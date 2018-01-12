@@ -1,0 +1,35 @@
+html, body {
+	min-height: 100%;
+}
+
+.container-main {
+	padding-left: 10%;
+	padding-right: 10%;
+}
+
+.screenlist {
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+
+.btn-screen {
+	margin-top: 0px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	margin-left: 0px;
+}
+
+.btn-screen-ctrl {
+	margin-right: 5px;
+}
+
+.btn-row {
+	padding-top: 15px;
+}
+
+.editor {
+}
+
+#content-input {
+	height: 50vh;
+}
