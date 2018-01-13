@@ -1,6 +1,5 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/includes/api_endpoints.php');
 ?>
 
 <footer class="container-fluid footer d-flex align-items-center">

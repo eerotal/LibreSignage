@@ -39,6 +39,6 @@
 	}
 
 	function error_and_exit($errcode) {
-		echo json_encode(array('error' => $errcode));
+		echo '{"error":'.$errcode.'}';
 		exit(0);
 	}
