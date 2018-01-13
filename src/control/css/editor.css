@@ -7,20 +7,20 @@ html, body {
 	padding-right: 10%;
 }
 
-.screenlist {
+.slidelist {
 	padding-top: 30px;
 	padding-bottom: 30px;
 }
 
-/* Screen save, new and remove button styling. */
-.btn-screen {
+/* Slide save, new and remove button styling. */
+.btn-slide {
 	margin-top: 0px;
 	margin-right: 10px;
 	margin-bottom: 10px;
 	margin-left: 0px;
 }
 
-.btn-screen-ctrl {
+.btn-slide-ctrl {
 	margin-right: 5px;
 }
 
@@ -33,7 +33,7 @@ html, body {
 	padding-top: 10px;
 }
 
-#content-input {
+#slide-input {
 	height: 50vh;
 }
 

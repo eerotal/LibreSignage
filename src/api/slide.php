@@ -38,7 +38,7 @@ class Slide {
 		$this->paths['config'] = $this->paths['dir'].
 					'/conf.json';
 		$this->paths['markup'] = $this->paths['dir'].
-					'/content.html';
+					'/markup.html';
 	}
 
 	private function _clear_paths() {
@@ -81,7 +81,7 @@ class Slide {
 			$this->_clear_paths();
 		}
 		if (!is_file($this->paths['markup'])) {
-			throw new Exception("Slide content doesn't ".
+			throw new Exception("Slide markup doesn't ".
 						"exist!");
 			$this->_clear_paths();
 		}

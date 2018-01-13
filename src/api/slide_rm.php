@@ -17,10 +17,10 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
 
 	header_plaintext();
-	$content_list = get_slides_id_list();
+	$slide_list = get_slides_id_list();
 
 	if (!empty($_POST['id']) &&
-		in_array($_POST['id'], $content_list)) {
+		in_array($_POST['id'], $slide_list)) {
 
 		if (!rmdir_recursive(LIBRESIGNAGE_ROOT.SLIDES_DIR
 				.'/'.$_POST['id'])) {

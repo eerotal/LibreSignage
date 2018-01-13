@@ -7,7 +7,7 @@
 	*    * id    = The ID of the slide.
 	*    * index = The index of the slide.
 	*    * time  = The amount of time the slide is shown.
-	*    * markup  = The HTML content of the slide.
+	*    * markup  = The markup of the slide.
 	*
 	*  Return value:
 	*    A JSON encoded array with the following keys:

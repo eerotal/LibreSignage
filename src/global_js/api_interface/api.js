@@ -1,19 +1,27 @@
 var API_ENDP = {
-	CONTENT_LIST: {
-		uri:	"/api/content_list.php",
+	SLIDE_LIST: {
+		uri:	"/api/slide_list.php",
 		method:	"GET"
 	},
-	CONTENT_GET: {
-		uri:	"/api/content_get.php",
+	SLIDE_GET: {
+		uri:	"/api/slide_get.php",
 		method: "GET"
 	},
-	CONTENT_MK: {
-		uri:	"/api/content_mk.php",
+	SLIDE_MK: {
+		uri:	"/api/slide_mk.php",
 		method: "POST"
 	},
-	CONTENT_RM: {
-		uri:	"/api/content_rm.php",
+	SLIDE_RM: {
+		uri:	"/api/slide_rm.php",
 		method: "POST"
+	},
+	LIBRARY_LICENSES: {
+		uri:	"/api/library_licenses.php",
+		method:	"GET"
+	},
+	LIBRESIGNAGE_LICENSE: {
+		uri:	"/api/libresignage_license.php",
+		methof:	"GET"
 	}
 }
 

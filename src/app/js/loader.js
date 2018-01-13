@@ -2,15 +2,15 @@ var _list_old = [];
 var _list_current = [];
 var _list_ready = false;
 
-var _content_old = [];
-var _content_current = [];
-var _content_ready = [];
+var _slides_old = [];
+var _slides_current = [];
+var _slides_ready = [];
 
-function content_get() {
-	if (_content_ready) {
-		return _content_current;
+function slides_get() {
+	if (_slides_ready) {
+		return _slides_current;
 	} else {
-		return _content_old;
+		return _slides_old;
 	}
 }
 
@@ -24,44 +24,44 @@ function list_get() {
 
 function list_retrieve(ready_callback) {
 	/*
-	*  Retrieve the current content list asynchronously.
+	*  Retrieve the current slide list asynchronously.
 	*  'ready_callback' is called after the list is ready.
 	*/
 	_list_ready = false;
 	_list_old = _list_current.slice();
 	_list_current = [];
-	api_call(API_ENDP.CONTENT_LIST, null, function(response) {
+	api_call(API_ENDP.SLIDE_LIST, null, function(response) {
 		_list_current = response;
 		_list_ready = true;
-		console.log("LibreSignage: Content list retrieved. (" +
-				_list_current.length + " screens)");
+		console.log("LibreSignage: Slide list retrieved. (" +
+				_list_current.length + " slides)");
 		if (ready_callback) {
 			ready_callback();
 		}
 	});
 }
 
-function content_retrieve(ready_callback) {
+function slides_retrieve(ready_callback) {
 	/*
-	*  Retrieve the content based on the current
-	*  content list asynchronously. 'ready_callback'
-	*  is called after all content is ready.
+	*  Retrieve the slides based on the current
+	*  slide list asynchronously. 'ready_callback'
+	*  is called after all slides are ready.
 	*/
 	var list = list_get();
-	_content_ready = false;
-	_content_old = _content_current.slice();
-	_content_current = [];
+	_slides_ready = false;
+	_slides_old = _slides_current.slice();
+	_slides_current = [];
 	for (i in list) {
-		api_call(API_ENDP.CONTENT_GET, {'id': list[i]}, function(response) {
+		api_call(API_ENDP.SLIDE_GET, {'id': list[i]}, function(response) {
 			if (response == null) { return; }
-			_content_current.push(response);
+			_slides_current.push(response);
 
-			if (_content_current.length == list.length) {
-				_content_ready = true;
-				console.log("LibreSignage: Content " +
+			if (_slides_current.length == list.length) {
+				_slides_ready = true;
+				console.log("LibreSignage: Slide " +
 						"retrieved. (" +
-						_content_current.length +
-						" screens)");
+						_slides_current.length +
+						" slides)");
 				if (ready_callback) {
 					ready_callback();
 				}

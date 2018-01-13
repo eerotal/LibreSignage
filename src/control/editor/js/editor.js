@@ -1,45 +1,45 @@
-var CONTENT_INPUT = $('#content-input');
-var _selected_screen = "";
+var SLIDE_INPUT = $('#slide-input');
+var _selected_slide = "";
 
-function screen_show(screen) {
-	console.log("LibreSignage: Show screen '" + screen + "'");
-	_selected_screen = screen;
+function slide_show(slide) {
+	console.log("LibreSignage: Show slide '" + slide + "'");
+	_selected_slide = slide;
 
-	api_call(API_ENDP.CONTENT_GET, {'id': screen}, function(response) {
+	api_call(API_ENDP.SLIDE_GET, {'id': slide}, function(response) {
 		if (!response || response.error) {
 			console.log("LibreSignage: API error!");
-			CONTENT_INPUT.val('');
+			SLIDE_INPUT.val('');
 			return;
 		}
-		CONTENT_INPUT.val(response.html);
+		SLIDE_INPUT.val(response.markup);
 	});
 }
 
-function screen_rm() {
-	if (!_selected_screen) {
-		alert("Please select a screen to remove first.");
+function slide_rm() {
+	if (!_selected_slide) {
+		alert("Please select a slide to remove first.");
 		return;
 	}
 
-	if (!confirm("Are you sure you want to delete the screen '" +
-		_selected_screen + "'.")) {
+	if (!confirm("Are you sure you want to delete the slide '" +
+		_selected_slide + "'.")) {
 		return;
 	}
 
-	api_call(API_ENDP.CONTENT_RM, {'id': _selected_screen},
+	api_call(API_ENDP.SLIDE_RM, {'id': _selected_slide},
 						function(response) {
 		if (!response || response.error) {
 			console.log("LibreSignage: API error!");
 			return;
 		}
 
-		$('#screen-btn-' + _selected_screen).remove();
+		$('#slide-btn-' + _selected_slide).remove();
 
-		console.log("LibreSignage: Deleted screen '" +
-				_selected_screen + "'.");
+		console.log("LibreSignage: Deleted slide '" +
+				_selected_slide + "'.");
 	});
 }
 
-function screen_mk() {
-	console.log("LibreSignage: Create screen!");
+function slide_mk() {
+	console.log("LibreSignage: Create slide!");
 }

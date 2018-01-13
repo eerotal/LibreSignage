@@ -1,7 +1,7 @@
-var CONTENT_RETRIEVE_INTERVAL = 30000;
+var SLIDES_RETRIEVE_INTERVAL = 30000;
 
 var display = $('#display');
-var c_screen = 0;
+var c_slide = 0;
 
 function renderer_animate(elem, animation, end_callback) {
 	/*
@@ -21,34 +21,33 @@ function renderer_animate(elem, animation, end_callback) {
 
 function renderer_update() {
 	/*
-	*  Render the next screen.
+	*  Render the next slide.
 	*/
-
-	var content = content_get();
-	if (!content.length) { return; }
+	var slides = slides_get();
+	if (!slides.length) { return; }
 
 	renderer_animate(display, 'swipe-left', function() {
-		display.html(content[c_screen].html);
+		display.html(slides[c_slide].markup);
 		renderer_animate(display, 'swipe-from-right', null);
 
-		console.log("LibreImage: Changing screen in " +
-				content[c_screen].time + "ms.");
+		console.log("LibreImage: Changing slide in " +
+				slides[c_slide].time + "ms.");
 
-		setTimeout(renderer_update, content[c_screen].time);
+		setTimeout(renderer_update, slides[c_slide].time);
 	});
 
-	if ((c_screen++) == content.length - 1) {
-		c_screen = 0;
+	if ((c_slide++) == slides.length - 1) {
+		c_slide = 0;
 	}
 }
 
 setInterval(function() {
-	list_retrieve(content_retrieve);
-}, CONTENT_RETRIEVE_INTERVAL);
+	list_retrieve(slides_retrieve);
+}, SLIDES_RETRIEVE_INTERVAL);
 
 // Start the renderer 'loop'.
 list_retrieve(function() {
-	content_retrieve(function() {
+	slides_retrieve(function() {
 		renderer_update();
 	});
 });

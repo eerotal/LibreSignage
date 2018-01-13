@@ -19,18 +19,18 @@
 			<div class="container-main container-fluid w-100 h-100 text-muted">
 				<?php
 					require_once($_SERVER['DOCUMENT_ROOT'].
-						'/control/editor/screenlist.php');
+						'/control/editor/slidelist.php');
 				?>
 				<div class="editor row container-fluid">
 					<div class="col-4">
-						<label for="content-name">Name</label>
-						<input class="form-control" id="content-name">
-						<label for="content-name">Time</label>
-						<input class="form-control" id="content-time">
+						<label for="slide-name">Name</label>
+						<input class="form-control" id="slide-name">
+						<label for="slide-name">Time</label>
+						<input class="form-control" id="slide-time">
 					</div>
 					<div class="col-8">
-						<label for="content-input">Content</label>
-						<textarea class="form-control" id="content-input">
+						<label for="slide-input">Markup</label>
+						<textarea class="form-control" id="slide-input">
 						</textarea>
 					</div>
 				</div>
