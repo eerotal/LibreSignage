@@ -12,6 +12,7 @@ html, body {
 	padding-bottom: 30px;
 }
 
+/* Screen save, new and remove button styling. */
 .btn-screen {
 	margin-top: 0px;
 	margin-right: 10px;
@@ -27,9 +28,12 @@ html, body {
 	padding-top: 15px;
 }
 
-.editor {
+/* Editor styling */
+.editor label {
+	padding-top: 10px;
 }
 
 #content-input {
 	height: 50vh;
 }
+

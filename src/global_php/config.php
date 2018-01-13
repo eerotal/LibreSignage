@@ -12,7 +12,7 @@
 	*  Paths relative to document root. DO NOT make these absolute
 	*  or system path information might be leaked to users.
 	*/
-	define("CONTENT_DIR", 				"/content");
+	define("SLIDES_DIR", 				"/content");
 	define("LIBRESIGNAGE_LICENSE_FILE_PATH",	"/doc/LICENSE.md");
 	define("LIBRARY_LICENSES_FILE_PATH",		"/doc/LIBRARY_LICENSES.md");
 	define("FOOTER_PATH",				"/global_php/footer.php");

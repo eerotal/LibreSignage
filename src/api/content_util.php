@@ -4,23 +4,7 @@
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/config.php');
-
-	function get_content_uri_list() {
-		$content_abs_dir = realpath(LIBRESIGNAGE_ROOT.'/'.CONTENT_DIR);
-		$content_files = scandir($content_abs_dir);
-		$content_files = array_values(array_diff($content_files,
-						array('.', '..')));
-		$i = 0;
-		while ($i < count($content_files)) {
-			if (substr($content_files[$i], 0, 1) == ".") {
-				array_splice($content_files, $i, 1);
-				continue;
-			}
-			$content_files[$i] = $content_files[$i];
-			$i++;
-		}
-		return $content_files;
-	}
+	require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/util.php');
 
 	function rmdir_recursive($path) {
 		/*

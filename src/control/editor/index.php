@@ -18,13 +18,21 @@
 		<main role="main" class="container-fluid h-100">
 			<div class="container-main container-fluid w-100 h-100 text-muted">
 				<?php
-					require_once($_SERVER['DOCUMENT_ROOT'].'/control/editor/screenlist.php');
+					require_once($_SERVER['DOCUMENT_ROOT'].
+						'/control/editor/screenlist.php');
 				?>
-				<div class="form-group container-fluid editor">
-					<form action="" method="post" id="content-editor-form">
+				<div class="editor row container-fluid">
+					<div class="col-4">
+						<label for="content-name">Name</label>
+						<input class="form-control" id="content-name">
+						<label for="content-name">Time</label>
+						<input class="form-control" id="content-time">
+					</div>
+					<div class="col-8">
 						<label for="content-input">Content</label>
-					</form>
-					<textarea name="content" form="content-editor-form" class="form-control" id="content-input"></textarea>
+						<textarea class="form-control" id="content-input">
+						</textarea>
+					</div>
 				</div>
 			</div>
 		</main>

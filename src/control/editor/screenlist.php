@@ -14,7 +14,8 @@
 						continue;
 					}
 
-					echo '<button type="button" class="btn btn-primary btn-screen" data-toggle="button"';
+					echo '<button type="button" class="btn btn-primary '.
+						'btn-screen" data-toggle="button"';
 
 					echo 'id="screen-btn-'.$content[$i].'"';
 					echo 'onclick="screen_show(\''.$content[$i].'\')">';
@@ -27,8 +28,12 @@
 	</div>
 	<div class="container-fluid row btn-row">
 		<div class="col-12">
-			<button type="button" class="btn btn-success btn-screen-ctrl" onclick="screen_mk()">New</button>
-			<button type="button" class="btn btn-danger btn-screen-ctrl" onclick="screen_rm()">Remove</button>
+			<button type="button" class="btn btn-success btn-screen-ctrl"
+					onclick="screen_save()">Save</button>
+			<button type="button" class="btn btn-success btn-screen-ctrl"
+					onclick="screen_mk()">New</button>
+			<button type="button" class="btn btn-danger btn-screen-ctrl"
+					onclick="screen_rm()">Remove</button>
 		</div>
 	</div>
 </div>
