@@ -25,6 +25,7 @@
 	$list = get_slides_id_list();
 
 	if (!empty($_GET['id']) && in_array($_GET['id'], $list)) {
+		// Get by ID.
 		$slide = new Slide();
 		try {
 			$slide->load($_GET['id']);

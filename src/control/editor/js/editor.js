@@ -17,26 +17,29 @@ function slide_show(slide) {
 
 function slide_rm() {
 	if (!_selected_slide) {
-		alert("Please select a slide to remove first.");
+		dialog_alert("Please select a slide", "Please select " +
+				"a slide to remove first.", null)
 		return;
 	}
 
-	if (!confirm("Are you sure you want to delete the slide '" +
-		_selected_slide + "'.")) {
-		return;
-	}
+	dialog_confirm("Delete slide?", "Are you sure you want " +
+			"to delete slide '" + _selected_slide + "'.",
+			function(status) {
+		if (status) {
+			api_call(API_ENDP.SLIDE_RM, {'id': _selected_slide},
+					function(response) {
+				if (!response || response.error) {
+					console.log("LibreSignage: API error!");
+					return;
+				}
 
-	api_call(API_ENDP.SLIDE_RM, {'id': _selected_slide},
-						function(response) {
-		if (!response || response.error) {
-			console.log("LibreSignage: API error!");
-			return;
+				$('#slide-btn-' + _selected_slide).remove();
+
+				console.log("LibreSignage: Deleted slide '" +
+						_selected_slide + "'.");
+				_selected_slide = "";
+			});
 		}
-
-		$('#slide-btn-' + _selected_slide).remove();
-
-		console.log("LibreSignage: Deleted slide '" +
-				_selected_slide + "'.");
 	});
 }
 

@@ -1,31 +1,41 @@
+/*
+*  LibreSignage API interface implementation.
+*  The functions defined in this file should be used to
+*  interface with the LibreSignage API.
+*/
+
 var API_ENDP = {
 	SLIDE_LIST: {
-		uri:	"/api/slide_list.php",
+		uri:	"/api/endpoint/slide_list.php",
 		method:	"GET"
 	},
 	SLIDE_GET: {
-		uri:	"/api/slide_get.php",
+		uri:	"/api/endpoint/slide_get.php",
 		method: "GET"
 	},
 	SLIDE_MK: {
-		uri:	"/api/slide_mk.php",
+		uri:	"/api/endpoint/slide_mk.php",
 		method: "POST"
 	},
 	SLIDE_RM: {
-		uri:	"/api/slide_rm.php",
+		uri:	"/api/endpoint/slide_rm.php",
 		method: "POST"
 	},
 	LIBRARY_LICENSES: {
-		uri:	"/api/library_licenses.php",
+		uri:	"/api/endpoint/library_licenses.php",
 		method:	"GET"
 	},
 	LIBRESIGNAGE_LICENSE: {
-		uri:	"/api/libresignage_license.php",
+		uri:	"/api/endpoint/libresignage_license.php",
 		methof:	"GET"
 	}
 }
 
 function _api_construct_param_str(params) {
+	/*
+	*  Construct the API call parameter string
+	*  from a dictionary of parameters.
+	*/
 	var ret = "";
 	for (var v in params) {
 		if (ret != "") {
@@ -39,6 +49,18 @@ function _api_construct_param_str(params) {
 }
 
 function api_call(endpoint, params, callback) {
+	/*
+	*  Call an API enpoint. The argument 'endpoint' should
+	*  be one of the enpoints defined in API_ENDP. 'params'
+	*  can be a dictionary of parameters to send with the
+	*  API call. Note that 'params' can't have arrays as
+	*  the parameter values at least as of yet. The 'callback'
+	*  parameter can be a function that is called after the
+	*  API call is complete. The parsed API response is passed
+	*  to the callback as the first argument. Both 'params' and
+	*  'callback' can be left null if they are not needed.
+	*/
+
 	var params_str = "";
 	var req = new XMLHttpRequest();
 

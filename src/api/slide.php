@@ -1,5 +1,11 @@
 <?php
 
+/*
+*  Slide object implementation and utility definitions.
+*  The Slide object is basically the interface between the raw
+*  file data and the API endpoints.
+*/
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/util.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/config.php');
 
