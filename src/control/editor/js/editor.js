@@ -17,14 +17,14 @@ function slide_show(slide) {
 
 function slide_rm() {
 	if (!_selected_slide) {
-		dialog_alert("Please select a slide", "Please select " +
+		dialog(DIALOG.ALERT, "Please select a slide", "Please select " +
 				"a slide to remove first.", null)
 		return;
 	}
 
-	dialog_confirm("Delete slide?", "Are you sure you want " +
+	dialog(DIALOG.CONFIRM, "Delete slide?", "Are you sure you want " +
 			"to delete slide '" + _selected_slide + "'.",
-			function(status) {
+			function(status, val) {
 		if (status) {
 			api_call(API_ENDP.SLIDE_RM, {'id': _selected_slide},
 					function(response) {
@@ -45,4 +45,22 @@ function slide_rm() {
 
 function slide_mk() {
 	console.log("LibreSignage: Create slide!");
+
+	dialog(DIALOG.PROMPT, "New slide", "Please enter a name for " +
+				"the new slide.",
+				function(status, value) {
+		var api_data = {
+			'id': value,
+			'time': 5000,
+			'markup': '<p></p>',
+			'index': 0
+		}
+		api_call(API_ENDP.SLIDE_MK, api_data, function(response) {
+			if (!response || response.error) {
+				console.log("LibreSignage: API error!");
+				return;
+			}
+			console.log("LibreSignage: Created slide '" + value + "'.");
+		});
+	});
 }

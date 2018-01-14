@@ -35,9 +35,6 @@
 						</textarea>
 					</div>
 				</div>
-				<?php
-					include($_SERVER['DOCUMENT_ROOT'].'/global_php/dialog.php');
-				?>
 			</div>
 		</main>
 		<?php

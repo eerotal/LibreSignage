@@ -1,4 +1,4 @@
-.dialog-overlay {
+#dialog-overlay {
 	position: absolute;
 
 	width: 100%;
@@ -15,7 +15,7 @@
 	background: rgba(145, 145, 145, 0.4);
 }
 
-.dialog {
+#dialog {
 	position: absolute;
 
 	width: 30%;
@@ -30,7 +30,12 @@
 	margin: 0;
 }
 
+#dialog-input {
+	margin-bottom: 20px;
+}
+
 .btn-dialog {
 	margin-left: 5px;
 	margin-right: 5px;
 }
+
