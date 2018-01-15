@@ -16,7 +16,6 @@
 	</head>
 	<body class="bg-dark">
 		<main role="main" class="container-fluid">
-			
 		</main>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
