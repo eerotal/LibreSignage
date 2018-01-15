@@ -137,8 +137,9 @@ class Slide {
 	function write() {
 		/*
 		*  Write the currently stored data into the
-		*  correct storage files. This function throws
-		*  exceptions on errors. No value is returned.
+		*  correct storage files. This function automatically
+		*  overwrites files if they already exist. On failure
+		*  exceptions are thrown.
 		*/
 		if (!file_exists($this->paths['dir']) ||
 			!is_dir($this->paths['dir'])) {

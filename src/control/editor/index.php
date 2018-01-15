@@ -23,13 +23,35 @@
 						'/control/editor/slidelist.php');
 				?>
 				<div class="editor row container-fluid">
-					<div class="col-4">
+					<div class="editor-controls" class="col">
 						<label for="slide-name">Name</label>
-						<input class="form-control" id="slide-name">
-						<label for="slide-name">Time</label>
-						<input class="form-control" id="slide-time">
+						<input class="form-control w-100" id="slide-name">
+						<label for="slide-time">Time (seconds)</label>
+						<select class="custom-select w-100" id="slide-time">
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10">10</option>
+						</select>
+						<label for="slide-index">Index</label>
+						<input class="form-control w-100" id="slide-index">
+						<div class="container-fluid btn-row d-flex justify-content-center">
+							<button type="button" class="btn btn-success btn-slide-ctrl"
+								onclick="slide_save()">Save</button>
+							<button type="button" class="btn btn-success btn-slide-ctrl"
+								onclick="slide_new()">New</button>
+							<button type="button" class="btn btn-danger btn-slide-ctrl"
+								onclick="slide_rm()">Remove</button>
+						</div>
+						<p id="editor-status"></p>
 					</div>
-					<div class="col-8">
+					<div class="slide-input-container col">
 						<label for="slide-input">Markup</label>
 						<textarea class="form-control" id="slide-input">
 						</textarea>
@@ -44,6 +66,7 @@
 		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+		<script src="/global_js/slide.js"></script>
 		<script src="/global_js/util.js"></script>
 		<script src="/global_js/dialog.js"></script>
 		<script src="/global_js/api_interface/api.js"></script>

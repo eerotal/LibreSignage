@@ -13,8 +13,8 @@ var API_ENDP = {
 		uri:	"/api/endpoint/slide_get.php",
 		method: "GET"
 	},
-	SLIDE_MK: {
-		uri:	"/api/endpoint/slide_mk.php",
+	SLIDE_SAVE: {
+		uri:	"/api/endpoint/slide_save.php",
 		method: "POST"
 	},
 	SLIDE_RM: {

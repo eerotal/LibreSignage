@@ -61,7 +61,7 @@
 	}
 	$params_sanitized['time'] = $tmp;
 
-	// TODO: Sanitize the markup!
+	// TODO: Sanitize & process the markup!
 	$params_sanitized['markup'] = $_POST['markup'];
 
 	$slide = new Slide();

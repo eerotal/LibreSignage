@@ -14,7 +14,7 @@
 					}
 
 					echo '<button type="button" class="btn btn-primary '.
-						'btn-slide" data-toggle="button"';
+						'btn-slide"';
 
 					echo 'id="slide-btn-'.$slides[$i].'"';
 					echo 'onclick="slide_show(\''.$slides[$i].'\')">';
@@ -23,16 +23,6 @@
 					$i++;
 				}
 			?>
-		</div>
-	</div>
-	<div class="container-fluid row btn-row">
-		<div class="col-12">
-			<button type="button" class="btn btn-success btn-slide-ctrl"
-					onclick="slide_save()">Save</button>
-			<button type="button" class="btn btn-success btn-slide-ctrl"
-					onclick="slide_mk()">New</button>
-			<button type="button" class="btn btn-danger btn-slide-ctrl"
-					onclick="slide_rm()">Remove</button>
 		</div>
 	</div>
 </div>

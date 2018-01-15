@@ -3,16 +3,24 @@ html, body {
 }
 
 .container-main {
-	padding-left: 10%;
-	padding-right: 10%;
+	padding-left: auto;
+	padding-right: auto;
 }
 
 .slidelist {
+	padding-left: 15px;
+	padding-right: 15px;
 	padding-top: 30px;
 	padding-bottom: 30px;
 }
 
-/* Slide save, new and remove button styling. */
+/* Controls styling. */
+.editor-controls {
+	min-width: 250px;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
 .btn-slide {
 	margin-top: 0px;
 	margin-right: 10px;
@@ -21,19 +29,37 @@ html, body {
 }
 
 .btn-slide-ctrl {
+	margin-left: 5px;
 	margin-right: 5px;
 }
 
 .btn-row {
 	padding-top: 15px;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 /* Editor styling */
+.editor {
+	margin: 0;
+}
+
 .editor label {
 	padding-top: 10px;
+}
+
+.slide-input-container {
+	min-width: 250px;
+	padding-left: 15px;
+	padding-right: 15px;
 }
 
 #slide-input {
 	height: 50vh;
 }
 
+#editor-status {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	text-align: center;
+}
