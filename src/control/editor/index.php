@@ -18,10 +18,10 @@
 	<body class="bg-dark">
 		<main role="main" class="container-fluid h-100">
 			<div class="container-main container-fluid w-100 h-100 text-muted">
-				<?php
-					require_once($_SERVER['DOCUMENT_ROOT'].
-						'/control/editor/slidelist.php');
-				?>
+				<div class="container-fluid row btn-row">
+					<div id="slidelist" class="col-12 d-flex flex-wrap">
+					</div>
+				</div>
 				<div class="editor row container-fluid">
 					<div class="editor-controls" class="col">
 						<label for="slide-name">Name</label>
@@ -70,6 +70,7 @@
 		<script src="/global_js/util.js"></script>
 		<script src="/global_js/dialog.js"></script>
 		<script src="/global_js/api_interface/api.js"></script>
+		<script src="/control/editor/js/slidelist.js"></script>
 		<script src="/control/editor/js/editor.js"></script>
 	</body>
 </html>

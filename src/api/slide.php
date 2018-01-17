@@ -72,6 +72,11 @@ class Slide {
 		return FALSE;
 	}
 
+	function clear() {
+		$this->_clear_data();
+		$this->_clear_paths();
+	}
+
 	function load(string $id) {
 		/*
 		*  Load the decoded data of a slide. This function
@@ -117,6 +122,10 @@ class Slide {
 			throw new Exception("Slide data is invalid!");
 			$this->_clear_data();
 		}
+	}
+
+	function get($key) {
+		return $this->data[$key];
 	}
 
 	function get_data() {

@@ -1,3 +1,4 @@
+var SLIDELIST_UPDATE_INTERVAL = 20000;
 
 // Some sane default values for new slides.
 var NEW_SLIDE_DEFAULTS = {
@@ -84,6 +85,7 @@ function slide_rm() {
 				console.log("LibreSignage: Deleted slide '" +
 						_selected_slide.get('id') + "'.");
 				_selected_slide = null;
+				slidelist_trigger_update();
 				clear_editor_controls();
 				set_editor_status("Slide deleted!");
 			});
@@ -138,5 +140,14 @@ function slide_save() {
 		}
 		console.log("LibreSignage: Saved slide '" + _selected_slide.get("id") + "'.");
 		set_editor_status("Saved!");
+		slidelist_trigger_update();
 	});
 }
+
+function setup() {
+	slidelist_trigger_update();
+	setInterval(slidelist_trigger_update,
+		SLIDELIST_UPDATE_INTERVAL);
+}
+
+setup();

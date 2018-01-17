@@ -7,7 +7,7 @@ html, body {
 	padding-right: auto;
 }
 
-.slidelist {
+#slidelist {
 	padding-left: 15px;
 	padding-right: 15px;
 	padding-top: 30px;

@@ -12,14 +12,14 @@
 	*    * markup  = The markup of the slide.
 	*
 	*  Return value:
-	*    A JSON encoded array with the following keys:
+	*    A JSON encoded dictionary with the following keys:
 	*     * id     = The ID of the created slide. **
 	*     * name   = The name of the slide. **
 	*     * index  = The index of the created slide. **
 	*     * time   = The amount of time the slide is shown. **
 	*     * error  = An error code or API_E_OK on success. ***
 	*
-	*   **  (Only exists when the call was successful.)
+	*   **  (Only exists if the call was successful.)
 	*   *** (The error codes are listed in api_errors.php.)
 	*/
 
