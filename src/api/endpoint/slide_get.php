@@ -8,6 +8,7 @@
 	*  Return value:
 	*    A JSON encoded dictionary with the following data.
 	*      * id      = The ID of the slide. **
+	*      * name    = The name of the slide. **
 	*      * index   = The index of the slide. **
 	*      * time    = The time the slide is shown. **
 	*      * markup  = The markup of the slide. **

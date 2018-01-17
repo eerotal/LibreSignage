@@ -1,7 +1,8 @@
 
 // Some sane default values for new slides.
 var NEW_SLIDE_DEFAULTS = {
-	'id': '',
+	'id': '__API_K_NULL__',
+	'name': 'New Slide',
 	'time': 5000,
 	'markup': '<p></p>',
 	'index': 0
@@ -13,7 +14,7 @@ var SLIDE_TIME = $("#slide-time");
 var SLIDE_INDEX = $("#slide-index");
 var EDITOR_STATUS = $("#editor-status");
 
-var _selected_slide = new Slide();
+var _selected_slide = null;
 
 function set_editor_status(str) {
 	EDITOR_STATUS.text(str);
@@ -36,6 +37,7 @@ function clear_editor_controls() {
 function slide_show(slide) {
 	console.log("LibreSignage: Show slide '" + slide + "'");
 
+	_selected_slide = new Slide();
 	_selected_slide.load(slide, function(ret) {
 		if (!ret) {
 			console.log("LibreSignage: API error!");
@@ -47,7 +49,7 @@ function slide_show(slide) {
 		SLIDE_INPUT.val(_selected_slide.get('markup'));
 		SLIDE_INPUT.prop("disabled", false);
 
-		SLIDE_NAME.val(_selected_slide.get('id'));
+		SLIDE_NAME.val(_selected_slide.get('name'));
 		SLIDE_NAME.prop("disabled", false);
 
 		SLIDE_TIME.val(_selected_slide.get('time')/1000);
@@ -67,7 +69,7 @@ function slide_rm() {
 	set_editor_status("Deleting slide...");
 
 	dialog(DIALOG.CONFIRM, "Delete slide?", "Are you sure you want " +
-			"to delete slide '" + _selected_slide.get("id") + "'.",
+			"to delete slide '" + _selected_slide.get("name") + "'.",
 			function(status, val) {
 		if (status) {
 			_selected_slide.remove(null, function(ret) {
@@ -81,7 +83,7 @@ function slide_rm() {
 
 				console.log("LibreSignage: Deleted slide '" +
 						_selected_slide.get('id') + "'.");
-				_selected_slide.clear();
+				_selected_slide = null;
 				clear_editor_controls();
 				set_editor_status("Slide deleted!");
 			});
@@ -93,13 +95,13 @@ function slide_new() {
 	console.log("LibreSignage: Create slide!");
 	set_editor_status("Creating new slide...");
 
-	_selected_slide.clear();
+	_selected_slide = new Slide();
 	_selected_slide.set(NEW_SLIDE_DEFAULTS);
 
 	SLIDE_INPUT.val(_selected_slide.get('markup'));
 	SLIDE_INPUT.prop("disabled", false);
 
-	SLIDE_NAME.val(_selected_slide.get('id'));
+	SLIDE_NAME.val(_selected_slide.get('name'));
 	SLIDE_NAME.prop("disabled", false);
 
 	SLIDE_TIME.val(_selected_slide.get('time')/1000);
@@ -116,7 +118,7 @@ function slide_save() {
 	set_editor_status("Saving...");
 
 	var ret = _selected_slide.set({
-		'id': SLIDE_NAME.val(),
+		'name': SLIDE_NAME.val(),
 		'time': SLIDE_TIME.val()*1000,
 		'index': SLIDE_INDEX.val(),
 		'markup': SLIDE_INPUT.val()

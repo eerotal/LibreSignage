@@ -5,6 +5,7 @@
 
 var SLIDE_REQ_KEYS = [
 	'id',
+	'name',
 	'time',
 	'index',
 	'markup'
@@ -12,15 +13,13 @@ var SLIDE_REQ_KEYS = [
 
 function Slide() {
 	this.data = {};
-	this.REQ_KEYS = SLIDE_REQ_KEYS;
 
 	this._verify = function(data) {
 		/*
-		*  Verify the data of this slide.
+		*  Verify the slide data in 'data'.
 		*/
-
-		for (k in data) {
-			if (!this.REQ_KEYS.includes(k)) {
+		for (k in SLIDE_REQ_KEYS) {
+			if (!(SLIDE_REQ_KEYS[k] in data)) {
 				return false;
 			}
 		}
@@ -47,9 +46,9 @@ function Slide() {
 				return;
 			}
 
-			for (k in slide.REQ_KEYS) {
-				slide.data[slide.REQ_KEYS[k]] =
-					response[slide.REQ_KEYS[k]];
+			for (k in SLIDE_REQ_KEYS) {
+				slide.data[SLIDE_REQ_KEYS[k]] =
+					response[SLIDE_REQ_KEYS[k]];
 			}
 
 			if (!slide._verify(slide.data)) {
@@ -92,23 +91,19 @@ function Slide() {
 	this.set = function(data) {
 		/*
 		*  Copy the slide data from 'data' to this
-		*  object's data dictionary. Only the valid
-		*  data keys are copied. If required keys
-		*  are missing from the 'data' dictionary, no
-		*  data is copied and this function returns false.
-		*  On success true is returned.
+		*  object's data dictionary overwriting existing
+		*  data. After the data has been set, this
+		*  function returns true if the data in this object
+		*  is valid and false otherwise.
 		*/
 
-		if (!this._verify(data)) {
-			return false;
+		for (k in SLIDE_REQ_KEYS) {
+			if (SLIDE_REQ_KEYS[k] in data) {
+				this.data[SLIDE_REQ_KEYS[k]] =
+					data[SLIDE_REQ_KEYS[k]];
+			}
 		}
-
-		for (k in this.REQ_KEYS) {
-			this.data[this.REQ_KEYS[k]] =
-				data[this.REQ_KEYS[k]];
-		}
-
-		return true;
+		return this._verify(this.data);
 	}
 
 	this.remove = function(id, callback) {
@@ -120,8 +115,9 @@ function Slide() {
 		*  is called. The callback function is passed true
 		*  as the first argument if the API call succeeded
 		*  and false is passed otherwise. 'callback' is also
-		*  called with false if 'id' isn't defined and no slide
-		*  is loaded.
+		*  called with false if 'id' isn't defined, no slide
+		*  is loaded or the current slide doesn't have an ID
+		*  (meaning it isn't saved yet).
 		*/
 
 		var r_id = "";
