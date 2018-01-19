@@ -22,10 +22,7 @@ html, body {
 }
 
 .btn-slide {
-	margin-top: 0px;
-	margin-right: 10px;
-	margin-bottom: 10px;
-	margin-left: 0px;
+	margin: 5px 5px 5px 5px;
 }
 
 .btn-slide-ctrl {
@@ -42,6 +39,7 @@ html, body {
 /* Editor styling */
 .editor {
 	margin: 0;
+	margin-bottom: 30px;
 }
 
 .editor label {
