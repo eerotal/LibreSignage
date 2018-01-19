@@ -39,6 +39,61 @@ function get_slides_id_list() {
 	return $slide_ids;
 }
 
+function get_slides_list() {
+	$slide_ids = get_slides_id_list();
+	$slides = array();
+
+	for ($i = 0; $i < count($slide_ids); $i++) {
+		$slides[$i] = new Slide();
+		$slides[$i]->load($slide_ids[$i]);
+	}
+	return $slides;
+}
+
+function sort_slides_by_index(array &$slides) {
+	usort($slides, function(Slide $a, Slide $b) {
+		if ($a->get('index') > $b->get('index')) {
+			return 1;
+		} else if ($a->get('index') < $b->get('index')) {
+			return -1;
+		} else {
+			return 0;
+		}
+	});
+}
+
+function juggle_slide_indices(string $force_index_for) {
+	/*
+	*  Recalculate the slide indices so that the indices
+	*  for $force_index_for and the slides before it stay
+	*  the same and the indices after $force_index_for are
+	*  incremented by one. This function throws exceptions
+	*  on errors.
+	*/
+	$forced_index = -1;
+
+	$slides = get_slides_list();
+	sort_slides_by_index($slides);
+
+	foreach($slides as $s) {
+		if ($s->get('id') == $force_index_for) {
+			$forced_index = $s->get('index');
+			break;
+		}
+	}
+	if ($forced_index == -1) {
+		throw new Exception("Slide ID not found in slides list!");
+	}
+
+	foreach ($slides as $s) {
+		if ($s->get('id') != $force_index_for &&
+			$s->get('index') >= $forced_index) {
+			$s->set('index', $s->get('index') + 1);
+		}
+		$s->write();
+	}
+}
+
 class Slide {
 	public $REQ_KEYS = SLIDE_REQ_KEYS;
 	private $paths = NULL;
@@ -136,7 +191,17 @@ class Slide {
 		return json_encode($this->data);
 	}
 
-	function set(array $data) {
+	function set($key, $val) {
+		/*
+		*  Set the slide data key $key to $val.
+		*  Returns the result of this->_verify()
+		*  on the slide data afterwards.
+		*/
+		$this->data[$key] = $val;
+		return $this->_verify($this->data);
+	}
+
+	function set_data(array $data) {
 		/*
 		*  Set the slide data. This function automatically
 		*  verifies the data after it has been set and returns

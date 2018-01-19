@@ -73,7 +73,7 @@
 
 	/*
 	*  If a slide ID is supplied *attempt* to use it.
-	*  The $slide->set() function will do further checks
+	*  The $slide->set_data() function will do further checks
 	*  on whether the ID is actually valid.
 	*/
 	$tmp = parse_api_constants($_POST['id']);
@@ -83,7 +83,7 @@
 		error_and_exit(API_E_INVALID_REQUEST);
 	}
 
-	if (!$slide->set($params_sanitized)) {
+	if (!$slide->set_data($params_sanitized)) {
 		/*
 		*  Fails on missing parameters or if the
 		*  provided ID doesn't exist.
@@ -96,6 +96,8 @@
 	} catch (Exception $e) {
 		error_and_exit(API_E_INTERNAL);
 	}
+
+	juggle_slide_indices($slide->get('id'));
 
 	$ret = $slide->get_data();
 	$ret['error'] = API_E_OK;
