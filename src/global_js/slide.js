@@ -72,7 +72,7 @@ function Slide() {
 		*  first argument if the API call was successful
 		*  and false is passed otherwise.
 		*/
-
+		var slide = this;
 		api_call(API_ENDP.SLIDE_SAVE, this.data,
 				function(response) {
 			if (!response || response.error) {
@@ -82,6 +82,17 @@ function Slide() {
 				}
 				return;
 			}
+
+			if (!slide._verify(response)) {
+				console.error("LibreSignage: " +
+					"Invalid API response.");
+				if (callback) {
+					callback(false);
+				}
+				return;
+			}
+
+			slide.set(response);
 			if (callback) {
 				callback(true);
 			}

@@ -42,11 +42,11 @@
 						<label for="slide-index">Index</label>
 						<input class="form-control w-100" id="slide-index">
 						<div class="container-fluid btn-row d-flex justify-content-center">
-							<button type="button" class="btn btn-success btn-slide-ctrl"
+							<button id="btn-slide-save" type="button" class="btn btn-success btn-slide-ctrl"
 								onclick="slide_save()">Save</button>
-							<button type="button" class="btn btn-success btn-slide-ctrl"
+							<button id="btn-slide-new" type="button" class="btn btn-success btn-slide-ctrl"
 								onclick="slide_new()">New</button>
-							<button type="button" class="btn btn-danger btn-slide-ctrl"
+							<button id="btn-slide-remove" type="button" class="btn btn-danger btn-slide-ctrl"
 								onclick="slide_rm()">Remove</button>
 						</div>
 						<p id="editor-status"></p>
