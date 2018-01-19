@@ -6,9 +6,9 @@
 *  file data and the API endpoints.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/util.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/uid.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/uid.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
 /*
 *  These are the required data keys that a slide must contain in

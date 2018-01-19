@@ -17,7 +17,7 @@
 	*    *** (The error codes are listed in api_errors.php.)
 	*/
 
-	require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/util.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_util.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_errors.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');

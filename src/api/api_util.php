@@ -3,8 +3,8 @@
 	*  API utility functions.
 	*/
 
-	require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/util.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
 	function rmdir_recursive($path) {
 		/*

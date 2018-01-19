@@ -1,5 +1,5 @@
 <?php
-	require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/config.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,7 +9,7 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 		<link rel="stylesheet" href="/app/css/renderer.css">
 		<link rel="stylesheet" href="/app/css/display.css">
-		<link rel="stylesheet" href="/global_css/footer_minimal.css">
+		<link rel="stylesheet" href="/common/css/footer_minimal.css">
 		<title>LibreSignage Display</title>
 	</head>
 	<body class="bg-dark">
@@ -23,8 +23,8 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
 
-		<script src="/global_js/util.js"></script>
-		<script src="/global_js/api.js"></script>
+		<script src="/common/js/util.js"></script>
+		<script src="/common/js/api.js"></script>
 		<script src="/app/js/loader.js"></script>
 		<script src="/app/js/renderer.js"></script>
 	</body>
