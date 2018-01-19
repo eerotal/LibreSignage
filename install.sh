@@ -18,7 +18,7 @@ if [ -n "$(ls -a $1)" ]; then
 	echo 'Install directory is not empty.'
 	read -p 'Remove existing files and continue? (Y\N)' read_val
 	case $read_val in
-		[Yy]* ) rm -rf $1/*; libresignage_install $1; break;;
+		[Yy]* ) rm -rfv $1/*; libresignage_install $1; break;;
 		* ) echo 'Aborting install!'; exit 1;;
 	esac
 fi

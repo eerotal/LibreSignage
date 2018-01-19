@@ -9,7 +9,7 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/config.php');
 
 	define('UID_MAX_SIZE',	PHP_INT_SIZE);
-	define('UID_FILE',	LIBRESIGNAGE_ROOT.'/data/uid.dat');
+	define('UID_FILE',	LIBRESIGNAGE_ROOT.'/data/uid/uid.dat');
 
 	function _uid_next(string $current_uid) {
 		$tmp = preg_replace('/^0x/', '', $current_uid);

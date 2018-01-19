@@ -1,7 +1,7 @@
 <?php
 	/*
 	*
-	*  An API handle to get specific data keys from all of the
+	*  An API handle to query specific data keys from all of the
 	*  currently existing slides.
 	*
 	*  GET parameters:

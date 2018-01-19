@@ -69,7 +69,7 @@
 		<script src="/global_js/slide.js"></script>
 		<script src="/global_js/util.js"></script>
 		<script src="/global_js/dialog.js"></script>
-		<script src="/global_js/api_interface/api.js"></script>
+		<script src="/global_js/api.js"></script>
 		<script src="/control/editor/js/slidelist.js"></script>
 		<script src="/control/editor/js/editor.js"></script>
 	</body>

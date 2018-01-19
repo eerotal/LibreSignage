@@ -9,8 +9,8 @@ var API_ENDP = {
 		uri:	"/api/endpoint/slide_list.php",
 		method:	"GET"
 	},
-	SLIDE_NAMES: {
-		uri:	"/api/endpoint/slide_names.php",
+	SLIDE_DATA_QUERY: {
+		uri:	"/api/endpoint/slide_data_query.php",
 		method:	"GET"
 	},
 	SLIDE_GET: {

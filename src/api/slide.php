@@ -7,7 +7,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/util.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/UID/uid_gen.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/uid.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/global_php/config.php');
 
 /*
