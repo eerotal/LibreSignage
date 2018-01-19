@@ -25,7 +25,7 @@
 				<div class="editor row container-fluid d-flex justify-content-center">
 					<div class="editor-controls" class="col">
 						<label for="slide-name">Name</label>
-						<input class="form-control w-100" id="slide-name">
+						<input type="text" class="form-control w-100" id="slide-name">
 						<label for="slide-time">Time (seconds)</label>
 						<select class="custom-select w-100" id="slide-time">
 							<option value="1">1</option>
@@ -40,7 +40,7 @@
 							<option value="10">10</option>
 						</select>
 						<label for="slide-index">Index</label>
-						<input class="form-control w-100" id="slide-index">
+						<input type="number" min="0" class="form-control w-100" id="slide-index">
 						<div class="container-fluid btn-row d-flex justify-content-center">
 							<button id="btn-slide-save" type="button" class="btn btn-success btn-slide-ctrl"
 								onclick="slide_save()">Save</button>

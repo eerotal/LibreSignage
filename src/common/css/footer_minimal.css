@@ -1,0 +1,25 @@
+:root {
+	--footer-height: 40px;
+}
+
+html {
+	position: relative;
+	min-height: 100%;
+}
+
+body {
+	margin-bottom: var(--footer-height);
+}
+
+.footer {
+	position: absolute;
+	bottom: 0;
+	height: var(--footer-height);
+	text-align: right;
+}
+
+.footer-content {
+	line-height: var(--footer-height);
+	padding-left: 15px;
+	padding-right: 15px;
+}
