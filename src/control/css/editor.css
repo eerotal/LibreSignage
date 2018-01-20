@@ -15,25 +15,14 @@ html, body {
 }
 
 /* Controls styling. */
-.editor-controls {
-	min-width: 250px;
-	padding-left: 15px;
-	padding-right: 15px;
-}
-
 .btn-slide {
 	margin: 5px 5px 5px 5px;
 }
 
 .btn-slide-ctrl {
+	margin-top: 15px;
 	margin-left: 5px;
 	margin-right: 5px;
-}
-
-.btn-row {
-	padding-top: 15px;
-	padding-left: 0;
-	padding-right: 0;
 }
 
 /* Editor styling */
@@ -44,12 +33,6 @@ html, body {
 
 .editor label {
 	padding-top: 10px;
-}
-
-.slide-input-container {
-	min-width: 250px;
-	padding-left: 15px;
-	padding-right: 15px;
 }
 
 #slide-input {

@@ -18,12 +18,12 @@
 	<body class="bg-dark">
 		<main role="main" class="container-fluid h-100">
 			<div class="container-main container-fluid w-100 h-100 text-muted">
-				<div class="container-fluid row btn-row m-0">
+				<div class="container-fluid btn-row m-0">
 					<div id="slidelist" class="col-12 d-flex flex-wrap justify-content-center">
 					</div>
 				</div>
-				<div class="editor row container-fluid d-flex justify-content-center">
-					<div class="editor-controls" class="col">
+				<div class="editor row container-fluid">
+					<div class="col-md-auto">
 						<label for="slide-name">Name</label>
 						<input type="text" class="form-control w-100" id="slide-name">
 						<label for="slide-time">Time (seconds)</label>
@@ -41,7 +41,7 @@
 						</select>
 						<label for="slide-index">Index</label>
 						<input type="number" min="0" class="form-control w-100" id="slide-index">
-						<div class="container-fluid btn-row d-flex justify-content-center">
+						<div class="container-fluid d-flex justify-content-center">
 							<button id="btn-slide-save" type="button" class="btn btn-success btn-slide-ctrl"
 								onclick="slide_save()">Save</button>
 							<button id="btn-slide-new" type="button" class="btn btn-success btn-slide-ctrl"
@@ -49,9 +49,13 @@
 							<button id="btn-slide-remove" type="button" class="btn btn-danger btn-slide-ctrl"
 								onclick="slide_rm()">Remove</button>
 						</div>
+						<div class="container-fluid d-flex justify-content-center">
+							<button id="btn-slide-preview" type="button" class="btn btn-success btn-slide-ctrl"
+								onclick="slide_preview()">Preview Slide</button>
+						</div>
 						<p id="editor-status"></p>
 					</div>
-					<div class="slide-input-container col">
+					<div class="col-md">
 						<label for="slide-input">Markup</label>
 						<textarea class="form-control" id="slide-input">
 						</textarea>
