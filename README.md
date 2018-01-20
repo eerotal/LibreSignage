@@ -1,14 +1,13 @@
-# LibreSignage - An open web based Info TV system
+# LibreSignage - An open source digital signage solution
 
-LibreSignage is a free and open source Info TV system based on a simple HTTP
-webserver model where the server hosts the Info TV content so that the 
-clients only need have web browsers installed. This also makes it
-possible to remotely edit the information screens using a web interface
-(which is not yet implemented).
+LibreSignage is a free and open source, lightweight and easy-to-use digital
+signage solution. LibreSignage runs on a HTTP web server serving content to
+normal web browsers that can be used to display the content on a variety of
+different devices. This makes it possible to use LibreSignage on basically
+any device that has acccess to the internet and that can display web pages.
 
 LibreSignage is under heavy development and it shouldn't be used for
-production or anything important.
-
+production or anything important yet.
 
 ## Used libraries
 
