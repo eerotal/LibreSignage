@@ -1,7 +1,7 @@
-var DEFAULT_RENDERER_UPDATE_INTERVAL = 5000;
-var SLIDES_RETRIEVE_INTERVAL = 30000;
+const DEFAULT_RENDERER_UPDATE_INTERVAL = 5000;
+const SLIDES_RETRIEVE_INTERVAL = 30000;
+const DISPLAY = $('#display');
 
-var display = $('#display');
 var c_slide = null;
 
 function _renderer_next_slide(c_slide, wrap) {
@@ -61,7 +61,7 @@ function renderer_update() {
 	var slides = slides_get();
 	if (!slides.length) { return; }
 
-	renderer_animate(display, 'swipe-left', function() {
+	renderer_animate(DISPLAY, 'swipe-left', function() {
 		c_slide = _renderer_next_slide(c_slide, true);
 		if (!c_slide) {
 			/*
@@ -72,9 +72,9 @@ function renderer_update() {
 				DEFAULT_RENDERER_UPDATE_INTERVAL);
 			return;
 		}
-		display.html(c_slide.markup);
+		DISPLAY.html(c_slide.markup);
 
-		renderer_animate(display, 'swipe-from-right', null);
+		renderer_animate(DISPLAY, 'swipe-from-right', null);
 
 		console.log("LibreImage: Changing slide in " +
 				c_slide.time + "ms.");
@@ -83,14 +83,32 @@ function renderer_update() {
 	});
 }
 
-setInterval(function() {
-	list_retrieve(slides_retrieve);
-}, SLIDES_RETRIEVE_INTERVAL);
+// --- Setup ---
+var params = get_GET_parameters();
 
-// Start the renderer 'loop'.
-list_retrieve(function() {
-	slides_retrieve(function() {
-		renderer_update();
+if ("preview" in params) {
+	// Preview a slide without starting the renderer.
+	console.log("LibreSignage: Preview slide " +
+			params["preview"] + ".");
+	var slide = new Slide();
+	slide.load(params["preview"], function(ret) {
+		if (!ret) {
+			console.log("LibreSignage: Failed to " +
+					"preview slide!");
+			return;
+		}
+		DISPLAY.html(slide.get("markup"));
 	});
-});
+} else {
+	// Start the normal renderer 'loop'.
+	console.log("LibreSignage: Start the renderer loop.");
+	setInterval(function() {
+		list_retrieve(slides_retrieve);
+	}, SLIDES_RETRIEVE_INTERVAL);
 
+	list_retrieve(function() {
+		slides_retrieve(function() {
+			renderer_update();
+		});
+	});
+}

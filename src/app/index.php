@@ -24,6 +24,7 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
 
 		<script src="/common/js/util.js"></script>
+		<script src="/common/js/slide.js"></script>
 		<script src="/common/js/api.js"></script>
 		<script src="/app/js/loader.js"></script>
 		<script src="/app/js/renderer.js"></script>

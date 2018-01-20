@@ -79,3 +79,26 @@ function array_next(arr, current, val_getter, start_val, no_next) {
 	return sel;
 
 }
+
+function get_GET_parameters() {
+	/*
+	*  Get the HTTP GET parameters in an associative array.
+	*/
+	var query_str = window.location.search.substr(1);
+	var params_strs = [];
+	var params = [];
+	var tmp = [];
+
+	if (!query_str.length) {
+		return [];
+	} else {
+		params_strs = query_str.split('&');
+	}
+
+	for (var i in params_strs) {
+		tmp = params_strs[i].split('=');
+		params[decodeURIComponent(tmp[0])] =
+			decodeURIComponent(tmp[1]);
+	}
+	return params;
+}

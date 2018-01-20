@@ -1,7 +1,7 @@
-var SLIDELIST_UPDATE_INTERVAL = 20000;
+const SLIDELIST_UPDATE_INTERVAL = 20000;
 
 // Some sane default values for new slides.
-var NEW_SLIDE_DEFAULTS = {
+const NEW_SLIDE_DEFAULTS = {
 	'id': '__API_K_NULL__',
 	'name': 'New Slide',
 	'time': 5000,
@@ -9,13 +9,13 @@ var NEW_SLIDE_DEFAULTS = {
 	'index': 0
 };
 
-var SLIDE_SAVE = $("#btn-slide-save");
-var SLIDE_REMOVE = $("#btn-slide-remove");
-var SLIDE_INPUT = $("#slide-input");
-var SLIDE_NAME = $("#slide-name");
-var SLIDE_TIME = $("#slide-time");
-var SLIDE_INDEX = $("#slide-index");
-var EDITOR_STATUS = $("#editor-status");
+const SLIDE_SAVE = $("#btn-slide-save");
+const SLIDE_REMOVE = $("#btn-slide-remove");
+const SLIDE_INPUT = $("#slide-input");
+const SLIDE_NAME = $("#slide-name");
+const SLIDE_TIME = $("#slide-time");
+const SLIDE_INDEX = $("#slide-index");
+const EDITOR_STATUS = $("#editor-status");
 
 var _selected_slide = null;
 
@@ -72,7 +72,7 @@ function slide_show(slide) {
 function slide_rm() {
 	if (!_selected_slide) {
 		dialog(DIALOG.ALERT, "Please select a slide", "Please select " +
-				"a slide to remove first.", null)
+				"a slide to remove first.", null);
 		return;
 	}
 	set_editor_status("Deleting slide...");
@@ -161,11 +161,31 @@ function slide_save() {
 	});
 }
 
-function setup() {
+function slide_preview() {
+	/*
+	*  Preview the current slide in a new window.
+	*/
+	if (_selected_slide) {
+		if (_selected_slide.get('id') != "__API_K_NULL__") {
+			window.open("/app/?preview=" +
+				_selected_slide.get('id'));
+		} else {
+			dialog(DIALOG.ALERT, "Please save the slide first",
+				"Slides can't be previewed before they " +
+				"are saved.", null);
+		}
+	} else {
+		dialog(DIALOG.ALERT, "Please select a slide",
+			"Please select a slide to preview first.", null);
+	}
+}
+
+
+function editor_setup() {
 	disable_editor_controls(); // Disable inputs.
 	slidelist_trigger_update();
 	setInterval(slidelist_trigger_update,
 		SLIDELIST_UPDATE_INTERVAL);
 }
 
-setup();
+editor_setup();
