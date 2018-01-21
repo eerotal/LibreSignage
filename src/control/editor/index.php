@@ -25,9 +25,18 @@
 				<div class="editor row container-fluid">
 					<div class="col-md-auto">
 						<label for="slide-name">Name</label>
-						<input type="text" class="form-control w-100" id="slide-name">
+						<input type="text"
+							class="form-control w-100"
+							id="slide-name"
+							data-toggle="tooltip"
+							title="The name of the slide. This is only visible in the editor.">
+
 						<label for="slide-time">Time (seconds)</label>
-						<select class="custom-select w-100" id="slide-time">
+						<select class="custom-select w-100"
+							id="slide-time"
+							data-toggle="tooltip"
+							title="The time the slide is shown in seconds.">
+
 							<option value="1">1</option>
 							<option value="2">2</option>
 							<option value="3">3</option>
@@ -39,19 +48,42 @@
 							<option value="9">9</option>
 							<option value="10">10</option>
 						</select>
+
 						<label for="slide-index">Index</label>
-						<input type="number" min="0" class="form-control w-100" id="slide-index">
+						<input type="number"
+							min="0"
+							class="form-control w-100"
+							id="slide-index"
+							data-toggle="tooltip"
+							title="The ordinal number of the slide. 0 is the first slide.">
+
 						<div class="container-fluid d-flex justify-content-center">
-							<button id="btn-slide-save" type="button" class="btn btn-success btn-slide-ctrl"
-								onclick="slide_save()">Save</button>
-							<button id="btn-slide-new" type="button" class="btn btn-success btn-slide-ctrl"
-								onclick="slide_new()">New</button>
-							<button id="btn-slide-remove" type="button" class="btn btn-danger btn-slide-ctrl"
-								onclick="slide_rm()">Remove</button>
+							<button id="btn-slide-save"
+								type="button"
+								class="btn btn-success btn-slide-ctrl"
+								onclick="slide_save()"
+								data-toggle="tooltip"
+								title="Save the selected slide.">Save</button>
+							<button id="btn-slide-new"
+								type="button"
+								class="btn btn-success btn-slide-ctrl"
+								onclick="slide_new()"
+								data-toggle="tooltip"
+								title="Create a new slide.">New</button>
+							<button id="btn-slide-remove"
+								type="button"
+								class="btn btn-danger btn-slide-ctrl"
+								onclick="slide_rm()"
+								data-toggle="tooltip"
+								title="Remove the selected slide.">Remove</button>
 						</div>
 						<div class="container-fluid d-flex justify-content-center">
-							<button id="btn-slide-preview" type="button" class="btn btn-success btn-slide-ctrl"
-								onclick="slide_preview()">Preview Slide</button>
+							<button id="btn-slide-preview"
+								type="button"
+								class="btn btn-success btn-slide-ctrl"
+								onclick="slide_preview()"
+								data-toggle="tooltip"
+								title="Preview the selected slide in a new window.">Preview Slide</button>
 						</div>
 						<p id="editor-status"></p>
 					</div>

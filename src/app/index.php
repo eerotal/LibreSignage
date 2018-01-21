@@ -26,6 +26,7 @@
 		<script src="/common/js/util.js"></script>
 		<script src="/common/js/slide.js"></script>
 		<script src="/common/js/api.js"></script>
+		<script src="/common/js/markup.js"></script>
 		<script src="/app/js/loader.js"></script>
 		<script src="/app/js/renderer.js"></script>
 	</body>
