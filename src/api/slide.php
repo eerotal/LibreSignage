@@ -62,35 +62,96 @@ function sort_slides_by_index(array &$slides) {
 	});
 }
 
+function normalize_slide_indices(array &$slides) {
+	/*
+	*  Sort the slide array $slides and recalculate
+	*  the slide indices so that no unused indices remain.
+	*  This function works on the $slides array reference
+	*  and doesn't return any value.
+	*/
+	sort_slides_by_index($slides);
+	for ($i = 0; $i < count($slides); $i++) {
+		$s = $slides[$i];
+		$s->set('index', $i);
+	}
+}
+
 function juggle_slide_indices(string $force_index_for) {
 	/*
-	*  Recalculate the slide indices so that the indices
-	*  for $force_index_for and the slides before it stay
-	*  the same and the indices after $force_index_for are
-	*  incremented by one. This function throws exceptions
-	*  on errors.
+	*  Recalculate slide indices and preserve the apparent
+	*  index of the slide with the ID $force_index_for but
+	*  do it so that no unused indices remain.
+	*  If $force_index_for is not set, the slide indices
+	*  are just recalculated so that no unused indices remain.
+	*  Below is an illustration of how this algorithm works.
+	*  The lines represent arrays of slide indices.
+	*
+	*  F = forced index (= eg. 3)
+	*  U = unused index.
+	*
+	*  -> Normalize and sort slide array based on indices.
+	*
+	*  1    2    3    4    5    6    7
+	*
+	*  -> Increment indices starting from F.
+	*
+	*  1    2    U    3+1  4+1  5+1  6+1  7+1
+	*  1    2    U    4    5    6    7    8
+	*
+	*  -> U = F
+	*
+	*  1    2    F    4    5    6    7    8
+	*  1    2    3    4    5    6    7    8
 	*/
-	$forced_index = -1;
-
+	$unused = -1;
+	$forced = NULL;
 	$slides = get_slides_list();
-	sort_slides_by_index($slides);
 
-	foreach($slides as $s) {
-		if ($s->get('id') == $force_index_for) {
-			$forced_index = $s->get('index');
+	// Store the forced slide separately.
+	for ($i = 0; $i < count($slides); $i++) {
+		if ($slides[$i]->get('id') == $force_index_for) {
+			$forced = $slides[$i];
+			unset($slides[$i]);
+			$slides = array_values($slides);
 			break;
 		}
 	}
-	if ($forced_index == -1) {
-		throw new Exception("Slide ID not found in slides list!");
-	}
 
-	foreach ($slides as $s) {
-		if ($s->get('id') != $force_index_for &&
-			$s->get('index') >= $forced_index) {
-			$s->set('index', $s->get('index') + 1);
+	normalize_slide_indices($slides);
+
+	if ($forced) {
+		/*
+		*  Recalculate the slide indices including the
+		*  $forced slide in the calculations. Note that
+		*  this part depends on the assumption that $slides
+		*  is sorted, which is done by normalize_slide_indices().
+		*
+		*/
+		$s_i = 0;
+		$f_i = 0;
+		foreach ($slides as $s) {
+			$s_i = $s->get('index');
+			$f_i = $forced->get('index');
+			if ($s_i >= $f_i) {
+				// Advance indices after $forced by one.
+				$s->set('index', $s_i + 1);
+			}
+			if ($s_i == $f_i && $unused == -1) {
+				// Store the unused index.
+				$unused = $s_i;
+			}
+			$s->write();
 		}
-		$s->write();
+		if ($unused == -1) {
+			/*
+			*  If the unused index is not set at this point,
+			*  it means $forced should have the last index,
+			*  which is $s_i + 1.
+			*/
+			$unused = $s_i + 1;
+		}
+		$forced->set('index', $unused);
+		$forced->write();
 	}
 }
 
