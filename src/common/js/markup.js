@@ -23,13 +23,15 @@
 *    [/size]             ==> Close the most recent text size block.
 */
 
-MARKUPCLASS_TYPES = {
+var _parser_ln_num = 0;
+
+const MARKUPCLASS_TYPES = {
 	BLOCK: 'block',
 	META: 'meta'
 }
 
 class MarkupClass {
-	constructor(type, name, args, subst_open, subst_close) {
+	constructor(type, name, args, subst_open, subst_close, callback) {
 		if (Object.values(MARKUPCLASS_TYPES).indexOf(type) != -1) {
 			this.type = type;
 		} else {
@@ -44,53 +46,67 @@ class MarkupClass {
 
 		this.args = args;
 
-		if (subst_open) {
+		if (subst_open != null) {
 			this.subst_open = subst_open;
 		} else {
 			throw new Error('MarkupClass opening ' +
 					'substitution undefined!');
 		}
 
-		if (subst_close) {
-			this.subst_close = subst_close;
-		} else {
-			throw new Error('MarkupClass closing ' +
-					'substitution undefined!');
-		}
-
+		this.subst_close = subst_close;
+		this.callback = callback;
 		this._make_regexes();
+	}
+
+	_make_arg_rstr(arg_type) {
+		/*
+		*  Return a variable regex string based on arg_type.
+		*/
+		switch(arg_type) {
+			case 'int':
+				return '([0-9]+)';
+			case 'str':
+				return '(\\w+)';
+			case 'url':
+				return '([A-Za-z0-9\\-\\.\\_\\~' +
+					'\\:\\/\\?\\#\\[\\]\\@\\!' +
+					'\\$\\&\\\'\\(\\)\\*\\+\\,' +
+					'\\;\\=\\`\\.]+)';
+			default:
+				throw new Error('Unknown class ' +
+						'variable type: ' +
+						arg_type);
+		}
 	}
 
 	_make_regexes() {
 		// Pre-create the regexes.
-		var regexp_str = '^\\[' + this.name;
+		var regex_str = '^\\[' + this.name;
 		for (var a in this.args) {
-			switch(this.args[a].var_type) {
-				case 'int':
-					regexp_str += ' ([0-9]+)';
-					break;
-				case 'str':
-					regexp_str += ' (\\w+)';
-					break;
-				default:
-					throw new Error('Unknown class ' +
-							'argument type!')
-			}
+			regex_str += ' ' + this._make_arg_rstr(this.args[a].arg_type);
 		}
-		regexp_str += '\\]';
+		regex_str += '\\]';
+		this.reg_open = new RegExp(regex_str);
 
-		this.reg_open = new RegExp(regexp_str);
-		this.reg_close = new RegExp('^\\[\\/' + this.name + '\\]');
+		if (this.subst_close) {
+			this.reg_close = new RegExp('^\\[\\/' + this.name +
+							'\\]');
+		} else {
+			this.reg_close = null;
+		}
 	}
 
 	_make_open_subst(match) {
 		/*
-		*  Make the opening substitution string
-		*  based on the match array.
+		*  Make the opening substitution string based on the match array.
 		*/
 		var tmp = this.subst_open;
-		for (var i = 0; i < Object.keys(this.args).length; i++) {
-			tmp = tmp.replace('%' + i, match[i + 1]);
+		var n = 0;
+		if (this.args) {
+			n = Object.keys(this.args).length;
+			for (var i = 0; i < n; i++) {
+				tmp = tmp.replace('%' + i, match[i + 1]);
+			}
 		}
 		return tmp;
 	}
@@ -102,21 +118,28 @@ class MarkupClass {
 
 	match(str) {
 		/*
-		*  Match with str. Returns the substitution string
-		*  if the string matches and null otherwise.
+		*  Match with str. Returns an array with the whole match
+		*  as the first item and the substitution string as the second
+		*  one. Null is returned if no match was found.
 		*/
 		var match = null;
 
 		match = str.match(this.reg_open);
 		if (match) {
-			console.log(this.name + ' ==> open');
-			return this._make_open_subst(match);
+			if (this.callback) {
+				this.callback();
+			}
+			return [match[0], this._make_open_subst(match)];
 		}
 
-		match = str.match(this.reg_close);
-		if (match)  {
-			console.log(this.name + ' ==> close');
-			return this._make_close_subst();
+		if (this.reg_close) {
+			match = str.match(this.reg_close);
+			if (match)  {
+				if (this.callback) {
+					this.callback();
+				}
+				return [match[0], this._make_close_subst(match)];
+			}
 		}
 
 		return null;
@@ -124,123 +147,94 @@ class MarkupClass {
 }
 
 const MARKUP = {
-	'header': {
-		'type': 'inline',
-		'regex': /^\[h([0-9])\](.*?)\[\/h\]/,
-		'make': function(match) {
-			var weight = 0;
-			if (match[1].length <= 6) {
-				weight = match[1].length;
-			} else {
-				weight = 6;
-			}
-			return  '<h' + weight + ' class="display-' +
-				weight + '">' + match[2] + '</h' +
-				weight +'>';
+	'heading': new MarkupClass(
+		'block',
+		'h',
+		{'weight': { 'arg_type': 'int' }},
+		'<h class="display-%0">',
+		'</h>',
+		null
+	),
+	'lead': new MarkupClass(
+		'block',
+		'lead',
+		null,
+		'<p class="lead">',
+		'</p>',
+		null
+	),
+	'bold': new MarkupClass(
+		'block',
+		'b',
+		null,
+		'<span style="font-weight: bold;">',
+		'</span>',
+		null
+	),
+	'italic': new MarkupClass(
+		'block',
+		'i',
+		null,
+		'<span style="font-style: italic;">',
+		'</span>',
+		null
+	),
+	'image': new MarkupClass(
+		'block',
+		'img',
+		{'url': {'arg_type': 'url'}},
+		'<img src="%0">',
+		'</span>',
+		null
+	),
+	'paragraph': new MarkupClass(
+		'block',
+		'p',
+		null,
+		'<p>',
+		'</p>',
+		null
+	),
+	'size': new MarkupClass(
+		'block',
+		'p',
+		{'font_size': {'arg_type': 'int'}},
+		'<span style="font-size: %0pt;">',
+		'</span>',
+		null
+	),
+	'color': new MarkupClass(
+		'block',
+		'color',
+		{'font_size': {'arg_type': 'str'}},
+		'<span style="color: %0;">',
+		'</span>',
+		null
+	),
+	'container': new MarkupClass(
+		'block',
+		'container',
+		{
+			'top': {'arg_type': 'int'},
+			'right': {'arg_type': 'int'},
+			'bottom': {'arg_type': 'int'},
+			'left': {'arg_type': 'int'},
+		},
+		'<div style="padding: %0vh %1vw %2vh %3vw;">',
+		'</div>',
+		null
+	),
+	'meta': new MarkupClass(
+		'meta',
+		'meta',
+		{'type': {'arg_type': 'str'}},
+		'',
+		null,
+		function() {
+			_parser_ln_num++;
 		}
-	},
-	'lead': {
-		'type': 'inline',
-		'regex': /^\[lead\](.*?)\[\/lead\]/,
-		'make': function(match) {
-			return '<p class="lead">' +
-				match[1] + '</p>';
-		}
-	},
-	'bold': {
-		'type': 'inline',
-		'regex': /^\*\*(.*)\*\*/,
-		'make': function(match) {
-			var ret = '';
-			ret += '<span style="font-weight: bold;">';
-			ret += match[1] + '</span>';
-			return ret;
-		}
-	},
-	'italic': {
-		'type': 'inline',
-		'regex': /^__(.*)__/,
-		'make': function(match) {
-			var ret = '';
-			ret += '<span style="font-style: italic;">';
-			ret += match[1] + '</span>';
-			return ret;
-		}
-	},
-	'image': {
-		'type': 'inline',
-		'regex': /^\[img \"([A-Za-z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\`\.]*)\"\]/,
-		'make': function(match) {
-			return '<img src="' + match[1] + '"></img>';
-		}
-	},
-	'paragraph_open': {
-		'type': 'block_open',
-		'regex': /^\[p\]/,
-		'make': function(match) {
-			return '<p>';
-		}
-	},
-	'paragraph_close': {
-		'type': 'block_close',
-		'regex': /^\[\/p\]/,
-		'make': function(match) {
-			return '</p>';
-		}
-	},
-	'size_open': {
-		'type': 'block_open',
-		'regex': /^\[size ([0-9]*)\]/,
-		'make': function(match) {
-			return '<span style="font-size: ' + match[1] + 'pt;">';
-		}
-	},
-	'size_close': {
-		'type': 'block_close',
-		'regex': /^\[\/size\]/,
-		'make': function(match) {
-			return '</span>';
-		}
-	},
-	'color_open': {
-		'type': 'block_open',
-		'regex': /^\[color ([a-z]*|#[0-9]{6})\]/,
-		'make': function(match) {
-			return '<span style="color: ' + match[1] + ';">';
-		}
-	},
-	'color_close': {
-		'type': 'block_close',
-		'regex': /^\[\/color\]/,
-		'make': function(match) {
-			return '</span>';
-		}
-	},
-	'container_open': {
-		'type': 'block_open',
-		'regex': /^\[container ([0-9]*) ([0-9]*) ([0-9]*) ([0-9]*)\]/,
-		'make': function(match) {
-			var ret = '<div style="padding: '
-			ret += match[1] + 'vh ';
-			ret += match[2] + 'vw ';
-			ret += match[3] + 'vh ';
-			ret += match[4] + 'vw;">';
-			return ret;
-		}
-	},
-	'container_close': {
-		'type': 'block_close',
-		'regex': /^\[\/container\]/,
-		'make': function(match) {
-			return '</div>';
-		}
-	},
-	'meta_newline': {
-		'type': 'meta',
-		'regex': /^\[_meta newline\]/,
-		'make': function() { return ''; }
-	}
-};
+	),
+}
 
 function markup_preprocess(str) {
 	var tmp = str;
@@ -250,14 +244,13 @@ function markup_preprocess(str) {
 	}
 
 	// Check for reserved classes in the input str.
-	if (tmp.match(/\[_meta newline\]/g)) {
-		console.error("LibreSignage: markup.js: Reserved " +
-				"class used in input.");
-		return null;
+	if (tmp.match(/\[meta.*\]/g)) {
+		throw new Error("LibreSignage: markup.js: Reserved " +
+				"meta class used in input.");
 	}
 
-	// Replace newlines with '[_meta newline]'.
-	tmp = tmp.replace(/(\r\n|\n)/g, '[_meta newline]');
+	// Replace newlines with '[meta newline]'.
+	tmp = tmp.replace(/(\r\n|\n)/g, '[meta newline]');
 
 	// Replace whitespaces with ' '.
 	tmp = tmp.replace(/\s+/g, ' ');
@@ -270,47 +263,22 @@ function markup_parse(str) {
 	var ret = "";
 	var match = null;
 
-	var open = [];
-	var ln = 0;
-
 	tmp = markup_preprocess(str);
 
 	while (tmp.length) {
 		for (var k in MARKUP) {
-			match = tmp.match(MARKUP[k].regex);
-			if (!match) { continue; }
-
-			if (k == 'meta_newline') {
-				ln++;
+			match = MARKUP[k].match(tmp);
+			if (!match) {
+				continue;
 			}
 
-			ret += MARKUP[k].make(match);
-			tmp = tmp.replace(MARKUP[k].regex, '');
-
-			// Some simple syntax error detection.
-			if (MARKUP[k].type == 'block_open') {
-				open.push(k);
-			} else if (MARKUP[k].type == 'block_close') {
-				if (open[open.length - 1] ==
-					k.replace('_close', '_open')) {
-					open.pop();
-				} else {
-					console.warn('LibreSignage: ' +
-						'markup.js: Unexpected ' +
-						'block closed (@ ' +
-						ln + ')');
-				}
-			}
+			ret += match[1];
+			tmp = tmp.replace(match[0], '');
 		}
 		if (!match) {
 			ret += tmp.substr(0, 1);
 			tmp = tmp.substr(1);
 		}
-	}
-	if (open.length) {
-		console.warn('LibreSignage: markup.js: Unclosed blocks ' +
-				'after parsing: ' + open.join(', '));
-		return '';
 	}
 	return ret;
 }
