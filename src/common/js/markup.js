@@ -23,6 +23,106 @@
 *    [/size]             ==> Close the most recent text size block.
 */
 
+MARKUPCLASS_TYPES = {
+	BLOCK: 'block',
+	META: 'meta'
+}
+
+class MarkupClass {
+	constructor(type, name, args, subst_open, subst_close) {
+		if (Object.values(MARKUPCLASS_TYPES).indexOf(type) != -1) {
+			this.type = type;
+		} else {
+			throw new Error('Invalid MarkupClass type.');
+		}
+
+		if (name) {
+			this.name = name;
+		} else {
+			throw new Error('MarkupClass name undefined!');
+		}
+
+		this.args = args;
+
+		if (subst_open) {
+			this.subst_open = subst_open;
+		} else {
+			throw new Error('MarkupClass opening ' +
+					'substitution undefined!');
+		}
+
+		if (subst_close) {
+			this.subst_close = subst_close;
+		} else {
+			throw new Error('MarkupClass closing ' +
+					'substitution undefined!');
+		}
+
+		this._make_regexes();
+	}
+
+	_make_regexes() {
+		// Pre-create the regexes.
+		var regexp_str = '^\\[' + this.name;
+		for (var a in this.args) {
+			switch(this.args[a].var_type) {
+				case 'int':
+					regexp_str += ' ([0-9]+)';
+					break;
+				case 'str':
+					regexp_str += ' (\\w+)';
+					break;
+				default:
+					throw new Error('Unknown class ' +
+							'argument type!')
+			}
+		}
+		regexp_str += '\\]';
+
+		this.reg_open = new RegExp(regexp_str);
+		this.reg_close = new RegExp('^\\[\\/' + this.name + '\\]');
+	}
+
+	_make_open_subst(match) {
+		/*
+		*  Make the opening substitution string
+		*  based on the match array.
+		*/
+		var tmp = this.subst_open;
+		for (var i = 0; i < Object.keys(this.args).length; i++) {
+			tmp = tmp.replace('%' + i, match[i + 1]);
+		}
+		return tmp;
+	}
+
+	_make_close_subst() {
+		// Return the closing substitution string.
+		return this.subst_close;
+	}
+
+	match(str) {
+		/*
+		*  Match with str. Returns the substitution string
+		*  if the string matches and null otherwise.
+		*/
+		var match = null;
+
+		match = str.match(this.reg_open);
+		if (match) {
+			console.log(this.name + ' ==> open');
+			return this._make_open_subst(match);
+		}
+
+		match = str.match(this.reg_close);
+		if (match)  {
+			console.log(this.name + ' ==> close');
+			return this._make_close_subst();
+		}
+
+		return null;
+	}
+}
+
 const MARKUP = {
 	'header': {
 		'type': 'inline',
