@@ -5,14 +5,12 @@
 *  them. Block classes like [p] or [container] on the other hand
 *  can have nested classes.
 *
-*  Inline classes:
-*    [h<n>]TEXT[/h]      ==> Heading.
+*  Markup classes:
+*    [h WEIGHT]TEXT[/h]  ==> Heading.
 *    [lead]TEXT[/lead]   ==> Lead paragraph.
-*    **TEXT**            ==> Bold text.
-*    __TEXT__            ==> Italics text.
+*    [b]TEXT[/b]         ==> Bold text.
+*    [i]TEXT[/i]         ==> Italics text.
 *    [img ADDRESS]       ==> Embed image from ADDRESS.
-
-*  Block classes:
 *    [p]                 ==> Open paragraph.
 *    [/p]                ==> Close paragraph.
 *    [color COLOR]       ==> Open a color block.
