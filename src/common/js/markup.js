@@ -21,7 +21,7 @@
 *    [/size]             ==> Close the most recent text size block.
 */
 
-var _parser_ln_num = 0;
+var _parser_ln_num = 1;
 
 const MARKUPCLASS_TYPES = {
 	BLOCK: 'block',
@@ -29,7 +29,8 @@ const MARKUPCLASS_TYPES = {
 }
 
 class MarkupClass {
-	constructor(type, name, args, subst_open, subst_close, callback) {
+	constructor(type, name, args, subst_open,
+			subst_close, callback, self_closing) {
 		if (Object.values(MARKUPCLASS_TYPES).indexOf(type) != -1) {
 			this.type = type;
 		} else {
@@ -53,6 +54,7 @@ class MarkupClass {
 
 		this.subst_close = subst_close;
 		this.callback = callback;
+		this.self_closing = self_closing;
 		this._make_regexes();
 	}
 
@@ -118,7 +120,8 @@ class MarkupClass {
 		/*
 		*  Match with str. Returns an array with the whole match
 		*  as the first item and the substitution string as the second
-		*  one. Null is returned if no match was found.
+		*  one. The third item is 'open' if the match opens a block and
+		*  'close' otherwise. Null is returned if no match was found.
 		*/
 		var match = null;
 
@@ -127,7 +130,8 @@ class MarkupClass {
 			if (this.callback) {
 				this.callback();
 			}
-			return [match[0], this._make_open_subst(match)];
+			return [match[0], this._make_open_subst(match),
+				'open'];
 		}
 
 		if (this.reg_close) {
@@ -136,11 +140,27 @@ class MarkupClass {
 				if (this.callback) {
 					this.callback();
 				}
-				return [match[0], this._make_close_subst(match)];
+				return [match[0], this._make_close_subst(match),
+					'close'];
 			}
 		}
 
 		return null;
+	}
+}
+
+class MarkupParseError extends Error {
+	constructor(msg, ln, ...params) {
+		super(...params)
+		super.stack = "";
+		this.ln = ln;
+		this.msg = msg;
+		if (ln != null) {
+			super.message = this.msg + ' (@ln: ' +
+					this.ln + ')';
+		} else {
+			super.message = this.msg;
+		}
 	}
 }
 
@@ -151,7 +171,8 @@ const MARKUP = {
 		{'weight': { 'arg_type': 'int' }},
 		'<h class="display-%0">',
 		'</h>',
-		null
+		null,
+		false
 	),
 	'lead': new MarkupClass(
 		'block',
@@ -159,7 +180,8 @@ const MARKUP = {
 		null,
 		'<p class="lead">',
 		'</p>',
-		null
+		null,
+		false
 	),
 	'bold': new MarkupClass(
 		'block',
@@ -167,7 +189,8 @@ const MARKUP = {
 		null,
 		'<span style="font-weight: bold;">',
 		'</span>',
-		null
+		null,
+		false
 	),
 	'italic': new MarkupClass(
 		'block',
@@ -175,7 +198,8 @@ const MARKUP = {
 		null,
 		'<span style="font-style: italic;">',
 		'</span>',
-		null
+		null,
+		false
 	),
 	'image': new MarkupClass(
 		'block',
@@ -183,7 +207,8 @@ const MARKUP = {
 		{'url': {'arg_type': 'url'}},
 		'<img src="%0">',
 		'</span>',
-		null
+		null,
+		true
 	),
 	'paragraph': new MarkupClass(
 		'block',
@@ -191,7 +216,8 @@ const MARKUP = {
 		null,
 		'<p>',
 		'</p>',
-		null
+		null,
+		false
 	),
 	'size': new MarkupClass(
 		'block',
@@ -199,7 +225,8 @@ const MARKUP = {
 		{'font_size': {'arg_type': 'int'}},
 		'<span style="font-size: %0pt;">',
 		'</span>',
-		null
+		null,
+		false
 	),
 	'color': new MarkupClass(
 		'block',
@@ -207,7 +234,8 @@ const MARKUP = {
 		{'font_size': {'arg_type': 'str'}},
 		'<span style="color: %0;">',
 		'</span>',
-		null
+		null,
+		false
 	),
 	'container': new MarkupClass(
 		'block',
@@ -220,7 +248,8 @@ const MARKUP = {
 		},
 		'<div style="padding: %0vh %1vw %2vh %3vw;">',
 		'</div>',
-		null
+		null,
+		false
 	),
 	'meta': new MarkupClass(
 		'meta',
@@ -230,7 +259,8 @@ const MARKUP = {
 		null,
 		function() {
 			_parser_ln_num++;
-		}
+		},
+		true
 	),
 }
 
@@ -260,7 +290,9 @@ function markup_parse(str) {
 	var tmp = str;
 	var ret = "";
 	var match = null;
+	var open = [];
 
+	_parser_ln_num = 1;
 	tmp = markup_preprocess(str);
 
 	while (tmp.length) {
@@ -269,9 +301,27 @@ function markup_parse(str) {
 			if (!match) {
 				continue;
 			}
-
 			ret += match[1];
 			tmp = tmp.replace(match[0], '');
+
+			if (match[2] == 'open' &&
+				!MARKUP[k].self_closing) {
+				open.push(k);
+			} else if (match[2] == 'close' &&
+				!MARKUP[k].self_closing) {
+				if (open[open.length - 1] == k) {
+					open.pop();
+					continue;
+				}
+
+				throw new MarkupParseError(
+					'Unexpected block "' + k +
+					'" closed. Expected to ' +
+					'close "' +
+					 open[open.length - 1] +
+					'".', _parser_ln_num
+				);
+			}
 		}
 		if (!match) {
 			ret += tmp.substr(0, 1);
