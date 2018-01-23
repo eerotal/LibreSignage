@@ -11,11 +11,11 @@ const NEW_SLIDE_DEFAULTS = {
 
 const SLIDE_SAVE = $("#btn-slide-save");
 const SLIDE_REMOVE = $("#btn-slide-remove");
-const SLIDE_INPUT = $("#slide-input");
 const SLIDE_NAME = $("#slide-name");
 const SLIDE_TIME = $("#slide-time");
 const SLIDE_INDEX = $("#slide-index");
 const EDITOR_STATUS = $("#editor-status");
+var SLIDE_INPUT = null;
 
 var _selected_slide = null;
 
@@ -24,14 +24,14 @@ function set_editor_status(str) {
 }
 
 function clear_editor_controls() {
-	SLIDE_INPUT.val('');
+	SLIDE_INPUT.setValue('');
 	SLIDE_NAME.val('');
 	SLIDE_TIME.val(1);
 	SLIDE_INDEX.val('');
 }
 
 function disable_editor_controls() {
-	SLIDE_INPUT.prop("disabled", true);
+	SLIDE_INPUT.setReadOnly(true);
 	SLIDE_NAME.prop("disabled", true);
 	SLIDE_TIME.prop("disabled", true);
 	SLIDE_INDEX.prop("disabled", true);
@@ -40,7 +40,7 @@ function disable_editor_controls() {
 }
 
 function enable_editor_controls() {
-	SLIDE_INPUT.prop("disabled", false);
+	SLIDE_INPUT.setReadOnly(false);
 	SLIDE_NAME.prop("disabled", false);
 	SLIDE_TIME.prop("disabled", false);
 	SLIDE_INDEX.prop("disabled", false);
@@ -61,7 +61,9 @@ function slide_show(slide) {
 			return;
 		}
 
-		SLIDE_INPUT.val(_selected_slide.get('markup'));
+		SLIDE_INPUT.setValue(_selected_slide.get('markup'));
+		SLIDE_INPUT.clearSelection(); // Deselect new text.
+
 		SLIDE_NAME.val(_selected_slide.get('name'));
 		SLIDE_TIME.val(_selected_slide.get('time')/1000);
 		SLIDE_INDEX.val(_selected_slide.get('index'));
@@ -109,7 +111,9 @@ function slide_new() {
 	_selected_slide = new Slide();
 	_selected_slide.set(NEW_SLIDE_DEFAULTS);
 
-	SLIDE_INPUT.val(_selected_slide.get('markup'));
+	SLIDE_INPUT.setValue(_selected_slide.get('markup'));
+	SLIDE_INPUT.clearSelection(); // Deselect new text.
+
 	SLIDE_NAME.val(_selected_slide.get('name'));
 	SLIDE_TIME.val(_selected_slide.get('time')/1000);
 	SLIDE_INDEX.val(_selected_slide.get('index'));
@@ -132,7 +136,7 @@ function slide_save() {
 		'name': SLIDE_NAME.val(),
 		'time': SLIDE_TIME.val()*1000,
 		'index': SLIDE_INDEX.val(),
-		'markup': SLIDE_INPUT.val()
+		'markup': SLIDE_INPUT.getValue()
 	});
 
 	if (!ret) {
@@ -182,7 +186,13 @@ function slide_preview() {
 
 
 function editor_setup() {
-	disable_editor_controls(); // Disable inputs.
+	// Setup the ACE editor with the Dawn theme and plaintext mode.
+	SLIDE_INPUT = ace.edit('slide-input');
+	SLIDE_INPUT.setTheme('ace/theme/dawn');
+	SLIDE_INPUT.$blockScrolling = Infinity;
+
+	// Disable inputs initially and setup update intevals.
+	disable_editor_controls();
 	slidelist_trigger_update();
 	setInterval(slidelist_trigger_update,
 		SLIDELIST_UPDATE_INTERVAL);

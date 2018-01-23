@@ -32,8 +32,9 @@
 				<p>LibreSignage is made possible by the
 				fantastic open source libraries
 				<a href="https://getbootstrap.com/">Bootstrap</a>,
-				<a href="https://jquery.com/">jQuery</a> and
-				<a href="https://popper.js.org/">Popper.js</a>.
+				<a href="https://jquery.com/">jQuery</a>,
+				<a href="https://popper.js.org/">Popper.js</a> and
+				<a href="https://ace.c9.io/">Ace</a>.
 				The licensing information for these libraries can
 				be found
 				<a href="/doc/LIBRARY_LICENSES.md">here</a>.</p>

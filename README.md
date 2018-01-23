@@ -9,7 +9,7 @@ any device that has acccess to the internet and that can display web pages.
 LibreSignage is under heavy development and it shouldn't be used for
 production or anything important yet.
 
-## Used libraries
+## Used thrid-party libraries
 
 * Bootstrap (MIT License)
   * Copyright (c) 2011-2016 Twitter, Inc.
@@ -17,6 +17,8 @@ production or anything important yet.
   * Copyright JS Foundation and other contributors, https://js.foundation/
 * Popper.JS (MIT License)
   * Copyright (C) 2016 Federico Zivolo and contributors
+* Ace (3-clause BSD License)
+  * Copyright (c) 2010, Ajax.org B.V. All rights reserved.
 
 The full licenses for these external libraries can be found in the file
 `src/doc/LIBRARY_LICENSES.md`.
