@@ -1,25 +1,165 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
-function _verify_credentials($username, $password) {
-	/*
-	*  Verify that the login system has the user 'username' and
-	*  that the password matches 'password'. Returns true
-	*  if the verification is successful and false otherwise.
-	*/
+$AUTH_USERS = NULL;
+$AUTH_INITED = FALSE;
 
-	$users_file = LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/passwd.json';
-	$users = json_decode(file_get_contents($users_file), $assoc=true);
+class User {
+	private $user = '';
+	private $pass_hash = '';
+	private $groups = NULL;
 
-	if (in_array($username, array_keys($users), true)) {
-		if (password_verify($password, $users[$username])) {
-			return true;
+	public function __construct(string $user, array $data) {
+		if (empty($user)) {
+			throw new Exception('Invalid username for '.
+					'User object.');
 		}
+		if (empty($data) ||
+			empty($data['hash']) ||
+			empty($data['groups'])) {
+			throw new Error('Invalid data for User object.');
+		}
+		$this->user = $user;
+		$this->pass_hash = $data['hash'];
+		$this->groups = $data['groups'];
 	}
-	return false;
+
+	public function is_in_group(string $group) {
+		return in_array($group, $this->groups);
+	}
+
+	public function verify_password(string $pass) {
+		return password_verify($pass, $this->pass_hash);
+	}
+
+	public function get_name() {
+		return $this->user;
+	}
+
+	public function get_data_json() {
+		/*
+		*  Get the JSON encoded userdata that's used
+		*  when writing it to the userdata file.
+		*  Returns the JSON encoded data on success
+		*  or throws an exception on failure.
+		*/
+		$tmp = json_encode(array(
+			'hash' => $this->pass_hash,
+			'groups' => $this->groups
+		));
+		if (!$tmp && json_last_error() != JSON_ERROR_NONE) {
+			throw new Exception('Userdata JSON '.
+					'encode failure.');
+		}
+		return $tmp;
+	}
+
+	public function get_data_session() {
+		/*
+		*  Get data that can be set into the $_SESSION
+		*  array.
+		*/
+		return array(
+			'groups' => $this->groups,
+			'user' => $this->user
+		);
+	}
 }
 
-function login($username, $password) {
+function _auth_write_users(array $users) {
+	/*
+	*  Write the data from the User objects in $users to
+	*  the userdata file. Throws an error if the authentication
+	*  system is not initialized.
+	*/
+
+	_auth_inited_check();
+
+	$data_str = '';
+	$users_file = LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/passwd.json';
+	foreach ($users as $u) {
+		try {
+			if ($data_str != '') {
+				$data_str .= ',';
+			}
+			$data_str .= '"'.$u->get_name().'": '.
+					$u->get_data_json();
+		} catch (Exception $e) {
+			// TODO: Error logging.
+			throw $e;
+		}
+	}
+	if (@file_put_contents($users_file,
+		'{'.$data_str.'}') === FALSE) {
+		throw new Exception('Failed to write userdata file.');
+	}
+}
+
+function _auth_load_users() {
+	/*
+	*  Load all the users from the userdata file.
+	*  Returns the $users array with User objects in it or
+	*  throws an Exception on error.
+	*/
+
+	$users = array();
+	$users_file = LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/passwd.json';
+	$users_data = json_decode(file_get_contents($users_file),
+					$assoc=true);
+
+	if ($users_data == NULL && json_last_error() != JSON_ERROR_NONE) {
+		throw new Exception('Userdata JSON parse error.');
+	}
+
+	foreach (array_keys($users_data) as $user) {
+		array_push($users, new User($user, $users_data[$user]));
+	}
+	return $users;
+}
+
+function _auth_get_users() {
+	global $AUTH_USERS;
+	return $AUTH_USERS;
+}
+
+function _auth_get_user_by_name(string $username) {
+	/*
+	*  Get the User object for $username from the
+	*  $users User object array. Throws an error if
+	*  the authentication system is not initialized.
+	*/
+
+	_auth_inited_check();
+
+	foreach (_auth_get_users() as $u) {
+		if ($u->get_name() == $username) {
+			return $u;
+		}
+	}
+	return NULL;
+}
+
+function _auth_verify_credentials(string $username, string $password) {
+	/*
+	*  Verify that the login system has the user 'username' and
+	*  that the password matches 'password'. Returns the User object
+	*  if the verification is successful and NULL otherwise.
+	*  This function throws an exception if the authentication
+	*  system is not initialized.
+	*/
+
+	_auth_inited_check();
+
+	$user_obj = _auth_get_user_by_name($username, _auth_get_users());
+	if ($user_obj) {
+		if ($user_obj->verify_password($password)) {
+			return $user_obj;
+		}
+	}
+	return NULL;
+}
+
+function auth_login(string $username, string $password) {
 	/*
 	*  Attempt to login with $username and $password.
 	*  Returns TRUE if the login succeeds and FALSE
@@ -32,15 +172,16 @@ function login($username, $password) {
 				'to login.');
 	}
 
-	if (is_authorized()) {
+	if (auth_is_authorized()) {
 		// Already logged in.
 		return TRUE;
 	}
 
 	if (!empty($username) && !empty($password)) {
-		if (_verify_credentials($username, $password)) {
+		$tmp = _auth_verify_credentials($username, $password);
+		if ($tmp != NULL) {
 			// Login success.
-			$_SESSION['user'] = $username;
+			$_SESSION['user'] = $tmp->get_data_session();
 			return TRUE;
 		}
 	}
@@ -48,7 +189,7 @@ function login($username, $password) {
 	return FALSE;
 }
 
-function logout() {
+function auth_logout() {
 	/*
 	*  Logout the currently logged in user. The session needs to
 	*  be started by the caller before calling this function.
@@ -73,24 +214,62 @@ function logout() {
 }
 
 
-function is_authorized($redir=false) {
+function auth_is_authorized(string $group = NULL, bool $redir = FALSE) {
 	/*
-	*  Check if the current session is authorized and
-	*  return true if it is. False is returned otherwise.
+	*  Check if the current session is authorized to access
+	*  a page that only the users in the group $group can access
+	*  and return true if it is. False is returned otherwise.
 	*  If 'redir' is true, this function also redirects
-	*  the client to the login page.
+	*  the client to the login page if access is not granted.
+	*
+	*  If $group is set to NULL (which it is by default), this
+	*  function grants access to all logged in users.
 	*/
 
 	if (!empty($_SESSION['user'])) {
-		return true;
+		if ($group == NULL) {
+			/*
+			*  This shortcut speeds things up by not
+			*  loading the userdata from file when not
+			*  needed.
+			*/
+			return TRUE;
+		} else {
+			_auth_inited_check('auth_init() call required '.
+					'when $group != NULL in an '.
+					'auth_is_authorized() call.');
+			$user_obj = _auth_get_user_by_name(
+					$_SESSION['user']['user']);
+			if ($user_obj == NULL) {
+				throw new Exception('Invalid username '.
+						'stored in session!');
+			}
+			return $user_obj->is_in_group($group);
+		}
 	} else {
 		if ($redir) {
 			header('Location: '.LOGIN_PAGE);
 			exit(0);
 		}
-		return false;
+		return FALSE;
 	}
 }
 
+function _auth_inited_check(string $additional_msg = '') {
+	global $AUTH_INITED;
+	if (!$AUTH_INITED) {
+		throw new Exception('Authentication system not '.
+				'initialized. '.$additional_msg);
+	}
+}
 
-
+function auth_init() {
+	global $AUTH_USERS, $AUTH_INITED;
+	try {
+		$AUTH_USERS = _auth_load_users();
+	} catch (Exception $e) {
+		// TODO: Error logging.
+		throw $e;
+	}
+	$AUTH_INITED = TRUE;
+}

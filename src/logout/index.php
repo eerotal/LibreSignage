@@ -3,7 +3,8 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
 
 	session_start();
-	logout();
+	auth_init();
+	auth_logout();
 ?>
 
 <!DOCTYPE html>
