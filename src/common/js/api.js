@@ -6,23 +6,23 @@
 
 var API_ENDP = {
 	SLIDE_LIST: {
-		uri:	"/api/endpoint/slide_list.php",
+		uri:	"/api/endpoint/slide/slide_list.php",
 		method:	"GET"
 	},
 	SLIDE_DATA_QUERY: {
-		uri:	"/api/endpoint/slide_data_query.php",
+		uri:	"/api/endpoint/slide/slide_data_query.php",
 		method:	"GET"
 	},
 	SLIDE_GET: {
-		uri:	"/api/endpoint/slide_get.php",
+		uri:	"/api/endpoint/slide/slide_get.php",
 		method: "GET"
 	},
 	SLIDE_SAVE: {
-		uri:	"/api/endpoint/slide_save.php",
+		uri:	"/api/endpoint/slide/slide_save.php",
 		method: "POST"
 	},
 	SLIDE_RM: {
-		uri:	"/api/endpoint/slide_rm.php",
+		uri:	"/api/endpoint/slide/slide_rm.php",
 		method: "POST"
 	},
 	LIBRARY_LICENSES: {
