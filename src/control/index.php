@@ -3,7 +3,7 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
 	session_start();
 	auth_init();
-	auth_is_authorized('admin', true);
+	auth_is_authorized('admin', TRUE);
 ?>
 <!DOCTYPE html>
 <html lang="en">

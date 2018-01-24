@@ -7,7 +7,7 @@ $AUTH_INITED = FALSE;
 class User {
 	private $user = '';
 	private $pass_hash = '';
-	private $groups = NULL;
+	private $groups = array();
 
 	public function __construct(string $user, array $data) {
 		if (empty($user)) {
@@ -16,7 +16,7 @@ class User {
 		}
 		if (empty($data) ||
 			empty($data['hash']) ||
-			empty($data['groups'])) {
+			!isset($data['groups'])) {
 			throw new Error('Invalid data for User object.');
 		}
 		$this->user = $user;
@@ -25,7 +25,7 @@ class User {
 	}
 
 	public function is_in_group(string $group) {
-		return in_array($group, $this->groups);
+		return in_array($group, $this->groups, TRUE);
 	}
 
 	public function verify_password(string $pass) {
@@ -98,7 +98,7 @@ function _auth_write_users(array $users) {
 function _auth_load_users() {
 	/*
 	*  Load all the users from the userdata file.
-	*  Returns the $users array with User objects in it or
+	*  Returns an array with User objects in it or
 	*  throws an Exception on error.
 	*/
 
@@ -218,9 +218,10 @@ function auth_is_authorized(string $group = NULL, bool $redir = FALSE) {
 	/*
 	*  Check if the current session is authorized to access
 	*  a page that only the users in the group $group can access
-	*  and return true if it is. False is returned otherwise.
-	*  If 'redir' is true, this function also redirects
-	*  the client to the login page if access is not granted.
+	*  and return TRUE if it is. FALSE is returned otherwise.
+	*  If 'redir' is TRUE, this function also redirects
+	*  the client to the login page or the HTTP 403 page if access
+	*  is not granted.
 	*
 	*  If $group is set to NULL (which it is by default), this
 	*  function grants access to all logged in users.
@@ -240,11 +241,17 @@ function auth_is_authorized(string $group = NULL, bool $redir = FALSE) {
 					'auth_is_authorized() call.');
 			$user_obj = _auth_get_user_by_name(
 					$_SESSION['user']['user']);
-			if ($user_obj == NULL) {
-				throw new Exception('Invalid username '.
-						'stored in session!');
+			if ($user_obj->is_in_group($group)) {
+				return TRUE;
+			} else {
+				if (!$redir) {
+					return FALSE;
+				}
+				header($_SERVER['SERVER_PROTOCOL'].
+					' 403 Forbidden');
+				header('Location: '.ERR_403);
+				exit(0);
 			}
-			return $user_obj->is_in_group($group);
 		}
 	} else {
 		if ($redir) {
