@@ -1,8 +1,9 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/login/auth_check.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
 	session_start();
-	check_authorized(true);
+	auth_init();
+	auth_is_authorized('editor', true);
 ?>
 <!DOCTYPE html>
 <html lang="en">
