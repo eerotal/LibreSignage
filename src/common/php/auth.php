@@ -64,6 +64,27 @@ class User {
 			'user' => $this->user
 		);
 	}
+
+	public function add_group(string $group) {
+		if (!in_array($group, $this->groups, TRUE)) {
+			array_push($this->groups, $group);
+		}
+	}
+
+	public function remove_group(string $group) {
+		$i = array_search($group, $this->groups, TRUE);
+		if ($i !== FALSE) {
+			array_splice($this->groups, $i, 1);
+		}
+	}
+
+	public function set_password(string $password) {
+		$tmp_hash = password_hash($password, PASSWORD_DEFAULT);
+		if ($tmp_hash === FALSE) {
+			throw new Exception('Password hashing failed.');
+		}
+		$this->pass_hash = $tmp_hash;
+	}
 }
 
 function _auth_write_users(array $users) {
