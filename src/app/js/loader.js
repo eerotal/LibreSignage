@@ -48,20 +48,40 @@ function slides_retrieve(ready_callback) {
 	*  is called after all slides are ready.
 	*/
 	var list = list_get();
+	var ready_cnt = list.length;
+
 	_slides_ready = false;
 	_slides_old = _slides_current.slice();
 	_slides_current = [];
-	for (i in list) {
-		api_call(API_ENDP.SLIDE_GET, {'id': list[i]}, function(response) {
-			if (response == null) { return; }
-			_slides_current.push(response);
 
-			if (_slides_current.length == list.length) {
+	for (i in list) {
+		_slides_current[i] = new Slide();
+		_slides_current[i].load(list[i], function(status) {
+			if (!status) {
+				console.error('LibreSignage: Error ' +
+					'while loading slide! ' +
+					'Discarding it.');
+				_slides_current[i] = null;
+			}
+
+			ready_cnt--;
+			if (!ready_cnt) {
+				/*
+				*  Remove null slides resulting from failed
+				*  Slide.load() calls.
+				*/
+				_slides_current = _slides_current.filter(
+					function(s) {
+						return s != null;
+					}
+				);
+
 				_slides_ready = true;
-				console.log("LibreSignage: Slide " +
-						"retrieved. (" +
-						_slides_current.length +
-						" slides)");
+				console.log("LibreSignage: Slides " +
+					"retrieved. (" +
+					_slides_current.length +
+					" slides)");
+
 				if (ready_callback) {
 					ready_callback();
 				}
