@@ -1,9 +1,9 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/login/auth_check.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
 
 	session_start();
-	if (check_authorized()) {
+	if (is_authorized()) {
 		header('Location: '.LOGIN_LANDING);
 		exit(0);
 	}
@@ -28,7 +28,7 @@
 					}?>>
 					<span>Incorrect username or password!</span>
 				</div>
-				<form class="container form-login" action="/login/login.php" method="post">
+				<form class="container form-login" action="/login/login_form.php" method="post">
 					<div class="form-group form-row">
 						<label for="input-user" class=" col-3 col-form-label">Username</label>
 						<div class="col">
