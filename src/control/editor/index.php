@@ -12,11 +12,15 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 		<link rel="stylesheet" href="/common/css/footer.css">
+		<link rel="stylesheet" href="/common/css/nav.css">
 		<link rel="stylesheet" href="/common/css/dialog.css">
-		<link rel="stylesheet" href="/control/css/editor.css">
+		<link rel="stylesheet" href="/control/editor/css/editor.css">
 		<title>LibreSignage Editor</title>
 	</head>
 	<body class="bg-dark">
+		<?php
+			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
+		?>
 		<main role="main" class="container-fluid h-100">
 			<div class="container-main container-fluid w-100 h-100 text-muted">
 				<div class="container-fluid btn-row m-0">

@@ -5,6 +5,10 @@
 */
 
 var API_ENDP = {
+	USERS_GET_ALL: {
+		uri:	"/api/endpoint/user/users_get_all.php",
+		method:	"GET"
+	},
 	SLIDE_LIST: {
 		uri:	"/api/endpoint/slide/slide_list.php",
 		method:	"GET"

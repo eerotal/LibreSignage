@@ -65,6 +65,10 @@ class User {
 		);
 	}
 
+	public function get_groups() {
+		return $this->groups;
+	}
+
 	public function add_group(string $group) {
 		if (!in_array($group, $this->groups, TRUE)) {
 			array_push($this->groups, $group);
@@ -138,7 +142,7 @@ function _auth_load_users() {
 	return $users;
 }
 
-function _auth_get_users() {
+function auth_get_users() {
 	global $AUTH_USERS;
 	return $AUTH_USERS;
 }
@@ -152,7 +156,7 @@ function _auth_get_user_by_name(string $username) {
 
 	_auth_inited_check();
 
-	foreach (_auth_get_users() as $u) {
+	foreach (auth_get_users() as $u) {
 		if ($u->get_name() == $username) {
 			return $u;
 		}
@@ -171,7 +175,7 @@ function _auth_verify_credentials(string $username, string $password) {
 
 	_auth_inited_check();
 
-	$user_obj = _auth_get_user_by_name($username, _auth_get_users());
+	$user_obj = _auth_get_user_by_name($username, auth_get_users());
 	if ($user_obj) {
 		if ($user_obj->verify_password($password)) {
 			return $user_obj;
@@ -292,7 +296,18 @@ function _auth_inited_check(string $additional_msg = '') {
 }
 
 function auth_init() {
+	/*
+	*  Initialize the authentication system. The caller must
+	*  start a session before calling this function. If no
+	*  session is active, this function throws an exception.
+	*/
 	global $AUTH_USERS, $AUTH_INITED;
+
+	if (session_status() != PHP_SESSION_ACTIVE) {
+		throw new Exception('No session active when attempted to'.
+				'initialize authentication system.');
+	}
+
 	try {
 		$AUTH_USERS = _auth_load_users();
 	} catch (Exception $e) {

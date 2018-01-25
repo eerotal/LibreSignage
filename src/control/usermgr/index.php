@@ -13,14 +13,16 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 		<link rel="stylesheet" href="/common/css/footer.css">
 		<link rel="stylesheet" href="/common/css/nav.css">
-		<link rel="stylesheet" href="/control/css/control.css">
-		<title>About LibreSignage</title>
+		<link rel="stylesheet" href="/control/usermgr/css/usermgr.css">
+		<title>LibreSignage User Manager</title>
 	</head>
 	<body class="bg-dark">
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>
-		<main role="main" class="container-fluid">
+		<main class="container-fluid h-100">
+			<div class="container text-muted">
+			</div>
 		</main>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
