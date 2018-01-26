@@ -1,72 +1,126 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
 $AUTH_USERS = NULL;
 $AUTH_INITED = FALSE;
 
 class User {
 	private $user = '';
-	private $pass_hash = '';
-	private $groups = array();
+	private $hash = '';
+	private $groups = NULL;
+	private $ready = FALSE;
 
-	public function __construct(string $user, array $data) {
+	public function set(string $user,
+				array $groups,
+				string $hash) {
 		if (empty($user)) {
 			throw new Exception('Invalid username for '.
 					'User object.');
 		}
-		if (empty($data) ||
-			empty($data['hash']) ||
-			!isset($data['groups'])) {
-			throw new Error('Invalid data for User object.');
+		if (empty($hash)) {
+			throw new Exception('Invalid password hash for '.
+					'user object.');
 		}
 		$this->user = $user;
-		$this->pass_hash = $data['hash'];
-		$this->groups = $data['groups'];
+		$this->hash = $hash;
+		if ($groups == NULL) {
+			$this->groups = array();
+		} else {
+			$this->groups = $groups;
+		}
+		$this->ready = TRUE;
+		return $this;
 	}
 
-	public function is_in_group(string $group) {
-		return in_array($group, $this->groups, TRUE);
+	public function load(string $user) {
+		/*
+		*  Load data for the user $user from file.
+		*/
+		$dir = LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$user;
+		$json = '';
+		$data = NULL;
+
+		if (!is_dir($dir)) {
+			throw new Exception('No user named '.$user.'.');
+		}
+		$json = @file_get_contents($dir.'/data.json');
+		if ($json === FALSE) {
+			throw new Exception('Failed to read user data!');
+		}
+		$data = json_decode($json, $assoc=TRUE);
+		if (json_last_error() != JSON_ERROR_NONE) {
+			throw new Exception('JSON user data '.
+					'decode error!');
+		}
+
+		try {
+			$this->set($data['user'],
+				$data['groups'],
+				$data['hash']);
+		} catch(Exception $e) {
+			throw $e;
+		}
+		return $this;
 	}
 
-	public function verify_password(string $pass) {
-		return password_verify($pass, $this->pass_hash);
+	public function write() {
+		/*
+		*  Write the userdata into files.
+		*/
+		$this->_error_on_not_ready();
+		$dir = LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$user;
+		$json = json_encode(array(
+			'user' => $this->user,
+			'groups' => $this->groups,
+			'hash' => $this->hash
+		));
+		$ret = file_put_contents($dir.'/data.json');
+		if ($ret === FALSE) {
+			throw new Exception('Failed to write userdata!');
+		}
+	}
+
+	private function _error_on_not_ready() {
+		if (!$this->is_ready()) {
+			throw new Exception('User data not ready!');
+		}
+	}
+
+	public function get_groups() {
+		$this->_error_on_not_ready();
+		return $this->groups;
 	}
 
 	public function get_name() {
+		$this->_error_on_not_ready();
 		return $this->user;
 	}
 
-	public function get_data_json() {
-		/*
-		*  Get the JSON encoded userdata that's used
-		*  when writing it to the userdata file.
-		*  Returns the JSON encoded data on success
-		*  or throws an exception on failure.
-		*/
-		$tmp = json_encode(array(
-			'hash' => $this->pass_hash,
-			'groups' => $this->groups
-		));
-		if (!$tmp && json_last_error() != JSON_ERROR_NONE) {
-			throw new Exception('Userdata JSON '.
-					'encode failure.');
-		}
-		return $tmp;
+	public function is_in_group(string $group) {
+		$this->_error_on_not_ready();
+		return in_array($group, $this->groups, TRUE);
 	}
 
-	public function get_data_session() {
+	public function is_ready() {
+		return $this->ready;
+	}
+
+	public function verify_password(string $pass) {
+		$this->_error_on_not_ready();
+		return password_verify($pass, $this->hash);
+	}
+
+	public function get_session_data() {
 		/*
 		*  Get data that can be set into the $_SESSION
 		*  array.
 		*/
+		$this->_error_on_not_ready();
 		return array(
-			'groups' => $this->groups,
-			'user' => $this->user
+			'user' => $this->get_name(),
+			'groups' => $this->get_groups()
 		);
-	}
-
-	public function get_groups() {
-		return $this->groups;
 	}
 
 	public function add_group(string $group) {
@@ -94,50 +148,43 @@ class User {
 function _auth_write_users(array $users) {
 	/*
 	*  Write the data from the User objects in $users to
-	*  the userdata file. Throws an error if the authentication
+	*  the userdata files. Throws an error if the authentication
 	*  system is not initialized.
 	*/
-
 	_auth_inited_check();
-
-	$data_str = '';
-	$users_file = LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/passwd.json';
-	foreach ($users as $u) {
+	foreach ($AUTH_USERS as $u) {
 		try {
-			if ($data_str != '') {
-				$data_str .= ',';
-			}
-			$data_str .= '"'.$u->get_name().'": '.
-					$u->get_data_json();
+			$u->write();
 		} catch (Exception $e) {
-			// TODO: Error logging.
 			throw $e;
 		}
-	}
-	if (@file_put_contents($users_file,
-		'{'.$data_str.'}') === FALSE) {
-		throw new Exception('Failed to write userdata file.');
 	}
 }
 
 function _auth_load_users() {
 	/*
-	*  Load all the users from the userdata file.
+	*  Load all the users from the userdata files.
 	*  Returns an array with User objects in it or
 	*  throws an Exception on error.
 	*/
-
 	$users = array();
-	$users_file = LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/passwd.json';
-	$users_data = json_decode(file_get_contents($users_file),
-					$assoc=true);
+	$tmp = NULL;
 
-	if ($users_data == NULL && json_last_error() != JSON_ERROR_NONE) {
-		throw new Exception('Userdata JSON parse error.');
+	$users_data_dir = LIBRESIGNAGE_ROOT.USER_DATA_DIR;
+	$user_dirs = @scandir($users_data_dir);
+
+	if ($user_dirs === FALSE) {
+		throw new Exception('Failed to scan user data dir!');
 	}
+	$user_dirs = array_diff($user_dirs, array('.', '..'));
 
-	foreach (array_keys($users_data) as $user) {
-		array_push($users, new User($user, $users_data[$user]));
+	foreach ($user_dirs as $d) {
+		if (!is_dir($users_data_dir.'/'.$d)) { continue; }
+		try {
+			array_push($users, (new User())->load($d));
+		} catch(Exception $e) {
+			throw $e;
+		}
 	}
 	return $users;
 }
@@ -153,9 +200,10 @@ function _auth_get_user_by_name(string $username) {
 	*  $users User object array. Throws an error if
 	*  the authentication system is not initialized.
 	*/
-
 	_auth_inited_check();
-
+	if (empty($username)) {
+		return NULL;
+	}
 	foreach (auth_get_users() as $u) {
 		if ($u->get_name() == $username) {
 			return $u;
@@ -172,10 +220,8 @@ function _auth_verify_credentials(string $username, string $password) {
 	*  This function throws an exception if the authentication
 	*  system is not initialized.
 	*/
-
 	_auth_inited_check();
-
-	$user_obj = _auth_get_user_by_name($username, auth_get_users());
+	$user_obj = _auth_get_user_by_name($username);
 	if ($user_obj) {
 		if ($user_obj->verify_password($password)) {
 			return $user_obj;
@@ -206,7 +252,7 @@ function auth_login(string $username, string $password) {
 		$tmp = _auth_verify_credentials($username, $password);
 		if ($tmp != NULL) {
 			// Login success.
-			$_SESSION['user'] = $tmp->get_data_session();
+			$_SESSION['user'] = $tmp->get_session_data();
 			return TRUE;
 		}
 	}
@@ -272,10 +318,7 @@ function auth_is_authorized(string $group = NULL, bool $redir = FALSE) {
 				if (!$redir) {
 					return FALSE;
 				}
-				header($_SERVER['SERVER_PROTOCOL'].
-					' 403 Forbidden');
-				header('Location: '.ERR_403);
-				exit(0);
+				error_redir(403);
 			}
 		}
 	} else {
@@ -304,7 +347,7 @@ function auth_init() {
 	global $AUTH_USERS, $AUTH_INITED;
 
 	if (session_status() != PHP_SESSION_ACTIVE) {
-		throw new Exception('No session active when attempted to'.
+		throw new Exception('No session active when attempting to'.
 				'initialize authentication system.');
 	}
 

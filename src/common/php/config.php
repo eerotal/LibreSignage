@@ -31,4 +31,5 @@
 	define("LOGIN_LANDING", 			CONTROL_PANEL_PAGE);
 	define("LOGOUT_LANDING",			LOGOUT_PAGE);
 
+	define("ERRORS",				"/errors");
 	define("ERR_403",				"/errors/403");

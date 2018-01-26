@@ -3,6 +3,8 @@
 	*  LibreSignage utility functions.
 	*/
 
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+
 	function array_is_equal(array $a, array $b) {
 		/*
 		*  Check if array $a has the same values
@@ -28,4 +30,19 @@
 		} else {
 			return false;
 		}
+	}
+
+	function error_redir(int $code) {
+		$tmp = $code;
+		$errors = array(
+			404 => '404 Not Found',
+			403 => '403 Forbidden',
+			500 => '500 Internal Server Error'
+		);
+		if (!array_key_exists($tmp, $errors)) {
+			$tmp = 500;
+		}
+		header($_SERVER['SERVER_PROTOCOL'].$errors[$tmp]);
+		header('Location: '.ERRORS.'/'.$code);
+		exit(0);
 	}
