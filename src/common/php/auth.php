@@ -19,8 +19,8 @@ class User {
 					'User object.');
 		}
 		if (empty($hash)) {
-			throw new Exception('Invalid password hash for '.
-					'user object.');
+			throw new Exception('Invalid password hash '.
+					'for user object.');
 		}
 		$this->user = $user;
 		$this->hash = $hash;
@@ -69,13 +69,24 @@ class User {
 		*  Write the userdata into files.
 		*/
 		$this->_error_on_not_ready();
-		$dir = LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$user;
+		$dir = LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$this->user;
 		$json = json_encode(array(
 			'user' => $this->user,
 			'groups' => $this->groups,
 			'hash' => $this->hash
 		));
-		$ret = file_put_contents($dir.'/data.json');
+		if ($json === FALSE &&
+			json_last_error() != JSON_ERROR_NONE) {
+			throw new Exception('Failed to JSON encode '.
+						'userdata!');
+		}
+		if (!is_dir($dir)) {
+			if (!@mkdir($dir, 0775, TRUE)) {
+				throw new Exception('Failed to create user '.
+						'directory!');
+			}
+		}
+		$ret = file_put_contents($dir.'/data.json', $json);
 		if ($ret === FALSE) {
 			throw new Exception('Failed to write userdata!');
 		}
@@ -104,6 +115,10 @@ class User {
 
 	public function is_ready() {
 		return $this->ready;
+	}
+
+	public function set_ready(bool $val) {
+		$this->ready = $val;
 	}
 
 	public function verify_password(string $pass) {
@@ -136,12 +151,20 @@ class User {
 		}
 	}
 
+	public function set_groups(array $groups) {
+		$this->groups = $groups;
+	}
+
 	public function set_password(string $password) {
 		$tmp_hash = password_hash($password, PASSWORD_DEFAULT);
 		if ($tmp_hash === FALSE) {
 			throw new Exception('Password hashing failed.');
 		}
-		$this->pass_hash = $tmp_hash;
+		$this->hash = $tmp_hash;
+	}
+
+	public function set_name(string $name) {
+		$this->user = $name;
 	}
 }
 

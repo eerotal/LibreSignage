@@ -18,15 +18,21 @@
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_util.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_errors.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
 
-	header_plaintext();
+	$SLIDE_DATA_QUERY = new APIEndpoint(
+		$method = API_METHOD['GET'],
+		$response_type = API_RESPONSE['JSON'],
+		$format = NULL
+	);
+	api_endpoint_init($SLIDE_DATA_QUERY);
 
 	// Check that the requested keys are in SLIDE_REQ_KEYS.
-	if (!count($_GET) || !array_is_subset(
-		array_keys($_GET), SLIDE_REQ_KEYS)) {
+	if (!count($SLIDE_DATA_QUERY->get()) || !array_is_subset(
+		array_keys($SLIDE_DATA_QUERY->get()), SLIDE_REQ_KEYS)) {
 		error_and_exit(API_E_INVALID_REQUEST);
 	}
 
@@ -43,7 +49,7 @@
 		}
 
 		$ret['data'][$s] = array();
-		foreach(array_keys($_GET) as $k) {
+		foreach(array_keys($SLIDE_DATA_QUERY->get()) as $k) {
 			$ret['data'][$s][$k] = $tmp_slide->get($k);
 		}
 	}

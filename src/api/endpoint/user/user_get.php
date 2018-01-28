@@ -1,7 +1,9 @@
 <?php
 	/*
-	*  API endpoint for getting a list of all the existing
-	*  users and the available user data.
+	*  API endpoint for getting a user's data based on the username.
+	*
+	*  GET parameters:
+	*    * user = The username to query.
 	*
 	*  Return value:
 	*    A JSON encoded dictionary with the following data.
@@ -20,12 +22,14 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_errors.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
 
-	$USERS_GET_ALL = new APIEndpoint(
+	$USER_GET = new APIEndpoint(
 		$method = API_METHOD['GET'],
 		$response_type = API_RESPONSE['JSON'],
-		$format = NULL
+		$format = array(
+			'user' => API_P_STR
+		)
 	);
-	api_endpoint_init($USERS_GET_ALL);
+	api_endpoint_init($USER_GET);
 
 	session_start();
 	auth_init();
@@ -33,18 +37,17 @@
 		error_and_exit(API_E_NOT_AUTHORIZED);
 	}
 
-	$users = auth_get_users();
+	$u = _auth_get_user_by_name($USER_GET->get('user'));
+	if ($u == NULL) {
+		error_and_exit(API_E_INVALID_REQUEST);
+	}
 	$ret_data = array(
-		'users' => array(),
-		'error' => API_E_OK
-	);
-
-	foreach ($users as $u) {
-		$ret_data['users'][$u->get_name()] = array(
+		'user' => array(
 			'user' => $u->get_name(),
 			'groups' => $u->get_groups()
-		);
-	}
+		),
+		'error' => API_E_OK
+	);
 
 	$ret_str = json_encode($ret_data);
 	if ($ret_str === FALSE && json_last_error() != JSON_ERROR_NONE) {
