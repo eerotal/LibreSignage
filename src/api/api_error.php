@@ -15,14 +15,21 @@ define("API_E_NOT_AUTHORIZED",	3);
 */
 $API_ERROR_TRACE = TRUE;
 
-function error_and_exit($errcode, $exception=NULL) {
+function api_throw($errcode, $exception=NULL) {
 	global $API_ERROR_TRACE;
+
 	$err = array(
 		'error' => $errcode
 	);
+
 	if ($API_ERROR_TRACE) {
-		$e = new Exception();
-		$err['trace'] = $e->getTraceAsString();
+		$bt = debug_backtrace();
+		$err['thrown_at'] = $bt[0]['file'].' @ ln: '.
+					$bt[0]['line'];
+		if ($exception) {
+			$err['e_msg'] = $exception->getMessage();
+			$err['e_trace'] = $exception->getTraceAsString();
+		}
 	}
 
 	$err_str = json_encode($err);

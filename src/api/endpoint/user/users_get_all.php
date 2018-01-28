@@ -16,7 +16,6 @@
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_util.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
 
@@ -30,7 +29,7 @@
 	session_start();
 	auth_init();
 	if (!auth_is_authorized('admin', FALSE)) {
-		error_and_exit(API_E_NOT_AUTHORIZED);
+		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
 	$users = auth_get_users();
@@ -48,6 +47,6 @@
 
 	$ret_str = json_encode($ret_data);
 	if ($ret_str === FALSE && json_last_error() != JSON_ERROR_NONE) {
-		error_and_exit(API_E_INTERNAL);
+		api_throw(API_E_INTERNAL);
 	}
 	echo $ret_str;

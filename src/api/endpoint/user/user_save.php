@@ -20,7 +20,6 @@
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_util.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
 
@@ -38,7 +37,7 @@
 	session_start();
 	auth_init();
 	if (!auth_is_authorized('admin', FALSE)) {
-		error_and_exit(API_E_NOT_AUTHORIZED);
+		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
 	$new_user = FALSE;
@@ -48,7 +47,7 @@
 		$u = new User();
 		if (!$USER_SAVE->has('pass')) {
 			// New users must have a password.
-			error_and_exit(API_E_INVALID_REQUEST);
+			api_throw(API_E_INVALID_REQUEST);
 		}
 		$u->set_name($USER_SAVE->get('user'));
 		$u->set_groups(array());
@@ -66,7 +65,7 @@
 	try {
 		$u->write();
 	} catch (Exception $e) {
-		error_and_exit(API_E_INTERNAL);
+		api_throw(API_E_INTERNAL, $e);
 	}
 
 	$ret = array(
@@ -77,7 +76,7 @@
 
 	$ret_str = json_encode($ret);
 	if ($ret_str === FALSE && json_last_error() != JSON_ERROR_NONE) {
-		error_and_exit(API_E_INTERNAL);
+		api_throw(API_E_INTERNAL);
 	}
 	echo $ret_str;
 

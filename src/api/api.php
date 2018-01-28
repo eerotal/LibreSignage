@@ -240,7 +240,7 @@ function api_endpoint_init(APIEndpoint $endpoint) {
 	try {
 		$endpoint->load_data();
 	} catch(Exception $e) {
-		error_and_exit($endpoint->last_error());
+		api_throw($endpoint->last_error(), $e);
 	}
 	header('Content-Type: '.$endpoint->get_content_type());
 }

@@ -32,7 +32,7 @@
 	// Check that the requested keys are in SLIDE_REQ_KEYS.
 	if (!count($SLIDE_DATA_QUERY->get()) || !array_is_subset(
 		array_keys($SLIDE_DATA_QUERY->get()), SLIDE_REQ_KEYS)) {
-		error_and_exit(API_E_INVALID_REQUEST);
+		api_throw(API_E_INVALID_REQUEST);
 	}
 
 	$slides = get_slides_id_list();
@@ -44,7 +44,7 @@
 		try {
 			$tmp_slide->load($s);
 		} catch (Exception $e) {
-			error_and_exit(API_E_INTERNAL);
+			api_throw(API_E_INTERNAL, $e);
 		}
 
 		$ret['data'][$s] = array();
@@ -56,7 +56,7 @@
 
 	$ret_json = json_encode($ret);
 	if ($ret === FALSE) {
-		error_and_exit(API_E_INTERNAL);
+		api_throw(API_E_INTERNAL);
 	}
 	echo $ret_json;
 

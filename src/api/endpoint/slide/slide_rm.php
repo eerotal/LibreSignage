@@ -31,9 +31,9 @@
 	if (in_array($SLIDE_RM->get('id'), $slide_list)) {
 		if (!rmdir_recursive(LIBRESIGNAGE_ROOT.SLIDES_DIR
 				.'/'.$SLIDE_RM->get('id'))) {
-			error_and_exit(API_E_INTERNAL);
+			api_throw(API_E_INTERNAL);
 		}
 		echo json_encode(array("error" => API_E_OK));
 		exit(0);
 	}
-	error_and_exit(API_E_INVALID_REQUEST);
+	api_throw(API_E_INVALID_REQUEST);

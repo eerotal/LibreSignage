@@ -39,16 +39,16 @@
 		try {
 			$slide->load($SLIDE_GET->get('id'));
 		} catch (Exception $e) {
-			error_and_exit(API_E_INTERNAL);
+			api_throw(API_E_INTERNAL, $e);
 		}
 
 		$ret = $slide->get_data();
 		$ret['error'] = 0;
 		$ret_str =  json_encode($ret);
 		if ($ret_str === FALSE) {
-			error_and_exit(API_E_INTERNAL);
+			api_throw(API_E_INTERNAL);
 		}
 		echo $ret_str;
 		exit(0);
 	}
-	error_and_exit(API_E_INVALID_REQUEST);
+	api_throw(API_E_INVALID_REQUEST);

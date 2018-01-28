@@ -47,7 +47,7 @@
 		array_keys($SLIDE_SAVE->get()))) {
 
 		// Required params do not exist. Return error.
-		error_and_exit(API_E_INVALID_REQUEST);
+		api_throw(API_E_INVALID_REQUEST);
 	}
 
 	$params_sanitized = array();
@@ -61,7 +61,7 @@
 	$tmp = preg_replace('/[^a-zA-Z0-9_-]/', '',
 				$SLIDE_SAVE->get('name'));
 	if ($tmp === NULL) {
-		error_and_exit(API_E_INTERNAL);
+		api_throw(API_E_INTERNAL);
 	}
 	$params_sanitized['name'] = $tmp;
 
@@ -69,14 +69,14 @@
 	$tmp = filter_var($SLIDE_SAVE->get('index'), FILTER_VALIDATE_INT,
 				$opt_index);
 	if ($tmp === FALSE) {
-		error_and_exit(API_E_INVALID_REQUEST);
+		api_throw(API_E_INVALID_REQUEST);
 	}
 	$params_sanitized['index'] = $tmp;
 
 	// Make sure 'time' is a float value in the correct range.
 	$tmp = filter_var($SLIDE_SAVE->get('time'), FILTER_VALIDATE_FLOAT);
 	if ($tmp === FALSE) {
-		error_and_exit(API_E_INVALID_REQUEST);
+		api_throw(API_E_INVALID_REQUEST);
 	}
 	$params_sanitized['time'] = $tmp;
 
@@ -94,7 +94,7 @@
 	if ($tmp == API_CONST['API_K_NO_CONSTANT']) {
 		$params_sanitized['id'] = $SLIDE_SAVE->get('id');
 	} else if ($tmp != API_CONST['API_K_NULL']) {
-		error_and_exit(API_E_INVALID_REQUEST);
+		api_throw(API_E_INVALID_REQUEST);
 	}
 
 	if (!$slide->set_data($params_sanitized)) {
@@ -102,13 +102,13 @@
 		*  Fails on missing parameters or if the
 		*  provided ID doesn't exist.
 		*/
-		error_and_exit(API_E_INVALID_REQUEST);
+		api_throw(API_E_INVALID_REQUEST);
 	}
 
 	try {
 		$slide->write();
 	} catch (Exception $e) {
-		error_and_exit(API_E_INTERNAL);
+		api_throw(API_E_INTERNAL, $e);
 	}
 
 	juggle_slide_indices($slide->get('id'));
@@ -117,6 +117,6 @@
 	$ret['error'] = API_E_OK;
 	$ret_str = json_encode($ret);
 	if ($ret_str === FALSE) {
-		error_and_exit(API_E_INTERNAL);
+		api_throw(API_E_INTERNAL);
 	}
 	echo $ret_str;
