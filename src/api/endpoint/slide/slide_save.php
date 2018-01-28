@@ -26,9 +26,8 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_util.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_errors.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_constants.php');
 
 	$SLIDE_SAVE = new APIEndpoint(

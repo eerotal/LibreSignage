@@ -17,7 +17,7 @@
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_util.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_errors.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
 
 	$USERS_GET_ALL = new APIEndpoint(

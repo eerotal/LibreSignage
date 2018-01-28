@@ -1,48 +1,77 @@
 <?php
+/*
+*  LibreSignage utility functions.
+*/
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+
+function rmdir_recursive($path) {
 	/*
-	*  LibreSignage utility functions.
+	*  Recursively remove a directory and
+	*  files within it.
 	*/
+	$files = @scandir($path);
+	if ($files === FALSE) {
+		return FALSE;
+	}
 
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+	$files = array_diff($files, array('.', '..'));
 
-	function array_is_equal(array $a, array $b) {
-		/*
-		*  Check if array $a has the same values
-		*  as array $b. Returns TRUE if $a is equal
-		*  to $b and FALSE otherwise.
-		*/
-		if (array_is_subset($a, $b) &&
-			count($a) == count($b)) {
-			return TRUE;
+	foreach ($files as $f) {
+		if (@is_dir($path.'/'.$f)) {
+			if (!rmdir_recursive($path.'/'.$f)) {
+				return FALSE;
+			}
 		} else {
-			return FALSE;
+			if (!@unlink($path.'/'.$f)) {
+				return FALSE;
+			}
 		}
 	}
+	if (!@rmdir($path)) {
+		return FALSE;
+	}
+	return TRUE;
+}
 
-	function array_is_subset(array $a, array $b) {
-		/*
-		*  Check if array $a is a subset of array
-		*  $b. Returns true if $a is a subset of
-		*  $b and false otherwise.
-		*/
-		if (count(array_intersect($a, $b)) == count($a)) {
-			return true;
-		} else {
-			return false;
-		}
+function array_is_equal(array $a, array $b) {
+	/*
+	*  Check if array $a has the same values
+	*  as array $b. Returns TRUE if $a is equal
+	*  to $b and FALSE otherwise.
+	*/
+	if (array_is_subset($a, $b) &&
+		count($a) == count($b)) {
+		return TRUE;
+	} else {
+		return FALSE;
 	}
+}
 
-	function error_redir(int $code) {
-		$tmp = $code;
-		$errors = array(
-			404 => '404 Not Found',
-			403 => '403 Forbidden',
-			500 => '500 Internal Server Error'
-		);
-		if (!array_key_exists($tmp, $errors)) {
-			$tmp = 500;
-		}
-		header($_SERVER['SERVER_PROTOCOL'].$errors[$tmp]);
-		header('Location: '.ERRORS.'/'.$code);
-		exit(0);
+function array_is_subset(array $a, array $b) {
+	/*
+	*  Check if array $a is a subset of array
+	*  $b. Returns true if $a is a subset of
+	*  $b and false otherwise.
+	*/
+	if (count(array_intersect($a, $b)) == count($a)) {
+		return true;
+	} else {
+		return false;
 	}
+}
+
+function error_redir(int $code) {
+	$tmp = $code;
+	$errors = array(
+		404 => '404 Not Found',
+		403 => '403 Forbidden',
+		500 => '500 Internal Server Error'
+	);
+	if (!array_key_exists($tmp, $errors)) {
+		$tmp = 500;
+	}
+	header($_SERVER['SERVER_PROTOCOL'].$errors[$tmp]);
+	header('Location: '.ERRORS.'/'.$code);
+	exit(0);
+}

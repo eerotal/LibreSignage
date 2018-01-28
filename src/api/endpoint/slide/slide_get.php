@@ -19,9 +19,8 @@
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_util.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_errors.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 
 	$SLIDE_GET = new APIEndpoint(
 		$method = API_METHOD['GET'],

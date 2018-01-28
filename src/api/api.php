@@ -3,7 +3,7 @@
 *  APIEndpoint object definition and interface functions.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_util.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
 // API Endpoint request methods.
 define("API_METHOD", array(
