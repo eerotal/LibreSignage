@@ -70,13 +70,8 @@
 
 	$ret = array(
 		'name' => $u->get_name(),
-		'groups' => $u->get_groups(),
-		'error' => API_E_OK
+		'groups' => $u->get_groups()
 	);
 
-	$ret_str = json_encode($ret);
-	if ($ret_str === FALSE && json_last_error() != JSON_ERROR_NONE) {
-		api_throw(API_E_INTERNAL);
-	}
-	echo $ret_str;
-
+	$USER_SAVE->resp_set($ret);
+	$USER_SAVE->send();

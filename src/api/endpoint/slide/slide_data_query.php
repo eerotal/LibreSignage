@@ -52,11 +52,5 @@
 			$ret['data'][$s][$k] = $tmp_slide->get($k);
 		}
 	}
-	$ret['error'] = API_E_OK;
-
-	$ret_json = json_encode($ret);
-	if ($ret === FALSE) {
-		api_throw(API_E_INTERNAL);
-	}
-	echo $ret_json;
-
+	$SLIDE_DATA_QUERY->resp_set($ret);
+	$SLIDE_DATA_QUERY->send();

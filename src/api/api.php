@@ -28,6 +28,7 @@ define("API_P_STR_ALLOW_EMPTY", 0x20);
 class APIEndpoint {
 	private $method = 0;
 	private $response_type = 0;
+	private $response = NULL;
 	private $format = NULL;
 	private $strict_format = TRUE;
 	private $data = NULL;
@@ -226,6 +227,33 @@ class APIEndpoint {
 
 	function is_inited() {
 		return $this->inited;
+	}
+
+	function resp_set(array $resp) {
+		/*
+		*  Set the API response data to $resp.
+		*/
+		$this->response = $resp;
+	}
+
+	function send() {
+		/*
+		*  Send the current API response.
+		*/
+		if (!$this->response) {
+			$this->response = array();
+		}
+		if (!isset($this->response['error'])) {
+			// Make sure the error value exists.
+			$this->response['error'] = API_E_OK;
+		}
+		$resp_str = json_encode($this->response);
+		if ($resp_str === FALSE &&
+			json_last_error() != JSON_ERROR_NONE) {
+			api_throw(API_E_INTERNAL);
+		}
+		echo $resp_str;
+		exit(0);
 	}
 }
 

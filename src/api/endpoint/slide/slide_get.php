@@ -42,13 +42,7 @@
 			api_throw(API_E_INTERNAL, $e);
 		}
 
-		$ret = $slide->get_data();
-		$ret['error'] = 0;
-		$ret_str =  json_encode($ret);
-		if ($ret_str === FALSE) {
-			api_throw(API_E_INTERNAL);
-		}
-		echo $ret_str;
-		exit(0);
+		$SLIDE_GET->resp_set($slide->get_data());
+		$SLIDE_GET->send();
 	}
 	api_throw(API_E_INVALID_REQUEST);

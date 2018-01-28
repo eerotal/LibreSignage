@@ -34,8 +34,7 @@
 
 	$users = auth_get_users();
 	$ret_data = array(
-		'users' => array(),
-		'error' => API_E_OK
+		'users' => array()
 	);
 
 	foreach ($users as $u) {
@@ -45,8 +44,5 @@
 		);
 	}
 
-	$ret_str = json_encode($ret_data);
-	if ($ret_str === FALSE && json_last_error() != JSON_ERROR_NONE) {
-		api_throw(API_E_INTERNAL);
-	}
-	echo $ret_str;
+	$USERS_GET_ALL->resp_set($ret_data);
+	$USERS_GET_ALL->send();

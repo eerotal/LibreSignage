@@ -44,12 +44,8 @@
 		'user' => array(
 			'user' => $u->get_name(),
 			'groups' => $u->get_groups()
-		),
-		'error' => API_E_OK
+		)
 	);
 
-	$ret_str = json_encode($ret_data);
-	if ($ret_str === FALSE && json_last_error() != JSON_ERROR_NONE) {
-		api_throw(API_E_INTERNAL);
-	}
-	echo $ret_str;
+	$USER_GET->resp_set($ret_data);
+	$USER_GET->send();

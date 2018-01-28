@@ -113,10 +113,5 @@
 
 	juggle_slide_indices($slide->get('id'));
 
-	$ret = $slide->get_data();
-	$ret['error'] = API_E_OK;
-	$ret_str = json_encode($ret);
-	if ($ret_str === FALSE) {
-		api_throw(API_E_INTERNAL);
-	}
-	echo $ret_str;
+	$SLIDE_SAVE->resp_set($slide->get_data());
+	$SLIDE_SAVE->send();

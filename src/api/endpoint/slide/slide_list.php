@@ -17,4 +17,5 @@
 	);
 	api_endpoint_init($SLIDE_LIST);
 
-	echo json_encode(get_slides_id_list());
+	$SLIDE_LIST->resp_set(get_slides_id_list());
+	$SLIDE_LIST->send();

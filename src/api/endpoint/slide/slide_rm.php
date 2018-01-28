@@ -33,7 +33,6 @@
 				.'/'.$SLIDE_RM->get('id'))) {
 			api_throw(API_E_INTERNAL);
 		}
-		echo json_encode(array("error" => API_E_OK));
-		exit(0);
+		$SLIDE_RM->send();
 	}
 	api_throw(API_E_INVALID_REQUEST);
