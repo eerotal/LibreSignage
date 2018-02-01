@@ -66,7 +66,7 @@ function _api_construct_GET_data(data) {
 	for (var v in data) {
 		if (typeof data[v] != 'string' &&
 			typeof data[v] != 'number') {
-			throw new Error("GET parameters can only be" +
+			throw new Error("GET parameters can only be " +
 					"numbers or strings!");
 		}
 		if (ret != "") {

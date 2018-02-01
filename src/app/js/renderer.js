@@ -12,11 +12,11 @@ function _renderer_next_slide(c_slide, wrap) {
 	return array_next(
 		slides,
 		c_slide,
-		function(array, key) {
+		(array, key) => {
 			return array[key].get('index');
 		},
 		-1, // Start index when !c_slide.
-		function() {
+		() => {
 			/*
 			*  If no next exists, attempt to wrap
 			*  the 'search'. Note the wrap=false
@@ -45,8 +45,8 @@ function renderer_animate(elem, animation, end_callback) {
 	*/
 
 	elem.addClass(animation);
-	elem.one("animationend", function _callback() {
-		this.classList.remove(animation);
+	elem.one("animationend", (event) => {
+		event.target.classList.remove(animation);
 		if (end_callback) {
 			end_callback();
 		}
@@ -57,7 +57,7 @@ function renderer_update() {
 	/*
 	*  Render the next slide.
 	*/
-	renderer_animate(DISPLAY, 'swipe-left', function() {
+	renderer_animate(DISPLAY, 'swipe-left', () => {
 		c_slide = _renderer_next_slide(c_slide, true);
 		if (!c_slide) {
 			/*
@@ -86,7 +86,7 @@ if ("preview" in params) {
 	console.log("LibreSignage: Preview slide " +
 			params["preview"] + ".");
 	var slide = new Slide();
-	slide.load(params["preview"], function(ret) {
+	slide.load(params["preview"], (ret) => {
 		if (!ret) {
 			console.log("LibreSignage: Failed to " +
 					"preview slide!");
@@ -97,12 +97,12 @@ if ("preview" in params) {
 } else {
 	// Start the normal renderer 'loop'.
 	console.log("LibreSignage: Start the renderer loop.");
-	setInterval(function() {
+	setInterval(() => {
 		list_retrieve(slides_retrieve);
 	}, SLIDES_RETRIEVE_INTERVAL);
 
-	list_retrieve(function() {
-		slides_retrieve(function() {
+	list_retrieve(() => {
+		slides_retrieve(() => {
 			renderer_update();
 		});
 	});
