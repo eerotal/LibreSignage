@@ -75,3 +75,39 @@ function error_redir(int $code) {
 	header('Location: '.ERRORS.'/'.$code);
 	exit(0);
 }
+
+function file_lock_and_get(string $path) {
+	/*
+	*  Basically the same thing as file_get_contents()
+	*  but this function acquires an exclusive lock
+	*  before reading any data.
+	*/
+	$ret = '';
+	$fp = @fopen($path, 'r');
+	if ($fp === FALSE) {
+		throw new Exception('Failed to open file for reading.');
+	}
+	if (flock($fp, LOCK_EX)) {
+		$ret = fread($fp, filesize($path));
+		flock($fp, LOCK_UN);
+	} else {
+		throw new Exception('Failed to lock file.');
+	}
+	fclose($fp);
+	return $ret;
+}
+
+function file_lock_and_put(string $path, string $data) {
+	/*
+	*  Wrapper for file_put_contents() with the
+	*  LOCK_EX flag set.
+	*/
+	if (!is_file($path)) {
+		throw new Exception($path. ' is not a file.');
+	}
+
+	$ret = file_put_contents($path, $data, LOCK_EX);
+	if ($ret === FALSE) {
+		throw new Exception('Failed to write file.');
+	}
+}

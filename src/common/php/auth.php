@@ -44,7 +44,11 @@ class User {
 		if (!is_dir($dir)) {
 			throw new Exception('No user named '.$user.'.');
 		}
-		$json = @file_get_contents($dir.'/data.json');
+		try {
+			$json = file_lock_and_get($dir.'/data.json');
+		} catch(Exception $e) {
+			throw $e;
+		}
 		if ($json === FALSE) {
 			throw new Exception('Failed to read user data!');
 		}
@@ -101,9 +105,11 @@ class User {
 						'directory!');
 			}
 		}
-		$ret = file_put_contents($dir.'/data.json', $json);
-		if ($ret === FALSE) {
-			throw new Exception('Failed to write userdata!');
+
+		try {
+			file_lock_and_put($dir.'/data.json', $json);
+		} catch (Exception $e) {
+			throw $e;
 		}
 	}
 
@@ -291,7 +297,7 @@ function auth_login(string $username, string $password) {
 	}
 
 	if (auth_is_authorized()) {
-		// Already logged in.
+		// Already logged in in the current session.
 		return TRUE;
 	}
 
@@ -303,6 +309,7 @@ function auth_login(string $username, string $password) {
 			return TRUE;
 		}
 	}
+
 	// Login failed.
 	return FALSE;
 }

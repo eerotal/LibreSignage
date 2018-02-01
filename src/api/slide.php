@@ -219,7 +219,13 @@ class Slide {
 		}
 
 		// Read data.
-		$data_str = @file_get_contents($this->paths['config']);
+		try {
+			$data_str = file_lock_and_get(
+				$this->paths['config']);
+		} catch(Exception $e) {
+			throw $e;
+		}
+
 		if ($data_str === FALSE) {
 			throw new Exception("Slide config read error!");
 		}
@@ -227,8 +233,14 @@ class Slide {
 		if ($this->data == NULL) {
 			throw new Exception("Slide config decode error!");
 		}
-		$this->data['markup'] = @file_get_contents(
-					$this->paths['markup']);
+
+		try {
+			$this->data['markup'] = file_lock_and_get(
+						$this->paths['markup']);
+		} catch(Exception $e) {
+			throw $e;
+		}
+
 		if ($this->data['markup'] == FALSE) {
 			throw new Exception("Slide markup read error!");
 			$this->_clear_data();
@@ -329,15 +341,18 @@ class Slide {
 		if ($conf_str === FALSE) {
 			throw new Exception("Slide config encode failed!");
 		}
-		if (!file_put_contents($this->paths['config'],
-					$conf_str)) {
-			throw new Exception("Failed to write slide ".
-						"config!");
+		try {
+			file_lock_and_put($this->paths['config'],
+					$conf_str);
+		} catch(Exception $e) {
+			throw $e;
 		}
-		if (!file_put_contents($this->paths['markup'],
-					$this->data['markup'])) {
-			throw new Exception("Failed to write slide ".
-						"markup!");
+
+		try {
+			file_lock_and_put($this->paths['markup'],
+					$this->data['markup']);
+		} catch(Exception $e) {
+			throw $e;
 		}
 	}
 }
