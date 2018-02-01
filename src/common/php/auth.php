@@ -198,6 +198,20 @@ class User {
 	}
 }
 
+function _auth_error_on_no_session() {
+	if (session_status() != PHP_SESSION_ACTIVE) {
+		throw new Exception('Auth: No session active.');
+	}
+}
+
+function _auth_inited_check(string $additional_msg = '') {
+	global $AUTH_INITED;
+	if (!$AUTH_INITED) {
+		throw new Exception('Authentication system not '.
+				'initialized. '.$additional_msg);
+	}
+}
+
 function _auth_write_users(array $users) {
 	/*
 	*  Write the data from the User objects in $users to
@@ -244,6 +258,7 @@ function _auth_load_users() {
 
 function auth_get_users() {
 	global $AUTH_USERS;
+	_auth_inited_check();
 	return $AUTH_USERS;
 }
 
@@ -290,12 +305,7 @@ function auth_login(string $username, string $password) {
 	*  otherwise. The $_SESSION data is also set when
 	*  the login succeeds.
 	*/
-
-	if (session_status() != PHP_SESSION_ACTIVE) {
-		throw new Exception('No session active when attempted '.
-				'to login.');
-	}
-
+	_auth_error_on_no_session();
 	if (auth_is_authorized()) {
 		// Already logged in in the current session.
 		return TRUE;
@@ -320,12 +330,7 @@ function auth_logout() {
 	*  be started by the caller before calling this function.
 	*  If no session is active, this function throws an exception.
 	*/
-
-	if (session_status() != PHP_SESSION_ACTIVE) {
-		throw new Exception('No session active when attempted '.
-				'to logout.');
-	}
-
+	_auth_error_on_no_session();
 	$_SESSION = array();
 
 	if (ini_get('session.use_cookies')) {
@@ -358,7 +363,7 @@ function auth_is_authorized(array $groups = NULL,
 	*  If both $groups and $users are NULL, access is granted
 	*  to all logged in users.
 	*/
-
+	_auth_error_on_no_session();
 	$auth = FALSE;
 
 	if (!empty($_SESSION['user'])) {
@@ -407,12 +412,9 @@ function auth_is_authorized(array $groups = NULL,
 	}
 }
 
-function _auth_inited_check(string $additional_msg = '') {
-	global $AUTH_INITED;
-	if (!$AUTH_INITED) {
-		throw new Exception('Authentication system not '.
-				'initialized. '.$additional_msg);
-	}
+function auth_get_logged_in_user() {
+	_auth_error_on_no_session();
+	return $_SESSION['user']['user'];
 }
 
 function auth_init() {
@@ -422,12 +424,7 @@ function auth_init() {
 	*  session is active, this function throws an exception.
 	*/
 	global $AUTH_USERS, $AUTH_INITED;
-
-	if (session_status() != PHP_SESSION_ACTIVE) {
-		throw new Exception('No session active when attempting to'.
-				'initialize authentication system.');
-	}
-
+	_auth_error_on_no_session();
 	try {
 		$AUTH_USERS = _auth_load_users();
 	} catch (Exception $e) {

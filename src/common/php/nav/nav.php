@@ -6,6 +6,8 @@
 	*  listed.
 	*/
 
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
+
 	$NAV_PAGE_LINKS = array(
 		'Display' => array(
 			'uri' => APP_PAGE,
@@ -44,21 +46,37 @@
 
 <nav class="nav nav-pills">
 	<div class="row container-fluid mx-auto">
-		<div class="nav-container col-2 d-inline-flex justify-content-start">
-		<p class="nav-item my-auto text-muted lead">LibreSignage</p>
+		<div class="col-md-2 my-auto m-0 p-0">
+			<p class="text-muted lead my-auto">
+				LibreSignage
+			</p>
 		</div>
-		<div class="nav-container col-10 d-inline-flex justify-content-end">
-		<?php
-		foreach (array_keys($NAV_PAGE_LINKS) as $k) {
-			echo '<a class="nav-item nav-link';
-			if (_is_page_active($k)) {
-				echo ' active';
-			}
-			echo '" href="'.
-				$NAV_PAGE_LINKS[$k]['uri'].'">';
-			echo $k.'</a>';
-		}
-		?>
+		<div class="col-md-10 p-0 m-0">
+			<div class="row container-fluid d-flex justify-content-end m-0 p-0">
+				<?php
+				foreach (array_keys($NAV_PAGE_LINKS) as $k) {
+					echo '<div class="col-md-auto m-0 p-0 pt-2 pb-2">';
+					echo '<a class="nav-item nav-link';
+					if (_is_page_active($k)) {
+						echo ' active';
+					}
+					echo '" href="'.
+						$NAV_PAGE_LINKS[$k]['uri'].'">';
+					echo $k.'</a>';
+					echo '</div>';
+				}
+				?>
+				<div class="col-md-auto nav-item my-auto pt-2 pb-2">
+					<a class="my-auto" href="/control/usermgr">[
+						<?php
+							echo auth_get_logged_in_user();
+						?>
+					]</a>
+					<a class="d-inline text-danger nav-link p-0 pl-2" href="/logout">
+						Logout
+					</a>
+				</div>
+			</div>
 		</div>
 	</div>
 </nav>

@@ -23,8 +23,7 @@
 		?>
 		<main class="container-fluid h-100">
 			<div class="container text-muted text-center">
-				<h1 id="user-manager-heading" class="display-4">LibreSignage User Manager</h1>
-				<div id="users-table">
+				<div id="users-table" class="mt-5 mb-5">
 				</div>
 			</div>
 		</main>
