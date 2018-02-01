@@ -23,13 +23,16 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
 
+	define('GROUP_NAME_COMP_REGEX', '/[^A-Za-z0-9_]/');
+	define('USER_NAME_COMP_REGEX', GROUP_NAME_COMP_REGEX);
+
 	$USER_SAVE = new APIEndpoint(
 		$method = API_METHOD['POST'],
 		$response_type = API_RESPONSE['JSON'],
 		$format = array(
 			'user' => API_P_STR,
-			'pass' => API_P_STR|API_P_OPT,
-			'groups' => API_P_ARR|API_P_OPT
+			'pass' => API_P_STR|API_P_OPT|API_P_NULL,
+			'groups' => API_P_ARR|API_P_OPT|API_P_NULL
 		)
 	);
 	api_endpoint_init($USER_SAVE);
@@ -49,14 +52,37 @@
 			// New users must have a password.
 			api_throw(API_E_INVALID_REQUEST);
 		}
+		if (count(preg_grep(USER_NAME_COMP_REGEX,
+			$USER_SAVE->get('user')))) {
+
+			api_throw(API_E_INVALID_REQUEST,
+				new Exception(
+					'Invalid chars in username.'
+				)
+			);
+		}
 		$u->set_name($USER_SAVE->get('user'));
 		$u->set_groups(array());
 	}
 	if ($USER_SAVE->has('pass')) {
-		$u->set_password($USER_SAVE->get('pass'));
+		if ($USER_SAVE->get('pass') != NULL) {
+			$u->set_password($USER_SAVE->get('pass'));
+		}
 	}
 	if ($USER_SAVE->has('groups')) {
-		$u->set_groups($USER_SAVE->get('groups'));
+		if ($USER_SAVE->get('groups') != NULL) {
+			if (count(preg_grep(GROUP_NAME_COMP_REGEX,
+				$USER_SAVE->get('groups')))) {
+
+				api_throw(API_E_INVALID_REQUEST,
+					new Exception(
+						'Invalid chars in '.
+						'group names.'
+					)
+				);
+			}
+			$u->set_groups($USER_SAVE->get('groups'));
+		}
 	}
 
 	// Make sure new users are considered valid.

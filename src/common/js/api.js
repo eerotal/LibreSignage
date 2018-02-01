@@ -6,6 +6,10 @@
 
 var API_ENDP = {
 	// -- User management API endpoints --
+	USER_REMOVE: {
+		uri:	"/api/endpoint/user/user_remove.php",
+		method: "POST"
+	},
 	USER_SAVE: {
 		uri:	"/api/endpoint/user/user_save.php",
 		method: "POST"

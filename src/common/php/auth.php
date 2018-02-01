@@ -37,7 +37,7 @@ class User {
 		/*
 		*  Load data for the user $user from file.
 		*/
-		$dir = LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$user;
+		$dir = $this->_get_data_dir($user);
 		$json = '';
 		$data = NULL;
 
@@ -64,12 +64,27 @@ class User {
 		return $this;
 	}
 
+	public function remove() {
+		/*
+		*  Remove the currently loaded user from the server.
+		*/
+		$this->_error_on_not_ready();
+		$dir = $this->_get_data_dir();
+		if (!is_dir($dir)) {
+			throw new Error("Failed to remove userdata: ".
+					"Directory doesn't exist.");
+		}
+		if (rmdir_recursive($dir) === FALSE) {
+			throw new Error('Failed to remove userdata.');
+		}
+	}
+
 	public function write() {
 		/*
 		*  Write the userdata into files.
 		*/
 		$this->_error_on_not_ready();
-		$dir = LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$this->user;
+		$dir = $this->_get_data_dir();
 		$json = json_encode(array(
 			'user' => $this->user,
 			'groups' => $this->groups,
@@ -90,6 +105,15 @@ class User {
 		if ($ret === FALSE) {
 			throw new Exception('Failed to write userdata!');
 		}
+	}
+
+	private function _get_data_dir($user=NULL) {
+		$tmp = $user;
+		if ($tmp == NULL) {
+			$this->_error_on_not_ready();
+			$tmp = $this->user;
+		}
+		return LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$tmp;
 	}
 
 	private function _error_on_not_ready() {

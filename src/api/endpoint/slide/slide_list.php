@@ -8,6 +8,7 @@
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
 
 	$SLIDE_LIST = new APIEndpoint(

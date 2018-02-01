@@ -24,6 +24,7 @@ define("API_P_FLOAT",		0x4);
 define("API_P_ARR",		0x8);
 define("API_P_OPT",		0x10);
 define("API_P_STR_ALLOW_EMPTY", 0x20);
+define("API_P_NULL",		0x40);
 
 class APIEndpoint {
 	private $method = 0;
@@ -105,6 +106,24 @@ class APIEndpoint {
 	}
 
 	private function _chk_param_type($param, int $bitmask) {
+		/*
+		*  Check whether $param is of the type defined
+		*  in $bitmask.
+		*
+		*  A bitmask can have a real type and NULL
+		*  specified, so check for NULL first and continue
+		*  to other types if NULL isn't specified as a type.
+		*/
+		if (API_P_NULL & $bitmask) {
+			if (gettype($param) == 'NULL') {
+				return TRUE;
+			}
+		}
+
+		/*
+		*  Check for the real types. Only one of these
+		*  can be defined at a time.
+		*/
 		if (API_P_STR & $bitmask) {
 			return gettype($param) == 'string';
 		} elseif (API_P_INT & $bitmask) {
@@ -119,7 +138,20 @@ class APIEndpoint {
 	}
 
 	private function _chk_param_data($param, int $bitmask) {
-		if (API_P_STR & $bitmask && strlen($param) == 0) {
+		/*
+		*  Check whether the data in $param is
+		*  valid according to the type defined in
+		*  $bitmask.
+		*/
+		if (!(API_P_NULL & $bitmask) &&
+			API_P_STR & $bitmask &&
+			strlen($param) == 0) {
+			/*
+			*     Type is not NULL
+			*  -> Type is string
+			*  -> String length is 0
+			*  -> Return TRUE if empty strings are allowed.
+			*/
 			return (API_P_STR_ALLOW_EMPTY & $bitmask) != 0;
 		}
 		return TRUE;
@@ -162,12 +194,10 @@ class APIEndpoint {
 			} else {
 				if (!$this->_chk_param_type($data[$k],
 						$format[$k])) {
-					echo 'Invalid type.';
 					return FALSE;
 				}
 				if (!$this->_chk_param_data($data[$k],
 						$format[$k])) {
-					echo 'Invalid data.';
 					return FALSE;
 				}
 			}

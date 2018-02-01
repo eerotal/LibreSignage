@@ -51,6 +51,30 @@ class User {
 			}
 		);
 	}
+
+	remove(ready_callback) {
+		api_call(API_ENDP.USER_REMOVE, {'user': this.user},
+			function(response) {
+				if (!response || response.error) {
+					throw new Error(
+						"API error while " +
+						"trying to remove user!"
+					);
+				}
+				if (ready_callback) {
+					ready_callback();
+				}
+			}
+		);
+	}
+
+	get_name() {
+		return this.user;
+	}
+
+	get_groups() {
+		return this.groups;
+	}
 }
 
 function _usermgr_error_on_not_ready() {
@@ -59,33 +83,45 @@ function _usermgr_error_on_not_ready() {
 	}
 }
 
-function _usermgr_error_on_invalid_user(user) {
-	if (!user_exists(user)) {
-		throw new Error("User '" + user + "' doesn't exist.");
-	}
-}
-
 function usermgr_is_ready() {
 	return _usermgr_ready;
 }
 
 function users_get() {
+	/*
+	*  Get the current array of users. The caller must
+	*  check whether the user manager is ready first
+	*  by calling usermgr_is_ready(). If the user manager
+	*  is not ready, an error is thrown.
+	*/
 	_usermgr_error_on_not_ready();
 	return _usermgr_users;
 }
 
 function users_load(ready_callback) {
 	/*
-	*  Load the user data for use in the usermgr.
+	*  Load the user data via the API for use in the user manager.
+	*  The data loading is done asynchronously. 'ready_callback'
+	*  is called when the data loading is finished.
 	*/
-	_usermgr_ready = false;
 	api_call(API_ENDP.USERS_GET_ALL, null, function(response) {
 		if (!response || response.error) {
 			throw new Error('User manager API error!');
 		}
 
-		_usermgr_users = response.users;
+		// Convert the response array into User objects.
+		var tmp = null;
+		_usermgr_ready = false;
+		_usermgr_users = [];
+		for (var u in response.users) {
+			tmp = new User();
+			tmp.set(response.users[u].user,
+				response.users[u].groups,
+				null);
+			_usermgr_users.push(tmp);
+		}
 		_usermgr_ready = true;
+
 		console.log("LibreSignage: Loaded user data!");
 
 		if (ready_callback) {
@@ -94,63 +130,20 @@ function users_load(ready_callback) {
 	});
 }
 
-function users_save(user) {
-	/*
-	*  Save the existing user data via the API.
-	*/
-	_usemgr_error_on_not_ready();
-
-	api_call(API_ENDP.USER_SAVE, user, function(response) {
-
-	});
-}
-
 function user_exists(user) {
 	/*
 	*  Check if 'user' exists. Returns true if it does
-	*  and false otherwise.
+	*  and false otherwise. The caller must check whether
+	*  the user manager is ready first by calling
+	*  usermgr_is_ready(). If the user manager is not ready,
+	*  an error is thrown.
 	*/
 	_usermgr_error_on_not_ready();
-	return Object.keys(users_get()).indexOf(user) != -1;
-}
-
-function user_is_in_group(user, group) {
-	/*
-	*  Check whether 'user' is in 'group'.
-	*  Returns true if it is and false otherwise.
-	*/
-	_usermgr_error_on_not_ready();
-	_usermgr_error_on_invalid_user(user);
-	return users_get()[user].groups.indexOf(group) != -1;
-}
-
-function user_get_groups(user) {
-	_usermgr_error_on_not_ready();
-	_usermgr_error_on_invalid_user(user);
-	return users_get()[user].groups;
-}
-
-function user_add_group(user, group) {
-	/*
-	*  Add the user 'user' to 'group'.
-	*/
-	_usermgr_error_on_not_ready();
-	_usermgr_error_on_invalid_user(user);
-	if (user_is_in_group(user, group)) {
-		return;
+	var usrs = users_get();
+	for (var u in usrs) {
+		if (usrs[u].get_name() == user) {
+			return true;
+		}
 	}
-	users_get()[user].groups.push(group);
-}
-
-function user_remove_group(user, group) {
-	/*
-	*  Remove the user 'user' from 'group'.
-	*/
-	var i = 0;
-	_usermgr_error_on_not_ready();
-	_usermgr_error_on_invalid_user(user);
-	i = users_get()[user].groups.indexOf(group);
-	if (i != -1) {
-		users_get()[user].groups.splice(i, 1);
-	}
+	return false;
 }

@@ -13,6 +13,7 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 		<link rel="stylesheet" href="/common/css/footer.css">
 		<link rel="stylesheet" href="/common/css/nav.css">
+		<link rel="stylesheet" href="/common/css/dialog.css">
 		<link rel="stylesheet" href="/control/usermgr/css/usermgr.css">
 		<title>LibreSignage User Manager</title>
 	</head>
@@ -21,7 +22,10 @@
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>
 		<main class="container-fluid h-100">
-			<div class="container text-muted">
+			<div class="container text-muted text-center">
+				<h1 id="user-manager-heading" class="display-4">LibreSignage User Manager</h1>
+				<div id="users-table">
+				</div>
 			</div>
 		</main>
 		<?php
@@ -32,6 +36,8 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
 		<script src="/common/js/api.js"></script>
+		<script src="/common/js/dialog.js"></script>
 		<script src="/control/usermgr/js/usermgr.js"></script>
+		<script src="/control/usermgr/js/usermgr_ui.js"></script>
 	</body>
 </html>
