@@ -32,7 +32,7 @@
 
 	session_start();
 	auth_init();
-	if (!auth_is_authorized('admin', FALSE)) {
+	if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 

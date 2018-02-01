@@ -236,8 +236,11 @@ class APIEndpoint {
 		}
 	}
 
-	function has(string $key) {
+	function has(string $key, bool $null_check = FALSE) {
 		if (in_array($key, array_keys($this->data))) {
+			if ($null_check && $this->data[$key] == NULL) {
+				return FALSE;
+			}
 			return TRUE;
 		} else {
 			return FALSE;

@@ -111,3 +111,22 @@ function file_lock_and_put(string $path, string $data) {
 		throw new Exception('Failed to write file.');
 	}
 }
+
+function gen_passwd(int $len) {
+	/*
+	*  Generate a random password with $len chars in it.
+	*/
+	$chr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.
+		'abcdefghijklmnopqrstuvwxyz'.
+		'0123456789-_';
+	$ret = '';
+	for ($i = 0; $i < $len; $i++) {
+		try {
+			$ret .= substr($chr, random_int(0,
+					strlen($chr) - 1), 1);
+		} catch(Exception $e) {
+			throw $e;
+		}
+	}
+	return $ret;
+}

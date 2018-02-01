@@ -339,40 +339,63 @@ function auth_logout() {
 }
 
 
-function auth_is_authorized(string $group = NULL, bool $redir = FALSE) {
+function auth_is_authorized(array $groups = NULL,
+				array $users = NULL,
+				bool $redir = FALSE) {
 	/*
 	*  Check if the current session is authorized to access
-	*  a page that only the users in the group $group can access
-	*  and return TRUE if it is. FALSE is returned otherwise.
-	*  If 'redir' is TRUE, this function also redirects
-	*  the client to the login page or the HTTP 403 page if access
-	*  is not granted.
+	*  a page and return TRUE if it is. FALSE is returned
+	*  otherwise. $groups and $users can optionally be used
+	*  to filter which groups or users can access a page.
+	*  These arguments are simply lists of group and user names.
+	*  Note that if both $groups and $users are defined, the
+	*  logged in user must only belong to either a group in
+	*  $groups or be a user listed in $users. Both aren't required
+	*  for access to be granted. If 'redir' is TRUE, this
+	*  function also redirects the client to the login page
+	*  or the HTTP 403 page if access is not granted.
 	*
-	*  If $group is set to NULL (which it is by default), this
-	*  function grants access to all logged in users.
+	*  If both $groups and $users are NULL, access is granted
+	*  to all logged in users.
 	*/
 
+	$auth = FALSE;
+
 	if (!empty($_SESSION['user'])) {
-		if ($group == NULL) {
-			/*
-			*  This shortcut speeds things up by not
-			*  loading the userdata from file when not
-			*  needed.
-			*/
+		if ($groups == NULL && $users == NULL) {
+			//  Don't load data from files when not needed.
 			return TRUE;
 		} else {
 			_auth_inited_check('auth_init() call required '.
-					'when $group != NULL in an '.
+					'when $groups != NULL or '.
+					'$users != NULL in an '.
 					'auth_is_authorized() call.');
+
 			$user_obj = _auth_get_user_by_name(
-					$_SESSION['user']['user']);
-			if ($user_obj->is_in_group($group)) {
-				return TRUE;
-			} else {
-				if (!$redir) {
+				$_SESSION['user']['user']);
+
+			if ($users != NULL) {
+				if (in_array($_SESSION['user']['user'],
+						$users)) {
+					$auth = TRUE;
+				}
+			}
+			if ($groups != NULL) {
+				foreach ($groups as $g) {
+					if ($user_obj->is_in_group($g)) {
+						$auth = TRUE;
+						break;
+					}
+				}
+			}
+			if (!$auth) {
+				if ($redir) {
+					error_redir(403);
+				} else {
 					return FALSE;
 				}
-				error_redir(403);
+			} else {
+				return TRUE;
 			}
 		}
 	} else {

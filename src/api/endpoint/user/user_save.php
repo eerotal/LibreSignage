@@ -2,16 +2,23 @@
 	/*
 	*  API endpoint for saving a user's user data.
 	*
+	*  Access is granted in any of the following cases.
+	*    a) The logged in user is in the group 'admin' and
+	*       they are not trying to set a new password. This
+	*       prevents the admin taking over an account.
+	*    b) The logged in user is the user to be modified and
+	*       they are not trying to set user groups. This prevents
+	*       privilege escalation.
+	*
 	*  POST parameters:
-	*    * user    = The user to modify or create.
-	*    * pass    = A new password (Optional for existing users)
-	*    * groups  = New groups (Optional)
+	*    * user    = The user to modify.
+	*    * pass    = New password (Optionally unset or NULL)
+	*    * groups  = New groups (Optionally unset or NULL)
 	*
 	*  Return value:
-	*    A JSON encoded dictionary with the following data.
-	*      * users      = A dictionary of the users and their data
-	*                     with the usernames as the keys.
-	*        * user     = The name of the user.
+	*    A JSON encoded dictionary with the following keys.
+	*      * user  **
+	*        * name     = The name of the user.
 	*        * groups   = The groups the user is in.
 	*      * error      = An error code or API_E_OK on success. ***
 	*
@@ -39,54 +46,58 @@
 
 	session_start();
 	auth_init();
-	if (!auth_is_authorized('admin', FALSE)) {
+
+	// Is authorized as an admin?
+	$auth_admin = auth_is_authorized(
+		$groups = array('admin'),
+		$users = NULL,
+		FALSE
+	);
+
+	// Is authorized as the user to be modified?
+	$auth_usr = auth_is_authorized(
+		$groups = NULL,
+		$users = array($USER_SAVE->get('user')),
+		FALSE
+	);
+
+	// Check for authorization.
+	if (!$auth_admin && !$auth_user) {
+		// Not logged in.
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	$new_user = FALSE;
+	if ($USER_SAVE->has('pass', TRUE) && !$auth_usr) {
+		// Case a) check.
+		api_throw(API_E_NOT_AUTHORIZED);
+	}
+
+	if ($USER_SAVE->has('groups', TRUE) && !$auth_admin) {
+		// Case b) check.
+		api_throw(API_E_NOT_AUTHORIZED);
+	}
+
 	$u = _auth_get_user_by_name($USER_SAVE->get('user'));
 	if ($u == NULL) {
-		// Create new user.
-		$u = new User();
-		if (!$USER_SAVE->has('pass')) {
-			// New users must have a password.
-			api_throw(API_E_INVALID_REQUEST);
-		}
-		if (count(preg_grep(USER_NAME_COMP_REGEX,
-			$USER_SAVE->get('user')))) {
+		// User doesn't exist.
+		api_throw(API_E_INVALID_REQUEST);
+	}
 
+	if ($USER_SAVE->has('pass', TRUE)) {
+		$u->set_password($USER_SAVE->get('pass'));
+	}
+	if ($USER_SAVE->has('groups', TRUE)) {
+		if (count(preg_grep(GROUP_NAME_COMP_REGEX,
+				$USER_SAVE->get('groups')))) {
 			api_throw(API_E_INVALID_REQUEST,
 				new Exception(
-					'Invalid chars in username.'
+					'Invalid chars in '.
+					'group names.'
 				)
 			);
 		}
-		$u->set_name($USER_SAVE->get('user'));
-		$u->set_groups(array());
+		$u->set_groups($USER_SAVE->get('groups'));
 	}
-	if ($USER_SAVE->has('pass')) {
-		if ($USER_SAVE->get('pass') != NULL) {
-			$u->set_password($USER_SAVE->get('pass'));
-		}
-	}
-	if ($USER_SAVE->has('groups')) {
-		if ($USER_SAVE->get('groups') != NULL) {
-			if (count(preg_grep(GROUP_NAME_COMP_REGEX,
-				$USER_SAVE->get('groups')))) {
-
-				api_throw(API_E_INVALID_REQUEST,
-					new Exception(
-						'Invalid chars in '.
-						'group names.'
-					)
-				);
-			}
-			$u->set_groups($USER_SAVE->get('groups'));
-		}
-	}
-
-	// Make sure new users are considered valid.
-	$u->set_ready(TRUE);
 
 	try {
 		$u->write();
@@ -95,8 +106,10 @@
 	}
 
 	$ret = array(
-		'name' => $u->get_name(),
-		'groups' => $u->get_groups()
+		'user' => array(
+			'name' => $u->get_name(),
+			'groups' => $u->get_groups()
+		)
 	);
 
 	$USER_SAVE->resp_set($ret);
