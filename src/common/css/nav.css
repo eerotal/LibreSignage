@@ -18,3 +18,14 @@
 	border-left: 1px solid var(--gray);
 	border-right: 1px solid var(--gray);
 }
+
+.nav-logout-cont {
+	margin-left: 1rem;
+	margin-right: 1rem;
+	margin-top: 0.75rem;
+	margin-bottom: 0.55rem;
+	padding-top: 0.25rem;
+	padding-bottom: 0.25rem;
+	border-top: 1px solid var(--secondary);
+	border-bottom: 1px solid var(--secondary);
+}

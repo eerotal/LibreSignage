@@ -91,13 +91,13 @@
 					echo '</div>';
 				}
 				?>
-				<div class="col-md-auto nav-item my-auto pt-2 pb-2">
-					<a class="my-auto" href="/control/usermgr">[
+				<div class="col-md-auto nav-item my-auto nav-logout-cont">
+					<a class="d-inline nav-link my-auto p-0 pr-1" href="/control/usermgr">[
 						<?php
 							echo auth_session_user()->get_name();
 						?>
 					]</a>
-					<a class="d-inline text-danger nav-link p-0 pl-2" href="/logout">
+					<a class="d-inline text-danger nav-link p-0 pl-1" href="/logout">
 						Logout
 					</a>
 				</div>
