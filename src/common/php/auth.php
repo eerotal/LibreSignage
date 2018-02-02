@@ -12,24 +12,18 @@ class User {
 	private $ready = FALSE;
 
 	public function set(string $user,
-				array $groups,
+				$groups,
 				string $hash) {
-		if (empty($user)) {
-			throw new Exception('Invalid username for '.
-					'User object.');
-		}
 		if (empty($hash)) {
 			throw new Exception('Invalid password hash '.
 					'for user object.');
 		}
-		$this->user = $user;
+
+		$this->set_name($user);
+		$this->set_groups($groups);
 		$this->hash = $hash;
-		if ($groups == NULL) {
-			$this->groups = array();
-		} else {
-			$this->groups = $groups;
-		}
 		$this->ready = TRUE;
+
 		return $this;
 	}
 
@@ -181,8 +175,14 @@ class User {
 		}
 	}
 
-	public function set_groups(array $groups) {
-		$this->groups = $groups;
+	public function set_groups($groups) {
+		if ($groups == NULL) {
+			$this->groups = array();
+		} else if (gettype($groups) == 'array') {
+			$this->groups = $groups;
+		} else {
+			throw new Exception('Invalid type for $groups.');
+		}
 	}
 
 	public function set_password(string $password) {
@@ -194,6 +194,9 @@ class User {
 	}
 
 	public function set_name(string $name) {
+		if (empty($name)) {
+			throw new Exception('Invalid username.');
+		}
 		$this->user = $name;
 	}
 }

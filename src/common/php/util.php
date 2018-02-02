@@ -97,13 +97,28 @@ function file_lock_and_get(string $path) {
 	return $ret;
 }
 
-function file_lock_and_put(string $path, string $data) {
+function file_lock_and_put(string $path,
+			string $data,
+			bool $create = TRUE) {
 	/*
 	*  Wrapper for file_put_contents() with the
-	*  LOCK_EX flag set.
+	*  LOCK_EX flag set. This function also
+	*  recursively creates the path to the file
+	*  if $create == TRUE and the path doesn't
+	*  already exist.
 	*/
-	if (!is_file($path)) {
-		throw new Exception($path. ' is not a file.');
+	if (!is_dir(dirname($path))) {
+		if ($create) {
+			if (!@$mkdir(dirname($path), 0775, TRUE)) {
+				throw new Exception('Failed to create '.
+						'directory.');
+			}
+		} else {
+			throw new Exception("Directory doesn't exist.");
+		}
+	}
+	if (!is_file($path) && !$create) {
+		throw new Exception("File doesn't exist.");
 	}
 
 	$ret = file_put_contents($path, $data, LOCK_EX);
