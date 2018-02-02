@@ -199,7 +199,7 @@ class User {
 }
 
 function _auth_error_on_no_session() {
-	if (session_status() != PHP_SESSION_ACTIVE) {
+	if (session_status() == PHP_SESSION_NONE) {
 		throw new Exception('Auth: No session active.');
 	}
 }
@@ -412,9 +412,9 @@ function auth_is_authorized(array $groups = NULL,
 	}
 }
 
-function auth_get_logged_in_user() {
+function auth_session_user() {
 	_auth_error_on_no_session();
-	return $_SESSION['user']['user'];
+	return _auth_get_user_by_name($_SESSION['user']['user']);
 }
 
 function auth_init() {

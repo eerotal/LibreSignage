@@ -11,19 +11,27 @@
 	$NAV_PAGE_LINKS = array(
 		'Display' => array(
 			'uri' => APP_PAGE,
-			'active' => FALSE
+			'active' => FALSE,
+			'groups' => NULL
 		),
 		'Editor' => array(
 			'uri' => EDITOR_PAGE,
-			'active' => FALSE
+			'active' => FALSE,
+			'groups' => array(
+				'editor'
+			)
 		),
 		'User Manager' => array(
 			'uri' => USER_MGR_PAGE,
-			'active' => FALSE
+			'active' => FALSE,
+			'groups' => array(
+				'admin'
+			)
 		),
 		'Control Panel' => array(
 			'uri' => CONTROL_PANEL_PAGE,
-			'active' => FALSE
+			'active' => FALSE,
+			'groups' => NULL
 		)
 	);
 
@@ -42,6 +50,20 @@
 		}
 		return $NAV_PAGE_LINKS[$name]['active'];
 	}
+
+	function _can_access_page(string $name) {
+		global $NAV_PAGE_LINKS;
+		if ($NAV_PAGE_LINKS[$name]['groups'] == NULL ) {
+			// 'groups' == NULL -> All groups have access.
+			return TRUE;
+		}
+		foreach ($NAV_PAGE_LINKS[$name]['groups'] as $g) {
+			if (auth_session_user()->is_in_group($g)) {
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
 ?>
 
 <nav class="nav nav-pills">
@@ -55,6 +77,9 @@
 			<div class="row container-fluid d-flex justify-content-end m-0 p-0">
 				<?php
 				foreach (array_keys($NAV_PAGE_LINKS) as $k) {
+					if (!_can_access_page($k)) {
+						continue;
+					}
 					echo '<div class="col-md-auto m-0 p-0 pt-2 pb-2">';
 					echo '<a class="nav-item nav-link';
 					if (_is_page_active($k)) {
@@ -69,7 +94,7 @@
 				<div class="col-md-auto nav-item my-auto pt-2 pb-2">
 					<a class="my-auto" href="/control/usermgr">[
 						<?php
-							echo auth_get_logged_in_user();
+							echo auth_session_user()->get_name();
 						?>
 					]</a>
 					<a class="d-inline text-danger nav-link p-0 pl-2" href="/logout">
