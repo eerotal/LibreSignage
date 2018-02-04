@@ -1,18 +1,21 @@
 USERS_TABLE = $('#users-table');
 
 // User table row template.
-const usr_table_row = (index, name, groups) => `
+const usr_table_row = (index, name, groups, pass) => `
 	<div class="row usr-table-row" id="usr-row-${name}">
-		<div id="usr-index-${name}" class="usr-table-col col-2">
+		<div id="usr-index-${name}" class="usr-table-col col-1">
 			${index}
 		</div>
-		<div id="usr-name-${name}" class="usr-table-col col-4">
+		<div id="usr-name-${name}" class="usr-table-col col-2">
 			${name}
 		</div>
-		<div id="usr-groups-${name}" class="usr-table-col col-4">
+		<div id="usr-groups-${name}" class="usr-table-col col-3">
 			${groups}
 		</div>
-		<div class="usr-table-col col-2">
+		<div id="usr-info-${name}" class="usr-table-col col-3">
+			${pass}
+		</div>
+		<div class="usr-table-col col-3">
 			<button type="button"
 				role="button"
 				class="btn btn-primary"
@@ -28,11 +31,11 @@ const usr_table_row = (index, name, groups) => `
 	<div class="collapse usr-edit-row" id="usr-edit-${name}">
 		<div class="usr-edit-row-container">
 			<div class="row usr-edit-input-row">
-				<label class="col-2 col-form-label"
+				<label class="col-3 col-form-label"
 					for="usr-name-input-${name}">
 					User
 				</label>
-				<div class="col-10">
+				<div class="col-9">
 					<input id="usr-name-input-${name}"
 						type="text"
 						class="form-control"
@@ -42,11 +45,11 @@ const usr_table_row = (index, name, groups) => `
 				</div>
 			</div>
 			<div class="row usr-edit-input-row">
-				<label class="col-2 col-form-label"
+				<label class="col-3 col-form-label"
 					for="usr-groups-input-${name}">
 					Groups
 				</label>
-				<div class="col-10">
+				<div class="col-9">
 					<input id="usr-groups-input-${name}"
 						type="text"
 						class="form-control"
@@ -182,21 +185,51 @@ function usermgr_remove(name) {
 }
 
 function usermgr_create() {
-	console.log("Create user!");
+	dialog(DIALOG.PROMPT,
+		'Create a user',
+		'Enter a name for the new user.',
+		(status, val) => {
+			if (!status) {
+				return;
+			}
+			api_call(API_ENDP.USER_CREATE,
+				{'user': val}, (response) => {
+				if (!response || response.error) {
+					throw new Error('API error ' +
+						'while creating a new ' +
+						'user.')
+				}
+
+				var tmp = new User();
+				tmp.set(response.user.name,
+					response.user.groups,
+					null);
+				tmp.set_info('Password: ' +
+					response.user.pass);
+				users_add(tmp);
+				usermgr_make_ui();
+			});
+		}
+	);
 }
 
 function usermgr_make_ui() {
 	/*
 	*  Render the user manager UI.
 	*/
+	var grps = null;
+	var info = null;
 	var i = 0;
 	var usrs = users_get();
 	USERS_TABLE.empty();
 	for (var u in usrs) {
+		grps = usrs[u].get_groups();
+		info = usrs[u].get_info();
 		USERS_TABLE.append(usr_table_row(
 			i,
 			usrs[u].get_name(),
-			usrs[i].get_groups()
+			!grps || !grps.length ? '' : grps.join(', '),
+			!info ? '' : info,
 		));
 		i++;
 	}

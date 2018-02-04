@@ -23,9 +23,27 @@
 		?>
 		<main class="container-fluid h-100">
 			<div class="container text-muted text-center">
-				<div id="users-table" class="container-fluid mt-5 mb-3">
+				<div class="container-fluid mt-5">
+					<div class="row usr-table-row">
+						<div class="usr-table-col col-1">
+							#
+						</div>
+						<div class="usr-table-col col-2">
+							User
+						</div>
+						<div class="usr-table-col col-3">
+							Groups
+						</div>
+						<div class="usr-table-col col-3">
+							Information
+						</div>
+						<div class="usr-table-col col-3">
+						</div>
+					</div>
 				</div>
-				<div class="container-fluid md-5">
+				<div id="users-table" class="container-fluid mt-3">
+				</div>
+				<div class="container-fluid mt-3 md-5">
 					<div class="usr-table-row">
 						<div class="usr-table-col">
 							<input type="button"

@@ -75,6 +75,14 @@ class User {
 	get_groups() {
 		return this.groups;
 	}
+
+	set_info(info) {
+		this.info = info;
+	}
+
+	get_info() {
+		return this.info;
+	}
 }
 
 function _usermgr_error_on_not_ready() {
@@ -96,6 +104,21 @@ function users_get() {
 	*/
 	_usermgr_error_on_not_ready();
 	return _usermgr_users;
+}
+
+function user_get_by_name(user) {
+	_usermgr_error_on_not_ready();
+	var usrs = users_get();
+	for (var u in usrs) {
+		if (usrs[u].get_name() == user) {
+			return usrs[u];
+		}
+	}
+}
+
+function users_add(user) {
+	_usermgr_error_on_not_ready();
+	_usermgr_users.push(user);
 }
 
 function users_load(ready_callback) {

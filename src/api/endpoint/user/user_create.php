@@ -28,7 +28,7 @@
 	define('USER_REGEX', GROUPS_REGEX);
 
 	$USER_CREATE = new APIEndpoint(
-		$method = API_METHOD['GET'],
+		$method = API_METHOD['POST'],
 		$response_type = API_RESPONSE['JSON'],
 		$format = array(
 			'user' => API_P_STR,
