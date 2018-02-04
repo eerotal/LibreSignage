@@ -10,7 +10,7 @@
 *    [lead]TEXT[/lead]   ==> Lead paragraph.
 *    [b]TEXT[/b]         ==> Bold text.
 *    [i]TEXT[/i]         ==> Italics text.
-*    [img ADDRESS]       ==> Embed image from ADDRESS.
+*    [img ADDRESS w h]   ==> Embed an image from ADDRESS.
 *    [p]                 ==> Open paragraph.
 *    [/p]                ==> Close paragraph.
 *    [color COLOR]       ==> Open a color block.
@@ -204,9 +204,13 @@ const MARKUP = {
 	'image': new MarkupClass(
 		'block',
 		'img',
-		{'url': {'arg_type': 'url'}},
-		'<img src="%0">',
-		'</span>',
+		{
+			'url': {'arg_type': 'url'},
+			'width': {'arg_type': 'int'},
+			'height': {'arg_type': 'int'}
+		},
+		'<img src="%0" style="width: %1vw; height: %2vh">',
+		'</img>',
 		null,
 		true
 	),

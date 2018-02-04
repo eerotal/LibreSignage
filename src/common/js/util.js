@@ -102,3 +102,8 @@ function get_GET_parameters() {
 	}
 	return params;
 }
+
+function sanitize_html(src) {
+	// Sanitize HTML tags.
+	return $("<div></div>").text(src).html();
+}

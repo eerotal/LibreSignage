@@ -68,7 +68,10 @@ function renderer_update() {
 				DEFAULT_RENDERER_UPDATE_INTERVAL);
 			return;
 		}
-		DISPLAY.html(markup_parse(c_slide.get('markup')));
+
+		DISPLAY.html(markup_parse(sanitize_html(
+			c_slide.get('markup')
+		)));
 
 		renderer_animate(DISPLAY, 'swipe-from-right', null);
 
@@ -92,7 +95,9 @@ if ("preview" in params) {
 					"preview slide!");
 			return;
 		}
-		DISPLAY.html(markup_parse(slide.get("markup")));
+		DISPLAY.html(markup_parse(sanitize_html(
+			slide.get("markup")
+		)));
 	});
 } else {
 	// Start the normal renderer 'loop'.

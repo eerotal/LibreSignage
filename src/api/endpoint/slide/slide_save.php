@@ -80,7 +80,6 @@
 	}
 	$params_sanitized['time'] = $tmp;
 
-	// TODO: Sanitize & process the markup!
 	$params_sanitized['markup'] = $SLIDE_SAVE->get('markup');
 
 	$slide = new Slide();
