@@ -3,7 +3,7 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
 	session_start();
 	auth_init();
-	auth_is_authorized(array('admin'), NULL, TRUE);
+	auth_is_authorized(NULL, NULL, TRUE);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,45 +14,64 @@
 		<link rel="stylesheet" href="/common/css/footer.css">
 		<link rel="stylesheet" href="/common/css/nav.css">
 		<link rel="stylesheet" href="/common/css/dialog.css">
-		<link rel="stylesheet" href="/control/usermgr/css/usermgr.css">
-		<title>LibreSignage User Manager</title>
+		<link rel="stylesheet" href="/control/user/css/user.css">
+		<title>LibreSignage User Settings</title>
 	</head>
 	<body class="bg-dark">
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>
-		<main class="container-fluid h-100">
-			<div class="container text-muted text-center">
-				<div class="container-fluid mt-5">
-					<div class="row usr-table-row">
-						<div class="usr-table-col col-1">
-							#
-						</div>
-						<div class="usr-table-col col-2">
-							User
-						</div>
-						<div class="usr-table-col col-3">
+		<main class="container-fluid h-100 mt-5">
+			<div class="user-settings-cont container text-muted mx-auto">
+				<div class="row form-group">
+					<label class="col-sm-4 col-form-label"
+						for="user-name">
+						Username
+					</label>
+					<input id="user-name"
+						type="text"
+						class="col-sm-8 form-control"
+						readonly>
+					</input>
+				</div>
+				<div class="row form-group">
+					<label class="col-sm-4 col-form-label"
+						for="user-groups">
 							Groups
-						</div>
-						<div class="usr-table-col col-3">
-							Information
-						</div>
-						<div class="usr-table-col col-3">
-						</div>
-					</div>
+					</label>
+					<input id="user-groups"
+						type="text"
+						class="col-sm-8 form-control"
+						readonly>
+					</input>
 				</div>
-				<div id="users-table" class="container-fluid mt-3">
+				<div class="row form-group">
+					<label class="col-sm-4 col-form-label"
+						for="user-pass">
+						Password
+					</label>
+					<input id="user-pass"
+						type="password"
+						class="col-sm-8 form-control">
+					</input>
 				</div>
-				<div class="container-fluid mt-3 md-5">
-					<div class="usr-table-row">
-						<div class="usr-table-col">
-							<input type="button"
-								class="btn btn-primary"
-								value="Create user"
-								onclick="usermgr_create()">
-							</input>
-						</div>
-					</div>
+				<div class="row form-group">
+					<label class="col-sm-4 col-form-label"
+						for="user-pass-confirm">
+						Confirm&nbsp;password
+					</label>
+					<input id="user-pass-confirm"
+						type="password"
+						class="col-sm-8 form-control">
+					</input>
+				</div>
+				<div class="row form-group">
+					<input id="user-save"
+						class="col-sm-12 btn btn-primary"
+						type="button"
+						value="Save"
+						onclick="user_settings_save()">
+					</input>
 				</div>
 			</div>
 		</main>
@@ -66,6 +85,6 @@
 		<script src="/common/js/api.js"></script>
 		<script src="/common/js/dialog.js"></script>
 		<script src="/common/js/user.js"></script>
-		<script src="/control/usermgr/js/usermgr_ui.js"></script>
+		<script src="/control/user/js/user.js"></script>
 	</body>
 </html>

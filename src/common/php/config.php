@@ -34,6 +34,7 @@
 	define("CONTROL_PANEL_PAGE",			"/control");
 	define("APP_PAGE",				"/app");
 	define("USER_MGR_PAGE",				"/control/usermgr");
+	define("USER_SETTINGS_PAGE",			"/control/user");
 
 	define("LOGIN_LANDING", 			CONTROL_PANEL_PAGE);
 	define("LOGOUT_LANDING",			LOGOUT_PAGE);

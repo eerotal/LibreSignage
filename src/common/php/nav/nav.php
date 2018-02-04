@@ -37,6 +37,11 @@
 				'admin'
 			)
 		),
+		'Settings' => array(
+			'uri' => USER_SETTINGS_PAGE,
+			'active' => FALSE,
+			'groups' => NULL
+		),
 		'Control Panel' => array(
 			'uri' => CONTROL_PANEL_PAGE,
 			'active' => FALSE,
@@ -101,7 +106,7 @@
 				}
 				?>
 				<div class="col-md-auto nav-item my-auto nav-logout-cont">
-					<a class="d-inline nav-link my-auto p-0 pr-1" href="/control/usermgr">[
+					<a class="d-inline nav-link my-auto p-0 pr-1" href="/control/user">[
 						<?php
 							echo auth_session_user()->get_name();
 						?>

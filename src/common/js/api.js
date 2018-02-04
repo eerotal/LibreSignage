@@ -22,6 +22,10 @@ var API_ENDP = {
 		uri:	"/api/endpoint/user/user_get.php",
 		method: "GET"
 	},
+	USER_GET_CURRENT: {
+		uri:	"/api/endpoint/user/user_get_current.php",
+		method: "GET"
+	},
 	USERS_GET_ALL: {
 		uri:	"/api/endpoint/user/users_get_all.php",
 		method:	"GET"
