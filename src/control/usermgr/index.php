@@ -22,8 +22,8 @@
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>
 		<main class="container-fluid h-100">
-			<div class="container text-muted text-center">
-				<div class="container-fluid mt-5">
+			<div class="container text-muted text-center mt-5 mb-5">
+				<div class="container-fluid">
 					<div class="row usr-table-row">
 						<div class="usr-table-col col-1">
 							#

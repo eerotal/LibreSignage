@@ -1,6 +1,8 @@
 .user-settings-cont {
 	min-width: 200px;
 	max-width: 500px;
+	padding-left: 45px;
+	padding-right: 45px;
 }
 
 .is-invalid-label {

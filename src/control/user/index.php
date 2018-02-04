@@ -21,8 +21,8 @@
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>
-		<main class="container-fluid h-100 mt-5">
-			<div class="user-settings-cont container text-muted mx-auto">
+		<main class="container-fluid h-100">
+			<div class="user-settings-cont container text-muted mx-auto mt-5 mb-5">
 				<div class="row form-group">
 					<label class="col-sm-4 col-form-label"
 						for="user-name">
