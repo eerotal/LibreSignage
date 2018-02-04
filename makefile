@@ -1,9 +1,14 @@
 INSTALL_DIR=/var/www/html
 
-.PHONY: install LOC
-.SILENT: install LOC
+.PHONY: install verify LOC
+.SILENT: install verify LOC
 
-install:
+verify:
+	echo '## Verify LibreSignage sources'
+	./verify.sh
+
+install: verify
+	echo '## Install'
 	./install.sh $(INSTALL_DIR)
 
 LOC:

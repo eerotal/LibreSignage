@@ -3,6 +3,8 @@
 	*  LibreSignage API call constants.
 	*/
 
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+
 	define("API_CONST", array(
 		'API_K_NO_CONSTANT' => 0,
 		'API_K_NULL'        => 1,

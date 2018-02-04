@@ -18,29 +18,32 @@
 	*    *** (The error codes are listed in api_errors.php.)
 	*/
 
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_util.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_errors.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 
-	header_plaintext();
+	$SLIDE_GET = new APIEndpoint(
+		$method = API_METHOD['GET'],
+		$response_type = API_RESPONSE['JSON'],
+		$format = array(
+			'id' => API_P_STR
+		)
+	);
+	api_endpoint_init($SLIDE_GET);
+
 	$list = get_slides_id_list();
 
-	if (!empty($_GET['id']) && in_array($_GET['id'], $list)) {
+	if (in_array($SLIDE_GET->get('id'), $list)) {
 		// Get by ID.
 		$slide = new Slide();
 		try {
-			$slide->load($_GET['id']);
+			$slide->load($SLIDE_GET->get('id'));
 		} catch (Exception $e) {
-			error_and_exit(API_E_INTERNAL);
+			api_throw(API_E_INTERNAL, $e);
 		}
 
-		$ret = $slide->get_data();
-		$ret['error'] = 0;
-		$ret_str =  json_encode($ret);
-		if ($ret_str === FALSE) {
-			error_and_exit(API_E_INTERNAL);
-		}
-		echo $ret_str;
-		exit(0);
+		$SLIDE_GET->resp_set($slide->get_data());
+		$SLIDE_GET->send();
 	}
-	error_and_exit(API_E_INVALID_REQUEST);
+	api_throw(API_E_INVALID_REQUEST);

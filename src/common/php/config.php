@@ -3,8 +3,15 @@
 	*  LibreSignage config code and constants.
 	*/
 
-	error_reporting(E_ALL);
-	ini_set('display_errors', 1);
+	/*
+	*  Build time flags
+	*    !!BUILD_VERIFY_NOCONFIG!!
+	*/
+
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/error.php');
+
+	// Enable debugging. Never set this to TRUE on a production system.
+	define("LIBRESIGNAGE_DEBUG",			TRUE);
 
 	define("LIBRESIGNAGE_ROOT",			$_SERVER['DOCUMENT_ROOT']);
 
@@ -15,6 +22,7 @@
 	define("SLIDES_DIR", 				"/data/slides");
 	define("LIBRESIGNAGE_LICENSE_FILE_PATH",	"/doc/LICENSE.md");
 	define("LIBRARY_LICENSES_FILE_PATH",		"/doc/LIBRARY_LICENSES.md");
+	define("NAV_PATH",				"/common/php/nav/nav.php");
 	define("FOOTER_PATH",				"/common/php/footer/footer.php");
 	define("FOOTER_MINIMAL_PATH",			"/common/php/footer/footer_minimal.php");
 	define("USER_DATA_DIR",				"/data/users");
@@ -23,10 +31,25 @@
 	define("LOGOUT_PAGE", 				"/logout");
 	define("ABOUT_PAGE",				"/about");
 	define("EDITOR_PAGE",				"/control/editor");
-	define("CONTROL_PAGE",				"/control");
+	define("CONTROL_PANEL_PAGE",			"/control");
 	define("APP_PAGE",				"/app");
+	define("USER_MGR_PAGE",				"/control/usermgr");
 
-	define("LOGIN_LANDING", 			CONTROL_PAGE);
+	define("LOGIN_LANDING", 			CONTROL_PANEL_PAGE);
 	define("LOGOUT_LANDING",			LOGOUT_PAGE);
 
-	define("ERR_403",				"/errors/403");
+	define("ERRORS",				"/errors");
+
+
+	/*
+	*  Setup error handling and reporting.
+	*/
+	if (LIBRESIGNAGE_DEBUG) {
+		error_reporting(E_ALL);
+		ini_set('display_errors', 1);
+		error_set_debug(TRUE);
+	}
+
+	set_exception_handler(function(Throwable $e) {
+		error_handle(500, $e);
+	});

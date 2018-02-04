@@ -1,0 +1,25 @@
+<?php
+	/*
+	*
+	*  API handle to get a list of all the existing slides.
+	*
+	*  Return value:
+	*    A JSON encoded array with all the existing slide IDs.
+	*/
+
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
+
+	$SLIDE_LIST = new APIEndpoint(
+		$method = API_METHOD['GET'],
+		$response_type = API_RESPONSE['JSON'],
+		$format = NULL
+	);
+	api_endpoint_init($SLIDE_LIST);
+
+	$SLIDE_LIST->resp_set(array(
+		'slides' => get_slides_id_list()
+	));
+	$SLIDE_LIST->send();

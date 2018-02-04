@@ -1,0 +1,42 @@
+#user-manager-heading {
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+
+.usr-table-row {
+	margin: 0;
+	padding: 0;
+	background-color: #212529;
+}
+
+.usr-table-col {
+	padding: 0;
+	border-bottom: 1px solid dimgrey;
+	color: white;
+	height: 60px;
+	line-height: 60px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.usr-edit-row {
+	color: black;
+	background-color: var(--secondary);
+}
+
+.usr-edit-row-container {
+	width: 75%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.usr-edit-input-row {
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+.usr-edit-btn {
+	margin-left: 5px;
+	margin-right: 5px;
+}

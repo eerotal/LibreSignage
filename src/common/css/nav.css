@@ -1,0 +1,31 @@
+.nav {
+	padding-top: 20px !important;
+	padding-bottom: 20px !important;
+	padding-left: 25px !important;
+	padding-right: 25px !important;
+}
+
+.nav-vdiv {
+	width: 0;
+	padding: 0;
+	margin-left: 10px;
+	margin-right:10px;
+	margin-top: 4px;
+	margin-bottom: 4px;
+}
+
+.nav-vdiv-gray {
+	border-left: 1px solid var(--gray);
+	border-right: 1px solid var(--gray);
+}
+
+.nav-logout-cont {
+	margin-left: 1rem;
+	margin-right: 1rem;
+	margin-top: 0.75rem;
+	margin-bottom: 0.55rem;
+	padding-top: 0.25rem;
+	padding-bottom: 0.25rem;
+	border-top: 1px solid var(--secondary);
+	border-bottom: 1px solid var(--secondary);
+}
