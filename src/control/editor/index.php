@@ -23,11 +23,14 @@
 		?>
 		<main role="main" class="container-fluid h-100">
 			<div class="container-main container-fluid w-100 h-100 text-muted">
-				<div class="container-fluid btn-row m-0">
-					<div id="slidelist" class="col-12 d-flex flex-wrap justify-content-center">
+				<div class="container-fluid col">
+					<span class="col">Slides</span>
+				</div>
+				<div class="container-fluid col">
+					<div id="slidelist" class="col-12 d-flex flex-wrap">
 					</div>
 				</div>
-				<div class="editor row container-fluid">
+				<div class="editor container-fluid row">
 					<div class="col-md-auto">
 						<label for="slide-name">Name</label>
 						<input type="text"

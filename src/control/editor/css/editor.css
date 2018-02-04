@@ -7,16 +7,9 @@ html, body {
 	padding-right: auto;
 }
 
-#slidelist {
-	padding-left: 15px;
-	padding-right: 15px;
-	padding-top: 0px;
-	padding-bottom: 0px;
-}
-
 /* Controls styling. */
 .btn-slide {
-	margin: 5px 5px 5px 5px;
+	margin: 5px 10px 5px 0px;
 }
 
 .btn-slide-ctrl {
