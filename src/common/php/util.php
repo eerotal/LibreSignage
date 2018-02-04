@@ -61,21 +61,6 @@ function array_is_subset(array $a, array $b) {
 	}
 }
 
-function error_redir(int $code) {
-	$tmp = $code;
-	$errors = array(
-		404 => '404 Not Found',
-		403 => '403 Forbidden',
-		500 => '500 Internal Server Error'
-	);
-	if (!array_key_exists($tmp, $errors)) {
-		$tmp = 500;
-	}
-	header($_SERVER['SERVER_PROTOCOL'].$errors[$tmp]);
-	header('Location: '.ERRORS.'/'.$code);
-	exit(0);
-}
-
 function file_lock_and_get(string $path) {
 	/*
 	*  Basically the same thing as file_get_contents()

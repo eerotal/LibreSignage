@@ -6,12 +6,12 @@
 .usr-table-row {
 	margin: 0;
 	padding: 0;
+	background-color: #212529;
 }
 
 .usr-table-col {
 	border-bottom: 1px solid dimgrey;
 	color: white;
-	background-color: #212529;
 	height: 60px;
 	line-height: 60px;
 }

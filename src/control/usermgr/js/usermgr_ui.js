@@ -181,6 +181,10 @@ function usermgr_remove(name) {
 	);
 }
 
+function usermgr_create() {
+	console.log("Create user!");
+}
+
 function usermgr_make_ui() {
 	/*
 	*  Render the user manager UI.

@@ -398,7 +398,7 @@ function auth_is_authorized(array $groups = NULL,
 			}
 			if (!$auth) {
 				if ($redir) {
-					error_redir(403);
+					error_handle(403);
 				} else {
 					return FALSE;
 				}
@@ -428,11 +428,6 @@ function auth_init() {
 	*/
 	global $AUTH_USERS, $AUTH_INITED;
 	_auth_error_on_no_session();
-	try {
-		$AUTH_USERS = _auth_load_users();
-	} catch (Exception $e) {
-		// TODO: Error logging.
-		throw $e;
-	}
+	$AUTH_USERS = _auth_load_users();
 	$AUTH_INITED = TRUE;
 }

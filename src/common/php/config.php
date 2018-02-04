@@ -3,8 +3,15 @@
 	*  LibreSignage config code and constants.
 	*/
 
-	error_reporting(E_ALL);
-	ini_set('display_errors', 1);
+	/*
+	*  Build time flags
+	*    !!BUILD_VERIFY_NOCONFIG!!
+	*/
+
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/error.php');
+
+	// Enable debugging. Never set this to TRUE on a production system.
+	define("LIBRESIGNAGE_DEBUG",			TRUE);
 
 	define("LIBRESIGNAGE_ROOT",			$_SERVER['DOCUMENT_ROOT']);
 
@@ -32,4 +39,17 @@
 	define("LOGOUT_LANDING",			LOGOUT_PAGE);
 
 	define("ERRORS",				"/errors");
-	define("ERR_403",				"/errors/403");
+
+
+	/*
+	*  Setup error handling and reporting.
+	*/
+	if (LIBRESIGNAGE_DEBUG) {
+		error_reporting(E_ALL);
+		ini_set('display_errors', 1);
+		error_set_debug(TRUE);
+	}
+
+	set_exception_handler(function(Throwable $e) {
+		error_handle(500, $e);
+	});

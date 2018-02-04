@@ -7,6 +7,7 @@
 	*    A JSON encoded array with all the existing slide IDs.
 	*/
 
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');

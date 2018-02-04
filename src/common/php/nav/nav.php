@@ -6,7 +6,16 @@
 	*  listed.
 	*/
 
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
+
+	if (!auth_is_authorized(NULL, NULL)) {
+		throw new Exception("Can't display navigation ".
+			"bar when not logged in. You should check ".
+			"for authorization before including ".
+			"'nav.php'.");
+	}
 
 	$NAV_PAGE_LINKS = array(
 		'Display' => array(

@@ -17,6 +17,7 @@
 	*    *** (The error codes are listed in api_errors.php.)
 	*/
 
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');

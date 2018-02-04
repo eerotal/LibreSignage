@@ -23,7 +23,18 @@
 		?>
 		<main class="container-fluid h-100">
 			<div class="container text-muted text-center">
-				<div id="users-table" class="mt-5 mb-5">
+				<div id="users-table" class="container-fluid mt-5 mb-3">
+				</div>
+				<div class="container-fluid md-5">
+					<div class="usr-table-row">
+						<div class="usr-table-col">
+							<input type="button"
+								class="btn btn-primary"
+								value="Create user"
+								onclick="usermgr_create()">
+							</input>
+						</div>
+					</div>
 				</div>
 			</div>
 		</main>
