@@ -14,12 +14,13 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 		<link rel="stylesheet" href="/common/css/footer.css">
+		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/logout/css/logout.css">
 		<title>LibreSignage Logout</title>
 	</head>
 	<body class="bg-dark">
-		<main role="main" class="container-fluid h-100">
-			<div class="container-fluid logout-container text-muted">
+		<main class="container-fluid h-100">
+			<div class="container-fluid logout-container">
 				<h4 class="display-4">Logged out!</h4>
 			</div>
 		</main>

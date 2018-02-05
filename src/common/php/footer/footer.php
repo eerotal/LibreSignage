@@ -12,9 +12,8 @@
 				}
 			?>
 			</br>
-			LibreSignage is free and open source software
-			licensed under the <a href="<?php echo ABOUT_PAGE ?>">
-			BSD 3-clause license</a>.
+			<a href="/about">LibreSignage</a>
+			is free and open source software.
 		</span>
 	</div>
 </footer>

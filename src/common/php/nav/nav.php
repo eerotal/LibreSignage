@@ -37,8 +37,18 @@
 				'admin'
 			)
 		),
+		'Settings' => array(
+			'uri' => USER_SETTINGS_PAGE,
+			'active' => FALSE,
+			'groups' => NULL
+		),
 		'Control Panel' => array(
 			'uri' => CONTROL_PANEL_PAGE,
+			'active' => FALSE,
+			'groups' => NULL
+		),
+		'About' => array(
+			'uri' => ABOUT_PAGE,
 			'active' => FALSE,
 			'groups' => NULL
 		)
@@ -77,19 +87,19 @@
 
 <nav class="nav nav-pills">
 	<div class="row container-fluid mx-auto">
-		<div class="col-md-2 my-auto m-0 p-0">
+		<div class="col-lg-2 my-auto m-0 p-0">
 			<p class="text-muted lead my-auto">
 				LibreSignage
 			</p>
 		</div>
-		<div class="col-md-10 p-0 m-0">
+		<div class="col-lg-10 p-0 m-0">
 			<div class="row container-fluid d-flex justify-content-end m-0 p-0">
 				<?php
 				foreach (array_keys($NAV_PAGE_LINKS) as $k) {
 					if (!_can_access_page($k)) {
 						continue;
 					}
-					echo '<div class="col-md-auto m-0 p-0 pt-2 pb-2">';
+					echo '<div class="col-lg-auto m-0 p-0 pt-2 pb-2">';
 					echo '<a class="nav-item nav-link';
 					if (_is_page_active($k)) {
 						echo ' active';
@@ -100,8 +110,8 @@
 					echo '</div>';
 				}
 				?>
-				<div class="col-md-auto nav-item my-auto nav-logout-cont">
-					<a class="d-inline nav-link my-auto p-0 pr-1" href="/control/usermgr">[
+				<div class="col-lg-auto nav-item my-auto nav-logout-cont">
+					<a class="d-inline nav-link my-auto p-0 pr-1" href="/control/user">[
 						<?php
 							echo auth_session_user()->get_name();
 						?>

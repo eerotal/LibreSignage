@@ -1,5 +1,5 @@
 :root {
-	--footer-height: 150px;
+	--footer-height: 100px;
 }
 
 html {
@@ -8,7 +8,7 @@ html {
 }
 
 body {
-	margin-bottom: var(--footer-height);
+	padding-bottom: var(--footer-height);
 }
 
 .footer {

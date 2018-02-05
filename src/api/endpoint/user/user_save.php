@@ -63,7 +63,7 @@
 	);
 
 	// Check for authorization.
-	if (!$auth_admin && !$auth_user) {
+	if (!$auth_admin && !$auth_usr) {
 		// Not logged in.
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
