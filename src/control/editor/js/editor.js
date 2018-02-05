@@ -2,7 +2,7 @@ const SLIDELIST_UPDATE_INTERVAL = 20000;
 
 // Some sane default values for new slides.
 const NEW_SLIDE_DEFAULTS = {
-	'id': '__API_K_NULL__',
+	'id': null,
 	'name': 'New Slide',
 	'time': 5000,
 	'markup': '<p></p>',

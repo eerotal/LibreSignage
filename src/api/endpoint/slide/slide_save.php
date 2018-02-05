@@ -28,13 +28,12 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_constants.php');
 
 	$SLIDE_SAVE = new APIEndpoint(
 		$method = API_METHOD['POST'],
 		$response_type = API_RESPONSE['JSON'],
 		$format = array(
-			'id' => API_P_STR,
+			'id' => API_P_STR|API_P_OPT|API_P_NULL,
 			'name' => API_P_STR,
 			'index' => API_P_STR,
 			'markup' => API_P_STR,
@@ -42,13 +41,6 @@
 		)
 	);
 	api_endpoint_init($SLIDE_SAVE);
-
-	if (!array_is_subset(SLIDE_REQ_KEYS,
-		array_keys($SLIDE_SAVE->get()))) {
-
-		// Required params do not exist. Return error.
-		api_throw(API_E_INVALID_REQUEST);
-	}
 
 	$params_sanitized = array();
 	$opt_index = array(
@@ -59,22 +51,23 @@
 
 	// Only allow alphanumeric characters in the 'name'.
 	$tmp = preg_replace('/[^a-zA-Z0-9_-]/', '',
-				$SLIDE_SAVE->get('name'));
+			$SLIDE_SAVE->get('name'));
 	if ($tmp === NULL) {
 		api_throw(API_E_INTERNAL);
 	}
 	$params_sanitized['name'] = $tmp;
 
-	// Make sure 'index' is an integer value.
-	$tmp = filter_var($SLIDE_SAVE->get('index'), FILTER_VALIDATE_INT,
-				$opt_index);
+	// Make sure 'index' is an integer value in the correct range.
+	$tmp = filter_var($SLIDE_SAVE->get('index'),
+			FILTER_VALIDATE_INT, $opt_index);
 	if ($tmp === FALSE) {
 		api_throw(API_E_INVALID_REQUEST);
 	}
 	$params_sanitized['index'] = $tmp;
 
-	// Make sure 'time' is a float value in the correct range.
-	$tmp = filter_var($SLIDE_SAVE->get('time'), FILTER_VALIDATE_FLOAT);
+	// Make sure 'time' is a float value.
+	$tmp = filter_var($SLIDE_SAVE->get('time'),
+				FILTER_VALIDATE_FLOAT);
 	if ($tmp === FALSE) {
 		api_throw(API_E_INVALID_REQUEST);
 	}
@@ -82,20 +75,16 @@
 
 	$params_sanitized['markup'] = $SLIDE_SAVE->get('markup');
 
-	$slide = new Slide();
-
 	/*
 	*  If a slide ID is supplied *attempt* to use it.
-	*  The $slide->set_data() function will do further checks
-	*  on whether the ID is actually valid.
+	*  The $slide->set_data() function will do further
+	*  checks on whether the ID is actually valid.
 	*/
-	$tmp = parse_api_constants($SLIDE_SAVE->get('id'));
-	if ($tmp == API_CONST['API_K_NO_CONSTANT']) {
+	if ($SLIDE_SAVE->has('id', TRUE)) {
 		$params_sanitized['id'] = $SLIDE_SAVE->get('id');
-	} else if ($tmp != API_CONST['API_K_NULL']) {
-		api_throw(API_E_INVALID_REQUEST);
 	}
 
+	$slide = new Slide();
 	if (!$slide->set_data($params_sanitized)) {
 		/*
 		*  Fails on missing parameters or if the
