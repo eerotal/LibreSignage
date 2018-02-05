@@ -23,10 +23,10 @@ main {
 		font-size: 7vw !important;
 	}
 	.display-3 {
-		font-size: 5vw !important;
+		font-size: 6vw !important;
 	}
 	.display-4 {
-		font-size: 6vw !important;
+		font-size: 5vw !important;
 	}
 }
 @media screen and (max-width: 700px) {
