@@ -5,6 +5,123 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 $AUTH_USERS = NULL;
 $AUTH_INITED = FALSE;
 
+class UserQuota {
+	private $user = NULL;
+	private $quota = NULL;
+	private $ready = FALSE;
+
+	public function __construct(User $user) {
+		if (!$user) {
+			throw new Exception('Invalid user for quota.');
+		}
+
+		if (file_exists($this->_quota_path($user))) {
+			// Load existing quota.
+			$this->_load($user);
+		} else {
+			// Initialize new quota.
+			$this->quota = array();
+			$this->user = $user;
+			$this->ready = TRUE;
+		}
+	}
+
+	private function _error_on_not_ready() {
+		if (!$this->ready) {
+			throw new Exception('Quota object not ready.');
+		}
+	}
+
+	private function _quota_path(User $user) {
+		return $user->get_data_dir().'/quota.json';
+	}
+
+	private function _load(User $user) {
+		/*
+		*  Load the quota data for $user from file.
+		*/
+		$q_path = $this->_quota_path($user);
+		if (!is_file($q_path)) {
+			throw new Exception("Quota file doesn't exist.");
+		}
+		$this->quota = json_decode(file_lock_and_get($q_path),
+						$assoc=TRUE);
+
+		if ($this->quota === NULL &&
+			json_last_error() != JSON_ERROR_NONE) {
+			throw new Exception('Failed to parse '.
+					'quota JSON.');
+		}
+		$this->user = $user;
+		$this->ready = TRUE;
+	}
+
+	public function flush() {
+		/*
+		*  Write the quota data to disk.
+		*/
+		$this->_error_on_not_ready();
+		$quota_enc = json_encode($this->quota);
+		if ($quota_enc === FALSE &&
+			json_last_error() != JSON_ERROR_NONE) {
+			throw new Exception('Failed to JSON '.
+					'encode quota.');
+		}
+		file_lock_and_put($this->_quota_path($this->user),
+				$quota_enc, TRUE);
+	}
+
+	public function set_limit(string $key, int $limit) {
+		/*
+		*  Set the quota limit for $key.
+		*/
+		$tmp = 0;
+		if (!empty($this->quota[$key]['used'])) {
+			$tmp = $this->quota[$key]['used'];
+		}
+		$this->quota[$key] = array(
+			'limit' => $limit,
+			'used' => $tmp
+		);
+	}
+
+	public function has_quota(string $key) {
+		/*
+		*  Check if a user has unused quota.
+		*/
+		if ($this->quota[$key]['used'] <
+			$this->quota[$key]['limit']) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+
+	public function use_quota(string $key, int $amount = 1) {
+		/*
+		*  Use $amount of $key quota.
+		*/
+		if ($this->has_quota($key)) {
+			$this->quota[$key]['used'] += $amount;
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+
+	public function free_quota(string $key, int $amount = 1) {
+		/*
+		*  Free $amount of $key quota.
+		*/
+		if (!empty($this->quota[$key]['empty'])) {
+			$this->quota[$key]['used'] -= 1;
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+}
+
 class User {
 	private $user = '';
 	private $hash = '';
@@ -31,7 +148,7 @@ class User {
 		/*
 		*  Load data for the user $user from file.
 		*/
-		$dir = $this->_get_data_dir($user);
+		$dir = $this->get_data_dir($user);
 		$json = '';
 		$data = NULL;
 
@@ -67,7 +184,7 @@ class User {
 		*  Remove the currently loaded user from the server.
 		*/
 		$this->_error_on_not_ready();
-		$dir = $this->_get_data_dir();
+		$dir = $this->get_data_dir();
 		if (!is_dir($dir)) {
 			throw new Error("Failed to remove userdata: ".
 					"Directory doesn't exist.");
@@ -82,7 +199,7 @@ class User {
 		*  Write the userdata into files.
 		*/
 		$this->_error_on_not_ready();
-		$dir = $this->_get_data_dir();
+		$dir = $this->get_data_dir();
 		$json = json_encode(array(
 			'user' => $this->user,
 			'groups' => $this->groups,
@@ -107,7 +224,7 @@ class User {
 		}
 	}
 
-	private function _get_data_dir($user=NULL) {
+	function get_data_dir($user=NULL) {
 		$tmp = $user;
 		if ($tmp == NULL) {
 			$this->_error_on_not_ready();
