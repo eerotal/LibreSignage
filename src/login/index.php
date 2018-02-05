@@ -22,7 +22,7 @@
 	<body class="bg-dark">
 		<main class="container-fluid h-100">
 			<div class="form-login-container">
-				<h4 class="display-4 form-login-header">LibreSignage Login</h4>
+				<h4 class="display-4 form-login-header">LibreSignage</br>Login</h4>
 				<div class="alert alert-warning" <?php
 					if (empty($_GET['failed'])) {
 						echo 'style="display: none"';

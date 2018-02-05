@@ -15,7 +15,9 @@
 	<body class="bg-dark">
 		<main class="container-fluid h-100">
 			<div class="container w-75 mx-auto text-justify">
-				<h1 class="display-1 text-center">LibreSignage</h1>
+				<h1 id="about-heading" class="display-1 text-center">
+					LibreSignage
+				</h1>
 				<p class="lead text-center">
 				An Open Source Digital Signage solution</p>
 
@@ -44,10 +46,12 @@
 				permissive BSD 3-clause license, which
 				can be seen below.</p>
 
-				<pre id="license" class="d-block mx-auto text-muted"><?php
-					echo file_get_contents($_SERVER['DOCUMENT_ROOT'].
-							LIBRESIGNAGE_LICENSE_FILE_PATH);
-				?></pre>
+				<div class="container text-center">
+					<pre class="text-muted"><?php
+						echo file_get_contents($_SERVER['DOCUMENT_ROOT'].
+								LIBRESIGNAGE_LICENSE_FILE_PATH);
+					?></pre>
+				</div>
 			</div>
 		</main>
 		<?php

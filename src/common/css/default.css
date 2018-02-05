@@ -12,3 +12,34 @@ main {
 	/* Default muted text */
 	color: var(--secondary);
 }
+
+
+/* Responsive display headings */
+@media screen and (min-width: 700px) {
+	.display-1 {
+		font-size: 8vw !important;
+	}
+	.display-2 {
+		font-size: 7vw !important;
+	}
+	.display-3 {
+		font-size: 5vw !important;
+	}
+	.display-4 {
+		font-size: 6vw !important;
+	}
+}
+@media screen and (max-width: 700px) {
+	.display-1 {
+		font-size: 12vw !important;
+	}
+	.display-2 {
+		font-size: 11vw !important;
+	}
+	.display-3 {
+		font-size: 10vw !important;
+	}
+	.display-4 {
+		font-size: 9vw !important;
+	}
+}

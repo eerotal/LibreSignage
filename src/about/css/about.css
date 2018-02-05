@@ -1,7 +1,4 @@
-
-#license {
-	/*
-	*  TODO: Make the license box responsive.
-	*/
-	width: 600px;
+#about-heading {
+	margin-left: -30px;
+	margin-right: -30px;
 }
