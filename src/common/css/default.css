@@ -1,0 +1,14 @@
+main {
+	/* Default spacing */
+	margin: 0;
+	padding-top: 30px;
+	padding-right: 15px;
+	padding-bottom: 30px;
+	padding-left: 15px;
+
+	/* Default sizing */
+	height: 100%;
+
+	/* Default muted text */
+	color: var(--secondary);
+}

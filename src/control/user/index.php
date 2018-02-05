@@ -14,6 +14,7 @@
 		<link rel="stylesheet" href="/common/css/footer.css">
 		<link rel="stylesheet" href="/common/css/nav.css">
 		<link rel="stylesheet" href="/common/css/dialog.css">
+		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/control/user/css/user.css">
 		<title>LibreSignage User Settings</title>
 	</head>
@@ -21,8 +22,8 @@
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>
-		<main class="container-fluid h-100">
-			<div class="user-settings-cont container text-muted mx-auto mt-5 mb-5">
+		<main class="container-fluid">
+			<div class="user-settings-cont container mx-auto">
 				<div class="row form-group">
 					<label class="col-sm-4 col-form-label"
 						for="user-name">

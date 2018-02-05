@@ -14,6 +14,7 @@
 		<link rel="stylesheet" href="/common/css/footer.css">
 		<link rel="stylesheet" href="/common/css/nav.css">
 		<link rel="stylesheet" href="/common/css/dialog.css">
+		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/control/usermgr/css/usermgr.css">
 		<title>LibreSignage User Manager</title>
 	</head>
@@ -21,8 +22,8 @@
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>
-		<main class="container-fluid h-100">
-			<div class="container text-muted text-center mt-5 mb-5">
+		<main class="container-fluid">
+			<div class="container text-center">
 				<div class="container-fluid">
 					<div class="row usr-table-row">
 						<div class="usr-table-col col-1">
