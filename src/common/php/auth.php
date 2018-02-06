@@ -24,6 +24,7 @@ class UserQuota {
 			$this->user = $user;
 			$this->ready = TRUE;
 		}
+		return $this;
 	}
 
 	private function _error_on_not_ready() {
@@ -54,6 +55,7 @@ class UserQuota {
 		}
 		$this->user = $user;
 		$this->ready = TRUE;
+		return $this;
 	}
 
 	public function flush() {
@@ -85,11 +87,14 @@ class UserQuota {
 		);
 	}
 
-	public function has_quota(string $key) {
+	public function has_quota(string $key, int $amount = 1) {
 		/*
 		*  Check if a user has unused quota.
 		*/
-		if ($this->quota[$key]['used'] <
+		if (empty($this->quota[$key]['limit'])) {
+			return FALSE;
+		}
+		if ($this->quota[$key]['used'] + $amount <=
 			$this->quota[$key]['limit']) {
 			return TRUE;
 		} else {
@@ -101,7 +106,7 @@ class UserQuota {
 		/*
 		*  Use $amount of $key quota.
 		*/
-		if ($this->has_quota($key)) {
+		if ($this->has_quota($key, $amount)) {
 			$this->quota[$key]['used'] += $amount;
 			return TRUE;
 		} else {
@@ -113,8 +118,11 @@ class UserQuota {
 		/*
 		*  Free $amount of $key quota.
 		*/
-		if (!empty($this->quota[$key]['empty'])) {
-			$this->quota[$key]['used'] -= 1;
+		if (empty($this->quota[$key]['limit'])) {
+			return FALSE;
+		}
+		if ($this->quota[$key]['used'] - $amount >= 0) {
+			$this->quota[$key]['used'] -= $amount;
 			return TRUE;
 		} else {
 			return FALSE;
@@ -216,12 +224,7 @@ class User {
 						'directory!');
 			}
 		}
-
-		try {
-			file_lock_and_put($dir.'/data.json', $json);
-		} catch (Exception $e) {
-			throw $e;
-		}
+		file_lock_and_put($dir.'/data.json', $json);
 	}
 
 	function get_data_dir($user=NULL) {
