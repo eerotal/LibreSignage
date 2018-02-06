@@ -241,6 +241,23 @@ class Slide {
 		if (!$this->_verify()) {
 			throw new Exception("Slide data is invalid!");
 		}
+		return TRUE;
+	function exists(string $id) {
+		$ret = FALSE;
+
+		$this->_mk_paths($id);
+		if ($this->_paths_exist()) {
+			$ret = TRUE;
+		} else {
+			$ret = FALSE;
+		}
+
+		$this->dirs = NULL;
+		$this->files = NULL;
+		return $ret;
+	}
+
+
 	}
 
 	function get($key) {
@@ -285,7 +302,7 @@ class Slide {
 		*  doesn't exist, however, this function returns FALSE.
 		*/
 		$tmp = $data;
-		$tmp->data = NULL;
+		$this->data = NULL;
 
 		if (empty($tmp[self::K_ID])) {
 			/*

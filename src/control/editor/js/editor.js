@@ -134,8 +134,8 @@ function slide_save() {
 
 	var ret = _selected_slide.set({
 		'name': SLIDE_NAME.val(),
-		'time': SLIDE_TIME.val()*1000,
-		'index': SLIDE_INDEX.val(),
+		'time': parseInt(SLIDE_TIME.val())*1000,
+		'index': parseInt(SLIDE_INDEX.val()),
 		'markup': SLIDE_INPUT.getValue()
 	});
 

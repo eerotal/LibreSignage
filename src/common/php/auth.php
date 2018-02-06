@@ -469,25 +469,29 @@ function auth_logout() {
 
 function auth_is_authorized(array $groups = NULL,
 				array $users = NULL,
-				bool $redir = FALSE) {
+				bool $redir = FALSE,
+				bool $both = FALSE) {
 	/*
 	*  Check if the current session is authorized to access
 	*  a page and return TRUE if it is. FALSE is returned
-	*  otherwise. $groups and $users can optionally be used
-	*  to filter which groups or users can access a page.
-	*  These arguments are simply lists of group and user names.
-	*  Note that if both $groups and $users are defined, the
-	*  logged in user must only belong to either a group in
-	*  $groups or be a user listed in $users. Both aren't required
-	*  for access to be granted. If 'redir' is TRUE, this
-	*  function also redirects the client to the login page
-	*  or the HTTP 403 page if access is not granted.
+	*  otherwise.
 	*
-	*  If both $groups and $users are NULL, access is granted
-	*  to all logged in users.
+	*  $groups and $users can optionally be used to filter which
+	*  groups or users can access a page. These arguments are simply
+	*  whitelists of group and user names. If $groups and $users are both
+	*  defined, the value of $both affects how authentication is done.
+	*  If $both is TRUE, it is required that the logged in user is in
+	*  a group listed in $groups and a user listed in $users. Otherwise
+	*  only one of these conditions must be met. If both $groups and
+	*  $users are NULL, access is granted to all logged in users.
+	*
+	*  If 'redir' is TRUE, this function also redirects the client to
+	*  the login page or the HTTP 403 page if access is not granted.
+	*
 	*/
 	_auth_error_on_no_session();
-	$auth = FALSE;
+	$auth_u = FALSE;
+	$auth_g = FALSE;
 
 	if (!empty($_SESSION['user'])) {
 		if ($groups == NULL && $users == NULL) {
@@ -505,25 +509,27 @@ function auth_is_authorized(array $groups = NULL,
 			if ($users != NULL) {
 				if (in_array($_SESSION['user']['user'],
 						$users)) {
-					$auth = TRUE;
+					$auth_u = TRUE;
 				}
 			}
 			if ($groups != NULL) {
 				foreach ($groups as $g) {
 					if ($user_obj->is_in_group($g)) {
-						$auth = TRUE;
+						$auth_g = TRUE;
 						break;
 					}
 				}
 			}
-			if (!$auth) {
+			if (($both && $auth_g && $auth_u) ||
+				(!$both && ($auth_g || $auth_u))) {
+
+				return TRUE;
+			} else {
 				if ($redir) {
 					error_handle(403);
 				} else {
 					return FALSE;
 				}
-			} else {
-				return TRUE;
 			}
 		}
 	} else {

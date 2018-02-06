@@ -94,7 +94,7 @@ function file_lock_and_put(string $path,
 	*/
 	if (!is_dir(dirname($path))) {
 		if ($create) {
-			if (!@$mkdir(dirname($path), 0775, TRUE)) {
+			if (@!mkdir(dirname($path), 0775, TRUE)) {
 				throw new Exception('Failed to create '.
 						'directory.');
 			}
