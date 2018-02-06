@@ -10,18 +10,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/uid.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
-/*
-*  These are the required data keys that a slide must contain in
-*  order to be considered valid for use.
-*/
-define("SLIDE_REQ_KEYS", array(
-	'id',
-	'name',
-	'index',
-	'time',
-	'markup'
-));
-
 function get_slides_id_list() {
 	$slides_dir_abs = LIBRESIGNAGE_ROOT.SLIDES_DIR;
 	$slide_ids = scandir($slides_dir_abs);
@@ -156,25 +144,51 @@ function juggle_slide_indices(string $force_index_for) {
 }
 
 class Slide {
-	public $REQ_KEYS = SLIDE_REQ_KEYS;
-	private $paths = NULL;
+	const REQ_KEYS = array(
+		'id',
+		'name',
+		'index',
+		'time',
+		'markup',
+		'owner'
+	);
+
+	const K_CONF = 'config';
+	const K_MARKUP = 'markup';
+	const K_ID = 'id';
+
+	const K_DIR = 'dir';
+
+	private $files = NULL;
+	private $dirs = NULL;
 	private $data = NULL;
 
-	private function _mk_path_strs(string $id) {
-		$this->paths['dir'] = LIBRESIGNAGE_ROOT.
-					SLIDES_DIR.'/'.$id;
-		$this->paths['config'] = $this->paths['dir'].
-					'/conf.json';
-		$this->paths['markup'] = $this->paths['dir'].
-					'/markup.html';
+	private function _mk_paths(string $id) {
+		$this->dirs = array(
+			self::K_DIR => LIBRESIGNAGE_ROOT.SLIDES_DIR.'/'.$id
+		);
+		$this->files = array(
+			self::K_CONF => $this->dirs[self::K_DIR].
+						'/conf.json',
+			self::K_MARKUP => $this->dirs[self::K_DIR].
+						'/markup.dat'
+		);
 	}
 
-	private function _clear_paths() {
-		$this->paths = NULL;
-	}
+	private function _paths_exist() {
+		// Check that all required files and dirs exist.
+		foreach ($this->files as $f) {
+			if (!is_file($f)) {
+				return FALSE;
+			}
+		}
 
-	private function _clear_data() {
-		$this->data = NULL;
+		foreach ($this->dirs as $d) {
+			if (!is_dir($d)) {
+				return FALSE;
+			}
+		}
+		return TRUE;
 	}
 
 	private function _verify() {
@@ -182,15 +196,10 @@ class Slide {
 		*  Verify the currently stored data.
 		*/
 		if (array_is_equal(array_keys($this->data),
-					$this->REQ_KEYS)) {
+					self::REQ_KEYS)) {
 			return TRUE;
 		}
 		return FALSE;
-	}
-
-	function clear() {
-		$this->_clear_data();
-		$this->_clear_paths();
 	}
 
 	function load(string $id) {
@@ -198,57 +207,39 @@ class Slide {
 		*  Load the decoded data of a slide. This function
 		*  throws errors on exceptions. No value is returned.
 		*/
-		$data_str = '';
-		$this->_mk_path_strs($id);
+		$dstr = '';
+		$this->data = NULL;
 
-		// Check that all required files exist.
-		if (!is_dir($this->paths['dir'])) {
-			throw new Exception("Slide directory doesn't".
-						"exist!");
-			$this->_clear_paths();
-		}
-		if (!is_file($this->paths['config'])) {
-			throw new Exception("Slide config doesn't ".
-						"exist!");
-			$this->_clear_paths();
-		}
-		if (!is_file($this->paths['markup'])) {
-			throw new Exception("Slide markup doesn't ".
-						"exist!");
-			$this->_clear_paths();
+		$this->_mk_paths($id);
+		if (!$this->_paths_exist()) {
+			return FALSE;
 		}
 
 		// Read data.
-		try {
-			$data_str = file_lock_and_get(
-				$this->paths['config']);
-		} catch(Exception $e) {
-			throw $e;
-		}
-
-		if ($data_str === FALSE) {
+		$dstr = file_lock_and_get($this->files[self::K_CONF]);
+		if ($dstr === FALSE) {
 			throw new Exception("Slide config read error!");
 		}
-		$this->data = json_decode($data_str, $assoc=TRUE);
-		if ($this->data == NULL) {
+
+		$this->data = json_decode($dstr, $assoc=TRUE);
+		if ($this->data == NULL &&
+			json_last_error() != JSON_ERROR_NONE) {
+
 			throw new Exception("Slide config decode error!");
 		}
 
-		try {
-			$this->data['markup'] = file_lock_and_get(
-						$this->paths['markup']);
-		} catch(Exception $e) {
-			throw $e;
+		// Read markup.
+		$this->data[self::K_MARKUP] = file_lock_and_get(
+			$this->files[self::K_MARKUP]
+		);
+		if ($this->data[self::K_MARKUP] == FALSE) {
+			throw new Exception("Slide markup read error!");
 		}
 
-		if ($this->data['markup'] == FALSE) {
-			throw new Exception("Slide markup read error!");
-			$this->_clear_data();
-		}
-		$this->data['id'] = $id;
+		$this->data[self::K_ID] = $id;
+
 		if (!$this->_verify()) {
 			throw new Exception("Slide data is invalid!");
-			$this->_clear_data();
 		}
 	}
 
@@ -283,7 +274,7 @@ class Slide {
 		*  Slide object.
 		*
 		*  Extra: Normally the $data array must contain exactly
-		*  the keys in SLIDE_REQ_KEYS in order to be considered
+		*  the keys in REQ_KEYS in order for it to be considered
 		*  valid, however this function makes an exception.
 		*  If the 'id' key is not set in $data, this function
 		*  automatically generates a new UID using the UID
@@ -294,27 +285,25 @@ class Slide {
 		*  doesn't exist, however, this function returns FALSE.
 		*/
 		$tmp = $data;
+		$tmp->data = NULL;
 
-		$this->_clear_data();
-		$this->_clear_paths();
-
-		if (empty($tmp['id'])) {
+		if (empty($tmp[self::K_ID])) {
 			/*
 			*  If the ID isn't defined, generate it.
 			*  This creates a new slide.
 			*/
 			try {
-				$tmp['id'] = get_uid();
+				$tmp[self::K_ID] = get_uid();
 			} catch (Exception $e) {
 				return FALSE;
 			}
-		} else if (!in_array($tmp['id'],
+		} else if (!in_array($tmp[self::K_ID],
 			get_slides_id_list(), TRUE)) {
 			// Provided slide ID doesn't exist.
 			return FALSE;
 		}
 
-		$this->_mk_path_strs($tmp['id']);
+		$this->_mk_paths($tmp[self::K_ID]);
 		$this->data = $tmp;
 		return $this->_verify();
 	}
@@ -326,33 +315,15 @@ class Slide {
 		*  overwrites files if they already exist. On failure
 		*  exceptions are thrown.
 		*/
-		if (!file_exists($this->paths['dir']) ||
-			!is_dir($this->paths['dir'])) {
-			if (!@mkdir($this->paths['dir'], 0775, true)) {
-				throw new Exception("Failed to create ".
-						"slide directory!");
-			}
-		}
-
 		$tmp = $this->data;
-		unset($tmp['markup']);
-		$conf_str = json_encode($tmp);
-
-		if ($conf_str === FALSE) {
+		unset($tmp[self::K_MARKUP]);
+		$cstr = json_encode($tmp);
+		if ($cstr === FALSE &&
+			json_last_error() != JSON_ERROR_NONE) {
 			throw new Exception("Slide config encode failed!");
 		}
-		try {
-			file_lock_and_put($this->paths['config'],
-					$conf_str);
-		} catch(Exception $e) {
-			throw $e;
-		}
-
-		try {
-			file_lock_and_put($this->paths['markup'],
-					$this->data['markup']);
-		} catch(Exception $e) {
-			throw $e;
-		}
+		file_lock_and_put($this->files[self::K_CONF], $cstr);
+		file_lock_and_put($this->files[self::K_MARKUP],
+				$this->data[self::K_MARKUP]);
 	}
 }

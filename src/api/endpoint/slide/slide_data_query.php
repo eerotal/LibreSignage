@@ -30,9 +30,9 @@
 	);
 	api_endpoint_init($SLIDE_DATA_QUERY);
 
-	// Check that the requested keys are in SLIDE_REQ_KEYS.
+	// Check that the requested keys are in the required keys array.
 	if (!count($SLIDE_DATA_QUERY->get()) || !array_is_subset(
-		array_keys($SLIDE_DATA_QUERY->get()), SLIDE_REQ_KEYS)) {
+		array_keys($SLIDE_DATA_QUERY->get()), Slide::REQ_KEYS)) {
 		api_throw(API_E_INVALID_REQUEST);
 	}
 
@@ -41,7 +41,6 @@
 	$tmp_slide = new Slide();
 
 	foreach($slides as $s) {
-		$tmp_slide->clear();
 		try {
 			$tmp_slide->load($s);
 		} catch (Exception $e) {

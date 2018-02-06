@@ -25,6 +25,7 @@
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
@@ -41,6 +42,12 @@
 		)
 	);
 	api_endpoint_init($SLIDE_SAVE);
+	session_start();
+	auth_init();
+
+	if (!auth_is_authorized(array('editor'), NULL, FALSE)) {
+		api_throw(API_E_NOT_AUTHORIZED);
+	}
 
 	$params_sanitized = array();
 	$opt_index = array(
@@ -83,6 +90,8 @@
 	if ($SLIDE_SAVE->has('id', TRUE)) {
 		$params_sanitized['id'] = $SLIDE_SAVE->get('id');
 	}
+
+	$params_sanitized['owner'] = auth_session_user()->get_name();
 
 	$slide = new Slide();
 	if (!$slide->set_data($params_sanitized)) {
