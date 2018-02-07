@@ -12,26 +12,23 @@ function rmdir_recursive($path) {
 	*/
 	$files = @scandir($path);
 	if ($files === FALSE) {
-		return FALSE;
+		throw new Exception('scandir() failed.');
 	}
 
 	$files = array_diff($files, array('.', '..'));
 
 	foreach ($files as $f) {
 		if (@is_dir($path.'/'.$f)) {
-			if (!rmdir_recursive($path.'/'.$f)) {
-				return FALSE;
-			}
+			rmdir_recursive($path.'/'.$f);
 		} else {
 			if (!@unlink($path.'/'.$f)) {
-				return FALSE;
+				throw new Exception('unlink() failed.');
 			}
 		}
 	}
 	if (!@rmdir($path)) {
-		return FALSE;
+		throw new Exception('rmdir() failed.');
 	}
-	return TRUE;
 }
 
 function array_is_equal(array $a, array $b) {

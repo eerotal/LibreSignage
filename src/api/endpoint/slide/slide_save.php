@@ -31,9 +31,6 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 
-	define("SLIDE_MIN_TIME", 1000);
-	define("SLIDE_MAX_TIME", 20000);
-
 	$SLIDE_SAVE = new APIEndpoint(
 		$method = API_METHOD['POST'],
 		$response_type = API_RESPONSE['JSON'],
@@ -46,31 +43,35 @@
 		)
 	);
 	api_endpoint_init($SLIDE_SAVE);
+
 	session_start();
 	auth_init();
 
+	$flag_new_slide = FALSE;
+	$flag_auth = FALSE;
 	$slide_data = array();
-	$auth = FALSE;
+
+	$user = auth_session_user();
+	$user_quota = new UserQuota($user);
 	$slide = new Slide();
 
 	if ($SLIDE_SAVE->has('id', TRUE)) {
 		if ($slide->load($SLIDE_SAVE->get('id'))) {
 			// Allow admins to modify slides.
-			$auth = auth_is_authorized(
+			$flag_auth = auth_is_authorized(
 				$groups = array('admin'),
 				$users = NULL,
 				$redir = FALSE,
 				$both = FALSE
 			);
-
-			// Allow owner to modify slides.
-			$auth = ($auth || auth_is_authorized(
+			// Allow owner to modify slide.
+			$flag_auth = ($flag_auth || auth_is_authorized(
 				$groups = array('editor'),
 				$users = array($slide->get('owner')),
 				$redir = FALSE,
 				$both = TRUE
 			));
-			if (!$auth) {
+			if (!$flag_auth) {
 				api_throw(API_E_NOT_AUTHORIZED);
 			}
 		} else {
@@ -79,28 +80,36 @@
 		}
 		// Initially load the existing slide data.
 		$slide_data = $slide->get_data();
+		$flag_new_slide = FALSE;
 	} else {
-		// Allow users in the editor group to create slides.
-		$auth = auth_is_authorized(
-			$groups = array('editor'),
+		/*
+		*  Allow users in the editor and
+		*  admin groups to create slides.
+		*/
+		$flag_auth = auth_is_authorized(
+			$groups = array('editor', 'admin'),
 			$users = NULL,
 			$redir = FALSE,
 			$both = FALSE
 		);
-		if (!$auth) {
+		if (!$flag_auth) {
 			api_throw(API_E_NOT_AUTHORIZED);
 		}
 
 		// Set current user as the owner.
-		$slide_data['owner'] = auth_session_user()->get_name();
+		$slide_data['owner'] = $user->get_name();
+		$flag_new_slide = TRUE;
 	}
 
 	// Only allow alphanumeric characters in the name.
-	$tmp = preg_replace('/[^a-zA-Z0-9_-]/', '', $SLIDE_SAVE->get('name'));
-	if ($tmp === NULL) {
+	$tmp = preg_match('/[^a-zA-Z0-9_-]/',
+			$SLIDE_SAVE->get('name'));
+	if ($tmp) {
+		api_throw(API_E_INVALID_REQUEST);
+	} else if ($tmp === NULL) {
 		api_throw(API_E_INTERNAL);
 	}
-	$slide_data['name'] = $tmp;
+	$slide_data['name'] = $SLIDE_SAVE->get('name');
 
 	// Make sure index >= 0.
 	if ($SLIDE_SAVE->get('index') < 0) {
@@ -108,13 +117,17 @@
 	}
 	$slide_data['index'] = $SLIDE_SAVE->get('index');
 
-	// Make sure time > 0.
+	// Make sure SLIDE_MIN_TIME <= time <= SLIDE_MAX_TIME.
 	if ($SLIDE_SAVE->get('time') < SLIDE_MIN_TIME ||
 		$SLIDE_SAVE->get('time') > SLIDE_MAX_TIME) {
 		api_throw(API_E_INVALID_REQUEST);
 	}
 	$slide_data['time'] = $SLIDE_SAVE->get('time');
 
+	// Make sure the size of the markup is not too big.
+	if (strlen($SLIDE_SAVE->get('markup')) > SLIDE_MAX_MARKUP_SIZE) {
+		api_throw(API_E_INVALID_REQUEST);
+	}
 	$slide_data['markup'] = $SLIDE_SAVE->get('markup');
 
 	if (!$slide->set_data($slide_data)) {
@@ -122,6 +135,12 @@
 	}
 
 	try {
+		if ($flag_new_slide) {
+			if (!$user_quota->use_quota('slides')) {
+				api_throw(API_E_QUOTA_EXCEEDED);
+			}
+			$user_quota->flush();
+		}
 		$slide->write();
 		juggle_slide_indices($slide->get('id'));
 	} catch (Exception $e) {

@@ -6,11 +6,15 @@ $AUTH_USERS = NULL;
 $AUTH_INITED = FALSE;
 
 class UserQuota {
+	const DEF_LIM = array(
+		'slides' => 20
+	);
+
 	private $user = NULL;
 	private $quota = NULL;
 	private $ready = FALSE;
 
-	public function __construct(User $user) {
+	public function __construct(User $user, $def_lim = NULL) {
 		if (!$user) {
 			throw new Exception('Invalid user for quota.');
 		}
@@ -21,6 +25,15 @@ class UserQuota {
 		} else {
 			// Initialize new quota.
 			$this->quota = array();
+			if ($def_lim) {
+				foreach ($def_lim as $k => $l) {
+					$this->set_limit($k, $l);
+				}
+			} else {
+				foreach (self::DEF_LIM as $k => $l) {
+					$this->set_limit($k, $l);
+				}
+			}
 			$this->user = $user;
 			$this->ready = TRUE;
 		}
@@ -127,6 +140,10 @@ class UserQuota {
 		} else {
 			return FALSE;
 		}
+	}
+
+	public function get_data() {
+		return $this->quota;
 	}
 }
 

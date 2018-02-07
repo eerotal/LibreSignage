@@ -41,6 +41,11 @@
 
 	define("ERRORS",				"/errors");
 
+	define("SLIDE_MIN_TIME",			1*1000);
+	define("SLIDE_MAX_TIME",			20*1000);
+	define("SLIDE_MAX_NAME_SIZE",			32);
+	define("SLIDE_MAX_MARKUP_SIZE",			2048);
+
 
 	/*
 	*  Setup error handling and reporting.

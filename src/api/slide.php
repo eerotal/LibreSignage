@@ -242,22 +242,6 @@ class Slide {
 			throw new Exception("Slide data is invalid!");
 		}
 		return TRUE;
-	function exists(string $id) {
-		$ret = FALSE;
-
-		$this->_mk_paths($id);
-		if ($this->_paths_exist()) {
-			$ret = TRUE;
-		} else {
-			$ret = FALSE;
-		}
-
-		$this->dirs = NULL;
-		$this->files = NULL;
-		return $ret;
-	}
-
-
 	}
 
 	function get($key) {
@@ -343,4 +327,11 @@ class Slide {
 		file_lock_and_put($this->files[self::K_MARKUP],
 				$this->data[self::K_MARKUP]);
 	}
+
+	function remove() {
+		if (!empty($this->dirs[self::K_DIR])) {
+			rmdir_recursive($this->dirs[self::K_DIR]);
+		}
+	}
 }
+
