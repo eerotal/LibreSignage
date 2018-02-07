@@ -24,25 +24,41 @@
 		$method = API_METHOD['GET'],
 		$response_type = API_RESPONSE['JSON'],
 		$format = array(
-			'user' => API_P_STR
+			'user' => API_P_STR|API_P_OPT|API_P_NULL
 		)
 	);
 	api_endpoint_init($USER_GET_QUOTA);
 
 	session_start();
 	auth_init();
-	if (!auth_is_authorized(array('admin'), NULL, FALSE, FALSE)) {
+
+	$flag_auth = FALSE;
+	$user_name = NULL;
+
+	if ($USER_GET_QUOTA->has('user', TRUE)) {
+		// Get quota for the requested user.
+		$user_name = $USER_GET_QUOTA->get('user');
+	} else {
+		// Get quota for the logged in user.
+		$user_name = auth_session_user()->get_name();
+	}
+
+	// Allow admins or the user themself to get the quota.
+	$flag_auth = auth_is_authorized(
+		$groups = array('admin'),
+		$users = array($user_name),
+		FALSE,
+		FALSE
+	);
+	if (!$flag_auth) {
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	$u = _auth_get_user_by_name($USER_GET_QUOTA->get('user'));
-	if ($u == NULL) {
-		api_throw(API_E_INVALID_REQUEST);
-	}
-	$u_quota = new UserQuota($u);
-	$ret_data = array(
-		'quota' => $u_quota->get_data()
-	);
+	$user = new User();
+	$user->load($user_name);
+	$user_quota = new UserQuota($user);
 
-	$USER_GET_QUOTA->resp_set($ret_data);
+	$USER_GET_QUOTA->resp_set(array(
+		'quota' => $user_quota->get_data()
+	));
 	$USER_GET_QUOTA->send();

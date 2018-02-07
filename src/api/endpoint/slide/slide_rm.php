@@ -36,8 +36,10 @@
 		api_throw(API_E_INVALID_REQUEST);
 	}
 
-	$user = auth_session_user();
-	$user_quota = new UserQuota($user);
+	// Get the slide owner's quota for freeing some of it.
+	$slide_owner = new User();
+	$slide_owner->load($slide->get('owner'));
+	$slide_owner_quota = new UserQuota($slide_owner);
 
 	// Allow admins to remove all slides.
 	$flag_auth = auth_is_authorized(
@@ -46,7 +48,6 @@
 		$redir = FALSE,
 		$both = FALSE
 	);
-
 	// Allow owner to remove a slide.
 	$flag_auth = $flag_auth || auth_is_authorized(
 		$groups = array('editor'),
@@ -54,16 +55,14 @@
 		$redir = FALSE,
 		$both = TRUE
 	);
-
 	if (!$flag_auth) {
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	// Remove slide and free quota.
 	try {
 		$slide->remove();
-		$user_quota->free_quota('slides');
-		$user_quota->flush();
+		$slide_owner_quota->free_quota('slides');
+		$slide_owner_quota->flush();
 	} catch (Exception $e) {
 		api_throw(API_E_INTERNAL, $e);
 	}
