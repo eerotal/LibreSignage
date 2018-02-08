@@ -7,8 +7,7 @@
 	*
 	*  Return value:
 	*    A JSON encoded dictionary with the following data.
-	*      * quota      = A dictionary with the quota limits and
-	*                     how much quota is used.
+	*      * quota      = A dictionary with the quota data.
 	*      * error      = An error code or API_E_OK on success. ***
 	*
 	*    **  (Only exists if the API call was successful.)

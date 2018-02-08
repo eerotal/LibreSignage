@@ -48,8 +48,11 @@
 	const MAX_USERS				= 50;
 
 	// User quota limits.
-	const DEFAULT_LIMITS = array(
-		'slides' => 20
+	const DEFAULT_QUOTA = array(
+		'slides' => array(
+			'limit' => 20,
+			'disp' => 'Slides'
+		)
 	);
 
 	/*

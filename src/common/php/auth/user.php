@@ -3,6 +3,10 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
 class UserQuota {
+	const Q_LIMIT = 'limit';
+	const Q_DISP = 'disp';
+	const Q_USED = 'used';
+
 	private $user = NULL;
 	private $quota = NULL;
 	private $ready = FALSE;
@@ -23,8 +27,11 @@ class UserQuota {
 					$this->set_limit($k, $l);
 				}
 			} else {
-				foreach (DEFAULT_LIMITS as $k => $l) {
-					$this->set_limit($k, $l);
+				foreach (DEFAULT_QUOTA as $k => $l) {
+					$this->set_limit($k,
+						$l[self::Q_LIMIT]);
+					$this->set_disp($k,
+						$l[self::Q_DISP]);
 				}
 			}
 			$this->user = $user;
@@ -85,24 +92,31 @@ class UserQuota {
 		*  Set the quota limit for $key.
 		*/
 		$tmp = 0;
-		if (!empty($this->quota[$key]['used'])) {
-			$tmp = $this->quota[$key]['used'];
+		if (!empty($this->quota[$key][self::Q_USED])) {
+			$tmp = $this->quota[$key][self::Q_USED];
 		}
 		$this->quota[$key] = array(
-			'limit' => $limit,
-			'used' => $tmp
+			self::Q_LIMIT => $limit,
+			self::Q_USED => $tmp
 		);
+	}
+
+	public function set_disp(string $key, string $disp) {
+		/*
+		*  Set the display name of a quota key.
+		*/
+		$this->quota[$key][self::Q_DISP] = $disp;
 	}
 
 	public function has_quota(string $key, int $amount = 1) {
 		/*
 		*  Check if a user has unused quota.
 		*/
-		if (empty($this->quota[$key]['limit'])) {
+		if (empty($this->quota[$key][self::Q_LIMIT])) {
 			return FALSE;
 		}
-		if ($this->quota[$key]['used'] + $amount <=
-			$this->quota[$key]['limit']) {
+		if ($this->quota[$key][self::Q_USED] + $amount <=
+			$this->quota[$key][self::Q_LIMIT]) {
 			return TRUE;
 		} else {
 			return FALSE;
@@ -114,7 +128,7 @@ class UserQuota {
 		*  Use $amount of $key quota.
 		*/
 		if ($this->has_quota($key, $amount)) {
-			$this->quota[$key]['used'] += $amount;
+			$this->quota[$key][self::Q_USED] += $amount;
 			return TRUE;
 		} else {
 			return FALSE;
@@ -125,11 +139,11 @@ class UserQuota {
 		/*
 		*  Free $amount of $key quota.
 		*/
-		if (empty($this->quota[$key]['limit'])) {
+		if (empty($this->quota[$key][self::Q_LIMIT])) {
 			return FALSE;
 		}
-		if ($this->quota[$key]['used'] - $amount >= 0) {
-			$this->quota[$key]['used'] -= $amount;
+		if ($this->quota[$key][self::Q_USED] - $amount >= 0) {
+			$this->quota[$key][self::Q_USED] -= $amount;
 			return TRUE;
 		} else {
 			return FALSE;
@@ -282,8 +296,7 @@ class User {
 
 	public function get_session_data() {
 		/*
-		*  Get data that can be set into the $_SESSION
-		*  array.
+		*  Get data that can be set into the $_SESSION array.
 		*/
 		$this->_error_on_not_ready();
 		return array(

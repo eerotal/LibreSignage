@@ -24,8 +24,10 @@ function ctrl_setup() {
 		}
 		var tmp = "";
 		for (var k in response.quota) {
-			tmp += quota_bar(k, response.quota[k].used,
-					0, response.quota[k].limit);
+			tmp += quota_bar(response.quota[k].disp,
+					response.quota[k].used,
+					0,
+					response.quota[k].limit);
 		}
 		QUOTA_CONTAINER.html(tmp);
 	});
