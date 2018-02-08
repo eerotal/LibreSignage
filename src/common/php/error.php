@@ -13,8 +13,8 @@ $ERROR_CODES = array(
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
 // Custom exception classes.
-class ArgumentException extends Exception {};
-class InternalException extends Exception {};
+class ArgException extends Exception {};
+class IntException extends Exception {};
 
 function error_set_debug(bool $debug) {
 	global $ERROR_DEBUG;

@@ -12,7 +12,7 @@ function rmdir_recursive($path) {
 	*/
 	$files = @scandir($path);
 	if ($files === FALSE) {
-		throw new Exception('scandir() failed.');
+		throw new IntException('scandir() failed.');
 	}
 
 	$files = array_diff($files, array('.', '..'));
@@ -22,12 +22,12 @@ function rmdir_recursive($path) {
 			rmdir_recursive($path.'/'.$f);
 		} else {
 			if (!@unlink($path.'/'.$f)) {
-				throw new Exception('unlink() failed.');
+				throw new IntException('unlink() failed.');
 			}
 		}
 	}
 	if (!@rmdir($path)) {
-		throw new Exception('rmdir() failed.');
+		throw new IntException('rmdir() failed.');
 	}
 }
 
@@ -67,13 +67,13 @@ function file_lock_and_get(string $path) {
 	$ret = '';
 	$fp = @fopen($path, 'r');
 	if ($fp === FALSE) {
-		throw new Exception('Failed to open file for reading.');
+		throw new IntException('Failed to open file for reading.');
 	}
 	if (flock($fp, LOCK_EX)) {
 		$ret = fread($fp, filesize($path));
 		flock($fp, LOCK_UN);
 	} else {
-		throw new Exception('Failed to lock file.');
+		throw new IntException('Failed to lock file.');
 	}
 	fclose($fp);
 	return $ret;
@@ -92,7 +92,7 @@ function file_lock_and_put(string $path,
 	if (!is_dir(dirname($path))) {
 		if ($create) {
 			if (@!mkdir(dirname($path), 0775, TRUE)) {
-				throw new Exception('Failed to create '.
+				throw new IntException('Failed to create '.
 						'directory.');
 			}
 		} else {
@@ -105,7 +105,7 @@ function file_lock_and_put(string $path,
 
 	$ret = file_put_contents($path, $data, LOCK_EX);
 	if ($ret === FALSE) {
-		throw new Exception('Failed to write file.');
+		throw new IntException('Failed to write file.');
 	}
 }
 
@@ -118,12 +118,8 @@ function gen_passwd(int $len) {
 		'0123456789-_';
 	$ret = '';
 	for ($i = 0; $i < $len; $i++) {
-		try {
-			$ret .= substr($chr, random_int(0,
-					strlen($chr) - 1), 1);
-		} catch(Exception $e) {
-			throw $e;
-		}
+		$ret .= substr($chr, random_int(0,
+				strlen($chr) - 1), 1);
 	}
 	return $ret;
 }

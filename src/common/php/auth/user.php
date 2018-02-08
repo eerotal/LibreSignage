@@ -9,7 +9,7 @@ class UserQuota {
 
 	public function __construct(User $user, $def_lim = NULL) {
 		if (!$user) {
-			throw new Exception('Invalid user for quota.');
+			throw new ArgException('Invalid user for quota.');
 		}
 
 		if (file_exists($this->_quota_path($user))) {
@@ -49,14 +49,14 @@ class UserQuota {
 		*/
 		$q_path = $this->_quota_path($user);
 		if (!is_file($q_path)) {
-			throw new Exception("Quota file doesn't exist.");
+			throw new IntException("Quota file doesn't exist.");
 		}
 		$this->quota = json_decode(file_lock_and_get($q_path),
 						$assoc=TRUE);
 
 		if ($this->quota === NULL &&
 			json_last_error() != JSON_ERROR_NONE) {
-			throw new Exception('Failed to parse '.
+			throw new IntException('Failed to parse '.
 					'quota JSON.');
 		}
 		$this->user = $user;
@@ -72,7 +72,7 @@ class UserQuota {
 		$quota_enc = json_encode($this->quota);
 		if ($quota_enc === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
-			throw new Exception('Failed to JSON '.
+			throw new IntException('Failed to JSON '.
 					'encode quota.');
 		}
 		file_lock_and_put($this->_quota_path($this->user),
@@ -161,7 +161,7 @@ class User {
 				$groups,
 				string $hash) {
 		if (empty($hash)) {
-			throw new Exception('Invalid password hash '.
+			throw new ArgException('Invalid password hash '.
 					'for user object.');
 		}
 
@@ -177,7 +177,7 @@ class User {
 		*  Load data for the user $user from file.
 		*/
 		if (empty($user)) {
-			throw new ArgumentException('Invalid username.');
+			throw new ArgException('Invalid username.');
 		}
 
 		$dir = $this->get_data_dir($user);
@@ -185,30 +185,23 @@ class User {
 		$data = NULL;
 
 		if (!is_dir($dir)) {
-			throw new ArgumentException('No user named '.
+			throw new ArgException('No user named '.
 							$user.'.');
 		}
-		try {
-			$json = file_lock_and_get($dir.'/data.json');
-		} catch(Exception $e) {
-			throw $e;
-		}
+		$json = file_lock_and_get($dir.'/data.json');
 		if ($json === FALSE) {
-			throw new Exception('Failed to read user data!');
+			throw new IntException('Failed to read '.
+						'user data!');
 		}
 		$data = json_decode($json, $assoc=TRUE);
 		if (json_last_error() != JSON_ERROR_NONE) {
-			throw new Exception('JSON user data '.
-					'decode error!');
+			throw new IntException('JSON user data '.
+						'decode error!');
 		}
 
-		try {
-			$this->set($data['user'],
-				$data['groups'],
-				$data['hash']);
-		} catch(Exception $e) {
-			throw $e;
-		}
+		$this->set($data['user'],
+			$data['groups'],
+			$data['hash']);
 	}
 
 	public function remove() {
@@ -241,12 +234,12 @@ class User {
 		));
 		if ($json === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
-			throw new Exception('Failed to JSON encode '.
+			throw new IntException('Failed to JSON encode '.
 						'userdata!');
 		}
 		if (!is_dir($dir)) {
 			// New user, check max users.
-			if (count_users() + 1 > MAX_USERS) {
+			if (user_count() + 1 > MAX_USERS) {
 				return FALSE;
 			}
 		}
@@ -328,41 +321,70 @@ class User {
 		} else if (gettype($groups) == 'array') {
 			$this->groups = $groups;
 		} else {
-			throw new Exception('Invalid type for $groups.');
+			throw new ArgException('Invalid type for $groups.');
 		}
 	}
 
 	public function set_password(string $password) {
 		$tmp_hash = password_hash($password, PASSWORD_DEFAULT);
 		if ($tmp_hash === FALSE) {
-			throw new Exception('Password hashing failed.');
+			throw new IntException('Password hashing failed.');
 		}
 		$this->hash = $tmp_hash;
 	}
 
 	public function set_name(string $name) {
 		if (empty($name)) {
-			throw new Exception('Invalid username.');
+			throw new ArgException('Invalid username.');
 		}
 		$this->user = $name;
 	}
 }
 
-function user_count() {
+function user_exists(string $user) {
 	/*
-	*  Count all the existing users based on the amount of
-	*  subdirectories in the USER_DATA_DIR directory.
+	*  Check whether $user exists.
 	*/
-	$cnt = 0;
+	try {
+		new User($user);
+	} catch (ArgException $e) {
+		return FALSE;
+	}
+	return TRUE;
+}
+
+function user_name_array() {
+	/*
+	*  Get an array of all the existing usernames.
+	*/
 	$user_dirs = @scandir(LIBRESIGNAGE_ROOT.USER_DATA_DIR);
 	if ($user_dirs === FALSE) {
-		throw new Exception('scandir() on users dir failed');
+		throw new IntException('scandir() on users dir failed.');
 	}
 	$user_dirs = array_diff($user_dirs, array('.', '..'));
-	foreach ($user_dirs as $d) {
-		if (is_dir(LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$d)) {
-			$cnt += 1;
+	foreach ($user_dirs as $k => $d) {
+		if (!user_exists($d)) {
+			$user_dirs[$k] = NULL;
 		}
 	}
-	return $cnt;
+	return array_values(array_diff($user_dirs, array(NULL)));
+}
+
+function user_array() {
+	/*
+	*  Get an array of all the existing user objects.
+	*/
+	$names = user_name_array();
+	$ret = array();
+	foreach ($names as $n) {
+		array_push($ret, new User($n));
+	}
+	return $ret;
+}
+
+function user_count() {
+	/*
+	*  Get the number of existing users.
+	*/
+	return count(user_array());
 }

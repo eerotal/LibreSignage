@@ -218,14 +218,14 @@ class Slide {
 		// Read data.
 		$dstr = file_lock_and_get($this->files[self::K_CONF]);
 		if ($dstr === FALSE) {
-			throw new Exception("Slide config read error!");
+			throw new IntException("Slide config read error!");
 		}
 
 		$this->data = json_decode($dstr, $assoc=TRUE);
 		if ($this->data == NULL &&
 			json_last_error() != JSON_ERROR_NONE) {
 
-			throw new Exception("Slide config decode error!");
+			throw new IntException("Slide config decode error!");
 		}
 
 		// Read markup.
@@ -233,13 +233,13 @@ class Slide {
 			$this->files[self::K_MARKUP]
 		);
 		if ($this->data[self::K_MARKUP] == FALSE) {
-			throw new Exception("Slide markup read error!");
+			throw new IntException("Slide markup read error!");
 		}
 
 		$this->data[self::K_ID] = $id;
 
 		if (!$this->_verify()) {
-			throw new Exception("Slide data is invalid!");
+			throw new IntException("Slide data is invalid!");
 		}
 		return TRUE;
 	}
@@ -321,7 +321,7 @@ class Slide {
 		$cstr = json_encode($tmp);
 		if ($cstr === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
-			throw new Exception("Slide config encode failed!");
+			throw new IntException("Slide config encode failed!");
 		}
 		file_lock_and_put($this->files[self::K_CONF], $cstr);
 		file_lock_and_put($this->files[self::K_MARKUP],

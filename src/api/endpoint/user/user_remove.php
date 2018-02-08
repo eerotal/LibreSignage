@@ -35,7 +35,7 @@
 
 	try {
 		$u = new User($USER_REMOVE->get('user'));
-	} catch (ArgumentException $e) {
+	} catch (ArgException $e) {
 		api_throw(API_E_INVALID_REQUEST, $e);
 	}
 

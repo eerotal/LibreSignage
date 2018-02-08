@@ -44,13 +44,12 @@
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	if (_auth_get_user_by_name($USER_CREATE->get('user'))) {
-		// User already exists.
+	if (user_exists($USER_CREATE->get('user'))) {
 		api_throw(API_E_INVALID_REQUEST);
 	}
 
-	$tmp_pass = '';
 	$user = new User();
+	$tmp_pass = '';
 
 	// Validate user name.
 	if (preg_match(USER_REGEX, $USER_CREATE->get('user'))) {

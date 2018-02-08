@@ -78,10 +78,10 @@
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	$u = _auth_get_user_by_name($USER_SAVE->get('user'));
-	if ($u == NULL) {
-		// User doesn't exist.
-		api_throw(API_E_INVALID_REQUEST);
+	try {
+		$u = new User($USER_SAVE->get('user'));
+	} catch (ArgException $e) {
+		api_throw(API_E_INVALID_REQUEST, $e);
 	}
 
 	if ($USER_SAVE->has('pass', TRUE)) {

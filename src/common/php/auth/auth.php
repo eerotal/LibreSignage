@@ -20,30 +20,6 @@ function _auth_error_on_uninited(string $additional_msg = '') {
 	}
 }
 
-function _auth_load_users() {
-	/*
-	*  Load all the users from the userdata files.
-	*  Returns an array with User objects in it or
-	*  throws an Exception on error.
-	*/
-	$users = array();
-	$tmp = NULL;
-
-	$users_data_dir = LIBRESIGNAGE_ROOT.USER_DATA_DIR;
-	$user_dirs = @scandir($users_data_dir);
-
-	if ($user_dirs === FALSE) {
-		throw new Exception('Failed to scan user data dir!');
-	}
-	$user_dirs = array_diff($user_dirs, array('.', '..'));
-
-	foreach ($user_dirs as $d) {
-		if (!is_dir($users_data_dir.'/'.$d)) { continue; }
-		array_push($users, new User($d));
-	}
-	return $users;
-}
-
 function auth_get_users() {
 	global $_AUTH_USERS;
 	_auth_error_on_uninited();
@@ -219,6 +195,6 @@ function auth_init() {
 	*/
 	global $_AUTH_USERS, $_AUTH_INITED;
 	_auth_error_on_no_session();
-	$_AUTH_USERS = _auth_load_users();
+	$_AUTH_USERS = user_array();
 	$_AUTH_INITED = TRUE;
 }

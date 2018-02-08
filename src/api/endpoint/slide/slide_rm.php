@@ -39,7 +39,7 @@
 	// Get the slide owner's quota for freeing some of it.
 	try {
 		$slide_owner = new User($slide->get('owner'));
-	} catch (ArgumentException $e){
+	} catch (ArgException $e){
 		api_throw(API_E_INVALID_REQUEST, $e);
 	}
 	$slide_owner_quota = new UserQuota($slide_owner);
