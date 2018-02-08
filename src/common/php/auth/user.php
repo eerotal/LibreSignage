@@ -3,10 +3,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
 class UserQuota {
-	const DEF_LIM = array(
-		'slides' => 20
-	);
-
 	private $user = NULL;
 	private $quota = NULL;
 	private $ready = FALSE;
@@ -150,7 +146,10 @@ class User {
 	private $groups = NULL;
 	private $ready = FALSE;
 
-	public function __construct(string $user) {
+	public function __construct($user = NULL) {
+		if (empty($user)) {
+			return $this;
+		}
 		$this->load($user);
 		return $this;
 	}
@@ -175,7 +174,7 @@ class User {
 		/*
 		*  Load data for the user $user from file.
 		*/
-		if ($empty($user)) {
+		if (empty($user)) {
 			throw new Exception('Invalid username.');
 		}
 
