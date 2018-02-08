@@ -6,6 +6,10 @@
 
 var API_ENDP = {
 	// -- User management API endpoints --
+	USER_GET_QUOTA: {
+		uri:	"/api/endpoint/user/user_get_quota.php",
+		method: "GET"
+	},
 	USER_CREATE: {
 		uri:	"/api/endpoint/user/user_create.php",
 		method: "POST"
