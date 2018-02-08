@@ -37,8 +37,11 @@
 	}
 
 	// Get the slide owner's quota for freeing some of it.
-	$slide_owner = new User();
-	$slide_owner->load($slide->get('owner'));
+	try {
+		$slide_owner = new User($slide->get('owner'));
+	} catch (ArgumentException $e){
+		api_throw(API_E_INVALID_REQUEST, $e);
+	}
 	$slide_owner_quota = new UserQuota($slide_owner);
 
 	// Allow admins to remove all slides.

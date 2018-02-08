@@ -33,9 +33,10 @@
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	$u = _auth_get_user_by_name($USER_REMOVE->get('user'));
-	if ($u == NULL) {
-		api_throw(API_E_INVALID_REQUEST);
+	try {
+		$u = new User($USER_REMOVE->get('user'));
+	} catch (ArgumentException $e) {
+		api_throw(API_E_INVALID_REQUEST, $e);
 	}
 
 	try {

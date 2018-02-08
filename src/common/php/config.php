@@ -27,6 +27,7 @@
 	const FOOTER_MINIMAL_PATH 		= "/common/php/footer/footer_minimal.php";
 	const USER_DATA_DIR 			= "/data/users";
 
+	// Page constants.
 	const LOGIN_PAGE 			= "/login";
 	const LOGOUT_PAGE 			= "/logout";
 	const ABOUT_PAGE 			= "/about";
@@ -35,15 +36,21 @@
 	const APP_PAGE 				= "/app";
 	const USER_MGR_PAGE 			= "/control/usermgr";
 	const USER_SETTINGS_PAGE 		= "/control/user";
-	const ERRORS 				= "/errors";
-
+	const ERROR_PAGES 			= "/errors";
 	const LOGIN_LANDING 			= CONTROL_PANEL_PAGE;
 	const LOGOUT_LANDING 			= LOGOUT_PAGE;
 
+	// LibreSignage instance limits.
 	const SLIDE_MIN_TIME 			= 1*1000;
 	const SLIDE_MAX_TIME 			= 20*1000;
 	const SLIDE_MAX_NAME_SIZE 		= 32;
 	const SLIDE_MAX_MARKUP_SIZE 		= 2048;
+	const MAX_USERS				= 50;
+
+	// User quota limits.
+	const DEFAULT_LIMITS = array(
+		'slides' => 20
+	);
 
 	/*
 	*  Setup error handling and reporting.

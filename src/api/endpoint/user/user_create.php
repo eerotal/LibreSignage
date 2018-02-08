@@ -84,7 +84,9 @@
 	$user->set_ready(TRUE);
 
 	try {
-		$user->write();
+		if ($user->write() === FALSE) {
+			api_throw(API_E_LIMITED);
+		}
 	} catch (Exception $e) {
 		api_throw(API_E_INTERNAL, $e);
 	}

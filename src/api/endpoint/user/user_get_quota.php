@@ -54,8 +54,11 @@
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	$user = new User();
-	$user->load($user_name);
+	try {
+		$user = new User($user_name);
+	} catch (ArgumentException $e) {
+		api_throw(API_E_INVALID_REQUEST, $e);
+	}
 	$user_quota = new UserQuota($user);
 
 	$USER_GET_QUOTA->resp_set(array(

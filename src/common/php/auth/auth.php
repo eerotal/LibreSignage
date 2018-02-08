@@ -39,7 +39,7 @@ function _auth_load_users() {
 
 	foreach ($user_dirs as $d) {
 		if (!is_dir($users_data_dir.'/'.$d)) { continue; }
-		array_push($users, (new User())->load($d));
+		array_push($users, new User($d));
 	}
 	return $users;
 }

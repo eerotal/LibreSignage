@@ -31,10 +31,7 @@
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	$u = _auth_get_user_by_name(auth_session_user()->get_name());
-	if ($u == NULL) {
-		api_throw(API_E_INVALID_REQUEST);
-	}
+	$u = auth_session_user();
 	$ret_data = array(
 		'user' => array(
 			'user' => $u->get_name(),

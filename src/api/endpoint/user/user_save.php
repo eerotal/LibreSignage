@@ -101,7 +101,9 @@
 	}
 
 	try {
-		$u->write();
+		if ($u->write() === FALSE) {
+			api_throw(API_E_LIMITED);
+		}
 	} catch (Exception $e) {
 		api_throw(API_E_INTERNAL, $e);
 	}

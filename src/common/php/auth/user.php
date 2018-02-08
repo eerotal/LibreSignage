@@ -23,7 +23,7 @@ class UserQuota {
 					$this->set_limit($k, $l);
 				}
 			} else {
-				foreach (self::DEF_LIM as $k => $l) {
+				foreach (DEFAULT_LIMITS as $k => $l) {
 					$this->set_limit($k, $l);
 				}
 			}
@@ -146,12 +146,15 @@ class User {
 	private $groups = NULL;
 	private $ready = FALSE;
 
-	public function __construct($user = NULL) {
-		if (empty($user)) {
-			return $this;
+	public function __construct($name = NULL) {
+		/*
+		*  If $name != NULL, load the userdata for the
+		*  user. Otherwise do nothing.
+		*/
+		if (empty($name)) {
+			return;
 		}
-		$this->load($user);
-		return $this;
+		$this->load($name);
 	}
 
 	public function set(string $user,
@@ -166,7 +169,6 @@ class User {
 		$this->set_groups($groups);
 		$this->hash = $hash;
 		$this->ready = TRUE;
-
 		return $this;
 	}
 
@@ -175,7 +177,7 @@ class User {
 		*  Load data for the user $user from file.
 		*/
 		if (empty($user)) {
-			throw new Exception('Invalid username.');
+			throw new ArgumentException('Invalid username.');
 		}
 
 		$dir = $this->get_data_dir($user);
@@ -183,7 +185,8 @@ class User {
 		$data = NULL;
 
 		if (!is_dir($dir)) {
-			throw new Exception('No user named '.$user.'.');
+			throw new ArgumentException('No user named '.
+							$user.'.');
 		}
 		try {
 			$json = file_lock_and_get($dir.'/data.json');
@@ -206,7 +209,6 @@ class User {
 		} catch(Exception $e) {
 			throw $e;
 		}
-		return $this;
 	}
 
 	public function remove() {
@@ -226,7 +228,9 @@ class User {
 
 	public function write() {
 		/*
-		*  Write the userdata into files.
+		*  Write the userdata into files. Returns FALSE
+		*  if the maximum amount of users is exceeded and
+		*  TRUE otherwise.
 		*/
 		$this->_error_on_not_ready();
 		$dir = $this->get_data_dir();
@@ -241,12 +245,13 @@ class User {
 						'userdata!');
 		}
 		if (!is_dir($dir)) {
-			if (!@mkdir($dir, 0775, TRUE)) {
-				throw new Exception('Failed to create user '.
-						'directory!');
+			// New user, check max users.
+			if (count_users() + 1 > MAX_USERS) {
+				return FALSE;
 			}
 		}
 		file_lock_and_put($dir.'/data.json', $json);
+		return TRUE;
 	}
 
 	function get_data_dir($user=NULL) {
@@ -341,4 +346,23 @@ class User {
 		}
 		$this->user = $name;
 	}
+}
+
+function user_count() {
+	/*
+	*  Count all the existing users based on the amount of
+	*  subdirectories in the USER_DATA_DIR directory.
+	*/
+	$cnt = 0;
+	$user_dirs = @scandir(LIBRESIGNAGE_ROOT.USER_DATA_DIR);
+	if ($user_dirs === FALSE) {
+		throw new Exception('scandir() on users dir failed');
+	}
+	$user_dirs = array_diff($user_dirs, array('.', '..'));
+	foreach ($user_dirs as $d) {
+		if (is_dir(LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$d)) {
+			$cnt += 1;
+		}
+	}
+	return $cnt;
 }

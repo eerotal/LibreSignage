@@ -11,6 +11,7 @@ define("API_E_INTERNAL",	1);
 define("API_E_INVALID_REQUEST",	2);
 define("API_E_NOT_AUTHORIZED",	3);
 define("API_E_QUOTA_EXCEEDED",	4);
+define("API_E_LIMITED",		5);
 
 /*
 *  Return detailed stack trace information with
