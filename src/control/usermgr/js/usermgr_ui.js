@@ -194,10 +194,26 @@ function usermgr_create() {
 			}
 			api_call(API_ENDP.USER_CREATE,
 				{'user': val}, (response) => {
-				if (!response || response.error) {
+				if (!response) {
 					throw new Error('API error ' +
 						'while creating a new ' +
 						'user.')
+				}
+
+				if (response.error == API_E.LIMITED) {
+					dialog(DIALOG.ALERT,
+						"Can't create user",
+						"The maximum number " +
+						"of users on the " +
+						"server has been " +
+						"reached. No more " +
+						"users can be created.",
+						null);
+					return;
+				} else if (response.error != API_E.OK) {
+					throw new Error('API error' +
+						'while creating a new ' +
+						'user.');
 				}
 
 				var tmp = new User();

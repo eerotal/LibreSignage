@@ -68,6 +68,15 @@ var API_ENDP = {
 	}
 }
 
+var API_E = {
+	OK:			0,
+	INTERNAL: 		1,
+	INVALID_REQUEST: 	2,
+	NOT_AUTHORIZED:		3,
+	QUOTA_EXCEEDED:		4,
+	LIMITED:		5
+}
+
 function _api_construct_GET_data(data) {
 	/*
 	*  Construct the API call data string
