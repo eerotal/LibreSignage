@@ -150,6 +150,11 @@ class User {
 	private $groups = NULL;
 	private $ready = FALSE;
 
+	public function __construct(string $user) {
+		$this->load($user);
+		return $this;
+	}
+
 	public function set(string $user,
 				$groups,
 				string $hash) {
@@ -170,6 +175,10 @@ class User {
 		/*
 		*  Load data for the user $user from file.
 		*/
+		if ($empty($user)) {
+			throw new Exception('Invalid username.');
+		}
+
 		$dir = $this->get_data_dir($user);
 		$json = '';
 		$data = NULL;
