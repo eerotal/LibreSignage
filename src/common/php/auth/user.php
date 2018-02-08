@@ -49,7 +49,8 @@ class UserQuota {
 		*/
 		$q_path = $this->_quota_path($user);
 		if (!is_file($q_path)) {
-			throw new IntException("Quota file doesn't exist.");
+			throw new IntException("Quota file doesn't ".
+						"exist.");
 		}
 		$this->quota = json_decode(file_lock_and_get($q_path),
 						$assoc=TRUE);
@@ -157,33 +158,25 @@ class User {
 		$this->load($name);
 	}
 
-	public function set(string $user,
-				$groups,
-				string $hash) {
-		if (empty($hash)) {
-			throw new ArgException('Invalid password hash '.
-					'for user object.');
+	private function _error_on_not_ready() {
+		if (!$this->is_ready()) {
+			throw new Exception('User data not ready!');
 		}
-
-		$this->set_name($user);
-		$this->set_groups($groups);
-		$this->hash = $hash;
-		$this->ready = TRUE;
-		return $this;
 	}
 
 	public function load(string $user) {
 		/*
 		*  Load data for the user $user from file.
 		*/
+		$json = '';
+		$data = NULL;
+		$dir = NULL;
+
 		if (empty($user)) {
 			throw new ArgException('Invalid username.');
 		}
 
 		$dir = $this->get_data_dir($user);
-		$json = '';
-		$data = NULL;
-
 		if (!is_dir($dir)) {
 			throw new ArgException('No user named '.
 							$user.'.');
@@ -199,9 +192,10 @@ class User {
 						'decode error!');
 		}
 
-		$this->set($data['user'],
-			$data['groups'],
-			$data['hash']);
+		$this->set_name($data['user']);
+		$this->set_groups($data['groups']);
+		$this->set_hash($data['hash']);
+		$this->set_ready(TRUE);
 	}
 
 	public function remove() {
@@ -211,11 +205,12 @@ class User {
 		$this->_error_on_not_ready();
 		$dir = $this->get_data_dir();
 		if (!is_dir($dir)) {
-			throw new Error("Failed to remove userdata: ".
-					"Directory doesn't exist.");
+			throw new IntException("Userdata doesn't ".
+						"exist.");
 		}
 		if (rmdir_recursive($dir) === FALSE) {
-			throw new Error('Failed to remove userdata.');
+			throw new IntException('Failed to remove '.
+						'userdata.');
 		}
 	}
 
@@ -256,10 +251,9 @@ class User {
 		return LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$tmp;
 	}
 
-	private function _error_on_not_ready() {
-		if (!$this->is_ready()) {
-			throw new Exception('User data not ready!');
-		}
+	public function get_name() {
+		$this->_error_on_not_ready();
+		return $this->user;
 	}
 
 	public function get_groups() {
@@ -267,9 +261,9 @@ class User {
 		return $this->groups;
 	}
 
-	public function get_name() {
+	public function get_hash() {
 		$this->_error_on_not_ready();
-		return $this->user;
+		return $this->hash;
 	}
 
 	public function is_in_group(string $group) {
@@ -279,10 +273,6 @@ class User {
 
 	public function is_ready() {
 		return $this->ready;
-	}
-
-	public function set_ready(bool $val) {
-		$this->ready = $val;
 	}
 
 	public function verify_password(string $pass) {
@@ -315,16 +305,6 @@ class User {
 		}
 	}
 
-	public function set_groups($groups) {
-		if ($groups == NULL) {
-			$this->groups = array();
-		} else if (gettype($groups) == 'array') {
-			$this->groups = $groups;
-		} else {
-			throw new ArgException('Invalid type for $groups.');
-		}
-	}
-
 	public function set_password(string $password) {
 		$tmp_hash = password_hash($password, PASSWORD_DEFAULT);
 		if ($tmp_hash === FALSE) {
@@ -333,11 +313,33 @@ class User {
 		$this->hash = $tmp_hash;
 	}
 
+	public function set_groups($groups) {
+		if ($groups == NULL) {
+			$this->groups = array();
+		} else if (gettype($groups) == 'array') {
+			$this->groups = $groups;
+		} else {
+			throw new ArgException('Invalid type for '.
+						'$groups.');
+		}
+	}
+
 	public function set_name(string $name) {
 		if (empty($name)) {
 			throw new ArgException('Invalid username.');
 		}
 		$this->user = $name;
+	}
+
+	public function set_hash(string $hash) {
+		if (empty($hash)) {
+			throw new ArgException('Invalid password hash.');
+		}
+		$this->hash = $hash;
+	}
+
+	public function set_ready(bool $val) {
+		$this->ready = $val;
 	}
 }
 
