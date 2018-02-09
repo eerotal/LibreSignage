@@ -12,6 +12,7 @@ define("API_E_INVALID_REQUEST",	2);
 define("API_E_NOT_AUTHORIZED",	3);
 define("API_E_QUOTA_EXCEEDED",	4);
 define("API_E_LIMITED",		5);
+define("API_E_CLIENT",		6); // Only for client side use!
 
 /*
 *  Return detailed stack trace information with
