@@ -60,8 +60,8 @@ function slides_retrieve(ready_callback) {
 
 	for (i in list) {
 		_slides_current[i] = new Slide();
-		_slides_current[i].load(list[i], (status) => {
-			if (!status) {
+		_slides_current[i].load(list[i], (err) => {
+			if (err) {
 				throw new Error('Error while loading ' +
 						'slide!');
 				_slides_current[i] = null;
@@ -70,8 +70,8 @@ function slides_retrieve(ready_callback) {
 			ready_cnt--;
 			if (!ready_cnt) {
 				/*
-				*  Remove null slides resulting from failed
-				*  Slide.load() calls.
+				*  Remove null slides resulting from
+				*  failed Slide.load() calls.
 				*/
 				_slides_current = _slides_current.filter(
 					(s) => { return s != null; }
