@@ -22,30 +22,26 @@ class User {
 			'groups': this.groups,
 			'pass': this.pass
 		};
-		api_call(API_ENDP.USER_SAVE, data , (resp) => {
-			if (resp.error) {
-				throw new Error("API error while " +
-						"saving user data!");
-			}
+		api_call(API_ENDP.USER_SAVE, data, (resp) => {
 			if (ready_callback) {
-				ready_callback();
+				ready_callback(resp.error);
 			}
 		});
 	}
 
 	load(user, ready_callback) {
-		var this_obj = this;
-		api_call(API_ENDP.USER_GET, {'user': user}, () => {
+		api_call(API_ENDP.USER_GET, {'user': user},
+			(resp) => {
 				if (resp.error) {
-					throw new Error(
-						"API error while " +
-						"loading user data!"
-					);
+					if (ready_callback) {
+						ready_callback(resp.error);
+					}
+					return;
 				}
-				this_obj.set(resp.user.user,
-						resp.user.groups);
+				this.set(resp.user.user,
+					resp.user.groups);
 				if (ready_callback) {
-					ready_callback();
+					ready_callback(resp.error);
 				}
 			}
 		);
@@ -54,14 +50,8 @@ class User {
 	remove(ready_callback) {
 		api_call(API_ENDP.USER_REMOVE, {'user': this.user},
 			(resp) => {
-				if (!resp || resp.error) {
-					throw new Error(
-						"API error while " +
-						"trying to remove user!"
-					);
-				}
 				if (ready_callback) {
-					ready_callback();
+					ready_callback(resp.error);
 				}
 			}
 		);

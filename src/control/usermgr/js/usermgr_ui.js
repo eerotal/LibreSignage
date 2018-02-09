@@ -132,7 +132,17 @@ function usermgr_save(name) {
 				console.error('Failed to save ' +
 						'userdata.');
 			}
-			usrs[u].save(() => {
+			usrs[u].save((err) => {
+				if (err == API_E.LIMITED) {
+					dialog(DIALOG.ALERT,
+						"Too many groups",
+						"You have specified " +
+						"too many groups for " +
+						"one user.", null);
+					return;
+				} else if (api_handle_disp_error(err)) {
+					return;
+				}
 				// Update the UI.
 				usermgr_make_ui();
 				dialog(DIALOG.ALERT,
@@ -192,46 +202,36 @@ function usermgr_remove(name) {
 function usermgr_create() {
 	dialog(DIALOG.PROMPT,
 		'Create a user',
-		'Enter a name for the new user.',
-		(status, val) => {
-			if (!status) {
+		'Enter a name for the new user.', (status, val) => {
+		if (!status) {
+			return;
+		}
+		api_call(API_ENDP.USER_CREATE,
+			{'user': val}, (resp) => {
+			if (resp.error == API_E.LIMITED) {
+				dialog(DIALOG.ALERT,
+					"Can't create user",
+					"The maximum number " +
+					"of users on the " +
+					"server has been " +
+					"reached. No more " +
+					"users can be created.",
+					null);
+				return;
+			} else if (api_handle_disp_error(resp.error)) {
 				return;
 			}
-			api_call(API_ENDP.USER_CREATE,
-				{'user': val}, (response) => {
-				if (!response) {
-					throw new Error('API error ' +
-						'while creating a new ' +
-						'user.')
-				}
 
-				if (response.error == API_E.LIMITED) {
-					dialog(DIALOG.ALERT,
-						"Can't create user",
-						"The maximum number " +
-						"of users on the " +
-						"server has been " +
-						"reached. No more " +
-						"users can be created.",
-						null);
-					return;
-				} else if (response.error != API_E.OK) {
-					throw new Error('API error' +
-						'while creating a new ' +
-						'user.');
-				}
-
-				var tmp = new User();
-				tmp.set(response.user.name,
-					response.user.groups,
-					null);
-				tmp.set_info('Password: ' +
-					response.user.pass);
-				users_add(tmp);
-				usermgr_make_ui();
-			});
-		}
-	);
+			var tmp = new User();
+			tmp.set(resp.user.name,
+				resp.user.groups,
+				null);
+			tmp.set_info('Password: ' +
+				resp.user.pass);
+			users_add(tmp);
+			usermgr_make_ui();
+		});
+	});
 }
 
 function usermgr_make_ui() {

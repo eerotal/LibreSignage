@@ -46,6 +46,7 @@
 	const SLIDE_MAX_NAME_SIZE 		= 32;
 	const SLIDE_MAX_MARKUP_SIZE 		= 2048;
 	const MAX_USERS				= 3;
+	const MAX_GROUPS_PER_USER		= 4;
 
 	// User quota limits.
 	const DEFAULT_QUOTA = array(

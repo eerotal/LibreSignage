@@ -71,6 +71,10 @@
 				)
 			);
 		}
+		if (count($USER_CREATE->get('groups')) >
+					MAX_GROUPS_PER_USER) {
+			api_throw(API_E_LIMITED);
+		}
 		$user->set_groups($USER_CREATE->get('groups'));
 	}
 
