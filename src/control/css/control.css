@@ -21,10 +21,17 @@
 	font-size: 4vw !important;
 }
 
+#user-quota-cont {
+	padding-right: 30px;
+	padding-left: 30px;
+}
+
 .quota-bar {
+	margin: 0;
+	padding: 0;
 	height: var(--quota-bar-height);
 	font-size: calc(var(--quota-bar-height)*0.5)px;
 	text-align: center;
 	line-height: var(--quota-bar-height);
-	color: var(--secondary);
 }
+

@@ -73,23 +73,25 @@ function slide_show(slide) {
 
 function slide_rm() {
 	if (!_selected_slide) {
-		dialog(DIALOG.ALERT, "Please select a slide", "Please select " +
-				"a slide to remove first.", null);
+		dialog(DIALOG.ALERT,
+			"Please select a slide",
+			"Please select a slide to remove first.",
+			null);
 		return;
 	}
 	set_editor_status("Deleting slide...");
 
-	dialog(DIALOG.CONFIRM, "Delete slide?", "Are you sure you want " +
-			"to delete slide '" + _selected_slide.get("name") + "'.",
-			function(status, val) {
+	dialog(DIALOG.CONFIRM,
+		"Delete slide?",
+		"Are you sure you want to delete slide '" +
+		_selected_slide.get("name") + "'.", (status, val) => {
 		if (status) {
-			_selected_slide.remove(null, function(ret) {
-				if (!ret) {
-					console.log("LibreSignage: API error!");
-					set_editor_status("Failed to remove slide!");
+			_selected_slide.remove(null, (stat) => {
+				if (api_handle_disp_error(stat)) {
+					set_editor_status("Failed to " +
+							"remove slide!");
 					return;
 				}
-
 				$('#slide-btn-' + _selected_slide.get('id')).remove();
 
 				console.log("LibreSignage: Deleted slide '" +
@@ -145,13 +147,13 @@ function slide_save() {
 		return;
 	}
 
-	_selected_slide.save(function(ret) {
-		if (!ret) {
-			console.log("LibreSignage: API error!");
+	_selected_slide.save((stat) => {
+		if (api_handle_disp_error(stat)) {
 			set_editor_status("Save failed!");
 			return;
 		}
-		console.log("LibreSignage: Saved slide '" + _selected_slide.get("id") + "'.");
+		console.log("LibreSignage: Saved slide '" +
+				_selected_slide.get("id") + "'.");
 		set_editor_status("Saved!");
 
 		/*

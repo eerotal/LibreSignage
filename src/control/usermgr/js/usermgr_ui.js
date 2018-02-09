@@ -160,20 +160,25 @@ function usermgr_remove(name) {
 		(status, val) => {
 			var usrs = users_get();
 			for (var u in usrs) {
-				if (usrs[u].get_name() == name) {
-					usrs[u].remove(() => {
-						users_load(() => {
-							usermgr_make_ui();
-						});
-					});
-
-					dialog(DIALOG.ALERT,
-						'User removed!',
-						'User ' + name +
-						' successfully removed.',
-						null);
-					return;
+				if (usrs[u].get_name() != name) {
+					continue;
 				}
+
+				usrs[u].remove((resp) => {
+					if (api_handle_disp_error(resp)) {
+						return;
+					}
+					users_load(() => {
+						usermgr_make_ui();
+					});
+				});
+
+				dialog(DIALOG.ALERT,
+					'User removed!',
+					'User ' + name +
+					' successfully removed.',
+					null);
+				break;
 			}
 			dialog(DIALOG.ALERT,
 				'Failed to remove user!',

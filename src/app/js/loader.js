@@ -30,12 +30,12 @@ function list_retrieve(ready_callback) {
 	_list_ready = false;
 	_list_old = _list_current.slice();
 	_list_current = [];
-	api_call(API_ENDP.SLIDE_LIST, null, (response) => {
-		if (!response || response.error) {
+	api_call(API_ENDP.SLIDE_LIST, null, (resp) => {
+		if (resp.error) {
 			throw new Error('API error while fetching ' +
 					'slide list.')
 		}
-		_list_current = response.slides;
+		_list_current = resp.slides;
 		_list_ready = true;
 		console.log("LibreSignage: Slide list retrieved. (" +
 				_list_current.length + " slides)");

@@ -74,7 +74,8 @@ var API_E = {
 	INVALID_REQUEST: 	2,
 	NOT_AUTHORIZED:		3,
 	QUOTA_EXCEEDED:		4,
-	LIMITED:		5
+	LIMITED:		5,
+	CLIENT:			6
 }
 
 function _api_construct_GET_data(data) {
@@ -121,9 +122,9 @@ function api_call(endpoint, data, callback) {
 			d = JSON.parse(this.responseText);
 		} catch(e) {
 			if (e instanceof SyntaxError) {
-				console.log("LibreSignage: API: " +
-						"Invalid response!");
-				d = null;
+				console.error("LibreSignage: Invalid " +
+						"API response syntax.");
+				d = {'error': API_E.INTERNAL};
 			}
 		}
 		callback(d);
@@ -149,4 +150,51 @@ function api_call(endpoint, data, callback) {
 		req.setRequestHeader("Content-Type", "application/json");
 		req.send(data_str);
 	}
+}
+
+function api_handle_disp_error(err, callback) {
+	var h = "";
+	var p = "";
+	switch(err) {
+		case API_E.OK:
+			return;
+		case API_E.INTERNAL:
+			h = "Internal server error";
+			p = "The server encountered an internal " +
+				"server error.";
+			break;
+		case API_E.INVALID_REQUEST:
+			h = "Invalid request";
+			p = "The server responded with an invalid " +
+				"request error. This is probably due " +
+				"to a software bug.";
+			break;
+		case API_E.NOT_AUTHORIZED:
+			h = "Not authorized";
+			p = "You are not authorized to perform this " +
+				"action.";
+			break;
+		case API_E.QUOTA_EXCEEDED:
+			h = "Quota exceeded";
+			p = "You have exceeded your quota for " +
+				"this action.";
+			break;
+		case API_E.LIMITED:
+			h = "Limited";
+			p = "The server prevented this action since " +
+				"it hit a maximum limit."
+			break;
+		case API_E.CLIENT:
+			h = "Client error";
+			p = "The client encountered an error.";
+			break;
+		default:
+			h = "Unknown error";
+			p = "The server encountered an unknown error.";
+			break;
+	}
+
+	dialog(DIALOG.ALERT, h, p, callback);
+	console.error("LibreSignage: " + p);
+	return err;
 }

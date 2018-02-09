@@ -50,7 +50,7 @@
 	// User quota limits.
 	const DEFAULT_QUOTA = array(
 		'slides' => array(
-			'limit' => 20,
+			'limit' => 2,
 			'disp' => 'Slides'
 		)
 	);

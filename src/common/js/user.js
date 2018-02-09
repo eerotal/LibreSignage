@@ -22,8 +22,8 @@ class User {
 			'groups': this.groups,
 			'pass': this.pass
 		};
-		api_call(API_ENDP.USER_SAVE, data ,function(response) {
-			if (!response || response.error) {
+		api_call(API_ENDP.USER_SAVE, data , (resp) => {
+			if (resp.error) {
 				throw new Error("API error while " +
 						"saving user data!");
 			}
@@ -35,16 +35,15 @@ class User {
 
 	load(user, ready_callback) {
 		var this_obj = this;
-		api_call(API_ENDP.USER_GET, {'user': user},
-			function(response) {
-				if (!response || response.error) {
+		api_call(API_ENDP.USER_GET, {'user': user}, () => {
+				if (resp.error) {
 					throw new Error(
 						"API error while " +
 						"loading user data!"
 					);
 				}
-				this_obj.set(response.user.user,
-						response.user.groups);
+				this_obj.set(resp.user.user,
+						resp.user.groups);
 				if (ready_callback) {
 					ready_callback();
 				}
@@ -54,8 +53,8 @@ class User {
 
 	remove(ready_callback) {
 		api_call(API_ENDP.USER_REMOVE, {'user': this.user},
-			function(response) {
-				if (!response || response.error) {
+			(resp) => {
+				if (!resp || resp.error) {
 					throw new Error(
 						"API error while " +
 						"trying to remove user!"
@@ -127,8 +126,8 @@ function users_load(ready_callback) {
 	*  The data loading is done asynchronously. 'ready_callback'
 	*  is called when the data loading is finished.
 	*/
-	api_call(API_ENDP.USERS_GET_ALL, null, function(response) {
-		if (!response || response.error) {
+	api_call(API_ENDP.USERS_GET_ALL, null, (resp) => {
+		if (!resp || resp.error) {
 			throw new Error('User manager API error!');
 		}
 
@@ -136,10 +135,10 @@ function users_load(ready_callback) {
 		var tmp = null;
 		_usermgr_ready = false;
 		_usermgr_users = [];
-		for (var u in response.users) {
+		for (var u in resp.users) {
 			tmp = new User();
-			tmp.set(response.users[u].user,
-				response.users[u].groups,
+			tmp.set(resp.users[u].user,
+				resp.users[u].groups,
 				null);
 			_usermgr_users.push(tmp);
 		}

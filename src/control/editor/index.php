@@ -14,6 +14,7 @@
 		<link rel="stylesheet" href="/common/css/footer.css">
 		<link rel="stylesheet" href="/common/css/nav.css">
 		<link rel="stylesheet" href="/common/css/default.css">
+		<link rel="stylesheet" href="/common/css/dialog.css">
 		<link rel="stylesheet" href="/control/editor/css/editor.css">
 		<title>LibreSignage Editor</title>
 	</head>

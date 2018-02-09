@@ -6,14 +6,14 @@
 var _usr = null;
 
 function user_settings_get_user(ready_callback) {
-	api_call(API_ENDP.USER_GET_CURRENT, null, (response) => {
-		if (!response || response.error) {
+	api_call(API_ENDP.USER_GET_CURRENT, null, (resp) => {
+		if (resp.error) {
 			throw new Error("API error while loding " +
 					"current user data.");
 		}
 		_usr = new User();
-		_usr.set(response.user.user,
-			response.user.groups,
+		_usr.set(resp.user.user,
+			resp.user.groups,
 			null);
 		if (ready_callback) {
 			ready_callback();
