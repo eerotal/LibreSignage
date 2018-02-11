@@ -1,5 +1,25 @@
 const SLIDELIST_UPDATE_INTERVAL = 20000;
 
+const DIALOG_MARKUP_TOO_LONG = (max) => {
+	return new Dialog(
+		DIALOG.ALERT,
+		'Too long slide markup',
+		`The slide markup is too long. The maximum length is
+		${max} characters.`,
+		null
+	);
+}
+
+const DIALOG_NAME_TOO_LONG = (max) => {
+	return new Dialog(
+		DIALOG.ALERT,
+		'Too long slide name',
+		`The slide name is too long. The maximum length is
+		${max} characters.`,
+		null
+	);
+}
+
 // Some sane default values for new slides.
 const NEW_SLIDE_DEFAULTS = {
 	'id': null,
@@ -134,6 +154,26 @@ function slide_save() {
 	console.log("LibreSignage: Save slide");
 	set_editor_status("Saving...");
 
+	if (SLIDE_NAME.val().length >
+			SERVER_LIMITS.SLIDE_MAX_NAME_SIZE) {
+
+		DIALOG_NAME_TOO_LONG(
+			SERVER_LIMITS.SLIDE_MAX_NAME_SIZE
+		).show();
+		set_editor_status("Save failed!");
+		return;
+	}
+
+	if (SLIDE_INPUT.getValue().length >
+			SERVER_LIMITS.SLIDE_MAX_MARKUP_SIZE) {
+
+		DIALOG_MARKUP_TOO_LONG(
+			SERVER_LIMITS.SLIDE_MAX_MARKUP_SIZE
+		).show();
+		set_editor_status("Save failed!");
+		return;
+	}
+
 	var ret = _selected_slide.set({
 		'name': SLIDE_NAME.val(),
 		'time': parseInt(SLIDE_TIME.val())*1000,
@@ -142,7 +182,7 @@ function slide_save() {
 	});
 
 	if (!ret) {
-		console.log("LibreSignage: Slide data error!");
+		console.error("LibreSignage: Slide data error!");
 		set_editor_status("Save failed!");
 		return;
 	}
@@ -188,16 +228,18 @@ function slide_preview() {
 
 
 function editor_setup() {
-	// Setup the ACE editor with the Dawn theme and plaintext mode.
-	SLIDE_INPUT = ace.edit('slide-input');
-	SLIDE_INPUT.setTheme('ace/theme/dawn');
-	SLIDE_INPUT.$blockScrolling = Infinity;
+	api_load_limits(() => {
+		// Setup the ACE editor with the Dawn theme and plaintext mode.
+		SLIDE_INPUT = ace.edit('slide-input');
+		SLIDE_INPUT.setTheme('ace/theme/dawn');
+		SLIDE_INPUT.$blockScrolling = Infinity;
 
-	// Disable inputs initially and setup update intevals.
-	disable_editor_controls();
-	slidelist_trigger_update();
-	setInterval(slidelist_trigger_update,
-		SLIDELIST_UPDATE_INTERVAL);
+		// Disable inputs initially and setup update intevals.
+		disable_editor_controls();
+		slidelist_trigger_update();
+		setInterval(slidelist_trigger_update,
+			SLIDELIST_UPDATE_INTERVAL);
+	});
 }
 
 editor_setup();
