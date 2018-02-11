@@ -1,5 +1,55 @@
 USERS_TABLE = $('#users-table');
 
+// Dialog messages.
+const DIALOG_GROUPS_INVALID_CHARS = new Dialog(
+	DIALOG.ALERT,
+	'Invalid user groups',
+	`The user groups contain invalid characters. Only A-Z, a-z, 0-9 and _
+	are allowed. Additionally the comma character can be used for
+	separating different groups. Spaces can be used too, but they are
+	removed from the group names when the changes are saved.`,
+	null
+);
+
+const DIALOG_TOO_MANY_GROUPS = (max) => {
+	return new Dialog(
+		DIALOG.ALERT,
+		'Too many user groups',
+		`You have specified too many groups for one user. The maximum
+		number of groups is ${max}.`,
+		null
+	);
+}
+
+const DIALOG_USER_SAVED = new Dialog(
+	DIALOG.ALERT,
+	'User saved',
+	'User information was successfully saved!',
+	null
+);
+
+const DIALOG_TOO_MANY_USERS = new Dialog(
+	DIALOG.ALERT,
+	'Too many users',
+	`The maximum number of users on the server has been reached. No more
+	users can be created.`,
+	null
+);
+
+const DIALOG_USER_REMOVED = new Dialog(
+	DIALOG.ALERT,
+	'User removed',
+	'The user was successfully removed',
+	null
+);
+
+const DIALOG_USER_REMOVE_FAILED = new Dialog(
+	DIALOG.ALERT,
+	'User removal failed',
+	'Failed to remove user.',
+	null
+);
+
 // User table row template.
 const usr_table_row = (index, name, groups, pass) => `
 	<div class="row usr-table-row" id="usr-row-${name}">
@@ -77,7 +127,7 @@ const usr_table_row = (index, name, groups, pass) => `
 
 function usermgr_assign_new_user_data(user) {
 	/*
-	*  Assign the edited user data for 'user' from
+	*  Assign the edited user data to 'user' from
 	*  the user manager UI.
 	*/
 	var tmp = '';
@@ -94,24 +144,24 @@ function usermgr_assign_new_user_data(user) {
 			*  space and comma in group names.
 			*/
 			if (tmp.match(/[^A-Za-z0-9_, ]/g)) {
-				dialog(DIALOG.ALERT,
-					'Invalid user groups ',
-					'The user groups specified ' +
-					'for ' + user + ' contain ' +
-					'invalid characters. Only ' +
-					'A-Z, a-z, 0-9 and _ are ' +
-					'allowed. Additionally the ' +
-					'comma character can be used ' +
-					'for separating different ' +
-					'groups. Spaces can be used ' +
-					'too, but they are removed ' +
-					'from the group names when ' +
-					'the changes are saved.',
-					null);
+				DIALOG_GROUPS_INVALID_CHARS.show();
 				return false;
 			}
+
+			// Strip whitespace and empty groups.
 			tmp = tmp.replace(/\s+/g, '');
+			tmp = tmp.replace(/,+/g, ',');
+			tmp = tmp.replace(/,$/, '');
 			usrs[u].groups = tmp.split(',');
+
+			// Check that the number of groups is valid.
+			if (usrs[u].groups.length >
+				SERVER_LIMITS.MAX_GROUPS_PER_USER) {
+				DIALOG_TOO_MANY_GROUPS(
+					SERVER_LIMITS.MAX_GROUPS_PER_USER
+				).show();
+				return false;
+			}
 			return true;
 		}
 	}
@@ -129,27 +179,16 @@ function usermgr_save(name) {
 					usrs[u].get_name()
 			);
 			if (!ret) {
-				console.error('Failed to save ' +
-						'userdata.');
+				console.error('Failed to save userdata.');
+				return;
 			}
 			usrs[u].save((err) => {
-				if (err == API_E.LIMITED) {
-					dialog(DIALOG.ALERT,
-						"Too many groups",
-						"You have specified " +
-						"too many groups for " +
-						"one user.", null);
-					return;
-				} else if (api_handle_disp_error(err)) {
+				if (api_handle_disp_error(err)) {
 					return;
 				}
 				// Update the UI.
 				usermgr_make_ui();
-				dialog(DIALOG.ALERT,
-					'User saved!',
-					'User information was ' +
-					'successfully saved!',
-					null);
+				DIALOG_USER_SAVED.show();
 			});
 			break;
 		}
@@ -183,18 +222,10 @@ function usermgr_remove(name) {
 					});
 				});
 
-				dialog(DIALOG.ALERT,
-					'User removed!',
-					'User ' + name +
-					' successfully removed.',
-					null);
-				break;
+				DIALOG_USER_REMOVED.show();
+				return;
 			}
-			dialog(DIALOG.ALERT,
-				'Failed to remove user!',
-				"The user " + name + " wasn't found.",
-				null);
-
+			DIALOG_USER_REMOVE_FAILED.show();
 		}
 	);
 }
@@ -209,14 +240,7 @@ function usermgr_create() {
 		api_call(API_ENDP.USER_CREATE,
 			{'user': val}, (resp) => {
 			if (resp.error == API_E.LIMITED) {
-				dialog(DIALOG.ALERT,
-					"Can't create user",
-					"The maximum number " +
-					"of users on the " +
-					"server has been " +
-					"reached. No more " +
-					"users can be created.",
-					null);
+				DIALOG_TOO_MANY_USERS.show();
 				return;
 			} else if (api_handle_disp_error(resp.error)) {
 				return;
@@ -257,8 +281,10 @@ function usermgr_make_ui() {
 }
 
 function usermgr_ui_setup() {
-	users_load(function() {
-		usermgr_make_ui();
+	api_load_limits(() => {
+		users_load(function() {
+			usermgr_make_ui();
+		});
 	});
 }
 

@@ -4,6 +4,8 @@
 *  interface with the LibreSignage API.
 */
 
+var SERVER_LIMITS = null;
+
 var API_ENDP = {
 	// -- User management API endpoints --
 	USER_GET_QUOTA: {
@@ -58,6 +60,10 @@ var API_ENDP = {
 	},
 
 	// -- General information API endpoints --
+	SERVER_LIMITS: {
+		uri:	"/api/endpoint/general/server_limits.php",
+		method: "GET"
+	},
 	LIBRARY_LICENSES: {
 		uri:	"/api/endpoint/library_licenses.php",
 		method:	"GET"
@@ -181,8 +187,8 @@ function api_handle_disp_error(err, callback) {
 			break;
 		case API_E.LIMITED:
 			h = "Limited";
-			p = "The server prevented this action since " +
-				"it hit a maximum limit."
+			p = "The server prevented this action because " +
+				"a limit would have been exceeded."
 			break;
 		case API_E.CLIENT:
 			h = "Client error";
@@ -197,4 +203,18 @@ function api_handle_disp_error(err, callback) {
 	dialog(DIALOG.ALERT, h, p, callback);
 	console.error("LibreSignage: " + p);
 	return err;
+}
+
+function api_load_limits(callback) {
+	api_call(API_ENDP.SERVER_LIMITS, null, (resp) => {
+		if (api_handle_disp_error(resp.error)) {
+			throw new Error("Failed to initialize API " +
+					"interface.");
+			return;
+		}
+		SERVER_LIMITS = resp.limits;
+		if (callback) {
+			callback();
+		}
+	});
 }

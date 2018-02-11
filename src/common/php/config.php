@@ -41,6 +41,15 @@
 	const LOGOUT_LANDING 			= LOGOUT_PAGE;
 
 	// LibreSignage instance limits.
+	const LS_LIM = array(
+		"SLIDE_MIN_TIME" 		=> 1*1000,
+		"SLIDE_MAX_TIME" 		=> 20*1000,
+		"SLIDE_MAX_NAME_SIZE" 		=> 32,
+		"SLIDE_MAX_MARKUP_SIZE" 	=> 2048,
+		"MAX_USERS" 			=> 3,
+		"MAX_GROUPS_PER_USER" 		=> 4
+	);
+
 	const SLIDE_MIN_TIME 			= 1*1000;
 	const SLIDE_MAX_TIME 			= 20*1000;
 	const SLIDE_MAX_NAME_SIZE 		= 32;
