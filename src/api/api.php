@@ -259,9 +259,9 @@ class APIEndpoint {
 		return $this->inited;
 	}
 
-	function resp_set(array $resp) {
+	function resp_set($resp) {
 		/*
-		*  Set the API response data to $resp.
+		*  Set the API response data.
 		*/
 		$this->response = $resp;
 	}
@@ -270,20 +270,27 @@ class APIEndpoint {
 		/*
 		*  Send the current API response.
 		*/
-		if (!$this->response) {
-			$this->response = array();
+		if ($this->response_type == API_RESPONSE['TEXT']) {
+			if ($this->response) {
+				echo $this->response;
+			}
+			exit(0);
+		} elseif ($this->response_type == API_RESPONSE['JSON']) {
+			if (!$this->response) {
+				$this->response = array();
+			}
+			if (!isset($this->response['error'])) {
+				// Make sure the error value exists.
+				$this->response['error'] = API_E_OK;
+			}
+			$resp_str = json_encode($this->response);
+			if ($resp_str === FALSE &&
+				json_last_error() != JSON_ERROR_NONE) {
+				api_throw(API_E_INTERNAL);
+			}
+			echo $resp_str;
+			exit(0);
 		}
-		if (!isset($this->response['error'])) {
-			// Make sure the error value exists.
-			$this->response['error'] = API_E_OK;
-		}
-		$resp_str = json_encode($this->response);
-		if ($resp_str === FALSE &&
-			json_last_error() != JSON_ERROR_NONE) {
-			api_throw(API_E_INTERNAL);
-		}
-		echo $resp_str;
-		exit(0);
 	}
 }
 

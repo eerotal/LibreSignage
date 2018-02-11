@@ -65,11 +65,11 @@ var API_ENDP = {
 		method: "GET"
 	},
 	LIBRARY_LICENSES: {
-		uri:	"/api/endpoint/library_licenses.php",
+		uri:	"/api/endpoint/general/library_licenses.php",
 		method:	"GET"
 	},
 	LIBRESIGNAGE_LICENSE: {
-		uri:	"/api/endpoint/libresignage_license.php",
+		uri:	"/api/endpoint/general/libresignage_license.php",
 		methof:	"GET"
 	}
 }
