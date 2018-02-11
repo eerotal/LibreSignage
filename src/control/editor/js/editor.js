@@ -53,7 +53,7 @@ function slide_show(slide) {
 
 	_selected_slide = new Slide();
 	_selected_slide.load(slide, function(ret) {
-		if (!ret) {
+		if (ret) {
 			console.log("LibreSignage: API error!");
 			set_editor_status("Failed to load slide!");
 			clear_editor_controls();

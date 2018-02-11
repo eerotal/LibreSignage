@@ -248,7 +248,7 @@ class User {
 		}
 		if (!is_dir($dir)) {
 			// New user, check max users.
-			if (user_count() + 1 > MAX_USERS) {
+			if (user_count() + 1 > gtlim('MAX_USERS')) {
 				return FALSE;
 			}
 		}

@@ -50,13 +50,6 @@
 		"MAX_GROUPS_PER_USER" 		=> 4
 	);
 
-	const SLIDE_MIN_TIME 			= 1*1000;
-	const SLIDE_MAX_TIME 			= 20*1000;
-	const SLIDE_MAX_NAME_SIZE 		= 32;
-	const SLIDE_MAX_MARKUP_SIZE 		= 2048;
-	const MAX_USERS				= 3;
-	const MAX_GROUPS_PER_USER		= 4;
-
 	// User quota limits.
 	const DEFAULT_QUOTA = array(
 		'slides' => array(
@@ -77,3 +70,8 @@
 	set_exception_handler(function(Throwable $e) {
 		error_handle(500, $e);
 	});
+
+
+	function gtlim(string $lim) {
+		return LS_LIM[$lim];
+	}
