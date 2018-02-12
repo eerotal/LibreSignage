@@ -57,7 +57,11 @@
 			new Exception('Invalid chars in group names.')
 		);
 	}
-	$user->set_name($USER_CREATE->get('user'));
+	try {
+		$user->set_name($USER_CREATE->get('user'));
+	} catch (Exception $e) {
+		api_throw(API_E_LIMITED, $e);
+	}
 
 	// Validate group names.
 	if ($USER_CREATE->has('groups', TRUE)) {
@@ -71,11 +75,11 @@
 				)
 			);
 		}
-		if (count($USER_CREATE->get('groups')) >
-				gtlim('MAX_GROUPS_PER_USER')) {
-			api_throw(API_E_LIMITED);
+		try {
+			$user->set_groups($USER_CREATE->get('groups'));
+		} catch (Exception $e) {
+			api_throw(API_E_LIMITED, $e);
 		}
-		$user->set_groups($USER_CREATE->get('groups'));
 	}
 
 	try {

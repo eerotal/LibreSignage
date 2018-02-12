@@ -97,11 +97,11 @@
 				)
 			);
 		}
-		if (count($USER_SAVE->get('groups')) >
-				gtlim('MAX_GROUPS_PER_USER')) {
-			api_throw(API_E_LIMITED);
+		try {
+			$u->set_groups($USER_SAVE->get('groups'));
+		} catch (Exception $e) {
+			api_throw(API_E_LIMITED, $e);
 		}
-		$u->set_groups($USER_SAVE->get('groups'));
 	}
 
 	try {

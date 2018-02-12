@@ -44,10 +44,13 @@
 	const LS_LIM = array(
 		"SLIDE_MIN_TIME" 		=> 1*1000,
 		"SLIDE_MAX_TIME" 		=> 20*1000,
-		"SLIDE_MAX_NAME_SIZE" 		=> 32,
-		"SLIDE_MAX_MARKUP_SIZE" 	=> 2048,
-		"MAX_USERS" 			=> 3,
-		"MAX_GROUPS_PER_USER" 		=> 4
+		"SLIDE_NAME_MAX_LEN" 		=> 32,
+		"SLIDE_MARKUP_MAX_LEN"	 	=> 2048,
+
+		"MAX_USERS" 			=> 64,
+		"MAX_USER_GROUPS" 		=> 32,
+		"USERNAME_MAX_LEN"		=> 64,
+		"PASSWORD_MAX_LEN"		=> 256
 	);
 
 	// User quota limits.

@@ -109,8 +109,9 @@
 	} else if ($tmp === NULL) {
 		api_throw(API_E_INTERNAL);
 	}
-	if (strlen($SLIDE_SAVE->get('name')) > gtlim('SLIDE_MAX_NAME_SIZE')) {
-		api_throw(API_E_INVALID_REQUEST);
+	if (strlen($SLIDE_SAVE->get('name')) >
+			gtlim('SLIDE_NAME_MAX_LEN')) {
+		api_throw(API_E_LIMITED);
 	}
 	$slide_data['name'] = $SLIDE_SAVE->get('name');
 
@@ -123,14 +124,14 @@
 	// Make sure SLIDE_MIN_TIME <= time <= SLIDE_MAX_TIME.
 	if ($SLIDE_SAVE->get('time') < gtlim('SLIDE_MIN_TIME') ||
 		$SLIDE_SAVE->get('time') > gtlim('SLIDE_MAX_TIME')) {
-		api_throw(API_E_INVALID_REQUEST);
+		api_throw(API_E_LIMITED);
 	}
 	$slide_data['time'] = $SLIDE_SAVE->get('time');
 
 	// Make sure the size of the markup is not too big.
 	if (strlen($SLIDE_SAVE->get('markup')) >
-			gtlim('SLIDE_MAX_MARKUP_SIZE')) {
-		api_throw(API_E_INVALID_REQUEST);
+			gtlim('SLIDE_MARKUP_MAX_LEN')) {
+		api_throw(API_E_LIMITED);
 	}
 	$slide_data['markup'] = $SLIDE_SAVE->get('markup');
 

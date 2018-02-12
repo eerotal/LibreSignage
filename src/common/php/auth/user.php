@@ -305,24 +305,16 @@ class User {
 		);
 	}
 
-	public function add_group(string $group) {
-		if (!in_array($group, $this->groups, TRUE)) {
-			array_push($this->groups, $group);
-		}
-	}
-
-	public function remove_group(string $group) {
-		$i = array_search($group, $this->groups, TRUE);
-		if ($i !== FALSE) {
-			array_splice($this->groups, $i, 1);
-		}
-	}
-
 	public function set_password(string $password) {
+		if (strlen($password) > gtlim('PASSWORD_MAX_LEN')) {
+			throw new ArgException('Password too long.');
+		}
+
 		$tmp_hash = password_hash($password, PASSWORD_DEFAULT);
 		if ($tmp_hash === FALSE) {
 			throw new IntException('Password hashing failed.');
 		}
+
 		$this->hash = $tmp_hash;
 	}
 
@@ -330,6 +322,10 @@ class User {
 		if ($groups == NULL) {
 			$this->groups = array();
 		} else if (gettype($groups) == 'array') {
+			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
+				throw new ArgException('Too many user '.
+							'groups.');
+			}
 			$this->groups = $groups;
 		} else {
 			throw new ArgException('Invalid type for '.
@@ -340,6 +336,9 @@ class User {
 	public function set_name(string $name) {
 		if (empty($name)) {
 			throw new ArgException('Invalid username.');
+		}
+		if (strlen($name) > gtlim('USERNAME_MAX_LEN')) {
+			throw new ArgException('Username too long.');
 		}
 		$this->user = $name;
 	}

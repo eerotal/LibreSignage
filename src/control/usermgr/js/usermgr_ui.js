@@ -4,10 +4,10 @@ USERS_TABLE = $('#users-table');
 const DIALOG_GROUPS_INVALID_CHARS = new Dialog(
 	DIALOG.ALERT,
 	'Invalid user groups',
-	`The user groups contain invalid characters. Only A-Z, a-z, 0-9 and _
-	are allowed. Additionally the comma character can be used for
-	separating different groups. Spaces can be used too, but they are
-	removed from the group names when the changes are saved.`,
+	`The user groups contain invalid characters. Only A-Z, a-z, 0-9
+	and _ are allowed. Additionally the comma character can be used
+	for separating different groups. Spaces can be used too, but they
+	are removed from the group names when the changes are saved.`,
 	null
 );
 
@@ -15,8 +15,8 @@ const DIALOG_TOO_MANY_GROUPS = (max) => {
 	return new Dialog(
 		DIALOG.ALERT,
 		'Too many user groups',
-		`You have specified too many groups for one user. The maximum
-		number of groups is ${max}.`,
+		`You have specified too many groups for one user. The
+		maximum number of groups is ${max}.`,
 		null
 	);
 }
@@ -31,8 +31,8 @@ const DIALOG_USER_SAVED = new Dialog(
 const DIALOG_TOO_MANY_USERS = new Dialog(
 	DIALOG.ALERT,
 	'Too many users',
-	`The maximum number of users on the server has been reached. No more
-	users can be created.`,
+	`The maximum number of users on the server has been reached.
+	No more users can be created.`,
 	null
 );
 
@@ -47,6 +47,20 @@ const DIALOG_USER_REMOVE_FAILED = new Dialog(
 	DIALOG.ALERT,
 	'User removal failed',
 	'Failed to remove user.',
+	null
+);
+
+const DIALOG_USER_NO_NAME = new Dialog(
+	DIALOG.ALERT,
+	'Invalid username',
+	'You must specify a username for the user to be created.',
+	null
+);
+
+const DIALOG_USERNAME_TOO_LONG = new Dialog(
+	DIALOG.ALERT,
+	'Invalid username',
+	'The specified username is too long.',
 	null
 );
 
@@ -237,6 +251,15 @@ function usermgr_create() {
 		if (!status) {
 			return;
 		}
+		if (!val.length) {
+			DIALOG_USER_NO_NAME.show();
+			return;
+		}
+		if (val.length > SERVER_LIMITS.USERNAME_MAX_LEN) {
+			DIALOG_USERNAME_TOO_LONG.show();
+			return;
+		}
+
 		api_call(API_ENDP.USER_CREATE,
 			{'user': val}, (resp) => {
 			if (resp.error == API_E.LIMITED) {
