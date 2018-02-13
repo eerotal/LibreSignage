@@ -107,13 +107,3 @@ function sanitize_html(src) {
 	// Sanitize HTML tags.
 	return $("<div></div>").text(src).html();
 }
-
-function input_ind_invalid(query) {
-	$(query).each((index) => {
-		console.log($(this).tagName);
-	});
-}
-
-function input_ind_valid(query) {
-
-}
