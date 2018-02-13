@@ -44,6 +44,7 @@
 	const LS_LIM = array(
 		"SLIDE_MIN_TIME" 		=> 1*1000,
 		"SLIDE_MAX_TIME" 		=> 20*1000,
+		"SLIDE_MAX_INDEX"		=> 65536,
 		"SLIDE_NAME_MAX_LEN" 		=> 32,
 		"SLIDE_MARKUP_MAX_LEN"	 	=> 2048,
 
@@ -60,6 +61,7 @@
 			'disp' => 'Slides'
 		)
 	);
+
 
 	/*
 	*  Setup error handling and reporting.
@@ -78,3 +80,14 @@
 	function gtlim(string $lim) {
 		return LS_LIM[$lim];
 	}
+
+	// Do some checks on the configured values.
+	$max_slides = DEFAULT_QUOTA['slides']['limit']*gtlim('MAX_USERS');
+	if ($max_slides > gtlim('SLIDE_MAX_INDEX') - 1) {
+		throw new Exception('The configured slide quota '.
+				'conflicts with the configured maximum '.
+				'slide index value.');
+	}
+	// Prevent namespace pollution.
+	unset($max_slides);
+

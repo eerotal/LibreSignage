@@ -10,22 +10,12 @@ const DIALOG_MARKUP_TOO_LONG = (max) => {
 	);
 }
 
-const DIALOG_NAME_TOO_LONG = (max) => {
-	return new Dialog(
-		DIALOG.ALERT,
-		'Too long slide name',
-		`The slide name is too long. The maximum length is
-		${max} characters.`,
-		null
-	);
-}
-
 // Some sane default values for new slides.
 const NEW_SLIDE_DEFAULTS = {
 	'id': null,
-	'name': 'New Slide',
+	'name': 'NewSlide',
 	'time': 5000,
-	'markup': '<p></p>',
+	'markup': '',
 	'index': 0
 };
 
@@ -36,6 +26,10 @@ const SLIDE_TIME = $("#slide-time");
 const SLIDE_INDEX = $("#slide-index");
 const EDITOR_STATUS = $("#editor-status");
 var SLIDE_INPUT = null;
+
+var name_validator = null;
+var index_validator = null;
+var save_btn_validator_group = null;
 
 var _selected_slide = null;
 
@@ -57,6 +51,11 @@ function disable_editor_controls() {
 	SLIDE_INDEX.prop("disabled", true);
 	SLIDE_SAVE.prop("disabled", true);
 	SLIDE_REMOVE.prop("disabled", true);
+
+	// Make sure the validators don't enable the save button.
+	save_btn_validator_group.for_each((validator) => {
+		validator.disable();
+	});
 }
 
 function enable_editor_controls() {
@@ -66,6 +65,10 @@ function enable_editor_controls() {
 	SLIDE_INDEX.prop("disabled", false);
 	SLIDE_SAVE.prop("disabled", false);
 	SLIDE_REMOVE.prop("disabled", false);
+
+	save_btn_validator_group.for_each((validator) => {
+		validator.enable();
+	});
 }
 
 function slide_show(slide) {
@@ -154,21 +157,18 @@ function slide_save() {
 	console.log("LibreSignage: Save slide");
 	set_editor_status("Saving...");
 
-	if (SLIDE_NAME.val().length >
-			SERVER_LIMITS.SLIDE_MAX_NAME_SIZE) {
-
-		DIALOG_NAME_TOO_LONG(
-			SERVER_LIMITS.SLIDE_MAX_NAME_SIZE
-		).show();
-		set_editor_status("Save failed!");
+	if (!name_validator.is_valid()) {
+		return;
+	}
+	if (!index_validator.is_valid()) {
 		return;
 	}
 
 	if (SLIDE_INPUT.getValue().length >
-			SERVER_LIMITS.SLIDE_MAX_MARKUP_SIZE) {
+			SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN) {
 
 		DIALOG_MARKUP_TOO_LONG(
-			SERVER_LIMITS.SLIDE_MAX_MARKUP_SIZE
+			SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN
 		).show();
 		set_editor_status("Save failed!");
 		return;
@@ -226,10 +226,47 @@ function slide_preview() {
 	}
 }
 
-
 function editor_setup() {
 	api_load_limits(() => {
-		// Setup the ACE editor with the Dawn theme and plaintext mode.
+		// Setup input validators.
+		name_validator = new StrValidator(
+			{
+				min: 1,
+				max: SERVER_LIMITS.SLIDE_NAME_MAX_LEN,
+				regex: /^[A-Za-z0-9_-]*$/
+			},
+			null
+		);
+		name_validator.attach(SLIDE_NAME);
+
+		index_validator = new NumValidator(
+			{
+				min: 0,
+				max: SERVER_LIMITS.SLIDE_MAX_INDEX
+			},
+			null
+		);
+		index_validator.attach(SLIDE_INDEX);
+
+		/*
+		*  ValidatorGroup for enabling or disabling the
+		*  save button based on whether all the inputs
+		*  are successfully validated.
+		*/
+		save_btn_validator_group = new ValidatorGroup(
+			[
+				name_validator,
+				index_validator
+			],
+			(valid) => {
+				SLIDE_SAVE.prop('disabled', !valid);
+			}
+		);
+
+		/*
+		*  Setup the ACE editor with the Dawn theme
+		*  and plaintext mode.
+		*/
 		SLIDE_INPUT = ace.edit('slide-input');
 		SLIDE_INPUT.setTheme('ace/theme/dawn');
 		SLIDE_INPUT.$blockScrolling = Infinity;

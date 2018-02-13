@@ -113,6 +113,7 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>
 		<script src="/common/js/slide.js"></script>
 		<script src="/common/js/util.js"></script>
+		<script src="/common/js/validator.js"></script>
 		<script src="/common/js/dialog.js"></script>
 		<script src="/common/js/api.js"></script>
 		<script src="/control/editor/js/slidelist.js"></script>

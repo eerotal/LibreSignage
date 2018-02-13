@@ -115,9 +115,10 @@
 	}
 	$slide_data['name'] = $SLIDE_SAVE->get('name');
 
-	// Make sure index >= 0.
-	if ($SLIDE_SAVE->get('index') < 0) {
-		api_throw(API_E_INVALID_REQUEST);
+	// Make sure 0 <= index <= SLIDE_MAX_INDEX.
+	if ($SLIDE_SAVE->get('index') < 0 ||
+		$SLIDE_SAVE->get('index') > gtlim('SLIDE_MAX_INDEX')) {
+		api_throw(API_E_LIMITED);
 	}
 	$slide_data['index'] = $SLIDE_SAVE->get('index');
 
