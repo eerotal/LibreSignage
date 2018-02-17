@@ -33,10 +33,11 @@ clean:
 
 LOC:
 	# Count the lines of code in LibreSignage.
-	wc -l `find . -name "*.php"		\
-			-o -name "*.js"		\
-			-o -name "*.html"	\
-			-o -name "*.css"	\
-			-o -name "*.sh"		\
-			-o -name "*.json"	\
-			-o -name "makefile"`
+	wc -l `find .	-name "dist" -prune -o		\
+			-name "*.php" -print		\
+			-o -name "*.js"	-print		\
+			-o -name "*.html" -print	\
+			-o -name "*.css" -print		\
+			-o -name "*.sh"	-print		\
+			-o -name "*.json" -print	\
+			-o -name "makefile" -print`
