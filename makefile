@@ -2,7 +2,7 @@ SRC_DIR=src
 DIST_DIR=dist
 
 .PHONY: install LOC clean
-.SILENT: install verify LOC build clean
+.SILENT: install verify LOC dist clean
 
 ifndef SRC_DIR
 $(error SRC_DIR not set)
@@ -12,20 +12,19 @@ ifndef DIST_DIR
 $(error DIST_DIR not set)
 endif
 
-build: src/*
-	echo '## Build LibreSignage...'
-	mkdir -p $(DIST_DIR)
-	cp -Rpv $(SRC_DIR)/* $(DIST_DIR)/
+dist: src/*
+	echo '## Create LibreSignage dist...'
+	./build/mkdist.sh
 
 verify: src/*
 	# Run the source verification scripts.
 	echo '## Verify LibreSignage sources'
-	./verify.sh
+	./build/verify.sh
 
-install: verify build
+install: verify dist
 	# Install LibreSignage to INSTALL_DIR.
 	echo '## Install'
-	./install.sh
+	./build/install.sh
 
 clean:
 	echo '## Clean LibreSignage build files'

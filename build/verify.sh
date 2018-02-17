@@ -5,6 +5,7 @@
 #    BUILD_VERIFY_NOCONFIG => Disable warning if config.php is not included.
 #
 
+set -e
 for f in `find . -type f -name '*.php'`; do
 	if [ -z "`grep /common/php/config.php $f`" ]; then
 		if [ -z "`grep !!BUILD_VERIFY_NOCONFIG!! $f`" ]; then

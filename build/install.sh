@@ -3,7 +3,8 @@
 # A script for building LibreSignage and installing an
 # apache2 virtual host for hosting a LibreSignage instance.
 
-APACHE_SITES='/etc/apache2/sites-available';
+set -e
+. build/build_conf.sh
 
 # Check that the APACHE_SITES directory exists.
 if [ ! -d "$APACHE_SITES" ]; then
@@ -64,7 +65,7 @@ fi
 
 echo 'Install LibreSignage to '$VHOST_DIR;
 echo 'Copy files.';
-cp -Rpv dist/* $VHOST_DIR'/.';
+cp -Rp $DIST_DIR/* $VHOST_DIR'/.';
 echo 'Done!';
 
 echo 'Create the Virtual Host config. ('$APACHE_SITES'/'$SERVER_NAME'.conf)';
