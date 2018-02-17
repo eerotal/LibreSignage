@@ -7,6 +7,7 @@
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
 	define('UID_MAX_SIZE',	PHP_INT_SIZE);
 	define('UID_FILE',	LIBRESIGNAGE_ROOT.'/data/uid/uid.dat');
@@ -25,56 +26,19 @@
 		*  Generate a new UID. On success the new UID hex
 		*  string is returned. Otherwise an error is thrown.
 		*/
-
-		if (!is_dir(dirname(UID_FILE))) {
-			if (!@mkdir(dirname(UID_FILE), $mode=0775,
-					$recursive=TRUE)) {
-				throw new IntException("Failed to create ".
-						"data directory!");
-			}
-		}
-
-		$uid_file = @fopen(UID_FILE, 'c+');
-		if ($uid_file === FALSE) {
-			throw new IntException("Failed to open UID file!");
-		}
-
-		if (flock($uid_file, LOCK_EX)) {
-			$uid_f_size = filesize(UID_FILE);
-			if ($uid_f_size === FALSE) {
-				goto cleanup_and_throw_file_error;
-			}
-
-			if ($uid_f_size != 0) {
-				$current_uid = fread($uid_file, $uid_f_size);
-				if ($current_uid === FALSE) {
-					goto cleanup_and_throw_file_error;
-				}
-			} else {
+		try {
+			$current_uid = file_lock_and_get(UID_FILE);
+			$current_uid = preg_replace('/\s+/', '',
+						$current_uid);
+			if (empty($current_uid)) {
 				$current_uid = '0x0';
 			}
-
-			if (fseek($uid_file, 0) == -1) {
-				goto cleanup_and_throw_file_error;
-			}
-			$new_uid = _uid_next($current_uid);
-			$ret = fwrite($uid_file, $new_uid);
-			flock($uid_file, LOCK_UN);
-			fclose($uid_file);
-
-			if ($ret === FALSE) {
-				return FALSE;
-			} else {
-				return $new_uid;
-			}
-		} else {
-			fclose($uid_file);
-			return FALSE;
+		} catch (Exception $e) {
+			$current_uid = '0x0';
 		}
 
-		// Error handling.
-		cleanup_and_throw_file_error:
-			flock($uid_file, LOCK_UN);
-			fclose($uid_file);
-			throw new IntException('UID file access failed!');
+		$new_uid = _uid_next($current_uid);
+		file_lock_and_put(UID_FILE, $new_uid);
+
+		return $new_uid;
 	}

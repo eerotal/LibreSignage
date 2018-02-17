@@ -106,7 +106,7 @@ function file_lock_and_put(string $path,
 		throw new Exception("File doesn't exist.");
 	}
 
-	$ret = file_put_contents($path, $data, LOCK_EX);
+	$ret = @file_put_contents($path, $data, LOCK_EX);
 	if ($ret === FALSE) {
 		throw new IntException('Failed to write file.');
 	}

@@ -293,11 +293,7 @@ class Slide {
 			*  If the ID isn't defined, generate it.
 			*  This creates a new slide.
 			*/
-			try {
-				$tmp[self::K_ID] = get_uid();
-			} catch (Exception $e) {
-				return FALSE;
-			}
+			$tmp[self::K_ID] = get_uid();
 		} else if (!in_array($tmp[self::K_ID],
 			get_slides_id_list(), TRUE)) {
 			// Provided slide ID doesn't exist.
