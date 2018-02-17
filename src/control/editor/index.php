@@ -32,41 +32,52 @@
 					</div>
 				</div>
 				<div class="editor container-fluid row">
-					<div class="col-md-auto">
-						<label for="slide-name">Name</label>
-						<input type="text"
-							class="form-control w-100"
-							id="slide-name"
-							data-toggle="tooltip"
-							title="The name of the slide. This is only visible in the editor.">
+					<div class="col-md-auto pt-2">
+						<div class="form-group" id="slide-name-group">
+							<label for="slide-name">Name</label>
+							<input type="text"
+								class="form-control w-100"
+								id="slide-name"
+								data-toggle="tooltip"
+								title="The name of the slide. This is only visible in the editor.">
+							<div class="invalid-feedback">
+								The slide name is invalid.
+							</div>
+						</div>
 
-						<label for="slide-time">Time (seconds)</label>
-						<select class="custom-select w-100"
-							id="slide-time"
-							data-toggle="tooltip"
-							title="The time the slide is shown in seconds.">
+						<div class="form-group" id="slide-time-group">
+							<label for="slide-time">Time (seconds)</label>
+							<select class="custom-select w-100"
+								id="slide-time"
+								data-toggle="tooltip"
+								title="The time the slide is shown in seconds.">
 
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-							<option value="5">5</option>
-							<option value="6">6</option>
-							<option value="7">7</option>
-							<option value="8">8</option>
-							<option value="9">9</option>
-							<option value="10">10</option>
-						</select>
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+							</select>
+						</div>
+						<div class="form-group" id="slide-index-group">
+							<label for="slide-index">Index</label>
+							<input type="number"
+								min="0"
+								class="form-control w-100"
+								id="slide-index"
+								data-toggle="tooltip"
+								title="The ordinal number of the slide. 0 is the first slide.">
+							<div class="invalid-feedback">
+								The slide index is invalid.
+							</div>
+						</div>
 
-						<label for="slide-index">Index</label>
-						<input type="number"
-							min="0"
-							class="form-control w-100"
-							id="slide-index"
-							data-toggle="tooltip"
-							title="The ordinal number of the slide. 0 is the first slide.">
-
-						<div class="container-fluid d-flex justify-content-center">
+						<div class="form-group container-fluid d-flex justify-content-center">
 							<button id="btn-slide-save"
 								type="button"
 								class="btn btn-success btn-slide-ctrl"

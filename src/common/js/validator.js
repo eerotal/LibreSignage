@@ -15,6 +15,11 @@ class ValidatorGroup {
 		}
 
 		this.validators = validators;
+
+		/*
+		*  Wrap the calc_state() function so that
+		*  'this' can be used in the function.
+		*/
 		this.calc_state_wrap = (valid) => {
 			this.calc_state(valid);
 		};
@@ -36,6 +41,7 @@ class ValidatorGroup {
 		} else {
 			this.valid = false;
 		}
+
 		this.callback = callback;
 	}
 
@@ -83,12 +89,14 @@ class Validator {
 		*  array of callback functions to call when a change
 		*  in the validation state occurs.
 		*/
+
 		if (settings && settings != Object(settings)) {
 			throw new Error('Invalid validator settings.');
 		}
 		if (callbacks && !Array.isArray(callbacks)) {
 			throw new Error('Invalid validator callbacks');
 		}
+
 		this.settings = settings;
 		this.callbacks = callbacks;
 
@@ -97,29 +105,46 @@ class Validator {
 		this.enabled = true;
 	}
 
-	attach(query) {
+	attach(query, style_on) {
 		/*
-		*  Attach the validator the the elements selected by
+		*  Attach the validator to the elements selected by
 		*  the jQuery object 'query' or if 'query' is a string,
-		*  use it to create a jQuery object.
+		*  use it to create a jQuery object. If 'style_on' is not
+		*  null, the styling is applied to the elements selected
+		*  by the jQuery object or the jQuery object created using
+		*  the query string in 'style_on'. Otherwise styling is
+		*  applied to the elements selected using 'query'.
 		*/
-		var tmp_q = null;
+
+		var tmp_query = null;
+		var tmp_style_on = null;
+
+		// Get the 'query' jQuery object.
 		if (typeof query == 'string') {
 			if (query.length) {
-				tmp_q = $(query);
+				tmp_query = $(query);
 			} else {
-				throw new Error('Invalid query string.');
+				throw new Error('query invalid.');
 			}
 		} else {
-			tmp_q = query;
+			tmp_query = query;
 		}
 
-		if (!tmp_q.length) {
-			return;
+		// Get the 'style_on' jQuery object.
+		if (typeof style_on == 'string') {
+			if (query.length) {
+				tmp_style_on = $(style_on);
+			} else {
+				throw new Error('style_on invalid.');
+			}
+		} else if (style_on == null) {
+			tmp_style_on = tmp_query;
+		} else {
+			tmp_style_on = style_on;
 		}
 
-		this.attached.push(tmp_q);
-		$(query).on(
+		// Attach event handler.
+		tmp_query.on(
 			'input',
 			(event) => {
 				if (this.enabled) {
@@ -127,14 +152,28 @@ class Validator {
 				}
 			}
 		);
+
+		this.attached[this.attached.length] = {
+			'event_from': tmp_query,
+			'style_on': tmp_style_on
+		}
 	}
 
 	detach() {
 		/*
 		*  Detach the validator from all elements.
 		*/
+
+		// Reset styling.
+		this._set_valid_state(true);
+
+		// Detach event handlers.
 		for (var i in this.attached) {
-			this.attached[i].off('input', null, this._validate);
+			this.attached[i]['event_from'].off(
+				'input',
+				null,
+				this._validate
+			);
 		}
 		this.attached = [];
 	}
@@ -169,19 +208,34 @@ class Validator {
 		/*
 		*  Set the state of this Validator. The assigned
 		*  callback functions are called if a change in
-		*  the state occurs.
+		*  the state occurs. This function also applies
+		*  the CSS styling to the selected parent 'style_on'
+		*  elements and their descendants recursively.
 		*/
+		var q = 'input, selector, textarea';
+		var att = this.attached;
+		var e = [];
+
+		// Select the correct elements.
+		for (var i in att) {
+			if (att[i]['style_on'].is(q)) {
+				e.push(att[i]['style_on']);
+			}
+			e.push(att[i]['style_on'].find($(q)));
+		}
+
+		// Apply styling, call callbacks and set state.
 		if (!valid && this.valid) {
-			for (var i in this.attached) {
-				this.attached[i].addClass('is-invalid');
+			for (var i in e) {
+				e[i].addClass('is-invalid');
 			}
 			for (var i in this.callbacks) {
 				this.callbacks[i](false);
 			}
 			this.valid = false;
 		} else if (valid && !this.valid) {
-			for (var i in this.attached) {
-				this.attached[i].removeClass('is-invalid');
+			for (var i in e) {
+				e[i].removeClass('is-invalid');
 			}
 			for (var i in this.callbacks) {
 				this.callbacks[i](true);
@@ -194,26 +248,57 @@ class Validator {
 		throw new Error('Subclasses should implement the ' +
 				'validator _validate() function.');
 	}
+
+	_chk_settings(settings) {
+		/*
+		*  Check the supplied settings against the array
+		*  of accepted settings and throw an error if
+		*  required settings don't exist.
+		*/
+		if (!Array.isArray(settings)) {
+			throw new Error('Invalid type for "settings".');
+		}
+		for (var i in settings) {
+			var skeys = Object.keys(this.settings);
+			if (skeys.indexOf(settings[i]) == -1) {
+				throw new Error('Invalid ' +
+					'Validator settings. ("' +
+					settings[i] + '" missing)');
+			}
+		}
+	}
 }
 
 class NumValidator extends Validator {
 	/*
 	*  Make sure number inputs are in the range [min, max].
 	*  Below is a list of the accepted settings.
-	*    min = The minimum value.
-	*    max = The maximum value.
+	*    min = The minimum value or null for unlimited.
+	*    max = The maximum value or null for unlimited.
 	*/
-	_validate(validator) {
-		var q = null;
-		var min = validator.settings.min;
-		var max = validator.settings.max;
+	constructor(...args) {
+		super(...args);
+		this._chk_settings(['min', 'max']);
+	}
 
-		for (var i in validator.attached) {
-			q = validator.attached[i];
-			if (q.val() < min || q.val() > max) {
-				validator._set_valid_state(false);
+	_numval_chk(value) {
+		var min = this.settings.min;
+		var max = this.settings.max;
+
+		var a = (min == null || value >= min);
+		var b = (max == null || value <= max);
+
+		return a && b;
+	}
+
+	_validate() {
+		var val = null;
+		for (var i in this.attached) {
+			val = this.attached[i]['event_from'].val();
+			if (this._numval_chk(val)) {
+				this._set_valid_state(true);
 			} else {
-				validator._set_valid_state(true);
+				this._set_valid_state(false);
 			}
 		}
 	}
@@ -225,30 +310,35 @@ class StrValidator extends Validator {
 	*  is within the range [min, max]. Below is a list
 	*  of the accepted settings.
 	*    min = The minimum string length.
-	*    max = The maximum string length (or -1 for unlimited).
-	*    regex = A regex to match (or null).
+	*    max = The maximum string length (or null for unlimited).
+	*    regex = A regex to match (or null if unused).
 	*/
 
-	_check_conditions(validator, value) {
-		var min = validator.settings.min;
-		var max = validator.settings.max;
-		var regex = validator.settings.regex;
+	constructor(...args) {
+		super(...args);
+		this._chk_settings(['min', 'max', 'regex']);
+	}
 
-		var a = value.length >= min;
-		var b = max == -1 || value.length <= max;
-		var c = !regex || value.match(regex);
+	_strval_chk(value) {
+		var min = this.settings.min;
+		var max = this.settings.max;
+		var regex = this.settings.regex;
+
+		var a = (value.length >= min);
+		var b = (max == null || value.length <= max);
+		var c = (regex == null || value.match(regex));
 
 		return a && b && c;
 	}
 
-	_validate(validator) {
-		var q = null;
-		for (var i in validator.attached) {
-			q = validator.attached[i];
-			if (!this._check_conditions(validator, q.val())) {
-				validator._set_valid_state(false);
+	_validate() {
+		var val = null;
+		for (var i in this.attached) {
+			val = this.attached[i]['event_from'].val();
+			if (!this._strval_chk(val)) {
+				this._set_valid_state(false);
 			} else {
-				validator._set_valid_state(true);
+				this._set_valid_state(true);
 			}
 		}
 	}

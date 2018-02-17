@@ -22,8 +22,11 @@ const NEW_SLIDE_DEFAULTS = {
 const SLIDE_SAVE = $("#btn-slide-save");
 const SLIDE_REMOVE = $("#btn-slide-remove");
 const SLIDE_NAME = $("#slide-name");
+const SLIDE_NAME_GRP = $("#slide-name-group");
 const SLIDE_TIME = $("#slide-time");
+const SLIDE_TIME_GRP = $("#slide-time-group");
 const SLIDE_INDEX = $("#slide-index");
+const SLIDE_INDEX_GRP = $("#slide-index-group");
 const EDITOR_STATUS = $("#editor-status");
 var SLIDE_INPUT = null;
 
@@ -237,7 +240,7 @@ function editor_setup() {
 			},
 			null
 		);
-		name_validator.attach(SLIDE_NAME);
+		name_validator.attach(SLIDE_NAME, SLIDE_NAME_GRP);
 
 		index_validator = new NumValidator(
 			{
@@ -246,7 +249,7 @@ function editor_setup() {
 			},
 			null
 		);
-		index_validator.attach(SLIDE_INDEX);
+		index_validator.attach(SLIDE_INDEX, SLIDE_INDEX_GRP);
 
 		/*
 		*  ValidatorGroup for enabling or disabling the
