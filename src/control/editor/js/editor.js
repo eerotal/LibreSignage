@@ -207,7 +207,7 @@ function slide_preview() {
 	/*
 	*  Preview the current slide in a new window.
 	*/
-	if (_selected_slide) {
+	if (_selected_slide && _selected_slide.get('id')) {
 		if (_selected_slide.get('id') != "__API_K_NULL__") {
 			window.open("/app/?preview=" +
 				_selected_slide.get('id'));
@@ -217,8 +217,9 @@ function slide_preview() {
 				"are saved.", null);
 		}
 	} else {
-		dialog(DIALOG.ALERT, "Please select a slide",
-			"Please select a slide to preview first.", null);
+		dialog(DIALOG.ALERT, "No slide selected",
+			"Please select a slide to preview or " +
+			"save the current slide first.", null);
 	}
 }
 
