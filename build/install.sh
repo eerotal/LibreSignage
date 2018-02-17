@@ -6,6 +6,12 @@
 set -e
 . build/build_conf.sh
 
+# Load saved configuration if it is supplied;
+if [ -n "$1" ]; then
+	echo 'Load install config from "'$1'".';
+	. $1;
+fi
+
 # Check that the APACHE_SITES directory exists.
 if [ ! -d "$APACHE_SITES" ]; then
 	echo "[ERROR] The apache2 sites-available directory doesn't exist.";
@@ -14,27 +20,38 @@ if [ ! -d "$APACHE_SITES" ]; then
 fi
 
 # Get config information.
-read -p 'Document root (DEF: /var/www): ' DOCUMENT_ROOT;
 if [ -z "$DOCUMENT_ROOT" ]; then
-	DOCUMENT_ROOT='/var/www';
+	read -p 'Document root (DEF: /var/www): ' DOCUMENT_ROOT;
+	if [ -z "$DOCUMENT_ROOT" ]; then
+		DOCUMENT_ROOT='/var/www';
+	fi
 fi
 
-read -p 'Domain name of the server: ' SERVER_NAME;
 if [ -z "$SERVER_NAME" ]; then
-	echo '[ERROR] Empty domain. Aborting!';
-	exit 1;
+	read -p 'Domain name of the server: ' SERVER_NAME;
+	if [ -z "$SERVER_NAME" ]; then
+		echo '[ERROR] Empty domain. Aborting!';
+		exit 1;
+	fi
 fi
 
-read -p 'Alias of the server: ' SERVER_ALIAS;
 if [ -z "$SERVER_ALIAS" ]; then
-	echo 'No server alias';
+	read -p 'Server name aliases (space separated): ' SERVER_ALIAS;
 fi
 
-
-read -p 'Email of the server admin (DEF: admin@example.com): ' SERVER_ADMIN_EMAIL;
 if [ -z "$SERVER_ADMIN_EMAIL" ]; then
-	SERVER_ADMIN_EMAIL='admin@example.com';
+	read -p 'Admin email (DEF: admin@example.com): ' SERVER_ADMIN_EMAIL;
+	if [ -z "$SERVER_ADMIN_EMAIL" ]; then
+		SERVER_ADMIN_EMAIL='admin@example.com';
+	fi
 fi
+
+echo 'Write config to "'$INSTALL_CONFIG'".';
+echo '#!/bin/bash' > $INSTALL_CONFIG;
+echo 'DOCUMENT_ROOT="'$DOCUMENT_ROOT'";' >> $INSTALL_CONFIG;
+echo 'SERVER_NAME="'$SERVER_NAME'";' >> $INSTALL_CONFIG;
+echo 'SERVER_ALIAS="'$SERVER_ALIAS'";' >> $INSTALL_CONFIG;
+echo 'SERVER_ADMIN_EMAIL="'$SERVER_ADMIN_EMAIL'";' >> $INSTALL_CONFIG;
 
 VHOST_DIR=`echo $DOCUMENT_ROOT'/'$SERVER_NAME | sed "s/\/\+/\//g"`;
 echo "Virtual host dir: "$VHOST_DIR;
@@ -80,7 +97,7 @@ if [ -f $APACHE_SITES'/'$SERVER_NAME'.conf' ]; then
 	esac
 fi
 
-. 'vhost_template.sh' > $APACHE_SITES'/'$SERVER_NAME'.conf';
+. 'build/vhost_template.sh' > $APACHE_SITES'/'$SERVER_NAME'.conf';
 echo 'LibreSignage installed!';
 
 read -p 'Enable the created virtual host and restart apache2? (Y\N): ' ENABLE_VHOST;

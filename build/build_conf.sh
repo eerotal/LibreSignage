@@ -6,6 +6,7 @@
 SRC_DIR='src';
 DIST_DIR='dist';
 APACHE_SITES='/etc/apache2/sites-available';
+INSTALL_CONFIG='install.instconf';
 
 # Default file permissions.
 DEF_OWNER="$USER:$USER";

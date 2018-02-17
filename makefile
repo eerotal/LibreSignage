@@ -24,11 +24,12 @@ verify: src/*
 install: verify dist
 	# Install LibreSignage to INSTALL_DIR.
 	echo '## Install'
-	./build/install.sh
+	./build/install.sh $(INST)
 
 clean:
 	echo '## Clean LibreSignage build files'
 	rm -rfv dist
+	rm -f *.instconf
 
 LOC:
 	# Count the lines of code in LibreSignage.
