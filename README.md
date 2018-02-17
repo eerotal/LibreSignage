@@ -45,7 +45,7 @@ _example.com_, you could add the following line to your _/etc/hosts_ file.
 This will redirect all requests for _example.com_ to _localhost_, making it
 possible to access the site by connecting to _example.com_.
 
-## Used thrid-party libraries
+## Used third-party libraries
 
 * Bootstrap (MIT License)
   * Copyright (c) 2011-2016 Twitter, Inc.
