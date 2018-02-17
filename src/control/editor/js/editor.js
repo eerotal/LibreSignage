@@ -160,15 +160,8 @@ function slide_save() {
 	console.log("LibreSignage: Save slide");
 	set_editor_status("Saving...");
 
-	if (!name_validator.is_valid()) {
-		return;
-	}
-	if (!index_validator.is_valid()) {
-		return;
-	}
-
 	if (SLIDE_INPUT.getValue().length >
-			SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN) {
+		SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN) {
 
 		DIALOG_MARKUP_TOO_LONG(
 			SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN

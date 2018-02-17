@@ -65,12 +65,15 @@ function file_lock_and_get(string $path) {
 	*  before reading any data.
 	*/
 	$ret = '';
+	$fs = filesize($path);
 	$fp = @fopen($path, 'r');
+
 	if ($fp === FALSE) {
 		throw new IntException('Failed to open file for reading.');
 	}
 	if (flock($fp, LOCK_EX)) {
-		$ret = fread($fp, filesize($path));
+		if ($fs == 0) { return ''; }
+		$ret = @fread($fp, $fs);
 		flock($fp, LOCK_UN);
 	} else {
 		throw new IntException('Failed to lock file.');

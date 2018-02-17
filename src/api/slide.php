@@ -232,7 +232,7 @@ class Slide {
 		$this->data[self::K_MARKUP] = file_lock_and_get(
 			$this->files[self::K_MARKUP]
 		);
-		if ($this->data[self::K_MARKUP] == FALSE) {
+		if ($this->data[self::K_MARKUP] === FALSE) {
 			throw new IntException("Slide markup read error!");
 		}
 
@@ -321,7 +321,8 @@ class Slide {
 		$cstr = json_encode($tmp);
 		if ($cstr === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
-			throw new IntException("Slide config encode failed!");
+			throw new IntException("Slide config ".
+						"encode failed!");
 		}
 		file_lock_and_put($this->files[self::K_CONF], $cstr);
 		file_lock_and_put($this->files[self::K_MARKUP],

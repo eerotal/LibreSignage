@@ -38,7 +38,7 @@
 			'id' => API_P_STR|API_P_OPT|API_P_NULL,
 			'name' => API_P_STR,
 			'index' => API_P_INT,
-			'markup' => API_P_STR,
+			'markup' => API_P_STR|API_P_STR_ALLOW_EMPTY,
 			'time' => API_P_INT
 		)
 	);
