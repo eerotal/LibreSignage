@@ -30,12 +30,12 @@ function list_retrieve(ready_callback) {
 	_list_ready = false;
 	_list_old = _list_current.slice();
 	_list_current = [];
-	api_call(API_ENDP.SLIDE_LIST, null, (response) => {
-		if (!response || response.error) {
+	api_call(API_ENDP.SLIDE_LIST, null, (resp) => {
+		if (resp.error) {
 			throw new Error('API error while fetching ' +
 					'slide list.')
 		}
-		_list_current = response.slides;
+		_list_current = resp.slides;
 		_list_ready = true;
 		console.log("LibreSignage: Slide list retrieved. (" +
 				_list_current.length + " slides)");
@@ -60,8 +60,8 @@ function slides_retrieve(ready_callback) {
 
 	for (i in list) {
 		_slides_current[i] = new Slide();
-		_slides_current[i].load(list[i], (status) => {
-			if (!status) {
+		_slides_current[i].load(list[i], (err) => {
+			if (err) {
 				throw new Error('Error while loading ' +
 						'slide!');
 				_slides_current[i] = null;
@@ -70,8 +70,8 @@ function slides_retrieve(ready_callback) {
 			ready_cnt--;
 			if (!ready_cnt) {
 				/*
-				*  Remove null slides resulting from failed
-				*  Slide.load() calls.
+				*  Remove null slides resulting from
+				*  failed Slide.load() calls.
 				*/
 				_slides_current = _slides_current.filter(
 					(s) => { return s != null; }

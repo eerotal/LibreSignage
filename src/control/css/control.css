@@ -1,0 +1,37 @@
+:root {
+	--quota-bar-height: 30px;
+}
+
+.header-col {
+	text-align: center;
+	margin-bottom: 50px;
+}
+
+.ctrl-panel-col {
+	margin-left: 10px;
+	margin-right: 10px;
+	padding: 25px;
+	height: 100%;
+}
+
+.ctrl-panel-col > h2 {
+	margin-left: -25px;
+	margin-right: -25px;
+	text-align: center;
+	font-size: 4vw !important;
+}
+
+#user-quota-cont {
+	padding-right: 30px;
+	padding-left: 30px;
+}
+
+.quota-bar {
+	margin: 0;
+	padding: 0;
+	height: var(--quota-bar-height);
+	font-size: calc(var(--quota-bar-height)*0.5)px;
+	text-align: center;
+	line-height: var(--quota-bar-height);
+}
+

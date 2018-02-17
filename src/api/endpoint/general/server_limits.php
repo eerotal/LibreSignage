@@ -1,12 +1,10 @@
 <?php
 	/*
-	*  API endpoint for removing a user.
-	*
-	*  POST parameters:
-	*    * user    = The user to remove.
+	*  API endpoint for getting the configured server limits.
 	*
 	*  Return value:
 	*    A JSON encoded dictionary with the following data.
+	*      * limits     = A dictionary with the limits. **
 	*      * error      = An error code or API_E_OK on success. ***
 	*
 	*    **  (Only exists if the API call was successful.)
@@ -18,31 +16,18 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
-	$USER_REMOVE = new APIEndpoint(
-		$method = API_METHOD['POST'],
+	$SERVER_LIMITS = new APIEndpoint(
+		$method = API_METHOD['GET'],
 		$response_type = API_RESPONSE['JSON'],
-		$format = array(
-			'user' => API_P_STR,
-		)
+		$format = NULL
 	);
-	api_endpoint_init($USER_REMOVE);
+	api_endpoint_init($SERVER_LIMITS);
 
 	session_start();
 	auth_init();
-	if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
+	if (!auth_is_authorized(NULL, NULL, FALSE)) {
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	try {
-		$u = new User($USER_REMOVE->get('user'));
-	} catch (ArgException $e) {
-		api_throw(API_E_INVALID_REQUEST, $e);
-	}
-
-	try {
-		$u->remove();
-	} catch (Exception $e) {
-		api_throw(API_E_INTERNAL, $e);
-	}
-
-	$USER_REMOVE->send();
+	$SERVER_LIMITS->resp_set(array('limits' => LS_LIM));
+	$SERVER_LIMITS->send();

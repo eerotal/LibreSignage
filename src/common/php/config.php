@@ -10,36 +10,57 @@
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/error.php');
 
-	// Enable debugging. Never set this to TRUE on a production system.
-	define("LIBRESIGNAGE_DEBUG",			TRUE);
+	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT']);
 
-	define("LIBRESIGNAGE_ROOT",			$_SERVER['DOCUMENT_ROOT']);
+	// Enable debugging. Never set this to TRUE on a production system.
+	const LIBRESIGNAGE_DEBUG = TRUE;
 
 	/*
 	*  Paths relative to document root. DO NOT make these absolute
 	*  or system path information might be leaked to users.
 	*/
-	define("SLIDES_DIR", 				"/data/slides");
-	define("LIBRESIGNAGE_LICENSE_FILE_PATH",	"/doc/LICENSE.md");
-	define("LIBRARY_LICENSES_FILE_PATH",		"/doc/LIBRARY_LICENSES.md");
-	define("NAV_PATH",				"/common/php/nav/nav.php");
-	define("FOOTER_PATH",				"/common/php/footer/footer.php");
-	define("FOOTER_MINIMAL_PATH",			"/common/php/footer/footer_minimal.php");
-	define("USER_DATA_DIR",				"/data/users");
+	const SLIDES_DIR 			= "/data/slides";
+	const LIBRESIGNAGE_LICENSE_FILE_PATH 	= "/doc/LICENSE.md";
+	const LIBRARY_LICENSES_FILE_PATH 	= "/doc/LIBRARY_LICENSES.md";
+	const NAV_PATH 				= "/common/php/nav/nav.php";
+	const FOOTER_PATH 			= "/common/php/footer/footer.php";
+	const FOOTER_MINIMAL_PATH 		= "/common/php/footer/footer_minimal.php";
+	const USER_DATA_DIR 			= "/data/users";
 
-	define("LOGIN_PAGE", 				"/login");
-	define("LOGOUT_PAGE", 				"/logout");
-	define("ABOUT_PAGE",				"/about");
-	define("EDITOR_PAGE",				"/control/editor");
-	define("CONTROL_PANEL_PAGE",			"/control");
-	define("APP_PAGE",				"/app");
-	define("USER_MGR_PAGE",				"/control/usermgr");
-	define("USER_SETTINGS_PAGE",			"/control/user");
+	// Page constants.
+	const LOGIN_PAGE 			= "/login";
+	const LOGOUT_PAGE 			= "/logout";
+	const ABOUT_PAGE 			= "/about";
+	const EDITOR_PAGE 			= "/control/editor";
+	const CONTROL_PANEL_PAGE 		= "/control";
+	const APP_PAGE 				= "/app";
+	const USER_MGR_PAGE 			= "/control/usermgr";
+	const USER_SETTINGS_PAGE 		= "/control/user";
+	const ERROR_PAGES 			= "/errors";
+	const LOGIN_LANDING 			= CONTROL_PANEL_PAGE;
+	const LOGOUT_LANDING 			= LOGOUT_PAGE;
 
-	define("LOGIN_LANDING", 			CONTROL_PANEL_PAGE);
-	define("LOGOUT_LANDING",			LOGOUT_PAGE);
+	// LibreSignage instance limits.
+	const LS_LIM = array(
+		"SLIDE_MIN_TIME" 		=> 1*1000,
+		"SLIDE_MAX_TIME" 		=> 20*1000,
+		"SLIDE_MAX_INDEX"		=> 65536,
+		"SLIDE_NAME_MAX_LEN" 		=> 32,
+		"SLIDE_MARKUP_MAX_LEN"	 	=> 2048,
 
-	define("ERRORS",				"/errors");
+		"MAX_USERS" 			=> 64,
+		"MAX_USER_GROUPS" 		=> 32,
+		"USERNAME_MAX_LEN"		=> 64,
+		"PASSWORD_MAX_LEN"		=> 256
+	);
+
+	// User quota limits.
+	const DEFAULT_QUOTA = array(
+		'slides' => array(
+			'limit' => 2,
+			'disp' => 'Slides'
+		)
+	);
 
 
 	/*
@@ -54,3 +75,19 @@
 	set_exception_handler(function(Throwable $e) {
 		error_handle(500, $e);
 	});
+
+
+	function gtlim(string $lim) {
+		return LS_LIM[$lim];
+	}
+
+	// Do some checks on the configured values.
+	$max_slides = DEFAULT_QUOTA['slides']['limit']*gtlim('MAX_USERS');
+	if ($max_slides > gtlim('SLIDE_MAX_INDEX') - 1) {
+		throw new Exception('The configured slide quota '.
+				'conflicts with the configured maximum '.
+				'slide index value.');
+	}
+	// Prevent namespace pollution.
+	unset($max_slides);
+

@@ -29,14 +29,14 @@
 		if (!is_dir(dirname(UID_FILE))) {
 			if (!@mkdir(dirname(UID_FILE), $mode=0775,
 					$recursive=TRUE)) {
-				throw new Exception("Failed to create ".
+				throw new IntException("Failed to create ".
 						"data directory!");
 			}
 		}
 
 		$uid_file = @fopen(UID_FILE, 'c+');
 		if ($uid_file === FALSE) {
-			throw new Exception("Failed to open UID file!");
+			throw new IntException("Failed to open UID file!");
 		}
 
 		if (flock($uid_file, LOCK_EX)) {
@@ -76,5 +76,5 @@
 		cleanup_and_throw_file_error:
 			flock($uid_file, LOCK_UN);
 			fclose($uid_file);
-			throw new Exception('UID file access failed!');
+			throw new IntException('UID file access failed!');
 	}

@@ -1,5 +1,5 @@
 #dialog-overlay {
-	position: absolute;
+	position: fixed;
 
 	width: 100%;
 	min-width: 100%;
@@ -13,6 +13,7 @@
 	left: 0;
 
 	background: rgba(145, 145, 145, 0.4);
+	z-index: 10000;
 }
 
 #dialog {

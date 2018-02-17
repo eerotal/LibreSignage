@@ -30,71 +30,69 @@ function Slide() {
 		/*
 		*  Load the slide with ID 'id' using the LibreSignage
 		*  API. The function 'callback' is called after the
-		*  API call has completed. True is passed as the first
-		*  argument if the API call succeeds and false is
-		*  passed otherwise.
+		*  API call has completed. An API error code is passed
+		*  to the callback function as the first argument. The
+		*  API_E.CLIENT error code is used for indicating
+		*  non-API errors.
 		*/
-
-		var slide = this;
-		api_call(API_ENDP.SLIDE_GET, { 'id': id },
-				function(response) {
-			if (!response || response.error) {
+		api_call(API_ENDP.SLIDE_GET, { 'id': id }, (resp) => {
+			if (resp.error) {
 				console.error("LibreSignage: API error!");
 				if (callback) {
-					callback(false);
+					callback(resp.error);
 				}
 				return;
 			}
 
 			for (k in SLIDE_REQ_KEYS) {
-				slide.data[SLIDE_REQ_KEYS[k]] =
-					response[SLIDE_REQ_KEYS[k]];
+				this.data[SLIDE_REQ_KEYS[k]] =
+					resp[SLIDE_REQ_KEYS[k]];
 			}
 
-			if (!slide._verify(slide.data)) {
-				slide.data = {};
+			if (!this._verify(this.data)) {
+				this.data = {};
 				if (callback) {
-					callback(false);
+					callback(API_E.CLIENT);
 				}
 				return;
 			}
+
 			if (callback) {
-				callback(true);
+				callback(resp.error);
 			}
 		});
 	}
 
 	this.save = function(callback) {
 		/*
-		*  Save this slide using the LibreSignage API.
-		*  The function 'callback' is called after the
-		*  API call has completed. True is passed as the
-		*  first argument if the API call was successful
-		*  and false is passed otherwise.
+		*  Save this slide using the LibreSignage API. The
+		*  function 'callback' is called after the API call
+		*  has completed. An API error code is passed to the
+		*  callback function as the first argument. The
+		*  API_E.CLIENT error code is used for indicating
+		*  non-API errors.
 		*/
-		var slide = this;
-		api_call(API_ENDP.SLIDE_SAVE, this.data,
-				function(response) {
-			if (!response || response.error) {
+		api_call(API_ENDP.SLIDE_SAVE, this.data, (resp) => {
+			if (resp.error) {
 				console.error("LibreSignage: API error!");
 				if (callback) {
-					callback(false);
+					callback(resp.error);
 				}
 				return;
 			}
 
-			if (!slide._verify(response)) {
+			if (!this._verify(resp)) {
 				console.error("LibreSignage: " +
 					"Invalid API response.");
 				if (callback) {
-					callback(false);
+					callback(API_E.CLIENT);
 				}
 				return;
 			}
 
-			slide.set(response);
+			this.set(resp);
 			if (callback) {
-				callback(true);
+				callback(resp.error);
 			}
 		});
 	}
@@ -119,16 +117,14 @@ function Slide() {
 
 	this.remove = function(id, callback) {
 		/*
-		*  If 'id' is defined, remove the slide with
+		*  If 'id' is defined, remove the slide with the
 		*  ID 'id' using the LibreSignage API. Otherwise
-		*  remove the currently loaded slide. Once the
-		*  API call has completed, the function 'callback'
-		*  is called. The callback function is passed true
-		*  as the first argument if the API call succeeded
-		*  and false is passed otherwise. 'callback' is also
-		*  called with false if 'id' isn't defined, no slide
-		*  is loaded or the current slide doesn't have an ID
-		*  (meaning it isn't saved yet).
+		*  remove the currently loaded slide. The function
+		*  'callback' is called after the API call has
+		*  completed. An API error code is passed to the
+		*  callback function as the first argument. The
+		*  API_E.CLIENT error code is used for indicating
+		*  non-API errors.
 		*/
 
 		var r_id = "";
@@ -137,22 +133,20 @@ function Slide() {
 		} else if (this.data.id) {
 			r_id = this.data.id;
 		} else {
-			if (callback) {
-				callback(false);
-			}
+			throw new Error("No slide ID specified " +
+					"for removal.");
 		}
 
-		api_call(API_ENDP.SLIDE_RM, { 'id': r_id },
-				function(response) {
-			if (!response || response.error) {
-				console.error("LibreSignage: API error!");
+		api_call(API_ENDP.SLIDE_RM, { 'id': r_id }, (resp) => {
+			if (resp.error) {
+				console.error("LibreSignage: API error.");
 				if (callback) {
-					callback(false);
+					callback(resp.error);
 				}
 				return;
 			}
 			if (callback) {
-				callback(true);
+				callback(resp.error);
 			}
 		})
 	}

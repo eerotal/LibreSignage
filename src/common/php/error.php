@@ -12,6 +12,10 @@ $ERROR_CODES = array(
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
+// Custom exception classes.
+class ArgException extends Exception {};
+class IntException extends Exception {};
+
 function error_set_debug(bool $debug) {
 	global $ERROR_DEBUG;
 	$ERROR_DEBUG = $debug;
@@ -42,7 +46,7 @@ function error_handle(int $code, Throwable $e = NULL) {
 		error_log($e->__toString());
 	}
 	header($_SERVER['SERVER_PROTOCOL'].$ERROR_CODES[$tmp]);
-	header('Location: '.ERRORS.'/'.$code);
+	header('Location: '.ERROR_PAGES.'/'.$code);
 	exit(0);
 
 }

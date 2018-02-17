@@ -20,16 +20,15 @@ function slidelist_retrieve(ready_callback) {
 	*/
 	_slidelist_ready = false;
 	api_call(API_ENDP.SLIDE_DATA_QUERY,
-			{'name': 1, 'index': 1},
-			function(response) {
-		if (!response || response.error) {
+			{'name': 1, 'index': 1}, (resp) => {
+		if (resp.error) {
 			console.error("LibreSignage: API error!");
 			return;
 		}
 		_slidelist_current = {};
 		_slidelist_old = {};
 		Object.assign(_slidelist_old, _slidelist_current);
-		Object.assign(_slidelist_current, response.data);
+		Object.assign(_slidelist_current, resp.data);
 
 		_slidelist_ready = true;
 		console.log("LibreSignage: Slide names retrieved!");

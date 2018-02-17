@@ -1,5 +1,5 @@
 {
 	"user": "test2",
 	"hash": "$2y$10$t4LcFmMcgOZwol0VOa2sB.o1paPZY8k8qVKlviYHiFm9t4HNsYf9S",
-	"groups": []
+	"groups": ["editor"]
 }

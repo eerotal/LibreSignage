@@ -23,10 +23,6 @@ html, body {
 	margin: 0;
 }
 
-.editor label {
-	padding-top: 10px;
-}
-
 #slide-input {
 	height: 50vh;
 }

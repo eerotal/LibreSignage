@@ -4,8 +4,14 @@
 *  interface with the LibreSignage API.
 */
 
+var SERVER_LIMITS = null;
+
 var API_ENDP = {
 	// -- User management API endpoints --
+	USER_GET_QUOTA: {
+		uri:	"/api/endpoint/user/user_get_quota.php",
+		method: "GET"
+	},
 	USER_CREATE: {
 		uri:	"/api/endpoint/user/user_create.php",
 		method: "POST"
@@ -54,14 +60,28 @@ var API_ENDP = {
 	},
 
 	// -- General information API endpoints --
+	SERVER_LIMITS: {
+		uri:	"/api/endpoint/general/server_limits.php",
+		method: "GET"
+	},
 	LIBRARY_LICENSES: {
-		uri:	"/api/endpoint/library_licenses.php",
+		uri:	"/api/endpoint/general/library_licenses.php",
 		method:	"GET"
 	},
 	LIBRESIGNAGE_LICENSE: {
-		uri:	"/api/endpoint/libresignage_license.php",
+		uri:	"/api/endpoint/general/libresignage_license.php",
 		methof:	"GET"
 	}
+}
+
+var API_E = {
+	OK:			0,
+	INTERNAL: 		1,
+	INVALID_REQUEST: 	2,
+	NOT_AUTHORIZED:		3,
+	QUOTA_EXCEEDED:		4,
+	LIMITED:		5,
+	CLIENT:			6
 }
 
 function _api_construct_GET_data(data) {
@@ -108,9 +128,9 @@ function api_call(endpoint, data, callback) {
 			d = JSON.parse(this.responseText);
 		} catch(e) {
 			if (e instanceof SyntaxError) {
-				console.log("LibreSignage: API: " +
-						"Invalid response!");
-				d = null;
+				console.error("LibreSignage: Invalid " +
+						"API response syntax.");
+				d = {'error': API_E.INTERNAL};
 			}
 		}
 		callback(d);
@@ -136,4 +156,65 @@ function api_call(endpoint, data, callback) {
 		req.setRequestHeader("Content-Type", "application/json");
 		req.send(data_str);
 	}
+}
+
+function api_handle_disp_error(err, callback) {
+	var h = "";
+	var p = "";
+	switch(err) {
+		case API_E.OK:
+			return;
+		case API_E.INTERNAL:
+			h = "Internal server error";
+			p = "The server encountered an internal " +
+				"server error.";
+			break;
+		case API_E.INVALID_REQUEST:
+			h = "Invalid request";
+			p = "The server responded with an invalid " +
+				"request error. This is probably due " +
+				"to a software bug.";
+			break;
+		case API_E.NOT_AUTHORIZED:
+			h = "Not authorized";
+			p = "You are not authorized to perform this " +
+				"action.";
+			break;
+		case API_E.QUOTA_EXCEEDED:
+			h = "Quota exceeded";
+			p = "You have exceeded your quota for " +
+				"this action.";
+			break;
+		case API_E.LIMITED:
+			h = "Limited";
+			p = "The server prevented this action because " +
+				"a limit would have been exceeded."
+			break;
+		case API_E.CLIENT:
+			h = "Client error";
+			p = "The client encountered an error.";
+			break;
+		default:
+			h = "Unknown error";
+			p = "The server encountered an unknown error.";
+			break;
+	}
+
+	dialog(DIALOG.ALERT, h, p, callback);
+	console.error("LibreSignage: " + p);
+	return err;
+}
+
+function api_load_limits(callback) {
+	api_call(API_ENDP.SERVER_LIMITS, null, (resp) => {
+		if (api_handle_disp_error(resp.error)) {
+			throw new Error("Failed to initialize API " +
+					"interface.");
+			return;
+		}
+		SERVER_LIMITS = resp.limits;
+		if (callback) {
+			callback();
+		}
+	});
 }

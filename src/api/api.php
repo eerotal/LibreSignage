@@ -40,10 +40,10 @@ class APIEndpoint {
 	function __construct(int $method, int $response_type,
 				$format, bool $strict_format=TRUE) {
 		if (!in_array($method, API_METHOD)) {
-			throw new Exception('Invalid API method!');
+			throw new ArgException('Invalid API method!');
 		}
 		if (!in_array($response_type, API_RESPONSE)) {
-			throw new Exception('Invalid API response type!');
+			throw new ArgException('Invalid API response type!');
 		}
 		$this->method = $method;
 		$this->format = $format;
@@ -59,18 +59,18 @@ class APIEndpoint {
 		$str = @file_get_contents('php://input');
 		if ($str === FALSE) {
 			$this->error = API_E_INTERNAL;
-			throw new Exception('Failed to read '.
+			throw new IntException('Failed to read '.
 					'request data!');
 		}
 		$data = json_decode($str, $assoc=TRUE);
 		if (json_last_error() != JSON_ERROR_NONE) {
 			$this->error = API_E_INTERNAL;
-			throw new Exception('Request data parsing '.
+			throw new IntException('Request data parsing '.
 						'failed!');
 		}
 		if (!$this->_verify($data)) {
 			$this->error = API_E_INVALID_REQUEST;
-			throw new Exception('Invalid request data!');
+			throw new ArgException('Invalid request data!');
 		}
 		$this->data = $data;
 		$this->inited = TRUE;
@@ -83,7 +83,7 @@ class APIEndpoint {
 		*/
 		if (!$this->_verify($_GET)) {
 			$this->error = API_E_INVALID_REQUEST;
-			throw new Exception('Invalid request data!');
+			throw new ArgException('Invalid request data!');
 		}
 		$this->data = $_GET;
 		$this->inited = TRUE;
@@ -95,14 +95,10 @@ class APIEndpoint {
 		*  this APIEndpoint object. _load_data_post()
 		*  and _load_data_get() do the actual work.
 		*/
-		try {
-			if ($this->method == API_METHOD['POST']) {
-				$this->_load_data_post();
-			} else if ($this->method == API_METHOD['GET']) {
-				$this->_load_data_get();
-			}
-		} catch(Exception $e) {
-			throw $e;
+		if ($this->method == API_METHOD['POST']) {
+			$this->_load_data_post();
+		} else if ($this->method == API_METHOD['GET']) {
+			$this->_load_data_get();
 		}
 	}
 
@@ -263,9 +259,9 @@ class APIEndpoint {
 		return $this->inited;
 	}
 
-	function resp_set(array $resp) {
+	function resp_set($resp) {
 		/*
-		*  Set the API response data to $resp.
+		*  Set the API response data.
 		*/
 		$this->response = $resp;
 	}
@@ -274,20 +270,27 @@ class APIEndpoint {
 		/*
 		*  Send the current API response.
 		*/
-		if (!$this->response) {
-			$this->response = array();
+		if ($this->response_type == API_RESPONSE['TEXT']) {
+			if ($this->response) {
+				echo $this->response;
+			}
+			exit(0);
+		} elseif ($this->response_type == API_RESPONSE['JSON']) {
+			if (!$this->response) {
+				$this->response = array();
+			}
+			if (!isset($this->response['error'])) {
+				// Make sure the error value exists.
+				$this->response['error'] = API_E_OK;
+			}
+			$resp_str = json_encode($this->response);
+			if ($resp_str === FALSE &&
+				json_last_error() != JSON_ERROR_NONE) {
+				api_throw(API_E_INTERNAL);
+			}
+			echo $resp_str;
+			exit(0);
 		}
-		if (!isset($this->response['error'])) {
-			// Make sure the error value exists.
-			$this->response['error'] = API_E_OK;
-		}
-		$resp_str = json_encode($this->response);
-		if ($resp_str === FALSE &&
-			json_last_error() != JSON_ERROR_NONE) {
-			api_throw(API_E_INTERNAL);
-		}
-		echo $resp_str;
-		exit(0);
 	}
 }
 

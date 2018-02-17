@@ -4,8 +4,8 @@
 	*  API handle to create a new slide.
 	*
 	*  POST JSON parameters:
-	*    * id      = The ID of the slide to modify or
-	*                __API_K_NULL__ for new slide.
+	*    * id      = The ID of the slide to modify or either
+	*                undefined or null for new slide.
 	*    * name    = The name of the slide.
 	*    * index   = The index of the slide.
 	*    * time    = The amount of time the slide is shown.
@@ -13,10 +13,11 @@
 	*
 	*  Return value:
 	*    A JSON encoded dictionary with the following keys:
-	*     * id     = The ID of the created slide. **
+	*     * id     = The ID of the slide. **
 	*     * name   = The name of the slide. **
 	*     * index  = The index of the created slide. **
 	*     * time   = The amount of time the slide is shown. **
+	*     * owner  = The owner of the slide. **
 	*     * error  = An error code or API_E_OK on success. ***
 	*
 	*   **  (Only exists if the call was successful.)
@@ -25,92 +26,132 @@
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_constants.php');
 
 	$SLIDE_SAVE = new APIEndpoint(
 		$method = API_METHOD['POST'],
 		$response_type = API_RESPONSE['JSON'],
 		$format = array(
-			'id' => API_P_STR,
+			'id' => API_P_STR|API_P_OPT|API_P_NULL,
 			'name' => API_P_STR,
-			'index' => API_P_STR,
-			'markup' => API_P_STR,
+			'index' => API_P_INT,
+			'markup' => API_P_STR|API_P_STR_ALLOW_EMPTY,
 			'time' => API_P_INT
 		)
 	);
 	api_endpoint_init($SLIDE_SAVE);
 
-	if (!array_is_subset(SLIDE_REQ_KEYS,
-		array_keys($SLIDE_SAVE->get()))) {
+	session_start();
+	auth_init();
 
-		// Required params do not exist. Return error.
-		api_throw(API_E_INVALID_REQUEST);
-	}
+	$flag_new_slide = FALSE;
+	$flag_auth = FALSE;
+	$slide_data = array();
 
-	$params_sanitized = array();
-	$opt_index = array(
-		'options' => array(
-			'min_range' => 0
-		)
-	);
-
-	// Only allow alphanumeric characters in the 'name'.
-	$tmp = preg_replace('/[^a-zA-Z0-9_-]/', '',
-				$SLIDE_SAVE->get('name'));
-	if ($tmp === NULL) {
-		api_throw(API_E_INTERNAL);
-	}
-	$params_sanitized['name'] = $tmp;
-
-	// Make sure 'index' is an integer value.
-	$tmp = filter_var($SLIDE_SAVE->get('index'), FILTER_VALIDATE_INT,
-				$opt_index);
-	if ($tmp === FALSE) {
-		api_throw(API_E_INVALID_REQUEST);
-	}
-	$params_sanitized['index'] = $tmp;
-
-	// Make sure 'time' is a float value in the correct range.
-	$tmp = filter_var($SLIDE_SAVE->get('time'), FILTER_VALIDATE_FLOAT);
-	if ($tmp === FALSE) {
-		api_throw(API_E_INVALID_REQUEST);
-	}
-	$params_sanitized['time'] = $tmp;
-
-	$params_sanitized['markup'] = $SLIDE_SAVE->get('markup');
-
+	$user = auth_session_user();
+	$user_quota = new UserQuota($user);
 	$slide = new Slide();
 
-	/*
-	*  If a slide ID is supplied *attempt* to use it.
-	*  The $slide->set_data() function will do further checks
-	*  on whether the ID is actually valid.
-	*/
-	$tmp = parse_api_constants($SLIDE_SAVE->get('id'));
-	if ($tmp == API_CONST['API_K_NO_CONSTANT']) {
-		$params_sanitized['id'] = $SLIDE_SAVE->get('id');
-	} else if ($tmp != API_CONST['API_K_NULL']) {
-		api_throw(API_E_INVALID_REQUEST);
+	if ($SLIDE_SAVE->has('id', TRUE)) {
+		if ($slide->load($SLIDE_SAVE->get('id'))) {
+			// Allow admins to modify slides.
+			$flag_auth = auth_is_authorized(
+				$groups = array('admin'),
+				$users = NULL,
+				$redir = FALSE,
+				$both = FALSE
+			);
+			// Allow owner to modify slide.
+			$flag_auth = ($flag_auth || auth_is_authorized(
+				$groups = array('editor'),
+				$users = array($slide->get('owner')),
+				$redir = FALSE,
+				$both = TRUE
+			));
+			if (!$flag_auth) {
+				api_throw(API_E_NOT_AUTHORIZED);
+			}
+		} else {
+			// Slide with the supplied ID doesn't exist.
+			api_throw(API_E_INVALID_REQUEST);
+		}
+		// Initially load the existing slide data.
+		$slide_data = $slide->get_data();
+		$flag_new_slide = FALSE;
+	} else {
+		/*
+		*  Allow users in the editor and
+		*  admin groups to create slides.
+		*/
+		$flag_auth = auth_is_authorized(
+			$groups = array('editor', 'admin'),
+			$users = NULL,
+			$redir = FALSE,
+			$both = FALSE
+		);
+		if (!$flag_auth) {
+			api_throw(API_E_NOT_AUTHORIZED);
+		}
+
+		// Set current user as the owner.
+		$slide_data['owner'] = $user->get_name();
+		$flag_new_slide = TRUE;
 	}
 
-	if (!$slide->set_data($params_sanitized)) {
-		/*
-		*  Fails on missing parameters or if the
-		*  provided ID doesn't exist.
-		*/
+	// Only allow alphanumeric characters in the name.
+	$tmp = preg_match('/[^a-zA-Z0-9_-]/',
+			$SLIDE_SAVE->get('name'));
+	if ($tmp) {
+		api_throw(API_E_INVALID_REQUEST);
+	} else if ($tmp === NULL) {
+		api_throw(API_E_INTERNAL);
+	}
+	if (strlen($SLIDE_SAVE->get('name')) >
+			gtlim('SLIDE_NAME_MAX_LEN')) {
+		api_throw(API_E_LIMITED);
+	}
+	$slide_data['name'] = $SLIDE_SAVE->get('name');
+
+	// Make sure 0 <= index <= SLIDE_MAX_INDEX.
+	if ($SLIDE_SAVE->get('index') < 0 ||
+		$SLIDE_SAVE->get('index') > gtlim('SLIDE_MAX_INDEX')) {
+		api_throw(API_E_LIMITED);
+	}
+	$slide_data['index'] = $SLIDE_SAVE->get('index');
+
+	// Make sure SLIDE_MIN_TIME <= time <= SLIDE_MAX_TIME.
+	if ($SLIDE_SAVE->get('time') < gtlim('SLIDE_MIN_TIME') ||
+		$SLIDE_SAVE->get('time') > gtlim('SLIDE_MAX_TIME')) {
+		api_throw(API_E_LIMITED);
+	}
+	$slide_data['time'] = $SLIDE_SAVE->get('time');
+
+	// Make sure the size of the markup is not too big.
+	if (strlen($SLIDE_SAVE->get('markup')) >
+			gtlim('SLIDE_MARKUP_MAX_LEN')) {
+		api_throw(API_E_LIMITED);
+	}
+	$slide_data['markup'] = $SLIDE_SAVE->get('markup');
+
+	if (!$slide->set_data($slide_data)) {
 		api_throw(API_E_INVALID_REQUEST);
 	}
 
 	try {
+		if ($flag_new_slide) {
+			if (!$user_quota->use_quota('slides')) {
+				api_throw(API_E_QUOTA_EXCEEDED);
+			}
+			$user_quota->flush();
+		}
 		$slide->write();
+		juggle_slide_indices($slide->get('id'));
 	} catch (Exception $e) {
 		api_throw(API_E_INTERNAL, $e);
 	}
-
-	juggle_slide_indices($slide->get('id'));
 
 	$SLIDE_SAVE->resp_set($slide->get_data());
 	$SLIDE_SAVE->send();

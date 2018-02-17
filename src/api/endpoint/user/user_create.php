@@ -21,7 +21,7 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
 	define('DEFAULT_PASSWD_LEN', 10);
 	define('GROUPS_REGEX', '/[^A-Za-z0-9_]/');
@@ -44,13 +44,12 @@
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	if (_auth_get_user_by_name($USER_CREATE->get('user'))) {
-		// User already exists.
+	if (user_exists($USER_CREATE->get('user'))) {
 		api_throw(API_E_INVALID_REQUEST);
 	}
 
-	$tmp_pass = '';
 	$user = new User();
+	$tmp_pass = '';
 
 	// Validate user name.
 	if (preg_match(USER_REGEX, $USER_CREATE->get('user'))) {
@@ -58,7 +57,11 @@
 			new Exception('Invalid chars in group names.')
 		);
 	}
-	$user->set_name($USER_CREATE->get('user'));
+	try {
+		$user->set_name($USER_CREATE->get('user'));
+	} catch (Exception $e) {
+		api_throw(API_E_LIMITED, $e);
+	}
 
 	// Validate group names.
 	if ($USER_CREATE->has('groups', TRUE)) {
@@ -72,7 +75,11 @@
 				)
 			);
 		}
-		$user->set_groups($USER_CREATE->get('groups'));
+		try {
+			$user->set_groups($USER_CREATE->get('groups'));
+		} catch (Exception $e) {
+			api_throw(API_E_LIMITED, $e);
+		}
 	}
 
 	try {
@@ -84,7 +91,9 @@
 	$user->set_ready(TRUE);
 
 	try {
-		$user->write();
+		if ($user->write() === FALSE) {
+			api_throw(API_E_LIMITED);
+		}
 	} catch (Exception $e) {
 		api_throw(API_E_INTERNAL, $e);
 	}

@@ -20,7 +20,7 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
 	$USER_GET = new APIEndpoint(
 		$method = API_METHOD['GET'],
@@ -37,10 +37,12 @@
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	$u = _auth_get_user_by_name($USER_GET->get('user'));
-	if ($u == NULL) {
-		api_throw(API_E_INVALID_REQUEST);
+	try {
+		$u = new User($USER_GET->get('user'));
+	} catch (ArgException $e) {
+		api_throw(API_E_INVALID_REQUEST, $e);
 	}
+
 	$ret_data = array(
 		'user' => array(
 			'user' => $u->get_name(),

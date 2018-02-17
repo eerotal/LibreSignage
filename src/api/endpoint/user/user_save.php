@@ -29,7 +29,7 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
 	define('GROUP_NAME_COMP_REGEX', '/[^A-Za-z0-9_]/');
 	define('USER_NAME_COMP_REGEX', GROUP_NAME_COMP_REGEX);
@@ -78,10 +78,10 @@
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	$u = _auth_get_user_by_name($USER_SAVE->get('user'));
-	if ($u == NULL) {
-		// User doesn't exist.
-		api_throw(API_E_INVALID_REQUEST);
+	try {
+		$u = new User($USER_SAVE->get('user'));
+	} catch (ArgException $e) {
+		api_throw(API_E_INVALID_REQUEST, $e);
 	}
 
 	if ($USER_SAVE->has('pass', TRUE)) {
@@ -97,11 +97,17 @@
 				)
 			);
 		}
-		$u->set_groups($USER_SAVE->get('groups'));
+		try {
+			$u->set_groups($USER_SAVE->get('groups'));
+		} catch (Exception $e) {
+			api_throw(API_E_LIMITED, $e);
+		}
 	}
 
 	try {
-		$u->write();
+		if ($u->write() === FALSE) {
+			api_throw(API_E_LIMITED);
+		}
 	} catch (Exception $e) {
 		api_throw(API_E_INTERNAL, $e);
 	}

@@ -1,5 +1,6 @@
 {
-	"name": "LibreSignage 2",
+	"name": "LibreSignage2",
 	"index": 1,
-	"time": 8000
+	"time": 8000,
+	"owner": "test"
 }
