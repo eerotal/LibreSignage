@@ -18,7 +18,7 @@
 		<link rel="stylesheet" href="/control/editor/css/editor.css">
 		<title>LibreSignage Editor</title>
 	</head>
-	<body class="bg-dark">
+	<body>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>
@@ -109,7 +109,7 @@
 					</div>
 					<div class="col-md">
 						<label for="slide-input">Markup</label>
-						<div id="slide-input" class="rounded"></div>
+						<div id="slide-input" class="no-font rounded"></div>
 					</div>
 				</div>
 			</div>

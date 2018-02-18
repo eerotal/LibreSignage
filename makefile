@@ -2,7 +2,7 @@ SRC_DIR=src
 DIST_DIR=dist
 
 .PHONY: install LOC clean realclean
-.SILENT: install verify LOC dist clean
+.SILENT: install verify LOC dist clean docs
 
 ifndef SRC_DIR
 $(error SRC_DIR not set)
@@ -13,8 +13,10 @@ $(error DIST_DIR not set)
 endif
 
 dist: src/*
-	echo '## Create LibreSignage dist...'
+	echo '## Create LibreSignage distribution...'
 	./build/scripts/mkdist.sh
+	echo '## Generate LibreSignage docs...'
+	./build/scripts/mkdocs.sh
 
 verify: src/*
 	# Run the source verification scripts.

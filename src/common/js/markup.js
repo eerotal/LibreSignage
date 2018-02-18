@@ -169,8 +169,8 @@ const MARKUP = {
 		'block',
 		'h',
 		{'weight': { 'arg_type': 'int' }},
-		'<h class="display-%0">',
-		'</h>',
+		'<h1 class="h%0">',
+		'</h1>',
 		null,
 		false
 	),
@@ -225,7 +225,7 @@ const MARKUP = {
 	),
 	'size': new MarkupClass(
 		'block',
-		'p',
+		'size',
 		{'font_size': {'arg_type': 'int'}},
 		'<span style="font-size: %0pt;">',
 		'</span>',

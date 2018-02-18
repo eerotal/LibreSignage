@@ -7,6 +7,8 @@ SRC_DIR='src';
 DIST_DIR='dist';
 APACHE_SITES='/etc/apache2/sites-available';
 INSTC_FILE_EXT='.instconf';
+MD_DIR="$DIST_DIR/doc/md";
+HTML_DIR="$DIST_DIR/doc/html";
 
 # Default file permissions.
 DEF_OWNER="$USER:$USER";

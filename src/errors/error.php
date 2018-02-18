@@ -12,7 +12,7 @@
 		<link rel="stylesheet" href="/errors/css/error.css">
 		<title>403 Forbidden</title>
 	</head>
-	<body class="bg-dark">
+	<body>
 		<main role="main" class="container-fluid">
 			<div id="container-error" class="container">
 				<h1 class="display-3 text-center"><?php echo $ERROR_PAGE_HEADING?></h1>

@@ -12,10 +12,10 @@
 		<link rel="stylesheet" href="/about/css/about.css">
 		<title>About LibreSignage</title>
 	</head>
-	<body class="bg-dark">
+	<body>
 		<main class="container-fluid h-100">
 			<div class="container w-75 mx-auto text-justify">
-				<h1 id="about-heading" class="display-1 text-center">
+				<h1 id="about-heading" class="display-3 text-center">
 					LibreSignage
 				</h1>
 				<p class="lead text-center">
@@ -40,16 +40,16 @@
 				<a href="https://ace.c9.io/">Ace</a>.
 				The licensing information for these libraries can
 				be found
-				<a href="/doc/LIBRARY_LICENSES.md">here</a>.</p>
+				<a href="/doc/md/LIBRARY_LICENSES.md">here</a>.</p>
 
 				<p>LibreSignage is licensed under the
 				permissive BSD 3-clause license, which
 				can be seen below.</p>
 
 				<div class="container text-center">
-					<pre class="text-muted"><?php
+					<pre><?php
 						echo file_get_contents($_SERVER['DOCUMENT_ROOT'].
-								LIBRESIGNAGE_LICENSE_FILE_PATH);
+								LIBRESIGNAGE_LICENSE_MD);
 					?></pre>
 				</div>
 			</div>

@@ -6,7 +6,7 @@
 .usr-table-row {
 	margin: 0;
 	padding: 0;
-	background-color: #212529;
+	background-color: var(--secondary);
 }
 
 .usr-table-col {
@@ -22,7 +22,6 @@
 
 .usr-edit-row {
 	color: black;
-	background-color: var(--secondary);
 }
 
 .usr-edit-row-container {

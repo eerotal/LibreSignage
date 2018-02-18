@@ -18,24 +18,20 @@
 		<link rel="stylesheet" href="/control/css/control.css">
 		<title>LibreSignage Control Panel</title>
 	</head>
-	<body class="bg-dark">
+	<body>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>
 		<main class="container-fluid">
 			<div class="row container-fluid mx-auto">
 				<div class="col-md-12 header-col">
-					<h1 class="display-3">
-						Welcome to LibreSignage!
-					</h1>
+					<h1>Welcome to LibreSignage!</h1>
 				</div>
 			</div>
 			<div class="row container-fluid mx-auto">
 				<div class="col-md-6">
 					<div class="bg-primary text-white ctrl-panel-col">
-						<h2 class="display-4">
-							Your quota
-						</h2>
+						<h4>Your quota</h4>
 						<div id="user-quota-cont">
 						</div>
 					</div>

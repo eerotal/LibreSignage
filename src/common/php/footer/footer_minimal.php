@@ -3,7 +3,7 @@
 ?>
 <footer class="footer container-fluid">
 	<div class="footer-content" class="container-fluid">
-		<span class="text-muted">
+		<span>
 			LibreSignage &bull; Copyright Eero Talus 2018
 		</span>
 	</div>

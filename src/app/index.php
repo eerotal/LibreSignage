@@ -7,14 +7,15 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/app/css/renderer.css">
 		<link rel="stylesheet" href="/app/css/display.css">
 		<link rel="stylesheet" href="/common/css/footer_minimal.css">
 		<title>LibreSignage Display</title>
 	</head>
-	<body class="bg-dark">
+	<body>
 		<main role="main" class="container-fluid">
-			<div id="display" class="text-muted"></div>
+			<div id="display"></div>
 		</main>
 		<?php
 			include_once($_SERVER['DOCUMENT_ROOT'].FOOTER_MINIMAL_PATH);

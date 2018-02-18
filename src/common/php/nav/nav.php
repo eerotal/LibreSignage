@@ -51,6 +51,11 @@
 			'uri' => ABOUT_PAGE,
 			'active' => FALSE,
 			'groups' => NULL
+		),
+		'Help' => array(
+			'uri' => DOCS_PAGE,
+			'active' => FALSE,
+			'groups' => NULL
 		)
 	);
 
@@ -88,7 +93,7 @@
 <nav class="nav nav-pills">
 	<div class="row container-fluid mx-auto">
 		<div class="col-lg-2 my-auto m-0 p-0">
-			<p class="text-muted lead my-auto">
+			<p class="lead my-auto">
 				LibreSignage
 			</p>
 		</div>

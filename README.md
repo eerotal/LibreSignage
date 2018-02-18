@@ -25,7 +25,7 @@ Doing a basic install of LibreSignage is quite simple. The required steps
 are listed below.
 
 1. Install the required dependencies. On Debian Buster this can be accomplished
-   by running `sudo apt install apache2 php7.0 git`.
+   by running `sudo apt install apache2 php7.0 git pandoc`.
 2. Use `cd` to move to the directory where you want to download the LibreSignage
    repository.
 3. Run `git clone https://github.com/eerotal/LibreSignage.git`. The repository
@@ -57,11 +57,11 @@ possible to access the site by connecting to _example.com_.
   * Copyright (c) 2010, Ajax.org B.V. All rights reserved.
 
 The full licenses for these external libraries can be found in the file
-`src/doc/LIBRARY_LICENSES.md`.
+`src/doc/md/LIBRARY_LICENSES.md`.
 
 ## License
 
 LibreSignage is licensed under the BSD 3-clause license, which can be found
-in the file `src/doc/LICENSE.md`.
+in the file `src/doc/md/LICENSE.md`.
 
 Copyright Eero Talus 2018
