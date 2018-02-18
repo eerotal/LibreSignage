@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-. build/build_conf.sh
+. build/scripts/build_conf.sh
 
 mkdir -p $DIST_DIR;
 

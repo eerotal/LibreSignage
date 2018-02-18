@@ -1,7 +1,7 @@
 SRC_DIR=src
 DIST_DIR=dist
 
-.PHONY: install LOC clean
+.PHONY: install LOC clean realclean
 .SILENT: install verify LOC dist clean
 
 ifndef SRC_DIR
@@ -14,22 +14,25 @@ endif
 
 dist: src/*
 	echo '## Create LibreSignage dist...'
-	./build/mkdist.sh
+	./build/scripts/mkdist.sh
 
 verify: src/*
 	# Run the source verification scripts.
 	echo '## Verify LibreSignage sources'
-	./build/verify.sh
+	./build/scripts/verify.sh
 
 install: verify dist
 	# Install LibreSignage to INSTALL_DIR.
 	echo '## Install'
-	./build/install.sh $(INST)
+	./build/scripts/install.sh $(INST)
 
 clean:
-	echo '## Clean LibreSignage build files'
+	echo '## Clean LibreSignage build files.'
 	rm -rfv dist
-	rm -f *.instconf
+
+realclean: clean
+	echo '## Clean all LibreSignage build files.'
+	rm -fv build/*.instconf
 
 LOC:
 	# Count the lines of code in LibreSignage.
