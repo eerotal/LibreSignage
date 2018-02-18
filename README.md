@@ -45,23 +45,33 @@ _example.com_, you could add the following line to your _/etc/hosts_ file.
 This will redirect all requests for _example.com_ to _localhost_, making it
 possible to access the site by connecting to _example.com_.
 
-## Used third-party libraries
+## Used third-party libraries and resources
 
-* Bootstrap (MIT License)
+* Bootstrap (Library, MIT License)
   * Copyright (c) 2011-2016 Twitter, Inc.
-* JQuery (MIT License)
+* JQuery (Library, MIT License)
   * Copyright JS Foundation and other contributors, https://js.foundation/
-* Popper.JS (MIT License)
+* Popper.JS (Library, MIT License)
   * Copyright (C) 2016 Federico Zivolo and contributors
-* Ace (3-clause BSD License)
+* Ace (Library, 3-clause BSD License)
   * Copyright (c) 2010, Ajax.org B.V. All rights reserved.
+* Raleway (Font, SIL Open Font License 1.1)
+  * Copyright (c) 2010, Matt McInerney (matt@pixelspread.com),
+    Copyright (c) 2011, Pablo Impallari (www.impallari.com|impallari@gmail.com),
+    Copyright (c) 2011, Rodrigo Fuenzalida (www.rfuenzalida.com|hello@rfuenzalida.com),
+    with Reserved Font Name Raleway
+* Montserrat (Font, SIL Open Font License 1.1)
+  * Copyright 2011 The Montserrat Project Authors
+    (https://github.com/JulietaUla/Montserrat)
 
-The full licenses for these external libraries can be found in the file
-`src/doc/md/LIBRARY_LICENSES.md`.
+The full licenses for these external libraries and resources can be found
+in the file `src/doc/md/LIBRARY_LICENSES.md`.
 
 ## License
 
 LibreSignage is licensed under the BSD 3-clause license, which can be found
-in the file `src/doc/md/LICENSE.md`.
+in the file `src/doc/md/LICENSE.md`. External libraries and resources are
+licensed under their respective licenses. See the section *Used third party
+libraries and resources* for more information.
 
 Copyright Eero Talus 2018
