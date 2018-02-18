@@ -56,6 +56,7 @@ if [ "$INSTC_LOADED" -ne "1" ]; then
 	echo 'Write config to "'$INSTC_FILE_NAME'".';
 
 	echo '#!/bin/bash' > $INSTC_FILE_NAME;
+	echo "# Generated on `date` by install.sh." >> $INSTC_FILE_NAME;
 	echo 'declare -A INSTC=( \' >> $INSTC_FILE_NAME;
 	for i in ${!INSTC[@]}; do
 		echo "	[$i]=\"${INSTC[$i]}\" \\" >> $INSTC_FILE_NAME;
