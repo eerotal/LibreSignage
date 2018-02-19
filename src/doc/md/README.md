@@ -69,13 +69,13 @@ with Reserved Font Name Raleway
 Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)  
 
 The full licenses for these third party libraries and resources can be found
-in the file `src/doc/md/LICENSES_EXT.md` in the source distribution.
+in the file `src/doc/md/LICENSES_EXT.md`.
 
 ## License
 
 LibreSignage is licensed under the BSD 3-clause license, which can be found
-in the file `src/doc/md/LICENSE.md` in the source distribution. Third party
-libraries and resources are licensed under their respective licenses. See the
-section *Used third party libraries and resources* for more information.
+in the file `src/doc/md/LICENSE.md`. Third party libraries and resources are
+licensed under their respective licenses. See the section *Used third party
+libraries and resources* for more information.
 
 Copyright Eero Talus 2018

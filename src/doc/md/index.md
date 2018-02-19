@@ -1,7 +1,7 @@
 # LibreSignage Documentation
 
 ### General
-[About LibreSignage](/about)  
+[Readme](/doc?doc=README)  
 
 ### Web Interface
 [Control Panel](/doc?doc=control_panel)  
@@ -13,3 +13,8 @@
 ### Miscellaneous
 [Limits](/doc?doc=limits)  
 [Markup](/doc?doc=markup)  
+
+### Licenses
+
+[LibreSignage license](/doc?doc=LICENSE)  
+[Third party licenses](/doc?doc=LICENSES_EXT)

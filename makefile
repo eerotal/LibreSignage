@@ -12,13 +12,13 @@ ifndef DIST_DIR
 $(error DIST_DIR not set)
 endif
 
-dist: src/*
+dist: README.md $(shell find src)
 	echo '## Create LibreSignage distribution...'
 	./build/scripts/mkdist.sh
 	echo '## Generate LibreSignage docs...'
 	./build/scripts/mkdocs.sh
 
-verify: src/*
+verify: $(shell find src)
 	# Run the source verification scripts.
 	echo '## Verify LibreSignage sources'
 	./build/scripts/verify.sh
