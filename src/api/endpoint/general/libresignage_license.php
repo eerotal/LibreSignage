@@ -1,4 +1,12 @@
 <?php
+	/*
+	*  ====>
+	*
+	*  Get the Markdown version of the LibreSignage license file.
+	*
+	*  <====
+	*/
+
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');

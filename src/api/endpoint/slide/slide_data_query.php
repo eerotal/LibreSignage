@@ -1,20 +1,19 @@
 <?php
 	/*
+	*  ====>
 	*
-	*  An API handle to query specific data keys from all of the
-	*  currently existing slides.
+	*  Query specific data keys from all of the currently
+	*  existing slides.
 	*
 	*  GET parameters:
 	*    Data can be requested by just assigning the key name
 	*    a value such as 1 in the GET parameters.
 	*
 	*  Return value:
-	*    A JSON encoded dictionary with the following keys:
-	*      * data  = The requested data as nested dictionaries. **
-	*      * error = An error code or API_E_OK on success. ***
+	*    data  = The requested data as nested dictionaries.
+	*    error = An error code or API_E_OK on success.
 	*
-	*    **  (Only exists if the call was successful.)
-	*    *** (The error codes are listed in api_errors.php.)
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');

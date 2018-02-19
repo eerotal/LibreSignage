@@ -1,15 +1,16 @@
 <?php
 	/*
-	*  An API handle to remove an existing slide.
+	*  ====>
+	*
+	*  Remove a slide.
 	*
 	*  POST parameters:
-	*    * id = The id of the slide to remove.
+	*    id = The id of the slide to remove.
 	*
 	*  Return value:
-	*    A JSON encoded dictionary with the following data.
-	*      * error = An error code or API_E_OK on success. **
+	*    error = An error code or API_E_OK on success.
 	*
-	*    ** (The error codes are listed in api_errors.php.)
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');

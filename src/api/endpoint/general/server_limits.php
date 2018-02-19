@@ -1,14 +1,14 @@
 <?php
 	/*
-	*  API endpoint for getting the configured server limits.
+	*  ====>
+	*
+	*  Get the configured server limits.
 	*
 	*  Return value:
-	*    A JSON encoded dictionary with the following data.
-	*      * limits     = A dictionary with the limits. **
-	*      * error      = An error code or API_E_OK on success. ***
+	*    limits     = A dictionary with the limits.
+	*    error      = An error code or API_E_OK on success.
 	*
-	*    **  (Only exists if the API call was successful.)
-	*    *** (The error codes are listed in api_errors.php.)
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');

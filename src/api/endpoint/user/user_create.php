@@ -1,21 +1,21 @@
 <?php
 	/*
-	*  API endpoint for creating a new user.
+	*  ====>
+	*
+	*  Create a new user.
 	*
 	*  POST parameters:
-	*    * user    = The user to create.
-	*    * groups  = New groups (Optionally unset or NULL)
+	*    user    = The user to create.
+	*    groups  = New groups (Optionally unset or NULL)
 	*
 	*  Return value:
-	*    A JSON encoded dictionary with the following keys.
-	*      * user  **
-	*        * name     = The name of the user.
-	*        * groups   = The groups the user is in.
-	*        * pass     = The generated cleartext password.
-	*      * error      = An error code or API_E_OK on success. ***
+	*    user
+	*      name     = The name of the user.
+	*      groups   = The groups the user is in.
+	*      pass     = The generated cleartext password.
+	*    error      = An error code or API_E_OK on success.
 	*
-	*    **  (Only exists if the API call was successful.)
-	*    *** (The error codes are listed in api_errors.php.)
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');

@@ -1,27 +1,26 @@
 <?php
 	/*
+	*  ====>
 	*
-	*  API handle to create a new slide.
+	*  Create a new slide.
 	*
 	*  POST JSON parameters:
-	*    * id      = The ID of the slide to modify or either
-	*                undefined or null for new slide.
-	*    * name    = The name of the slide.
-	*    * index   = The index of the slide.
-	*    * time    = The amount of time the slide is shown.
-	*    * markup  = The markup of the slide.
+	*    id      = The ID of the slide to modify or either
+	*              undefined or null for new slide.
+	*    name    = The name of the slide.
+	*    index   = The index of the slide.
+	*    time    = The amount of time the slide is shown.
+	*    markup  = The markup of the slide.
 	*
 	*  Return value:
-	*    A JSON encoded dictionary with the following keys:
-	*     * id     = The ID of the slide. **
-	*     * name   = The name of the slide. **
-	*     * index  = The index of the created slide. **
-	*     * time   = The amount of time the slide is shown. **
-	*     * owner  = The owner of the slide. **
-	*     * error  = An error code or API_E_OK on success. ***
+	*    id     = The ID of the slide.
+	*    name   = The name of the slide.
+	*    index  = The index of the created slide.
+	*    time   = The amount of time the slide is shown.
+	*    owner  = The owner of the slide.
+	*    error  = An error code or API_E_OK on success.
 	*
-	*   **  (Only exists if the call was successful.)
-	*   *** (The error codes are listed in api_errors.php.)
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');

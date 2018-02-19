@@ -1,21 +1,21 @@
 <?php
 	/*
-	*  API handle to get the JSON encoded data of a slide.
+	*  ====>
+	*
+	*  Get the data of a slide.
 	*
 	*  GET parameters:
-	*    * id = The id of the slide to get.
+	*    id = The id of the slide to get.
 	*
 	*  Return value:
-	*    A JSON encoded dictionary with the following data.
-	*      * id      = The ID of the slide. **
-	*      * name    = The name of the slide. **
-	*      * index   = The index of the slide. **
-	*      * time    = The time the slide is shown. **
-	*      * markup  = The markup of the slide. **
-	*      * error   = An error code or API_E_OK on success. ***
+	*    id      = The ID of the slide.
+	*    name    = The name of the slide.
+	*    index   = The index of the slide.
+	*    time    = The time the slide is shown.
+	*    markup  = The markup of the slide.
+	*    error   = An error code or API_E_OK on success.
 	*
-	*    **  (Only exists if the API call was successful.)
-	*    *** (The error codes are listed in api_errors.php.)
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');

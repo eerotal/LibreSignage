@@ -9,6 +9,8 @@ APACHE_SITES='/etc/apache2/sites-available';
 INSTC_FILE_EXT='.instconf';
 MD_DIR="$DIST_DIR/doc/md";
 HTML_DIR="$DIST_DIR/doc/html";
+API_DOC="$MD_DIR/api.md";
+API_ENDPOINTS_DIR="$DIST_DIR/api/endpoint";
 
 # Default file permissions.
 DEF_OWNER="$USER:$USER";
