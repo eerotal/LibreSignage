@@ -47,11 +47,6 @@
 			'active' => FALSE,
 			'groups' => NULL
 		),
-		'About' => array(
-			'uri' => ABOUT_PAGE,
-			'active' => FALSE,
-			'groups' => NULL
-		),
 		'Help' => array(
 			'uri' => DOCS_PAGE,
 			'active' => FALSE,

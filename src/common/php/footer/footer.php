@@ -12,7 +12,9 @@
 				}
 			?>
 			</br>
-			<a href="/about">LibreSignage</a>
+			<a href="<?php echo ABOUT_PAGE; ?>">
+				LibreSignage
+			</a>
 			is free and open source software.
 		</span>
 	</div>

@@ -33,7 +33,7 @@
 	const LOGIN_PAGE 			= "/login";
 	const LOGOUT_PAGE 			= "/logout";
 	const DOCS_PAGE				= "/doc";
-	const ABOUT_PAGE 			= "/about";
+	const ABOUT_PAGE 			= "/doc?doc=about";
 	const EDITOR_PAGE 			= "/control/editor";
 	const CONTROL_PANEL_PAGE 		= "/control";
 	const APP_PAGE 				= "/app";

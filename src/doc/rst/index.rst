@@ -5,6 +5,8 @@ LibreSignage Documentation
 General
 -------
 
+`About LibreSignage </doc?doc=about>`_
+
 `Readme </doc?doc=README>`_
 
 Web Interface

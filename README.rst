@@ -2,11 +2,11 @@
 LibreSignage - An open source digital signage solution
 ######################################################
 
-LibreSignage is a free and open source, lightweight and easy-to-use digital
-signage solution. LibreSignage runs on a HTTP web server serving content to
-normal web browsers that can be used to display the content on a variety of
-different devices. This makes it possible to use LibreSignage on basically
-any device that has acccess to the internet and that can display web pages.
+LibreSignage is a free and open source, lightweight and easy-to-use
+digital signage solution. LibreSignage runs on a HTTP web server serving
+content to normal web browsers. This makes it possible to use basically
+any device with the ability to display web pages from the internet as a
+client for a LibreSignage instance.
 
 LibreSignage is under heavy development and it shouldn't be used for
 production or anything important yet.
