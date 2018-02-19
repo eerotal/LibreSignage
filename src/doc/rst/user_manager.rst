@@ -23,7 +23,7 @@ accepted but they are removed when the changes are saved.
 Users can be removed by clicking the *Remove* button.
 
 Creating new users
-++++++++++++++++++
+------------------
 
 New user can be created by clicking the *Create User* button and specifying a
 name for the new user in the popup dialog. The maximum length of the username is

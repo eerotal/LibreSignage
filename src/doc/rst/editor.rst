@@ -58,15 +58,12 @@ instance config, however it shouldn't be changed without investigating
 the consequences (ie. don't change it if you don't know what you are
 doing). The *SLIDE_MAX_INDEX* limit controls the maximum index.
 
-Markup
-""""""
-
-The markup field contains the actual slide content. The markup field
-accepts a special markup sytax described in
-`LibreSignage Markup </doc?doc=markup>`_. The maximum length of the markup
-is set in the LibreSignage instance config and by default it's set to
-2048 characters. The amount of space the markup takes should be taken
-into account when fiddling with the markup length limit. The
+**Markup** - The markup field contains the actual slide content.
+The markup field accepts a special markup sytax described in
+`LibreSignage Markup </doc?doc=markup>`_. The maximum length of the
+markup is set in the LibreSignage instance config and by default it's
+set to 2048 characters. The amount of space the markup takes should
+be taken into account when fiddling with the markup length limit. The
 *SLIDE_MARKUP_MAX_LEN* limit controls the length limit.
 
 Buttons
@@ -81,12 +78,13 @@ Buttons
 **Preview Slide** - Preview the current slide in a separate tab. The
 slide must be saved before it can be previewed.
 
-## Slide quotas
+Slide quotas
+------------
 
 The amount of slides one user can create is limited by
-`User Quotas </doc?doc=quotas>`_ that are set in the LibreSignage instance
-config in *common/php/config.php*. A slide quota of 10 would mean a
-user can create a total of 10 slides. If the user attempts to create
-more slides than they are allowed to, the user is notified that their
-quota is exceeded. The current personal quota limits and the used quotas
-are visible on the main *Control Panel* page for all users.
+`User Quotas </doc?doc=quotas>`_ that are set in the LibreSignage
+instance config in *common/php/config.php*. A slide quota of 10 would
+mean a user can create a total of 10 slides. If the user attempts to
+create more slides than they are allowed to, the user is notified that
+their quota is exceeded. The current personal quota limits and the used
+quotas are visible on the main *Control Panel* page for all users.
