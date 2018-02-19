@@ -82,7 +82,7 @@ Slide quotas
 ------------
 
 The amount of slides one user can create is limited by
-`User Quotas </doc?doc=quotas>`_ that are set in the LibreSignage
+`User Quotas </doc?doc=limits>`_ that are set in the LibreSignage
 instance config in *common/php/config.php*. A slide quota of 10 would
 mean a user can create a total of 10 slides. If the user attempts to
 create more slides than they are allowed to, the user is notified that
