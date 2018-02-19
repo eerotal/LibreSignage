@@ -4,7 +4,7 @@
 
 <footer class="container-fluid footer d-flex align-items-center">
 	<div class="container-fluid">
-		<span class="text-muted">
+		<span>
 			LibreSignage &bull; Copyright Eero Talus 2018
 			<?php
 				if (date('Y') != '2018') {
@@ -12,7 +12,9 @@
 				}
 			?>
 			</br>
-			<a href="/about">LibreSignage</a>
+			<a href="<?php echo ABOUT_PAGE; ?>">
+				LibreSignage
+			</a>
 			is free and open source software.
 		</span>
 	</div>

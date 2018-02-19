@@ -1,10 +1,13 @@
 <?php
 	/*
+	*  ====>
 	*
-	*  API handle to get a list of all the existing slides.
+	*  *Get a list of all the existing slides.*
 	*
-	*  Return value:
-	*    A JSON encoded array with all the existing slide IDs.
+	*  Return value
+	*    * An array with all the existing slide IDs.
+	*
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');

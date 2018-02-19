@@ -9,6 +9,10 @@ mkdir -p $DIST_DIR;
 echo 'Copy LibreSignage files to "'$DIST_DIR'".';
 cp -Rp $SRC_DIR/* $DIST_DIR/.;
 
+# Copy the README file too.
+echo "Copy $LS_README to $DIST_DIR.";
+cp -Rp $LS_README $RST_DIR/.;
+
 # Set correct file permissions.
 echo "Set default file permissions (Owner: $DEF_OWNER | Mode: $DEF_MODE)";
 chown -R $DEF_OWNER $DIST_DIR;

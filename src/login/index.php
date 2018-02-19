@@ -19,7 +19,7 @@
 		<link rel="stylesheet" href="/login/css/login.css">
 		<title>LibreSignage Login</title>
 	</head>
-	<body class="bg-dark">
+	<body>
 		<main class="container-fluid h-100">
 			<div class="form-login-container">
 				<h4 class="display-4 form-login-header">LibreSignage</br>Login</h4>

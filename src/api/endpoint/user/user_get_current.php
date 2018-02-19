@@ -1,16 +1,18 @@
 <?php
 	/*
-	*  API endpoint for getting the current user's data.
+	*  ====>
 	*
-	*  Return value:
-	*    A JSON encoded dictionary with the following data.
-	*      * user **
-	*        * user     = The name of the user.
-	*        * groups   = The groups the user is in.
-	*      * error      = An error code or API_E_OK on success. ***
+	*  *Get the data of the current user.*
 	*
-	*    **  (Only exists if the API call was successful.)
-	*    *** (The error codes are listed in api_errors.php.)
+	*  Return value
+	*    * user
+	*
+	*      * user     = The name of the user.
+	*      * groups   = The groups the user is in.
+	*
+	*    * error      = An error code or API_E_OK on success.
+	*
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');

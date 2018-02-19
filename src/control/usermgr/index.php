@@ -18,7 +18,7 @@
 		<link rel="stylesheet" href="/control/usermgr/css/usermgr.css">
 		<title>LibreSignage User Manager</title>
 	</head>
-	<body class="bg-dark">
+	<body>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>

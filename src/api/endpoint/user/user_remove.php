@@ -1,16 +1,16 @@
 <?php
 	/*
-	*  API endpoint for removing a user.
+	*  ====>
 	*
-	*  POST parameters:
+	*  *Remove a user based on a username.*
+	*
+	*  POST parameters
 	*    * user    = The user to remove.
 	*
-	*  Return value:
-	*    A JSON encoded dictionary with the following data.
-	*      * error      = An error code or API_E_OK on success. ***
+	*  Return value
+	*    * error      = An error code or API_E_OK on success.
 	*
-	*    **  (Only exists if the API call was successful.)
-	*    *** (The error codes are listed in api_errors.php.)
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');

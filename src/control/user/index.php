@@ -18,7 +18,7 @@
 		<link rel="stylesheet" href="/control/user/css/user.css">
 		<title>LibreSignage User Settings</title>
 	</head>
-	<body class="bg-dark">
+	<body>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>

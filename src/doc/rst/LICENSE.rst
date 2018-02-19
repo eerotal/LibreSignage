@@ -1,3 +1,7 @@
+####################
+LibreSignage License
+####################
+
 Copyright 2018 Eero Talus
 
 Redistribution and use in source and binary forms, with or without

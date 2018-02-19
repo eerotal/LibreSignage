@@ -89,8 +89,8 @@ if ("preview" in params) {
 	console.log("LibreSignage: Preview slide " +
 			params["preview"] + ".");
 	var slide = new Slide();
-	slide.load(params["preview"], (ret) => {
-		if (!ret) {
+	slide.load(params["preview"], (err) => {
+		if (err) {
 			console.log("LibreSignage: Failed to " +
 					"preview slide!");
 			return;

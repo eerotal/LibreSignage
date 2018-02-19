@@ -1,18 +1,20 @@
 <?php
 	/*
-	*  API endpoint for getting a list of all the existing
-	*  users and the available user data.
+	*  ====>
 	*
-	*  Return value:
-	*    A JSON encoded dictionary with the following data.
-	*      * users      = A dictionary of the users and their data
-	*                    with the usernames as the keys.
-	*        * user     = The name of the user.
-	*        * groups   = The groups the user is in.
-	*      * error      = An error code or API_E_OK on success. ***
+	*  *Get a list of all existing users along with the
+	*  available userdata.*
 	*
-	*    **  (Only exists if the API call was successful.)
-	*    *** (The error codes are listed in api_errors.php.)
+	*  Return value
+	*    * users = A dictionary of the users and their data
+	*      with the usernames as the keys.
+	*
+	*      * user     = The name of the user.
+	*      * groups   = The groups the user is in.
+	*
+	*    * error      = An error code or API_E_OK on success.
+	*
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');

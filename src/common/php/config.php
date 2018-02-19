@@ -20,8 +20,10 @@
 	*  or system path information might be leaked to users.
 	*/
 	const SLIDES_DIR 			= "/data/slides";
-	const LIBRESIGNAGE_LICENSE_FILE_PATH 	= "/doc/LICENSE.md";
-	const LIBRARY_LICENSES_FILE_PATH 	= "/doc/LIBRARY_LICENSES.md";
+	const DOC_HTML_DIR			= "/doc/html";
+	const DOC_RST_DIR			= "/doc/rst";
+	const LICENSE_LS_RST	 		= "/doc/rst/LICENSE.rst";
+	const LICENSES_EXT_RST		 	= "/doc/rst/LICENSES_EXT.rst";
 	const NAV_PATH 				= "/common/php/nav/nav.php";
 	const FOOTER_PATH 			= "/common/php/footer/footer.php";
 	const FOOTER_MINIMAL_PATH 		= "/common/php/footer/footer_minimal.php";
@@ -30,7 +32,8 @@
 	// Page constants.
 	const LOGIN_PAGE 			= "/login";
 	const LOGOUT_PAGE 			= "/logout";
-	const ABOUT_PAGE 			= "/about";
+	const DOCS_PAGE				= "/doc";
+	const ABOUT_PAGE 			= "/doc?doc=about";
 	const EDITOR_PAGE 			= "/control/editor";
 	const CONTROL_PANEL_PAGE 		= "/control";
 	const APP_PAGE 				= "/app";

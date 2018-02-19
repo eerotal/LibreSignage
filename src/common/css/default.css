@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300|Raleway');
+
 main {
 	/* Default spacing */
 	margin: 0;
@@ -10,11 +12,28 @@ main {
 	height: 100%;
 
 	/* Default muted text */
-	color: var(--secondary);
+	color: var(--dark);
+
 }
 
+body {
+	/* Default background color */
+	background-color: var(--light);
+}
 
-/* Responsive display headings */
+/* Setup fonts */
+html, body {
+	font-family: 'Raleway', sans-serif !important;
+}
+.lead {
+	font-family: 'Montserrat', sans-serif !important;
+}
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Montserrat', sans-serif !important;
+	margin-bottom: 1rem;
+}
+
+/* Responsive display heading sizes */
 @media screen and (min-width: 700px) {
 	.display-1 {
 		font-size: 8vw !important;

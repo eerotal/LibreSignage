@@ -1,20 +1,21 @@
 <?php
 	/*
-	*  API endpoint for getting a user's data based on the username.
+	*  ====>
 	*
-	*  GET parameters:
+	*  *Get a user's data based on a username.*
+	*
+	*  GET parameters
 	*    * user = The username to query.
 	*
-	*  Return value:
-	*    A JSON encoded dictionary with the following data.
-	*      * users      = A dictionary of the users and their data
-	*                    with the usernames as the keys.
-	*        * user     = The name of the user.
-	*        * groups   = The groups the user is in.
-	*      * error      = An error code or API_E_OK on success. ***
+	*  Return value
+	*    * users
 	*
-	*    **  (Only exists if the API call was successful.)
-	*    *** (The error codes are listed in api_errors.php.)
+	*      * user     = The name of the user.
+	*      * groups   = The groups the user is in.
+	*
+	*    * error      = An error code or API_E_OK on success.
+	*
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');

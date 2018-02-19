@@ -1,17 +1,17 @@
 <?php
 	/*
-	*  API endpoint for getting a user's quota based on the username.
+	*  ====>
 	*
-	*  GET parameters:
+	*  *Get a user's quota based on a username.*
+	*
+	*  GET parameters
 	*    * user = The username to query.
 	*
-	*  Return value:
-	*    A JSON encoded dictionary with the following data.
-	*      * quota      = A dictionary with the quota data.
-	*      * error      = An error code or API_E_OK on success. ***
+	*  Return value
+	*    * quota      = A dictionary with the quota data.
+	*    * error      = An error code or API_E_OK on success.
 	*
-	*    **  (Only exists if the API call was successful.)
-	*    *** (The error codes are listed in api_errors.php.)
+	*  <====
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
