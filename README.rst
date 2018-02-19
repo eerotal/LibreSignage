@@ -75,13 +75,13 @@ Montserrat (Font, SIL Open Font License 1.1)
   Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)  
 
 The full licenses for these third party libraries and resources can be found
-in the file *src/doc/md/LICENSES_EXT.rst* in the source distribution.
+in the file *src/doc/rst/LICENSES_EXT.rst* in the source distribution.
 
 License
 -------
 
 LibreSignage is licensed under the BSD 3-clause license, which can be found
-in the file *src/doc/md/LICENSE.rst* in the source distribution. Third party
+in the file *src/doc/rst/LICENSE.rst* in the source distribution. Third party
 libraries and resources are licensed under their respective licenses. See the
 section *Used third party libraries and resources* for more information.
 
