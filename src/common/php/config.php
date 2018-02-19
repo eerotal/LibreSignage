@@ -21,9 +21,9 @@
 	*/
 	const SLIDES_DIR 			= "/data/slides";
 	const DOC_HTML_DIR			= "/doc/html";
-	const DOC_MD_DIR			= "/doc/md";
-	const LICENSE_LS_MD	 		= "/doc/md/LICENSE.md";
-	const LICENSES_EXT_MD		 	= "/doc/md/LICENSES_EXT.md";
+	const DOC_RST_DIR			= "/doc/rst";
+	const LICENSE_LS_RST	 		= "/doc/rst/LICENSE.rst";
+	const LICENSES_EXT_RST		 	= "/doc/rst/LICENSES_EXT.rst";
 	const NAV_PATH 				= "/common/php/nav/nav.php";
 	const FOOTER_PATH 			= "/common/php/footer/footer.php";
 	const FOOTER_MINIMAL_PATH 		= "/common/php/footer/footer_minimal.php";

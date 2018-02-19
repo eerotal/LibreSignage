@@ -2,18 +2,20 @@
 	/*
 	*  ====>
 	*
-	*  Create a new user.
+	*  *Create a new user.*
 	*
-	*  POST parameters:
-	*    user    = The user to create.
-	*    groups  = New groups (Optionally unset or NULL)
+	*  POST parameters
+	*    * user    = The user to create.
+	*    * groups  = New groups (Optionally unset or NULL)
 	*
-	*  Return value:
-	*    user
-	*      name     = The name of the user.
-	*      groups   = The groups the user is in.
-	*      pass     = The generated cleartext password.
-	*    error      = An error code or API_E_OK on success.
+	*  Return value
+	*    * user
+	*
+	*      * name   = The name of the user.
+	*      * groups = The groups the user is in.
+	*      * pass   = The generated cleartext password.
+	*
+	*    * error = An error code or API_E_OK on success.
 	*
 	*  <====
 	*/

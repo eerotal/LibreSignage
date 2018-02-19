@@ -2,14 +2,14 @@
 	/*
 	*  ====>
 	*
-	*  Get a user's quota based on a username.
+	*  *Get a user's quota based on a username.*
 	*
-	*  GET parameters:
-	*    user = The username to query.
+	*  GET parameters
+	*    * user = The username to query.
 	*
-	*  Return value:
-	*    quota      = A dictionary with the quota data.
-	*    error      = An error code or API_E_OK on success.
+	*  Return value
+	*    * quota      = A dictionary with the quota data.
+	*    * error      = An error code or API_E_OK on success.
 	*
 	*  <====
 	*/

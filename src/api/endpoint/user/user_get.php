@@ -2,17 +2,18 @@
 	/*
 	*  ====>
 	*
-	*  Get a user's data based on a username.
+	*  *Get a user's data based on a username.*
 	*
-	*  GET parameters:
-	*    user = The username to query.
+	*  GET parameters
+	*    * user = The username to query.
 	*
-	*  Return value:
-	*    users      = A dictionary of the users and their data
-	*                 with the usernames as the keys.
-	*      user     = The name of the user.
-	*      groups   = The groups the user is in.
-	*    error      = An error code or API_E_OK on success.
+	*  Return value
+	*    * users
+	*
+	*      * user     = The name of the user.
+	*      * groups   = The groups the user is in.
+	*
+	*    * error      = An error code or API_E_OK on success.
 	*
 	*  <====
 	*/

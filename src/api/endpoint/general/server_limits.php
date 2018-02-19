@@ -2,11 +2,11 @@
 	/*
 	*  ====>
 	*
-	*  Get the configured server limits.
+	*  *Get the configured server limits.*
 	*
-	*  Return value:
-	*    limits     = A dictionary with the limits.
-	*    error      = An error code or API_E_OK on success.
+	*  Return value
+	*    * limits     = A dictionary with the limits.
+	*    * error      = An error code or API_E_OK on success.
 	*
 	*  <====
 	*/

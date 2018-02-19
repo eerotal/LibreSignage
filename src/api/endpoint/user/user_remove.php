@@ -2,13 +2,13 @@
 	/*
 	*  ====>
 	*
-	*  Remove a user based on a username.
+	*  *Remove a user based on a username.*
 	*
-	*  POST parameters:
-	*    user    = The user to remove.
+	*  POST parameters
+	*    * user    = The user to remove.
 	*
-	*  Return value:
-	*    error      = An error code or API_E_OK on success.
+	*  Return value
+	*    * error      = An error code or API_E_OK on success.
 	*
 	*  <====
 	*/

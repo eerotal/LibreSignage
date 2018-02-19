@@ -2,26 +2,29 @@
 	/*
 	*  ====>
 	*
-	*  Save a user's data.
+	*  *Save a user's data.*
 	*
 	*  Access is granted in any of the following cases.
-	*    a) The logged in user is in the group 'admin' and
+	*
+	*    1. The logged in user is in the group 'admin' and
 	*       they are not trying to set a new password. This
 	*       prevents the admin taking over an account.
-	*    b) The logged in user is the user to be modified and
+	*    2. The logged in user is the user to be modified and
 	*       they are not trying to set user groups. This prevents
 	*       privilege escalation.
 	*
-	*  POST parameters:
-	*    user    = The user to modify.
-	*    pass    = New password (Optionally unset or NULL)
-	*    groups  = New groups (Optionally unset or NULL)
+	*  POST parameters
+	*    * user    = The user to modify.
+	*    * pass    = New password (Optionally unset or NULL)
+	*    * groups  = New groups (Optionally unset or NULL)
 	*
-	*  Return value:
-	*    user
-	*      name     = The name of the user.
-	*      groups   = The groups the user is in.
-	*    error      = An error code or API_E_OK on success.
+	*  Return value
+	*    * user
+	*
+	*      * name     = The name of the user.
+	*      * groups   = The groups the user is in.
+	*
+	*    * error      = An error code or API_E_OK on success.
 	*
 	*  <====
 	*/

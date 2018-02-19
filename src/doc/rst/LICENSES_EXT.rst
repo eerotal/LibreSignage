@@ -1,7 +1,10 @@
-# Third party licenses
+####################
+Third party licenses
+####################
 
 
-## Bootstrap
+Bootstrap
+---------
 
 The MIT License (MIT)
 
@@ -26,7 +29,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-## JQuery
+JQuery
+------
 
 Copyright JS Foundation and other contributors, https://js.foundation/
 
@@ -66,7 +70,8 @@ own licenses; we recommend you read them, as their terms may differ from
 the terms above.
 
 
-## Popper.js
+Popper.js
+---------
 
 The MIT License (MIT)
 
@@ -92,7 +97,8 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-## Ace
+Ace
+---
 
 Copyright (c) 2010, Ajax.org B.V.
 All rights reserved.
@@ -120,7 +126,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-## Raleway
+Raleway
+-------
 
 Copyright (c) 2010, Matt McInerney (matt@pixelspread.com),
 Copyright (c) 2011, Pablo Impallari (www.impallari.com|impallari@gmail.com),
@@ -219,7 +226,8 @@ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 
 
-## Montserrat
+Montserrat
+----------
 
 Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)
 

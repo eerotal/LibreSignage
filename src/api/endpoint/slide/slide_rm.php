@@ -2,13 +2,13 @@
 	/*
 	*  ====>
 	*
-	*  Remove a slide.
+	*  *Remove a slide.*
 	*
-	*  POST parameters:
-	*    id = The id of the slide to remove.
+	*  POST parameters
+	*    * id = The id of the slide to remove.
 	*
-	*  Return value:
-	*    error = An error code or API_E_OK on success.
+	*  Return value
+	*    * error = An error code or API_E_OK on success.
 	*
 	*  <====
 	*/

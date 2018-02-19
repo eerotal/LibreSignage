@@ -2,10 +2,10 @@
 	/*
 	*  ====>
 	*
-	*  Get a list of all the existing slides.
+	*  *Get a list of all the existing slides.*
 	*
-	*  Return value:
-	*    An array with all the existing slide IDs.
+	*  Return value
+	*    * An array with all the existing slide IDs.
 	*
 	*  <====
 	*/

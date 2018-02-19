@@ -12,7 +12,7 @@ ifndef DIST_DIR
 $(error DIST_DIR not set)
 endif
 
-dist: README.md $(shell find src)
+dist: README.rst $(shell find src)
 	echo '## Create LibreSignage distribution...'
 	./build/scripts/mkdist.sh
 	echo '## Generate LibreSignage docs...'

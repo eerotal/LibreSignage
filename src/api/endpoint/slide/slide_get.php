@@ -2,18 +2,18 @@
 	/*
 	*  ====>
 	*
-	*  Get the data of a slide.
+	*  *Get the data of a slide.*
 	*
-	*  GET parameters:
-	*    id = The id of the slide to get.
+	*  GET parameters
+	*    * id = The id of the slide to get.
 	*
-	*  Return value:
-	*    id      = The ID of the slide.
-	*    name    = The name of the slide.
-	*    index   = The index of the slide.
-	*    time    = The time the slide is shown.
-	*    markup  = The markup of the slide.
-	*    error   = An error code or API_E_OK on success.
+	*  Return value
+	*    * id      = The ID of the slide.
+	*    * name    = The name of the slide.
+	*    * index   = The index of the slide.
+	*    * time    = The time the slide is shown.
+	*    * markup  = The markup of the slide.
+	*    * error   = An error code or API_E_OK on success.
 	*
 	*  <====
 	*/

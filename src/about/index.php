@@ -40,7 +40,7 @@
 				<a href="https://ace.c9.io/">Ace</a>.
 				The licensing information for these libraries can
 				be found
-				<a href="/doc/md/LICENSES_EXT.md">here</a>.</p>
+				<a href="/doc/rst/LICENSES_EXT.rst">here</a>.</p>
 
 				<p>LibreSignage is licensed under the
 				permissive BSD 3-clause license, which
@@ -49,7 +49,7 @@
 				<div class="container text-center">
 					<pre><?php
 						echo file_get_contents($_SERVER['DOCUMENT_ROOT'].
-								LICENSE_LS_MD);
+								LICENSE_LS_RST);
 					?></pre>
 				</div>
 			</div>

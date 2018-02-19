@@ -2,16 +2,16 @@
 	/*
 	*  ====>
 	*
-	*  Query specific data keys from all of the currently
-	*  existing slides.
+	*  *Query specific data keys from all of the currently
+	*  existing slides.*
 	*
-	*  GET parameters:
-	*    Data can be requested by just assigning the key name
-	*    a value such as 1 in the GET parameters.
+	*  GET parameters
+	*    * Data can be requested by just assigning the key name
+	*      a value such as 1 in the GET parameters.
 	*
-	*  Return value:
-	*    data  = The requested data as nested dictionaries.
-	*    error = An error code or API_E_OK on success.
+	*  Return value
+	*    * data  = The requested data as nested dictionaries.
+	*    * error = An error code or API_E_OK on success.
 	*
 	*  <====
 	*/

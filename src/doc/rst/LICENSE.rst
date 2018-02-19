@@ -1,4 +1,6 @@
-# LibreSignage License
+####################
+LibreSignage License
+####################
 
 Copyright 2018 Eero Talus
 

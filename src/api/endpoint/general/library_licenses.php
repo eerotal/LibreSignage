@@ -2,7 +2,7 @@
 	/*
 	*  ====>
 	*
-	*  Get the Markdown version of the third party licenses file.
+	*  *Get the Markdown version of the third party licenses file.*
 	*
 	*  <====
 	*/
@@ -18,6 +18,6 @@
 	api_endpoint_init($LIBRARY_LICENSES);
 
 	$LIBRARY_LICENSES->resp_set(file_get_contents(
-		realpath(LIBRESIGNAGE_ROOT.LICENSES_EXT_MD)
+		realpath(LIBRESIGNAGE_ROOT.LICENSES_EXT_RST)
 	));
 	$LIBRARY_LICENSES->send();

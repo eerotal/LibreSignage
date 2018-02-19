@@ -2,7 +2,7 @@
 	/*
 	*  ====>
 	*
-	*  Get the Markdown version of the LibreSignage license file.
+	*  *Get the Markdown version of the LibreSignage license file.*
 	*
 	*  <====
 	*/
@@ -19,6 +19,6 @@
 	api_endpoint_init($LIBRESIGNAGE_LICENSE);
 
 	$LIBRESIGNAGE_LICENSE->resp_set(file_get_contents(
-		realpath(LIBRESIGNAGE_ROOT.LIBRESIGNAGE_LICENSE_MD)
+		realpath(LIBRESIGNAGE_ROOT.LIBRESIGNAGE_LICENSE_RST)
 	));
 	$LIBRESIGNAGE_LICENSE->send();

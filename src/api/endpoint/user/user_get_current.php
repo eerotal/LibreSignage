@@ -2,13 +2,15 @@
 	/*
 	*  ====>
 	*
-	*  Get the data of the current user.
+	*  *Get the data of the current user.*
 	*
-	*  Return value:
-	*    user
-	*      user     = The name of the user.
-	*      groups   = The groups the user is in.
-	*    error      = An error code or API_E_OK on success.
+	*  Return value
+	*    * user
+	*
+	*      * user     = The name of the user.
+	*      * groups   = The groups the user is in.
+	*
+	*    * error      = An error code or API_E_OK on success.
 	*
 	*  <====
 	*/
