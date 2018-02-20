@@ -48,7 +48,8 @@ if [ "$INSTC_LOADED" -ne "1" ]; then
 	fi
 
 	read -p 'Server name aliases (space separated): ' INSTC[ALIAS];
-	read -p 'Admin email: ' INSTC[EMAIL];
+	read -p 'Admin name: ' INSTC[ADMIN_NAME];
+	read -p 'Admin email: ' INSTC[ADMIN_EMAIL];
 
 	# Write the install config to file.
 
@@ -95,6 +96,12 @@ echo 'Install LibreSignage to '$VHOST_DIR;
 echo 'Copy files.';
 cp -Rp $DIST_DIR/* $VHOST_DIR'/.';
 echo 'Done!';
+
+echo "Create instance config ($VHOST_DIR/$LS_INSTANCE_CONF)...";
+sed -i "s/<<ADMIN_NAME>>/${INSTC[ADMIN_NAME]}/g" \
+		$VHOST_DIR'/'$LS_INSTANCE_CONF;
+sed -i "s/<<ADMIN_EMAIL>>/${INSTC[ADMIN_EMAIL]}/g" \
+		$VHOST_DIR'/'$LS_INSTANCE_CONF;
 
 echo 'Create VHost config. ('$APACHE_SITES'/'${INSTC[NAME]}'.conf)';
 if [ -f $APACHE_SITES'/'${INSTCONF[NAME]}'.conf' ]; then

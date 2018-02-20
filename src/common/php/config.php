@@ -9,6 +9,7 @@
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/error.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/ls_instance.php');
 
 	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT']);
 

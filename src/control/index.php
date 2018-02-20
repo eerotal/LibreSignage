@@ -36,6 +36,14 @@
 						</div>
 					</div>
 				</div>
+				<div class="col-md-6">
+					<p>This LibreSignage instance is
+					maintained by <?php echo ADMIN_NAME; ?>.
+					If you have any problems using
+					LibreSignage, please email the admin at
+					<a href="mailto: <?php echo ADMIN_EMAIL; ?>">
+					<?php echo ADMIN_EMAIL; ?></a>.</p>
+				</div>
 			</div>
 		</main>
 		<?php

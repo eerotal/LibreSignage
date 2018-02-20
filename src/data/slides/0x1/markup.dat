@@ -1,3 +1,5 @@
-[container 35 8 8 8]
-	[h 1]Welcome to LibreSignage![/h]
+[container 35 0 0 0]
+	[xcenter]
+		[h 12]Welcome to LibreSignage![/h]
+	[/xcenter]
 [/container]

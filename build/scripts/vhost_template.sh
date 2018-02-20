@@ -2,8 +2,8 @@
 # This file is sourced in install.sh.
 
 echo '<VirtualHost *:80>';
-if [ -n "${INSTC[EMAIL]}" ]; then
-	echo '	ServerAdmin '${INSTC[EMAIL]};
+if [ -n "${INSTC[ADMIN_EMAIL]}" ]; then
+	echo '	ServerAdmin '${INSTC[ADMIN_EMAIL]};
 fi
 echo '	ServerName '${INSTC[NAME]};
 if [ -n "${INSTC[ALIAS]}" ]; then
