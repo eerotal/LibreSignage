@@ -11,15 +11,17 @@ Markup classes
 --------------
 
 Heading
-  Syntax: ``[h weight][/h]``
+  Syntax: ``[h size][/h]``
 
-  Display a heading. `weight` is an integer number in the range 1-6 where
-  1 is the largest heading and 6 is the smallest one.
+  Display a heading. ``size`` is the size of the heading in percents
+  relative to the height of the viewport.
 
 Lead
   Syntax: ``[lead][/lead]``
 
-  Display a lead paragraph.
+  Display a lead paragraph. The default font size for lead paragraphs
+  is 4% of the viewport height. The font size can be changed using the
+  ``[size][/size]`` class.
 
 Bold text
   Syntax: ``[b][/b]``
@@ -46,7 +48,9 @@ Image
 Paragraph
   Syntax: ``[p][/p]``
 
-  Display a paragraph.
+  Display a paragraph. The default font size for paragraphs is 3% of the
+  viewport height. The font size can be changed using the ``[size][/size]``
+  class.
 
 Color
   Syntax: ``[color col][/color]``
@@ -63,12 +67,24 @@ Container
   paddings use the width of the viewport as the reference and the top and
   bottom paddings use the height of the viewport as the reference.
 
+Horizontal centering container
+  Syntax: ``[xcenter][/xcenter]``
+
+  Create a container that horizontally centers all content within it.
+
+Column layout container
+  Syntax: ``[columns][/columns]``
+
+  Create a container with a column layout. Each ``[container]`` class
+  inside a ``[columns]`` container creates a new column. All columns
+  within one ``[columns]`` container have equal width.
+
 Font size
   Syntax: ``[size s][/size]``
 
   Set the font size. All text inside this class will have the specified
   font size if not nested classes change the size. ``s`` is the size
-  of the text in points.
+  of the in percents relative to the height of the viewport.
 
 Examples
 --------

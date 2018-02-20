@@ -6,19 +6,17 @@
 *  can have nested classes.
 *
 *  Markup classes:
-*    [h WEIGHT]TEXT[/h]  ==> Heading.
-*    [lead]TEXT[/lead]   ==> Lead paragraph.
-*    [b]TEXT[/b]         ==> Bold text.
-*    [i]TEXT[/i]         ==> Italics text.
-*    [img ADDRESS w h]   ==> Embed an image from ADDRESS.
-*    [p]                 ==> Open paragraph.
-*    [/p]                ==> Close paragraph.
-*    [color COLOR]       ==> Open a color block.
-*    [/color]            ==> Close a color block.
-*    [container T R B L] ==> Open a container.
-*    [/container]        ==> Close a container.
-*    [size SIZE]         ==> Open text size block.
-*    [/size]             ==> Close the most recent text size block.
+*    [h SIZE][/h]                     ==> Heading.
+*    [lead][/lead]                    ==> Lead paragraph.
+*    [b][/b]                          ==> Bold text.
+*    [i][/i]                          ==> Italics text.
+*    [img ADDRESS w h]                ==> Embed an image from ADDRESS.
+*    [p][/p]                          ==> Close paragraph.
+*    [color COLOR][/color]            ==> Color class.
+*    [container T R B L][/container]  ==> Container with padding.
+*    [xcenter][/xcenter]              ==> Horizontal centering container.
+*    [columns][/columns]              ==> Column layout container.
+*    [size SIZE][/size]               ==> Text size class.
 */
 
 var _parser_ln_num = 1;
@@ -168,8 +166,8 @@ const MARKUP = {
 	'heading': new MarkupClass(
 		'block',
 		'h',
-		{'weight': { 'arg_type': 'int' }},
-		'<h1 class="h%0">',
+		{'size': { 'arg_type': 'int' }},
+		'<h1 style="font-size: %0vh !important;">',
 		'</h1>',
 		null,
 		false
@@ -227,7 +225,7 @@ const MARKUP = {
 		'block',
 		'size',
 		{'font_size': {'arg_type': 'int'}},
-		'<span style="font-size: %0pt;">',
+		'<span style="font-size: %0vh;">',
 		'</span>',
 		null,
 		false
@@ -251,6 +249,31 @@ const MARKUP = {
 			'left': {'arg_type': 'int'},
 		},
 		'<div style="padding: %0vh %1vw %2vh %3vw;">',
+		'</div>',
+		null,
+		false
+	),
+	'xcenter': new MarkupClass(
+		'block',
+		'xcenter',
+		null,
+		`<div style="margin-left: auto;
+				margin-right: auto;
+				text-align: center;
+				width: auto;
+				height: auto;">`,
+		'</div>',
+		null,
+		false
+	),
+	'columns': new MarkupClass(
+		'block',
+		'columns',
+		null,
+		`<div style="display: flex;
+				flex-direction: row;
+				width: auto;
+				height: auto;">`,
 		'</div>',
 		null,
 		false

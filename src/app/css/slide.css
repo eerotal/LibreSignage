@@ -1,0 +1,9 @@
+/* Default font sizing in the display */
+.lead { font-size: 4vh; }
+p { font-size: 3vh; }
+
+/* Make divs as large as possible by default. */
+div {
+	width: 100%;
+	height: 100%;
+}
