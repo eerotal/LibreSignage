@@ -28,7 +28,9 @@ Doing a basic install of LibreSignage is quite simple. The required steps
 are listed below.
 
 1. Install the required dependencies. On Debian Buster this can be accomplished
-   by running ``sudo apt install apache2 php7.0 git pandoc``.
+   by running ``sudo apt install apache2 php7.0 git pandoc python-imaging``.
+   *pandoc* is needed for compiling the reStructuredText documentation files
+   to HTML.
 2. Use ``cd`` to move to the directory where you want to download the LibreSignage
    repository.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``. The repository
@@ -47,6 +49,35 @@ based systems of course. For example, if you specified the server name
 
 This will redirect all requests for *example.com* to *localhost*, making it
 possible to access the site by connecting to *example.com*.
+
+Screenshots
+-----------
+
+Open these images in a new tab to view the full resolution versions.
+
+**LibreSignage Editor**
+
+.. image:: http://etal.mbnet.fi/libresignage/editor.png
+   :width: 320 px
+   :height: 180 px
+
+**LibreSignage User Manager**
+
+.. image:: http://etal.mbnet.fi/libresignage/user_manager.png
+   :width: 320 px
+   :height: 180 px
+
+**LibreSignage Display**
+
+.. image:: http://etal.mbnet.fi/libresignage/display.png
+   :width: 320 px
+   :height: 180 px
+
+**LibreSignage Documentation**
+
+.. image:: http://etal.mbnet.fi/libresignage/docs.png
+   :width: 320 px
+   :height: 180 px
 
 Used third-party libraries and resources
 ----------------------------------------
