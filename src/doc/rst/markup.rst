@@ -89,20 +89,48 @@ Font size
 Examples
 --------
 
+Basic classes
++++++++++++++
+
 ::
 
   [container 10 10 10 10]
-          [h 1]This is a heading[/h]
-          [lead]This is a short lead paragraph.[/lead]
-          [p]
-                 This is a normal paragraph that contains the
-                 main content of the slide
-          [/p]
-          [color red]
-                  [p]
-                          This is a paragraph with red text where
-                          part of the text is [b]bold[/b] and part
-                          of it is [i]italic[/i].
-                  [/p]
-          [/color]
+      [h 15]This is a heading[/h]
+      [lead]This is a short lead paragraph.[/lead]
+      [p]This is a normal paragraph that contains the
+      main content of the slide[/p]
+      [color red]
+          [p]This is a paragraph with red text where
+          part of the text is [b]bold[/b] and part
+          of it is [i]italic[/i].[/p]
+      [/color]
+  [/container]
+
+Columns
++++++++++
+
+::
+
+  [container 10 10 10 10]
+      [xcenter]
+          [h 12]Multi-column example[/h]
+      [/xcenter]
+      [columns]
+          [container 0 0 0 0]
+              [h 5]First column[/h]
+              [p]This is the first column in this slide. Columns are created
+              using the [i]columns[/i] class. Each [i]container[/i] inside a
+              [i]columns[/i] class creates a new column. The maximum number of
+              columns is not limited in any way.[/p]
+          [/container]
+          [container 0 0 0 0]
+              [h 5]Second column[/h]  
+              [p]This is the second column in this slide. Columns within one
+              [i]columns[/i] class all have equal width and height.[/p]
+          [/container]
+      [/columns]
+      [container 0 0 0 0]
+              [p]Containers [b]outside[/b] a [i]columns[/i] class are normal full-width
+          containers like this one.[/p]
+      [/container]
   [/container]

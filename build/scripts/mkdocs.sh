@@ -38,6 +38,9 @@ source files by the LibreSignage build system on `date`. The
 information below can also be found in the API endpoint source
 files.
 
+Endpoint documentation
+++++++++++++++++++++++
+
 EndOfText
 
 heading='';
@@ -49,7 +52,7 @@ for f in $API_ENDPOINTS_DIR/**; do
 		echo 'Gen API doc from "'$f'".';
 		echo $heading >> $API_DOC;
 
-		# Add the line of #s below the heading.
+		# Add the line of dashes below the heading.
 		for (( i=0; i<${#heading}; i++ )); do
 			line="$line-";
 		done
