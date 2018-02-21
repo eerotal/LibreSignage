@@ -22,7 +22,6 @@
 		$format = NULL
 	);
 	session_start();
-	auth_init();
 	api_endpoint_init($SLIDE_LIST, auth_session_user());
 
 	$SLIDE_LIST->resp_set(array(

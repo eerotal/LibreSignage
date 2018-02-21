@@ -17,7 +17,6 @@
 		$format = NULL
 	);
 	session_start();
-	auth_init();
 	api_endpoint_init($LIBRARY_LICENSES, auth_session_user());
 
 	$LIBRARY_LICENSES->resp_set(file_get_contents(

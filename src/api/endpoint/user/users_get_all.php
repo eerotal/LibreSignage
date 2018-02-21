@@ -21,6 +21,7 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 
 	$USERS_GET_ALL = new APIEndpoint(
 		$method = API_METHOD['GET'],
@@ -28,14 +29,13 @@
 		$format = NULL
 	);
 	session_start();
-	auth_init();
 	api_endpoint_init($USERS_GET_ALL, auth_session_user());
 
 	if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
 		api_throw(API_E_NOT_AUTHORIZED);
 	}
 
-	$users = auth_get_users();
+	$users = user_array();
 	$ret_data = array(
 		'users' => array()
 	);

@@ -29,7 +29,6 @@
 		$format = NULL
 	);
 	session_start();
-	auth_init();
 	api_endpoint_init($SLIDE_DATA_QUERY, auth_session_user());
 
 	// Check that the requested keys are in the required keys array.
