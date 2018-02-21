@@ -1,5 +1,10 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
+
+	session_start();
+	auth_init();
+	auth_is_authorized(NULL, NULL, TRUE);
 ?>
 <!DOCTYPE html>
 <html lang="en">

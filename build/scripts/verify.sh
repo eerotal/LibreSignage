@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 #  Build verification code for LibreSignage. Implemented
 #  verification flags:
@@ -6,7 +8,9 @@
 #
 
 set -e
-for f in `find . -type f -name '*.php'`; do
+. build/scripts/build_conf.sh
+
+for f in `find $SRC_DIR -type f -name '*.php'`; do
 	if [ -z "`grep /common/php/config.php $f`" ]; then
 		if [ -z "`grep !!BUILD_VERIFY_NOCONFIG!! $f`" ]; then
 			echo "Warning: config.php not included in "$f".";
