@@ -26,10 +26,9 @@
 			'user' => API_P_STR|API_P_OPT|API_P_NULL
 		)
 	);
-	api_endpoint_init($USER_GET_QUOTA);
-
 	session_start();
 	auth_init();
+	api_endpoint_init($USER_GET_QUOTA, auth_session_user());
 
 	$flag_auth = FALSE;
 	$user_name = NULL;
@@ -61,6 +60,6 @@
 	$user_quota = new UserQuota($user);
 
 	$USER_GET_QUOTA->resp_set(array(
-		'quota' => $user_quota->get_data()
+		'quota' => $user_quota->get_quota_data()
 	));
 	$USER_GET_QUOTA->send();

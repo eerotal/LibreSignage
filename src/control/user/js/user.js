@@ -76,6 +76,6 @@ function user_settings_save(usr) {
 	}
 }
 
-api_load_limits(() => {
+api_init(() => {
 	user_settings_get_user(user_settings_setup);
 });

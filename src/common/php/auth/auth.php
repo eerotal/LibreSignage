@@ -184,6 +184,9 @@ function auth_is_authorized(array $groups = NULL,
 
 function auth_session_user() {
 	_auth_error_on_no_session();
+	if (empty($_SESSION['user']['user'])) {
+		return NULL;
+	}
 	return _auth_get_user_by_name($_SESSION['user']['user']);
 }
 

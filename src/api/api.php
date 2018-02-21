@@ -294,7 +294,7 @@ class APIEndpoint {
 	}
 }
 
-function api_endpoint_init(APIEndpoint $endpoint) {
+function api_endpoint_init(APIEndpoint $endpoint, $user) {
 	/*
 	*  Initialize the APIEnpoint $endpoint and
 	*  error out of the API call if an exception
@@ -302,6 +302,31 @@ function api_endpoint_init(APIEndpoint $endpoint) {
 	*  correct HTTP Content-Type header for the
 	*  endpoint.
 	*/
+
+	// Use the API rate quota of the caller.
+	if ($user == NULL) {
+		api_throw(API_E_NOT_AUTHORIZED);
+	}
+
+	$quota = new UserQuota($user);
+	if ($quota->has_state_var('api_t_start')) {
+		$t = $quota->get_state_var('api_t_start');
+		if (time() - $t >= gtlim('API_RATE_T')) {
+			// Reset rate quota and time after the cutoff.
+			$quota->set_state_var('api_t_start', time());
+			$quota->set_quota('api_rate', 0);
+		}
+
+	} else {
+		// Start counting time.
+		$quota->set_state_var('api_t_start', time());
+	}
+
+	if (!$quota->use_quota('api_rate')) {
+		api_throw(API_E_RATE);
+	}
+	$quota->flush();
+
 	try {
 		$endpoint->load_data();
 	} catch(Exception $e) {

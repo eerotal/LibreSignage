@@ -7,8 +7,14 @@ class UserQuota {
 	const Q_DISP = 'disp';
 	const Q_USED = 'used';
 
+	const K_QUOTA = 'quota';
+	const K_STATE = 'state';
+
 	private $user = NULL;
-	private $quota = NULL;
+	private $data = array(
+		'quota' => NULL,
+		'state' => NULL
+	);
 	private $ready = FALSE;
 
 	public function __construct(User $user, $def_lim = NULL) {
@@ -21,7 +27,10 @@ class UserQuota {
 			$this->_load($user);
 		} else {
 			// Initialize new quota.
-			$this->quota = array();
+			$this->data = array(
+				self::K_QUOTA => array(),
+				self::K_STATE => array()
+			);
 			if ($def_lim) {
 				foreach ($def_lim as $k => $l) {
 					$this->set_limit($k, $l);
@@ -59,10 +68,10 @@ class UserQuota {
 			throw new IntException("Quota file doesn't ".
 						"exist.");
 		}
-		$this->quota = json_decode(file_lock_and_get($q_path),
+		$this->data = json_decode(file_lock_and_get($q_path),
 						$assoc=TRUE);
 
-		if ($this->quota === NULL &&
+		if ($this->data === NULL &&
 			json_last_error() != JSON_ERROR_NONE) {
 			throw new IntException('Failed to parse '.
 					'quota JSON.');
@@ -77,14 +86,21 @@ class UserQuota {
 		*  Write the quota data to disk.
 		*/
 		$this->_error_on_not_ready();
-		$quota_enc = json_encode($this->quota);
-		if ($quota_enc === FALSE &&
+		$data_enc = json_encode($this->data);
+		if ($data_enc === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
 			throw new IntException('Failed to JSON '.
-					'encode quota.');
+					'encode quota data.');
 		}
 		file_lock_and_put($this->_quota_path($this->user),
-				$quota_enc, TRUE);
+				$data_enc, TRUE);
+	}
+
+	public function get_limit(string $key) {
+		if (isset($this->data[self::K_QUOTA][$key])) {
+			return $this->data[self::K_QUOTA][$key][self::Q_LIMIT];
+		}
+		return NULL;
 	}
 
 	public function set_limit(string $key, int $limit) {
@@ -92,10 +108,10 @@ class UserQuota {
 		*  Set the quota limit for $key.
 		*/
 		$tmp = 0;
-		if (!empty($this->quota[$key][self::Q_USED])) {
-			$tmp = $this->quota[$key][self::Q_USED];
+		if ($this->get_limit($key) != NULL) {
+			$tmp = $this->get_limit($key);
 		}
-		$this->quota[$key] = array(
+		$this->data[self::K_QUOTA][$key] = array(
 			self::Q_LIMIT => $limit,
 			self::Q_USED => $tmp
 		);
@@ -105,18 +121,18 @@ class UserQuota {
 		/*
 		*  Set the display name of a quota key.
 		*/
-		$this->quota[$key][self::Q_DISP] = $disp;
+		$this->data[self::K_QUOTA][$key][self::Q_DISP] = $disp;
 	}
 
 	public function has_quota(string $key, int $amount = 1) {
 		/*
 		*  Check if a user has unused quota.
 		*/
-		if (empty($this->quota[$key][self::Q_LIMIT])) {
+		if ($this->get_limit($key) == NULL) {
 			return FALSE;
 		}
-		if ($this->quota[$key][self::Q_USED] + $amount <=
-			$this->quota[$key][self::Q_LIMIT]) {
+		if ($this->get_quota($key) + $amount <=
+				$this->get_limit($key)) {
 			return TRUE;
 		} else {
 			return FALSE;
@@ -128,7 +144,8 @@ class UserQuota {
 		*  Use $amount of $key quota.
 		*/
 		if ($this->has_quota($key, $amount)) {
-			$this->quota[$key][self::Q_USED] += $amount;
+			$this->set_quota($key,
+				$this->get_quota($key) + $amount);
 			return TRUE;
 		} else {
 			return FALSE;
@@ -139,19 +156,47 @@ class UserQuota {
 		/*
 		*  Free $amount of $key quota.
 		*/
-		if (empty($this->quota[$key][self::Q_LIMIT])) {
-			return FALSE;
-		}
-		if ($this->quota[$key][self::Q_USED] - $amount >= 0) {
-			$this->quota[$key][self::Q_USED] -= $amount;
+		if ($this->get_quota($key) - $amount >= 0) {
+			$this->set_quota($key,
+				$this->get_quota($key) - $amount);
 			return TRUE;
 		} else {
 			return FALSE;
 		}
 	}
 
-	public function get_data() {
-		return $this->quota;
+	public function set_quota(string $key, int $amount) {
+		if ($this->get_limit($key) == NULL) {
+			throw new Exception('No such quota limit.');
+		}
+		$this->data[self::K_QUOTA][$key][self::Q_USED] = $amount;
+	}
+
+	public function get_quota(string $key) {
+		if ($this->get_limit($key) == NULL) {
+			throw new Exception('No such quota limit exists.');
+		}
+		return $this->data[self::K_QUOTA][$key][self::Q_USED];
+	}
+
+
+	public function has_state_var($key) {
+		return isset($this->data[self::K_STATE][$key]);
+	}
+
+	public function set_state_var($key, $val) {
+		$this->data[self::K_STATE][$key] = $val;
+	}
+
+	public function get_state_var($key) {
+		if (!$this->has_state_var($key)) {
+			throw new Exception('No such state variable.');
+		}
+		return $this->data[self::K_STATE][$key];
+	}
+
+	public function get_quota_data() {
+		return $this->data[self::K_QUOTA];
 	}
 }
 

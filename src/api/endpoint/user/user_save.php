@@ -46,10 +46,9 @@
 			'groups' => API_P_ARR|API_P_OPT|API_P_NULL
 		)
 	);
-	api_endpoint_init($USER_SAVE);
-
 	session_start();
 	auth_init();
+	api_endpoint_init($USER_SAVE, auth_session_user());
 
 	// Is authorized as an admin?
 	$auth_admin = auth_is_authorized(

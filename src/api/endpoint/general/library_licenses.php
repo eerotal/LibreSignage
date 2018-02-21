@@ -7,6 +7,7 @@
 	*  <====
 	*/
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 
@@ -15,7 +16,9 @@
 		$response_type = API_RESPONSE['TEXT'],
 		$format = NULL
 	);
-	api_endpoint_init($LIBRARY_LICENSES);
+	session_start();
+	auth_init();
+	api_endpoint_init($LIBRARY_LICENSES, auth_session_user());
 
 	$LIBRARY_LICENSES->resp_set(file_get_contents(
 		realpath(LIBRESIGNAGE_ROOT.LICENSES_EXT_RST)

@@ -41,10 +41,9 @@
 			'time' => API_P_INT
 		)
 	);
-	api_endpoint_init($SLIDE_SAVE);
-
 	session_start();
 	auth_init();
+	api_endpoint_init($SLIDE_SAVE, auth_session_user());
 
 	$flag_new_slide = FALSE;
 	$flag_auth = FALSE;

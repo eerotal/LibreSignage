@@ -55,7 +55,8 @@
 		"MAX_USERS" 			=> 64,
 		"MAX_USER_GROUPS" 		=> 32,
 		"USERNAME_MAX_LEN"		=> 64,
-		"PASSWORD_MAX_LEN"		=> 256
+		"PASSWORD_MAX_LEN"		=> 256,
+		"API_RATE_T"			=> 60
 	);
 
 	// User quota limits.
@@ -64,9 +65,10 @@
 			'limit' => 2,
 			'disp' => 'Slides'
 		),
-		'api_calls' => array(
+		'api_rate' => array(
 			'limit' => 100,
-			'disp' => 'API call quota (calls/min)'
+			'disp' => 'API quota (calls/'.
+					LS_LIM['API_RATE_T'].'s)'
 		)
 	);
 

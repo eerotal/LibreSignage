@@ -294,7 +294,7 @@ const MARKUP = {
 function markup_preprocess(str) {
 	var tmp = str;
 
-	if (!tmp) {
+	if (tmp == null) {
 		return null;
 	}
 
