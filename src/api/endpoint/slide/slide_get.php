@@ -32,7 +32,6 @@
 		)
 	);
 	session_start();
-	auth_init();
 	api_endpoint_init($SLIDE_GET, auth_session_user());
 
 	$list = get_slides_id_list();

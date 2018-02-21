@@ -3,7 +3,6 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
 	session_start();
-	auth_init();
 
 	// Redirect already logged in users to the landing page.
 	if (auth_is_authorized()) {

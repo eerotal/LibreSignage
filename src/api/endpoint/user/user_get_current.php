@@ -26,7 +26,6 @@
 		$format = NULL
 	);
 	session_start();
-	auth_init();
 	api_endpoint_init($USER_GET, auth_session_user());
 
 	if (!auth_is_authorized(NULL, NULL, FALSE)) {

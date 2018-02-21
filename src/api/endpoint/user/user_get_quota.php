@@ -27,7 +27,6 @@
 		)
 	);
 	session_start();
-	auth_init();
 	api_endpoint_init($USER_GET_QUOTA, auth_session_user());
 
 	$flag_auth = FALSE;

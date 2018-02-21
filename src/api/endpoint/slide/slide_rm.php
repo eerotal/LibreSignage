@@ -28,7 +28,6 @@
 		)
 	);
 	session_start();
-	auth_init();
 	api_endpoint_init($SLIDE_RM, auth_session_user());
 
 	$slide = new Slide();

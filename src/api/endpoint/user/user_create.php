@@ -38,7 +38,6 @@
 		)
 	);
 	session_start();
-	auth_init();
 	api_endpoint_init($USER_CREATE, auth_session_user());
 
 	if (!auth_is_authorized(array('admin'), NULL, FALSE)) {

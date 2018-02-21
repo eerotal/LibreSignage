@@ -18,7 +18,6 @@
 		$format = NULL
 	);
 	session_start();
-	auth_init();
 	api_endpoint_init($LIBRESIGNAGE_LICENSE, auth_session_user());
 
 	$LIBRESIGNAGE_LICENSE->resp_set(file_get_contents(

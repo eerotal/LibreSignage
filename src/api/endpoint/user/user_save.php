@@ -47,7 +47,6 @@
 		)
 	);
 	session_start();
-	auth_init();
 	api_endpoint_init($USER_SAVE, auth_session_user());
 
 	// Is authorized as an admin?
