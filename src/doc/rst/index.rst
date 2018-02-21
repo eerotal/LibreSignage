@@ -25,14 +25,16 @@ Web Interface
 Miscellaneous
 -------------
 
-`Limits </doc?doc=limits>`_
-
 `Markup </doc?doc=markup>`_
 
 Development
 -----------
 
-`API Documentation </doc?doc=api>`_
+`API Endpoints </doc?doc=api>`_
+
+`API Errors </doc?doc=api_errors>`_
+
+`Limits </doc?doc=limits>`_
 
 Licenses
 --------
