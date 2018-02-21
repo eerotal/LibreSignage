@@ -48,13 +48,19 @@
 		FALSE
 	);
 	if (!$flag_auth) {
-		api_throw(API_E_NOT_AUTHORIZED);
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Not authorized."
+		);
 	}
 
 	try {
 		$user = new User($user_name);
 	} catch (ArgException $e) {
-		api_throw(API_E_INVALID_REQUEST, $e);
+		throw new APIException(
+			API_E_INVALID_REQUEST,
+			"Failed to load user.", 0, $e
+		);
 	}
 	$user_quota = new UserQuota($user);
 

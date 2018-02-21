@@ -339,17 +339,6 @@ class User {
 		return password_verify($pass, $this->hash);
 	}
 
-	public function get_session_data() {
-		/*
-		*  Get data that can be set into the $_SESSION array.
-		*/
-		$this->_error_on_not_ready();
-		return array(
-			'user' => $this->get_name(),
-			'groups' => $this->get_groups()
-		);
-	}
-
 	public function set_password(string $password) {
 		if (strlen($password) > gtlim('PASSWORD_MAX_LEN')) {
 			throw new ArgException('Password too long.');

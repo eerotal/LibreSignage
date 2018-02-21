@@ -69,11 +69,17 @@
 				$both = TRUE
 			));
 			if (!$flag_auth) {
-				api_throw(API_E_NOT_AUTHORIZED);
+				throw new APIException(
+					API_E_NOT_AUTHORIZED,
+					"Not authorized."
+				);
 			}
 		} else {
 			// Slide with the supplied ID doesn't exist.
-			api_throw(API_E_INVALID_REQUEST);
+			throw new APIException(
+				API_E_INVALID_REQUEST,
+				"No such slide."
+			);
 		}
 		// Initially load the existing slide data.
 		$slide_data = $slide->get_data();
@@ -90,7 +96,10 @@
 			$both = FALSE
 		);
 		if (!$flag_auth) {
-			api_throw(API_E_NOT_AUTHORIZED);
+			throw new APIException(
+				API_E_NOT_AUTHORIZED,
+				"Not authorized."
+			);
 		}
 
 		// Set current user as the owner.
@@ -102,53 +111,73 @@
 	$tmp = preg_match('/[^a-zA-Z0-9_-]/',
 			$SLIDE_SAVE->get('name'));
 	if ($tmp) {
-		api_throw(API_E_INVALID_REQUEST);
+		throw new APIException(
+			API_E_INVALID_REQUEST,
+			"Invalid chars in slide name."
+		);
 	} else if ($tmp === NULL) {
-		api_throw(API_E_INTERNAL);
+		throw new APIException(
+			API_E_INTERNAL,
+			"preg_match() failed."
+		);
 	}
 	if (strlen($SLIDE_SAVE->get('name')) >
 			gtlim('SLIDE_NAME_MAX_LEN')) {
-		api_throw(API_E_LIMITED);
+		throw new APIException(
+			API_E_LIMITED,
+			"Slide name too long."
+		);
 	}
 	$slide_data['name'] = $SLIDE_SAVE->get('name');
 
 	// Make sure 0 <= index <= SLIDE_MAX_INDEX.
 	if ($SLIDE_SAVE->get('index') < 0 ||
 		$SLIDE_SAVE->get('index') > gtlim('SLIDE_MAX_INDEX')) {
-		api_throw(API_E_LIMITED);
+		throw new APIException(
+			API_E_LIMITED,
+			"Invalid slide index."
+		);
 	}
 	$slide_data['index'] = $SLIDE_SAVE->get('index');
 
 	// Make sure SLIDE_MIN_TIME <= time <= SLIDE_MAX_TIME.
 	if ($SLIDE_SAVE->get('time') < gtlim('SLIDE_MIN_TIME') ||
 		$SLIDE_SAVE->get('time') > gtlim('SLIDE_MAX_TIME')) {
-		api_throw(API_E_LIMITED);
+		throw new APIException(
+			API_E_LIMITED,
+			"Invalid slide time."
+		);
 	}
 	$slide_data['time'] = $SLIDE_SAVE->get('time');
 
 	// Make sure the size of the markup is not too big.
 	if (strlen($SLIDE_SAVE->get('markup')) >
 			gtlim('SLIDE_MARKUP_MAX_LEN')) {
-		api_throw(API_E_LIMITED);
+		throw new APIException(
+			API_E_LIMITED,
+			"Slide markup too long."
+		);
 	}
 	$slide_data['markup'] = $SLIDE_SAVE->get('markup');
 
 	if (!$slide->set_data($slide_data)) {
-		api_throw(API_E_INVALID_REQUEST);
+		throw new APIException(
+			API_E_INVALID_REQUEST,
+			"Failed to set slide data."
+		);
 	}
 
-	try {
-		if ($flag_new_slide) {
-			if (!$user_quota->use_quota('slides')) {
-				api_throw(API_E_QUOTA_EXCEEDED);
-			}
-			$user_quota->flush();
+	if ($flag_new_slide) {
+		if (!$user_quota->use_quota('slides')) {
+			throw new APIException(
+				API_E_QUOTA_EXCEEDED,
+				"Slide quota exceeded."
+			);
 		}
-		$slide->write();
-		juggle_slide_indices($slide->get('id'));
-	} catch (Exception $e) {
-		api_throw(API_E_INTERNAL, $e);
+		$user_quota->flush();
 	}
+	$slide->write();
+	juggle_slide_indices($slide->get('id'));
 
 	$SLIDE_SAVE->resp_set($slide->get_data());
 	$SLIDE_SAVE->send();

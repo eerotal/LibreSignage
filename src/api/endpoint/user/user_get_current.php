@@ -29,7 +29,10 @@
 	api_endpoint_init($USER_GET, auth_session_user());
 
 	if (!auth_is_authorized(NULL, NULL, FALSE)) {
-		api_throw(API_E_NOT_AUTHORIZED);
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Not authorized."
+		);
 	}
 
 	$u = auth_session_user();

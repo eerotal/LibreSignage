@@ -286,7 +286,10 @@ class APIEndpoint {
 			$resp_str = json_encode($this->response);
 			if ($resp_str === FALSE &&
 				json_last_error() != JSON_ERROR_NONE) {
-				api_throw(API_E_INTERNAL);
+				throw new APIException(
+					API_E_INTERNAL,
+					"Failed to encode response JSON."
+				);
 			}
 			echo $resp_str;
 			exit(0);
@@ -305,7 +308,10 @@ function api_endpoint_init(APIEndpoint $endpoint, $user) {
 
 	// Use the API rate quota of the caller.
 	if ($user == NULL) {
-		api_throw(API_E_NOT_AUTHORIZED);
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Not logged in."
+		);
 	}
 
 	$quota = new UserQuota($user);
@@ -323,14 +329,19 @@ function api_endpoint_init(APIEndpoint $endpoint, $user) {
 	}
 
 	if (!$quota->use_quota('api_rate')) {
-		api_throw(API_E_RATE);
+		throw new APIException(
+			API_E_RATE,
+			"API rate limited."
+		);
 	}
 	$quota->flush();
 
 	try {
 		$endpoint->load_data();
 	} catch(Exception $e) {
-		api_throw($endpoint->last_error(), $e);
+		throw new APIException(
+			$endpoint->last_error(),
+			"API endpoint error.", 0, $e);
 	}
 	header('Content-Type: '.$endpoint->get_content_type());
 }

@@ -34,13 +34,19 @@
 	api_endpoint_init($USER_GET, auth_session_user());
 
 	if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
-		api_throw(API_E_NOT_AUTHORIZED);
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Not authorized."
+		);
 	}
 
 	try {
 		$u = new User($USER_GET->get('user'));
 	} catch (ArgException $e) {
-		api_throw(API_E_INVALID_REQUEST, $e);
+		throw new APIException(
+			API_E_INVALID_REQUEST,
+			"Failed to load user.", 0, $e
+		);
 	}
 
 	$ret_data = array(

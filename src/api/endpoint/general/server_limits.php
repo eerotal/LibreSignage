@@ -25,7 +25,7 @@
 	api_endpoint_init($SERVER_LIMITS, auth_session_user());
 
 	if (!auth_is_authorized(NULL, NULL, FALSE)) {
-		api_throw(API_E_NOT_AUTHORIZED);
+		throw new APIException(API_E_NOT_AUTHORIZED);
 	}
 
 	$SERVER_LIMITS->resp_set(array('limits' => LS_LIM));

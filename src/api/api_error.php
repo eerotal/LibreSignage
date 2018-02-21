@@ -66,33 +66,56 @@ const API_E_MSG = array(
 */
 define("API_ERROR_TRACE", LIBRESIGNAGE_DEBUG);
 
-function api_throw($errcode, $exception=NULL) {
-	/*
-	*  Throw the API error code $errcode. Additionally
-	*  include exception information in the response
-	*  if $exception != NULL and API_ERROR_TRACE is TRUE.
-	*/
-	$err = array(
-		'error' => $errcode
-	);
+class APIException extends Exception {
+	private $api_err = 0;
 
-	if (API_ERROR_TRACE) {
-		$bt = debug_backtrace();
-		$err['thrown_at'] = $bt[0]['file'].' @ ln: '.
-					$bt[0]['line'];
-		if ($exception) {
-			$err['e_msg'] = $exception->getMessage();
-			$err['e_trace'] = $exception->getTraceAsString();
+	public function __construct(int $api_err,
+				string $message = "",
+				int $code = 0,
+				Throwable $previous = NULL) {
+
+		$this->api_err = $api_err;
+		parent::__construct($message, $code, $previous);
+	}
+
+	public function get_api_err() {
+		return $this->api_err;
+	}
+
+	public static function __to_api_string(int $api_err,
+					Throwable $e) {
+		/*
+		*  Get the JSON string representation of an
+		*  Exception object.
+		*/
+		$err = array(
+			'error' => $api_err
+		);
+
+		if (API_ERROR_TRACE) {
+			$err['thrown_at'] = $e->getFile().' @ ln: '.
+						$e->getLine();
+			$err['e_msg'] = $e->getMessage();
+			$err['e_trace'] = $e->getTraceAsString();
 		}
-	}
 
-	$err_str = json_encode($err);
-	if ($err_str == FALSE &&
-		json_last_error() != JSON_ERROR_NONE) {
-		echo '{"error": '.API_E_INTERNAL.'}';
-		exit(0);
+		$err_str = json_encode($err);
+		if ($err_str == FALSE &&
+			json_last_error() != JSON_ERROR_NONE) {
+			return '{"error": '.API_E_INTERNAL.'}';
+		}
+		return $err_str;
 	}
-	echo $err_str;
-	exit(0);
 }
 
+set_exception_handler(function(Throwable $e) {
+	/*
+	*  Set the exception handler for the API system.
+	*/
+	if (get_class($e) == 'APIException') {
+		echo APIException::__to_api_string($e->get_api_err(), $e);
+	} else {
+		echo APIException::__to_api_string(API_E_INTERNAL, $e);
+	}
+	exit(1);
+});
