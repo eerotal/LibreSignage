@@ -21,10 +21,10 @@
 		$response_type = API_RESPONSE['JSON'],
 		$format = NULL
 	);
-	api_endpoint_init($SERVER_LIMITS);
-
 	session_start();
 	auth_init();
+	api_endpoint_init($SERVER_LIMITS, auth_session_user());
+
 	if (!auth_is_authorized(NULL, NULL, FALSE)) {
 		api_throw(API_E_NOT_AUTHORIZED);
 	}

@@ -1,5 +1,10 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
+
+	session_start();
+	auth_init();
+	auth_is_authorized(NULL, NULL, TRUE);
 
 	// Load the documentation list.
 	$docs = @scandir(LIBRESIGNAGE_ROOT.DOC_HTML_DIR);

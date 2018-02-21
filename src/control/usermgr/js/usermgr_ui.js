@@ -304,7 +304,7 @@ function usermgr_make_ui() {
 }
 
 function usermgr_ui_setup() {
-	api_load_limits(() => {
+	api_init(() => {
 		users_load(function() {
 			usermgr_make_ui();
 		});

@@ -27,9 +27,9 @@
 			'id' => API_P_STR
 		)
 	);
-	api_endpoint_init($SLIDE_RM);
 	session_start();
 	auth_init();
+	api_endpoint_init($SLIDE_RM, auth_session_user());
 
 	$slide = new Slide();
 	if (!$slide->load($SLIDE_RM->get('id'))) {

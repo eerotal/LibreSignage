@@ -27,10 +27,10 @@
 		$response_type = API_RESPONSE['JSON'],
 		$format = NULL
 	);
-	api_endpoint_init($USERS_GET_ALL);
-
 	session_start();
 	auth_init();
+	api_endpoint_init($USERS_GET_ALL, auth_session_user());
+
 	if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
 		api_throw(API_E_NOT_AUTHORIZED);
 	}

@@ -5,6 +5,8 @@
 */
 
 var SERVER_LIMITS = null;
+var API_E_MESSAGES = null;
+var API_E = null;
 
 var API_ENDP = {
 	// -- User management API endpoints --
@@ -60,6 +62,14 @@ var API_ENDP = {
 	},
 
 	// -- General information API endpoints --
+	API_ERR_CODES: {
+		uri:	"/api/endpoint/general/api_err_codes.php",
+		method:	"GET"
+	},
+	API_ERR_MSGS: {
+		uri:	"/api/endpoint/general/api_err_msgs.php",
+		method:	"GET"
+	},
 	SERVER_LIMITS: {
 		uri:	"/api/endpoint/general/server_limits.php",
 		method: "GET"
@@ -72,16 +82,6 @@ var API_ENDP = {
 		uri:	"/api/endpoint/general/libresignage_license.php",
 		methof:	"GET"
 	}
-}
-
-var API_E = {
-	OK:			0,
-	INTERNAL: 		1,
-	INVALID_REQUEST: 	2,
-	NOT_AUTHORIZED:		3,
-	QUOTA_EXCEEDED:		4,
-	LIMITED:		5,
-	CLIENT:			6
 }
 
 function _api_construct_GET_data(data) {
@@ -161,48 +161,50 @@ function api_call(endpoint, data, callback) {
 function api_handle_disp_error(err, callback) {
 	var h = "";
 	var p = "";
-	switch(err) {
-		case API_E.OK:
-			return;
-		case API_E.INTERNAL:
-			h = "Internal server error";
-			p = "The server encountered an internal " +
-				"server error.";
-			break;
-		case API_E.INVALID_REQUEST:
-			h = "Invalid request";
-			p = "The server responded with an invalid " +
-				"request error. This is probably due " +
-				"to a software bug.";
-			break;
-		case API_E.NOT_AUTHORIZED:
-			h = "Not authorized";
-			p = "You are not authorized to perform this " +
-				"action.";
-			break;
-		case API_E.QUOTA_EXCEEDED:
-			h = "Quota exceeded";
-			p = "You have exceeded your quota for " +
-				"this action.";
-			break;
-		case API_E.LIMITED:
-			h = "Limited";
-			p = "The server prevented this action because " +
-				"a limit would have been exceeded."
-			break;
-		case API_E.CLIENT:
-			h = "Client error";
-			p = "The client encountered an error.";
-			break;
-		default:
-			h = "Unknown error";
-			p = "The server encountered an unknown error.";
-			break;
-	}
 
+	if (err == 0) { return 0; }
+
+	if (!API_E_MESSAGES) {
+		h = "Error";
+		p = "An error was encountered, but a more detailed " +
+			"error description can't be shown because the " +
+			"error messages haven't been loaded.";
+	} else if (err in Object.keys(API_E_MESSAGES)) {
+		h = API_E_MESSAGES[err].short;
+		p = API_E_MESSAGES[err].long;
+	} else {
+		h = "Unknown error";
+		p = "The server encountered an unknown error.";
+	}
 	dialog(DIALOG.ALERT, h, p, callback);
 	console.error("LibreSignage: " + p);
 	return err;
+}
+
+function api_load_error_codes(callback) {
+	api_call(API_ENDP.API_ERR_CODES, null, (resp) => {
+		if (api_handle_disp_error(resp.error)) {
+			throw new Error("Failed to initialize API " +
+					"interface.");
+		}
+		API_E = resp.codes;
+		if (callback) {
+			callback();
+		}
+	});
+}
+
+function api_load_error_msgs(callback) {
+	api_call(API_ENDP.API_ERR_MSGS, null, (resp) => {
+		if (api_handle_disp_error(resp.error)) {
+			throw new Error("Failed to initialize API " +
+					"interface");
+		}
+		API_E_MESSAGES = resp.messages;
+		if (callback) {
+			callback();
+		}
+	});
 }
 
 function api_load_limits(callback) {
@@ -210,11 +212,25 @@ function api_load_limits(callback) {
 		if (api_handle_disp_error(resp.error)) {
 			throw new Error("Failed to initialize API " +
 					"interface.");
-			return;
 		}
 		SERVER_LIMITS = resp.limits;
 		if (callback) {
 			callback();
 		}
+	});
+}
+
+function api_init(callback) {
+	/*
+	*  Initialize the API interface.
+	*/
+	api_load_error_codes(() => {
+		api_load_error_msgs(() => {
+			api_load_limits(() => {
+				console.log("LibreSignage API " +
+						"initialized!");
+				callback();
+			});
+		});
 	});
 }

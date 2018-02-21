@@ -224,7 +224,7 @@ function slide_preview() {
 }
 
 function editor_setup() {
-	api_load_limits(() => {
+	api_init(() => {
 		// Setup input validators.
 		name_validator = new StrValidator(
 			{

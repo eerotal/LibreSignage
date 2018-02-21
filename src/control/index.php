@@ -28,15 +28,14 @@
 					<h1>Welcome to LibreSignage!</h1>
 				</div>
 			</div>
-			<div class="row container-fluid mx-auto">
-				<div class="col-md-6">
-					<div class="bg-primary text-white ctrl-panel-col">
-						<h4>Your quota</h4>
-						<div id="user-quota-cont">
-						</div>
+			<div class="row ctrl-panel-row container-fluid">
+				<div class="col-md-6 ctrl-panel-col">
+					<h4>Your quota</h4>
+					<div id="user-quota-cont">
 					</div>
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-6 ctrl-panel-col cont-info-primary">
+					<h4>Problems using LibreSignage?</h4>
 					<p>This LibreSignage instance is
 					maintained by <?php echo ADMIN_NAME; ?>.
 					If you have any problems using

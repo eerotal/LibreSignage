@@ -17,6 +17,7 @@
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
@@ -27,7 +28,9 @@
 		$response_type = API_RESPONSE['JSON'],
 		$format = NULL
 	);
-	api_endpoint_init($SLIDE_DATA_QUERY);
+	session_start();
+	auth_init();
+	api_endpoint_init($SLIDE_DATA_QUERY, auth_session_user());
 
 	// Check that the requested keys are in the required keys array.
 	if (!count($SLIDE_DATA_QUERY->get()) || !array_is_subset(

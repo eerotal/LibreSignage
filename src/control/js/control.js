@@ -35,5 +35,6 @@ function ctrl_setup() {
 	});
 }
 
-
-ctrl_setup();
+api_init(() => {
+	ctrl_setup();
+});
