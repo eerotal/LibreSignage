@@ -63,6 +63,10 @@
 		'slides' => array(
 			'limit' => 2,
 			'disp' => 'Slides'
+		),
+		'api_calls' => array(
+			'limit' => 100,
+			'disp' => 'API call quota (calls/min)'
 		)
 	);
 
