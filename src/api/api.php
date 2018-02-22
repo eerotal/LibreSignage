@@ -7,25 +7,25 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
 // API Endpoint request methods.
-define("API_METHOD", array(
+const API_METHOD = array(
 	"GET" => 0,
 	"POST" => 1
-));
+);
 
 // API Endpoint response types.
-define("API_RESPONSE", array(
+const API_RESPONSE = array(
 	"JSON" => 0,
 	"TEXT" => 1
-));
+);
 
 // API parameter bitmasks.
-define("API_P_STR",		0x1);
-define("API_P_INT",		0x2);
-define("API_P_FLOAT",		0x4);
-define("API_P_ARR",		0x8);
-define("API_P_OPT",		0x10);
-define("API_P_STR_ALLOW_EMPTY", 0x20);
-define("API_P_NULL",		0x40);
+const API_P_STR			= 0x1;
+const API_P_INT			= 0x2;
+const API_P_FLOAT		= 0x4;
+const API_P_ARR			= 0x8;
+const API_P_OPT			= 0x10;
+const API_P_STR_ALLOW_EMPTY	= 0x20;
+const API_P_NULL		= 0x40;
 
 class APIEndpoint {
 	private $method = 0;
@@ -33,12 +33,14 @@ class APIEndpoint {
 	private $response = NULL;
 	private $format = NULL;
 	private $strict_format = TRUE;
+	private $req_quota = TRUE;
 	private $data = NULL;
 	private $inited = FALSE;
 	private $error = 0;
 
 	function __construct(int $method, int $response_type,
-				$format, bool $strict_format=TRUE) {
+				$format, bool $strict_format=TRUE,
+				bool $req_quota=TRUE) {
 		if (!in_array($method, API_METHOD)) {
 			throw new ArgException('Invalid API method!');
 		}
@@ -48,6 +50,7 @@ class APIEndpoint {
 		$this->method = $method;
 		$this->format = $format;
 		$this->strict_format = $strict_format;
+		$this->req_quota = $req_quota;
 		$this->response_type = $response_type;
 	}
 
@@ -259,6 +262,10 @@ class APIEndpoint {
 		return $this->inited;
 	}
 
+	function requires_quota() {
+		return $this->req_quota;
+	}
+
 	function resp_set($resp) {
 		/*
 		*  Set the API response data.
@@ -307,8 +314,6 @@ function api_endpoint_init(APIEndpoint $endpoint, $user) {
 	*/
 
 	api_error_setup();
-
-	// Use the API rate quota of the caller.
 	if ($user == NULL) {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,
@@ -316,34 +321,41 @@ function api_endpoint_init(APIEndpoint $endpoint, $user) {
 		);
 	}
 
-	$quota = new UserQuota($user);
-	if ($quota->has_state_var('api_t_start')) {
-		$t = $quota->get_state_var('api_t_start');
-		if (time() - $t >= gtlim('API_RATE_T')) {
-			// Reset rate quota and time after the cutoff.
+	// Use the API rate quota of the caller if required.
+	if ($endpoint->requires_quota()) {
+		$quota = new UserQuota($user);
+		if ($quota->has_state_var('api_t_start')) {
+			$t = $quota->get_state_var('api_t_start');
+			if (time() - $t >= gtlim('API_RATE_T')) {
+				/*
+				*  Reset rate quota and time
+				*  after the cutoff.
+				*/
+				$quota->set_state_var('api_t_start',
+							time());
+				$quota->set_quota('api_rate', 0);
+			}
+		} else {
+			// Start counting time.
 			$quota->set_state_var('api_t_start', time());
-			$quota->set_quota('api_rate', 0);
 		}
 
-	} else {
-		// Start counting time.
-		$quota->set_state_var('api_t_start', time());
+		if (!$quota->use_quota('api_rate')) {
+			throw new APIException(
+				API_E_RATE,
+				"API rate limited."
+			);
+		}
+		$quota->flush();
 	}
-
-	if (!$quota->use_quota('api_rate')) {
-		throw new APIException(
-			API_E_RATE,
-			"API rate limited."
-		);
-	}
-	$quota->flush();
 
 	try {
 		$endpoint->load_data();
 	} catch(Exception $e) {
 		throw new APIException(
 			$endpoint->last_error(),
-			"API endpoint error.", 0, $e);
+			"API endpoint error.", 0, $e
+		);
 	}
 	header('Content-Type: '.$endpoint->get_content_type());
 }

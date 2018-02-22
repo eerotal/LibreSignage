@@ -22,7 +22,7 @@ const quota_bar = (name, val, min, max) => `
 
 function ctrl_setup() {
 	api_call(API_ENDP.USER_GET_QUOTA, null, (resp) => {
-		if (resp.error) {
+		if (api_handle_disp_error(resp.error)) {
 			throw new Error("API exception while loading " +
 					"user quota.");
 		}
