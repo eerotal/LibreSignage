@@ -306,6 +306,8 @@ function api_endpoint_init(APIEndpoint $endpoint, $user) {
 	*  endpoint.
 	*/
 
+	api_error_setup();
+
 	// Use the API rate quota of the caller.
 	if ($user == NULL) {
 		throw new APIException(

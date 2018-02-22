@@ -76,16 +76,8 @@
 	/*
 	*  Setup error handling and reporting.
 	*/
-	if (LIBRESIGNAGE_DEBUG) {
-		error_reporting(E_ALL);
-		ini_set('display_errors', 1);
-		error_set_debug(TRUE);
-	}
-
-	set_exception_handler(function(Throwable $e) {
-		error_handle(500, $e);
-	});
-
+	error_setup();
+	error_set_debug(LIBRESIGNAGE_DEBUG);
 
 	function gtlim(string $lim) {
 		return LS_LIM[$lim];
@@ -100,4 +92,3 @@
 	}
 	// Prevent namespace pollution.
 	unset($max_slides);
-
