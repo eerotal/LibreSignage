@@ -39,13 +39,13 @@
 	if (in_array($SLIDE_GET->get('id'), $list)) {
 		// Get by ID.
 		$slide = new Slide();
-		try {
-			$slide->load($SLIDE_GET->get('id'));
-		} catch (Exception $e) {
-			api_throw(API_E_INTERNAL, $e);
-		}
+		$slide->load($SLIDE_GET->get('id'));
 
 		$SLIDE_GET->resp_set($slide->get_data());
 		$SLIDE_GET->send();
 	}
-	api_throw(API_E_INVALID_REQUEST);
+
+	throw new APIException(
+		API_E_INVALID_REQUEST,
+		"Slide doesn't exist."
+	);

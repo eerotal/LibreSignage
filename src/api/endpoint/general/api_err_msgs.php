@@ -3,7 +3,8 @@
 /*
 *  ====>
 *
-*  *Get the messages corresponding to different API error codes.*
+*  *Get the messages corresponding to different API error codes.
+*  This endpoint doesn't require or consume the API rate quota.*
 *
 *  Return value
 *    * messages = A dictionary of error messages.
@@ -19,7 +20,9 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 $API_ERR_MSGS = new APIEndpoint(
 	$method = API_METHOD['GET'],
 	$response_type = API_RESPONSE['JSON'],
-	$format = NULL
+	$format = NULL,
+	$strict_format = TRUE,
+	$req_quota = FALSE
 );
 session_start();
 api_endpoint_init($API_ERR_MSGS, auth_session_user());

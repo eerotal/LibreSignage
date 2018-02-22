@@ -66,23 +66,35 @@
 	// Check for authorization.
 	if (!$auth_admin && !$auth_usr) {
 		// Not logged in.
-		api_throw(API_E_NOT_AUTHORIZED);
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Not logged in."
+		);
 	}
 
 	if ($USER_SAVE->has('pass', TRUE) && !$auth_usr) {
-		// Case a) check.
-		api_throw(API_E_NOT_AUTHORIZED);
+		// Case 1. check.
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Admins can't change password of other users."
+		);
 	}
 
 	if ($USER_SAVE->has('groups', TRUE) && !$auth_admin) {
-		// Case b) check.
-		api_throw(API_E_NOT_AUTHORIZED);
+		// Case 2. check.
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Non-admin users can't set groups."
+		);
 	}
 
 	try {
 		$u = new User($USER_SAVE->get('user'));
 	} catch (ArgException $e) {
-		api_throw(API_E_INVALID_REQUEST, $e);
+		throw new APIException(
+			API_E_INVALID_REQUEST,
+			"Failed to load user.", 0, $e
+		);
 	}
 
 	if ($USER_SAVE->has('pass', TRUE)) {
@@ -91,26 +103,26 @@
 	if ($USER_SAVE->has('groups', TRUE)) {
 		if (count(preg_grep(GROUP_NAME_COMP_REGEX,
 				$USER_SAVE->get('groups')))) {
-			api_throw(API_E_INVALID_REQUEST,
-				new Exception(
-					'Invalid chars in '.
-					'group names.'
-				)
+			throw new APIException(
+				API_E_INVALID_REQUEST,
+				"Invalid chars in groups names."
 			);
 		}
 		try {
 			$u->set_groups($USER_SAVE->get('groups'));
 		} catch (Exception $e) {
-			api_throw(API_E_LIMITED, $e);
+			throw new APIException(
+				API_E_LIMITED,
+				"Failed to set user groups.", 0, $e
+			);
 		}
 	}
 
-	try {
-		if ($u->write() === FALSE) {
-			api_throw(API_E_LIMITED);
-		}
-	} catch (Exception $e) {
-		api_throw(API_E_INTERNAL, $e);
+	if ($u->write() === FALSE) {
+		throw new APIException(
+			API_E_LIMITED,
+			"Failed to write userdata."
+		);
 	}
 
 	$ret = array(

@@ -41,11 +41,17 @@
 	api_endpoint_init($USER_CREATE, auth_session_user());
 
 	if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
-		api_throw(API_E_NOT_AUTHORIZED);
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Not authorized."
+		);
 	}
 
 	if (user_exists($USER_CREATE->get('user'))) {
-		api_throw(API_E_INVALID_REQUEST);
+		throw new APIException(
+			API_E_INVALID_REQUEST,
+			"User already exists."
+		);
 	}
 
 	$user = new User();
@@ -53,14 +59,18 @@
 
 	// Validate user name.
 	if (preg_match(USER_REGEX, $USER_CREATE->get('user'))) {
-		api_throw(API_E_INVALID_REQUEST,
-			new Exception('Invalid chars in group names.')
+		throw new APIException(
+			API_E_INVALID_REQUEST,
+			"Invalid chars in group names."
 		);
 	}
 	try {
 		$user->set_name($USER_CREATE->get('user'));
 	} catch (Exception $e) {
-		api_throw(API_E_LIMITED, $e);
+		throw new APIException(
+			API_E_LIMITED,
+			"Limited.", 0, $e
+		);
 	}
 
 	// Validate group names.
@@ -68,34 +78,37 @@
 		if (count(preg_grep(GROUPS_REGEX,
 			$USER_CREATE->get('groups')))) {
 
-			api_throw(API_E_INVALID_REQUEST,
-				new Exception(
-					'Invalid chars in '.
-					'group names.'
-				)
+			throw new APIException(
+				API_E_INVALID_REQUEST,
+				"Invalid chars in group names."
 			);
 		}
 		try {
 			$user->set_groups($USER_CREATE->get('groups'));
 		} catch (Exception $e) {
-			api_throw(API_E_LIMITED, $e);
+			throw new APIException(
+				API_E_LIMITED,
+				"Limited.", 0, $e
+			);
 		}
 	}
 
 	try {
 		$tmp_pass = gen_passwd(DEFAULT_PASSWD_LEN);
 	} catch (Exception $e) {
-		api_throw(API_E_INTERNAL, $e);
+		throw new APIException(
+			API_E_INTERNAL,
+			"Failed to generate password.", 0, $e
+		);
 	}
 	$user->set_password($tmp_pass);
 	$user->set_ready(TRUE);
 
-	try {
-		if ($user->write() === FALSE) {
-			api_throw(API_E_LIMITED);
-		}
-	} catch (Exception $e) {
-		api_throw(API_E_INTERNAL, $e);
+	if ($user->write() === FALSE) {
+		throw new APIException(
+			API_E_LIMITED,
+			"Too many users."
+		);
 	}
 
 	$ret = array(

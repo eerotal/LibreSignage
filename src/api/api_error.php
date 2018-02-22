@@ -5,7 +5,16 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
-// API errors
+/*
+*  This controls whether the API exception handler returns
+*  detailed exception information in the JSON error message.
+*/
+const API_ERROR_TRACE = LIBRESIGNAGE_DEBUG;
+
+/*
+*  API error codes. These can be fetched via the
+*  api_err_codes.php API endpoint.
+*/
 const API_E = array(
 	"API_E_OK"		=> 0,
 	"API_E_INTERNAL"	=> 1,
@@ -17,11 +26,15 @@ const API_E = array(
 	"API_E_RATE"		=> 7
 );
 
-// Define the error codes in the symbol table too.
+// Define the error codes in the global namespace too.
 foreach (API_E as $err => $code) {
 	define($err, $code);
 }
 
+/*
+*  Human readabled API error messages. These can be
+*  fetched via the api_err_msgs.php API endpoint.
+*/
 const API_E_MSG = array(
 	API_E_OK => array(
 		"short" =>"No error",
@@ -57,42 +70,76 @@ const API_E_MSG = array(
 		"short" => "API rate limited",
 		"long" => "The server ignored an API call because the ".
 			"API rate limit was exceeded."
-	)
-);
+	));
 
-/*
-*  Return detailed stack trace information with
-*  API errors when this is TRUE.
-*/
-define("API_ERROR_TRACE", LIBRESIGNAGE_DEBUG);
+class APIException extends Exception {
+	private $api_err = 0;
+	public function __construct(int $api_err,
+				string $message = "",
+				int $code = 0,
+				Throwable $previous = NULL) {
 
-function api_throw($errcode, $exception=NULL) {
-	/*
-	*  Throw the API error code $errcode. Additionally
-	*  include exception information in the response
-	*  if $exception != NULL and API_ERROR_TRACE is TRUE.
-	*/
-	$err = array(
-		'error' => $errcode
-	);
+		$this->api_err = $api_err;
+		parent::__construct($message, $code, $previous);
+	}
 
-	if (API_ERROR_TRACE) {
-		$bt = debug_backtrace();
-		$err['thrown_at'] = $bt[0]['file'].' @ ln: '.
-					$bt[0]['line'];
-		if ($exception) {
-			$err['e_msg'] = $exception->getMessage();
-			$err['e_trace'] = $exception->getTraceAsString();
+	public function get_api_err() {
+		return $this->api_err;
+	}
+
+	public static function _to_api_string(int $api_err,
+					Throwable $e) {
+		/*
+		*  Get the JSON string representation of an
+		*  Exception object. $api_err is an API error code
+		*  and $e is the exception object.
+		*/
+		$err = array(
+			'error' => $api_err
+		);
+
+		if (API_ERROR_TRACE) {
+			$err['thrown_at'] = $e->getFile().' @ ln: '.
+						$e->getLine();
+			$err['e_msg'] = $e->getMessage();
+			$err['e_trace'] = $e->getTraceAsString();
 		}
-	}
 
-	$err_str = json_encode($err);
-	if ($err_str == FALSE &&
-		json_last_error() != JSON_ERROR_NONE) {
-		echo '{"error": '.API_E_INTERNAL.'}';
-		exit(0);
+		$err_str = json_encode($err);
+		if ($err_str == FALSE &&
+			json_last_error() != JSON_ERROR_NONE) {
+			return '{"error": '.API_E_INTERNAL.'}';
+		}
+		return $err_str;
 	}
-	echo $err_str;
-	exit(0);
 }
 
+function api_error_setup() {
+	/*
+	*  Setup exception handling for the API system.
+	*/
+	set_exception_handler(function(Throwable $e) {
+		try {
+			if (get_class($e) == 'APIException') {
+				echo APIException::_to_api_string(
+						$e->get_api_err(), $e
+				);
+			} else {
+				echo APIException::_to_api_string(
+					API_E_INTERNAL, $e
+				);
+			}
+			exit(1);
+		} catch (Exception $e) {
+			/*
+			*  Exceptions thrown in the exception handler
+			*  cause hard to debug fatal errors. Handle them.
+			*/
+			echo '{"error":'.API_E_INTERNAL.','.
+				'"e_msg":"Exception thrown in the '.
+				'exception handler on line '.
+				$e->getLine().'."}';
+			exit(1);
+		}
+	});
+}

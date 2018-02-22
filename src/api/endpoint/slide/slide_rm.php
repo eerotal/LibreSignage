@@ -33,14 +33,20 @@
 	$slide = new Slide();
 	if (!$slide->load($SLIDE_RM->get('id'))) {
 		// Slide doesn't exist.
-		api_throw(API_E_INVALID_REQUEST);
+		throw new APIException(
+			API_E_INVALID_REQUEST,
+			"Slide doesn't exist."
+		);
 	}
 
 	// Get the slide owner's quota for freeing some of it.
 	try {
 		$slide_owner = new User($slide->get('owner'));
 	} catch (ArgException $e){
-		api_throw(API_E_INVALID_REQUEST, $e);
+		throw new APIException(
+			API_E_INVALID_REQUEST,
+			"Failed to load slide.", 0, $e
+		);
 	}
 	$slide_owner_quota = new UserQuota($slide_owner);
 
@@ -59,14 +65,14 @@
 		$both = TRUE
 	);
 	if (!$flag_auth) {
-		api_throw(API_E_NOT_AUTHORIZED);
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Not authorized."
+		);
 	}
 
-	try {
-		$slide->remove();
-		$slide_owner_quota->free_quota('slides');
-		$slide_owner_quota->flush();
-	} catch (Exception $e) {
-		api_throw(API_E_INTERNAL, $e);
-	}
+	$slide->remove();
+	$slide_owner_quota->free_quota('slides');
+	$slide_owner_quota->flush();
+
 	$SLIDE_RM->send();

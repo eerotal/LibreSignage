@@ -32,7 +32,10 @@
 	api_endpoint_init($USERS_GET_ALL, auth_session_user());
 
 	if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
-		api_throw(API_E_NOT_AUTHORIZED);
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Not authorized."
+		);
 	}
 
 	$users = user_array();
