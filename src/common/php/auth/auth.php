@@ -136,7 +136,7 @@ function auth_is_authorized(array $groups = NULL,
 
 		// ==> Not authorized.
 		if ($redir) {
-			error_handle(403);
+			error_handle(HTTP_ERR_403);
 		} else {
 			return FALSE;
 		}

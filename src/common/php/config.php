@@ -59,6 +59,10 @@
 		"API_RATE_T"			=> 60
 	);
 
+	function gtlim(string $lim) {
+		return LS_LIM[$lim];
+	}
+
 	// User quota limits.
 	const DEFAULT_QUOTA = array(
 		'slides' => array(
@@ -72,16 +76,11 @@
 		)
 	);
 
-
 	/*
 	*  Setup error handling and reporting.
 	*/
 	error_setup();
 	error_set_debug(LIBRESIGNAGE_DEBUG);
-
-	function gtlim(string $lim) {
-		return LS_LIM[$lim];
-	}
 
 	// Do some checks on the configured values.
 	$max_slides = DEFAULT_QUOTA['slides']['limit']*gtlim('MAX_USERS');

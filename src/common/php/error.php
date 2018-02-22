@@ -70,28 +70,13 @@ function _notify_contact_admin() {
 		"into the email.";
 }
 
-function error_exception_in_handler(Throwable $e) {
-	/*
-	*  Handle exceptions thrown in the configured
-	*  exception handler.
-	*/
-	if ($ERROR_DEBUG) {
-		header('Content-Type: text/plain');
-		echo "\n### ".get_class($e)." thrown in the ".
-				"exception handler ###\n";
-		echo $e->__toString();
-		_notify_contact_admin();
-		exit(1);
-	}
-}
-
 function error_handle(int $code, Throwable $e = NULL) {
 	/*
-	*  When $ERROR_DEBUG == FALSE:
-	*    Redirect the client to the error page corresponding
-	*    to the HTTP error code $code. If $e != NULL, log it.
-	*  When $ERROR_DEBUG == TRUE:
-	*    Echo the exception information to the client.
+	*  Redirect the client to the error page corresponding
+	*  to the HTTP error code $code. Additionally echo the
+	*  exception $e to the client if $ERROR_DEBUG == TRUE
+	*  and $e != NULL. If $ERROR_DEBUG == FALSE, the
+	*  exception is logged instead of echoing.
 	*/
 	global $ERROR_DEBUG;
 
@@ -120,6 +105,13 @@ function error_handle(int $code, Throwable $e = NULL) {
 		*  Exceptions thrown in the exception handler cause
 		*  hard to debug fatal errors. Handle them.
 		*/
-		error_exception_in_handler();
+		if ($ERROR_DEBUG) {
+			header('Content-Type: text/plain');
+			echo "\n### ".get_class($e)." thrown in the ".
+					"exception handler ###\n";
+			echo $e->__toString();
+			_notify_contact_admin();
+		}
+		exit(1);
 	}
 }
