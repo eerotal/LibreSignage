@@ -1,5 +1,5 @@
 :root {
-	--footer-height: 40px;
+	--footer-height: 2.5rem;
 }
 
 html {
@@ -20,6 +20,7 @@ body {
 
 .footer-content {
 	line-height: var(--footer-height);
+	padding: 0;
 	padding-left: 15px;
 	padding-right: 15px;
 }

@@ -4,7 +4,9 @@ const quota_bar = (name, val, min, max) => `
 	<h6>${name}</h6>
 
 	<div class="row quota-bar">
-		<div class="p-0 m-0 col-2">${val}/${max}</div>
+		<div class="p-0 pr-2 m-0 col-2 text-right">
+			${val}/${max}
+		</div>
 		<div class="col-10 progress quota-bar">
 			<div class="progress-bar bg-success
 					progress-bar-striped"
