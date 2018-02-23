@@ -14,95 +14,107 @@ Heading
   | Syntax: ``[h size][/h]``
   | Type:   ``inline``
 
-  Display a heading. ``size`` is the size of the heading in percents
-  relative to the height of the viewport.
+Display a heading. ``size`` is the size of the heading in percents
+relative to the height of the viewport.
+
 
 Lead
   | Syntax: ``[lead][/lead]``
   | Type:   ``inline``
   
-  Display a lead paragraph. The default font size for lead paragraphs
-  is 4% of the viewport height. The font size can be changed using the
-  ``[size][/size]`` class.
+Display a lead paragraph. The default font size for lead paragraphs
+is 4% of the viewport height. The font size can be changed using the
+``[size][/size]`` class.
+
 
 Bold text
   | Syntax: ``[b][/b]``
   | Type:   ``inline``
 
-  Display **bold** text.
+Display **bold** text.
+
 
 Italics text
   | Syntax: ``[i][/i]``
   | Type:   ``inline``
 
-  Display *italic* text.
+Display *italic* text.
+
 
 Image
   | Syntax: ``[img address width height]``
   | Type:   ``inline``
 
-  The image class can be used to embed an image. ``address`` is the URL
-  address of the image, ``width`` is the width of the image and
-  ``height`` is the height of the image. The dimensions are measured
-  in percents of the horizontal and vertical viewport dimensions
-  respectively.
+The image class can be used to embed an image. ``address`` is the URL
+address of the image, ``width`` is the width of the image and
+``height`` is the height of the image. The dimensions are measured
+in percents of the horizontal and vertical viewport dimensions
+respectively.
 
-  *Example: If the width is set to 50, the width of the image is 50% of
-  the **width** of the viewport. If the height is also set to 50, the
-  height of the image is 50% of the **height** of the viewport.*
+*Example: If the width is set to 50, the width of the image is 50% of
+the **width** of the viewport. If the height is also set to 50, the
+height of the image is 50% of the **height** of the viewport.*
+
 
 Paragraph
   | Syntax: ``[p][/p]``
   | Type:   ``inline``
 
-  Display a paragraph. The default font size for paragraphs is 3% of
-  the viewport height. The font size can be changed using the
-  ``[size][/size]`` class.
+Display a paragraph. The default font size for paragraphs is 3% of
+the viewport height. The font size can be changed using the
+``[size][/size]`` class.
+
 
 Color
   | Syntax: ``[color col][/color]``
   | Type:   ``inline``
 
-  Set the color of text. All text inside this class will have the color
-  set by this class if no nested classes change the color. ``col`` is
-  the name of the color or a hexadecimal color code.
+Set the color of text. All text inside this class will have the color
+set by this class if no nested classes change the color. ``col`` is
+the name of the color or a hexadecimal color code.
+
 
 Container
   | Syntax: ``[container top right bottom left][/container]``
   | Type:   ``block``
 
-  Create a container with specific paddings on each side. The paddings
-  are defined in percents of the viewport dimensions. The left and right
-  paddings use the width of the viewport as the reference and the top
-  and bottom paddings use the height of the viewport as the reference.
+Create a container with specific paddings on each side. The paddings
+are defined in percents of the viewport dimensions. The left and right
+paddings use the width of the viewport as the reference and the top
+and bottom paddings use the height of the viewport as the reference.
+
 
 Horizontal centering container
   | Syntax: ``[xcenter][/xcenter]``
   | Type:   ``block``
 
-  Create a container that horizontally centers all content within it.
+Create a container that horizontally centers all content within it.
+
 
 Column layout container
   | Syntax: ``[columns][/columns]``
   | Type:   ``block``
 
-  Create a container with a column layout. Each ``[container]`` class
+Create a container with a column layout. Each ``[container]`` class
   inside a ``[columns]`` container creates a new column. All columns
   within one ``[columns]`` container have equal width.
+
 
 Font size
   | Syntax: ``[size s][/size]``
   | Type:   ``block``
 
-  Set the font size. All text inside this class will have the specified
-  font size if not nested classes change the size. ``s`` is the size
-  of the in percents relative to the height of the viewport.
+Set the font size. All text inside this class will have the specified
+font size if not nested classes change the size. ``s`` is the size
+of the in percents relative to the height of the viewport.
+
 
 Align
   | Syntax: ``[align-<right|center|left|justify>][/align-<...>]``
   | Type:   ``block``
 
-  Align text either left, center or right or justify it.
+Align text either left, center or right or justify it.
+
 
 Examples
 --------
