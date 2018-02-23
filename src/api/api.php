@@ -4,6 +4,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/argarray.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
 // API Endpoint request methods.
@@ -28,6 +29,12 @@ const API_P_STR_ALLOW_EMPTY	= 0x20;
 const API_P_NULL		= 0x40;
 
 class APIEndpoint {
+	const METHOD		= 'method';
+	const RESPONSE_TYPE	= 'response_type';
+	const FORMAT		= 'format';
+	const STRICT_FORMAT	= 'strict_format';
+	const REQ_QUOTA	= 'req_quota';
+
 	private $method = 0;
 	private $response_type = 0;
 	private $response = NULL;
@@ -38,20 +45,25 @@ class APIEndpoint {
 	private $inited = FALSE;
 	private $error = 0;
 
-	function __construct(int $method, int $response_type,
-				$format, bool $strict_format=TRUE,
-				bool $req_quota=TRUE) {
-		if (!in_array($method, API_METHOD)) {
-			throw new ArgException('Invalid API method!');
+	public function __construct(array $config) {
+		$args = new ArgumentArray(
+			array(
+				self::METHOD        => API_METHOD,
+				self::RESPONSE_TYPE => API_RESPONSE,
+				self::FORMAT        => 'array',
+				self::STRICT_FORMAT => 'boolean',
+				self::REQ_QUOTA     => 'boolean'
+			),
+			array(
+				self::FORMAT        => array(),
+				self::STRICT_FORMAT => TRUE,
+				self::REQ_QUOTA     => TRUE
+			)
+		);
+		$ret = $args->chk($config);
+		foreach ($ret as $k => $v) {
+			$this->$k = $v;
 		}
-		if (!in_array($response_type, API_RESPONSE)) {
-			throw new ArgException('Invalid API response type!');
-		}
-		$this->method = $method;
-		$this->format = $format;
-		$this->strict_format = $strict_format;
-		$this->req_quota = $req_quota;
-		$this->response_type = $response_type;
 	}
 
 	private function _load_data_post() {
@@ -161,17 +173,17 @@ class APIEndpoint {
 		return (API_P_OPT & $bitmask) != 0;
 	}
 
-	private function _verify($data, $format=NULL) {
+	private function _verify($data, array $format=array()) {
 		/*
 		*  Verify request data using the format filter $format
-		*  or $this->format if $format === NULL. If $format
-		*  and $this->format are both NULL, this function returns
+		*  or $this->format if $format is empty. If $format
+		*  and $this->format are both empty, this function returns
 		*  TRUE without doing any verification. If the flag
 		*  $this->strict_format is TRUE, extra keys in $data that
 		*  don't exist in format are considered invalid.
 		*/
-		if ($format === NULL) {
-			if ($this->format === NULL) {
+		if (!count($format)) {
+			if (!count($this->format)) {
 				return TRUE;
 			}
 			$format = $this->format;
@@ -354,7 +366,7 @@ function api_endpoint_init(APIEndpoint $endpoint, $user) {
 	} catch(Exception $e) {
 		throw new APIException(
 			$endpoint->last_error(),
-			"API endpoint error.", 0, $e
+			$e->getMessage(), 0, $e
 		);
 	}
 	header('Content-Type: '.$endpoint->get_content_type());

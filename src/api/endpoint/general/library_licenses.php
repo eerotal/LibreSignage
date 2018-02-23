@@ -12,13 +12,11 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 
-$LIBRARY_LICENSES = new APIEndpoint(
-	$method = API_METHOD['GET'],
-	$response_type = API_RESPONSE['TEXT'],
-	$format = NULL,
-	$strict_format = TRUE,
-	$req_quota = FALSE
-);
+$LIBRARY_LICENSES = new APIEndpoint(array(
+	APIEndpoint::METHOD		=> API_METHOD['GET'],
+	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['TEXT'],
+	APIEndpoint::REQ_QUOTA		=> FALSE
+));
 session_start();
 api_endpoint_init($LIBRARY_LICENSES, auth_session_user());
 
