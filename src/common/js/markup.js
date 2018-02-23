@@ -278,6 +278,42 @@ const MARKUP = {
 		null,
 		false
 	),
+	'align-left': new MarkupClass(
+		'block',
+		'align-left',
+		null,
+		'<div style="text-align: left;">',
+		'</div>',
+		null,
+		false
+	),
+	'align-center': new MarkupClass(
+		'block',
+		'align-center',
+		null,
+		'<div style="text-align: center;"',
+		'</div>',
+		null,
+		false
+	),
+	'align-right': new MarkupClass(
+		'block',
+		'align-right',
+		null,
+		'<div style="text-align: right;">',
+		'</div>',
+		null,
+		false
+	),
+	'align-justify': new MarkupClass(
+		'block',
+		'align-justify',
+		null,
+		'<div style="text-align: justify;">',
+		'</div>',
+		null,
+		false
+	),
 	'meta': new MarkupClass(
 		'meta',
 		'meta',
