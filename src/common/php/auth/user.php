@@ -237,8 +237,7 @@ class User {
 
 		$dir = $this->get_data_dir($user);
 		if (!is_dir($dir)) {
-			throw new ArgException('No user named '.
-							$user.'.');
+			throw new ArgException("No user named $user.");
 		}
 		$json = file_lock_and_get($dir.'/data.json');
 		if ($json === FALSE) {

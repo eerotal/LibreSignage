@@ -96,8 +96,8 @@ Column layout container
   | Type:   ``block``
 
 Create a container with a column layout. Each ``[container]`` class
-  inside a ``[columns]`` container creates a new column. All columns
-  within one ``[columns]`` container have equal width.
+inside a ``[columns]`` container creates a new column. All columns
+within one ``[columns]`` container have equal width.
 
 
 Font size

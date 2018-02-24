@@ -144,9 +144,19 @@ function auth_is_authorized(array $groups = NULL,
 }
 
 function auth_session_user() {
+	$user = NULL;
 	_auth_chk_session();
-	if (empty($_SESSION['user'])) {
-		return NULL;
+	if (empty($_SESSION['user'])) { return NULL; }
+	try {
+		$user = new User($_SESSION['user']);
+	} catch (ArgException $e) {
+		/*
+		*  Logout since the current userdata in
+		*  $_SESSION is invalid.
+		*/
+		auth_logout();
+		session_start();
+		$user = NULL;
 	}
-	return new User($_SESSION['user']);
+	return $user;
 }

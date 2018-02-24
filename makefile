@@ -15,6 +15,7 @@ endif
 
 dist: $(shell find $(SRC_DIR))
 	echo '## Create LibreSignage distribution...'
+	rm -rfv $(DIST_DIR)
 	./build/scripts/mkdist.sh
 
 docs: README.rst $(shell find $(SRC_DOCS_DIR))
@@ -25,13 +26,13 @@ verify: $(shell find $(SRC_DIR))
 	echo '## Verify LibreSignage sources...'
 	./build/scripts/verify.sh
 
-install: $(shell find $(DIST_DIR))
+install: $(shell if [ -d $(DIST_DIR) ]; then find $(DIST_DIR); fi)
 	echo '## Install LibreSignage...'
 	./build/scripts/install.sh $(INST)
 
 clean:
 	echo '## Clean LibreSignage build files...'
-	rm -rfv dist
+	rm -rfv $(DIST_DIR)
 
 realclean: clean
 	echo '## Clean all LibreSignage build files...'

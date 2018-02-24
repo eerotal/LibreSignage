@@ -51,7 +51,7 @@ const API_E_MSG = array(
 	),
 	API_E_NOT_AUTHORIZED => array(
 		"short" => "Not authorized",
-		"You are not authorized to perform this action."
+		"long" => "You are not authorized to perform this action."
 	),
 	API_E_QUOTA_EXCEEDED => array(
 		"short" => "Quota exceeded",
