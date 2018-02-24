@@ -21,7 +21,6 @@ if [ -n "$1" ]; then
 		echo '[ERROR] No server name in config.';
 		exit 1;
 	fi
-
 	INSTC_LOADED=1;
 else
 	declare -A INSTC;

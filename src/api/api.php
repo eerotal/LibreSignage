@@ -104,7 +104,7 @@ class APIEndpoint {
 		$this->inited = TRUE;
 	}
 
-	function load_data() {
+	public function load_data() {
 		/*
 		*  Wrapper function for loading data into
 		*  this APIEndpoint object. _load_data_post()
@@ -230,7 +230,7 @@ class APIEndpoint {
 		return TRUE;
 	}
 
-	function last_error() {
+	public function last_error() {
 		/*
 		*  Get the last error that occurred and
 		*  reset the error flag.
@@ -240,7 +240,7 @@ class APIEndpoint {
 		return $tmp;
 	}
 
-	function get($key = NULL) {
+	public function get(string $key) {
 		if ($key === NULL) {
 			return $this->data;
 		} else {
@@ -248,7 +248,7 @@ class APIEndpoint {
 		}
 	}
 
-	function has(string $key, bool $null_check = FALSE) {
+	public function has(string $key, bool $null_check = FALSE) {
 		if (in_array($key, array_keys($this->data))) {
 			if ($null_check && $this->data[$key] == NULL) {
 				return FALSE;
@@ -259,7 +259,7 @@ class APIEndpoint {
 		}
 	}
 
-	function get_content_type() {
+	public function get_content_type() {
 		switch($this->response_type) {
 			case API_RESPONSE['JSON']:
 				return 'application/json';
@@ -270,22 +270,22 @@ class APIEndpoint {
 		}
 	}
 
-	function is_inited() {
+	public function is_inited() {
 		return $this->inited;
 	}
 
-	function requires_quota() {
+	public function requires_quota() {
 		return $this->req_quota;
 	}
 
-	function resp_set($resp) {
+	public function resp_set($resp) {
 		/*
 		*  Set the API response data.
 		*/
 		$this->response = $resp;
 	}
 
-	function send() {
+	public function send() {
 		/*
 		*  Send the current API response.
 		*/

@@ -34,6 +34,8 @@ Development
 
 `API Errors </doc?doc=api_errors>`_
 
+`The APIEndpoint class </doc?doc=APIEndpoint>`_
+
 `Limits </doc?doc=limits>`_
 
 Licenses

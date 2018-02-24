@@ -1,7 +1,8 @@
 SRC_DIR=src
 DIST_DIR=dist
+SRC_DOCS_DIR=$(SRC_DIR)/doc
 
-.PHONY: install LOC clean realclean
+.PHONY: LOC clean realclean
 .SILENT: install verify LOC dist clean docs
 
 ifndef SRC_DIR
@@ -12,28 +13,28 @@ ifndef DIST_DIR
 $(error DIST_DIR not set)
 endif
 
-dist: clean README.rst $(shell find src)
+dist: $(shell find $(SRC_DIR))
 	echo '## Create LibreSignage distribution...'
 	./build/scripts/mkdist.sh
-	echo '## Generate LibreSignage docs...'
+
+docs: README.rst $(shell find $(SRC_DOCS_DIR))
+	echo '## Compile LibreSignage documentation...'
 	./build/scripts/mkdocs.sh
 
-verify: $(shell find src)
-	# Run the source verification scripts.
-	echo '## Verify LibreSignage sources'
+verify: $(shell find $(SRC_DIR))
+	echo '## Verify LibreSignage sources...'
 	./build/scripts/verify.sh
 
-install: verify dist
-	# Install LibreSignage to INSTALL_DIR.
-	echo '## Install'
+install: $(shell find $(DIST_DIR))
+	echo '## Install LibreSignage...'
 	./build/scripts/install.sh $(INST)
 
 clean:
-	echo '## Clean LibreSignage build files.'
+	echo '## Clean LibreSignage build files...'
 	rm -rfv dist
 
 realclean: clean
-	echo '## Clean all LibreSignage build files.'
+	echo '## Clean all LibreSignage build files...'
 	rm -fv build/*.instconf
 
 LOC:
