@@ -8,9 +8,6 @@ content to normal web browsers. This makes it possible to use basically
 any device with the ability to display web pages from the internet as a
 client for a LibreSignage instance.
 
-LibreSignage is under heavy development and it shouldn't be used for
-production or anything important yet.
-
 Installation
 ------------
 
@@ -49,6 +46,14 @@ based systems of course. For example, if you specified the server name
 
 This will redirect all requests for *example.com* to *localhost*, making it
 possible to access the site by connecting to *example.com*.
+
+Default users
+-------------
+
+The initial configured users are ``admin`` with the password ``admin`` and
+``user`` with the password ``user``. It goes without saying that you should
+create new users and change the passwords if you intend to use LibreSignage
+on a production system.
 
 Screenshots
 -----------
