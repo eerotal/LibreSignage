@@ -208,8 +208,8 @@ class NumValidator extends Validator {
 	*  Validate numeric inputs.
 	*
 	*  Settings:
-	*    * min = The minimum value.    (integer)
-	*    * max = The maximum value.    (integer)
+	*    * min = The minimum value.    (number)
+	*    * max = The maximum value.    (number)
 	*    * nan = Allow NaN values.     (boolean)
 	*    * float = Allow float values. (boolean)
 	*/

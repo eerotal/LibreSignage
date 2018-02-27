@@ -36,6 +36,8 @@ Development
 
 `The APIEndpoint class </doc?doc=APIEndpoint>`_
 
+`Input validator </doc?doc=input_validator>`_
+
 `Limits </doc?doc=limits>`_
 
 Licenses
