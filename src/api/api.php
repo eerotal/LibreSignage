@@ -240,7 +240,7 @@ class APIEndpoint {
 		return $tmp;
 	}
 
-	public function get(string $key) {
+	public function get($key = NULL) {
 		if ($key === NULL) {
 			return $this->data;
 		} else {
