@@ -3,6 +3,13 @@
 *  User Settings page.
 */
 
+
+var USER_NAME = $("#user-name");
+var USER_GROUPS = $("#user-groups");
+var USER_PASS = $("#user-pass");
+var USER_PASS_CONFIRM = $("#user-pass-confirm");
+
+var pass_sel = null;
 var _usr = null;
 
 function user_settings_get_user(ready_callback) {
@@ -22,16 +29,21 @@ function user_settings_get_user(ready_callback) {
 }
 
 function user_settings_setup() {
-	$("#user-name").val(_usr.get_name());
-	$("#user-groups").val(_usr.get_groups());
-	$("#user-pass").attr(
-		'maxlength',
-		SERVER_LIMITS.PASSWORD_MAX_LEN
+	pass_sel = new ValidatorSelector(
+		USER_PASS.add(USER_PASS_CONFIRM),
+		USER_PASS.add(USER_PASS_CONFIRM),
+		[
+			new StrValidator({
+				min: 1,
+				max: 10,
+				regex: null
+			}),
+			new EqValidator()
+		]
 	);
-	$("#user-pass-confirm").attr(
-		'maxlength',
-		SERVER_LIMITS.PASSWORD_MAX_LEN
-	);
+
+	USER_NAME.val(_usr.get_name());
+	USER_GROUPS.val(_usr.get_groups());
 }
 
 function user_settings_save(usr) {
@@ -39,41 +51,30 @@ function user_settings_save(usr) {
 		throw new Error("Current user not loaded.");
 	}
 
-	if (!$("#user-pass").val() && !$("#user-pass-confirm").val()) {
-		return;
-	}
+	if (!pass_sel.state()) { return; }
 
-	if ($("#user-pass").val() == $("#user-pass-confirm").val()) {
-		// Change password using the API.
-		_usr.pass = $("#user-pass").val();
-		_usr.save((ret) => {
-			if (api_handle_disp_error(ret)) {
-				return;
-			}
+	// Change password using the API.
+	_usr.pass = $("#user-pass").val();
+	_usr.save((ret) => {
+		if (api_handle_disp_error(ret)) {
+			return;
+		}
 
-			// Remove possible mismatch indicators.
-			$("#user-pass").removeClass('is-invalid');
-			$("label[for=user-pass]").removeClass('is-invalid-label');
-			$("#user-pass-confirm").removeClass('is-invalid');
-			$("label[for=user-pass-confirm]").removeClass('is-invalid-label');
+		// Remove possible mismatch indicators.
+		$("#user-pass").removeClass('is-invalid');
+		$("label[for=user-pass]").removeClass('is-invalid-label');
+		$("#user-pass-confirm").removeClass('is-invalid');
+		$("label[for=user-pass-confirm]").removeClass('is-invalid-label');
 
-			// Empty input boxes.
-			$("#user-pass").val('');
-			$("#user-pass-confirm").val('');
+		// Empty input boxes.
+		$("#user-pass").val('');
+		$("#user-pass-confirm").val('');
 
-			dialog(DIALOG.ALERT,
-				'Changes saved',
-				'Changes to user settings saved.',
-				null);
-		});
-
-	} else {
-		// Indicate mismatch in password fields.
-		$("#user-pass").addClass('is-invalid');
-		$("label[for=user-pass]").addClass('is-invalid-label');
-		$("#user-pass-confirm").addClass('is-invalid');
-		$("label[for=user-pass-confirm]").addClass('is-invalid-label');
-	}
+		dialog(DIALOG.ALERT,
+			'Changes saved',
+			'Changes to user settings saved.',
+			null);
+	});
 }
 
 api_init(() => {

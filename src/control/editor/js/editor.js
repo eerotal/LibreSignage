@@ -30,9 +30,8 @@ const SLIDE_INDEX_GRP = $("#slide-index-group");
 const EDITOR_STATUS = $("#editor-status");
 var SLIDE_INPUT = null;
 
-var name_validator = null;
-var index_validator = null;
-var save_btn_validator_group = null;
+var name_sel = null;
+var index_sel = null;
 
 var _selected_slide = null;
 
@@ -55,10 +54,9 @@ function disable_editor_controls() {
 	SLIDE_SAVE.prop("disabled", true);
 	SLIDE_REMOVE.prop("disabled", true);
 
-	// Make sure the validators don't enable the save button.
-	save_btn_validator_group.for_each((validator) => {
-		validator.disable();
-	});
+	// Make sure the ValidatorSelectors don't enable the save button.
+	name_sel.disable();
+	index_sel.disable();
 }
 
 function enable_editor_controls() {
@@ -69,9 +67,8 @@ function enable_editor_controls() {
 	SLIDE_SAVE.prop("disabled", false);
 	SLIDE_REMOVE.prop("disabled", false);
 
-	save_btn_validator_group.for_each((validator) => {
-		validator.enable();
-	});
+	name_sel.enable();
+	index_sel.enable();
 }
 
 function slide_show(slide) {
@@ -225,36 +222,39 @@ function slide_preview() {
 
 function editor_setup() {
 	api_init(() => {
-		// Setup input validators.
-		name_validator = new StrValidator(
-			{
+		name_sel = new ValidatorSelector(
+			SLIDE_NAME,
+			SLIDE_NAME_GRP,
+			[new StrValidator({
 				min: 1,
 				max: SERVER_LIMITS.SLIDE_NAME_MAX_LEN,
+				regex: null
+			}, "The name is too short or too long."),
+			new StrValidator({
+				min: null,
+				max: null,
 				regex: /^[A-Za-z0-9_-]*$/
-			},
-			null
+			}, "The name contains invalid characters.")]
 		);
-		name_validator.attach(SLIDE_NAME, SLIDE_NAME_GRP);
-
-		index_validator = new NumValidator(
-			{
+		index_sel = new ValidatorSelector(
+			SLIDE_INDEX,
+			SLIDE_INDEX_GRP,
+			[new NumValidator({
 				min: 0,
-				max: SERVER_LIMITS.SLIDE_MAX_INDEX
-			},
-			null
+				max: SERVER_LIMITS.SLIDE_MAX_INDEX,
+				nan: false,
+				float: true
+			}, "The index is outside the accepted bounds."),
+			new NumValidator({
+				min: null,
+				max: null,
+				nan: true,
+				float: false
+			}, "The index must be an integer value.")]
 		);
-		index_validator.attach(SLIDE_INDEX, SLIDE_INDEX_GRP);
 
-		/*
-		*  ValidatorGroup for enabling or disabling the
-		*  save button based on whether all the inputs
-		*  are successfully validated.
-		*/
-		save_btn_validator_group = new ValidatorGroup(
-			[
-				name_validator,
-				index_validator
-			],
+		val_trigger = new ValidatorTrigger(
+			[name_sel, index_sel],
 			(valid) => {
 				SLIDE_SAVE.prop('disabled', !valid);
 			}

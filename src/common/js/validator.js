@@ -1,269 +1,203 @@
 /*
-*  A universal input validator implementation for LibreSignage.
+*  A universal input validator system for LibreSignage.
 */
 
-class ValidatorGroup {
-	constructor(validators, callback) {
+class ValidatorSelector {
+	/*
+	*  A class used for selecting the inputs to
+	*  validate with validator objects.
+	*/
+	constructor(query, style, validators, callbacks) {
 		/*
-		*  Constructor for the ValidatorGroup class.
-		*  'validators' is an array of validator objects
-		*  to use for the ValidatorGroup.
+		*  Construct the ValidatorSelector object.
+		*
+		*  * 'query' is a jQuery object or a query string that
+		*    selects the input elements to validate.
+		*  * 'style' is a jQuery object or a query string that
+		*    selects the elements to apply the styling on.
+		*  * 'validators' is a list of validator objects to add
+		*    to the selector. 'validators' can be left null if
+		*    it isn't needed. Validators can also be added with
+		*    ValidatorSelector.add().
+		*  * 'callbacks' is an array of callback functions to
+		*    call every time the validation state changes. The
+		*    ValidatorSelector object is passed as the first
+		*    argument to the callback functions.
 		*/
-		if (!Array.isArray(validators)) {
-			throw new Error('Invalid validators for ' +
-					'ValidatorGroup.');
+		this.validators = [];
+		this.callbacks = [];
+		this.enabled = true;
+		this.valid = true;
+		this.query = $(query);
+		this.style = $(style);
+
+		if (!this.query.length) {
+			throw new Error('No input elements selected.');
 		}
-
-		this.validators = validators;
-
-		/*
-		*  Wrap the calc_state() function so that
-		*  'this' can be used in the function.
-		*/
-		this.calc_state_wrap = (valid) => {
-			this.calc_state(valid);
-		};
-
-		this.valid_cnt = this.validators.length;
-		for (var i in this.validators) {
-			this.validators[i].add_callback(
-				this.calc_state_wrap
-			);
-
-			// Calculate the initial state for this group.
-			if (!this.validators[i].valid) {
-				this.valid_cnt--;
-			}
+		if (!this.style.length) {
+			throw new Error('No style elements selected.');
 		}
-
-		if (this.valid_cnt == this.validators.length) {
-			this.valid = true;
-		} else {
-			this.valid = false;
+		this.query.on(
+			'input',
+			() => { this.validate(); }
+		);
+		for (var i in validators) {
+			this.add(validators[i]);
 		}
-
-		this.callback = callback;
 	}
 
-	calc_state(valid) {
+	add(validator) {
 		/*
-		*  This function is called every time a Validator
-		*  in the this.validators array changes state.
+		*  Add a validator to the ValidatorSelector object.
 		*/
-		if (valid) {
-			this.valid_cnt++;
-		} else {
-			this.valid_cnt--;
+		if (!validator || validator != Object(validator)) {
+			throw new Error('Invalid validator object.');
+		}
+		this.validators.push(validator);
+		this.validate();
+	}
+
+	state() {
+		return this.valid;
+	}
+
+	set_dom_msg(msg) {
+		if (msg != null) {
+			this.msg = msg;
+			this.style.find('.invalid-feedback').html(msg);
+		}
+	}
+
+	set_state(valid) {
+		var change = false;
+		if (!valid && this.valid) {
+			this.valid = false;
+			this.query.addClass('is-invalid');
+			change = true;
+		} else if (valid && !this.valid) {
+			this.valid = true;
+			this.query.removeClass('is-invalid');
+			change = true;
 		}
 
-		if (this.valid_cnt == this.validators.length) {
-			if (!this.valid) {
-				if (this.callback) {
-					this.callback(true);
-				}
-				this.valid = true;
+		if (change) {
+			for (var i in this.callbacks) {
+				this.callbacks[i](this);
 			}
-		} else {
-			if (this.valid) {
+		}
+	}
+
+	add_callback(callback) {
+		this.callbacks.push(callback);
+	}
+
+	disable() {
+		this.enabled = false;
+		this.set_state(true);
+	}
+
+	enable () {
+		this.enabled = true;
+		this.validate();
+	}
+
+	validate() {
+		var m = null;
+		var s = true;
+		if (!this.enabled) { return; }
+		for (var i in this.validators) {
+			if (!this.validators[i].validate(this)) {
+				m = this.validators[i].get_msg();
+				this.set_dom_msg(m);
+				s = false;
+			}
+		}
+		this.set_state(s);
+	}
+}
+
+class ValidatorTrigger {
+	/*
+	*  This class creates a trigger for calling functions based
+	*  on whether all of the specified ValidatorSelectors are
+	*  valid or not.
+	*/
+	constructor(selectors, callback) {
+		/*
+		*  Construct the ValidatorTrigger object.
+		*
+		*  * 'selectors' is an array of selectors to user for
+		*    this trigger.
+		*  * 'callback' is the callback function to call when
+		*    a change occurs.
+		*/
+		this.callback = callback;
+		this.selectors = selectors;
+		for (var i in this.selectors) {
+			this.selectors[i].add_callback((sel) => {
+				this.trigger();
+			});
+		}
+	}
+
+	trigger() {
+		/*
+		*  Check the validation state of the ValidatorSelectors
+		*  and call the callback function if needed.
+		*/
+		var s = this.selectors;
+		for (var i in s) {
+			if (this.valid && !s[i].state()) {
+				this.valid = false;
 				if (this.callback) {
 					this.callback(false);
 				}
-				this.valid = false;
+				break;
+			} else if (!this.valid && s[i].state()) {
+				this.valid = true;
+				if (this.callback) {
+					this.callback(true);
+				}
+				break;
 			}
-		}
-	}
-
-	for_each(func) {
-		for (var i in this.validators) {
-			func(this.validators[i]);
 		}
 	}
 }
 
 class Validator {
-	constructor(settings, callbacks) {
+	constructor(settings, msg) {
 		/*
-		*  Constructor function for the Validator class.
-		*  'settings' should contain the validator specific
-		*  settings as a dictionary and 'callbacks' is an
-		*  array of callback functions to call when a change
-		*  in the validation state occurs.
+		*  Construct the Validator object. Classes
+		*  extending this class should always call the
+		*  original constructor with eg. 'super(...args);'
+		*  if they redefine the constructor. See the
+		*  predefined validators for examples.
 		*/
-
 		if (settings && settings != Object(settings)) {
 			throw new Error('Invalid validator settings.');
 		}
-		if (callbacks && !Array.isArray(callbacks)) {
-			throw new Error('Invalid validator callbacks');
-		}
-
 		this.settings = settings;
-		this.callbacks = callbacks;
-
-		this.attached = [];
-		this.valid = true;
-		this.enabled = true;
+		this.msg = msg;
 	}
 
-	attach(query, style_on) {
+	get_msg() {
+		return this.msg;
+	}
+
+	chk_settings(proto) {
 		/*
-		*  Attach the validator to the elements selected by
-		*  the jQuery object 'query' or if 'query' is a string,
-		*  use it to create a jQuery object. If 'style_on' is not
-		*  null, the styling is applied to the elements selected
-		*  by the jQuery object or the jQuery object created using
-		*  the query string in 'style_on'. Otherwise styling is
-		*  applied to the elements selected using 'query'.
+		*  Check the current this.settings associative array
+		*  against the 'proto' array. If settings that exist
+		*  in 'proto' are missing from this.settings, errors
+		*  are thrown.
 		*/
-
-		var tmp_query = null;
-		var tmp_style_on = null;
-
-		// Get the 'query' jQuery object.
-		if (typeof query == 'string') {
-			if (query.length) {
-				tmp_query = $(query);
-			} else {
-				throw new Error('query invalid.');
-			}
-		} else {
-			tmp_query = query;
-		}
-
-		// Get the 'style_on' jQuery object.
-		if (typeof style_on == 'string') {
-			if (query.length) {
-				tmp_style_on = $(style_on);
-			} else {
-				throw new Error('style_on invalid.');
-			}
-		} else if (style_on == null) {
-			tmp_style_on = tmp_query;
-		} else {
-			tmp_style_on = style_on;
-		}
-
-		// Attach event handler.
-		tmp_query.on(
-			'input',
-			(event) => {
-				if (this.enabled) {
-					this._validate(this, event);
-				}
-			}
-		);
-
-		this.attached[this.attached.length] = {
-			'event_from': tmp_query,
-			'style_on': tmp_style_on
-		}
-	}
-
-	detach() {
-		/*
-		*  Detach the validator from all elements.
-		*/
-
-		// Reset styling.
-		this._set_valid_state(true);
-
-		// Detach event handlers.
-		for (var i in this.attached) {
-			this.attached[i]['event_from'].off(
-				'input',
-				null,
-				this._validate
-			);
-		}
-		this.attached = [];
-	}
-
-	add_callback(cb) {
-		if (!this.callbacks) {
-			this.callbacks = [];
-		}
-		this.callbacks.push(cb);
-	}
-
-	remove_callback() {
-		var i = this.callbacks.indexOf(cb);
-		if (i != -1) {
-			this.callbacks.splice(i, 1);
-		}
-	}
-
-	enable() {
-		// Enable and validate the Validator.
-		this.enabled = true;
-		this._validate(this);
-	}
-
-	disable() {
-		// Disable and override the Validator.
-		this.enabled = false;
-		this._set_valid_state(true);
-	}
-
-	_set_valid_state(valid) {
-		/*
-		*  Set the state of this Validator. The assigned
-		*  callback functions are called if a change in
-		*  the state occurs. This function also applies
-		*  the CSS styling to the selected parent 'style_on'
-		*  elements and their descendants recursively.
-		*/
-		var q = 'input, selector, textarea';
-		var att = this.attached;
-		var e = [];
-
-		// Select the correct elements.
-		for (var i in att) {
-			if (att[i]['style_on'].is(q)) {
-				e.push(att[i]['style_on']);
-			}
-			e.push(att[i]['style_on'].find($(q)));
-		}
-
-		// Apply styling, call callbacks and set state.
-		if (!valid && this.valid) {
-			for (var i in e) {
-				e[i].addClass('is-invalid');
-			}
-			for (var i in this.callbacks) {
-				this.callbacks[i](false);
-			}
-			this.valid = false;
-		} else if (valid && !this.valid) {
-			for (var i in e) {
-				e[i].removeClass('is-invalid');
-			}
-			for (var i in this.callbacks) {
-				this.callbacks[i](true);
-			}
-			this.valid = true;
-		}
-	}
-
-	_validate() {
-		throw new Error('Subclasses should implement the ' +
-				'validator _validate() function.');
-	}
-
-	_chk_settings(settings) {
-		/*
-		*  Check the supplied settings against the array
-		*  of accepted settings and throw an error if
-		*  required settings don't exist.
-		*/
-		if (!Array.isArray(settings)) {
-			throw new Error('Invalid type for "settings".');
-		}
-		for (var i in settings) {
-			var skeys = Object.keys(this.settings);
-			if (skeys.indexOf(settings[i]) == -1) {
-				throw new Error('Invalid ' +
-					'Validator settings. ("' +
-					settings[i] + '" missing)');
+		for (var i in proto) {
+			var keys = Object.keys(this.settings);
+			if (keys.indexOf(proto[i]) == -1) {
+				throw new Error(
+					'Invalid Validator settings. ("' +
+					proto[i] + '" missing).'
+				);
 			}
 		}
 	}
@@ -271,75 +205,110 @@ class Validator {
 
 class NumValidator extends Validator {
 	/*
-	*  Make sure number inputs are in the range [min, max].
-	*  Below is a list of the accepted settings.
-	*    min = The minimum value or null for unlimited.
-	*    max = The maximum value or null for unlimited.
+	*  Validate numeric inputs.
+	*
+	*  Settings:
+	*    * min = The minimum value.    (integer)
+	*    * max = The maximum value.    (integer)
+	*    * nan = Allow NaN values.     (boolean)
+	*    * float = Allow float values. (boolean)
 	*/
 	constructor(...args) {
 		super(...args);
-		this._chk_settings(['min', 'max']);
+		this.chk_settings(['min', 'max', 'nan']);
 	}
 
-	_numval_chk(value) {
+	validate(elem) {
+		var val = null;
 		var min = this.settings.min;
 		var max = this.settings.max;
-
-		var a = (min == null || value >= min);
-		var b = (max == null || value <= max);
-
-		return a && b;
-	}
-
-	_validate() {
-		var val = null;
-		for (var i in this.attached) {
-			val = this.attached[i]['event_from'].val();
-			if (this._numval_chk(val)) {
-				this._set_valid_state(true);
+		var nan = this.settings.nan;
+		var float = this.settings.float;
+		var a, b;
+		var ret = null;
+		elem.query.each(function() {
+			if (float) {
+				val = parseFloat($(this).val());
 			} else {
-				this._set_valid_state(false);
+				if ($(this).val().indexOf('.') != -1) {
+					ret = false;
+					return false;
+				}
+				val = parseInt($(this).val(), 10);
 			}
-		}
+			if (isNaN(val) && !nan) {
+				ret = false;
+				return false;
+			} else if (isNaN(val) && nan) {
+				ret = true;
+				return false;
+			}
+			a = (min == null || val >= min);
+			b = (max == null || val <= max);
+			ret = a && b;
+		});
+		return ret;
 	}
 }
 
 class StrValidator extends Validator {
 	/*
-	*  Make sure the length of a text input's text
-	*  is within the range [min, max]. Below is a list
-	*  of the accepted settings.
-	*    min = The minimum string length.
-	*    max = The maximum string length (or null for unlimited).
-	*    regex = A regex to match (or null if unused).
+	*  Validate string inputs.
+	*
+	*  Settings:
+	*    * min = The minimum length.    (integer)
+	*    * max = The maximum length.    (integer)
+	*    * regex = A "whitelist" regex. (regex)
 	*/
-
 	constructor(...args) {
 		super(...args);
-		this._chk_settings(['min', 'max', 'regex']);
+		this.chk_settings(['min', 'max', 'regex']);
 	}
 
-	_strval_chk(value) {
+	validate(elem) {
+		var val = null;
 		var min = this.settings.min;
 		var max = this.settings.max;
 		var regex = this.settings.regex;
+		var a, b, c;
+		var ret = false;
+		var tmp = null;
 
-		var a = (value.length >= min);
-		var b = (max == null || value.length <= max);
-		var c = (regex == null || value.match(regex));
-
-		return a && b && c;
-	}
-
-	_validate() {
-		var val = null;
-		for (var i in this.attached) {
-			val = this.attached[i]['event_from'].val();
-			if (!this._strval_chk(val)) {
-				this._set_valid_state(false);
+		elem.query.each(function() {
+			val = $(this).val();
+			a = (min == null || val.length >= min);
+			b = (max == null || val.length <= max);
+			if (regex == null) {
+				c = true;
 			} else {
-				this._set_valid_state(true);
+				tmp = val.match(regex);
+				c = (tmp && tmp[0].length == val.length);
 			}
-		}
+			ret = a && b && c;
+			if (!ret) {
+				return false;
+			}
+		});
+		return ret;
+	}
+}
+
+class EqValidator extends Validator {
+	/*
+	*  Validate all the selected inputs to have the same value.
+	*  This validator doesn't need any settings.
+	*/
+	validate(elem) {
+		var ret = true;
+		var v = null;
+		elem.query.each(function() {
+			if (v == null) {
+				v = $(this).val();
+			} else if (v != $(this).val()) {
+				ret = false;
+				return false;
+			}
+		});
+		return ret;
 	}
 }

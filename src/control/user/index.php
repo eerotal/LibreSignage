@@ -60,10 +60,16 @@
 						for="user-pass-confirm">
 						Confirm&nbsp;password
 					</label>
-					<input id="user-pass-confirm"
-						type="password"
-						class="col-sm-8 form-control">
-					</input>
+					<div class="col-sm-8 p-0">
+						<input id="user-pass-confirm"
+							type="password"
+							class="form-control">
+						</input>
+						<div class="invalid-feedback">
+							The passwords don't match
+							or they are too long.
+						</div>
+					</div>
 				</div>
 				<div class="row form-group">
 					<input id="user-save"
@@ -85,6 +91,7 @@
 		<script src="/common/js/api.js"></script>
 		<script src="/common/js/dialog.js"></script>
 		<script src="/common/js/user.js"></script>
+		<script src="/common/js/validator.js"></script>
 		<script src="/control/user/js/user.js"></script>
 	</body>
 </html>

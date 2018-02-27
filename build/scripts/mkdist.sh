@@ -7,7 +7,13 @@ mkdir -p $DIST_DIR;
 
 # Copy LibreSignage files to dist/.
 echo 'Copy LibreSignage files to "'$DIST_DIR'".';
-cp -Rp $SRC_DIR/* $DIST_DIR/.;
+
+# Exclude *.swp files created by Nano.
+find $SRC_DIR -type d -exec sh -c \
+	'mkdir -p $2/${0#$1/*}' '{}' $SRC_DIR $DIST_DIR \;
+
+find $SRC_DIR -type f ! -name '*.swp' -exec sh -c \
+	'cp -Rp $0 $2/${0#$1/*}' '{}' $SRC_DIR $DIST_DIR \;
 
 # Copy the README file too.
 echo "Copy $LS_README to $DIST_DIR.";

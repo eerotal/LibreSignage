@@ -39,9 +39,7 @@
 								id="slide-name"
 								data-toggle="tooltip"
 								title="The name of the slide. This is only visible in the editor.">
-							<div class="invalid-feedback">
-								The slide name is invalid.
-							</div>
+							<div class="invalid-feedback"></div>
 						</div>
 
 						<div class="form-group" id="slide-time-group">
@@ -71,9 +69,7 @@
 								id="slide-index"
 								data-toggle="tooltip"
 								title="The ordinal number of the slide. 0 is the first slide.">
-							<div class="invalid-feedback">
-								The slide index is invalid.
-							</div>
+							<div class="invalid-feedback"></div>
 						</div>
 
 						<div class="form-group container-fluid d-flex justify-content-center">
