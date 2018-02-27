@@ -25,7 +25,7 @@ Doing a basic install of LibreSignage is quite simple. The required steps
 are listed below.
 
 1. Install the required dependencies. On Debian Buster this can be accomplished
-   by running ``sudo apt install apache2 php7.0 git pandoc python-imaging``.
+   by running ``sudo apt install apache2 php7.0 git pandoc``.
    *pandoc* is needed for compiling the reStructuredText documentation files
    to HTML.
 2. Use ``cd`` to move to the directory where you want to download the LibreSignage
