@@ -61,8 +61,6 @@ function user_settings_save(usr) {
 		throw new Error("Current user not loaded.");
 	}
 
-	if (!pass_sel.state()) { return; }
-
 	// Change password using the API.
 	_usr.pass = USER_PASS.val();
 	_usr.save((ret) => {
