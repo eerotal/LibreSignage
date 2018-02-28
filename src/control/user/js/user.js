@@ -3,11 +3,12 @@
 *  User Settings page.
 */
 
-
 var USER_NAME = $("#user-name");
 var USER_GROUPS = $("#user-groups");
 var USER_PASS = $("#user-pass");
+var USER_PASS_GRP = $("#user-pass-group");
 var USER_PASS_CONFIRM = $("#user-pass-confirm");
+var USER_PASS_CONFIRM_GRP = $("#user-pass-confirm-group");
 
 var pass_sel = null;
 var _usr = null;
@@ -31,14 +32,17 @@ function user_settings_get_user(ready_callback) {
 function user_settings_setup() {
 	pass_sel = new ValidatorSelector(
 		USER_PASS.add(USER_PASS_CONFIRM),
-		USER_PASS.add(USER_PASS_CONFIRM),
+		USER_PASS_GRP.add(USER_PASS_CONFIRM_GRP),
 		[
 			new StrValidator({
 				min: 1,
 				max: 10,
 				regex: null
-			}),
-			new EqValidator()
+			},"The password length is invalid."),
+			new EqValidator(
+				null,
+				"The passwords don't match."
+			)
 		]
 	);
 
@@ -54,21 +58,15 @@ function user_settings_save(usr) {
 	if (!pass_sel.state()) { return; }
 
 	// Change password using the API.
-	_usr.pass = $("#user-pass").val();
+	_usr.pass = USER_PASS.val();
 	_usr.save((ret) => {
 		if (api_handle_disp_error(ret)) {
 			return;
 		}
 
-		// Remove possible mismatch indicators.
-		$("#user-pass").removeClass('is-invalid');
-		$("label[for=user-pass]").removeClass('is-invalid-label');
-		$("#user-pass-confirm").removeClass('is-invalid');
-		$("label[for=user-pass-confirm]").removeClass('is-invalid-label');
-
 		// Empty input boxes.
-		$("#user-pass").val('');
-		$("#user-pass-confirm").val('');
+		USER_PASS.val('');
+		USER_PASS_CONFIRM.val('');
 
 		dialog(DIALOG.ALERT,
 			'Changes saved',

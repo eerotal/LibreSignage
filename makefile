@@ -26,7 +26,7 @@ verify: $(shell find $(SRC_DIR))
 	echo '## Verify LibreSignage sources...'
 	./build/scripts/verify.sh
 
-install: $(shell if [ -d $(DIST_DIR) ]; then find $(DIST_DIR) ! -name '*.swp'; fi)
+install: dist $(shell if [ -d $(DIST_DIR) ]; then find $(DIST_DIR) ! -name '*.swp'; fi)
 	echo '## Install LibreSignage...'
 	./build/scripts/install.sh $(INST)
 

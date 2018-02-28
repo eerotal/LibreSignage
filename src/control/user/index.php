@@ -23,6 +23,7 @@
 		?>
 		<main class="container-fluid">
 			<div class="user-settings-cont container mx-auto">
+				<!-- Username -->
 				<div class="row form-group">
 					<label class="col-sm-4 col-form-label"
 						for="user-name">
@@ -34,6 +35,8 @@
 						readonly>
 					</input>
 				</div>
+
+				<!-- User groups -->
 				<div class="row form-group">
 					<label class="col-sm-4 col-form-label"
 						for="user-groups">
@@ -45,7 +48,10 @@
 						readonly>
 					</input>
 				</div>
-				<div class="row form-group">
+
+				<!-- Password input -->
+				<div id="user-pass-group"
+					class="row form-group">
 					<label class="col-sm-4 col-form-label"
 						for="user-pass">
 						Password
@@ -55,22 +61,24 @@
 						class="col-sm-8 form-control">
 					</input>
 				</div>
+
+				<!-- Password confirm input -->
 				<div class="row form-group">
 					<label class="col-sm-4 col-form-label"
 						for="user-pass-confirm">
 						Confirm&nbsp;password
 					</label>
-					<div class="col-sm-8 p-0">
+					<div id="user-pass-confirm-group"
+						class="col-sm-8 p-0">
 						<input id="user-pass-confirm"
 							type="password"
 							class="form-control">
 						</input>
-						<div class="invalid-feedback">
-							The passwords don't match
-							or they are too long.
-						</div>
+						<div class="invalid-feedback"></div>
 					</div>
 				</div>
+
+				<!-- Save button -->
 				<div class="row form-group">
 					<input id="user-save"
 						class="col-sm-12 btn btn-primary"
