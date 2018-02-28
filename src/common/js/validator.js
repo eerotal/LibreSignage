@@ -27,7 +27,7 @@ class ValidatorSelector {
 		this.validators = [];
 		this.callbacks = [];
 		this.enabled = true;
-		this.valid = true;
+		this.valid = null; // Initially null, validate() sets this.
 		this.query = $(query);
 		this.style = $(style);
 
@@ -44,6 +44,10 @@ class ValidatorSelector {
 		for (var i in validators) {
 			this.add(validators[i]);
 		}
+		for (var i in callbacks) {
+			this.add_callback(callbacks[i]);
+		}
+		this.validate();
 	}
 
 	add(validator) {
@@ -54,11 +58,24 @@ class ValidatorSelector {
 			throw new Error('Invalid validator object.');
 		}
 		this.validators.push(validator);
-		this.validate();
+	}
+
+	add_callback(callback) {
+		/*
+		*  Add a callback to the ValidatorSelector object.
+		*/
+		if (!callback) {
+			return;
+		}
+		this.callbacks.push(callback);
 	}
 
 	state() {
-		return this.valid;
+		if (this.state == null) {
+			return false;
+		} else {
+			return this.valid;
+		}
 	}
 
 	set_dom_msg(msg) {
@@ -69,26 +86,18 @@ class ValidatorSelector {
 	}
 
 	set_state(valid) {
-		var change = false;
-		if (!valid && this.valid) {
-			this.valid = false;
-			this.query.addClass('is-invalid');
-			change = true;
-		} else if (valid && !this.valid) {
-			this.valid = true;
-			this.query.removeClass('is-invalid');
-			change = true;
-		}
-
-		if (change) {
+		if (this.valid != valid) {
+			if (!valid) {
+				this.valid = false;
+				this.query.addClass('is-invalid');
+			} else if (valid) {
+				this.valid = true;
+				this.query.removeClass('is-invalid');
+			}
 			for (var i in this.callbacks) {
 				this.callbacks[i](this);
 			}
 		}
-	}
-
-	add_callback(callback) {
-		this.callbacks.push(callback);
 	}
 
 	disable() {

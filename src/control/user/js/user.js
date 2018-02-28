@@ -9,6 +9,7 @@ var USER_PASS = $("#user-pass");
 var USER_PASS_GRP = $("#user-pass-group");
 var USER_PASS_CONFIRM = $("#user-pass-confirm");
 var USER_PASS_CONFIRM_GRP = $("#user-pass-confirm-group");
+var USER_SAVE = $("#user-save");
 
 var pass_sel = null;
 var _usr = null;
@@ -43,6 +44,11 @@ function user_settings_setup() {
 				null,
 				"The passwords don't match."
 			)
+		],
+		[
+			(sel) => {
+				USER_SAVE.attr('disabled', !sel.state());
+			}
 		]
 	);
 
