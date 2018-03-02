@@ -222,6 +222,8 @@ function slide_preview() {
 
 function editor_setup() {
 	api_init(() => {
+		setup_defaults();
+
 		name_sel = new ValidatorSelector(
 			SLIDE_NAME,
 			SLIDE_NAME_GRP,

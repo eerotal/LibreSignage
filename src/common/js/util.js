@@ -107,3 +107,14 @@ function sanitize_html(src) {
 	// Sanitize HTML tags.
 	return $("<div></div>").text(src).html();
 }
+
+function setup_defaults() {
+	// Setup tooltips.
+	$('[data-toggle="tooltip"]').tooltip({
+		'delay': {
+			'show': 800,
+			'hide': 50
+		},
+		'trigger': 'hover'
+	});
+}
