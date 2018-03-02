@@ -3,8 +3,6 @@
 ?>
 <footer class="footer container-fluid">
 	<div class="footer-content" class="container-fluid">
-		<span>
-			LibreSignage &bull; Copyright Eero Talus 2018
-		</span>
+		<p>LibreSignage &bull; Copyright Eero Talus 2018</p>
 	</div>
 <footer>

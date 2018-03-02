@@ -23,14 +23,16 @@
 		?>
 		<main class="container-fluid">
 			<div class="container-main container-fluid w-100 h-100">
-				<div class="container-fluid col">
+				<div class="container-fluid row m-0">
 					<span class="col">Slides</span>
 				</div>
-				<div class="container-fluid col">
-					<div id="slidelist" class="col-12 d-flex flex-wrap">
+				<div class="container-fluid row m-0">
+					<div class="col-12">
+						<div id="slidelist" class="d-flex flex-row flex-nowrap">
+						</div>
 					</div>
 				</div>
-				<div class="editor container-fluid row">
+				<div class="container-fluid row m-0">
 					<div class="col-md-auto pt-2">
 						<div class="form-group" id="slide-name-group">
 							<label for="slide-name">Name</label>

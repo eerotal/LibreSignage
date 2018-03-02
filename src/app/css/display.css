@@ -19,11 +19,10 @@ html, body, main, #display {
 	margin: 0;
 }
 
-body {
-	/*
-	*  Leave space for footer.
-	*/
-	height: calc(100% - var(--footer-height));
-	min-height: calc(100% - var(--footer-height));
-	max-height: calc(100% - var(--footer-height));
+h1, h2, h3, h4, h5, h6 {
+	margin-bottom: 0.25em;
+}
+
+p {
+	margin-bottom: 1em;
 }

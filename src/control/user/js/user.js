@@ -51,7 +51,6 @@ function user_settings_setup() {
 			}
 		]
 	);
-
 	USER_NAME.val(_usr.get_name());
 	USER_GROUPS.val(_usr.get_groups());
 }
