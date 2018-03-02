@@ -45,7 +45,7 @@ try {
 } catch (ArgException $e){
 	throw new APIException(
 		API_E_INVALID_REQUEST,
-		"Failed to load slide.", 0, $e
+		"Failed to load user.", 0, $e
 	);
 }
 $slide_owner_quota = new UserQuota($slide_owner);

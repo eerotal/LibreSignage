@@ -23,6 +23,7 @@ const SLIDE_SAVE = $("#btn-slide-save");
 const SLIDE_REMOVE = $("#btn-slide-remove");
 const SLIDE_NAME = $("#slide-name");
 const SLIDE_NAME_GRP = $("#slide-name-group");
+const SLIDE_OWNER = $("#slide-owner");
 const SLIDE_TIME = $("#slide-time");
 const SLIDE_TIME_GRP = $("#slide-time-group");
 const SLIDE_INDEX = $("#slide-index");
@@ -88,6 +89,7 @@ function slide_show(slide) {
 		SLIDE_INPUT.clearSelection(); // Deselect new text.
 
 		SLIDE_NAME.val(_selected_slide.get('name'));
+		SLIDE_OWNER.val(_selected_slide.get('owner'));
 		SLIDE_TIME.val(_selected_slide.get('time')/1000);
 		SLIDE_INDEX.val(_selected_slide.get('index'));
 		enable_editor_controls();

@@ -34,6 +34,7 @@
 				</div>
 				<div class="container-fluid row m-0">
 					<div class="col-md-auto pt-2">
+						<!-- Slide name input -->
 						<div class="form-group" id="slide-name-group">
 							<label for="slide-name">Name</label>
 							<input type="text"
@@ -44,6 +45,18 @@
 							<div class="invalid-feedback"></div>
 						</div>
 
+						<!-- Slide owner label -->
+						<div class="form-group" id="slide-owner-group">
+							<label for="slide-owner">Owner</label>
+							<input type="text"
+								class="form-control w-100"
+								id="slide-owner"
+								data-toggle="tooltip"
+								title="The owner of the slide."
+								disabled>
+						</div>
+
+						<!-- Slide time selector -->
 						<div class="form-group" id="slide-time-group">
 							<label for="slide-time">Time (seconds)</label>
 							<select class="custom-select w-100"
@@ -63,6 +76,8 @@
 								<option value="10">10</option>
 							</select>
 						</div>
+
+						<!-- Slide index input -->
 						<div class="form-group" id="slide-index-group">
 							<label for="slide-index">Index</label>
 							<input type="number"
@@ -74,6 +89,7 @@
 							<div class="invalid-feedback"></div>
 						</div>
 
+						<!-- Control buttons -->
 						<div class="form-group container-fluid d-flex justify-content-center">
 							<button id="btn-slide-save"
 								type="button"

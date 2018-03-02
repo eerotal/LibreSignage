@@ -6,6 +6,7 @@
 var SLIDE_REQ_KEYS = [
 	'id',
 	'name',
+	'owner',
 	'time',
 	'index',
 	'markup'
