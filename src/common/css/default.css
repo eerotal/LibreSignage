@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:300|Raleway');
 
+:root {
+	--secondary-light: rgb(210, 210, 210);
+}
+
 /* Default styling for 'main'. */
 main {
 	/* Default spacing */

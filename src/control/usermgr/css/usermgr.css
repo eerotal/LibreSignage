@@ -6,22 +6,18 @@
 .usr-table-row {
 	margin: 0;
 	padding: 0;
-	background-color: var(--secondary);
+	color: var(--black);
+	background-color: var(--white);
+	border-bottom: 1px solid var(--secondary-light);
 }
 
 .usr-table-col {
 	padding: 0;
-	border-bottom: 1px solid dimgrey;
-	color: white;
 	height: 60px;
 	line-height: 60px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-}
-
-.usr-edit-row {
-	color: black;
 }
 
 .usr-edit-row-container {
