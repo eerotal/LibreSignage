@@ -56,24 +56,22 @@ are marked respectively
   The API parameter flags are constructed by OR'ing together
   a subset of the following constants.
 
-    | ``API_P_STR``: String type.
-    | ``API_P_INT``: Integer type.
-    | ``API_P_FLOAT``: Floating point type.
-    | ``API_P_ARR``: Array type.
-    | ``API_P_OPT``: Optional parameter.
-    | ``API_P_STR_ALLOW_EMPTY``: Allow empty strings when
-                                 ``API_P_STR`` is also set.
-    | ``API_P_NULL``: NULL type. This can be used along with
-                      one of the other type flags if needed.
-
-  Note that multiple type flags can't be specified at the same
-  time. The ``API_P_NULL`` flag can, however, be specified along
-  with one of the other type flags.
+    | ``API_P_STR``:          String type.
+    | ``API_P_INT``:          Integer type.
+    | ``API_P_FLOAT``:        Floating point type.
+    | ``API_P_ARR``:          Array type.
+    | ``API_P_NULL``:         NULL type.
+    | ``API_P_OPT``:          Optional parameter.
+    | ``API_P_EMPTY_STR_OK``: Allow empty strings when
+                              ``API_P_STR`` is also set.
+    | ``API_P_ANY``:          Accept any type.
+    | ``API_P_UNUSED``:       Indicates an unused parameter. Defined as
+                              ``API_P_ANY|API_P_EMPTY_STR_OK|API_P_OPT``.
 
   The format specified using this config option is used to
   automatically validate the received GET or POST parameters
   and an error is automatically sent as a response if the
-  received arguments are invalid. If the FORMAT array is empty,
+  received arguments are invalid. If the FORMAT array is empty
   no validation is done.
 
 ``APIEndpoint::STRICT_FORMAT`` - *Optional* - Default: TRUE
