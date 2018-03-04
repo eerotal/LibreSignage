@@ -7,6 +7,7 @@
 var SERVER_LIMITS = null;
 var API_E_MESSAGES = null;
 var API_E = null;
+var API_INITED = false;
 
 var API_ENDP = {
 	// -- User management API endpoints --
@@ -224,11 +225,13 @@ function api_init(callback) {
 	/*
 	*  Initialize the API interface.
 	*/
+	if (API_INITED) { return; }
 	api_load_error_codes(() => {
 		api_load_error_msgs(() => {
 			api_load_limits(() => {
 				console.log("LibreSignage API " +
 						"initialized!");
+				API_INITED = true;
 				callback();
 			});
 		});

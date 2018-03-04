@@ -84,36 +84,38 @@ function renderer_update() {
 function display_setup() {
 	var params = get_GET_parameters();
 
-	if ("preview" in params) {
-		// Preview a slide without starting the renderer.
-		console.log("LibreSignage: Preview slide " +
-				params["preview"] + ".");
-		var slide = new Slide();
-		slide.load(params["preview"], (err) => {
-			if (err) {
-				console.log("LibreSignage: Failed to " +
-						"preview slide!");
+	api_init(() => {
+		if ("preview" in params) {
+			// Preview a slide without starting the renderer.
+			console.log("LibreSignage: Preview slide " +
+					params["preview"] + ".");
+			var slide = new Slide();
+			slide.load(params["preview"], (err) => {
+				if (err) {
+					console.log("LibreSignage: " +
+							"Failed to " +
+							"preview slide!");
 				return;
-			}
-			DISPLAY.html(markup_parse(sanitize_html(
-				slide.get("markup")
-			)));
-		});
-	} else {
-		// Start the normal renderer 'loop'.
-		console.log("LibreSignage: Start the renderer loop.");
-		setInterval(() => {
-			list_retrieve(slides_retrieve);
-		}, SLIDES_RETRIEVE_INTERVAL);
-
-		list_retrieve(() => {
-			slides_retrieve(() => {
-				renderer_update();
+				}
+				DISPLAY.html(markup_parse(sanitize_html(
+					slide.get("markup")
+				)));
 			});
-		});
-	}
+		} else {
+			// Start the normal renderer 'loop'.
+			console.log("LibreSignage: Start the " +
+					"renderer loop.");
+			setInterval(() => {
+				list_retrieve(slides_retrieve);
+			}, SLIDES_RETRIEVE_INTERVAL);
+
+			list_retrieve(() => {
+				slides_retrieve(() => {
+					renderer_update();
+				});
+			});
+		}
+	});
 }
 
-api_init(() => {
-	display_setup();
-});
+display_setup();

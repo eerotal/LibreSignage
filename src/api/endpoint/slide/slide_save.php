@@ -34,10 +34,11 @@ $SLIDE_SAVE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
-		'id' => API_P_STR|API_P_OPT|API_P_NULL,
+		'id' => API_P_STR|API_P_NULL|API_P_OPT,
 		'name' => API_P_STR,
 		'index' => API_P_INT,
-		'markup' => API_P_STR|API_P_STR_ALLOW_EMPTY,
+		'markup' => API_P_STR|API_P_EMPTY_STR_OK,
+		'owner' => API_P_UNUSED,
 		'time' => API_P_INT
 	)
 ));

@@ -8,11 +8,14 @@
 *    * id = The id of the slide to get.
 *
 *  Return value
-*    * id      = The ID of the slide.
-*    * name    = The name of the slide.
-*    * index   = The index of the slide.
-*    * time    = The time the slide is shown.
-*    * markup  = The markup of the slide.
+*    * slide
+*
+*      * id      = The ID of the slide.
+*      * name    = The name of the slide.
+*      * index   = The index of the slide.
+*      * time    = The time the slide is shown.
+*      * markup  = The markup of the slide.
+*
 *    * error   = An error code or API_E_OK on success.
 *
 *  <====
@@ -41,7 +44,7 @@ if (in_array($SLIDE_GET->get('id'), $list)) {
 	$slide = new Slide();
 	$slide->load($SLIDE_GET->get('id'));
 
-	$SLIDE_GET->resp_set($slide->get_data());
+	$SLIDE_GET->resp_set(array('slide' => $slide->get_data()));
 	$SLIDE_GET->send();
 }
 

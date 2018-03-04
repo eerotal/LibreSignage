@@ -19,14 +19,21 @@ const API_RESPONSE = array(
 	"TEXT" => 1
 );
 
-// API parameter bitmasks.
+// API type flags.
 const API_P_STR			= 0x1;
 const API_P_INT			= 0x2;
 const API_P_FLOAT		= 0x4;
 const API_P_ARR			= 0x8;
 const API_P_OPT			= 0x10;
-const API_P_STR_ALLOW_EMPTY	= 0x20;
-const API_P_NULL		= 0x40;
+const API_P_NULL		= 0x20;
+
+// API data flags.
+const API_P_EMPTY_STR_OK	= 0x40;
+
+// API convenience flags.
+const API_P_ANY			= API_P_STR|API_P_INT|API_P_FLOAT
+				|API_P_ARR|API_P_NULL;
+const API_P_UNUSED 		= API_P_ANY|API_P_EMPTY_STR_OK|API_P_OPT;
 
 class APIEndpoint {
 	const METHOD		= 'method';
@@ -43,7 +50,6 @@ class APIEndpoint {
 	private $req_quota = TRUE;
 	private $data = NULL;
 	private $inited = FALSE;
-	private $error = 0;
 
 	public function __construct(array $config) {
 		$args = new ArgumentArray(
@@ -73,20 +79,18 @@ class APIEndpoint {
 		*/
 		$str = @file_get_contents('php://input');
 		if ($str === FALSE) {
-			$this->error = API_E_INTERNAL;
 			throw new IntException('Failed to read '.
 					'request data!');
 		}
 		$data = json_decode($str, $assoc=TRUE);
-		if (json_last_error() != JSON_ERROR_NONE) {
-			$this->error = API_E_INTERNAL;
+		if ($data === NULL &&
+			json_last_error() != JSON_ERROR_NONE) {
 			throw new IntException('Request data parsing '.
 						'failed!');
 		}
-		if (!$this->_verify($data)) {
-			$this->error = API_E_INVALID_REQUEST;
-			throw new ArgException('Invalid request data!');
-		}
+
+		$this->_verify($data);
+
 		$this->data = $data;
 		$this->inited = TRUE;
 	}
@@ -96,10 +100,7 @@ class APIEndpoint {
 		*  Load GET data. Throws exception and sets the
 		*  error flag on error.
 		*/
-		if (!$this->_verify($_GET)) {
-			$this->error = API_E_INVALID_REQUEST;
-			throw new ArgException('Invalid request data!');
-		}
+		$this->_verify($_GET);
 		$this->data = $_GET;
 		$this->inited = TRUE;
 	}
@@ -117,56 +118,54 @@ class APIEndpoint {
 		}
 	}
 
-	private function _chk_param_type($param, int $bitmask) {
+	private function _chk_type(array $data, array $format, $i) {
 		/*
-		*  Check whether $param is of the type defined
-		*  in $bitmask.
-		*
-		*  A bitmask can have a real type and NULL
-		*  specified, so check for NULL first and continue
-		*  to other types if NULL isn't specified as a type.
+		*  Check the value at $i in $data against the
+		*  configured type flags in $format and throw an
+		*  ArgException if the types don't match.
 		*/
-		if (API_P_NULL & $bitmask) {
-			if (gettype($param) == 'NULL') {
-				return TRUE;
-			}
+		$bitmask = $format[$i];
+		$type = gettype($data[$i]);
+		$ok = FALSE;
+
+		if (API_P_NULL & $bitmask && $type == 'NULL') {
+			$ok = TRUE;
+		} elseif (API_P_STR & $bitmask && $type == 'string') {
+			$ok = TRUE;
+		} elseif (API_P_INT & $bitmask && $type == 'integer') {
+			$ok = TRUE;
+		} elseif (API_P_ARR & $bitmask && $type == 'array') {
+			$ok = TRUE;
+		} elseif (API_P_BOOL & $bitmask && $type == 'boolean') {
+			$ok = TRUE;
+		} elseif (API_P_FLOAT & $bitmask && $type == 'double') {
+			$ok = TRUE;
 		}
 
-		/*
-		*  Check for the real types. Only one of these
-		*  can be defined at a time.
-		*/
-		if (API_P_STR & $bitmask) {
-			return gettype($param) == 'string';
-		} elseif (API_P_INT & $bitmask) {
-			return gettype($param) == 'integer';
-		} elseif (API_P_ARR & $bitmask) {
-			return gettype($param) == 'array';
-		} elseif (API_P_BOOL & $bitmask) {
-			return gettype($param) == 'boolean';
-		} elseif (API_P_FLOAT & $bitmask) {
-			return gettype($param) == 'double';
+		if (!$ok) {
+			throw new ArgException(
+				"Invalid type '$type' for '$i'."
+			);
 		}
 	}
 
-	private function _chk_param_data($param, int $bitmask) {
+	function _chk_data(array $data, array $format, $i) {
 		/*
-		*  Check whether the data in $param is
-		*  valid according to the type defined in
-		*  $bitmask.
+		*  Check the value at $i in $data against the
+		*  configured data flags in $format and throw an
+		*  ArgException id the data doesn't match the flags.
 		*/
-		if (!(API_P_NULL & $bitmask) &&
-			API_P_STR & $bitmask &&
-			strlen($param) == 0) {
-			/*
-			*     Type is not NULL
-			*  -> Type is string
-			*  -> String length is 0
-			*  -> Return TRUE if empty strings are allowed.
-			*/
-			return (API_P_STR_ALLOW_EMPTY & $bitmask) != 0;
+		$bitmask = $format[$i];
+		$value =  $data[$i];
+
+		if (!(API_P_EMPTY_STR_OK & $bitmask)
+			&& gettype($data[$i]) == 'string'
+			&& empty($value)) {
+			throw new ArgException(
+				"Invalid empty data for '$i'."
+			);
 		}
-		return TRUE;
+
 	}
 
 	private function _is_param_opt(int $bitmask) {
@@ -195,23 +194,17 @@ class APIEndpoint {
 				if ($this->_is_param_opt($format[$k])) {
 					continue;
 				}
-				return FALSE;
+				throw new ArgException(
+					"API request parameter ".
+					"'$format[$k]' missing."
+				);
 			}
 			if (gettype($format[$k]) == 'array') {
 				// Verify nested formats.
-				if (!$this->_verify($data[$k],
-						$format[$k])) {
-					return FALSE;
-				}
+				$this->_verify($data[$k], $format[$k]);
 			} else {
-				if (!$this->_chk_param_type($data[$k],
-						$format[$k])) {
-					return FALSE;
-				}
-				if (!$this->_chk_param_data($data[$k],
-						$format[$k])) {
-					return FALSE;
-				}
+				$this->_chk_type($data, $format, $k);
+				$this->_chk_data($data, $format, $k);
 			}
 		}
 
@@ -220,24 +213,13 @@ class APIEndpoint {
 		*  $this->strict_format is TRUE.
 		*/
 		if ($this->strict_format) {
-			if (array_is_subset(array_keys($data),
+			if (!array_is_subset(array_keys($data),
 					array_keys($format))) {
-				return TRUE;
-			} else {
-				return FALSE;
+				throw new ArgException(
+					"Extra keys in API request."
+				);
 			}
 		}
-		return TRUE;
-	}
-
-	public function last_error() {
-		/*
-		*  Get the last error that occurred and
-		*  reset the error flag.
-		*/
-		$tmp = $this->error;
-		$this->error = API_E_OK;
-		return $tmp;
 	}
 
 	public function get($key = NULL) {
@@ -363,10 +345,13 @@ function api_endpoint_init(APIEndpoint $endpoint, $user) {
 
 	try {
 		$endpoint->load_data();
-	} catch(Exception $e) {
+	} catch(ArgException $e) {
 		throw new APIException(
-			$endpoint->last_error(),
-			$e->getMessage(), 0, $e
+			API_E_INVALID_REQUEST, $e->getMessage(), 0, $e
+		);
+	} catch(IntException $e) {
+		throw new APIException(
+			API_E_INTERNAL, $e->getMessage(), 0, $e
 		);
 	}
 	header('Content-Type: '.$endpoint->get_content_type());

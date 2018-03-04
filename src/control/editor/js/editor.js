@@ -14,6 +14,7 @@ const DIALOG_MARKUP_TOO_LONG = (max) => {
 const NEW_SLIDE_DEFAULTS = {
 	'id': null,
 	'name': 'NewSlide',
+	'owner': null,
 	'time': 5000,
 	'markup': '',
 	'index': 0
@@ -40,11 +41,21 @@ function set_editor_status(str) {
 	EDITOR_STATUS.text(str);
 }
 
-function clear_editor_controls() {
-	SLIDE_INPUT.setValue('');
-	SLIDE_NAME.val('');
-	SLIDE_TIME.val(1);
-	SLIDE_INDEX.val('');
+function set_editor_inputs(slide) {
+	if (!slide) {
+		SLIDE_INPUT.setValue('');
+		SLIDE_NAME.val('');
+		SLIDE_OWNER.val('');
+		SLIDE_TIME.val(1);
+		SLIDE_INDEX.val('');
+	} else {
+		SLIDE_INPUT.setValue(slide.get('markup'));
+		SLIDE_NAME.val(slide.get('name'));
+		SLIDE_OWNER.val(slide.get('owner'));
+		SLIDE_TIME.val(slide.get('time')/1000);
+		SLIDE_INDEX.val(slide.get('index'));
+	}
+	SLIDE_INPUT.clearSelection(); // Deselect new text.
 }
 
 function disable_editor_controls() {
@@ -80,18 +91,11 @@ function slide_show(slide) {
 		if (ret) {
 			console.log("LibreSignage: API error!");
 			set_editor_status("Failed to load slide!");
-			clear_editor_controls();
+			set_editor_inputs(null);
 			disable_editor_controls();
 			return;
 		}
-
-		SLIDE_INPUT.setValue(_selected_slide.get('markup'));
-		SLIDE_INPUT.clearSelection(); // Deselect new text.
-
-		SLIDE_NAME.val(_selected_slide.get('name'));
-		SLIDE_OWNER.val(_selected_slide.get('owner'));
-		SLIDE_TIME.val(_selected_slide.get('time')/1000);
-		SLIDE_INDEX.val(_selected_slide.get('index'));
+		set_editor_inputs(_selected_slide);
 		enable_editor_controls();
 	});
 }
@@ -123,7 +127,7 @@ function slide_rm() {
 						_selected_slide.get('id') + "'.");
 				_selected_slide = null;
 				slidelist_trigger_update();
-				clear_editor_controls();
+				set_editor_inputs(null);
 				disable_editor_controls();
 				set_editor_status("Slide deleted!");
 			});
@@ -138,12 +142,7 @@ function slide_new() {
 	_selected_slide = new Slide();
 	_selected_slide.set(NEW_SLIDE_DEFAULTS);
 
-	SLIDE_INPUT.setValue(_selected_slide.get('markup'));
-	SLIDE_INPUT.clearSelection(); // Deselect new text.
-
-	SLIDE_NAME.val(_selected_slide.get('name'));
-	SLIDE_TIME.val(_selected_slide.get('time')/1000);
-	SLIDE_INDEX.val(_selected_slide.get('index'));
+	set_editor_inputs(_selected_slide);
 	enable_editor_controls();
 
 	/*
@@ -169,18 +168,12 @@ function slide_save() {
 		return;
 	}
 
-	var ret = _selected_slide.set({
+	_selected_slide.set({
 		'name': SLIDE_NAME.val(),
 		'time': parseInt(SLIDE_TIME.val())*1000,
 		'index': parseInt(SLIDE_INDEX.val()),
 		'markup': SLIDE_INPUT.getValue()
 	});
-
-	if (!ret) {
-		console.error("LibreSignage: Slide data error!");
-		set_editor_status("Save failed!");
-		return;
-	}
 
 	_selected_slide.save((stat) => {
 		if (api_handle_disp_error(stat)) {
@@ -197,7 +190,6 @@ function slide_save() {
 		*  editor controls except the Remove button.
 		*/
 		SLIDE_REMOVE.prop('disabled', false);
-
 		slidelist_trigger_update();
 	});
 }
