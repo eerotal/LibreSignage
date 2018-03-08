@@ -1,4 +1,4 @@
-const SLIDELIST_UPDATE_INTERVAL = 20000;
+const SLIDELIST_UPDATE_INTERVAL = 60000;
 
 const DIALOG_MARKUP_TOO_LONG = (max) => {
 	return new Dialog(
