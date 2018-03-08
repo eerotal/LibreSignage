@@ -1,4 +1,5 @@
 var SLIDELIST = $("#slidelist");
+var SLIDE_THUMB_SEL_STR = '.slide-thumb';
 
 var _slidelist_current = {};
 var _slidelist_old = {};
@@ -41,9 +42,8 @@ function slidelist_retrieve(ready_callback) {
 		{'name': 1, 'index': 1},
 		(resp) => {
 			if (resp.error) {
-				console.error("LibreSignage: " +
-						"API error!");
-				return;
+				throw new Error("LibreSignage: " +
+						"API error.")
 			}
 			_slidelist_old = {};
 			Object.assign(_slidelist_old,
@@ -55,7 +55,7 @@ function slidelist_retrieve(ready_callback) {
 
 			_slidelist_ready = true;
 			console.log("LibreSignage: Slide " +
-					"names retrieved!");
+					"names retrieved.");
 
 			if (ready_callback) {
 				ready_callback();
@@ -100,28 +100,36 @@ function _slidelist_update() {
 	*  Update the editor HTML with the new slide list.
 	*/
 	var id = null;
-	var html = "";
 	var list = slidelist_get();
-	console.log("LibreSignage: Updating slide list!");
+	console.log("LibreSignage: Update slide list.");
 
-	while ((id = _slidelist_next_id(id, list))) {
-		html += slidelist_btn(
-			id,
-			list[id]['index'],
-			list[id]['name']
+	SLIDELIST.html('');
+	while (id = _slidelist_next_id(id, list)) {
+		SLIDELIST.append(
+			slidelist_btn(
+				id,
+				list[id]['index'],
+				list[id]['name']
+			)
 		);
 	}
-	SLIDELIST.html(html);
+	console.log("LibreSignage: Disable logging for "+
+			"slide thumbnail iframes (log, warn, error).");
+	$(SLIDE_THUMB_SEL_STR).each(function() {
+		this.contentWindow.console.log = function() {};
+		this.contentWindow.console.warn = function() {};
+		this.contentWindow.console.error = function() {};
+	});
 }
 
 function slidelist_trigger_update() {
 	if (_slidelist_ready) {
 		console.log("LibreSignage: Trigger slidelist " +
-				"update!");
+				"update.");
 		slidelist_retrieve(_slidelist_update);
 	} else {
 		console.warn("LibreSignage: Not triggering a " +
 				"slidelist update when the " +
-				"previous one hasn't completed!");
+				"previous one hasn't completed.");
 	}
 }
