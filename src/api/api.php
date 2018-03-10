@@ -79,18 +79,22 @@ class APIEndpoint {
 		*/
 		$str = @file_get_contents('php://input');
 		if ($str === FALSE) {
-			throw new IntException('Failed to read '.
-					'request data!');
+			throw new IntException(
+				"Failed to read request data!"
+			);
 		}
-		$data = json_decode($str, $assoc=TRUE);
-		if ($data === NULL &&
-			json_last_error() != JSON_ERROR_NONE) {
-			throw new IntException('Request data parsing '.
-						'failed!');
+		if (!strlen($str)) {
+			$data = array();
+		} else {
+			$data = json_decode($str, $assoc=TRUE);
+			if ($data === NULL &&
+				json_last_error() != JSON_ERROR_NONE) {
+				throw new IntException(
+					"Request data parsing failed!"
+				);
+			}
 		}
-
 		$this->_verify($data);
-
 		$this->data = $data;
 		$this->inited = TRUE;
 	}
@@ -196,7 +200,7 @@ class APIEndpoint {
 				}
 				throw new ArgException(
 					"API request parameter ".
-					"'$format[$k]' missing."
+					"'$k' missing."
 				);
 			}
 			if (gettype($format[$k]) == 'array') {
