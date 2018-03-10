@@ -15,7 +15,9 @@ function auth_verify(string $username, string $password) {
 	*  that the password matches $password. Returns the User
 	*  object if the verification is successful and NULL otherwise.
 	*/
-	if (!user_exists($username)) {
+	if (empty($username) ||
+		empty($password) ||
+		!user_exists($username)) {
 		return NULL;
 	}
 
@@ -28,7 +30,19 @@ function auth_verify(string $username, string $password) {
 	return NULL;
 }
 
-function auth_login(string $username, string $password) {
+function auth_key_verify(string $key) {
+	if (!empty($key)) {
+		$users = user_array();
+		foreach ($users as $k => $u) {
+			if (in_array($key, $u->get_keys())) {
+				return $u;
+			}
+		}
+	}
+	return NULL;
+}
+
+function auth_login($username, $password, $key = NULL) {
 	/*
 	*  Attempt to login with $username and $password.
 	*  Returns TRUE if the login succeeds and FALSE
@@ -42,14 +56,25 @@ function auth_login(string $username, string $password) {
 		return TRUE;
 	}
 
-	if (!empty($username) && !empty($password)) {
+	$tmp = NULL;
+	if (!empty($username) || !empty($password)) {
 		$tmp = auth_verify($username, $password);
-		if ($tmp != NULL) {
-			$_SESSION['user'] = $tmp->get_name();
-			return TRUE;
-		}
+	} else if (!empty($key)) {
+		$tmp = auth_key_verify($key);
+	}
+	if ($tmp != NULL) {
+		$_SESSION['user'] = $tmp->get_name();
+		return TRUE;
 	}
 	return FALSE;
+}
+
+function auth_attempt_key_login() {
+	if (!empty($_GET['auth'])) {
+		return auth_login(NULL, NULL, $_GET['auth']);
+	} else {
+		return FALSE;
+	}
 }
 
 function auth_logout() {
@@ -93,7 +118,6 @@ function auth_is_authorized(array $groups = NULL,
 	*  If $redir is TRUE, this function also redirects the client to
 	*  the login page if the user is not logged in or to the HTTP
 	*  403 page if access is not granted.
-	*
 	*/
 	_auth_chk_session();
 	$auth_u = FALSE;

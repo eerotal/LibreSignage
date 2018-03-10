@@ -1,5 +1,6 @@
 {
 	"user":"user",
-	"groups":["editor"],
-	"hash":"$2y$10$dtPURh2O5OeuPQipr.f9w.XysSgMuQ4j\/J9zPjPXdDURoQ6OTCvNW"
+	"groups":["editor", "display"],
+	"hash":"$2y$10$dtPURh2O5OeuPQipr.f9w.XysSgMuQ4j\/J9zPjPXdDURoQ6OTCvNW",
+	"keys":[]
 }

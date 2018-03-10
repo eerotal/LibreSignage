@@ -204,6 +204,7 @@ class User {
 	private $user = '';
 	private $hash = '';
 	private $groups = NULL;
+	private $keys = NULL;
 	private $ready = FALSE;
 
 	public function __construct($name = NULL) {
@@ -253,6 +254,7 @@ class User {
 		$this->set_name($data['user']);
 		$this->set_groups($data['groups']);
 		$this->set_hash($data['hash']);
+		$this->set_keys($data['keys']);
 		$this->set_ready(TRUE);
 	}
 
@@ -283,7 +285,8 @@ class User {
 		$json = json_encode(array(
 			'user' => $this->user,
 			'groups' => $this->groups,
-			'hash' => $this->hash
+			'hash' => $this->hash,
+			'keys' => $this->keys
 		));
 		if ($json === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
@@ -324,6 +327,11 @@ class User {
 		return $this->hash;
 	}
 
+	public function get_keys() {
+		$this->_error_on_not_ready();
+		return $this->keys;
+	}
+
 	public function is_in_group(string $group) {
 		$this->_error_on_not_ready();
 		return in_array($group, $this->groups, TRUE);
@@ -331,6 +339,11 @@ class User {
 
 	public function is_ready() {
 		return $this->ready;
+	}
+
+	public function verify_key(string $key) {
+		$this->_error_on_not_ready();
+		return in_array($key, $this->keys);
 	}
 
 	public function verify_password(string $pass) {
@@ -381,6 +394,10 @@ class User {
 			throw new ArgException('Invalid password hash.');
 		}
 		$this->hash = $hash;
+	}
+
+	public function set_keys(array $keys) {
+		$this->keys = $keys;
 	}
 
 	public function set_ready(bool $val) {

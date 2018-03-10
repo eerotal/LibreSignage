@@ -3,7 +3,8 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
 	session_start();
-	auth_is_authorized(NULL, NULL, TRUE);
+	auth_attempt_key_login();
+	auth_is_authorized(array("display"), NULL, TRUE);
 ?>
 <!DOCTYPE html>
 <html lang="en">
