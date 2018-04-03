@@ -9,6 +9,7 @@
 *
 *      * user     = The name of the user.
 *      * groups   = The groups the user is in.
+*      * keys     = The keys for the user.
 *
 *    * error      = An error code or API_E_OK on success.
 *
@@ -38,7 +39,8 @@ $u = auth_session_user();
 $ret_data = array(
 	'user' => array(
 		'user' => $u->get_name(),
-		'groups' => $u->get_groups()
+		'groups' => $u->get_groups(),
+		'keys' => $u->get_keys()
 	)
 );
 $USER_GET->resp_set($ret_data);

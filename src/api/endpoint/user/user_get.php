@@ -2,7 +2,12 @@
 /*
 *  ====>
 *
-*  *Get a user's data based on a username.*
+*  *Get a user's data based on a username. Note that this
+*  endpoint doesn't return any secret information like
+*  passwords or authetication keys. user_get_current.php
+*  returns the available secret information aswell. The
+*  user_get_keys.php endpoint can be used for getting
+*  just the authentication keys for the current user.*
 *
 *  GET parameters
 *    * user = The username to query.

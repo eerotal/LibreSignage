@@ -23,8 +23,9 @@
 		?>
 		<main class="container-fluid">
 			<div class="user-settings-cont container mx-auto">
+				<h2>User settings</h2>
 				<!-- Username -->
-				<div class="row form-group">
+				<div class="row form-group w-100">
 					<label class="col-sm-4 col-form-label"
 						for="user-name">
 						Username
@@ -37,40 +38,40 @@
 				</div>
 
 				<!-- User groups -->
-				<div class="row form-group">
+				<div class="row form-group w-100">
 					<label class="col-sm-4 col-form-label"
-						for="user-groups">
+					for="user-groups">
 							Groups
 					</label>
 					<input id="user-groups"
 						type="text"
 						class="col-sm-8 form-control"
-						readonly>
+					readonly>
 					</input>
 				</div>
 
 				<!-- Password input -->
 				<div id="user-pass-group"
-					class="row form-group">
+					class="row form-group w-100">
 					<label class="col-sm-4 col-form-label"
 						for="user-pass">
 						Password
 					</label>
 					<input id="user-pass"
-						type="password"
+							type="password"
 						class="col-sm-8 form-control">
 					</input>
 				</div>
 
 				<!-- Password confirm input -->
-				<div class="row form-group">
+				<div class="row form-group w-100">
 					<label class="col-sm-4 col-form-label"
 						for="user-pass-confirm">
 						Confirm&nbsp;password
 					</label>
 					<div id="user-pass-confirm-group"
 						class="col-sm-8 p-0">
-						<input id="user-pass-confirm"
+					<input id="user-pass-confirm"
 							type="password"
 							class="form-control">
 						</input>
@@ -79,13 +80,35 @@
 				</div>
 
 				<!-- Save button -->
-				<div class="row form-group">
+				<div class="row form-group w-100">
 					<input id="user-save"
 						class="col-sm-12 btn btn-primary"
 						type="button"
 						value="Save"
-						onclick="user_settings_save()">
+							onclick="user_settings_save()">
 					</input>
+				</div>
+			</div>
+			<div class="user-settings-cont container mx-auto">
+				<h2>Authentication keys</h2>
+				<div class="row form-group w-100">
+					<table id="user-keys-table" class="table">
+						<thead>
+							<tr>
+								<th scope="col">Key</th>
+								<th scope="col">Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+				<div class="row form-group w-100">
+					<input id="key-create"
+						class="col-sm-12 btn btn-primary"
+						type="button"
+						value="Generate a new key"
+						onclick="user_settings_key_generate()">
 				</div>
 			</div>
 		</main>

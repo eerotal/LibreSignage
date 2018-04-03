@@ -39,6 +39,18 @@ var API_ENDP = {
 		uri:	"/api/endpoint/user/users_get_all.php",
 		method:	"GET"
 	},
+	USER_GENERATE_KEY: {
+		uri:	"/api/endpoint/user/user_generate_key.php",
+		method:	"POST"
+	},
+	USER_REMOVE_KEY: {
+		uri:	"/api/endpoint/user/user_remove_key.php",
+		method:	"POST"
+	},
+	USER_GET_KEYS: {
+		uri:	"/api/endpoint/user/user_get_keys.php",
+		method:	"GET"
+	},
 
 	// -- Slide API endpoints --
 	SLIDE_LIST: {

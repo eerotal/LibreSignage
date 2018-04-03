@@ -1,10 +1,11 @@
 .user-settings-cont {
 	min-width: 200px;
 	max-width: 550px;
+	padding-bottom: 20px;
 	padding-left: 45px;
 	padding-right: 45px;
 }
 
-.is-invalid-label {
-	color: var(--red);
+#user-keys-table td {
+	vertical-align: middle;
 }
