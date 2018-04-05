@@ -74,6 +74,16 @@ var API_ENDP = {
 		method: "POST"
 	},
 
+	// -- Authentication API endpoints --
+	AUTH_LOGIN: {
+		uri:	"/api/endpoint/auth/auth_login.php",
+		method: "POST"
+	},
+	AUTH_LOGIN_KEY: {
+		uri:	"/api/endpoint/auth/auth_login_key.php",
+		method: "POST"
+	},
+
 	// -- General information API endpoints --
 	API_ERR_CODES: {
 		uri:	"/api/endpoint/general/api_err_codes.php",
@@ -233,28 +243,11 @@ function api_load_limits(callback) {
 	});
 }
 
-function api_auth_setup() {
-	/*
-	*  Setup authentication cookies if they aren't
-	*  already setup.
-	*/
-	var get = null;
-
-	console.log("LibreSignage API: Authentication setup.");
-	if (get_cookies['auth']) { return;}
-
-	get = get_GET_parameters();
-	if (get['auth']) {
-		document.cookie = `auth=${get['auth']};`
-	}
-}
-
 function api_init(callback) {
 	/*
 	*  Initialize the API interface.
 	*/
 	if (API_INITED) { return; }
-	api_auth_setup();
 	api_load_error_codes(() => {
 		api_load_error_msgs(() => {
 			api_load_limits(() => {
@@ -262,7 +255,9 @@ function api_init(callback) {
 						"initialized!");
 
 				API_INITED = true;
-				callback();
+				if (callback) {
+					callback();
+				}
 			});
 		});
 	});

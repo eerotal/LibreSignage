@@ -2,10 +2,7 @@
 /*
 *  ====>
 *
-*  *Login using an authentication key.*
-*
-*  POST parameters
-*    * key = The authentication key to use.
+*  *Logout using the authentication system.*
 *
 *  Return value
 *    * error = An error code or API_E_OK on success.
@@ -18,28 +15,16 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
-$AUTH_LOGIN = new APIEndpoint(array(
+$AUTH_LOGOUT = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
-		'key' => API_P_STR
-	),
+	APIEndpoint::FORMAT => array(),
 	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_AUTH		=> FALSE
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($AUTH_LOGIN, NULL);
+api_endpoint_init($AUTH_LOGOUT, auth_session_user());
 
-$ret = auth_login_key(
-	$AUTH_LOGIN->get('key')
-);
+auth_logout();
 
-if ($ret) {
-	$AUTH_LOGIN->resp_set(array(
-		'error' => API_E_OK
-	));
-} else {
-	$AUTH_LOGIN->resp_set(array(
-		'error' => API_E_INCORRECT_CREDS
-	));
-}
-$AUTH_LOGIN->send();
+$AUTH_LOGOUT->resp_set(array('error' => API_E_OK));
+$AUTH_LOGOUT->send();

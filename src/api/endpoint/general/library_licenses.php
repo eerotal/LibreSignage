@@ -15,9 +15,10 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 $LIBRARY_LICENSES = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['TEXT'],
-	APIEndpoint::REQ_QUOTA		=> FALSE
+	APIEndpoint::REQ_QUOTA		=> FALSE,
+	APIEndpoint::REQ_AUTH		=> FALSE
 ));
-api_endpoint_init($LIBRARY_LICENSES, auth_session_user());
+api_endpoint_init($LIBRARY_LICENSES, NULL);
 
 $LIBRARY_LICENSES->resp_set(file_get_contents(
 	realpath(LIBRESIGNAGE_ROOT.LICENSES_EXT_RST)

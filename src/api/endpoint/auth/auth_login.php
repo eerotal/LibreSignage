@@ -20,7 +20,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
 $AUTH_LOGIN = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['GET'],
+	APIEndpoint::METHOD		=> API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
 		'username' => API_P_STR,
@@ -42,7 +42,7 @@ if ($ret) {
 	));
 } else {
 	$AUTH_LOGIN->resp_set(array(
-		'error' => API_E_INCORRECT_CREDENTIALS
+		'error' => API_E_INCORRECT_CREDS
 	));
 }
 $AUTH_LOGIN->send();
