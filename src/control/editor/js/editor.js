@@ -215,61 +215,64 @@ function slide_preview() {
 }
 
 function editor_setup() {
-	api_init(() => {
-		setup_defaults();
+	setup_defaults();
 
-		name_sel = new ValidatorSelector(
-			SLIDE_NAME,
-			SLIDE_NAME_GRP,
-			[new StrValidator({
-				min: 1,
-				max: SERVER_LIMITS.SLIDE_NAME_MAX_LEN,
-				regex: null
-			}, "The name is too short or too long."),
-			new StrValidator({
-				min: null,
-				max: null,
-				regex: /^[A-Za-z0-9_-]*$/
-			}, "The name contains invalid characters.")]
-		);
-		index_sel = new ValidatorSelector(
-			SLIDE_INDEX,
-			SLIDE_INDEX_GRP,
-			[new NumValidator({
-				min: 0,
-				max: SERVER_LIMITS.SLIDE_MAX_INDEX,
-				nan: false,
-				float: true
-			}, "The index is outside the accepted bounds."),
-			new NumValidator({
-				min: null,
-				max: null,
-				nan: true,
-				float: false
-			}, "The index must be an integer value.")]
-		);
+	name_sel = new ValidatorSelector(
+		SLIDE_NAME,
+		SLIDE_NAME_GRP,
+		[new StrValidator({
+			min: 1,
+			max: SERVER_LIMITS.SLIDE_NAME_MAX_LEN,
+			regex: null
+		}, "The name is too short or too long."),
+		new StrValidator({
+			min: null,
+			max: null,
+			regex: /^[A-Za-z0-9_-]*$/
+		}, "The name contains invalid characters.")]
+	);
+	index_sel = new ValidatorSelector(
+		SLIDE_INDEX,
+		SLIDE_INDEX_GRP,
+		[new NumValidator({
+			min: 0,
+			max: SERVER_LIMITS.SLIDE_MAX_INDEX,
+			nan: false,
+			float: true
+		}, "The index is outside the accepted bounds."),
+		new NumValidator({
+			min: null,
+			max: null,
+			nan: true,
+			float: false
+		}, "The index must be an integer value.")]
+	);
 
-		val_trigger = new ValidatorTrigger(
-			[name_sel, index_sel],
-			(valid) => {
-				SLIDE_SAVE.prop('disabled', !valid);
-			}
-		);
+	val_trigger = new ValidatorTrigger(
+		[name_sel, index_sel],
+		(valid) => {
+			SLIDE_SAVE.prop('disabled', !valid);
+		}
+	);
 
-		/*
-		*  Setup the ACE editor with the Dawn theme
-		*  and plaintext mode.
-		*/
-		SLIDE_INPUT = ace.edit('slide-input');
-		SLIDE_INPUT.setTheme('ace/theme/dawn');
-		SLIDE_INPUT.$blockScrolling = Infinity;
+	/*
+	*  Setup the ACE editor with the Dawn theme
+	*  and plaintext mode.
+	*/
+	SLIDE_INPUT = ace.edit('slide-input');
+	SLIDE_INPUT.setTheme('ace/theme/dawn');
+	SLIDE_INPUT.$blockScrolling = Infinity;
 
-		// Disable inputs initially and setup update intevals.
-		disable_editor_controls();
-		slidelist_trigger_update();
-		setInterval(slidelist_trigger_update,
-			SLIDELIST_UPDATE_INTERVAL);
-	});
+	// Disable inputs initially and setup update intevals.
+	disable_editor_controls();
+	slidelist_trigger_update();
+	setInterval(
+		slidelist_trigger_update,
+		SLIDELIST_UPDATE_INTERVAL
+	);
 }
 
-editor_setup();
+api_init(
+	null,	// Use default config.
+	editor_setup
+)

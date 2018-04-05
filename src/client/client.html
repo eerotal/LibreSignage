@@ -1,0 +1,29 @@
+<!--
+	A client login and redirection page for the
+	default LibreSignage display interface. The
+	files in this directory (client.html and the js
+	directory) should be copied to the client devices.
+	The configuration variables HOST and KEY below
+	should be modified to reflect the specific production
+	environment. HOST is the FQDN or IP address of the
+	server and KEY is the authentication key that's used
+	by the client.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+	<body>
+		<div id="log"></div>
+		<script>
+			// Client configuration.
+			const HOST = "";
+			const KEY = "";
+			const PROTOCOL = "http:";
+		</script>
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+			integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			crossorigin="anonymous">
+		</script>
+ 		<script src="js/client.js"></script>
+	</body>
+</html>

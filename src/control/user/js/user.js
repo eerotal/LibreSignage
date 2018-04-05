@@ -128,8 +128,11 @@ function user_settings_key_delete(key) {
 	});
 }
 
-api_init(() => {
-	// Load the current (logged in) user.
-	_usr = new User();
-	_usr.load(null, user_settings_setup);
-});
+api_init(
+	null,	// Use default config.
+	() => {
+		// Load the current (logged in) user.
+		_usr = new User();
+		_usr.load(null, user_settings_setup);
+	}
+);

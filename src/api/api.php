@@ -318,16 +318,25 @@ class APIEndpoint {
 	}
 }
 
-function api_endpoint_init(APIEndpoint $endpoint, $user) {
+function api_handle_preflight() {
 	/*
-	*  Initialize the APIEnpoint $endpoint and
-	*  error out of the API call if an exception
-	*  is thrown. This function also sets the
-	*  correct HTTP Content-Type header for the
-	*  endpoint.
+	*  Handle sending proper responses for preflight
+	*  requests.
+	*/
+	header('Access-Control-Allow-Origin: *');
+	header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+	header('Access-Control-Allow-Headers: Content-Type');
+	header('Access-Control-Max-Age: 600');
+}
+
+function api_handle_request(APIEndpoint $endpoint, $user) {
+	/*
+	*  Handle reqular API calls using POST or GET.
 	*/
 
-	api_error_setup();
+	// Send required headers.
+	header('Content-Type: '.$endpoint->get_content_type());
+	header('Access-Control-Allow-Origin: *');
 
 	// Check authentication if required.
 	if ($endpoint->requires_authentication()) {
@@ -378,5 +387,33 @@ function api_endpoint_init(APIEndpoint $endpoint, $user) {
 			API_E_INTERNAL, $e->getMessage(), 0, $e
 		);
 	}
-	header('Content-Type: '.$endpoint->get_content_type());
+}
+
+function api_endpoint_init(APIEndpoint $endpoint, $user) {
+	/*
+	*  Handle endpoint initialization and API calls.
+	*  This function and the api_handle_* functions
+	*  also take care of all the smaller protocol details
+	*  like handling preflight requests and sending the
+	*  proper HTTP headers.
+	*/
+
+	api_error_setup();
+
+	switch ($_SERVER['REQUEST_METHOD']) {
+		case "POST":
+			api_handle_request($endpoint, $user);
+			break;
+		case "GET":
+			api_handle_request($endpoint, $user);
+			break;
+		case "OPTIONS":
+			api_handle_preflight();
+			break;
+		default:
+			header('Content-Type: '.$endpoint->get_content_type());
+			throw new ArgAxception("Invalid request method.");
+			break;
+	}
+
 }

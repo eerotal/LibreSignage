@@ -4,10 +4,15 @@
 *  interface with the LibreSignage API.
 */
 
+var API_CONFIG = {
+	protocol: null,
+	hostname: null,
+	configured: false
+}
+
 var SERVER_LIMITS = null;
 var API_E_MESSAGES = null;
 var API_E = null;
-var API_INITED = false;
 
 var API_ENDP = {
 	// -- User management API endpoints --
@@ -83,6 +88,10 @@ var API_ENDP = {
 		uri:	"/api/endpoint/auth/auth_login_key.php",
 		method: "POST"
 	},
+	AUTH_LOGOUT: {
+		uri:	"/api/endpoint/auth/auth_logout.php",
+		method: "POST"
+	},
 
 	// -- General information API endpoints --
 	API_ERR_CODES: {
@@ -104,6 +113,12 @@ var API_ENDP = {
 	LIBRESIGNAGE_LICENSE: {
 		uri:	"/api/endpoint/general/libresignage_license.php",
 		methof:	"GET"
+	}
+}
+
+function _api_chk_configured() {
+	if (!API_CONFIG.configured) {
+		throw new Error("API not initialized");
 	}
 }
 
@@ -142,6 +157,8 @@ function api_call(endpoint, data, callback) {
 	*  left null if they are not needed.
 	*/
 
+	_api_chk_configured();
+
 	var data_str = "";
 	var req = new XMLHttpRequest();
 
@@ -151,8 +168,8 @@ function api_call(endpoint, data, callback) {
 			d = JSON.parse(this.responseText);
 		} catch(e) {
 			if (e instanceof SyntaxError) {
-				console.error("LibreSignage: Invalid " +
-						"API response syntax.");
+				console.error("API: Invalid " +
+						"response syntax.");
 				d = {'error': API_E.INTERNAL};
 			}
 		}
@@ -165,23 +182,33 @@ function api_call(endpoint, data, callback) {
 		*  content type x-www-form-urlencoded.
 		*/
 		data_str = _api_construct_GET_data(data);
-		req.open(endpoint.method, endpoint.uri +
-				"?" + data_str);
-		req.setRequestHeader("Content-Type",
-			"application/x-www-form-urlencoded");
+		req.open(
+			endpoint.method,
+			api_host() + endpoint.uri + "?" + data_str
+		);
+		req.setRequestHeader(
+			"Content-Type",
+			"application/x-www-form-urlencoded"
+		);
 		req.send();
 	} else {
 		/*
 		*  Send the POST data as JSON in the request body.
 		*/
 		data_str = JSON.stringify(data);
-		req.open(endpoint.method, endpoint.uri);
+		req.open(
+			endpoint.method,
+			api_host() + endpoint.uri
+		);
 		req.setRequestHeader("Content-Type", "application/json");
+		console.log(data_str);
 		req.send(data_str);
 	}
 }
 
 function api_handle_disp_error(err, callback) {
+	_api_chk_configured();
+
 	var h = "";
 	var p = "";
 
@@ -200,7 +227,7 @@ function api_handle_disp_error(err, callback) {
 		p = "The server encountered an unknown error.";
 	}
 	dialog(DIALOG.ALERT, h, p, callback);
-	console.error("LibreSignage: " + p);
+	console.error("API: " + p);
 	return err;
 }
 
@@ -243,18 +270,58 @@ function api_load_limits(callback) {
 	});
 }
 
-function api_init(callback) {
+function api_host() {
+	/*
+	*  Get the API host URL.
+	*/
+	_api_chk_configured();
+	return API_CONFIG.protocol + "\/\/" + API_CONFIG.hostname;
+}
+
+function api_apply_config(config) {
+	/*
+	*  Apply the API config from 'config'.
+	*/
+	var tmp = config;
+	console.log("API: Configuring API interface.")
+	if (tmp == null) {
+		tmp = {};
+	} else if (tmp !== Object(tmp)) {
+		throw new Error(
+			"Invalid type for 'config'. " +
+			"Expected object or null."
+		);
+	}
+
+	if (tmp.protocol) {
+		console.log("API: Protocol: " + tmp.protocol);
+		API_CONFIG.protocol = tmp.protocol;
+	} else {
+		console.log("API: Using default protocol.")
+		API_CONFIG.protocol = window.location.protocol;
+	}
+
+	if (tmp.hostname) {
+		console.log("API: Hostname: " + tmp.hostname);
+		API_CONFIG.hostname = tmp.hostname;
+	} else {
+		console.log("API: Using default hostname.");
+		API_CONFIG.hostname = window.location.hostname;
+	}
+}
+
+function api_init(config, callback) {
 	/*
 	*  Initialize the API interface.
 	*/
-	if (API_INITED) { return; }
+	if (API_CONFIG.configured) { return; }
+	api_apply_config(config);
+	API_CONFIG.configured = true;
+
 	api_load_error_codes(() => {
 		api_load_error_msgs(() => {
 			api_load_limits(() => {
-				console.log("LibreSignage API " +
-						"initialized!");
-
-				API_INITED = true;
+				console.log("API: Initialized.");
 				if (callback) {
 					callback();
 				}

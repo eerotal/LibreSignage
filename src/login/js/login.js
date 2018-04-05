@@ -40,4 +40,7 @@ function login_setup() {
 	BTN_LOGIN[0].addEventListener('click', login);
 }
 
-api_init(login_setup);
+api_init(
+	null,	// Use default config.
+	login_setup
+);
