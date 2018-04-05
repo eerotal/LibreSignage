@@ -34,7 +34,6 @@ $SLIDE_GET = new APIEndpoint(array(
 		'id' => API_P_STR
 	)
 ));
-session_start();
 api_endpoint_init($SLIDE_GET, auth_session_user());
 
 $list = get_slides_id_list();

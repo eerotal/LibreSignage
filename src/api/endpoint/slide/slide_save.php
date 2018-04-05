@@ -42,7 +42,6 @@ $SLIDE_SAVE = new APIEndpoint(array(
 		'time' => API_P_INT
 	)
 ));
-session_start();
 api_endpoint_init($SLIDE_SAVE, auth_session_user());
 
 $flag_new_slide = FALSE;

@@ -2,7 +2,6 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
-	session_start();
 	if (auth_is_authorized()) {
 		header('Location: '.LOGIN_LANDING);
 		exit(0);

@@ -20,7 +20,6 @@ $SLIDE_LIST = new APIEndpoint(array(
 	APIEndpoint::METHOD 		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE 	=> API_RESPONSE['JSON']
 ));
-session_start();
 api_endpoint_init($SLIDE_LIST, auth_session_user());
 
 $SLIDE_LIST->resp_set(array(

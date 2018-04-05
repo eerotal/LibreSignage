@@ -22,7 +22,6 @@ $SERVER_LIMITS = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::REQ_QUOTA		=> FALSE
 ));
-session_start();
 api_endpoint_init($SERVER_LIMITS, auth_session_user());
 
 if (!auth_is_authorized(NULL, NULL, FALSE)) {

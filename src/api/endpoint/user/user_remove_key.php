@@ -26,7 +26,6 @@ $USER_REMOVE_KEY = new APIEndpoint(array(
 		'key' => API_P_STR
 	)
 ));
-session_start();
 api_endpoint_init($USER_REMOVE_KEY, auth_session_user());
 
 if (!auth_is_authorized(array('keys'), NULL, FALSE)) {

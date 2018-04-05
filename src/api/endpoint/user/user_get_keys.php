@@ -22,7 +22,6 @@ $USER_GET_KEYS = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT		=> array()
 ));
-session_start();
 api_endpoint_init($USER_GET_KEYS, auth_session_user());
 
 if (!auth_is_authorized(NULL, NULL, FALSE)) {

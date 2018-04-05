@@ -27,7 +27,6 @@ $SLIDE_DATA_QUERY = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON']
 ));
-session_start();
 api_endpoint_init($SLIDE_DATA_QUERY, auth_session_user());
 
 // Check that the requested keys are in the required keys array.

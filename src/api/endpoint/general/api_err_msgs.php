@@ -22,7 +22,6 @@ $API_ERR_MSGS = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::REQ_QUOTA		=> FALSE
 ));
-session_start();
 api_endpoint_init($API_ERR_MSGS, auth_session_user());
 
 $API_ERR_MSGS->resp_set(array('messages' => API_E_MSG));

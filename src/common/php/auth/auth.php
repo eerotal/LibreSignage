@@ -3,17 +3,11 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 
-function _auth_chk_session() {
-	if (session_status() == PHP_SESSION_NONE) {
-		throw new IntException("No active session.");
-	}
-}
-
 function auth_verify(string $username, string $password) {
 	/*
-	*  Verify that the auth system has the user $username and
-	*  that the password matches $password. Returns the User
-	*  object if the verification is successful and NULL otherwise.
+	*  Verify the $username - $password combination. Returns the
+	*  corresponding User object if the verification is successful
+	*  and NULL otherwise.
 	*/
 	if (empty($username) ||
 		empty($password) ||
@@ -31,6 +25,11 @@ function auth_verify(string $username, string $password) {
 }
 
 function auth_key_verify(string $key) {
+	/*
+	*  Verify the authentication key $key. Returns the
+	*  corresponding user object if the verification is
+	*  successfull and NULL otherwise.
+	*/
 	if (!empty($key)) {
 		$users = user_array();
 		foreach ($users as $k => $u) {
@@ -42,48 +41,51 @@ function auth_key_verify(string $key) {
 	return NULL;
 }
 
-function auth_login($username, $password, $key = NULL) {
+function auth_login($username, $password) {
 	/*
-	*  Attempt to login with $username and $password.
-	*  Returns TRUE if the login succeeds and FALSE
-	*  otherwise. The $_SESSION data is also set when
-	*  the login succeeds. A session needs to be started
-	*  before calling this function.
+	*  Login using a username and password. Returns TRUE on
+	*  success and FALSE otherwise.
 	*/
-	_auth_chk_session();
+
+	// Already authenticated?
 	if (auth_is_authorized()) {
-		// Already logged in.
 		return TRUE;
 	}
 
 	$tmp = NULL;
-	if (!empty($username) || !empty($password)) {
+	if (!empty($username) && !empty($password)) {
 		$tmp = auth_verify($username, $password);
-	} else if (!empty($key)) {
-		$tmp = auth_key_verify($key);
-	}
-	if ($tmp != NULL) {
-		$_SESSION['user'] = $tmp->get_name();
-		return TRUE;
+		if ($tmp != NULL) {
+			$_SESSION['user'] = $tmp->get_name();
+			return TRUE;
+		}
 	}
 	return FALSE;
 }
 
-function auth_attempt_key_login() {
-	if (!empty($_GET['auth'])) {
-		return auth_login(NULL, NULL, $_GET['auth']);
-	} else {
-		return FALSE;
+function auth_login_key($key) {
+	/*
+	*  Login using an authentication key. Returns TRUE on
+	*  success and FALSE otherwise.
+	*/
+
+	// Already logged in?
+	if (auth_is_authorized()) {
+		return TRUE;
 	}
+
+	$tmp = NULL;
+	if (!empty($key)) {
+		$tmp = auth_key_verify($key);
+		if ($tmp != NULL) {
+			$_SESSION['user'] = $tmp->get_name();
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 function auth_logout() {
-	/*
-	*  Logout the currently logged in user. A session
-	*  needs to be started by the caller before calling
-	*  this function.
-	*/
-	_auth_chk_session();
 	$_SESSION = array();
 
 	if (ini_get('session.use_cookies')) {
@@ -119,7 +121,6 @@ function auth_is_authorized(array $groups = NULL,
 	*  the login page if the user is not logged in or to the HTTP
 	*  403 page if access is not granted.
 	*/
-	_auth_chk_session();
 	$auth_u = FALSE;
 	$auth_g = FALSE;
 	$usr = auth_session_user();
@@ -169,18 +170,33 @@ function auth_is_authorized(array $groups = NULL,
 
 function auth_session_user() {
 	$user = NULL;
-	_auth_chk_session();
 	if (empty($_SESSION['user'])) { return NULL; }
 	try {
+		// Attempt to load the userdata.
 		$user = new User($_SESSION['user']);
 	} catch (ArgException $e) {
-		/*
-		*  Logout since the current userdata in
-		*  $_SESSION is invalid.
-		*/
+		// Logout since the current username is invalid.
 		auth_logout();
 		session_start();
 		$user = NULL;
 	}
 	return $user;
 }
+
+function auth_setup() {
+	/*
+	*  Setup the authentication system.
+	*  - Start a new session.
+	*  - Set the 'auth_setup' flag in $_SESSION.
+	*/
+	session_start();
+
+	// Return if the setup is already done.
+	if (array_key_exists('auth_setup', $_SESSION) &&
+		$_SESSION['auth_setup']) {
+		return;
+	}
+}
+
+// Automatically setup the authentication system.
+auth_setup();

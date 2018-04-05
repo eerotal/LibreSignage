@@ -40,7 +40,8 @@ class APIEndpoint {
 	const RESPONSE_TYPE	= 'response_type';
 	const FORMAT		= 'format';
 	const STRICT_FORMAT	= 'strict_format';
-	const REQ_QUOTA	= 'req_quota';
+	const REQ_QUOTA		= 'req_quota';
+	const REQ_AUTH		= 'req_auth';
 
 	private $method = 0;
 	private $response_type = 0;
@@ -48,6 +49,7 @@ class APIEndpoint {
 	private $format = NULL;
 	private $strict_format = TRUE;
 	private $req_quota = TRUE;
+	private $req_auth = TRUE;
 	private $data = NULL;
 	private $inited = FALSE;
 
@@ -58,17 +60,27 @@ class APIEndpoint {
 				self::RESPONSE_TYPE => API_RESPONSE,
 				self::FORMAT        => 'array',
 				self::STRICT_FORMAT => 'boolean',
-				self::REQ_QUOTA     => 'boolean'
+				self::REQ_QUOTA     => 'boolean',
+				self::REQ_AUTH      => 'boolean'
 			),
 			array(
 				self::FORMAT        => array(),
 				self::STRICT_FORMAT => TRUE,
-				self::REQ_QUOTA     => TRUE
+				self::REQ_QUOTA     => TRUE,
+				self::REQ_AUTH      => TRUE
 			)
 		);
 		$ret = $args->chk($config);
 		foreach ($ret as $k => $v) {
 			$this->$k = $v;
+		}
+
+		// Check config validity.
+		if ($this->req_quota && !$this->req_auth) {
+			throw new ArgException(
+				"APIEndpoint can't require quota if ".
+				"authentication isn't required."
+			);
 		}
 	}
 
@@ -264,6 +276,10 @@ class APIEndpoint {
 		return $this->req_quota;
 	}
 
+	public function requires_authentication() {
+		return $this->req_auth;
+	}
+
 	public function resp_set($resp) {
 		/*
 		*  Set the API response data.
@@ -312,11 +328,15 @@ function api_endpoint_init(APIEndpoint $endpoint, $user) {
 	*/
 
 	api_error_setup();
-	if ($user == NULL) {
-		throw new APIException(
-			API_E_NOT_AUTHORIZED,
-			"Not logged in."
-		);
+
+	// Check authentication if required.
+	if ($endpoint->requires_authentication()) {
+		if ($user == NULL) {
+			throw new APIException(
+				API_E_NOT_AUTHORIZED,
+				"Not logged in."
+			);
+		}
 	}
 
 	// Use the API rate quota of the caller if required.

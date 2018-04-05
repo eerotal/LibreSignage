@@ -27,7 +27,6 @@ $SLIDE_RM = new APIEndpoint(array(
 		'id' => API_P_STR
 	)
 ));
-session_start();
 api_endpoint_init($SLIDE_RM, auth_session_user());
 
 $slide = new Slide();

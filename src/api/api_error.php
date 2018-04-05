@@ -16,14 +16,15 @@ const API_ERROR_TRACE = LIBRESIGNAGE_DEBUG;
 *  api_err_codes.php API endpoint.
 */
 const API_E = array(
-	"API_E_OK"		=> 0,
-	"API_E_INTERNAL"	=> 1,
-	"API_E_INVALID_REQUEST"	=> 2,
-	"API_E_NOT_AUTHORIZED"	=> 3,
-	"API_E_QUOTA_EXCEEDED"	=> 4,
-	"API_E_LIMITED"		=> 5,
-	"API_E_CLIENT"		=> 6, // Only for client side use!
-	"API_E_RATE"		=> 7
+	"API_E_OK"		      => 0,
+	"API_E_INTERNAL"	      => 1,
+	"API_E_INVALID_REQUEST"	      => 2,
+	"API_E_NOT_AUTHORIZED"	      => 3,
+	"API_E_QUOTA_EXCEEDED"	      => 4,
+	"API_E_LIMITED"		      => 5,
+	"API_E_CLIENT"		      => 6, // Only for client side use!
+	"API_E_RATE"		      => 7,
+	"API_E_INCORRECT_CREDENTIALS" => 8
 );
 
 // Define the error codes in the global namespace too.
@@ -70,7 +71,13 @@ const API_E_MSG = array(
 		"short" => "API rate limited",
 		"long" => "The server ignored an API call because the ".
 			"API rate limit was exceeded."
-	));
+	),
+	API_E_INCORRECT_CREDENTIALS => array(
+		"short" => "Incorrect credentials received",
+		"long" => "The authentication system received incorrect ".
+			"credentials."
+	)
+);
 
 class APIException extends Exception {
 	private $api_err = 0;

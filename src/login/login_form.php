@@ -2,8 +2,6 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
-	session_start();
-
 	// Redirect already logged in users to the landing page.
 	if (auth_is_authorized()) {
 		header('Location: '.LOGIN_LANDING);

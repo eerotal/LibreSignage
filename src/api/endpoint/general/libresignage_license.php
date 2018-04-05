@@ -18,8 +18,6 @@ $LIBRESIGNAGE_LICENSE = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['TEXT'],
 	APIEndpoint::REQ_QUOTA		=> FALSE
 ));
-
-session_start();
 api_endpoint_init($LIBRESIGNAGE_LICENSE, auth_session_user());
 
 $LIBRESIGNAGE_LICENSE->resp_set(file_get_contents(

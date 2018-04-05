@@ -46,7 +46,6 @@ $USER_SAVE = new APIEndpoint(array(
 		'groups' => API_P_ARR|API_P_OPT|API_P_NULL
 	)
 ));
-session_start();
 api_endpoint_init($USER_SAVE, auth_session_user());
 
 // Is authorized as an admin?

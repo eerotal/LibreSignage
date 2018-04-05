@@ -2,8 +2,6 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
-	session_start();
-	auth_attempt_key_login();
 	auth_is_authorized(array("display"), NULL, TRUE);
 ?>
 <!DOCTYPE html>
@@ -13,6 +11,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 		<link rel="stylesheet" href="/common/css/default.css">
+		<link rel="stylesheet" href="/common/css/dialog.css">
 		<link rel="stylesheet" href="/app/css/renderer.css">
 		<link rel="stylesheet" href="/app/css/display.css">
 		<link rel="stylesheet" href="/common/css/footer_minimal.css">
@@ -29,6 +28,7 @@
 
 		<script src="/common/js/util.js"></script>
 		<script src="/common/js/slide.js"></script>
+		<script src="/common/js/dialog.js"></script>
 		<script src="/common/js/api.js"></script>
 		<script src="/common/js/markup.js"></script>
 		<script src="/app/js/loader.js"></script>

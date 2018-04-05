@@ -17,7 +17,6 @@ $LIBRARY_LICENSES = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['TEXT'],
 	APIEndpoint::REQ_QUOTA		=> FALSE
 ));
-session_start();
 api_endpoint_init($LIBRARY_LICENSES, auth_session_user());
 
 $LIBRARY_LICENSES->resp_set(file_get_contents(

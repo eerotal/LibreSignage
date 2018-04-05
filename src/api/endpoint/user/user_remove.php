@@ -25,7 +25,6 @@ $USER_REMOVE = new APIEndpoint(array(
 		'user' => API_P_STR,
 	)
 ));
-session_start();
 api_endpoint_init($USER_REMOVE, auth_session_user());
 
 if (!auth_is_authorized(array('admin'), NULL, FALSE)) {

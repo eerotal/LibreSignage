@@ -37,7 +37,6 @@ $USER_CREATE = new APIEndpoint(array(
 		'groups' => API_P_ARR|API_P_OPT|API_P_NULL
 	)
 ));
-session_start();
 api_endpoint_init($USER_CREATE, auth_session_user());
 
 if (!auth_is_authorized(array('admin'), NULL, FALSE)) {

@@ -27,7 +27,6 @@ $USERS_GET_ALL = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON']
 ));
-session_start();
 api_endpoint_init($USERS_GET_ALL, auth_session_user());
 
 if (!auth_is_authorized(array('admin'), NULL, FALSE)) {

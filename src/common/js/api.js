@@ -233,16 +233,34 @@ function api_load_limits(callback) {
 	});
 }
 
+function api_auth_setup() {
+	/*
+	*  Setup authentication cookies if they aren't
+	*  already setup.
+	*/
+	var get = null;
+
+	console.log("LibreSignage API: Authentication setup.");
+	if (get_cookies['auth']) { return;}
+
+	get = get_GET_parameters();
+	if (get['auth']) {
+		document.cookie = `auth=${get['auth']};`
+	}
+}
+
 function api_init(callback) {
 	/*
 	*  Initialize the API interface.
 	*/
 	if (API_INITED) { return; }
+	api_auth_setup();
 	api_load_error_codes(() => {
 		api_load_error_msgs(() => {
 			api_load_limits(() => {
 				console.log("LibreSignage API " +
 						"initialized!");
+
 				API_INITED = true;
 				callback();
 			});

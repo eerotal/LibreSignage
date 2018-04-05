@@ -22,7 +22,6 @@ $USER_GENERATE_KEY = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT		=> array()
 ));
-session_start();
 api_endpoint_init($USER_GENERATE_KEY, auth_session_user());
 
 const DEFAULT_KEY_LEN = 15;
