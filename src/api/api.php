@@ -320,6 +320,23 @@ class APIEndpoint {
 	}
 }
 
+function api_key_verify(string $key) {
+	/*
+	*  Verify the API key $key. Returns the corresponding
+	*  user object if the verification is successful and
+	*  NULL otherwise.
+	*/
+	if (!empty($key)) {
+		$users = user_array();
+		foreach ($users as $k => $u) {
+			if ($u->verify_api_key($key)) {
+				return $u;
+			}
+		}
+	}
+	return NULL;
+}
+
 function api_handle_preflight() {
 	/*
 	*  Handle sending proper responses for preflight
@@ -363,7 +380,7 @@ function api_handle_request(APIEndpoint $endpoint) {
 		);
 	}
 
-	$caller = auth_api_key_verify(getallheaders()["Api-Key"]);
+	$caller = api_key_verify(getallheaders()["Api-Key"]);
 	if ($caller === NULL) {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,

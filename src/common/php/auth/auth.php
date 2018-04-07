@@ -24,23 +24,6 @@ function auth_verify(string $username, string $password) {
 	return NULL;
 }
 
-function auth_api_key_verify(string $key) {
-	/*
-	*  Verify the authentication key $key. Returns the
-	*  corresponding user object if the verification is
-	*  successfull and NULL otherwise.
-	*/
-	if (!empty($key)) {
-		$users = user_array();
-		foreach ($users as $k => $u) {
-			if ($u->verify_api_key($key)) {
-				return $u;
-			}
-		}
-	}
-	return NULL;
-}
-
 function auth_login($username, $password) {
 	/*
 	*  Login using a username and password. Returns the corresponding
