@@ -25,9 +25,11 @@ $SLIDE_RM = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
 		'id' => API_P_STR
-	)
+	),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_API_KEY	=> TRUE
 ));
-api_endpoint_init($SLIDE_RM, auth_session_user());
+api_endpoint_init($SLIDE_RM);
 
 $slide = new Slide();
 if (!$slide->load($SLIDE_RM->get('id'))) {
@@ -50,19 +52,12 @@ try {
 $slide_owner_quota = new UserQuota($slide_owner);
 
 // Allow admins to remove all slides.
-$flag_auth = auth_is_authorized(
-	$groups = array('admin'),
-	$users = NULL,
-	$redir = FALSE,
-	$both = FALSE
-);
-// Allow owner to remove a slide.
-$flag_auth = $flag_auth || auth_is_authorized(
-	$groups = array('editor'),
-	$users = array($slide->get('owner')),
-	$redir = FALSE,
-	$both = TRUE
-);
+$flag_auth = $SLIDE_RM->get_caller()->is_in_group('admin');
+
+// Allow the owner to remove a slide if they are in the editor group.
+$flag_auth |= ($SLIDE_RM->get_caller()->is_in_group('editor') &&
+	$SLIDE_RM->get_caller()->get_name() === $slide->get('owner'));
+
 if (!$flag_auth) {
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,

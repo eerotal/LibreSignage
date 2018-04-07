@@ -2,12 +2,8 @@
 /*
 *  ====>
 *
-*  *Get a user's data based on a username. Note that this
-*  endpoint doesn't return any secret information like
-*  passwords or authetication keys. user_get_current.php
-*  returns the available secret information aswell. The
-*  user_get_keys.php endpoint can be used for getting
-*  just the authentication keys for the current user.*
+*  *Get a user's data based on a username. This endpoint
+*  doesn't return any secret information like passwords.*
 *
 *  GET parameters
 *    * user = The username to query.
@@ -33,11 +29,13 @@ $USER_GET = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
 		'user' => API_P_STR
-	)
+	),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_API_KEY	=> TRUE
 ));
-api_endpoint_init($USER_GET, auth_session_user());
+api_endpoint_init($USER_GET);
 
-if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
+if (!$USER_GET->get_caller()->is_in_group('admin')) {
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,
 		"Not authorized."

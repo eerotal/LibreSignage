@@ -25,9 +25,12 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
 
 $SLIDE_DATA_QUERY = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON']
+	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
+	APIEndpoint::FORMAT		=> array(),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_API_KEY	=> TRUE
 ));
-api_endpoint_init($SLIDE_DATA_QUERY, auth_session_user());
+api_endpoint_init($SLIDE_DATA_QUERY);
 
 // Check that the requested keys are in the required keys array.
 if (!count($SLIDE_DATA_QUERY->get()) || !array_is_subset(

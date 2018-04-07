@@ -9,7 +9,7 @@
 *
 *  Return value
 *    * quota      = A dictionary with the quota data.
-*    * error      = An error code or API_E_OK on success.
+*    * error      = An error code or API_E_OK on success.*
 *
 *  <====
 */
@@ -24,9 +24,11 @@ $USER_GET_QUOTA = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
 		'user' => API_P_STR|API_P_OPT|API_P_NULL
-	)
+	),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_API_KEY	=> TRUE
 ));
-api_endpoint_init($USER_GET_QUOTA, auth_session_user());
+api_endpoint_init($USER_GET_QUOTA);
 
 $flag_auth = FALSE;
 $user_name = NULL;
@@ -36,17 +38,12 @@ if ($USER_GET_QUOTA->has('user', TRUE)) {
 	$user_name = $USER_GET_QUOTA->get('user');
 } else {
 	// Get quota for the logged in user.
-	$user_name = auth_session_user()->get_name();
+	$user_name = $USER_GET_QUOTA->get_caller()->get_name();
 }
 
 // Allow admins or the user themself to get the quota.
-$flag_auth = auth_is_authorized(
-	$groups = array('admin'),
-	$users = array($user_name),
-	FALSE,
-	FALSE
-);
-if (!$flag_auth) {
+if (!$USER_GET_QUOTA->get_caller()->is_in_group('admin')
+	|| $USER_GET_QUOTA->get_caller()->get_name() != $user_name) {
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,
 		"Not authorized."

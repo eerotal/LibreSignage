@@ -6,10 +6,10 @@
 *
 *  Access is granted in any of the following cases.
 *
-*    1. The logged in user is in the group 'admin' and
+*    1. The authenticated in user is in the group 'admin' and
 *       they are not trying to set a new password. This
 *       prevents the admin taking over an account.
-*    2. The logged in user is the user to be modified and
+*    2. The authenticated in user is the user to be modified and
 *       they are not trying to set user groups. This prevents
 *       privilege escalation.
 *
@@ -44,30 +44,25 @@ $USER_SAVE = new APIEndpoint(array(
 		'user' => API_P_STR,
 		'pass' => API_P_STR|API_P_OPT|API_P_NULL,
 		'groups' => API_P_ARR|API_P_OPT|API_P_NULL
-	)
+	),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_API_KEY	=> TRUE
 ));
-api_endpoint_init($USER_SAVE, auth_session_user());
+api_endpoint_init($USER_SAVE);
 
 // Is authorized as an admin?
-$auth_admin = auth_is_authorized(
-	$groups = array('admin'),
-	$users = NULL,
-	FALSE
-);
+$auth_admin = $USER_SAVE->get_caller()->is_in_group('admin');
 
 // Is authorized as the user to be modified?
-$auth_usr = auth_is_authorized(
-	$groups = NULL,
-	$users = array($USER_SAVE->get('user')),
-	FALSE
-);
+$auth_usr = ($USER_SAVE->get_caller()->get_name()
+		=== $USER_SAVE->get('user'));
 
 // Check for authorization.
 if (!$auth_admin && !$auth_usr) {
 	// Not logged in.
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,
-		"Not logged in."
+		"Not authorized to modify the user."
 	);
 }
 
@@ -75,7 +70,7 @@ if ($USER_SAVE->has('pass', TRUE) && !$auth_usr) {
 	// Case 1. check.
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,
-		"Admins can't change password of other users."
+		"Admins can't change the passwords of other users."
 	);
 }
 

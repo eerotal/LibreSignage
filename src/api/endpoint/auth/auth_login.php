@@ -9,6 +9,7 @@
 *    * password    = Password
 *
 *  Return value
+*    * api_key = A newly generated API key for accessing the API.
 *    * error = An error code or API_E_OK on success.
 *
 *  <====
@@ -27,17 +28,22 @@ $AUTH_LOGIN = new APIEndpoint(array(
 		'password' => API_P_STR
 	),
 	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_AUTH		=> FALSE
+	APIEndpoint::REQ_API_KEY	=> FALSE
 ));
-api_endpoint_init($AUTH_LOGIN, NULL);
+api_endpoint_init($AUTH_LOGIN);
 
-$ret = auth_login(
+$user = auth_login(
 	$AUTH_LOGIN->get('username'),
 	$AUTH_LOGIN->get('password')
 );
 
-if ($ret) {
+if ($user) {
+	// Generate a new API key.
+	$api_key = $user->gen_api_key();
+	$user->write();
+
 	$AUTH_LOGIN->resp_set(array(
+		'api_key' => $api_key,
 		'error' => API_E_OK
 	));
 } else {

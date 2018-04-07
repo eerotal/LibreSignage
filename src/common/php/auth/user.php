@@ -201,10 +201,13 @@ class UserQuota {
 }
 
 class User {
+	const API_KEY_LEN = 15;
+	const API_KEY_MAX_AGE = 600;
+
 	private $user = '';
 	private $hash = '';
 	private $groups = NULL;
-	private $keys = NULL;
+	private $api_keys = NULL;
 	private $ready = FALSE;
 
 	public function __construct($name = NULL) {
@@ -254,7 +257,7 @@ class User {
 		$this->set_name($data['user']);
 		$this->set_groups($data['groups']);
 		$this->set_hash($data['hash']);
-		$this->set_keys($data['keys']);
+		$this->set_api_keys($data['api_keys']);
 		$this->set_ready(TRUE);
 	}
 
@@ -286,7 +289,7 @@ class User {
 			'user' => $this->user,
 			'groups' => $this->groups,
 			'hash' => $this->hash,
-			'keys' => $this->keys
+			'api_keys' => $this->api_keys
 		));
 		if ($json === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
@@ -312,24 +315,64 @@ class User {
 		return LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$tmp;
 	}
 
-	public function get_name() {
-		$this->_error_on_not_ready();
-		return $this->user;
+	// -- API key functions --
+	public function set_api_keys($api_keys) {
+		$this->api_keys = $api_keys;
 	}
 
+	public function get_api_keys() {
+		$this->_error_on_not_ready();
+		return $this->api_keys;
+	}
+
+	public function gen_api_key() {
+		$this->_error_on_not_ready();
+
+		$new_key = bin2hex(random_bytes(self::API_KEY_LEN));
+		$tmp = array(
+			'api_key' => $new_key,
+			'created' => time(),
+			'max_age' => self::API_KEY_MAX_AGE
+		);
+		array_push($this->api_keys, $tmp);
+
+		return $tmp;
+	}
+
+	public function rm_api_key(string $api_key) {
+		$this->_error_on_not_ready();
+		$i = array_search($api_key, $this->api_keys);
+		if ($i !== FALSE) {
+			array_splice($this->api_keys, i, 1);
+		} else {
+			throw new ArgException("No such API key.");
+		}
+	}
+
+	public function verify_api_key(string $api_key) {
+		$this->_error_on_not_ready();
+		$new_keys = $this->api_keys;
+
+		foreach ($this->api_keys as $i => $d) {
+			$tmp = $d['created'] + $d['max_age'];
+			if ($d['api_key'] === $api_key && time() <= $tmp) {
+				return TRUE;
+			} else if (time() > $tmp) {
+				// Mark the API expired key for purging.
+				$new_keys[$i] = NULL;
+			}
+		}
+
+		$this->api_keys = array_filter($new_keys);
+		$this->write();
+
+		return FALSE;
+	}
+
+	// -- Group functions --
 	public function get_groups() {
 		$this->_error_on_not_ready();
 		return $this->groups;
-	}
-
-	public function get_hash() {
-		$this->_error_on_not_ready();
-		return $this->hash;
-	}
-
-	public function get_keys() {
-		$this->_error_on_not_ready();
-		return $this->keys;
 	}
 
 	public function is_in_group(string $group) {
@@ -337,15 +380,22 @@ class User {
 		return in_array($group, $this->groups, TRUE);
 	}
 
-	public function is_ready() {
-		return $this->ready;
+	public function set_groups($groups) {
+		if ($groups == NULL) {
+			$this->groups = array();
+		} else if (gettype($groups) == 'array') {
+			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
+				throw new ArgException('Too many user '.
+							'groups.');
+			}
+			$this->groups = $groups;
+		} else {
+			throw new ArgException('Invalid type for '.
+						'$groups.');
+		}
 	}
 
-	public function verify_key(string $key) {
-		$this->_error_on_not_ready();
-		return in_array($key, $this->keys);
-	}
-
+	// -- Password functions --
 	public function verify_password(string $pass) {
 		$this->_error_on_not_ready();
 		return password_verify($pass, $this->hash);
@@ -364,21 +414,19 @@ class User {
 		$this->hash = $tmp_hash;
 	}
 
-	public function set_groups($groups) {
-		if ($groups == NULL) {
-			$this->groups = array();
-		} else if (gettype($groups) == 'array') {
-			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
-				throw new ArgException('Too many user '.
-							'groups.');
-			}
-			$this->groups = $groups;
-		} else {
-			throw new ArgException('Invalid type for '.
-						'$groups.');
+	public function set_hash(string $hash) {
+		if (empty($hash)) {
+			throw new ArgException('Invalid password hash.');
 		}
+		$this->hash = $hash;
 	}
 
+	public function get_hash() {
+		$this->_error_on_not_ready();
+		return $this->hash;
+	}
+
+	// -- Name functions --
 	public function set_name(string $name) {
 		if (empty($name)) {
 			throw new ArgException('Invalid username.');
@@ -389,20 +437,20 @@ class User {
 		$this->user = $name;
 	}
 
-	public function set_hash(string $hash) {
-		if (empty($hash)) {
-			throw new ArgException('Invalid password hash.');
-		}
-		$this->hash = $hash;
+	public function get_name() {
+		$this->_error_on_not_ready();
+		return $this->user;
 	}
 
-	public function set_keys(array $keys) {
-		$this->keys = $keys;
-	}
-
+	// -- Object ready setting/checking functions --
 	public function set_ready(bool $val) {
 		$this->ready = $val;
 	}
+
+	public function is_ready() {
+		return $this->ready;
+	}
+
 }
 
 function user_exists(string $user) {

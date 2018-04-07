@@ -35,11 +35,13 @@ $USER_CREATE = new APIEndpoint(array(
 	APIEndpoint::FORMAT => array(
 		'user' => API_P_STR,
 		'groups' => API_P_ARR|API_P_OPT|API_P_NULL
-	)
+	),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_API_KEY	=> TRUE
 ));
-api_endpoint_init($USER_CREATE, auth_session_user());
+api_endpoint_init($USER_CREATE);
 
-if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
+if (!$USER_CREATE->get_caller()->is_in_group('admin')) {
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,
 		"Not authorized."

@@ -201,7 +201,6 @@ function api_call(endpoint, data, callback) {
 			api_host() + endpoint.uri
 		);
 		req.setRequestHeader("Content-Type", "application/json");
-		console.log(data_str);
 		req.send(data_str);
 	}
 }

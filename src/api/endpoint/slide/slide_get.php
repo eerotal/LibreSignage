@@ -32,9 +32,11 @@ $SLIDE_GET = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
 		'id' => API_P_STR
-	)
+	),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_API_KEY	=> TRUE
 ));
-api_endpoint_init($SLIDE_GET, auth_session_user());
+api_endpoint_init($SLIDE_GET);
 
 $list = get_slides_id_list();
 

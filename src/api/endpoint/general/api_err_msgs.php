@@ -21,9 +21,9 @@ $API_ERR_MSGS = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_AUTH		=> FALSE
+	APIEndpoint::REQ_API_KEY	=> FALSE
 ));
-api_endpoint_init($API_ERR_MSGS, NULL);
+api_endpoint_init($API_ERR_MSGS);
 
 $API_ERR_MSGS->resp_set(array('messages' => API_E_MSG));
 $API_ERR_MSGS->send();

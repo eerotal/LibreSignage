@@ -24,7 +24,7 @@ function auth_verify(string $username, string $password) {
 	return NULL;
 }
 
-function auth_key_verify(string $key) {
+function auth_api_key_verify(string $key) {
 	/*
 	*  Verify the authentication key $key. Returns the
 	*  corresponding user object if the verification is
@@ -33,7 +33,7 @@ function auth_key_verify(string $key) {
 	if (!empty($key)) {
 		$users = user_array();
 		foreach ($users as $k => $u) {
-			if (in_array($key, $u->get_keys())) {
+			if ($u->verify_api_key($key)) {
 				return $u;
 			}
 		}
@@ -43,13 +43,13 @@ function auth_key_verify(string $key) {
 
 function auth_login($username, $password) {
 	/*
-	*  Login using a username and password. Returns TRUE on
-	*  success and FALSE otherwise.
+	*  Login using a username and password. Returns the corresponding
+	*  User object on success and NULL otherwise.
 	*/
 
 	// Already authenticated?
 	if (auth_is_authorized()) {
-		return TRUE;
+		return auth_session_user();
 	}
 
 	$tmp = NULL;
@@ -57,37 +57,14 @@ function auth_login($username, $password) {
 		$tmp = auth_verify($username, $password);
 		if ($tmp != NULL) {
 			$_SESSION['user'] = $tmp->get_name();
-			return TRUE;
+			return $tmp;
 		}
 	}
-	return FALSE;
-}
-
-function auth_login_key($key) {
-	/*
-	*  Login using an authentication key. Returns TRUE on
-	*  success and FALSE otherwise.
-	*/
-
-	// Already logged in?
-	if (auth_is_authorized()) {
-		return TRUE;
-	}
-
-	$tmp = NULL;
-	if (!empty($key)) {
-		$tmp = auth_key_verify($key);
-		if ($tmp != NULL) {
-			$_SESSION['user'] = $tmp->get_name();
-			return TRUE;
-		}
-	}
-	return FALSE;
+	return NULL;
 }
 
 function auth_logout() {
 	$_SESSION = array();
-
 	if (ini_get('session.use_cookies')) {
 		$cp = session_get_cookie_params();
 		setcookie(session_name(), '', time() - 42000,

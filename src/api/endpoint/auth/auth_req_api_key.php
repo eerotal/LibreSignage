@@ -2,12 +2,13 @@
 /*
 *  ====>
 *
-*  *Login using an authentication key.*
+*  *Request a new API key for a user.*
 *
 *  POST parameters
-*    * key = The authentication key to use.
+*    * PARAM_API_KEY
 *
 *  Return value
+*    * api_key = A newly generated API key for accessing the API.
 *    * error = An error code or API_E_OK on success.
 *
 *  <====
@@ -18,28 +19,20 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
-$AUTH_LOGIN = new APIEndpoint(array(
+$AUTH_REQ_API_KEY = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
-		'key' => API_P_STR
-	),
+	APIEndpoint::FORMAT		=> array(),
 	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_AUTH		=> FALSE
+	APIEndpoint::REQ_API_KEY	=> TRUE
 ));
-api_endpoint_init($AUTH_LOGIN, NULL);
+api_endpoint_init($AUTH_REQ_API_KEY);
 
-$ret = auth_login_key(
-	$AUTH_LOGIN->get('key')
-);
+$api_key = $AUTH_REQ_API_KEY->get_caller()->gen_api_key();
+$AUTH_REQ_API_KEY->get_caller()->write();
 
-if ($ret) {
-	$AUTH_LOGIN->resp_set(array(
-		'error' => API_E_OK
-	));
-} else {
-	$AUTH_LOGIN->resp_set(array(
-		'error' => API_E_INCORRECT_CREDS
-	));
-}
-$AUTH_LOGIN->send();
+$AUTH_REQ_API_KEY->resp_set(array(
+	'api_key' => $api_key,
+	'error' => API_E_OK
+));
+$AUTH_REQ_API_KEY->send();

@@ -36,12 +36,13 @@ const API_P_ANY			= API_P_STR|API_P_INT|API_P_FLOAT
 const API_P_UNUSED 		= API_P_ANY|API_P_EMPTY_STR_OK|API_P_OPT;
 
 class APIEndpoint {
+	// Config options.
 	const METHOD		= 'method';
 	const RESPONSE_TYPE	= 'response_type';
 	const FORMAT		= 'format';
 	const STRICT_FORMAT	= 'strict_format';
 	const REQ_QUOTA		= 'req_quota';
-	const REQ_AUTH		= 'req_auth';
+	const REQ_API_KEY	= 'req_api_key';
 
 	private $method = 0;
 	private $response_type = 0;
@@ -49,9 +50,10 @@ class APIEndpoint {
 	private $format = NULL;
 	private $strict_format = TRUE;
 	private $req_quota = TRUE;
-	private $req_auth = TRUE;
+	private $req_api_key = TRUE;
 	private $data = NULL;
 	private $inited = FALSE;
+	private $caller = NULL;
 
 	public function __construct(array $config) {
 		$args = new ArgumentArray(
@@ -61,26 +63,18 @@ class APIEndpoint {
 				self::FORMAT        => 'array',
 				self::STRICT_FORMAT => 'boolean',
 				self::REQ_QUOTA     => 'boolean',
-				self::REQ_AUTH      => 'boolean'
+				self::REQ_API_KEY   => 'boolean'
 			),
 			array(
 				self::FORMAT        => array(),
 				self::STRICT_FORMAT => TRUE,
 				self::REQ_QUOTA     => TRUE,
-				self::REQ_AUTH      => TRUE
+				self::REQ_API_KEY   => TRUE
 			)
 		);
 		$ret = $args->chk($config);
 		foreach ($ret as $k => $v) {
 			$this->$k = $v;
-		}
-
-		// Check config validity.
-		if ($this->req_quota && !$this->req_auth) {
-			throw new ArgException(
-				"APIEndpoint can't require quota if ".
-				"authentication isn't required."
-			);
 		}
 	}
 
@@ -276,8 +270,16 @@ class APIEndpoint {
 		return $this->req_quota;
 	}
 
-	public function requires_authentication() {
-		return $this->req_auth;
+	public function requires_api_key() {
+		return $this->req_api_key;
+	}
+
+	public function set_caller($caller) {
+		$this->caller = $caller;
+	}
+
+	public function get_caller() {
+		return $this->caller;
 	}
 
 	public function resp_set($resp) {
@@ -325,11 +327,11 @@ function api_handle_preflight() {
 	*/
 	header('Access-Control-Allow-Origin: *');
 	header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-	header('Access-Control-Allow-Headers: Content-Type');
+	header('Access-Control-Allow-Headers: Content-Type, Api-Key');
 	header('Access-Control-Max-Age: 600');
 }
 
-function api_handle_request(APIEndpoint $endpoint, $user) {
+function api_handle_request(APIEndpoint $endpoint) {
 	/*
 	*  Handle reqular API calls using POST or GET.
 	*/
@@ -338,44 +340,7 @@ function api_handle_request(APIEndpoint $endpoint, $user) {
 	header('Content-Type: '.$endpoint->get_content_type());
 	header('Access-Control-Allow-Origin: *');
 
-	// Check authentication if required.
-	if ($endpoint->requires_authentication()) {
-		if ($user == NULL) {
-			throw new APIException(
-				API_E_NOT_AUTHORIZED,
-				"Not logged in."
-			);
-		}
-	}
-
-	// Use the API rate quota of the caller if required.
-	if ($endpoint->requires_quota()) {
-		$quota = new UserQuota($user);
-		if ($quota->has_state_var('api_t_start')) {
-			$t = $quota->get_state_var('api_t_start');
-			if (time() - $t >= gtlim('API_RATE_T')) {
-				/*
-				*  Reset rate quota and time
-				*  after the cutoff.
-				*/
-				$quota->set_state_var('api_t_start',
-							time());
-				$quota->set_quota('api_rate', 0);
-			}
-		} else {
-			// Start counting time.
-			$quota->set_state_var('api_t_start', time());
-		}
-
-		if (!$quota->use_quota('api_rate')) {
-			throw new APIException(
-				API_E_RATE,
-				"API rate limited."
-			);
-		}
-		$quota->flush();
-	}
-
+	// Initialize the endpoint.
 	try {
 		$endpoint->load_data();
 	} catch(ArgException $e) {
@@ -387,9 +352,55 @@ function api_handle_request(APIEndpoint $endpoint, $user) {
 			API_E_INTERNAL, $e->getMessage(), 0, $e
 		);
 	}
+
+	// Check API key if required.
+	if (!$endpoint->requires_api_key()) { return; }
+
+	if (!array_key_exists("Api-Key", getallheaders())) {
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"No Api-Key header even though required."
+		);
+	}
+
+	$caller = auth_api_key_verify(getallheaders()["Api-Key"]);
+	if ($caller === NULL) {
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Invalid API key."
+		);
+	}
+	$endpoint->set_caller($caller);
+
+	// Use the API rate quota of the caller if required.
+	if (!$endpoint->requires_quota()) { return; }
+
+	$quota = new UserQuota($caller);
+	if ($quota->has_state_var('api_t_start')) {
+		$t = $quota->get_state_var('api_t_start');
+		if (time() - $t >= gtlim('API_RATE_T')) {
+			/*
+			*  Reset rate quota and time
+			*  after the cutoff.
+			*/
+			$quota->set_state_var('api_t_start', time());
+			$quota->set_quota('api_rate', 0);
+		}
+	} else {
+		// Start counting time.
+		$quota->set_state_var('api_t_start', time());
+	}
+
+	if (!$quota->use_quota('api_rate')) {
+		throw new APIException(
+			API_E_RATE,
+			"API rate limited."
+		);
+	}
+	$quota->flush();
 }
 
-function api_endpoint_init(APIEndpoint $endpoint, $user) {
+function api_endpoint_init(APIEndpoint $endpoint) {
 	/*
 	*  Handle endpoint initialization and API calls.
 	*  This function and the api_handle_* functions
@@ -402,10 +413,10 @@ function api_endpoint_init(APIEndpoint $endpoint, $user) {
 
 	switch ($_SERVER['REQUEST_METHOD']) {
 		case "POST":
-			api_handle_request($endpoint, $user);
+			api_handle_request($endpoint);
 			break;
 		case "GET":
-			api_handle_request($endpoint, $user);
+			api_handle_request($endpoint);
 			break;
 		case "OPTIONS":
 			api_handle_preflight();

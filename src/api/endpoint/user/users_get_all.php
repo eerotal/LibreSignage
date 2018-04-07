@@ -25,11 +25,14 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 
 $USERS_GET_ALL = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON']
+	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
+	APIEndpoint::FORMAT		=> array(),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_API_KEY	=> TRUE
 ));
-api_endpoint_init($USERS_GET_ALL, auth_session_user());
+api_endpoint_init($USERS_GET_ALL);
 
-if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
+if (!$USERS_GET_ALL->get_caller()->is_in_group('admin')) {
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,
 		"Not authorized."
