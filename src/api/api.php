@@ -130,8 +130,7 @@ class APIEndpoint {
 				break;
 			default:
 				throw new ArgException(
-					"Unknown endpoint ".
-					"method '$this->method'."
+					"Unexpected API method."
 				);
 		}
 	}
@@ -370,7 +369,8 @@ function api_handle_request(APIEndpoint $endpoint) {
 	header('Access-Control-Allow-Origin: *');
 
 	// Check the request method.
-	if ($_SERVER['REQUEST_METHOD'] != $endpoint->get_method()) {
+	if ($_SERVER['REQUEST_METHOD'] !=
+		array_search($endpoint->get_method(), API_METHOD)) {
 		throw new ArgException(
 			"Invalid request method '".
 			$_SERVER['REQUEST_METHOD'].
@@ -379,6 +379,19 @@ function api_handle_request(APIEndpoint $endpoint) {
 				$endpoint->get_method(),
 				API_METHOD
 			)."'."
+		);
+	}
+
+	// Initialize the endpoint.
+	try {
+		$endpoint->load_data();
+	} catch(ArgException $e) {
+		throw new APIException(
+			API_E_INVALID_REQUEST, $e->getMessage(), 0, $e
+		);
+	} catch(IntException $e) {
+		throw new APIException(
+			API_E_INTERNAL, $e->getMessage(), 0, $e
 		);
 	}
 
@@ -400,19 +413,6 @@ function api_handle_request(APIEndpoint $endpoint) {
 		);
 	}
 	$endpoint->set_caller($caller);
-
-	// Initialize the endpoint.
-	try {
-		$endpoint->load_data();
-	} catch(ArgException $e) {
-		throw new APIException(
-			API_E_INVALID_REQUEST, $e->getMessage(), 0, $e
-		);
-	} catch(IntException $e) {
-		throw new APIException(
-			API_E_INTERNAL, $e->getMessage(), 0, $e
-		);
-	}
 
 	// Use the API rate quota of the caller if required.
 	if (!$endpoint->requires_quota()) { return; }

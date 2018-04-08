@@ -4,10 +4,13 @@
 *  interface with the LibreSignage API.
 */
 
+const API_KEY_RENEWAL_HEADROOM = 10;
+
 var API_CONFIG = {
 	protocol: null,
 	hostname: null,
-	configured: false
+	configured: false,
+	authenticated: false
 }
 
 var SERVER_LIMITS = null;
@@ -18,131 +21,122 @@ var API_ENDP = {
 	// -- User management API endpoints --
 	USER_GET_QUOTA: {
 		uri:	"/api/endpoint/user/user_get_quota.php",
-		method: "GET"
+		method: "GET",
+		auth:	true
 	},
 	USER_CREATE: {
 		uri:	"/api/endpoint/user/user_create.php",
-		method: "POST"
+		method: "POST",
+		auth:	true
 	},
 	USER_REMOVE: {
 		uri:	"/api/endpoint/user/user_remove.php",
-		method: "POST"
+		method: "POST",
+		auth:	true
 	},
 	USER_SAVE: {
 		uri:	"/api/endpoint/user/user_save.php",
-		method: "POST"
+		method: "POST",
+		auth:	true
 	},
 	USER_GET: {
 		uri:	"/api/endpoint/user/user_get.php",
-		method: "GET"
+		method: "GET",
+		auth:	true
 	},
 	USER_GET_CURRENT: {
 		uri:	"/api/endpoint/user/user_get_current.php",
-		method: "GET"
+		method: "GET",
+		auth:	true
 	},
 	USERS_GET_ALL: {
 		uri:	"/api/endpoint/user/users_get_all.php",
-		method:	"GET"
-	},
-	USER_GENERATE_KEY: {
-		uri:	"/api/endpoint/user/user_generate_key.php",
-		method:	"POST"
-	},
-	USER_REMOVE_KEY: {
-		uri:	"/api/endpoint/user/user_remove_key.php",
-		method:	"POST"
-	},
-	USER_GET_KEYS: {
-		uri:	"/api/endpoint/user/user_get_keys.php",
-		method:	"GET"
+		method:	"GET",
+		auth:	true
 	},
 
 	// -- Slide API endpoints --
 	SLIDE_LIST: {
 		uri:	"/api/endpoint/slide/slide_list.php",
-		method:	"GET"
+		method:	"GET",
+		auth:	true
 	},
 	SLIDE_DATA_QUERY: {
 		uri:	"/api/endpoint/slide/slide_data_query.php",
-		method:	"GET"
+		method:	"GET",
+		auth:	true
 	},
 	SLIDE_GET: {
 		uri:	"/api/endpoint/slide/slide_get.php",
-		method: "GET"
+		method: "GET",
+		auth:	true,
 	},
 	SLIDE_SAVE: {
 		uri:	"/api/endpoint/slide/slide_save.php",
-		method: "POST"
+		method: "POST",
+		auth:	true
 	},
 	SLIDE_RM: {
 		uri:	"/api/endpoint/slide/slide_rm.php",
-		method: "POST"
+		method: "POST",
+		auth:	true
 	},
 
 	// -- Authentication API endpoints --
 	AUTH_LOGIN: {
 		uri:	"/api/endpoint/auth/auth_login.php",
-		method: "POST"
-	},
-	AUTH_LOGIN_KEY: {
-		uri:	"/api/endpoint/auth/auth_login_key.php",
-		method: "POST"
+		method: "POST",
+		auth:	false
 	},
 	AUTH_LOGOUT: {
 		uri:	"/api/endpoint/auth/auth_logout.php",
-		method: "POST"
+		method: "POST",
+		auth:	true
+	},
+	AUTH_REQ_API_KEY: {
+		uri:	"/api/endpoint/auth/auth_req_api_key.php",
+		method: "POST",
+		auth:	true
 	},
 
 	// -- General information API endpoints --
 	API_ERR_CODES: {
 		uri:	"/api/endpoint/general/api_err_codes.php",
-		method:	"GET"
+		method:	"GET",
+		auth:	false
 	},
 	API_ERR_MSGS: {
 		uri:	"/api/endpoint/general/api_err_msgs.php",
-		method:	"GET"
+		method:	"GET",
+		auth:	false
 	},
 	SERVER_LIMITS: {
 		uri:	"/api/endpoint/general/server_limits.php",
-		method: "GET"
+		method: "GET",
+		auth:	false
 	},
 	LIBRARY_LICENSES: {
 		uri:	"/api/endpoint/general/library_licenses.php",
-		method:	"GET"
+		method:	"GET",
+		auth:	false
 	},
 	LIBRESIGNAGE_LICENSE: {
 		uri:	"/api/endpoint/general/libresignage_license.php",
-		methof:	"GET"
+		methof:	"GET",
+		auth:	false
 	}
 }
 
 function _api_chk_configured() {
 	if (!API_CONFIG.configured) {
-		throw new Error("API not initialized");
+		throw new Error("API: Not initialized");
 	}
 }
 
-function _api_construct_GET_data(data) {
-	/*
-	*  Construct the API call data string
-	*  for a GET request from an associative
-	*  array or object.
-	*/
-	var ret = "";
-	for (var v in data) {
-		if (typeof data[v] != 'string' &&
-			typeof data[v] != 'number') {
-			throw new Error("GET parameters can only be " +
-					"numbers or strings!");
-		}
-		if (ret != "") {
-			ret += "&";
-		}
-		ret += encodeURIComponent(v);
-		ret += "=";
-		ret += encodeURIComponent(data[v]);
+function _api_chk_authenticated() {
+	if (!API_CONFIG.authenticated) {
+		throw new Error("API: Not authenticated.");
 	}
-	return ret;
 }
 
 function api_call(endpoint, data, callback) {
@@ -158,51 +152,58 @@ function api_call(endpoint, data, callback) {
 	*/
 
 	_api_chk_configured();
+	if (endpoint.auth) { _api_chk_authenticated(); }
 
 	var data_str = "";
-	var req = new XMLHttpRequest();
-
-	req.addEventListener("load", function() {
-		var d = null;
-		try {
-			d = JSON.parse(this.responseText);
-		} catch(e) {
-			if (e instanceof SyntaxError) {
-				console.error("API: Invalid " +
-						"response syntax.");
-				d = {'error': API_E.INTERNAL};
+	var ajax_settings = {
+		url: endpoint.uri,
+		method: endpoint.method,
+		complete: function(jqxhr, status) {
+			var d = null;
+			if (status != 'success') {
+				console.error("API: XHR failed.");
+				callback({'error': API_E.INTERNAL});
+				return;
 			}
-		}
-		callback(d);
-	});
 
-	if (endpoint.method == "GET") {
-		/*
-		*  Send the GET data in the URL with the
-		*  content type x-www-form-urlencoded.
-		*/
-		data_str = _api_construct_GET_data(data);
-		req.open(
-			endpoint.method,
-			api_host() + endpoint.uri + "?" + data_str
-		);
-		req.setRequestHeader(
-			"Content-Type",
-			"application/x-www-form-urlencoded"
-		);
-		req.send();
-	} else {
-		/*
-		*  Send the POST data as JSON in the request body.
-		*/
-		data_str = JSON.stringify(data);
-		req.open(
-			endpoint.method,
-			api_host() + endpoint.uri
-		);
-		req.setRequestHeader("Content-Type", "application/json");
-		req.send(data_str);
+			try {
+				d = JSON.parse(jqxhr.responseText);
+			} catch(e) {
+				if (e instanceof SyntaxError) {
+					console.error("API: Invalid " +
+						"response syntax.");
+					d = {'error': API_E.INTERNAL};
+				}
+			}
+			callback(d);
+		}
+	};
+
+	switch (endpoint.method) {
+		case "POST":
+			ajax_settings.data = JSON.stringify(data);
+			ajax_settings.content =
+				'application/json';
+			break;
+		case "GET":
+			// Let jQuery encode the data.
+			ajax_settings.data = data;
+			ajax_settings.content =
+				'application/x-www-form-urlencoded';
+			break;
+		default:
+			throw new Error(
+				`Invalid endpoint method
+				'${endpoint.method}'.`
+			);
 	}
+
+	if (endpoint.auth) {
+		ajax_settings.headers = {
+			'Api-Key': get_cookie('api_key')
+		};
+	}
+	$.ajax(ajax_settings);
 }
 
 function api_handle_disp_error(err, callback) {
@@ -233,8 +234,9 @@ function api_handle_disp_error(err, callback) {
 function api_load_error_codes(callback) {
 	api_call(API_ENDP.API_ERR_CODES, null, (resp) => {
 		if (api_handle_disp_error(resp.error)) {
-			throw new Error("Failed to initialize API " +
-					"interface.");
+			throw new Error("API: Failed to load " +
+					"error codes.");
+			return;
 		}
 		API_E = resp.codes;
 		if (callback) {
@@ -246,8 +248,8 @@ function api_load_error_codes(callback) {
 function api_load_error_msgs(callback) {
 	api_call(API_ENDP.API_ERR_MSGS, null, (resp) => {
 		if (api_handle_disp_error(resp.error)) {
-			throw new Error("Failed to initialize API " +
-					"interface");
+			throw new Error("API: Failed to load " +
+					"error messages.");
 		}
 		API_E_MESSAGES = resp.messages;
 		if (callback) {
@@ -259,8 +261,7 @@ function api_load_error_msgs(callback) {
 function api_load_limits(callback) {
 	api_call(API_ENDP.SERVER_LIMITS, null, (resp) => {
 		if (api_handle_disp_error(resp.error)) {
-			throw new Error("Failed to initialize API " +
-					"interface.");
+			throw new Error("API: Failed to load limits.");
 		}
 		SERVER_LIMITS = resp.limits;
 		if (callback) {
@@ -307,6 +308,104 @@ function api_apply_config(config) {
 		console.log("API: Using default hostname.");
 		API_CONFIG.hostname = window.location.hostname;
 	}
+}
+
+function api_key_schedule_renewal() {
+	/*
+	*  Schedule API key renewal just before the
+	*  API key expires.
+	*/
+
+	if (!cookie_exists('api_key')) {
+		throw new Error(
+			"API: Can't schedule cookie renewal when " +
+			"no API key exists."
+		);
+	}
+
+	var created = parseInt(get_cookie('api_key_created'), 10);
+	var max_age = parseInt(get_cookie('api_key_max_age'), 10);
+
+	var left = created + max_age - Date.now()/1000;
+	var t = left - API_KEY_RENEWAL_HEADROOM;
+
+	if (left <= 0) {
+		API_CONFIG.authenticated = false;
+		throw new Error(
+			"API: Won't schedule key renewal because " +
+			"the API key is already expired."
+		);
+	} else if (t <= 0) {
+		// Attempt to renew the key now since it will expire soon.
+		api_key_renew();
+	}
+
+	console.log("API: Key renewal in " + t + " seconds.");
+	setTimeout(api_key_renew, t*1000);
+}
+
+function api_key_renew() {
+	/*
+	*  Renew the stored API key.
+	*/
+	console.log("API: Renewing API key.");
+	api_call(
+		API_ENDP.AUTH_REQ_API_KEY,
+		null,
+		(resp) => {
+			if (api_handle_disp_error(resp.error)) {
+				API_CONFIG.authenticated = false;
+				throw new Error("API: Failed to " +
+						"renew API key.");
+			}
+			api_key_store(
+				resp.api_key.api_key,
+				resp.api_key.created,
+				resp.api_key.max_age
+			);
+			API_CONFIG.authenticated = true;
+
+			console.log("API: Key renewal complete.");
+			api_key_schedule_renewal();
+		}
+	)
+}
+
+function api_key_store(api_key, created, max_age) {
+	/*
+	*  Store the supplied API key data in cookies.
+	*/
+	console.log("API: Store API key data.")
+	set_cookie({"api_key": api_key, "path": "/"});
+	set_cookie({"api_key_created": created, "path": "/"});
+	set_cookie({"api_key_max_age": max_age, "path": "/"});
+}
+
+function api_login(user, pass) {
+	/*
+	*  Login using the supplied credentials and store the
+	*  returned API key.
+	*/
+	api_call(
+		API_ENDP.AUTH_LOGIN,
+		{username: user, password: pass},
+		(resp) => {
+			if (api_handle_disp_error(resp.error)) {
+				console.error(
+					"API: Authentication failed."
+				);
+				return;
+			}
+			api_key_store(
+				resp.api_key.api_key,
+				resp.api_key.created,
+				resp.api_key.max_age
+			);
+			API_CONFIG.authenticated = true;
+
+			api_key_schedule_renewal();
+		}
+	);
 }
 
 function api_init(config, callback) {
