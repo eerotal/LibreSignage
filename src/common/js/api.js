@@ -316,10 +316,10 @@ function api_key_schedule_renewal() {
 	*  API key expires.
 	*/
 
-	if (!cookie_exists('api_key')) {
+	if (!API_CONFIG.authenticated) {
 		throw new Error(
 			"API: Can't schedule cookie renewal when " +
-			"no API key exists."
+			"not authenticated."
 		);
 	}
 
@@ -386,6 +386,7 @@ function api_login(user, pass) {
 	*  Login using the supplied credentials and store the
 	*  returned API key.
 	*/
+	console.log("API: Authenticate");
 	api_call(
 		API_ENDP.AUTH_LOGIN,
 		{username: user, password: pass},
