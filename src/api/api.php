@@ -121,10 +121,18 @@ class APIEndpoint {
 		*  this APIEndpoint object. _load_data_post()
 		*  and _load_data_get() do the actual work.
 		*/
-		if ($this->method == API_METHOD['POST']) {
-			$this->_load_data_post();
-		} else if ($this->method == API_METHOD['GET']) {
-			$this->_load_data_get();
+		switch($this->method) {
+			case API_METHOD['POST']:
+				$this->_load_data_post();
+				break;
+			case API_METHOD['GET']:
+				$this->_load_data_get();
+				break;
+			default:
+				throw new ArgException(
+					"Unknown endpoint ".
+					"method '$this->method'."
+				);
 		}
 	}
 
@@ -282,6 +290,10 @@ class APIEndpoint {
 		return $this->caller;
 	}
 
+	public function get_method() {
+		return $this->method;
+	}
+
 	public function resp_set($resp) {
 		/*
 		*  Set the API response data.
@@ -357,16 +369,16 @@ function api_handle_request(APIEndpoint $endpoint) {
 	header('Content-Type: '.$endpoint->get_content_type());
 	header('Access-Control-Allow-Origin: *');
 
-	// Initialize the endpoint.
-	try {
-		$endpoint->load_data();
-	} catch(ArgException $e) {
-		throw new APIException(
-			API_E_INVALID_REQUEST, $e->getMessage(), 0, $e
-		);
-	} catch(IntException $e) {
-		throw new APIException(
-			API_E_INTERNAL, $e->getMessage(), 0, $e
+	// Check the request method.
+	if ($_SERVER['REQUEST_METHOD'] != $endpoint->get_method()) {
+		throw new ArgException(
+			"Invalid request method '".
+			$_SERVER['REQUEST_METHOD'].
+			"'. Expected '".
+			array_search(
+				$endpoint->get_method(),
+				API_METHOD
+			)."'."
 		);
 	}
 
@@ -388,6 +400,19 @@ function api_handle_request(APIEndpoint $endpoint) {
 		);
 	}
 	$endpoint->set_caller($caller);
+
+	// Initialize the endpoint.
+	try {
+		$endpoint->load_data();
+	} catch(ArgException $e) {
+		throw new APIException(
+			API_E_INVALID_REQUEST, $e->getMessage(), 0, $e
+		);
+	} catch(IntException $e) {
+		throw new APIException(
+			API_E_INTERNAL, $e->getMessage(), 0, $e
+		);
+	}
 
 	// Use the API rate quota of the caller if required.
 	if (!$endpoint->requires_quota()) { return; }
@@ -439,7 +464,10 @@ function api_endpoint_init(APIEndpoint $endpoint) {
 			api_handle_preflight();
 			break;
 		default:
-			header('Content-Type: '.$endpoint->get_content_type());
+			header(
+				'Content-Type: '.
+				$endpoint->get_content_type()
+			);
 			throw new ArgAxception("Invalid request method.");
 			break;
 	}
