@@ -21,11 +21,8 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 
 $SLIDE_GET = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],

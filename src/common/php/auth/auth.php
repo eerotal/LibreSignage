@@ -1,162 +1,65 @@
 <?php
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
+/*
+*  Web interface authentication functionality for LibreSignage.
+*  API authentication is handled in the file api/api_auth.php.
+*/
 
-function auth_verify(string $username, string $password) {
-	/*
-	*  Verify the $username - $password combination. Returns the
-	*  corresponding User object if the verification is successful
-	*  and NULL otherwise.
-	*/
-	if (empty($username) ||
-		empty($password) ||
-		!user_exists($username)) {
-		return NULL;
-	}
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_auth.php');
 
-	$usr = new User($username);
-	if ($usr) {
-		if ($usr->verify_password($password)) {
-			return $usr;
-		}
-	}
-	return NULL;
-}
+const COOKIE_API_KEY = 'api_key';
 
-function auth_login($username, $password) {
-	/*
-	*  Login using a username and password. Returns the corresponding
-	*  User object on success and NULL otherwise.
-	*/
-
-	// Already authenticated?
-	if (auth_is_authorized()) {
-		return auth_session_user();
-	}
-
-	$tmp = NULL;
-	if (!empty($username) && !empty($password)) {
-		$tmp = auth_verify($username, $password);
-		if ($tmp != NULL) {
-			$_SESSION['user'] = $tmp->get_name();
-			return $tmp;
-		}
-	}
-	return NULL;
-}
-
-function auth_logout() {
-	$_SESSION = array();
-	if (ini_get('session.use_cookies')) {
-		$cp = session_get_cookie_params();
-		setcookie(session_name(), '', time() - 42000,
-			$cp['path'], $cp['domain'],
-			$cp['secure'], $cp['httponly']);
-	}
-	session_destroy();
-}
-
-function auth_is_authorized(array $groups = NULL,
-				array $users = NULL,
-				bool $redir = FALSE,
-				bool $both = FALSE) {
-	/*
-	*  Check whether the current session is authorized to access
-	*  a page and return TRUE if it is. FALSE is returned
-	*  otherwise.
-	*
-	*  $groups and $users can optionally be used to filter which
-	*  groups or users can access a page. These arguments are simply
-	*  whitelists of group and user names. If $groups and $users are
-	*  both defined, the value of $both affects how authentication is
-	*  done. If $both is TRUE, it is required that the logged in user
-	*  is in a group listed in $groups and a user listed in $users.
-	*  Otherwise only one of these conditions must be met.
-	*
-	*  If both $groups and $users are NULL and $both is FALSE, access
-	*  is granted to all logged in users.
-	*
-	*  If $redir is TRUE, this function also redirects the client to
-	*  the login page if the user is not logged in or to the HTTP
-	*  403 page if access is not granted.
-	*/
-	$auth_u = FALSE;
-	$auth_g = FALSE;
-	$usr = auth_session_user();
-
-	if ($usr == NULL) {
+function web_auth($user_wl = NULL, $group_wl = NULL, bool $redir = FALSE) {
+	$u = web_auth_cookie_verify($redir);
+	if (!$u) {
 		if ($redir) {
 			header('Location: '.LOGIN_PAGE);
 			exit(0);
 		}
-		return FALSE;
+		return NULL;
 	}
-
-	if (!$both && $groups == NULL && $users == NULL) {
-		return TRUE;
-	} else {
-		if ($users != NULL) {
-			if (in_array($usr->get_name(), $users)) {
-				$auth_u = TRUE;
+	if ($user_wl) {
+		if (!web_auth_user_whitelist($u, $user_wl)) {
+			if ($redir) {
+				error_handle(HTTP_ERR_403);
 			}
-		}
-		if ($groups != NULL) {
-			foreach ($groups as $g) {
-				if ($usr->is_in_group($g)) {
-					$auth_g = TRUE;
-					break;
-				}
-			}
-		}
-		if ($both) {
-			if ($auth_g && $auth_u) {
-				return TRUE;
-			}
-		} else {
-			if ($auth_g || $auth_u) {
-				return TRUE;
-			}
-		}
-
-		// ==> Not authorized.
-		if ($redir) {
-			error_handle(HTTP_ERR_403);
-		} else {
-			return FALSE;
+			return NULL;
 		}
 	}
+	if ($group_wl) {
+		if (!web_auth_group_whitelist($u, $group_wl)) {
+			if ($redir) {
+				error_handle(HTTP_ERR_403);
+			}
+			return NULL;
+		}
+	}
+	return $u;
 }
 
-function auth_session_user() {
-	$user = NULL;
-	if (empty($_SESSION['user'])) { return NULL; }
-	try {
-		// Attempt to load the userdata.
-		$user = new User($_SESSION['user']);
-	} catch (ArgException $e) {
-		// Logout since the current username is invalid.
-		auth_logout();
-		session_start();
-		$user = NULL;
-	}
-	return $user;
-}
-
-function auth_setup() {
+function web_auth_cookie_verify(bool $redir = FALSE) {
 	/*
-	*  Setup the authentication system.
-	*  - Start a new session.
-	*  - Set the 'auth_setup' flag in $_SESSION.
+	*  Verify the API key in the API key cookie. This function
+	*  can be used to grant access to web pages. The api_key_verify()
+	*  function is used for API calls.
 	*/
-	session_start();
-
-	// Return if the setup is already done.
-	if (array_key_exists('auth_setup', $_SESSION) &&
-		$_SESSION['auth_setup']) {
-		return;
+	if (!empty($_COOKIE[COOKIE_API_KEY])) {
+		return api_key_verify($_COOKIE[COOKIE_API_KEY]);
 	}
+	return FALSE;
 }
 
-// Automatically setup the authentication system.
-auth_setup();
+function web_auth_user_whitelist(User $u, array $wl) {
+	/*
+	*  Return TRUE if the user $u is in the whitelist $wl.
+	*  FALSE is returned otherwise.
+	*/
+	return array_search($u->get_name(), $wl, TRUE);
+}
+
+function web_auth_group_whitelist(User $u, array $wl) {
+	/*
+	*  Return TRUE if the user $u is in one of the groups in $wl.
+	*  FALSE is returned otherwise.
+	*/
+	return count(array_intersect($u->get_groups(), $wl)) > 0;
+}

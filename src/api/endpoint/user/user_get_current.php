@@ -15,10 +15,7 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
 $USER_GET = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],

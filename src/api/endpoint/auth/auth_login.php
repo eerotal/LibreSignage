@@ -15,10 +15,7 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
 $AUTH_LOGIN = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
@@ -32,7 +29,7 @@ $AUTH_LOGIN = new APIEndpoint(array(
 ));
 api_endpoint_init($AUTH_LOGIN);
 
-$user = auth_login(
+$user = api_creds_verify(
 	$AUTH_LOGIN->get('username'),
 	$AUTH_LOGIN->get('password')
 );

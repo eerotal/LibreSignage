@@ -3,6 +3,8 @@
 *  APIEndpoint object definition and interface functions.
 */
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_auth.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/argarray.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
@@ -329,23 +331,6 @@ class APIEndpoint {
 			exit(0);
 		}
 	}
-}
-
-function api_key_verify(string $key) {
-	/*
-	*  Verify the API key $key. Returns the corresponding
-	*  user object if the verification is successful and
-	*  NULL otherwise.
-	*/
-	if (!empty($key)) {
-		$users = user_array();
-		foreach ($users as $k => $u) {
-			if ($u->verify_api_key($key)) {
-				return $u;
-			}
-		}
-	}
-	return NULL;
 }
 
 function api_handle_preflight() {

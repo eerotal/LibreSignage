@@ -2,7 +2,7 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js_include.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
-	auth_is_authorized(NULL, NULL, TRUE);
+	web_auth(NULL, NULL, TRUE);
 ?>
 <!DOCTYPE html>
 <html lang="en">

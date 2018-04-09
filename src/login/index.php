@@ -3,7 +3,7 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js_include.php');
 
-	if (auth_is_authorized()) {
+	if (web_auth()) {
 		header('Location: '.LOGIN_LANDING);
 		exit(0);
 	}

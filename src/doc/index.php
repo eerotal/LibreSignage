@@ -3,7 +3,7 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js_include.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
-	auth_is_authorized(NULL, NULL, TRUE);
+	web_auth(NULL, NULL, TRUE);
 
 	// Load the documentation list.
 	$docs = @scandir(LIBRESIGNAGE_ROOT.DOC_HTML_DIR);
