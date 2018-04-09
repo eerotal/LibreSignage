@@ -53,6 +53,7 @@
 		?>
 
 		<script src="/common/js/util.js"></script>
+		<script src="/common/js/cookie.js"></script>
 		<script src="/common/js/api.js"></script>
 		<script src="/common/js/dialog.js"></script>
 		<script src="/control/js/control.js"></script>

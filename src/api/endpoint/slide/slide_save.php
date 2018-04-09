@@ -61,7 +61,7 @@ if ($SLIDE_SAVE->has('id', TRUE)) {
 
 		// Allow owner to modify slide.
 		$flag_auth |= ($user->is_in_group('editor') &&
-			$user->get_name() === $slide->get('owner')));
+			$user->get_name() === $slide->get('owner'));
 		if (!$flag_auth) {
 			throw new APIException(
 				API_E_NOT_AUTHORIZED,

@@ -8,22 +8,19 @@ function login_redirect(uri) {
 }
 
 function login() {
-	api_call(
-		API_ENDP.AUTH_LOGIN,
-		{
-			username: INPUT_USERNAME.val(),
-			password: INPUT_PASSWORD.val()
-		},
-		(resp) => {
-			if (resp.error == API_E.API_E_INCORRECT_CREDS) {
+	api_login(
+		INPUT_USERNAME.val(),
+		INPUT_PASSWORD.val(),
+		(err) => {
+			if (err == API_E.API_E_INCORRECT_CREDS) {
 				login_redirect("/login?failed=1");
-			} else if (resp.error == API_E.API_E_OK) {
+			} else if (err == API_E.API_E_OK) {
 				login_redirect(LOGIN_LANDING);
 			} else {
-				api_handle_disp_error(resp.error);
+				api_handle_disp_error(err);
 			}
 		}
-	);
+	)
 }
 
 function login_setup() {
@@ -40,7 +37,9 @@ function login_setup() {
 	BTN_LOGIN[0].addEventListener('click', login);
 }
 
-api_init(
-	null,	// Use default config.
-	login_setup
-);
+$(document).ready(() => {
+	api_init(
+		null,	// Use default config.
+		login_setup
+	);
+});

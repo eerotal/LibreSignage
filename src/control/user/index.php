@@ -89,28 +89,6 @@
 					</input>
 				</div>
 			</div>
-			<div class="user-settings-cont container mx-auto">
-				<h2>Authentication keys</h2>
-				<div class="row form-group w-100">
-					<table id="user-keys-table" class="table">
-						<thead>
-							<tr>
-								<th scope="col">Key</th>
-								<th scope="col">Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
-				<div class="row form-group w-100">
-					<input id="key-create"
-						class="col-sm-12 btn btn-primary"
-						type="button"
-						value="Generate a new key"
-						onclick="user_settings_key_generate()">
-				</div>
-			</div>
 		</main>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
@@ -121,6 +99,7 @@
 		?>
 
 		<script src="/common/js/util.js"></script>
+		<script src="/common/js/cookie.js"></script>
 		<script src="/common/js/api.js"></script>
 		<script src="/common/js/dialog.js"></script>
 		<script src="/common/js/user.js"></script>

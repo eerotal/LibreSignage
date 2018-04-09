@@ -139,6 +139,7 @@
 		<script src="/common/js/util.js"></script>
 		<script src="/common/js/validator.js"></script>
 		<script src="/common/js/dialog.js"></script>
+		<script src="/common/js/cookie.js"></script>
 		<script src="/common/js/api.js"></script>
 		<script src="/control/editor/js/slidelist.js"></script>
 		<script src="/control/editor/js/editor.js"></script>

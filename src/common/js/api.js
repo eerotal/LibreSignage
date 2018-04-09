@@ -330,7 +330,7 @@ function api_key_schedule_renewal() {
 	var t = left - API_KEY_RENEWAL_HEADROOM;
 
 	if (left <= 0) {
-		API_CONFIG.authenticated = false;
+		api_key_remove();
 		throw new Error(
 			"API: Won't schedule key renewal because " +
 			"the API key is already expired."
@@ -354,7 +354,7 @@ function api_key_renew() {
 		null,
 		(resp) => {
 			if (api_handle_disp_error(resp.error)) {
-				API_CONFIG.authenticated = false;
+				api_key_remove();
 				throw new Error("API: Failed to " +
 						"renew API key.");
 			}
@@ -363,7 +363,6 @@ function api_key_renew() {
 				resp.api_key.created,
 				resp.api_key.max_age
 			);
-			API_CONFIG.authenticated = true;
 
 			console.log("API: Key renewal complete.");
 			api_key_schedule_renewal();
@@ -375,36 +374,106 @@ function api_key_store(api_key, created, max_age) {
 	/*
 	*  Store the supplied API key data in cookies.
 	*/
-	console.log("API: Store API key data.")
 	set_cookie({"api_key": api_key, "path": "/"});
 	set_cookie({"api_key_created": created, "path": "/"});
 	set_cookie({"api_key_max_age": max_age, "path": "/"});
+	API_CONFIG.authenticated = true;
 }
 
-function api_login(user, pass) {
+function api_key_remove() {
+	/*
+	*  Remove the API key data cookies.
+	*/
+	API_CONFIG.authenticated = false;
+	rm_cookie({"api_key": "", "path": "/"});
+	rm_cookie({"api_key_created": "", "path": "/"});
+	rm_cookie({"api_key_max_age": "", "path": "/"});
+}
+
+function api_key_check() {
+	/*
+	*  Check whether the API key cookies already exist and
+	*  whether they are actually valid and set the authenticated
+	*  flag based on that. A key renewal is also scheduled if
+	*  a valid key is found.
+	*/
+	console.log("API: Check authentication status.");
+	if (cookie_exists('api_key') &&
+		cookie_exists('api_key_created') &&
+		cookie_exists('api_key_max_age')) {
+
+		// Check whether the key is expired.
+		let created = parseInt(get_cookie('api_key_created'), 10);
+		let max_age = parseInt(get_cookie('api_key_max_age'), 10);
+		let left = created + max_age - Date.now()/1000;
+
+		if (left <= 0) {
+			console.log("API: API key expired.");
+			api_key_remove();
+		}
+
+		console.log("API: Already authenticated.")
+		API_CONFIG.authenticated = true;
+
+		api_key_schedule_renewal();
+	} else {
+		/*
+		*  Make sure no invalid key data exists
+		*  and set the authenticated flag to false.
+		*/
+		console.log("API: Invalid or no API key data.");
+		api_key_remove();
+	}
+}
+
+function api_login(user, pass, ready_callback) {
 	/*
 	*  Login using the supplied credentials and store the
-	*  returned API key.
+	*  returned API key. ready_callback is called when the
+	*  login is successfully finished.
 	*/
 	console.log("API: Authenticate");
 	api_call(
 		API_ENDP.AUTH_LOGIN,
 		{username: user, password: pass},
 		(resp) => {
-			if (api_handle_disp_error(resp.error)) {
-				console.error(
-					"API: Authentication failed."
+			if (resp.error == API_E.API_E_OK) {
+				api_key_store(
+					resp.api_key.api_key,
+					resp.api_key.created,
+					resp.api_key.max_age
 				);
-				return;
+				api_key_schedule_renewal();
+			} else {
+				console.error("API: Auth failed.");
 			}
-			api_key_store(
-				resp.api_key.api_key,
-				resp.api_key.created,
-				resp.api_key.max_age
-			);
-			API_CONFIG.authenticated = true;
 
-			api_key_schedule_renewal();
+			if (ready_callback) {
+				ready_callback(resp.error);
+			}
+		}
+	);
+}
+
+function api_logout(ready_callback) {
+	/*
+	*  Call the logout API endpoint and remove API key cookies.
+	*  ready_callback is called when the logout is successfully
+	*  finished.
+	*/
+	api_call(
+		API_ENDP.AUTH_LOGOUT,
+		null,
+		(resp) => {
+			if (resp.error == API_E.API_E_OK) {
+				// Remove API key data cookies.
+				api_key_remove();
+			} else {
+				console.error("API: Logout failed.");
+			}
+			if (ready_callback) {
+				ready_callback(resp.error);
+			}
 		}
 	);
 }
@@ -416,6 +485,8 @@ function api_init(config, callback) {
 	if (API_CONFIG.configured) { return; }
 	api_apply_config(config);
 	API_CONFIG.configured = true;
+
+	api_key_check();
 
 	api_load_error_codes(() => {
 		api_load_error_msgs(() => {

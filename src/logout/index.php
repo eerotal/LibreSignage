@@ -2,8 +2,6 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js_include.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
-
-	auth_logout();
 ?>
 
 <!DOCTYPE html>
@@ -31,11 +29,10 @@
 			js_include_bootstrap();
 		?>
 
-		<script>
-			// Redirect to the login page after 2 seconds.
-			setTimeout(() => {
-				window.location.href = "/login";
-			}, 2000);
-		</script>
+		<script src="/common/js/dialog.js"></script>
+		<script src="/common/js/util.js"></script>
+		<script src="/common/js/cookie.js"></script>
+		<script src="/common/js/api.js"></script>
+		<script src="/logout/js/logout.js"></script>
 	</body>
 </html>

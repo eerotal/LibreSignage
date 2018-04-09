@@ -43,7 +43,7 @@ if ($USER_GET_QUOTA->has('user', TRUE)) {
 
 // Allow admins or the user themself to get the quota.
 if (!$USER_GET_QUOTA->get_caller()->is_in_group('admin')
-	|| $USER_GET_QUOTA->get_caller()->get_name() != $user_name) {
+	&& $USER_GET_QUOTA->get_caller()->get_name() != $user_name) {
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,
 		"Not authorized."
