@@ -73,4 +73,4 @@ $(document).ready(() => {
 			_usr.load(null, user_settings_setup);
 		}
 	);
-}
+});
