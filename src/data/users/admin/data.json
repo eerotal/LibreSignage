@@ -1,6 +1,6 @@
 {
 	"user":"admin",
-	"groups":["admin","editor","display","keys"],
+	"groups":["admin","editor","display"],
 	"hash":"$2y$10$eZjS01R.HyPGQ\/FXkXATP.ITpMcydYPM2\/6n8sa232.2CWDwGlPzK",
 	"api_keys": []
 }

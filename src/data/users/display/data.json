@@ -1,6 +1,6 @@
 {
 	"user":"display",
-	"groups":["display", "keys"],
+	"groups":["display"],
 	"hash":"$2y$10$RjscC9qZnpURyWMOAVt2se9j4Y5\/VOJmQ4QsIVVqc0hijIlpYjhSC",
 	"api_keys":[]
 }
