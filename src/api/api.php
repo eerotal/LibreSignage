@@ -56,6 +56,7 @@ class APIEndpoint {
 	private $data = NULL;
 	private $inited = FALSE;
 	private $caller = NULL;
+	private $api_key = NULL;
 
 	public function __construct(array $config) {
 		$args = new ArgumentArray(
@@ -291,6 +292,14 @@ class APIEndpoint {
 		return $this->caller;
 	}
 
+	public function set_api_key($key) {
+		$this->api_key = $key;
+	}
+
+	public function get_api_key() {
+		return $this->api_key;
+	}
+
 	public function get_method() {
 		return $this->method;
 	}
@@ -390,14 +399,18 @@ function api_handle_request(APIEndpoint $endpoint) {
 		);
 	}
 
-	$caller = api_key_verify(getallheaders()["Api-Key"]);
+	$api_key = getallheaders()["Api-Key"];
+	$caller = api_key_verify($api_key);
 	if ($caller === NULL) {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,
 			"Invalid API key."
 		);
 	}
+
+	// Store caller data in endpoint.
 	$endpoint->set_caller($caller);
+	$endpoint->set_api_key($api_key);
 
 	// Use the API rate quota of the caller if required.
 	if (!$endpoint->requires_quota()) { return; }

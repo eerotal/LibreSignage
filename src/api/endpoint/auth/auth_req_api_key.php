@@ -2,7 +2,9 @@
 /*
 *  ====>
 *
-*  *Request a new API key for a user.*
+*  *Request a new API key for a user. The API key used when this
+*  endpoint was called is automatically expired when this call
+*  finishes.*
 *
 *  Return value
 *    * api_key = A newly generated API key for accessing the API.
@@ -22,7 +24,13 @@ $AUTH_REQ_API_KEY = new APIEndpoint(array(
 ));
 api_endpoint_init($AUTH_REQ_API_KEY);
 
+// Generate the new key.
 $api_key = $AUTH_REQ_API_KEY->get_caller()->gen_api_key();
+
+// Expire the old key.
+$AUTH_REQ_API_KEY->get_caller()->rm_api_key(
+	$AUTH_REQ_API_KEY->get_api_key()
+);
 $AUTH_REQ_API_KEY->get_caller()->write();
 
 $AUTH_REQ_API_KEY->resp_set(array(

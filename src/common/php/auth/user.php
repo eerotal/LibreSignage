@@ -341,12 +341,13 @@ class User {
 
 	public function rm_api_key(string $api_key) {
 		$this->_error_on_not_ready();
-		$i = array_search($api_key, $this->api_keys);
-		if ($i !== FALSE) {
-			array_splice($this->api_keys, i, 1);
-		} else {
-			throw new ArgException("No such API key.");
+		foreach ($this->api_keys as $i => $d) {
+			if ($d["api_key"] == $api_key) {
+				array_splice($this->api_keys, $i, 1);
+				return;
+			}
 		}
+		throw new ArgException("No such API key.");
 	}
 
 	public function verify_api_key(string $api_key) {

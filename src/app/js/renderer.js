@@ -75,7 +75,7 @@ function renderer_update() {
 
 		renderer_animate(DISPLAY, 'swipe-from-right', null);
 
-		console.log("LibreImage: Changing slide in " +
+		console.log("LibreSignage: Changing slide in " +
 				c_slide.get('time') + "ms.");
 		setTimeout(renderer_update, c_slide.get('time'));
 	});
