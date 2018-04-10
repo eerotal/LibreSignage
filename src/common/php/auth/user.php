@@ -316,33 +316,39 @@ class User {
 	}
 
 	// -- Auth token functions --
-	public function set_auth_tokens($auth_tokens) {
+	private function set_auth_tokens($auth_tokens) {
 		$this->auth_tokens = $auth_tokens;
-	}
-
-	public function get_auth_tokens() {
-		$this->_error_on_not_ready();
-		return $this->auth_tokens;
 	}
 
 	public function gen_auth_token() {
 		$this->_error_on_not_ready();
 
 		$tok = bin2hex(random_bytes(self::AUTH_TOKEN_LEN));
+		$tok_hash = password_hash($tok, PASSWORD_DEFAULT);
+		if ($tok_hash === FALSE) {
+			throw new IntException(
+				"Authentication token hashing failed."
+			);
+		}
+
 		$tmp = array(
-			'auth_token' => $tok,
 			'created' => time(),
 			'max_age' => self::AUTH_TOKEN_MAX_AGE
 		);
-		array_push($this->auth_tokens, $tmp);
+		$store = $tmp;
+		$ret = $tmp;
 
-		return $tmp;
+		$store['token_hash'] = $tok_hash;
+		$ret['token'] = $tok;
+
+		array_push($this->auth_tokens, $store);
+		return $ret;
 	}
 
-	public function rm_auth_token(string $auth_token) {
+	public function rm_auth_token(string $tok) {
 		$this->_error_on_not_ready();
 		foreach ($this->auth_tokens as $i => $d) {
-			if ($d['auth_token'] == $auth_token) {
+			if (password_verify($tok, $d['token_hash'])) {
 				array_splice($this->auth_tokens, $i, 1);
 				return;
 			}
@@ -362,7 +368,8 @@ class User {
 
 		foreach ($this->auth_tokens as $i => $d) {
 			$tmp = $d['created'] + $d['max_age'];
-			if ($d['auth_token'] === $tok && time() <= $tmp) {
+			if (password_verify($tok, $d['token_hash']) &&
+				time() <= $tmp) {
 				$valid = TRUE;
 			} else if (time() > $tmp) {
 				// Mark the expired token for purging.

@@ -362,7 +362,7 @@ function auth_token_renew() {
 						"renew auth token.");
 			}
 			auth_token_store(
-				resp.auth_token.auth_token,
+				resp.auth_token.token,
 				resp.auth_token.created,
 				resp.auth_token.max_age
 			);
@@ -448,7 +448,7 @@ function api_login(user, pass, ready_callback) {
 		(resp) => {
 			if (resp.error == API_E.API_E_OK) {
 				auth_token_store(
-					resp.auth_token.auth_token,
+					resp.auth_token.token,
 					resp.auth_token.created,
 					resp.auth_token.max_age
 				);
