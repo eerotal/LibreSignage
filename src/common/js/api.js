@@ -354,7 +354,7 @@ function auth_token_renew() {
 	console.log("API: Renew authentication token.");
 	api_call(
 		API_ENDP.AUTH_REQ_TOKEN,
-		null,
+		{who: "LibreSignage Web Interface"},
 		(resp) => {
 			if (api_handle_disp_error(resp.error)) {
 				auth_token_remove();
@@ -444,7 +444,11 @@ function api_login(user, pass, ready_callback) {
 	console.log("API: Authenticate");
 	api_call(
 		API_ENDP.AUTH_LOGIN,
-		{username: user, password: pass},
+		{
+			username: user,
+			password: pass,
+			who: "LibreSignage Web Interface"
+		},
 		(resp) => {
 			if (resp.error == API_E.API_E_OK) {
 				auth_token_store(

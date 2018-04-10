@@ -320,7 +320,17 @@ class User {
 		$this->auth_tokens = $auth_tokens;
 	}
 
-	public function gen_auth_token() {
+	public function gen_auth_token(string $who, string $from) {
+		/*
+		*  Generate a new authentication token and store
+		*  the data in the User object. 'who' is a caller
+		*  supplied identification string that can be
+		*  displayed in user interfaces listing all active
+		*  connections. 'from' is the IP address of the
+		*  party requesting the authentication token. Note
+		*  that 'who' and 'from' are truncated to a max length
+		*  of 45 characters.
+		*/
 		$this->_error_on_not_ready();
 
 		$tok = bin2hex(random_bytes(self::AUTH_TOKEN_LEN));
@@ -332,6 +342,8 @@ class User {
 		}
 
 		$tmp = array(
+			'who' => substr($who, 0, 45),
+			'from' => substr($from, 0, 45),
 			'created' => time(),
 			'max_age' => self::AUTH_TOKEN_MAX_AGE
 		);

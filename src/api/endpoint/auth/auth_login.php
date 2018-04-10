@@ -7,6 +7,8 @@
 *  POST parameters
 *    * username    = Username
 *    * password    = Password
+*    * who         = A string that identifies the caller. For example
+*                    the name of the software that's using the API.
 *
 *  Return value
 *    * auth_token = A newly generated authentication token.
@@ -22,7 +24,8 @@ $AUTH_LOGIN = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
 		'username' => API_P_STR,
-		'password' => API_P_STR
+		'password' => API_P_STR,
+		'who'      => API_P_STR
 	),
 	APIEndpoint::REQ_QUOTA		=> FALSE,
 	APIEndpoint::REQ_AUTH		=> FALSE
@@ -36,7 +39,10 @@ $user = auth_creds_verify(
 
 if ($user) {
 	// Generate a new auth token.
-	$auth_token = $user->gen_auth_token();
+	$auth_token = $user->gen_auth_token(
+		$AUTH_LOGIN->get('who'),
+		$_SERVER['REMOTE_ADDR']
+	);
 	$user->write();
 
 	$AUTH_LOGIN->resp_set(array(
