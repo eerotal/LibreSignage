@@ -1,12 +1,51 @@
 <?php
 /*
-*  Web interface authentication functionality for LibreSignage.
-*  API authentication is handled in the file api/api_auth.php.
+*  Authentication functionality for LibreSignage.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_auth.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 
-const COOKIE_API_KEY = 'api_key';
+const COOKIE_AUTH_TOKEN = 'auth_token';
+
+// -- General authentication functions. --
+
+function auth_creds_verify(string $user, string $pass) {
+	/*
+	*  Verify the supplied login credentials and return
+	*  the corresponding User object if they are valid.
+	*  NULL is returned otherwise.
+	*/
+	if (empty($user) || empty($pass) || !user_exists($user)) {
+		return NULL;
+	}
+
+	$u = new User($user);
+	if ($u) {
+		if ($u->verify_password($pass)) {
+			return $u;
+		}
+	}
+	return NULL;
+}
+
+function auth_token_verify(string $tok) {
+	/*
+	*  Verify an authentication token and return the
+	*  corresponding User object if the token is valid.
+	*  Otherwise NULL is returned.
+	*/
+	if (!empty($tok)) {
+		$users = user_array();
+		foreach ($users as $k => $u) {
+			if ($u->verify_auth_token($tok)) {
+				return $u;
+			}
+		}
+	}
+	return NULL;
+}
+
+// -- Web interface authentication functions. --
 
 function web_auth($user_wl = NULL, $group_wl = NULL, bool $redir = FALSE) {
 	$u = web_auth_cookie_verify($redir);
@@ -38,12 +77,11 @@ function web_auth($user_wl = NULL, $group_wl = NULL, bool $redir = FALSE) {
 
 function web_auth_cookie_verify(bool $redir = FALSE) {
 	/*
-	*  Verify the API key in the API key cookie. This function
-	*  can be used to grant access to web pages. The api_key_verify()
-	*  function is used for API calls.
+	*  Verify the auth token in the token cookie. This function
+	*  can be used to grant access to web pages.
 	*/
-	if (!empty($_COOKIE[COOKIE_API_KEY])) {
-		return api_key_verify($_COOKIE[COOKIE_API_KEY]);
+	if (!empty($_COOKIE[COOKIE_AUTH_TOKEN])) {
+		return auth_token_verify($_COOKIE[COOKIE_AUTH_TOKEN]);
 	}
 	return FALSE;
 }

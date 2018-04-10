@@ -3,8 +3,8 @@
 *  APIEndpoint object definition and interface functions.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_auth.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/argarray.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
@@ -44,19 +44,19 @@ class APIEndpoint {
 	const FORMAT		= 'format';
 	const STRICT_FORMAT	= 'strict_format';
 	const REQ_QUOTA		= 'req_quota';
-	const REQ_API_KEY	= 'req_api_key';
+	const REQ_AUTH		= 'req_auth';
 
-	private $method = 0;
-	private $response_type = 0;
-	private $response = NULL;
-	private $format = NULL;
-	private $strict_format = TRUE;
-	private $req_quota = TRUE;
-	private $req_api_key = TRUE;
-	private $data = NULL;
-	private $inited = FALSE;
-	private $caller = NULL;
-	private $api_key = NULL;
+	private $method		= 0;
+	private $response_type	= 0;
+	private $response	= NULL;
+	private $format		= NULL;
+	private $strict_format	= TRUE;
+	private $req_quota	= TRUE;
+	private $req_auth	= TRUE;
+	private $data		= NULL;
+	private $inited		= FALSE;
+	private $caller		= NULL;
+	private $auth_token	= NULL;
 
 	public function __construct(array $config) {
 		$args = new ArgumentArray(
@@ -66,13 +66,13 @@ class APIEndpoint {
 				self::FORMAT        => 'array',
 				self::STRICT_FORMAT => 'boolean',
 				self::REQ_QUOTA     => 'boolean',
-				self::REQ_API_KEY   => 'boolean'
+				self::REQ_AUTH      => 'boolean'
 			),
 			array(
 				self::FORMAT        => array(),
 				self::STRICT_FORMAT => TRUE,
 				self::REQ_QUOTA     => TRUE,
-				self::REQ_API_KEY   => TRUE
+				self::REQ_AUTH      => TRUE
 			)
 		);
 		$ret = $args->chk($config);
@@ -280,8 +280,8 @@ class APIEndpoint {
 		return $this->req_quota;
 	}
 
-	public function requires_api_key() {
-		return $this->req_api_key;
+	public function requires_auth() {
+		return $this->req_auth;
 	}
 
 	public function set_caller($caller) {
@@ -292,12 +292,12 @@ class APIEndpoint {
 		return $this->caller;
 	}
 
-	public function set_api_key($key) {
-		$this->api_key = $key;
+	public function set_auth_token($token) {
+		$this->auth_token = $token;
 	}
 
-	public function get_api_key() {
-		return $this->api_key;
+	public function get_auth_token() {
+		return $this->auth_token;
 	}
 
 	public function get_method() {
@@ -349,7 +349,7 @@ function api_handle_preflight() {
 	*/
 	header('Access-Control-Allow-Origin: *');
 	header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-	header('Access-Control-Allow-Headers: Content-Type, Api-Key');
+	header('Access-Control-Allow-Headers: Content-Type, Auth-Token');
 	header('Access-Control-Max-Age: 600');
 }
 
@@ -389,28 +389,28 @@ function api_handle_request(APIEndpoint $endpoint) {
 		);
 	}
 
-	// Check API key if required.
-	if (!$endpoint->requires_api_key()) { return; }
+	// Check authentication.
+	if (!$endpoint->requires_auth()) { return; }
 
-	if (!array_key_exists("Api-Key", getallheaders())) {
+	if (!array_key_exists("Auth-Token", getallheaders())) {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,
-			"No Api-Key header even though required."
+			"No Auth-Token header even though required."
 		);
 	}
 
-	$api_key = getallheaders()["Api-Key"];
-	$caller = api_key_verify($api_key);
+	$auth_token = getallheaders()["Auth-Token"];
+	$caller = auth_token_verify($auth_token);
 	if ($caller === NULL) {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,
-			"Invalid API key."
+			"Invalid authentication token."
 		);
 	}
 
 	// Store caller data in endpoint.
 	$endpoint->set_caller($caller);
-	$endpoint->set_api_key($api_key);
+	$endpoint->set_auth_token($auth_token);
 
 	// Use the API rate quota of the caller if required.
 	if (!$endpoint->requires_quota()) { return; }

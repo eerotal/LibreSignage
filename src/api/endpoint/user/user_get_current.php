@@ -22,7 +22,7 @@ $USER_GET = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT		=> array(),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_API_KEY	=> TRUE
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
 api_endpoint_init($USER_GET);
 

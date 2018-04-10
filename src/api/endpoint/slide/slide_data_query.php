@@ -24,7 +24,7 @@ $SLIDE_DATA_QUERY = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT		=> array(),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_API_KEY	=> TRUE
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
 api_endpoint_init($SLIDE_DATA_QUERY);
 

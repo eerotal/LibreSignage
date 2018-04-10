@@ -34,7 +34,7 @@ $USER_CREATE = new APIEndpoint(array(
 		'groups' => API_P_ARR|API_P_OPT|API_P_NULL
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_API_KEY	=> TRUE
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
 api_endpoint_init($USER_CREATE);
 

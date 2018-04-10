@@ -17,11 +17,12 @@ $AUTH_LOGOUT = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT		=> array(),
 	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_API_KEY	=> TRUE
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
 api_endpoint_init($AUTH_LOGOUT);
 
-$AUTH_LOGOUT->get_caller()->rm_api_key($AUTH_LOGOUT->get_api_key());
+$AUTH_LOGOUT->get_caller()->rm_auth_token($AUTH_LOGOUT->get_auth_token());
+$AUTH_LOGOUT->get_caller()->write();
 
 $AUTH_LOGOUT->resp_set(array('error' => API_E_OK));
 $AUTH_LOGOUT->send();

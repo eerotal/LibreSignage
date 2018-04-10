@@ -38,7 +38,7 @@ $SLIDE_SAVE = new APIEndpoint(array(
 		'time' => API_P_INT
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_API_KEY	=> TRUE
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
 api_endpoint_init($SLIDE_SAVE);
 

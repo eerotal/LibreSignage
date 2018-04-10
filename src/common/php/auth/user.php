@@ -201,13 +201,13 @@ class UserQuota {
 }
 
 class User {
-	const API_KEY_LEN = 15;
-	const API_KEY_MAX_AGE = 600;
+	const AUTH_TOKEN_LEN = 15;
+	const AUTH_TOKEN_MAX_AGE = 600;
 
 	private $user = '';
 	private $hash = '';
 	private $groups = NULL;
-	private $api_keys = NULL;
+	private $auth_tokens = NULL;
 	private $ready = FALSE;
 
 	public function __construct($name = NULL) {
@@ -257,7 +257,7 @@ class User {
 		$this->set_name($data['user']);
 		$this->set_groups($data['groups']);
 		$this->set_hash($data['hash']);
-		$this->set_api_keys($data['api_keys']);
+		$this->set_auth_tokens($data['auth_tokens']);
 		$this->set_ready(TRUE);
 	}
 
@@ -289,7 +289,7 @@ class User {
 			'user' => $this->user,
 			'groups' => $this->groups,
 			'hash' => $this->hash,
-			'api_keys' => $this->api_keys
+			'auth_tokens' => $this->auth_tokens
 		));
 		if ($json === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
@@ -315,59 +315,63 @@ class User {
 		return LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$tmp;
 	}
 
-	// -- API key functions --
-	public function set_api_keys($api_keys) {
-		$this->api_keys = $api_keys;
+	// -- Auth token functions --
+	public function set_auth_tokens($auth_tokens) {
+		$this->auth_tokens = $auth_tokens;
 	}
 
-	public function get_api_keys() {
+	public function get_auth_tokens() {
 		$this->_error_on_not_ready();
-		return $this->api_keys;
+		return $this->auth_tokens;
 	}
 
-	public function gen_api_key() {
+	public function gen_auth_token() {
 		$this->_error_on_not_ready();
 
-		$new_key = bin2hex(random_bytes(self::API_KEY_LEN));
+		$tok = bin2hex(random_bytes(self::AUTH_TOKEN_LEN));
 		$tmp = array(
-			'api_key' => $new_key,
+			'auth_token' => $tok,
 			'created' => time(),
-			'max_age' => self::API_KEY_MAX_AGE
+			'max_age' => self::AUTH_TOKEN_MAX_AGE
 		);
-		array_push($this->api_keys, $tmp);
+		array_push($this->auth_tokens, $tmp);
 
 		return $tmp;
 	}
 
-	public function rm_api_key(string $api_key) {
+	public function rm_auth_token(string $auth_token) {
 		$this->_error_on_not_ready();
-		foreach ($this->api_keys as $i => $d) {
-			if ($d["api_key"] == $api_key) {
-				array_splice($this->api_keys, $i, 1);
+		foreach ($this->auth_tokens as $i => $d) {
+			if ($d['auth_token'] == $auth_token) {
+				array_splice($this->auth_tokens, $i, 1);
 				return;
 			}
 		}
-		throw new ArgException("No such API key.");
+		throw new ArgException("No such authentication token.");
 	}
 
-	public function verify_api_key(string $api_key) {
+	public function verify_auth_token(string $tok) {
+		/*
+		*  Verify that $tok is a valid authentication token
+		*  for this user and remove all expired tokens at the
+		*  same time.
+		*/
 		$this->_error_on_not_ready();
-		$new_keys = $this->api_keys;
+		$valid = FALSE;
+		$new_tokens = $this->auth_tokens;
 
-		foreach ($this->api_keys as $i => $d) {
+		foreach ($this->auth_tokens as $i => $d) {
 			$tmp = $d['created'] + $d['max_age'];
-			if ($d['api_key'] === $api_key && time() <= $tmp) {
-				return TRUE;
+			if ($d['auth_token'] === $tok && time() <= $tmp) {
+				$valid = TRUE;
 			} else if (time() > $tmp) {
-				// Mark the API expired key for purging.
-				$new_keys[$i] = NULL;
+				// Mark the expired token for purging.
+				$new_tokens[$i] = NULL;
 			}
 		}
-
-		$this->api_keys = array_filter($new_keys);
+		$this->auth_tokens = array_filter($new_tokens);
 		$this->write();
-
-		return FALSE;
+		return $valid;
 	}
 
 	// -- Group functions --

@@ -14,7 +14,7 @@ $LIBRESIGNAGE_LICENSE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['TEXT'],
 	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_API_KEY	=> FALSE
+	APIEndpoint::REQ_AUTH		=> FALSE
 ));
 api_endpoint_init($LIBRESIGNAGE_LICENSE);
 

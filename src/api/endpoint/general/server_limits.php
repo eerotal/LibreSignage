@@ -18,7 +18,7 @@ $SERVER_LIMITS = new APIEndpoint(array(
 	APIEndpoint::METHOD 		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_API_KEY	=> FALSE
+	APIEndpoint::REQ_AUTH		=> FALSE
 ));
 api_endpoint_init($SERVER_LIMITS);
 

@@ -28,7 +28,7 @@ $USER_GET = new APIEndpoint(array(
 		'user' => API_P_STR
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_API_KEY	=> TRUE
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
 api_endpoint_init($USER_GET);
 
