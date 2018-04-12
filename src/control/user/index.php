@@ -88,6 +88,20 @@
 							onclick="user_settings_save()">
 					</input>
 				</div>
+
+				<h2>Active sessions</h2>
+				<div class="row form-group w-100">
+					<table class="col-12">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>IP address</th>
+							</tr>
+						</thead>
+						<tbody id="user-session-table">
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</main>
 		<?php

@@ -207,7 +207,7 @@ class User {
 	private $user = '';
 	private $hash = '';
 	private $groups = NULL;
-	private $auth_tokens = NULL;
+	private $sessions = NULL;
 	private $ready = FALSE;
 
 	public function __construct($name = NULL) {
@@ -257,7 +257,7 @@ class User {
 		$this->set_name($data['user']);
 		$this->set_groups($data['groups']);
 		$this->set_hash($data['hash']);
-		$this->set_auth_tokens($data['auth_tokens']);
+		$this->set_session_data($data['sessions']);
 		$this->set_ready(TRUE);
 	}
 
@@ -289,7 +289,7 @@ class User {
 			'user' => $this->user,
 			'groups' => $this->groups,
 			'hash' => $this->hash,
-			'auth_tokens' => $this->auth_tokens
+			'sessions' => $this->sessions
 		));
 		if ($json === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
@@ -315,82 +315,150 @@ class User {
 		return LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$tmp;
 	}
 
-	// -- Auth token functions --
-	private function set_auth_tokens($auth_tokens) {
-		$this->auth_tokens = $auth_tokens;
+	// -- Session functions --
+	private function _session_gen_auth_token() {
+		/*
+		*  Generate a new cryptographically secure authentication
+		*  token and return the token and it's hash as an array.
+		*/
+		$tok = bin2hex(random_bytes(self::AUTH_TOKEN_LEN));
+		$ret = array(
+			'token' => $tok,
+			'token_hash' => password_hash(
+						$tok,
+						PASSWORD_DEFAULT
+					)
+		);
+		if ($ret['token_hash'] === FALSE) {
+			throw new IntException(
+				"Failed to hash authentication token."
+			);
+		}
+		return $ret;
 	}
 
-	public function gen_auth_token(string $who, string $from) {
+	private function _session_replace(array $s_old, array $s_new) {
 		/*
-		*  Generate a new authentication token and store
-		*  the data in the User object. 'who' is a caller
-		*  supplied identification string that can be
-		*  displayed in user interfaces listing all active
-		*  connections. 'from' is the IP address of the
-		*  party requesting the authentication token. Note
-		*  that 'who' and 'from' are truncated to a max length
-		*  of 45 characters.
+		*  Replace the session $s_old with the session $s_new.
+		*  Note that this function doesn't check whether the
+		*  old session is expired.
+		*/
+		$this->_error_on_not_ready();
+		for ($i = 0; $i < count($this->sessions); $i++) {
+			$c = $this->sessions[$i];
+			if ($s_old['token_hash'] == $c['token_hash']) {
+				$this->sessions[$i] = $s_new;
+				return;
+			}
+		}
+		throw new ArgException("No such session.");
+	}
+
+	public function get_session_data() {
+		return $this->sessions;
+	}
+
+	public function set_session_data($data) {
+		$this->sessions = $data;
+	}
+
+	public function session_new(string $who, string $from) {
+		/*
+		*  Start a new session and store the session data
+		*  in the User object. 'who' is a caller supplied
+		*  identification string that can be displayed
+		*  in user interfaces listing all active sessions.
+		*  'from' is the IP address of the party requesting
+		*  the new session. Note that 'who' and 'from' are
+		*  truncated to a max length of 45 characters.
 		*/
 		$this->_error_on_not_ready();
 
-		$tok = bin2hex(random_bytes(self::AUTH_TOKEN_LEN));
-		$tok_hash = password_hash($tok, PASSWORD_DEFAULT);
-		if ($tok_hash === FALSE) {
-			throw new IntException(
-				"Authentication token hashing failed."
-			);
-		}
-
-		$tmp = array(
+		$token = $this->_session_gen_auth_token();
+		$session = array(
 			'who' => substr($who, 0, 45),
 			'from' => substr($from, 0, 45),
 			'created' => time(),
 			'max_age' => self::AUTH_TOKEN_MAX_AGE
 		);
-		$store = $tmp;
-		$ret = $tmp;
+		$store = $session;
+		$ret = $session;
 
-		$store['token_hash'] = $tok_hash;
-		$ret['token'] = $tok;
+		$store['token_hash'] = $token['token_hash'];
+		$ret['token'] = $token['token'];
 
-		array_push($this->auth_tokens, $store);
+		array_push($this->sessions, $store);
 		return $ret;
 	}
 
-	public function rm_auth_token(string $tok) {
+	public function session_rm(string $tok) {
+		/*
+		*  Remove an existing session with the authentication
+		*  token $tok.
+		*/
 		$this->_error_on_not_ready();
-		foreach ($this->auth_tokens as $i => $d) {
+		foreach ($this->sessions as $i => $d) {
 			if (password_verify($tok, $d['token_hash'])) {
-				array_splice($this->auth_tokens, $i, 1);
+				array_splice($this->sessions, $i, 1);
 				return;
 			}
 		}
 		throw new ArgException("No such authentication token.");
 	}
 
-	public function verify_auth_token(string $tok) {
+	public function session_renew(string $tok) {
 		/*
-		*  Verify that $tok is a valid authentication token
-		*  for this user and remove all expired tokens at the
-		*  same time.
+		*  Renew an existing session and return the new
+		*  session data. The old authentication key is
+		*  automatically expired. This function throws an
+		*  error if the original session is expired or
+		*  if no session corresponding to the supplied auth
+		*  token exists.
 		*/
 		$this->_error_on_not_ready();
-		$valid = FALSE;
-		$new_tokens = $this->auth_tokens;
 
-		foreach ($this->auth_tokens as $i => $d) {
+		$s_old = $this->session_verify($tok);
+		if ($s_old == NULL) {
+			throw new ArgException("No such session.");
+		}
+		$token = $this->_session_gen_auth_token();
+		$s_new = array(
+			'who' => $s_old['who'],
+			'from' => $s_old['from'],
+			'token' => $token['token'],
+			'token_hash' => $token['token_hash'],
+			'created' => time(),
+			'max_age' => self::AUTH_TOKEN_MAX_AGE
+		);
+		$this->_session_replace($s_old, $s_new);
+		return $s_new;
+	}
+
+	public function session_verify(string $tok) {
+		/*
+		*  Verify that the authentication token $tok matches
+		*  a session and remove any expired sessions. This
+		*  function returns the session data for the matching
+		*  session if the verification is successful and NULL
+		*  otherwise.
+		*/
+		$this->_error_on_not_ready();
+		$session = NULL;
+		$new_s = $this->sessions;
+
+		foreach ($this->sessions as $i => $d) {
 			$tmp = $d['created'] + $d['max_age'];
 			if (password_verify($tok, $d['token_hash']) &&
 				time() <= $tmp) {
-				$valid = TRUE;
+				$session = $d;
 			} else if (time() > $tmp) {
-				// Mark the expired token for purging.
-				$new_tokens[$i] = NULL;
+				// Mark expired sessions for purging.
+				$new_s[$i] = NULL;
 			}
 		}
-		$this->auth_tokens = array_filter($new_tokens);
+		$this->sessions = array_filter($new_s);
 		$this->write();
-		return $valid;
+		return $session;
 	}
 
 	// -- Group functions --

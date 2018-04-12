@@ -4,7 +4,7 @@
 *  interface with the LibreSignage API.
 */
 
-const AUTH_TOKEN_RENEWAL_HEADROOM = 10;
+const SESSION_RENEWAL_HEADROOM = 10;
 
 var API_CONFIG = {
 	protocol: null,
@@ -93,9 +93,14 @@ var API_ENDP = {
 		method: "POST",
 		auth:	true
 	},
-	AUTH_REQ_TOKEN: {
-		uri:	"/api/endpoint/auth/auth_req_token.php",
+	AUTH_SESSION_RENEW: {
+		uri:	"/api/endpoint/auth/auth_session_renew.php",
 		method: "POST",
+		auth:	true
+	},
+	AUTH_GET_SESSIONS: {
+		uri:	"/api/endpoint/auth/auth_get_sessions.php",
+		method: "GET",
 		auth:	true
 	},
 
@@ -200,7 +205,7 @@ function api_call(endpoint, data, callback) {
 
 	if (endpoint.auth) {
 		ajax_settings.headers = {
-			'Auth-Token': get_cookie('auth_token')
+			'Auth-Token': get_cookie('session_token')
 		};
 	}
 	$.ajax(ajax_settings);
@@ -310,127 +315,127 @@ function api_apply_config(config) {
 	}
 }
 
-function auth_token_schedule_renewal() {
+function session_schedule_renewal() {
 	/*
-	*  Schedule auth token renewal just before the
-	*  last token expires.
+	*  Schedule session renewal just before the
+	*  last session expires.
 	*/
 
 	if (!API_CONFIG.authenticated) {
 		throw new Error(
-			"API: Can't schedule token renewal when " +
+			"API: Can't schedule session renewal when " +
 			"not authenticated."
 		);
 	}
 
-	var created = parseInt(get_cookie('auth_token_created'), 10);
-	var max_age = parseInt(get_cookie('auth_token_max_age'), 10);
+	var created = parseInt(get_cookie('session_created'), 10);
+	var max_age = parseInt(get_cookie('session_max_age'), 10);
 
 	var left = created + max_age - Date.now()/1000;
-	var t = left - AUTH_TOKEN_RENEWAL_HEADROOM;
+	var t = left - SESSION_RENEWAL_HEADROOM;
 
 	if (left <= 0) {
-		auth_token_remove();
+		session_remove();
 		throw new Error(
-			"API: Won't schedule token renewal because " +
-			"the auth token is already expired."
+			"API: Won't schedule session renewal because " +
+			"the session is already expired."
 		);
 	} else if (t <= 0) {
 		/*
-		*  Attempt to renew the token now because
+		*  Attempt to renew the session now because
 		*  it will expire soon.
 		*/
-		auth_token_renew();
+		session_renew();
 	}
 
-	console.log("API: Token renewal in " + t + " seconds.");
-	setTimeout(auth_token_renew, t*1000);
+	console.log("API: Session renewal in " + t + " seconds.");
+	setTimeout(session_renew, t*1000);
 }
 
-function auth_token_renew() {
+function session_renew() {
 	/*
-	*  Renew the stored authentication token.
+	*  Renew the stored session.
 	*/
-	console.log("API: Renew authentication token.");
+	console.log("API: Renew session.");
 	api_call(
-		API_ENDP.AUTH_REQ_TOKEN,
+		API_ENDP.AUTH_SESSION_RENEW,
 		{who: "LibreSignage Web Interface"},
 		(resp) => {
 			if (api_handle_disp_error(resp.error)) {
-				auth_token_remove();
+				session_remove();
 				throw new Error("API: Failed to " +
-						"renew auth token.");
+						"renew session.");
 			}
-			auth_token_store(
-				resp.auth_token.token,
-				resp.auth_token.created,
-				resp.auth_token.max_age
+			session_store(
+				resp.session.token,
+				resp.session.created,
+				resp.session.max_age
 			);
 
-			console.log("API: Token renewal complete.");
-			auth_token_schedule_renewal();
+			console.log("API: Session renewal complete.");
+			session_schedule_renewal();
 		}
 	)
 }
 
-function auth_token_store(token, created, max_age) {
+function session_store(token, created, max_age) {
 	/*
-	*  Store the supplied auth token data in cookies.
+	*  Store the supplied session data in cookies.
 	*/
-	set_cookie({"auth_token": token, "path": "/"});
-	set_cookie({"auth_token_created": created, "path": "/"});
-	set_cookie({"auth_token_max_age": max_age, "path": "/"});
+	set_cookie({"session_token": token, "path": "/"});
+	set_cookie({"session_created": created, "path": "/"});
+	set_cookie({"session_max_age": max_age, "path": "/"});
 	API_CONFIG.authenticated = true;
 }
 
-function auth_token_remove() {
+function session_remove() {
 	/*
-	*  Remove the auth token data cookies.
+	*  Remove the session data cookies.
 	*/
 	API_CONFIG.authenticated = false;
-	rm_cookie({"auth_token": "", "path": "/"});
-	rm_cookie({"auth_token_created": "", "path": "/"});
-	rm_cookie({"auth_token_max_age": "", "path": "/"});
+	rm_cookie({"session_token": "", "path": "/"});
+	rm_cookie({"session_created": "", "path": "/"});
+	rm_cookie({"session_max_age": "", "path": "/"});
 }
 
-function auth_token_check() {
+function session_check() {
 	/*
-	*  Check whether the auth token cookies already exist and
+	*  Check whether the session cookies already exist and
 	*  whether they are actually valid and set the authenticated
-	*  flag based on that. A token renewal is also scheduled if
-	*  a valid token is found.
+	*  flag based on that. A session renewal is also scheduled if
+	*  a valid session is found.
 	*/
 	console.log("API: Check authentication status.");
-	if (cookie_exists('auth_token') &&
-		cookie_exists('auth_token_created') &&
-		cookie_exists('auth_token_max_age')) {
+	if (cookie_exists('session_token') &&
+		cookie_exists('session_created') &&
+		cookie_exists('session_max_age')) {
 
-		// Check whether the token is expired.
+		// Check whether the session is expired.
 		let created = parseInt(
-			get_cookie('auth_token_created'), 10
+			get_cookie('session_created'), 10
 		);
 		let max_age = parseInt(
-			get_cookie('auth_token_max_age'), 10
+			get_cookie('session_max_age'), 10
 		);
 		let left = created + max_age - Date.now()/1000;
 
 		if (left <= 0) {
-			console.log("API: Auth token expired.");
-			auth_token_remove();
+			console.log("API: Session expired.");
+			session_remove();
 			return;
 		}
 
 		console.log("API: Already authenticated.")
 		API_CONFIG.authenticated = true;
 
-		auth_token_schedule_renewal();
+		session_schedule_renewal();
 	} else {
 		/*
-		*  Make sure no invalid token data exists
+		*  Make sure no invalid session data exists
 		*  and set the authenticated flag to false.
 		*/
-		console.log("API: Invalid or no auth token.");
-		auth_token_remove();
+		console.log("API: Invalid or no session data.");
+		session_remove();
 		return;
 	}
 }
@@ -438,7 +443,7 @@ function auth_token_check() {
 function api_login(user, pass, ready_callback) {
 	/*
 	*  Login using the supplied credentials and store the
-	*  returned auth token. ready_callback is called when
+	*  returned session data. ready_callback is called when
 	*  the login is successfully finished.
 	*/
 	console.log("API: Authenticate");
@@ -451,12 +456,12 @@ function api_login(user, pass, ready_callback) {
 		},
 		(resp) => {
 			if (resp.error == API_E.API_E_OK) {
-				auth_token_store(
-					resp.auth_token.token,
-					resp.auth_token.created,
-					resp.auth_token.max_age
+				session_store(
+					resp.session.token,
+					resp.session.created,
+					resp.session.max_age
 				);
-				auth_token_schedule_renewal();
+				session_schedule_renewal();
 			} else {
 				console.error("API: Auth failed.");
 			}
@@ -470,7 +475,7 @@ function api_login(user, pass, ready_callback) {
 
 function api_logout(ready_callback) {
 	/*
-	*  Call the logout API endpoint and remove auth token cookies.
+	*  Call the logout API endpoint and remove session data cookies.
 	*  ready_callback is called when the logout is successfully
 	*  finished.
 	*/
@@ -479,8 +484,8 @@ function api_logout(ready_callback) {
 		null,
 		(resp) => {
 			if (resp.error == API_E.API_E_OK) {
-				// Remove auth token data cookies.
-				auth_token_remove();
+				// Remove session data cookies.
+				session_remove();
 			} else {
 				console.error("API: Logout failed.");
 			}
@@ -499,7 +504,7 @@ function api_init(config, callback) {
 	api_apply_config(config);
 	API_CONFIG.configured = true;
 
-	auth_token_check();
+	session_check();
 
 	api_load_error_codes(() => {
 		api_load_error_msgs(() => {

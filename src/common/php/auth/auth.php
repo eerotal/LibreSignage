@@ -5,7 +5,7 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 
-const COOKIE_AUTH_TOKEN = 'auth_token';
+const COOKIE_AUTH_TOKEN = 'session_token';
 
 // -- General authentication functions. --
 
@@ -37,7 +37,7 @@ function auth_token_verify(string $tok) {
 	if (!empty($tok)) {
 		$users = user_array();
 		foreach ($users as $k => $u) {
-			if ($u->verify_auth_token($tok)) {
+			if ($u->session_verify($tok)) {
 				return $u;
 			}
 		}

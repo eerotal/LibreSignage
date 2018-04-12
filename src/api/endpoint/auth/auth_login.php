@@ -38,15 +38,15 @@ $user = auth_creds_verify(
 );
 
 if ($user) {
-	// Generate a new auth token.
-	$auth_token = $user->gen_auth_token(
+	// Create a new session.
+	$session = $user->session_new(
 		$AUTH_LOGIN->get('who'),
 		$_SERVER['REMOTE_ADDR']
 	);
 	$user->write();
 
 	$AUTH_LOGIN->resp_set(array(
-		'auth_token' => $auth_token,
+		'session' => $session,
 		'error' => API_E_OK
 	));
 } else {
