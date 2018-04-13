@@ -206,8 +206,8 @@ class User {
 
 	private $user = '';
 	private $hash = '';
-	private $groups = NULL;
-	private $sessions = NULL;
+	private $groups = array();
+	private $sessions = array();
 	private $ready = FALSE;
 
 	public function __construct($name = NULL) {
@@ -404,6 +404,21 @@ class User {
 			}
 		}
 		throw new ArgException("No such authentication token.");
+	}
+
+	public function session_n_rm(string $tok) {
+		/*
+		*  'Negated' session_rm(). Remove all other sessions
+		*  except the session corresponding to the authentication
+		*  token $tok.
+		*/
+		$s_new = $this->sessions;
+		foreach ($s_new as $i => $d) {
+			if (!password_verify($tok, $d['token_hash'])) {
+				$s_new[$i] = NULL;
+			}
+		}
+		$this->sessions = array_filter($s_new);
 	}
 
 	public function session_renew(string $tok) {

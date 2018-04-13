@@ -25,52 +25,52 @@
 			<div class="user-settings-cont container mx-auto">
 				<h2>User settings</h2>
 				<!-- Username -->
-				<div class="row form-group w-100">
-					<label class="col-sm-4 col-form-label"
+				<div class="form-group w-100">
+					<label class="col-form-label"
 						for="user-name">
 						Username
 					</label>
 					<input id="user-name"
 						type="text"
-						class="col-sm-8 form-control"
+						class="form-control"
 						readonly>
 					</input>
 				</div>
 
 				<!-- User groups -->
-				<div class="row form-group w-100">
-					<label class="col-sm-4 col-form-label"
-					for="user-groups">
+				<div class="form-group w-100">
+					<label class="col-form-label"
+						for="user-groups">
 							Groups
 					</label>
 					<input id="user-groups"
 						type="text"
-						class="col-sm-8 form-control"
+						class="form-control"
 					readonly>
 					</input>
 				</div>
 
 				<!-- Password input -->
-				<div id="user-pass-group"
-					class="row form-group w-100">
-					<label class="col-sm-4 col-form-label"
+				<div id="user-pass-group>
+					class="form-group w-100">
+					<label class="col-form-label"
 						for="user-pass">
 						Password
 					</label>
 					<input id="user-pass"
 							type="password"
-						class="col-sm-8 form-control">
+						class="form-control">
 					</input>
 				</div>
 
 				<!-- Password confirm input -->
-				<div class="row form-group w-100">
-					<label class="col-sm-4 col-form-label"
+				<div class="form-group w-100">
+					<label class="col-form-label"
 						for="user-pass-confirm">
 						Confirm&nbsp;password
 					</label>
 					<div id="user-pass-confirm-group"
-						class="col-sm-8 p-0">
+						class="p-0">
 					<input id="user-pass-confirm"
 							type="password"
 							class="form-control">
@@ -80,9 +80,9 @@
 				</div>
 
 				<!-- Save button -->
-				<div class="row form-group w-100">
+				<div class="form-group w-100">
 					<input id="user-save"
-						class="col-sm-12 btn btn-primary"
+						class="btn btn-primary w-100"
 						type="button"
 						value="Save"
 							onclick="user_settings_save()">
@@ -90,17 +90,17 @@
 				</div>
 
 				<h2>Active sessions</h2>
-				<div class="row form-group w-100">
-					<table class="col-12">
-						<thead>
-							<tr>
-								<th>Name</th>
-								<th>IP address</th>
-							</tr>
-						</thead>
-						<tbody id="user-session-table">
-						</tbody>
+				<div class="form-group w-100 text-center">
+					<table class="mx-auto text-left"
+						id="user-sessions">
 					</table>
+				</div>
+				<div class="form-group w-100">
+					<input type="button"
+						class="btn btn-danger"
+						style="width: 100%"
+						id="btn-logout-other"
+						value="Logout other sessions">
 				</div>
 			</div>
 		</main>

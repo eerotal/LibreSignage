@@ -93,6 +93,11 @@ var API_ENDP = {
 		method: "POST",
 		auth:	true
 	},
+	AUTH_LOGOUT_OTHER: {
+		uri:	"/api/endpoint/auth/auth_logout_other.php",
+		method: "POST",
+		auth:	true
+	},
 	AUTH_SESSION_RENEW: {
 		uri:	"/api/endpoint/auth/auth_session_renew.php",
 		method: "POST",

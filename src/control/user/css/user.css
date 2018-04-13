@@ -1,11 +1,21 @@
 .user-settings-cont {
-	min-width: 200px;
-	max-width: 550px;
+	min-width: 300px;
+	max-width: 750px;
 	padding-bottom: 20px;
 	padding-left: 45px;
 	padding-right: 45px;
 }
 
-#user-keys-table td {
-	vertical-align: middle;
+.user-session-row {
+	border-collapse: separate;
+	border-spacing: 5px;
+}
+
+#user-sessions {
+	border-collapse: collapse;
+}
+
+#user-sessions tr {
+	border-top: 1px solid var(--secondary-light);
+	border-bottom: 1px solid var(--secondary-light);
 }
