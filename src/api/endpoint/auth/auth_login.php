@@ -39,6 +39,18 @@ $user = auth_creds_verify(
 
 if ($user) {
 	// Create a new session.
+	$tmp = preg_match('/[^a-zA-Z0-9_-]/', $AUTH_LOGIN->get('who'));
+	if ($tmp) {
+		throw new APIException(
+			API_E_INVALID_REQUEST,
+			"Invalid characters in the 'who' parameter."
+		);
+	} else if ($tmp === NULL) {
+		throw new APIException(
+			API_E_INTERNAL,
+			"preg_match() failed."
+		);
+	}
 	$session = $user->session_new(
 		$AUTH_LOGIN->get('who'),
 		$_SERVER['REMOTE_ADDR']

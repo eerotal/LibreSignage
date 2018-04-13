@@ -364,7 +364,7 @@ function session_renew() {
 	console.log("API: Renew session.");
 	api_call(
 		API_ENDP.AUTH_SESSION_RENEW,
-		{who: "LibreSignage Web Interface"},
+		null,
 		(resp) => {
 			if (api_handle_disp_error(resp.error)) {
 				session_remove();
@@ -457,7 +457,7 @@ function api_login(user, pass, ready_callback) {
 		{
 			username: user,
 			password: pass,
-			who: "LibreSignage Web Interface"
+			who: "LibreSignage-Web-Interface"
 		},
 		(resp) => {
 			if (resp.error == API_E.API_E_OK) {
