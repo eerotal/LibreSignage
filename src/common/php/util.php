@@ -10,7 +10,7 @@ function rmdir_recursive($path) {
 	*  Recursively remove a directory and
 	*  files within it.
 	*/
-	$files = @scandir($path);
+	$files = scandir($path);
 	if ($files === FALSE) {
 		throw new IntException('scandir() failed.');
 	}
@@ -18,15 +18,15 @@ function rmdir_recursive($path) {
 	$files = array_diff($files, array('.', '..'));
 
 	foreach ($files as $f) {
-		if (@is_dir($path.'/'.$f)) {
+		if (is_dir($path.'/'.$f)) {
 			rmdir_recursive($path.'/'.$f);
 		} else {
-			if (!@unlink($path.'/'.$f)) {
+			if (!unlink($path.'/'.$f)) {
 				throw new IntException('unlink() failed.');
 			}
 		}
 	}
-	if (!@rmdir($path)) {
+	if (!rmdir($path)) {
 		throw new IntException('rmdir() failed.');
 	}
 }
@@ -61,21 +61,25 @@ function array_is_subset(array $a, array $b) {
 function file_lock_and_get(string $path) {
 	/*
 	*  Basically the same thing as file_get_contents()
-	*  but this function acquires an exclusive lock
-	*  before reading any data.
+	*  but this function acquires a shared lock before
+	*  reading any data.
 	*/
 	$ret = '';
-	$fs = filesize($path);
-	$fp = @fopen($path, 'r');
+
+	clearstatcache();
+	$fp = fopen($path, 'r');
 
 	if ($fp === FALSE) {
 		throw new IntException('Failed to open file for reading.');
 	}
-	if (flock($fp, LOCK_EX)) {
-		if ($fs == 0) { return ''; }
-		$ret = @fread($fp, $fs);
+	if (flock($fp, LOCK_SH)) {
+		$fs = filesize($path);
+		if ($fs === 0) { return ''; }
+
+		$ret = fread($fp, $fs);
 		flock($fp, LOCK_UN);
 	} else {
+		fclose($fp);
 		throw new IntException('Failed to lock file.');
 	}
 	fclose($fp);
@@ -94,7 +98,7 @@ function file_lock_and_put(string $path,
 	*/
 	if (!is_dir(dirname($path))) {
 		if ($create) {
-			if (@!mkdir(dirname($path), 0775, TRUE)) {
+			if (!mkdir(dirname($path), 0775, TRUE)) {
 				throw new IntException('Failed to create '.
 						'directory.');
 			}
@@ -106,7 +110,9 @@ function file_lock_and_put(string $path,
 		throw new Exception("File doesn't exist.");
 	}
 
-	$ret = @file_put_contents($path, $data, LOCK_EX);
+	$ret = file_put_contents($path, $data, LOCK_EX);
+	clearstatcache();
+
 	if ($ret === FALSE) {
 		throw new IntException('Failed to write file.');
 	}

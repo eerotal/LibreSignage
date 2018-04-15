@@ -29,6 +29,31 @@ $session = $AUTH_SESSION_RENEW->get_caller()->session_renew(
 );
 $AUTH_SESSION_RENEW->get_caller()->write();
 
+/*
+*  Set the session cookies. Note that the server setting these
+*  cookies is merely a convenience feature for web browser clients
+*  that need to access the LibreSignage web interface too. Other
+*  clients can ignore these cookies if so desired.
+*/
+setcookie(
+	$name = 'session_token',
+	$value = $session['token'],
+	$expire = $session['created'] + $session['max_age'],
+	$path = '/'
+);
+setcookie(
+	$name = 'session_created',
+	$value = $session['created'],
+	$expire = $session['created'] + $session['max_age'],
+	$path = '/'
+);
+setcookie(
+	$name = 'session_max_age',
+	$value = $session['max_age'],
+	$expire = $session['created'] + $session['max_age'],
+	$path = '/'
+);
+
 $AUTH_SESSION_RENEW->resp_set(array(
 	'session' => $session,
 	'error' => API_E_OK

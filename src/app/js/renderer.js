@@ -83,7 +83,6 @@ function renderer_update() {
 
 function display_setup() {
 	var params = get_GET_parameters();
-
 	if ("preview" in params) {
 		// Preview a slide without starting the renderer.
 		console.log("LibreSignage: Preview slide " +
@@ -115,7 +114,9 @@ function display_setup() {
 	}
 }
 
-api_init(
-	null,	// Use default config.
-	display_setup
-)
+$(document).ready(() => {
+	api_init(
+		null,	// Use default config.
+		display_setup
+	)
+});

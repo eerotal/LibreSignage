@@ -4,7 +4,7 @@
 *  interface with the LibreSignage API.
 */
 
-const SESSION_RENEWAL_HEADROOM = 10;
+const SESSION_RENEWAL_HEADROOM = 30;
 
 var API_CONFIG = {
 	protocol: null,
@@ -166,26 +166,18 @@ function api_call(endpoint, data, callback) {
 
 	var data_str = "";
 	var ajax_settings = {
-		url: endpoint.uri,
+		url: `${api_host()}/${endpoint.uri}`,
 		method: endpoint.method,
-		complete: function(jqxhr, status) {
-			var d = null;
-			if (status != 'success') {
-				console.error("API: XHR failed.");
-				callback({'error': API_E.INTERNAL});
-				return;
-			}
-
-			try {
-				d = JSON.parse(jqxhr.responseText);
-			} catch(e) {
-				if (e instanceof SyntaxError) {
-					console.error("API: Invalid " +
-						"response syntax.");
-					d = {'error': API_E.INTERNAL};
-				}
-			}
-			callback(d);
+		dataType: 'json',
+		error: function(jqhxr, status, exception) {
+			console.error(
+				`API: XHR failed. ` +
+				`(status: ${status})`
+			);
+			callback({'error': API_E.API_E_INTERNAL});
+		},
+		success: function(data, status, jqxhr) {
+			callback(data);
 		}
 	};
 
@@ -322,17 +314,10 @@ function api_apply_config(config) {
 
 function session_schedule_renewal() {
 	/*
-	*  Schedule session renewal just before the
-	*  last session expires.
+	*  Schedule a session renewal just before the
+	*  existing session expires.
 	*/
-
-	if (!API_CONFIG.authenticated) {
-		throw new Error(
-			"API: Can't schedule session renewal when " +
-			"not authenticated."
-		);
-	}
-
+	_api_chk_authenticated();
 	var created = parseInt(get_cookie('session_created'), 10);
 	var max_age = parseInt(get_cookie('session_max_age'), 10);
 
@@ -341,18 +326,15 @@ function session_schedule_renewal() {
 
 	if (left <= 0) {
 		session_remove();
-		throw new Error(
+		console.error(
 			"API: Won't schedule session renewal because " +
 			"the session is already expired."
 		);
+		return;
 	} else if (t <= 0) {
-		/*
-		*  Attempt to renew the session now because
-		*  it will expire soon.
-		*/
+		// Attempt to renew the session now.
 		session_renew();
 	}
-
 	console.log("API: Session renewal in " + t + " seconds.");
 	setTimeout(session_renew, t*1000);
 }
@@ -367,16 +349,11 @@ function session_renew() {
 		null,
 		(resp) => {
 			if (api_handle_disp_error(resp.error)) {
+				console.error("API: Session renewal " +
+						"failed.");
 				session_remove();
-				throw new Error("API: Failed to " +
-						"renew session.");
+				return;
 			}
-			session_store(
-				resp.session.token,
-				resp.session.created,
-				resp.session.max_age
-			);
-
 			console.log("API: Session renewal complete.");
 			session_schedule_renewal();
 		}
@@ -385,8 +362,15 @@ function session_renew() {
 
 function session_store(token, created, max_age) {
 	/*
-	*  Store the supplied session data in cookies.
+	*  Store session data in cookies. This is not _normally_
+	*  needed, but the client startup script still uses this.
+	*  The caller needs to schedule a session renewal if that's
+	*  needed.
 	*/
+	if (max_age + authenticated >= Date.now()/1000) {
+		console.error("API: Won't store an expired session.");
+		return;
+	}
 	set_cookie({"session_token": token, "path": "/"});
 	set_cookie({"session_created": created, "path": "/"});
 	set_cookie({"session_max_age": max_age, "path": "/"});
@@ -405,43 +389,26 @@ function session_remove() {
 
 function session_check() {
 	/*
-	*  Check whether the session cookies already exist and
-	*  whether they are actually valid and set the authenticated
-	*  flag based on that. A session renewal is also scheduled if
-	*  a valid session is found.
+	*  Check the authentication cookies and flag the API
+	*  as authenticated if the cookies are valid. A session
+	*  renewal is also scheduled if the cookies are valid.
 	*/
 	console.log("API: Check authentication status.");
 	if (cookie_exists('session_token') &&
 		cookie_exists('session_created') &&
 		cookie_exists('session_max_age')) {
-
-		// Check whether the session is expired.
-		let created = parseInt(
-			get_cookie('session_created'), 10
-		);
-		let max_age = parseInt(
-			get_cookie('session_max_age'), 10
-		);
-		let left = created + max_age - Date.now()/1000;
-
-		if (left <= 0) {
-			console.log("API: Session expired.");
-			session_remove();
-			return;
-		}
-
+		/*
+		*  Because the cookies exist, the session is not
+		*  expired yet. (The cookie parameter 'expire' is
+		*  set by the server.)
+		*/
 		console.log("API: Already authenticated.")
 		API_CONFIG.authenticated = true;
-
 		session_schedule_renewal();
 	} else {
-		/*
-		*  Make sure no invalid session data exists
-		*  and set the authenticated flag to false.
-		*/
+		// Remove invalid cookies.
 		console.log("API: Invalid or no session data.");
 		session_remove();
-		return;
 	}
 }
 
@@ -461,14 +428,11 @@ function api_login(user, pass, ready_callback) {
 		},
 		(resp) => {
 			if (resp.error == API_E.API_E_OK) {
-				session_store(
-					resp.session.token,
-					resp.session.created,
-					resp.session.max_age
-				);
+				API_CONFIG.authenticated = true;
 				session_schedule_renewal();
 			} else {
 				console.error("API: Auth failed.");
+				session_remove();
 			}
 
 			if (ready_callback) {

@@ -11,7 +11,7 @@
 *                    the name of the software that's using the API.
 *
 *  Return value
-*    * auth_token = A newly generated authentication token.
+*    * session = A session data array.
 *    * error = An error code or API_E_OK on success.
 *
 *  <====
@@ -56,6 +56,32 @@ if ($user) {
 		$_SERVER['REMOTE_ADDR']
 	);
 	$user->write();
+
+	/*
+	*  Set the session cookies. Note that the server setting these
+	*  cookies is merely a convenience feature that is useful for
+	*  web browser clients that need to access the LibreSignage
+	*  web interface too. Other clients can ignore these cookies
+	*  if so desired.
+	*/
+	setcookie(
+		$name = 'session_token',
+		$value = $session['token'],
+		$expire = $session['created'] + $session['max_age'],
+		$path = '/'
+	);
+	setcookie(
+		$name = 'session_created',
+		$value = $session['created'],
+		$expire = $session['created'] + $session['max_age'],
+		$path = '/'
+	);
+	setcookie(
+		$name = 'session_max_age',
+		$value = $session['max_age'],
+		$expire = $session['created'] + $session['max_age'],
+		$path = '/'
+	);
 
 	$AUTH_LOGIN->resp_set(array(
 		'session' => $session,

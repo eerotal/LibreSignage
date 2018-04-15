@@ -45,6 +45,9 @@ class UserQuota {
 			}
 			$this->user = $user;
 			$this->ready = TRUE;
+
+			// Write the quota to file.
+			$this->flush();
 		}
 		return $this;
 	}
@@ -68,13 +71,18 @@ class UserQuota {
 			throw new IntException("Quota file doesn't ".
 						"exist.");
 		}
-		$this->data = json_decode(file_lock_and_get($q_path),
-						$assoc=TRUE);
+
+		$tmp = file_lock_and_get($q_path);
+		$this->data = json_decode(
+			$tmp,
+			$assoc=TRUE
+		);
 
 		if ($this->data === NULL &&
 			json_last_error() != JSON_ERROR_NONE) {
-			throw new IntException('Failed to parse '.
-					'quota JSON.');
+			throw new IntException(
+				"Failed to parse quota JSON."
+			);
 		}
 		$this->user = $user;
 		$this->ready = TRUE;
@@ -92,8 +100,11 @@ class UserQuota {
 			throw new IntException('Failed to JSON '.
 					'encode quota data.');
 		}
-		file_lock_and_put($this->_quota_path($this->user),
-				$data_enc, TRUE);
+		file_lock_and_put(
+			$this->_quota_path($this->user),
+			$data_enc,
+			TRUE
+		);
 	}
 
 	public function get_limit(string $key) {
@@ -249,7 +260,8 @@ class User {
 						'user data!');
 		}
 		$data = json_decode($json, $assoc=TRUE);
-		if (json_last_error() != JSON_ERROR_NONE) {
+		if ($data === NULL &&
+			json_last_error() != JSON_ERROR_NONE) {
 			throw new IntException('JSON user data '.
 						'decode error!');
 		}
@@ -344,6 +356,8 @@ class User {
 		*  old session is expired.
 		*/
 		$this->_error_on_not_ready();
+
+		$c = NULL;
 		for ($i = 0; $i < count($this->sessions); $i++) {
 			$c = $this->sessions[$i];
 			if ($s_old['token_hash'] == $c['token_hash']) {
@@ -359,7 +373,7 @@ class User {
 	}
 
 	public function set_session_data($data) {
-		$this->sessions = $data;
+		$this->sessions = array_values($data);
 	}
 
 	public function session_new(string $who, string $from) {
@@ -387,7 +401,7 @@ class User {
 		$store['token_hash'] = $token['token_hash'];
 		$ret['token'] = $token['token'];
 
-		array_push($this->sessions, $store);
+		$this->sessions[] = $store;
 		return $ret;
 	}
 
@@ -400,6 +414,11 @@ class User {
 		foreach ($this->sessions as $i => $d) {
 			if (password_verify($tok, $d['token_hash'])) {
 				array_splice($this->sessions, $i, 1);
+
+				// Reset indices.
+				$this->sessions = array_values(
+					$this->sessions
+				);
 				return;
 			}
 		}
@@ -418,7 +437,9 @@ class User {
 				$s_new[$i] = NULL;
 			}
 		}
-		$this->sessions = array_filter($s_new);
+
+		// Filter NULL values and reset indices.
+		$this->sessions = array_values(array_filter($s_new));
 	}
 
 	public function session_renew(string $tok) {
@@ -471,7 +492,7 @@ class User {
 				$new_s[$i] = NULL;
 			}
 		}
-		$this->sessions = array_filter($new_s);
+		$this->sessions = array_values(array_filter($new_s));
 		$this->write();
 		return $session;
 	}
