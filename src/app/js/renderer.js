@@ -83,6 +83,19 @@ function renderer_update() {
 
 function display_setup() {
 	var params = get_GET_parameters();
+
+	if ("tok" in params) {
+		/*
+		*  Authenticate using the supplied token and renew
+		*  the session right away to prevent leaking a valid
+		*  session token via the URL parameters.
+		*/
+		session_store(params["tok"], 0, 0);
+		history.replaceState(null, "Hide auth token", "/app");
+		console.log("LibreSignage: Force session renewal.");
+		session_renew();
+	}
+
 	if ("preview" in params) {
 		// Preview a slide without starting the renderer.
 		console.log("LibreSignage: Preview slide " +

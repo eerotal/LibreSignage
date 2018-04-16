@@ -3,7 +3,19 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js_include.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
-	web_auth(NULL, array("display"), TRUE);
+	/*
+	*  Try to authenticate using an authentication token
+	*  provided via the GET parameter 'tok'. This is only used
+	*  in the display page because standalone clients need to
+	*  authenticate without user intervention. If the 'tok'
+	*  parameter doesn't exist, fall back to the normal auth
+	*  system ($wa_tok = NULL).
+	*/
+	$wa_tok = NULL;
+	if (!empty($_GET['tok'])) {
+		$wa_tok = $_GET['tok'];
+	}
+	web_auth(NULL, array("display"), TRUE, $wa_tok);
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -367,7 +367,7 @@ function session_store(token, created, max_age) {
 	*  The caller needs to schedule a session renewal if that's
 	*  needed.
 	*/
-	if (max_age + authenticated >= Date.now()/1000) {
+	if (max_age + created >= Date.now()/1000) {
 		console.error("API: Won't store an expired session.");
 		return;
 	}
@@ -436,7 +436,7 @@ function api_login(user, pass, ready_callback) {
 			}
 
 			if (ready_callback) {
-				ready_callback(resp.error);
+				ready_callback(resp);
 			}
 		}
 	);
@@ -444,9 +444,9 @@ function api_login(user, pass, ready_callback) {
 
 function api_logout(ready_callback) {
 	/*
-	*  Call the logout API endpoint and remove session data cookies.
-	*  ready_callback is called when the logout is successfully
-	*  finished.
+	*  Call the logout API endpoint and remove session
+	*  data cookies. ready_callback is called when the
+	*  logout is successfully finished.
 	*/
 	api_call(
 		API_ENDP.AUTH_LOGOUT,
@@ -459,7 +459,7 @@ function api_logout(ready_callback) {
 				console.error("API: Logout failed.");
 			}
 			if (ready_callback) {
-				ready_callback(resp.error);
+				ready_callback(resp);
 			}
 		}
 	);

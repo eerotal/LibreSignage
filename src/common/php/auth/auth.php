@@ -47,8 +47,27 @@ function auth_token_verify(string $tok) {
 
 // -- Web interface authentication functions. --
 
-function web_auth($user_wl = NULL, $group_wl = NULL, bool $redir = FALSE) {
-	$u = web_auth_cookie_verify($redir);
+function web_auth($user_wl = NULL,
+			$group_wl = NULL,
+			bool $redir = FALSE,
+			$token = NULL) {
+	$u = NULL;
+	if (empty($token)) {
+		// Use authentication token from cookie.
+		$u = web_auth_cookie_verify($redir);
+	} else {
+		// Use supplied authentication token.
+		$u = auth_token_verify($token);
+		if ($u == NULL) {
+			if ($redir) {
+				header('Location: '.LOGIN_PAGE);
+				exit(0);
+			} else {
+				return NULL;
+			}
+		}
+	}
+
 	if (!$u) {
 		if ($redir) {
 			header('Location: '.LOGIN_PAGE);
@@ -83,7 +102,7 @@ function web_auth_cookie_verify(bool $redir = FALSE) {
 	if (!empty($_COOKIE[COOKIE_AUTH_TOKEN])) {
 		return auth_token_verify($_COOKIE[COOKIE_AUTH_TOKEN]);
 	}
-	return FALSE;
+	return NULL;
 }
 
 function web_auth_user_whitelist(User $u, array $wl) {

@@ -14,8 +14,8 @@ function main() {
 	api_login(
 		USER,
 		PASS,
-		(err) => {
-			if (err != API_E.API_E_OK) {
+		(resp) => {
+			if (resp.error != API_E.API_E_OK) {
 				log("Login failed.", "red");
 				return;
 			}
@@ -23,32 +23,14 @@ function main() {
 
 			// Redirect to display.
 			window.location.replace(
-				`${PROTOCOL}//${HOST}/app`
+				`${PROTOCOL}//${HOST}/app` +
+				`?tok=${resp.session.token}`
 			);
 		}
 	);
 }
 
-
-function setup() {
-	log("LibreSignage client setup.<br>");
-
-	// Load necessary JavaScript libraries from HOST.
-	$.getScript(
-		`${PROTOCOL}//${HOST}/common/js/api.js`,
-		function(data, status, xhr) {
-			log("Libs loaded.<br>");
-			api_init(
-				{
-					hostname: HOST,
-					protocol: PROTOCOL
-				},
-				main
-			);
-		}
-	);
-}
-
+log("LibreSignage display client startup.<br>");
 $.when(
 	$.getScript(`${PROTOCOL}//${HOST}/common/js/api.js`),
 	$.getScript(`${PROTOCOL}//${HOST}/common/js/cookie.js`),

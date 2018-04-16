@@ -7,8 +7,8 @@ function logout_redirect() {
 }
 
 function logout() {
-	api_logout((err) => {
-		if (api_handle_disp_error(err)) {
+	api_logout((resp) => {
+		if (api_handle_disp_error(resp.error)) {
 			return;
 		} else {
 			logout_redirect();

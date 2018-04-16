@@ -11,13 +11,13 @@ function login() {
 	api_login(
 		INPUT_USERNAME.val(),
 		INPUT_PASSWORD.val(),
-		(err) => {
-			if (err == API_E.API_E_INCORRECT_CREDS) {
+		(resp) => {
+			if (resp.error == API_E.API_E_INCORRECT_CREDS) {
 				login_redirect("/login?failed=1");
-			} else if (err == API_E.API_E_OK) {
+			} else if (resp.error == API_E.API_E_OK) {
 				login_redirect(LOGIN_LANDING);
 			} else {
-				api_handle_disp_error(err);
+				api_handle_disp_error(resp.error);
 			}
 		}
 	)

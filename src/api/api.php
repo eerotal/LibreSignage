@@ -344,8 +344,7 @@ class APIEndpoint {
 
 function api_handle_preflight() {
 	/*
-	*  Handle sending proper responses for preflight
-	*  requests.
+	*  Handle preflight requests.
 	*/
 	header('Access-Control-Allow-Origin: *');
 	header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
