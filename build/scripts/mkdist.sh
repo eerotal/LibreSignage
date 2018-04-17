@@ -29,7 +29,7 @@ if ! `command -v tar &>/dev/null`; then
 	echo "[INFO] Install 'tar' if you need the client tarball."
 else
 	echo "[INFO] Compress tarball:"
-	tar -zcvf client.tar.gz *;
+	tar -zcvf client.tar.gz client.html;
 fi
 
 if ! `command -v zip &>/dev/null`; then
@@ -37,7 +37,7 @@ if ! `command -v zip &>/dev/null`; then
 	echo "[INFO] Install 'zip' if you need the client ZIP archive.";
 else
 	echo "[INFO] Compress zip:";
-	zip -r client.zip * -x *.tar.gz
+	zip -r client.zip client.html -x *.tar.gz
 fi
 
 cd -;

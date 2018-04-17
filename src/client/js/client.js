@@ -1,6 +1,6 @@
 var LOG = $("#log");
 
-function log(msg, color) {
+function client_log(msg, color) {
 	// Log a message with an optional color.
 	var tmp = "";
 	if (color) { tmp += `<span style="color: ${color}">`; }
@@ -9,17 +9,26 @@ function log(msg, color) {
 	LOG[0].innerHTML += tmp;
 }
 
-function main() {
-	// Login using the authentication key defined in client.html.
+function client_main() {
+	/*
+	*  Login using the configuration values
+	*  defined in client.html.
+	*/
 	api_login(
 		USER,
 		PASS,
 		(resp) => {
 			if (resp.error != API_E.API_E_OK) {
-				log("Login failed.", "red");
+				client_log(
+					"Login failed.",
+					"red"
+				);
 				return;
 			}
-			log("Ready. Redirecting...<br>", "green");
+			client_log(
+				"Ready. Redirecting...<br>",
+				"green"
+			);
 
 			// Redirect to display.
 			window.location.replace(
@@ -30,20 +39,12 @@ function main() {
 	);
 }
 
-log("LibreSignage display client startup.<br>");
-$.when(
-	$.getScript(`${PROTOCOL}//${HOST}/common/js/api.js`),
-	$.getScript(`${PROTOCOL}//${HOST}/common/js/cookie.js`),
-	$.Deferred(function (deferred) {
-		$( deferred.resolve );
-	})
-).done(function() {
-	log("Libs loaded.<br>");
+function client_setup() {
 	api_init(
 		{
 			hostname: HOST,
 			protocol: PROTOCOL
 		},
-		main
+		client_main
 	);
-});
+}

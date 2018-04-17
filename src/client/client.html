@@ -14,16 +14,30 @@
 <html lang="en">
 	<body>
 		<div id="log"></div>
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+			integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			crossorigin="anonymous">
+		</script>
 		<script>
 			// Client configuration.
 			const HOST = "";
 			const PROTOCOL = "http:";
 			const USER = "";
 			const PASS = "";
-		</script>
-		<script src="https://code.jquery.com/jquery-3.3.1.min.js"
-			integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-			crossorigin="anonymous">
+
+			// Load external libraries and setup the client.
+			$.when(
+				$.getScript(`${HOST}//${PROTOCOL}/common/js/api.js`),
+				$.getScript(`${HOST}//${PROTOCOL}/common/js/cookie.js`),
+				$.getScript(`${HOST}//${PROTOCOL}/client/js/client.js`),
+				$.Deferred(function(deferred) {
+					$(deferred.resolve);
+				})
+			).done(function() {
+				log("LibreSignage display startup.<br>");
+				log("External libraries loaded.<br>");
+				client_setup();
+			});
 		</script>
  		<script src="js/client.js"></script>
 	</body>
