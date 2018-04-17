@@ -14,46 +14,57 @@ Installation
 LibreSignage is designed to be used with Apache 2.0 and the default install
 system is programmed to use Apache's Virtual Host configuration features.
 
-In a nutshell, Virtual Hosts are a way of hosting multiple websites on one
-server, which is ideal in the case of LibreSignage. Using Virtual Hosts makes
-it really simple to host one or more LibreSignage instances on a server and
-adding or removing instances is also rather easy. You can look up more
-information about Virtual Hosts on the
+In a nutshell, Virtual Hosts are a way of hosting multiple websites on
+one server, which is ideal in the case of LibreSignage. Using Virtual
+Hosts makes it really simple to host one or more LibreSignage instances
+on a server and adding or removing instances is also rather easy. You
+can look up more information about Virtual Hosts on the
 `Apache website <https://httpd.apache.org/docs/2.4/vhosts/>`_.
 
 Doing a basic install of LibreSignage is quite simple. The required steps
 are listed below.
 
-1. Install the required dependencies. On Debian Buster this can be accomplished
-   by running ``sudo apt install apache2 php7.0 git pandoc``.
-   *pandoc* is needed for compiling the reStructuredText documentation files
-   to HTML.
-2. Use ``cd`` to move to the directory where you want to download the LibreSignage
-   repository.
-3. Run ``git clone https://github.com/eerotal/LibreSignage.git``. The repository
-   will be cloned into the directory *LibreSignage/*.
+1. Install the required dependencies. On Debian Buster this can be
+   accomplished by running ``sudo apt install apache2 php7.0 git
+   pandoc zip``. *pandoc* is needed for compiling the reStructuredText
+   documentation files to HTML. *zip* is needed for compressing the
+   client startup page files into a ZIP archive.
+2. Use ``cd`` to move to the directory where you want to download the
+   LibreSignage repository.
+3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
+   The repository will be cloned into the directory *LibreSignage/*.
 4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
-5. Run ``sudo make install``, read the instructions and answer the questions.
+5. Run ``sudo make dist docs install``, read the instructions and answer
+   the questions.
 
-After this the LibreSignage instance is fully installed and ready to be used
-via the web interface. If you specified a domain name you don't actually own
-just for testing the install, you can add it to your */etc/hosts* file to be
-able to test the site using a normal browser. This only applies on Linux
-based systems of course. For example, if you specified the server name
-*example.com*, you could add the following line to your */etc/hosts* file.
+After this the LibreSignage instance is fully installed and ready to be
+used via the web interface. If you specified a domain name you don't
+actually own just for testing the install, you can add it to your
+*/etc/hosts* file to be able to test the site using a normal browser.
+This only applies on Linux based systems of course. For example, if you
+specified the server name *example.com*, you could add the following
+line to your */etc/hosts* file.
 
 ``example.com    127.0.0.1``
 
-This will redirect all requests for *example.com* to *localhost*, making it
-possible to access the site by connecting to *example.com*.
+This will redirect all requests for *example.com* to *localhost*,
+making it possible to access the site by connecting to *example.com*.
 
 Default users
 -------------
 
-The initial configured users are ``admin`` with the password ``admin`` and
-``user`` with the password ``user``. It goes without saying that you should
-create new users and change the passwords if you intend to use LibreSignage
-on a production system.
+The initial configured users and their groups and passwords are listed
+below. It goes without saying that you should create new users and
+change the passwords if you intend to use LibreSignage on a production
+system.
+
+=========== ======================== ==========
+    User             Groups           Password
+=========== ======================== ==========
+admin        admin, editor, display   admin
+user         editor, display          user
+display      display                  display
+=========== ======================== ==========
 
 Screenshots
 -----------
