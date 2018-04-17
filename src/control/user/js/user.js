@@ -6,25 +6,25 @@ const user_session_row = (who, from, created, cur) => `
 <tr><td>
 	<table class="user-session-row">
 		<tr>
-			<th class="text-right">Name</th>
+			<th class="text-right">Name:</th>
 			<td>
 				${who}
 			</td>
 		</tr>
 		<tr>
-			<th class="text-right">IP</th>
+			<th class="text-right">IP:</th>
 			<td>
 				${from}
 			</td>
 		</tr>
 		<tr>
-			<th class="text-right">Started</th>
+			<th class="text-right">Renewed:</th>
 			<td>
 				${new Date(created).toUTCString()}
 			</td>
 		</tr>
 		<tr>
-			<th>Your session</th>
+			<th class="text-right">Your session:</th>
 			<td>
 				<span style="color: green;">
 					${cur ? "Yes" : ""}
