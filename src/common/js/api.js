@@ -108,6 +108,11 @@ var API_ENDP = {
 		method: "GET",
 		auth:	true
 	},
+	AUTH_NEW_LOGIN_TOKEN: {
+		uri:	"/api/endpoint/auth/auth_new_login_token.php",
+		method: "POST",
+		auth:	true
+	},
 
 	// -- General information API endpoints --
 	API_ERR_CODES: {

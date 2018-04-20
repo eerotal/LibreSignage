@@ -212,13 +212,15 @@ class UserQuota {
 }
 
 class User {
-	const AUTH_TOKEN_LEN = 15;
+	const LOGIN_TOKEN_LEN = 30;
+	const AUTH_TOKEN_LEN = 30;
 	const AUTH_TOKEN_MAX_AGE = 600;
 
 	private $user = '';
 	private $hash = '';
 	private $groups = array();
 	private $sessions = array();
+	private $login_tokens = array();
 	private $ready = FALSE;
 
 	public function __construct($name = NULL) {
@@ -270,6 +272,7 @@ class User {
 		$this->set_groups($data['groups']);
 		$this->set_hash($data['hash']);
 		$this->set_session_data($data['sessions']);
+		$this->set_login_tokens($data['login_tokens']);
 		$this->set_ready(TRUE);
 	}
 
@@ -301,7 +304,8 @@ class User {
 			'user' => $this->user,
 			'groups' => $this->groups,
 			'hash' => $this->hash,
-			'sessions' => $this->sessions
+			'sessions' => $this->sessions,
+			'login_tokens' => $this->login_tokens
 		));
 		if ($json === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
@@ -495,6 +499,68 @@ class User {
 		$this->sessions = array_values(array_filter($new_s));
 		$this->write();
 		return $session;
+	}
+
+	/* -- Login token functions --
+	*
+	*  Login tokens are used for secure authentication where
+	*  a permanent login is needed. The client page, for example,
+	*  only asks the user for the username and password once. On
+	*  subsequent logins, it uses the stored login token for
+	*  authentication.
+	*/
+
+	public function set_login_tokens(array $tokens) {
+		$this->login_tokens = $tokens;
+	}
+
+	public function login_token_new() {
+		/*
+		*  Generate a new one-time use login token and
+		*  store it's hash in the User object. The actual
+		*  token is returned on success.
+		*/
+		$lt = bin2hex(random_bytes(self::LOGIN_TOKEN_LEN));
+		$hash = password_hash(
+			$lt,
+			PASSWORD_DEFAULT
+		);
+		if ($hash === FALSE) {
+			throw new IntException(
+				"Failed to hash login token."
+			);
+		}
+		$this->login_tokens[] = $hash;
+		return $lt;
+	}
+
+	public function login_token_remove(string $lt) {
+		/*
+		*  Remove the login token $lt from the login
+		*  token array.
+		*/
+		foreach($this->login_tokens as $i => $h) {
+			if (password_verify($lt, $h)) {
+				$this->login_tokens[$i] = NULL;
+				break;
+			}
+		}
+		$this->login_tokens = array_filter($this->login_tokens);
+	}
+
+	public function login_token_verify(string $lt) {
+		/*
+		*  Verify a one-time use login token and remove
+		*  the token from the User object if the token
+		*  is valid.
+		*/
+		foreach ($this->login_tokens as $i => $h) {
+			if (password_verify($lt, $h)) {
+				$this->login_token_remove($lt);
+				return TRUE;
+			}
+		}
+		return FALSE;
 	}
 
 	// -- Group functions --

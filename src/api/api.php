@@ -399,7 +399,7 @@ function api_handle_request(APIEndpoint $endpoint) {
 	}
 
 	$auth_token = getallheaders()["Auth-Token"];
-	$caller = auth_token_verify($auth_token);
+	$caller = auth_session_verify($auth_token);
 	if ($caller === NULL) {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,
