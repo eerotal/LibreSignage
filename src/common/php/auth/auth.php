@@ -9,23 +9,6 @@ const COOKIE_AUTH_TOKEN = 'session_token';
 
 // -- General authentication functions. --
 
-function auth_login_token_verify(string $lt) {
-	/*
-	*  Verify the login token $lt and return the
-	*  corresponding user object if the token is
-	*  valid. NULL is returned otherwise.
-	*/
-	if (!empty($lt)) {
-		$users = user_array();
-		foreach($users as $i => $u) {
-			if ($u->login_token_verify($lt)) {
-				return $u;
-			}
-		}
-	}
-	return NULL;
-}
-
 function auth_creds_verify(string $user, string $pass) {
 	/*
 	*  Verify the supplied login credentials and return
@@ -45,7 +28,7 @@ function auth_creds_verify(string $user, string $pass) {
 	return NULL;
 }
 
-function auth_session_verify(string $tok) {
+function auth_token_verify(string $tok) {
 	/*
 	*  Verify an authentication token and return the
 	*  corresponding User object if the token is valid.
@@ -74,7 +57,7 @@ function web_auth($user_wl = NULL,
 		$u = web_auth_cookie_verify($redir);
 	} else {
 		// Use supplied authentication token.
-		$u = auth_session_verify($token);
+		$u = auth_token_verify($token);
 		if ($u == NULL) {
 			if ($redir) {
 				header('Location: '.LOGIN_PAGE);
@@ -117,7 +100,7 @@ function web_auth_cookie_verify(bool $redir = FALSE) {
 	*  can be used to grant access to web pages.
 	*/
 	if (!empty($_COOKIE[COOKIE_AUTH_TOKEN])) {
-		return auth_session_verify($_COOKIE[COOKIE_AUTH_TOKEN]);
+		return auth_token_verify($_COOKIE[COOKIE_AUTH_TOKEN]);
 	}
 	return NULL;
 }
