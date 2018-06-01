@@ -69,6 +69,20 @@ Screenshots
 -----------
 
 Open these images in a new tab to view the full resolution versions.
+*Note that these screenshots are always the latest ones no matter what
+branch or commit you are viewing.*
+
+**LibreSignage Login**
+
+.. image:: http://etal.mbnet.fi/libresignage/login.png
+   :width: 320 px
+   :height: 180 px
+
+**LibreSignage Control Panel**
+
+.. image:: http://etal.mbnet.fi/libresignage/control.png
+   :width: 320 px
+   :height: 180 px
 
 **LibreSignage Editor**
 
