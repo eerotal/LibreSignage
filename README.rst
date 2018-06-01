@@ -26,9 +26,8 @@ are listed below.
 
 1. Install the required dependencies. On Debian Buster this can be
    accomplished by running ``sudo apt install apache2 php7.0 git
-   pandoc zip``. *pandoc* is needed for compiling the reStructuredText
-   documentation files to HTML. *zip* is needed for compressing the
-   client startup page files into a ZIP archive.
+   pandoc``. *pandoc* is needed for compiling the reStructuredText
+   documentation files to HTML.
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
