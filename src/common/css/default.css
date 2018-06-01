@@ -1,7 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:300|Raleway');
 
 :root {
-	--secondary-light: rgb(210, 210, 210);
+	--gray-1: rgb(210, 210, 210);
+	--gray-2: rgb(220, 220, 220);
+	--gray-3: rgb(230, 230, 230);
+	--gray-3: rgb(240, 240, 240);
+	--gray-5: rgb(250, 250, 250);
 }
 
 /* Default styling for 'main'. */

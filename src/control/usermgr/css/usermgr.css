@@ -8,7 +8,7 @@
 	padding: 0;
 	color: var(--black);
 	background-color: var(--white);
-	border-bottom: 1px solid var(--secondary-light);
+	border-bottom: 1px solid var(--gray-1);
 }
 
 .usr-table-col {

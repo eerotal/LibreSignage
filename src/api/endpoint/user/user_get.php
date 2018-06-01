@@ -2,7 +2,8 @@
 /*
 *  ====>
 *
-*  *Get a user's data based on a username.*
+*  *Get a user's data based on a username. This endpoint
+*  doesn't return any secret information like passwords.*
 *
 *  GET parameters
 *    * user = The username to query.
@@ -18,22 +19,20 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
 $USER_GET = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
 		'user' => API_P_STR
-	)
+	),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-session_start();
-api_endpoint_init($USER_GET, auth_session_user());
+api_endpoint_init($USER_GET);
 
-if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
+if (!$USER_GET->get_caller()->is_in_group('admin')) {
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,
 		"Not authorized."

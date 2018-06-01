@@ -4,9 +4,15 @@ The APIEndpoint class
 The APIEndpoint class is the class used to define LibreSignage
 API endpoints. Using APIEnpoint objects makes it easy to handle
 getting API parameters, setting the correct HTTP headers and
-sending the correctly formatted API response. This document is
-a detailed explanation of how the APIEndpoint class works and
-how it is used. 
+sending the correctly formatted API response. The APIEndpoint
+system automatically supports normal GET and POST requests as
+well as CORS requests from any domain.
+
+This document is a detailed explanation of how the APIEndpoint
+class works and how it is used. However, only a small subset of
+the APIEndpoint functions is described. The best way to check out
+the other ones is to just read the source code. Most functions
+contain comments describing what they do and how they can be used.
 
 Constructing the APIEndpoint object
 +++++++++++++++++++++++++++++++++++
@@ -88,6 +94,16 @@ are marked respectively
   Otherwise reject it. This also selects whether the API rate
   quota is used when the API endpoint is called.
 
+``APIEndpoint::REQ_AUTH`` - *Optional* - Default: TRUE
+
+* Make sure the caller is authenticated before granting access
+  to the API endpoint. If this configuration option is TRUE,
+  the user needs to authenticate using the auth_login.php
+  endpoint. This endpoint returns a session token that should
+  be passed to successive API endpoints in the 'Auth-Token'
+  HTTP header. An error is thrown if the header doesn't exist
+  or the token is invalid.
+
 Using the APIEndpoint object
 ++++++++++++++++++++++++++++
 
@@ -98,34 +114,40 @@ Before any APIEndpoint functionality can be used, the API
 endpoint must be initialized by calling the function
 ``api_endpoint_init()``. The function is defined as follows.
 
-``function api_endpoint_init(APIEndpoint $endpoint, $user)``
+``function api_endpoint_init(APIEndpoint $endpoint)``
 
 The ``$endpoint`` argument is the APIEndpoint object created
-earlier. The ``$user`` argument is the User object of the
-currently logged in user. The easiest way to get the User
-object is to call the authentication system function
-``auth_session_user()``. This function returns the User object
-of the current session which can be passed straight to
-``api_endpoint_init()``. Note that the result of requiring
-a User object is that API endpoints can only be accessed by
-logged in users.
+earlier.
 
 The first thing the initialization function does is setup
 a special API exception handler function that reports all
-uncaught exceptions back to the calling user via the API.
+uncaught exceptions back to the caller via the API.
 
-The initialization function then checks that the supplied User
-object is not not ``NULL`` to confirm that a User is logged in.
-After this the API rate quota is checked. If there is no quota
-left and the APIEndpoint config requires quota, the function
-throws an error. Catching this exception is not needed since
-the default API exception handler is meant to report this
-exception to the calling user.
+After this the API system handles the call based on whether
+it is a GET, POST or OPTIONS request. The OPTIONS method is
+used by CORS preflight requests and is not normally used
+manually. If any other request methods are used or if the
+request method doesn't match the one required by the endpoint,
+an exception is thrown.
 
-If there is sufficient quota left, the initialization function
-loads the GET or POST data for the API endpoint and sets the
-correct HTTP ``Content-Type`` header for the configured response
-type. After this the function returns successfully.
+The first thing the API does for all responses is to set
+the proper HTTP response headers depending on how the
+endpoint is configured.
+
+In case the request is a GET or POST request, the system checks
+the authentication status of the caller. If the 'Auth-Token'
+HTTP header exists and contains a valid session token, the
+caller is granted access. Otherwise an error is thrown.
+
+After this the endpoint request data is loaded and parsed
+into the APIEndpoint object.
+
+Next the API rate quota is checked. If there is no quota left
+and the APIEndpoint config requires quota, the function throws
+an error.
+
+If all the steps above succeed, the function returns and the
+APIEndpoint object is ready to be used.
 
 Getting POST or GET parameters
 ------------------------------

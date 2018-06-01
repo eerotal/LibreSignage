@@ -15,26 +15,18 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
 $USER_GET = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON']
+	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
+	APIEndpoint::FORMAT		=> array(),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-session_start();
-api_endpoint_init($USER_GET, auth_session_user());
+api_endpoint_init($USER_GET);
 
-if (!auth_is_authorized(NULL, NULL, FALSE)) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		"Not authorized."
-	);
-}
-
-$u = auth_session_user();
+$u = $USER_GET->get_caller();
 $ret_data = array(
 	'user' => array(
 		'user' => $u->get_name(),
@@ -43,3 +35,4 @@ $ret_data = array(
 );
 $USER_GET->resp_set($ret_data);
 $USER_GET->send();
+

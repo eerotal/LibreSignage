@@ -1,162 +1,122 @@
 <?php
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
+/*
+*  Authentication functionality for LibreSignage.
+*/
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 
-function _auth_chk_session() {
-	if (session_status() == PHP_SESSION_NONE) {
-		throw new IntException("No active session.");
-	}
-}
+const COOKIE_AUTH_TOKEN = 'session_token';
 
-function auth_verify(string $username, string $password) {
+// -- General authentication functions. --
+
+function auth_creds_verify(string $user, string $pass) {
 	/*
-	*  Verify that the auth system has the user $username and
-	*  that the password matches $password. Returns the User
-	*  object if the verification is successful and NULL otherwise.
+	*  Verify the supplied login credentials and return
+	*  the corresponding User object if they are valid.
+	*  NULL is returned otherwise.
 	*/
-	if (!user_exists($username)) {
+	if (empty($user) || empty($pass) || !user_exists($user)) {
 		return NULL;
 	}
 
-	$usr = new User($username);
-	if ($usr) {
-		if ($usr->verify_password($password)) {
-			return $usr;
+	$u = new User($user);
+	if ($u) {
+		if ($u->verify_password($pass)) {
+			return $u;
 		}
 	}
 	return NULL;
 }
 
-function auth_login(string $username, string $password) {
+function auth_token_verify(string $tok) {
 	/*
-	*  Attempt to login with $username and $password.
-	*  Returns TRUE if the login succeeds and FALSE
-	*  otherwise. The $_SESSION data is also set when
-	*  the login succeeds. A session needs to be started
-	*  before calling this function.
+	*  Verify an authentication token and return the
+	*  corresponding User object if the token is valid.
+	*  Otherwise NULL is returned.
 	*/
-	_auth_chk_session();
-	if (auth_is_authorized()) {
-		// Already logged in.
-		return TRUE;
-	}
-
-	if (!empty($username) && !empty($password)) {
-		$tmp = auth_verify($username, $password);
-		if ($tmp != NULL) {
-			$_SESSION['user'] = $tmp->get_name();
-			return TRUE;
+	if (!empty($tok)) {
+		$users = user_array();
+		foreach ($users as $k => $u) {
+			if ($u->session_verify($tok)) {
+				return $u;
+			}
 		}
 	}
-	return FALSE;
+	return NULL;
 }
 
-function auth_logout() {
-	/*
-	*  Logout the currently logged in user. A session
-	*  needs to be started by the caller before calling
-	*  this function.
-	*/
-	_auth_chk_session();
-	$_SESSION = array();
+// -- Web interface authentication functions. --
 
-	if (ini_get('session.use_cookies')) {
-		$cp = session_get_cookie_params();
-		setcookie(session_name(), '', time() - 42000,
-			$cp['path'], $cp['domain'],
-			$cp['secure'], $cp['httponly']);
+function web_auth($user_wl = NULL,
+			$group_wl = NULL,
+			bool $redir = FALSE,
+			$token = NULL) {
+	$u = NULL;
+	if (empty($token)) {
+		// Use authentication token from cookie.
+		$u = web_auth_cookie_verify($redir);
+	} else {
+		// Use supplied authentication token.
+		$u = auth_token_verify($token);
+		if ($u == NULL) {
+			if ($redir) {
+				header('Location: '.LOGIN_PAGE);
+				exit(0);
+			} else {
+				return NULL;
+			}
+		}
 	}
-	session_destroy();
-}
 
-function auth_is_authorized(array $groups = NULL,
-				array $users = NULL,
-				bool $redir = FALSE,
-				bool $both = FALSE) {
-	/*
-	*  Check whether the current session is authorized to access
-	*  a page and return TRUE if it is. FALSE is returned
-	*  otherwise.
-	*
-	*  $groups and $users can optionally be used to filter which
-	*  groups or users can access a page. These arguments are simply
-	*  whitelists of group and user names. If $groups and $users are
-	*  both defined, the value of $both affects how authentication is
-	*  done. If $both is TRUE, it is required that the logged in user
-	*  is in a group listed in $groups and a user listed in $users.
-	*  Otherwise only one of these conditions must be met.
-	*
-	*  If both $groups and $users are NULL and $both is FALSE, access
-	*  is granted to all logged in users.
-	*
-	*  If $redir is TRUE, this function also redirects the client to
-	*  the login page if the user is not logged in or to the HTTP
-	*  403 page if access is not granted.
-	*
-	*/
-	_auth_chk_session();
-	$auth_u = FALSE;
-	$auth_g = FALSE;
-	$usr = auth_session_user();
-
-	if ($usr == NULL) {
+	if (!$u) {
 		if ($redir) {
 			header('Location: '.LOGIN_PAGE);
 			exit(0);
 		}
-		return FALSE;
+		return NULL;
 	}
-
-	if (!$both && $groups == NULL && $users == NULL) {
-		return TRUE;
-	} else {
-		if ($users != NULL) {
-			if (in_array($usr->get_name(), $users)) {
-				$auth_u = TRUE;
+	if ($user_wl) {
+		if (!web_auth_user_whitelist($u, $user_wl)) {
+			if ($redir) {
+				error_handle(HTTP_ERR_403);
 			}
-		}
-		if ($groups != NULL) {
-			foreach ($groups as $g) {
-				if ($usr->is_in_group($g)) {
-					$auth_g = TRUE;
-					break;
-				}
-			}
-		}
-		if ($both) {
-			if ($auth_g && $auth_u) {
-				return TRUE;
-			}
-		} else {
-			if ($auth_g || $auth_u) {
-				return TRUE;
-			}
-		}
-
-		// ==> Not authorized.
-		if ($redir) {
-			error_handle(HTTP_ERR_403);
-		} else {
-			return FALSE;
+			return NULL;
 		}
 	}
+	if ($group_wl) {
+		if (!web_auth_group_whitelist($u, $group_wl)) {
+			if ($redir) {
+				error_handle(HTTP_ERR_403);
+			}
+			return NULL;
+		}
+	}
+	return $u;
 }
 
-function auth_session_user() {
-	$user = NULL;
-	_auth_chk_session();
-	if (empty($_SESSION['user'])) { return NULL; }
-	try {
-		$user = new User($_SESSION['user']);
-	} catch (ArgException $e) {
-		/*
-		*  Logout since the current userdata in
-		*  $_SESSION is invalid.
-		*/
-		auth_logout();
-		session_start();
-		$user = NULL;
+function web_auth_cookie_verify(bool $redir = FALSE) {
+	/*
+	*  Verify the auth token in the token cookie. This function
+	*  can be used to grant access to web pages.
+	*/
+	if (!empty($_COOKIE[COOKIE_AUTH_TOKEN])) {
+		return auth_token_verify($_COOKIE[COOKIE_AUTH_TOKEN]);
 	}
-	return $user;
+	return NULL;
+}
+
+function web_auth_user_whitelist(User $u, array $wl) {
+	/*
+	*  Return TRUE if the user $u is in the whitelist $wl.
+	*  FALSE is returned otherwise.
+	*/
+	return array_search($u->get_name(), $wl, TRUE);
+}
+
+function web_auth_group_whitelist(User $u, array $wl) {
+	/*
+	*  Return TRUE if the user $u is in one of the groups in $wl.
+	*  FALSE is returned otherwise.
+	*/
+	return count(array_intersect($u->get_groups(), $wl)) > 0;
 }

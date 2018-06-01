@@ -20,7 +20,7 @@ html, body {
 	max-height: 90px;
 	background-color: var(--white);
 	color: var(--secondary);
-	border: 1px solid var(--secondary-light);
+	border: 1px solid var(--gray-1);
 }
 
 .slide-cont:hover {
@@ -53,13 +53,13 @@ html, body {
 	pointer-events: none;
 	height: 100%;
 	width: 100%;
-	border: 1px solid var(--secondary-light);
+	border: 1px solid var(--gray-1);
 }
 
 /* Editor styling */
 #slide-input {
 	height: 50vh;
-	border: 1px solid var(--secondary-light);
+	border: 1px solid var(--gray-1);
 }
 
 #editor-status {

@@ -44,6 +44,15 @@
 	const LOGIN_LANDING 			= CONTROL_PANEL_PAGE;
 	const LOGOUT_LANDING 			= LOGOUT_PAGE;
 
+	/*
+	*  Permanent cookie expiration date.
+	*  (Tuesday, 19-Jan-2038 03:14:07 UTC)
+	*/
+	const PERMACOOKIE_EXPIRE		= 2147483647;
+
+	const SESSION_MAX_AGE			= 600;
+	const AUTH_TOKEN_LEN			= 15;
+
 	// LibreSignage instance limits.
 	const LS_LIM = array(
 		"SLIDE_MIN_TIME" 		=> 1*1000,

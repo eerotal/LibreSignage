@@ -75,7 +75,7 @@ function renderer_update() {
 
 		renderer_animate(DISPLAY, 'swipe-from-right', null);
 
-		console.log("LibreImage: Changing slide in " +
+		console.log("LibreSignage: Changing slide in " +
 				c_slide.get('time') + "ms.");
 		setTimeout(renderer_update, c_slide.get('time'));
 	});
@@ -83,39 +83,40 @@ function renderer_update() {
 
 function display_setup() {
 	var params = get_GET_parameters();
-
-	api_init(() => {
-		if ("preview" in params) {
-			// Preview a slide without starting the renderer.
-			console.log("LibreSignage: Preview slide " +
-					params["preview"] + ".");
-			var slide = new Slide();
-			slide.load(params["preview"], (err) => {
-				if (err) {
-					console.log("LibreSignage: " +
-							"Failed to " +
-							"preview slide!");
+	if ("preview" in params) {
+		// Preview a slide without starting the renderer.
+		console.log("LibreSignage: Preview slide " +
+				params["preview"] + ".");
+		var slide = new Slide();
+		slide.load(params["preview"], (err) => {
+			if (err) {
+				console.log("LibreSignage: " +
+						"Failed to " +
+						"preview slide!");
 				return;
-				}
-				DISPLAY.html(markup_parse(sanitize_html(
-					slide.get("markup")
-				)));
-			});
-		} else {
-			// Start the normal renderer 'loop'.
-			console.log("LibreSignage: Start the " +
-					"renderer loop.");
-			setInterval(() => {
-				list_retrieve(slides_retrieve);
-			}, SLIDES_RETRIEVE_INTERVAL);
-
+			}
+			DISPLAY.html(markup_parse(sanitize_html(
+				slide.get("markup")
+			)));
+		});
+	} else {
+		// Start the normal renderer 'loop'.
+		console.log("LibreSignage: Start the " +
+				"renderer loop.");
+		setInterval(() => {
+			list_retrieve(slides_retrieve);
+		}, SLIDES_RETRIEVE_INTERVAL);
 			list_retrieve(() => {
-				slides_retrieve(() => {
-					renderer_update();
-				});
+			slides_retrieve(() => {
+				renderer_update();
 			});
-		}
-	});
+		});
+	}
 }
 
-display_setup();
+$(document).ready(() => {
+	api_init(
+		null,	// Use default config.
+		display_setup
+	)
+});

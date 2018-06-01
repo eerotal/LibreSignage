@@ -304,11 +304,14 @@ function usermgr_make_ui() {
 }
 
 function usermgr_ui_setup() {
-	api_init(() => {
-		users_load(function() {
-			usermgr_make_ui();
-		});
-	});
+	api_init(
+		null,	// Use default config.
+		() => {
+			users_load(function() {
+				usermgr_make_ui();
+			});
+		}
+	);
 }
 
 usermgr_ui_setup();

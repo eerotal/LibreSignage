@@ -1,8 +1,8 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js_include.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
-	session_start();
-	auth_is_authorized(NULL, NULL, TRUE);
+	web_auth(NULL, NULL, TRUE);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,54 +23,55 @@
 		?>
 		<main class="container-fluid">
 			<div class="user-settings-cont container mx-auto">
+				<h2>User settings</h2>
 				<!-- Username -->
-				<div class="row form-group">
-					<label class="col-sm-4 col-form-label"
+				<div class="form-group w-100">
+					<label class="col-form-label"
 						for="user-name">
 						Username
 					</label>
 					<input id="user-name"
 						type="text"
-						class="col-sm-8 form-control"
+						class="form-control"
 						readonly>
 					</input>
 				</div>
 
 				<!-- User groups -->
-				<div class="row form-group">
-					<label class="col-sm-4 col-form-label"
+				<div class="form-group w-100">
+					<label class="col-form-label"
 						for="user-groups">
 							Groups
 					</label>
 					<input id="user-groups"
 						type="text"
-						class="col-sm-8 form-control"
-						readonly>
+						class="form-control"
+					readonly>
 					</input>
 				</div>
 
 				<!-- Password input -->
-				<div id="user-pass-group"
-					class="row form-group">
-					<label class="col-sm-4 col-form-label"
+				<div id="user-pass-group>
+					class="form-group w-100">
+					<label class="col-form-label"
 						for="user-pass">
 						Password
 					</label>
 					<input id="user-pass"
-						type="password"
-						class="col-sm-8 form-control">
+							type="password"
+						class="form-control">
 					</input>
 				</div>
 
 				<!-- Password confirm input -->
-				<div class="row form-group">
-					<label class="col-sm-4 col-form-label"
+				<div class="form-group w-100">
+					<label class="col-form-label"
 						for="user-pass-confirm">
 						Confirm&nbsp;password
 					</label>
 					<div id="user-pass-confirm-group"
-						class="col-sm-8 p-0">
-						<input id="user-pass-confirm"
+						class="p-0">
+					<input id="user-pass-confirm"
 							type="password"
 							class="form-control">
 						</input>
@@ -79,23 +80,40 @@
 				</div>
 
 				<!-- Save button -->
-				<div class="row form-group">
+				<div class="form-group w-100">
 					<input id="user-save"
-						class="col-sm-12 btn btn-primary"
+						class="btn btn-primary w-100"
 						type="button"
 						value="Save"
-						onclick="user_settings_save()">
+							onclick="user_settings_save()">
 					</input>
+				</div>
+
+				<h2>Active sessions</h2>
+				<div class="form-group w-100 text-center">
+					<table class="mx-auto text-left"
+						id="user-sessions">
+					</table>
+				</div>
+				<div class="form-group w-100">
+					<input type="button"
+						class="btn btn-danger"
+						style="width: 100%"
+						id="btn-logout-other"
+						value="Logout other sessions">
 				</div>
 			</div>
 		</main>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
+
+			js_include_jquery();
+			js_include_popper();
+			js_include_bootstrap();
 		?>
 
-		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+		<script src="/common/js/util.js"></script>
+		<script src="/common/js/cookie.js"></script>
 		<script src="/common/js/api.js"></script>
 		<script src="/common/js/dialog.js"></script>
 		<script src="/common/js/user.js"></script>

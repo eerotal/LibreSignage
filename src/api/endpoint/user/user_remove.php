@@ -13,22 +13,20 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
 $USER_REMOVE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
 		'user' => API_P_STR,
-	)
+	),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-session_start();
-api_endpoint_init($USER_REMOVE, auth_session_user());
+api_endpoint_init($USER_REMOVE);
 
-if (!auth_is_authorized(array('admin'), NULL, FALSE)) {
+if (!$USER_REMOVE->get_caller()->is_in_group('admin')) {
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,
 		"Not authorized."

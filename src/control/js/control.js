@@ -37,6 +37,9 @@ function ctrl_setup() {
 	});
 }
 
-api_init(() => {
-	ctrl_setup();
-});
+api_init(
+	null,	// Use default config.
+	() => {
+		ctrl_setup();
+	}
+);

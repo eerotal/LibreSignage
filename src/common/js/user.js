@@ -6,7 +6,14 @@ var _usermgr_users = [];
 var _usermgr_ready = false;
 
 class User {
-	set(user, groups, pass) {
+	/*
+	*  Object for handling LibreSignage user data. Most functions
+	*  that wrap API endpoints work asynchronously. These functions
+	*  usually have an argument named 'ready_callback' that's called
+	*  once the API endpoint call has returned. The API error code is
+	*  passed to the callback function as the first argument.
+	*/
+	set(user, groups, pass, keys) {
 		if (!user) {
 			throw new Error("Invalid username for " +
 					"User object.");
@@ -14,9 +21,13 @@ class User {
 		this.user = user;
 		this.groups = groups;
 		this.pass = pass;
+		this.keys = keys;
 	}
 
 	save(ready_callback) {
+		/*
+		*  Save the loaded user data.
+		*/
 		var data = {
 			'user': this.user,
 			'groups': this.groups,
@@ -30,24 +41,52 @@ class User {
 	}
 
 	load(user, ready_callback) {
-		api_call(API_ENDP.USER_GET, {'user': user},
-			(resp) => {
-				if (resp.error) {
-					if (ready_callback) {
-						ready_callback(resp.error);
-					}
-					return;
-				}
-				this.set(resp.user.user,
-					resp.user.groups);
+		/*
+		*  Load the user named 'user'. Note that not all of
+		*  the user data fields such as 'keys' are always
+		*  populated. The 'keys' field, for example, is only
+		*  populated if the user is loaded by passing null
+		*  in 'user'. This means the loaded user is the current
+		*  one (who is allowed to access the authentication keys
+		*  of course).
+		*/
+		var cb = (resp) => {
+			if (resp.error) {
 				if (ready_callback) {
 					ready_callback(resp.error);
 				}
+				return;
 			}
-		);
+			this.set(
+				resp.user.user,
+				resp.user.groups,
+				null,
+				resp.user.keys
+			);
+			if (ready_callback) {
+				ready_callback(resp.error);
+			}
+		}
+
+		if (user == null) {
+			api_call(
+				API_ENDP.USER_GET_CURRENT,
+				null,
+				cb
+			);
+		} else {
+			api_call(
+				API_ENDP.USER_GET,
+				{'user': user},
+				cb
+			);
+		}
 	}
 
 	remove(ready_callback) {
+		/*
+		*  Remove the loaded user.
+		*/
 		api_call(API_ENDP.USER_REMOVE, {'user': this.user},
 			(resp) => {
 				if (ready_callback) {
@@ -63,6 +102,46 @@ class User {
 
 	get_groups() {
 		return this.groups;
+	}
+
+	get_keys() {
+		return this.keys;
+	}
+
+	gen_key(ready_callback) {
+		/*
+		*  Generate a new authentication key.
+		*/
+		api_call(API_ENDP.USER_GENERATE_KEY, null,
+			(resp) => {
+				if (resp.error == API_E.API_E_OK) {
+					this.keys.push(resp.key);
+				}
+				if (ready_callback) {
+					ready_callback(resp.error);
+				}
+			}
+		);
+	}
+
+	rm_key(rkey, ready_callback) {
+		/*
+		*  Remove an authentication key.
+		*/
+		api_call(API_ENDP.USER_REMOVE_KEY, {key: rkey},
+			(resp) => {
+				if (resp.error == API_E.API_E_OK) {
+					// Successfully removed.
+					var i = this.keys.indexOf(rkey);
+					if (i >= 0) {
+						this.keys.splice(i, 1);
+					}
+				}
+				if (ready_callback) {
+					ready_callback(resp.error);
+				}
+			}
+		);
 	}
 
 	set_info(info) {

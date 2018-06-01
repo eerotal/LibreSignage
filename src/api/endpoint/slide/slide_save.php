@@ -23,12 +23,8 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 
 $SLIDE_SAVE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
@@ -40,35 +36,28 @@ $SLIDE_SAVE = new APIEndpoint(array(
 		'markup' => API_P_STR|API_P_EMPTY_STR_OK,
 		'owner' => API_P_UNUSED,
 		'time' => API_P_INT
-	)
+	),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-session_start();
-api_endpoint_init($SLIDE_SAVE, auth_session_user());
+api_endpoint_init($SLIDE_SAVE);
 
 $flag_new_slide = FALSE;
 $flag_auth = FALSE;
 $slide_data = array();
 
-$user = auth_session_user();
+$user = $SLIDE_SAVE->get_caller();
 $user_quota = new UserQuota($user);
 $slide = new Slide();
 
 if ($SLIDE_SAVE->has('id', TRUE)) {
 	if ($slide->load($SLIDE_SAVE->get('id'))) {
 		// Allow admins to modify slides.
-		$flag_auth = auth_is_authorized(
-			$groups = array('admin'),
-			$users = NULL,
-			$redir = FALSE,
-			$both = FALSE
-		);
+		$flag_auth = $user->is_in_group('admin');
+
 		// Allow owner to modify slide.
-		$flag_auth = ($flag_auth || auth_is_authorized(
-			$groups = array('editor'),
-			$users = array($slide->get('owner')),
-			$redir = FALSE,
-			$both = TRUE
-		));
+		$flag_auth |= ($user->is_in_group('editor') &&
+			$user->get_name() === $slide->get('owner'));
 		if (!$flag_auth) {
 			throw new APIException(
 				API_E_NOT_AUTHORIZED,
@@ -90,13 +79,8 @@ if ($SLIDE_SAVE->has('id', TRUE)) {
 	*  Allow users in the editor and
 	*  admin groups to create slides.
 	*/
-	$flag_auth = auth_is_authorized(
-		$groups = array('editor', 'admin'),
-		$users = NULL,
-		$redir = FALSE,
-		$both = FALSE
-	);
-	if (!$flag_auth) {
+	if (!$user->is_in_group('editor') &&
+		!$user->is_in_group('admin')) {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,
 			"Not authorized."

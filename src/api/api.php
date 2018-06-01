@@ -3,6 +3,8 @@
 *  APIEndpoint object definition and interface functions.
 */
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/argarray.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
@@ -22,13 +24,14 @@ const API_RESPONSE = array(
 // API type flags.
 const API_P_STR			= 0x1;
 const API_P_INT			= 0x2;
-const API_P_FLOAT		= 0x4;
-const API_P_ARR			= 0x8;
-const API_P_OPT			= 0x10;
-const API_P_NULL		= 0x20;
+const API_P_FLOAT		= 0x3;
+const API_P_ARR			= 0x4;
+const API_P_OPT			= 0x5;
+const API_P_NULL		= 0x6;
+const API_P_BOOL		= 0x7;
 
 // API data flags.
-const API_P_EMPTY_STR_OK	= 0x40;
+const API_P_EMPTY_STR_OK	= 0x8;
 
 // API convenience flags.
 const API_P_ANY			= API_P_STR|API_P_INT|API_P_FLOAT
@@ -36,20 +39,25 @@ const API_P_ANY			= API_P_STR|API_P_INT|API_P_FLOAT
 const API_P_UNUSED 		= API_P_ANY|API_P_EMPTY_STR_OK|API_P_OPT;
 
 class APIEndpoint {
+	// Config options.
 	const METHOD		= 'method';
 	const RESPONSE_TYPE	= 'response_type';
 	const FORMAT		= 'format';
 	const STRICT_FORMAT	= 'strict_format';
-	const REQ_QUOTA	= 'req_quota';
+	const REQ_QUOTA		= 'req_quota';
+	const REQ_AUTH		= 'req_auth';
 
-	private $method = 0;
-	private $response_type = 0;
-	private $response = NULL;
-	private $format = NULL;
-	private $strict_format = TRUE;
-	private $req_quota = TRUE;
-	private $data = NULL;
-	private $inited = FALSE;
+	private $method		= 0;
+	private $response_type	= 0;
+	private $response	= NULL;
+	private $format		= NULL;
+	private $strict_format	= TRUE;
+	private $req_quota	= TRUE;
+	private $req_auth	= TRUE;
+	private $data		= NULL;
+	private $inited		= FALSE;
+	private $caller		= NULL;
+	private $auth_token	= NULL;
 
 	public function __construct(array $config) {
 		$args = new ArgumentArray(
@@ -58,12 +66,14 @@ class APIEndpoint {
 				self::RESPONSE_TYPE => API_RESPONSE,
 				self::FORMAT        => 'array',
 				self::STRICT_FORMAT => 'boolean',
-				self::REQ_QUOTA     => 'boolean'
+				self::REQ_QUOTA     => 'boolean',
+				self::REQ_AUTH      => 'boolean'
 			),
 			array(
 				self::FORMAT        => array(),
 				self::STRICT_FORMAT => TRUE,
-				self::REQ_QUOTA     => TRUE
+				self::REQ_QUOTA     => TRUE,
+				self::REQ_AUTH      => TRUE
 			)
 		);
 		$ret = $args->chk($config);
@@ -79,18 +89,22 @@ class APIEndpoint {
 		*/
 		$str = @file_get_contents('php://input');
 		if ($str === FALSE) {
-			throw new IntException('Failed to read '.
-					'request data!');
+			throw new IntException(
+				"Failed to read request data!"
+			);
 		}
-		$data = json_decode($str, $assoc=TRUE);
-		if ($data === NULL &&
-			json_last_error() != JSON_ERROR_NONE) {
-			throw new IntException('Request data parsing '.
-						'failed!');
+		if (!strlen($str)) {
+			$data = array();
+		} else {
+			$data = json_decode($str, $assoc=TRUE);
+			if ($data === NULL &&
+				json_last_error() != JSON_ERROR_NONE) {
+				throw new IntException(
+					"Request data parsing failed!"
+				);
+			}
 		}
-
 		$this->_verify($data);
-
 		$this->data = $data;
 		$this->inited = TRUE;
 	}
@@ -111,10 +125,17 @@ class APIEndpoint {
 		*  this APIEndpoint object. _load_data_post()
 		*  and _load_data_get() do the actual work.
 		*/
-		if ($this->method == API_METHOD['POST']) {
-			$this->_load_data_post();
-		} else if ($this->method == API_METHOD['GET']) {
-			$this->_load_data_get();
+		switch($this->method) {
+			case API_METHOD['POST']:
+				$this->_load_data_post();
+				break;
+			case API_METHOD['GET']:
+				$this->_load_data_get();
+				break;
+			default:
+				throw new ArgException(
+					"Unexpected API method."
+				);
 		}
 	}
 
@@ -196,7 +217,7 @@ class APIEndpoint {
 				}
 				throw new ArgException(
 					"API request parameter ".
-					"'$format[$k]' missing."
+					"'$k' missing."
 				);
 			}
 			if (gettype($format[$k]) == 'array') {
@@ -260,6 +281,30 @@ class APIEndpoint {
 		return $this->req_quota;
 	}
 
+	public function requires_auth() {
+		return $this->req_auth;
+	}
+
+	public function set_caller($caller) {
+		$this->caller = $caller;
+	}
+
+	public function get_caller() {
+		return $this->caller;
+	}
+
+	public function set_auth_token($token) {
+		$this->auth_token = $token;
+	}
+
+	public function get_auth_token() {
+		return $this->auth_token;
+	}
+
+	public function get_method() {
+		return $this->method;
+	}
+
 	public function resp_set($resp) {
 		/*
 		*  Set the API response data.
@@ -298,51 +343,40 @@ class APIEndpoint {
 	}
 }
 
-function api_endpoint_init(APIEndpoint $endpoint, $user) {
+function api_handle_preflight() {
 	/*
-	*  Initialize the APIEnpoint $endpoint and
-	*  error out of the API call if an exception
-	*  is thrown. This function also sets the
-	*  correct HTTP Content-Type header for the
-	*  endpoint.
+	*  Handle preflight requests.
+	*/
+	header('Access-Control-Allow-Origin: *');
+	header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+	header('Access-Control-Allow-Headers: Content-Type, Auth-Token');
+	header('Access-Control-Max-Age: 600');
+}
+
+function api_handle_request(APIEndpoint $endpoint) {
+	/*
+	*  Handle reqular API calls using POST or GET.
 	*/
 
-	api_error_setup();
-	if ($user == NULL) {
-		throw new APIException(
-			API_E_NOT_AUTHORIZED,
-			"Not logged in."
+	// Send required headers.
+	header('Content-Type: '.$endpoint->get_content_type());
+	header('Access-Control-Allow-Origin: *');
+
+	// Check the request method.
+	if ($_SERVER['REQUEST_METHOD'] !=
+		array_search($endpoint->get_method(), API_METHOD)) {
+		throw new ArgException(
+			"Invalid request method '".
+			$_SERVER['REQUEST_METHOD'].
+			"'. Expected '".
+			array_search(
+				$endpoint->get_method(),
+				API_METHOD
+			)."'."
 		);
 	}
 
-	// Use the API rate quota of the caller if required.
-	if ($endpoint->requires_quota()) {
-		$quota = new UserQuota($user);
-		if ($quota->has_state_var('api_t_start')) {
-			$t = $quota->get_state_var('api_t_start');
-			if (time() - $t >= gtlim('API_RATE_T')) {
-				/*
-				*  Reset rate quota and time
-				*  after the cutoff.
-				*/
-				$quota->set_state_var('api_t_start',
-							time());
-				$quota->set_quota('api_rate', 0);
-			}
-		} else {
-			// Start counting time.
-			$quota->set_state_var('api_t_start', time());
-		}
-
-		if (!$quota->use_quota('api_rate')) {
-			throw new APIException(
-				API_E_RATE,
-				"API rate limited."
-			);
-		}
-		$quota->flush();
-	}
-
+	// Initialize the endpoint.
 	try {
 		$endpoint->load_data();
 	} catch(ArgException $e) {
@@ -354,5 +388,86 @@ function api_endpoint_init(APIEndpoint $endpoint, $user) {
 			API_E_INTERNAL, $e->getMessage(), 0, $e
 		);
 	}
-	header('Content-Type: '.$endpoint->get_content_type());
+
+	// Check authentication.
+	if (!$endpoint->requires_auth()) { return; }
+
+	if (!array_key_exists("Auth-Token", getallheaders())) {
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"No Auth-Token header even though required."
+		);
+	}
+
+	$auth_token = getallheaders()["Auth-Token"];
+	$caller = auth_token_verify($auth_token);
+	if ($caller === NULL) {
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Invalid authentication token."
+		);
+	}
+
+	// Store caller data in endpoint.
+	$endpoint->set_caller($caller);
+	$endpoint->set_auth_token($auth_token);
+
+	// Use the API rate quota of the caller if required.
+	if (!$endpoint->requires_quota()) { return; }
+
+	$quota = new UserQuota($caller);
+	if ($quota->has_state_var('api_t_start')) {
+		$t = $quota->get_state_var('api_t_start');
+		if (time() - $t >= gtlim('API_RATE_T')) {
+			/*
+			*  Reset rate quota and time
+			*  after the cutoff.
+			*/
+			$quota->set_state_var('api_t_start', time());
+			$quota->set_quota('api_rate', 0);
+		}
+	} else {
+		// Start counting time.
+		$quota->set_state_var('api_t_start', time());
+	}
+
+	if (!$quota->use_quota('api_rate')) {
+		throw new APIException(
+			API_E_RATE,
+			"API rate limited."
+		);
+	}
+	$quota->flush();
+}
+
+function api_endpoint_init(APIEndpoint $endpoint) {
+	/*
+	*  Handle endpoint initialization and API calls.
+	*  This function and the api_handle_* functions
+	*  also take care of all the smaller protocol details
+	*  like handling preflight requests and sending the
+	*  proper HTTP headers.
+	*/
+
+	api_error_setup();
+
+	switch ($_SERVER['REQUEST_METHOD']) {
+		case "POST":
+			api_handle_request($endpoint);
+			break;
+		case "GET":
+			api_handle_request($endpoint);
+			break;
+		case "OPTIONS":
+			api_handle_preflight();
+			break;
+		default:
+			header(
+				'Content-Type: '.
+				$endpoint->get_content_type()
+			);
+			throw new ArgAxception("Invalid request method.");
+			break;
+	}
+
 }

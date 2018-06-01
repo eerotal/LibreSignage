@@ -21,21 +21,19 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 
 $SLIDE_GET = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
 		'id' => API_P_STR
-	)
+	),
+	APIEndpoint::REQ_QUOTA		=> TRUE,
+	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-session_start();
-api_endpoint_init($SLIDE_GET, auth_session_user());
+api_endpoint_init($SLIDE_GET);
 
 $list = get_slides_id_list();
 

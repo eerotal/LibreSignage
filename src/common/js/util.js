@@ -103,6 +103,15 @@ function get_GET_parameters() {
 	return params;
 }
 
+function get_cookies() {
+	var ret = {};
+	var tmp = document.cookie.split('; ');
+	for (let c of tmp) {
+		ret[c.split('=')[0]] = c.split('=')[1];
+	}
+	return ret;
+}
+
 function sanitize_html(src) {
 	// Sanitize HTML tags.
 	return $("<div></div>").text(src).html();

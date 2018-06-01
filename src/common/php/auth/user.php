@@ -45,6 +45,9 @@ class UserQuota {
 			}
 			$this->user = $user;
 			$this->ready = TRUE;
+
+			// Write the quota to file.
+			$this->flush();
 		}
 		return $this;
 	}
@@ -68,13 +71,18 @@ class UserQuota {
 			throw new IntException("Quota file doesn't ".
 						"exist.");
 		}
-		$this->data = json_decode(file_lock_and_get($q_path),
-						$assoc=TRUE);
+
+		$tmp = file_lock_and_get($q_path);
+		$this->data = json_decode(
+			$tmp,
+			$assoc=TRUE
+		);
 
 		if ($this->data === NULL &&
 			json_last_error() != JSON_ERROR_NONE) {
-			throw new IntException('Failed to parse '.
-					'quota JSON.');
+			throw new IntException(
+				"Failed to parse quota JSON."
+			);
 		}
 		$this->user = $user;
 		$this->ready = TRUE;
@@ -92,8 +100,11 @@ class UserQuota {
 			throw new IntException('Failed to JSON '.
 					'encode quota data.');
 		}
-		file_lock_and_put($this->_quota_path($this->user),
-				$data_enc, TRUE);
+		file_lock_and_put(
+			$this->_quota_path($this->user),
+			$data_enc,
+			TRUE
+		);
 	}
 
 	public function get_limit(string $key) {
@@ -203,7 +214,8 @@ class UserQuota {
 class User {
 	private $user = '';
 	private $hash = '';
-	private $groups = NULL;
+	private $groups = array();
+	private $sessions = array();
 	private $ready = FALSE;
 
 	public function __construct($name = NULL) {
@@ -245,7 +257,8 @@ class User {
 						'user data!');
 		}
 		$data = json_decode($json, $assoc=TRUE);
-		if (json_last_error() != JSON_ERROR_NONE) {
+		if ($data === NULL &&
+			json_last_error() != JSON_ERROR_NONE) {
 			throw new IntException('JSON user data '.
 						'decode error!');
 		}
@@ -253,6 +266,7 @@ class User {
 		$this->set_name($data['user']);
 		$this->set_groups($data['groups']);
 		$this->set_hash($data['hash']);
+		$this->set_session_data($data['sessions']);
 		$this->set_ready(TRUE);
 	}
 
@@ -283,7 +297,8 @@ class User {
 		$json = json_encode(array(
 			'user' => $this->user,
 			'groups' => $this->groups,
-			'hash' => $this->hash
+			'hash' => $this->hash,
+			'sessions' => $this->sessions
 		));
 		if ($json === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
@@ -309,19 +324,188 @@ class User {
 		return LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$tmp;
 	}
 
-	public function get_name() {
-		$this->_error_on_not_ready();
-		return $this->user;
+	// -- Session functions --
+	private function _session_gen_auth_token() {
+		/*
+		*  Generate a new cryptographically secure authentication
+		*  token and return the token and it's hash as an array.
+		*/
+		$tok = bin2hex(random_bytes(AUTH_TOKEN_LEN));
+		$ret = array(
+			'token' => $tok,
+			'token_hash' => password_hash(
+						$tok,
+						PASSWORD_DEFAULT
+					)
+		);
+		if ($ret['token_hash'] === FALSE) {
+			throw new IntException(
+				"Failed to hash authentication token."
+			);
+		}
+		return $ret;
 	}
 
+	private function _session_replace(array $s_old, array $s_new) {
+		/*
+		*  Replace the session $s_old with the session $s_new.
+		*  Note that this function doesn't check whether the
+		*  old session is expired.
+		*/
+		$this->_error_on_not_ready();
+
+		$c = NULL;
+		for ($i = 0; $i < count($this->sessions); $i++) {
+			$c = $this->sessions[$i];
+			if ($s_old['token_hash'] == $c['token_hash']) {
+				$this->sessions[$i] = $s_new;
+				return;
+			}
+		}
+		throw new ArgException("No such session.");
+	}
+
+	public function get_session_data() {
+		return $this->sessions;
+	}
+
+	public function set_session_data($data) {
+		$this->sessions = array_values($data);
+	}
+
+	public function session_new(string $who,
+				string $from,
+				bool $permanent = FALSE) {
+		/*
+		*  Start a new session and store the session data
+		*  in the User object. $who is a caller supplied
+		*  identification string that can be displayed
+		*  in user interfaces listing all active sessions.
+		*  $from is the IP address of the party requesting
+		*  the new session. Note that $who and $from are
+		*  truncated to a max length of 45 characters.
+		*  If $permanent is TRUE, the created session
+		*  never expires unless it's manually expired
+		*  using session_renew().
+		*/
+		$this->_error_on_not_ready();
+
+		$token = $this->_session_gen_auth_token();
+		$session = array(
+			'who' => substr($who, 0, 45),
+			'from' => substr($from, 0, 45),
+			'created' => time(),
+			'max_age' => SESSION_MAX_AGE,
+			'permanent' => $permanent
+		);
+		$store = $session;
+		$ret = $session;
+
+		$store['token_hash'] = $token['token_hash'];
+		$ret['token'] = $token['token'];
+
+		$this->sessions[] = $store;
+		return $ret;
+	}
+
+	public function session_rm(string $tok) {
+		/*
+		*  Remove an existing session with the authentication
+		*  token $tok.
+		*/
+		$this->_error_on_not_ready();
+		foreach ($this->sessions as $i => $d) {
+			if (password_verify($tok, $d['token_hash'])) {
+				array_splice($this->sessions, $i, 1);
+
+				// Reset indices.
+				$this->sessions = array_values(
+					$this->sessions
+				);
+				return;
+			}
+		}
+		throw new ArgException("No such authentication token.");
+	}
+
+	public function session_n_rm(string $tok) {
+		/*
+		*  'Negated' session_rm(). Remove all other sessions
+		*  except the session corresponding to the authentication
+		*  token $tok.
+		*/
+		$s_new = $this->sessions;
+		foreach ($s_new as $i => $d) {
+			if (!password_verify($tok, $d['token_hash'])) {
+				$s_new[$i] = NULL;
+			}
+		}
+
+		// Filter NULL values and reset indices.
+		$this->sessions = array_values(array_filter($s_new));
+	}
+
+	public function session_renew(string $tok) {
+		/*
+		*  Renew an existing session and return the new
+		*  session data. The old authentication key is
+		*  automatically expired. All the config and
+		*  identification data is copied over from the old
+		*  session. This function throws an error if the
+		*  original session is expired or if no session
+		*  corresponding to the supplied auth token exists.
+		*/
+		$this->_error_on_not_ready();
+
+		$s_old = $this->session_verify($tok);
+		if ($s_old == NULL) {
+			throw new ArgException("No such session.");
+		}
+		$token = $this->_session_gen_auth_token();
+		$s_new = array(
+			'who' => $s_old['who'],
+			'from' => $s_old['from'],
+			'permanent' => $s_old['permanent'],
+			'token' => $token['token'],
+			'token_hash' => $token['token_hash'],
+			'created' => time(),
+			'max_age' => SESSION_MAX_AGE
+		);
+		$this->_session_replace($s_old, $s_new);
+		return $s_new;
+	}
+
+	public function session_verify(string $tok) {
+		/*
+		*  Verify that the authentication token $tok matches
+		*  a session and remove any expired sessions. This
+		*  function returns the session data for the matching
+		*  session if the verification is successful and NULL
+		*  otherwise.
+		*/
+		$this->_error_on_not_ready();
+		$session = NULL;
+		$new_s = $this->sessions;
+
+		foreach ($this->sessions as $i => $d) {
+			$tmp = $d['created'] + $d['max_age'];
+			if (password_verify($tok, $d['token_hash']) &&
+				($d['permanent'] || time() <= $tmp)) {
+				$session = $d;
+			} else if (!$d['permanent'] && time() > $tmp) {
+				// Mark expired sessions for purging.
+				$new_s[$i] = NULL;
+			}
+		}
+		$this->sessions = array_values(array_filter($new_s));
+		$this->write();
+		return $session;
+	}
+
+	// -- Group functions --
 	public function get_groups() {
 		$this->_error_on_not_ready();
 		return $this->groups;
-	}
-
-	public function get_hash() {
-		$this->_error_on_not_ready();
-		return $this->hash;
 	}
 
 	public function is_in_group(string $group) {
@@ -329,10 +513,22 @@ class User {
 		return in_array($group, $this->groups, TRUE);
 	}
 
-	public function is_ready() {
-		return $this->ready;
+	public function set_groups($groups) {
+		if ($groups == NULL) {
+			$this->groups = array();
+		} else if (gettype($groups) == 'array') {
+			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
+				throw new ArgException('Too many user '.
+							'groups.');
+			}
+			$this->groups = $groups;
+		} else {
+			throw new ArgException('Invalid type for '.
+						'$groups.');
+		}
 	}
 
+	// -- Password functions --
 	public function verify_password(string $pass) {
 		$this->_error_on_not_ready();
 		return password_verify($pass, $this->hash);
@@ -351,21 +547,19 @@ class User {
 		$this->hash = $tmp_hash;
 	}
 
-	public function set_groups($groups) {
-		if ($groups == NULL) {
-			$this->groups = array();
-		} else if (gettype($groups) == 'array') {
-			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
-				throw new ArgException('Too many user '.
-							'groups.');
-			}
-			$this->groups = $groups;
-		} else {
-			throw new ArgException('Invalid type for '.
-						'$groups.');
+	public function set_hash(string $hash) {
+		if (empty($hash)) {
+			throw new ArgException('Invalid password hash.');
 		}
+		$this->hash = $hash;
 	}
 
+	public function get_hash() {
+		$this->_error_on_not_ready();
+		return $this->hash;
+	}
+
+	// -- Name functions --
 	public function set_name(string $name) {
 		if (empty($name)) {
 			throw new ArgException('Invalid username.');
@@ -376,16 +570,20 @@ class User {
 		$this->user = $name;
 	}
 
-	public function set_hash(string $hash) {
-		if (empty($hash)) {
-			throw new ArgException('Invalid password hash.');
-		}
-		$this->hash = $hash;
+	public function get_name() {
+		$this->_error_on_not_ready();
+		return $this->user;
 	}
 
+	// -- Object ready setting/checking functions --
 	public function set_ready(bool $val) {
 		$this->ready = $val;
 	}
+
+	public function is_ready() {
+		return $this->ready;
+	}
+
 }
 
 function user_exists(string $user) {
