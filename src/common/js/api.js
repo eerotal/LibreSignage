@@ -137,16 +137,24 @@ var API_ENDP = {
 	}
 }
 
-function _api_chk_configured() {
-	if (!API_CONFIG.configured) {
+function _api_ensure_configured() {
+	if (!api_configured) {
 		throw new Error("API: Not initialized");
 	}
 }
 
-function _api_chk_authenticated() {
-	if (!API_CONFIG.authenticated) {
+function _api_ensure_authenticated() {
+	if (!api_authenticated) {
 		throw new Error("API: Not authenticated.");
 	}
+}
+
+function api_configured() {
+	return API_CONFIG.configured;
+}
+
+function api_authenticated() {
+	return API_CONFIG.authenticated;
 }
 
 function api_call(endpoint, data, callback) {
@@ -161,8 +169,8 @@ function api_call(endpoint, data, callback) {
 	*  left null if they are not needed.
 	*/
 
-	_api_chk_configured();
-	if (endpoint.auth) { _api_chk_authenticated(); }
+	_api_ensure_configured();
+	if (endpoint.auth) { _api_ensure_authenticated(); }
 
 	var data_str = "";
 	var ajax_settings = {
@@ -209,7 +217,7 @@ function api_call(endpoint, data, callback) {
 }
 
 function api_handle_disp_error(err, callback) {
-	_api_chk_configured();
+	_api_ensure_configured();
 
 	var h = "";
 	var p = "";
@@ -276,7 +284,7 @@ function api_host() {
 	/*
 	*  Get the API host URL.
 	*/
-	_api_chk_configured();
+	_api_ensure_configured();
 	return API_CONFIG.protocol + "\/\/" + API_CONFIG.hostname;
 }
 
@@ -317,7 +325,7 @@ function session_schedule_renewal() {
 	*  Schedule a session renewal just before the
 	*  existing session expires.
 	*/
-	_api_chk_authenticated();
+	_api_ensure_authenticated();
 
 	if (get_cookie('session_permanent') == '1') {
 		console.log(
