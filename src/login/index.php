@@ -65,6 +65,17 @@
 								value="Login">
 						</div>
 					</div>
+					<div class="form-group form-row">
+						<div class="col">
+							<input class="form-check-input"
+								type="checkbox"
+								id="checkbox-perm-session">
+							<label class="form-check-label"
+								for="checkbox-perm-session">
+								Start a display session.
+							</label>
+						</div>
+					</div>
 				</div>
 			</div>
 		</main>

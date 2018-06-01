@@ -383,24 +383,6 @@ function session_renew() {
 	)
 }
 
-function session_store(token, created, max_age, permanent) {
-	/*
-	*  Store session data in cookies. This is not _normally_
-	*  needed, but the client startup script still uses this.
-	*  The caller needs to schedule a session renewal if that's
-	*  needed.
-	*/
-	if (!permanent && max_age + created >= Date.now()/1000) {
-		console.error("API: Won't store an expired session.");
-		return;
-	}
-	set_cookie({"session_token": token, "path": "/"});
-	set_cookie({"session_created": created, "path": "/"});
-	set_cookie({"session_max_age": max_age, "path": "/"});
-	set_cookie({"session_permanent": permanent, "path": "/"});
-	API_CONFIG.authenticated = true;
-}
-
 function session_remove() {
 	/*
 	*  Remove the session data cookies.
