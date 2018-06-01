@@ -35,22 +35,34 @@ $AUTH_SESSION_RENEW->get_caller()->write();
 *  that need to access the LibreSignage web interface too. Other
 *  clients can ignore these cookies if so desired.
 */
+$exp = 0;
+if ($session['permanent']) {
+	$exp = PERMACOOKIE_EXPIRE;
+} else {
+	$exp = $session['created'] + $session['max_age'];
+}
 setcookie(
 	$name = 'session_token',
 	$value = $session['token'],
-	$expire = $session['created'] + $session['max_age'],
+	$expire = $exp,
 	$path = '/'
 );
 setcookie(
 	$name = 'session_created',
 	$value = $session['created'],
-	$expire = $session['created'] + $session['max_age'],
+	$expire = $exp,
 	$path = '/'
 );
 setcookie(
 	$name = 'session_max_age',
 	$value = $session['max_age'],
-	$expire = $session['created'] + $session['max_age'],
+	$expire = $exp,
+	$path = '/'
+);
+setcookie(
+	$name = 'session_permanent',
+	$value = $session['permanent'] ? '1' : '0',
+	$expire = $exp,
 	$path = '/'
 );
 

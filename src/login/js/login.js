@@ -11,6 +11,7 @@ function login() {
 	api_login(
 		INPUT_USERNAME.val(),
 		INPUT_PASSWORD.val(),
+		false,
 		(resp) => {
 			if (resp.error == API_E.API_E_INCORRECT_CREDS) {
 				login_redirect("/login?failed=1");

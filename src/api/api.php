@@ -24,13 +24,14 @@ const API_RESPONSE = array(
 // API type flags.
 const API_P_STR			= 0x1;
 const API_P_INT			= 0x2;
-const API_P_FLOAT		= 0x4;
-const API_P_ARR			= 0x8;
-const API_P_OPT			= 0x10;
-const API_P_NULL		= 0x20;
+const API_P_FLOAT		= 0x3;
+const API_P_ARR			= 0x4;
+const API_P_OPT			= 0x5;
+const API_P_NULL		= 0x6;
+const API_P_BOOL		= 0x7;
 
 // API data flags.
-const API_P_EMPTY_STR_OK	= 0x40;
+const API_P_EMPTY_STR_OK	= 0x8;
 
 // API convenience flags.
 const API_P_ANY			= API_P_STR|API_P_INT|API_P_FLOAT

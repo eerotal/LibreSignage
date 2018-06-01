@@ -212,9 +212,6 @@ class UserQuota {
 }
 
 class User {
-	const AUTH_TOKEN_LEN = 15;
-	const AUTH_TOKEN_MAX_AGE = 600;
-
 	private $user = '';
 	private $hash = '';
 	private $groups = array();
@@ -333,7 +330,7 @@ class User {
 		*  Generate a new cryptographically secure authentication
 		*  token and return the token and it's hash as an array.
 		*/
-		$tok = bin2hex(random_bytes(self::AUTH_TOKEN_LEN));
+		$tok = bin2hex(random_bytes(AUTH_TOKEN_LEN));
 		$ret = array(
 			'token' => $tok,
 			'token_hash' => password_hash(
@@ -376,15 +373,20 @@ class User {
 		$this->sessions = array_values($data);
 	}
 
-	public function session_new(string $who, string $from) {
+	public function session_new(string $who,
+				string $from,
+				bool $permanent = FALSE) {
 		/*
 		*  Start a new session and store the session data
-		*  in the User object. 'who' is a caller supplied
+		*  in the User object. $who is a caller supplied
 		*  identification string that can be displayed
 		*  in user interfaces listing all active sessions.
-		*  'from' is the IP address of the party requesting
-		*  the new session. Note that 'who' and 'from' are
+		*  $from is the IP address of the party requesting
+		*  the new session. Note that $who and $from are
 		*  truncated to a max length of 45 characters.
+		*  If $permanent is TRUE, the created session
+		*  never expires unless it's manually expired
+		*  using session_renew().
 		*/
 		$this->_error_on_not_ready();
 
@@ -393,7 +395,8 @@ class User {
 			'who' => substr($who, 0, 45),
 			'from' => substr($from, 0, 45),
 			'created' => time(),
-			'max_age' => self::AUTH_TOKEN_MAX_AGE
+			'max_age' => SESSION_MAX_AGE,
+			'permanent' => $permanent
 		);
 		$store = $session;
 		$ret = $session;
@@ -446,10 +449,11 @@ class User {
 		/*
 		*  Renew an existing session and return the new
 		*  session data. The old authentication key is
-		*  automatically expired. This function throws an
-		*  error if the original session is expired or
-		*  if no session corresponding to the supplied auth
-		*  token exists.
+		*  automatically expired. All the config and
+		*  identification data is copied over from the old
+		*  session. This function throws an error if the
+		*  original session is expired or if no session
+		*  corresponding to the supplied auth token exists.
 		*/
 		$this->_error_on_not_ready();
 
@@ -461,10 +465,11 @@ class User {
 		$s_new = array(
 			'who' => $s_old['who'],
 			'from' => $s_old['from'],
+			'permanent' => $s_old['permanent'],
 			'token' => $token['token'],
 			'token_hash' => $token['token_hash'],
 			'created' => time(),
-			'max_age' => self::AUTH_TOKEN_MAX_AGE
+			'max_age' => SESSION_MAX_AGE
 		);
 		$this->_session_replace($s_old, $s_new);
 		return $s_new;
@@ -485,9 +490,9 @@ class User {
 		foreach ($this->sessions as $i => $d) {
 			$tmp = $d['created'] + $d['max_age'];
 			if (password_verify($tok, $d['token_hash']) &&
-				time() <= $tmp) {
+				($d['permanent'] || time() <= $tmp)) {
 				$session = $d;
-			} else if (time() > $tmp) {
+			} else if (!$d['permanent'] && time() > $tmp) {
 				// Mark expired sessions for purging.
 				$new_s[$i] = NULL;
 			}

@@ -318,8 +318,31 @@ function session_schedule_renewal() {
 	*  existing session expires.
 	*/
 	_api_chk_authenticated();
+
+	if (get_cookie('session_permanent') == '1') {
+		console.log(
+			"API: Won't schedule session renewal " +
+			"for a permanent session."
+		);
+		return;
+	}
+
 	var created = parseInt(get_cookie('session_created'), 10);
 	var max_age = parseInt(get_cookie('session_max_age'), 10);
+
+	if (max_age <= SESSION_RENEWAL_HEADROOM) {
+		throw new Error(
+			"Session max_age too low. " +
+			"(max_age <= SESSION_RENEWAL_HEADROOM)"
+		);
+	} else if (max_age <= SESSION_RENEWAL_HEADROOM + 10) {
+		throw new Error(
+			"Session max_age is so low that the " +
+			"session would be renewed very often " +
+			"causing a high load on the client and " +
+			"server. Session renewal won't be scheduled."
+		);
+	}
 
 	var left = created + max_age - Date.now()/1000;
 	var t = left - SESSION_RENEWAL_HEADROOM;
@@ -360,20 +383,21 @@ function session_renew() {
 	)
 }
 
-function session_store(token, created, max_age) {
+function session_store(token, created, max_age, permanent) {
 	/*
 	*  Store session data in cookies. This is not _normally_
 	*  needed, but the client startup script still uses this.
 	*  The caller needs to schedule a session renewal if that's
 	*  needed.
 	*/
-	if (max_age + created >= Date.now()/1000) {
+	if (!permanent && max_age + created >= Date.now()/1000) {
 		console.error("API: Won't store an expired session.");
 		return;
 	}
 	set_cookie({"session_token": token, "path": "/"});
 	set_cookie({"session_created": created, "path": "/"});
 	set_cookie({"session_max_age": max_age, "path": "/"});
+	set_cookie({"session_permanent": permanent, "path": "/"});
 	API_CONFIG.authenticated = true;
 }
 
@@ -385,6 +409,7 @@ function session_remove() {
 	rm_cookie({"session_token": "", "path": "/"});
 	rm_cookie({"session_created": "", "path": "/"});
 	rm_cookie({"session_max_age": "", "path": "/"});
+	rm_cookie({"session_permanent": "", "path": "/"});
 }
 
 function session_check() {
@@ -412,7 +437,7 @@ function session_check() {
 	}
 }
 
-function api_login(user, pass, ready_callback) {
+function api_login(user, pass, perm, ready_callback) {
 	/*
 	*  Login using the supplied credentials and store the
 	*  returned session data. ready_callback is called when
@@ -424,6 +449,7 @@ function api_login(user, pass, ready_callback) {
 		{
 			username: user,
 			password: pass,
+			permanent: perm,
 			who: "LibreSignage-Web-Interface"
 		},
 		(resp) => {
