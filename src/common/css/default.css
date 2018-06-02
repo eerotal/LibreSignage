@@ -100,3 +100,13 @@ h1, h2, h3, h4, h5, h6 {
 	border-left: 3px solid var(--danger);
 	background-color: rgba(220, 53, 69, 0.08);
 }
+
+.link-nostyle {
+	color: var(--dark);
+	text-decoration: none;
+}
+
+.link-nostyle:hover {
+	color: var(--secondary);
+	text-decoration: none;
+}

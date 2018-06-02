@@ -13,7 +13,10 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+		<link rel="stylesheet"
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css"
+			integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy"
+			crossorigin="anonymous">
 		<link rel="stylesheet" href="/common/css/footer.css">
 		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/common/css/dialog.css">
@@ -65,8 +68,23 @@
 								value="Login">
 						</div>
 					</div>
+					<hr/>
 					<div class="form-group form-row">
-						<div class="col">
+						<div class="col text-left">
+							<a class="link-nostyle"
+								data-toggle="collapse"
+								href="#collapse-adv"
+								aria-expanded="false"
+								aria-controls="collapse-adv">
+								Advanced
+								<span style="font-size: 0.9rem">
+									&#9660;
+								</span>
+							</a>
+						</div>
+					</div>
+					<div class="form-group form-row">
+						<div id="collapse-adv" class="col collapse">
 							<input class="form-check-input"
 								type="checkbox"
 								id="checkbox-perm-session">
