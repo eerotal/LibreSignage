@@ -10,6 +10,17 @@ const DIALOG_MARKUP_TOO_LONG = (max) => {
 	);
 }
 
+const DIALOG_SLIDE_NOT_SAVED = (callback) => {
+	return new Dialog(
+		DIALOG.CONFIRM,
+		'Slide not saved',
+		'The current slide is not saved yet. All changes ' +
+		'will be lost if you continue. Are you sure you want ' +
+		'to continue?',
+		callback
+	);
+}
+
 // Some sane default values for new slides.
 const NEW_SLIDE_DEFAULTS = {
 	'id': null,
@@ -42,6 +53,9 @@ function set_editor_status(str) {
 }
 
 function set_editor_inputs(slide) {
+	/*
+	*  Display the data of 'slide' on the editor inputs.
+	*/
 	if (!slide) {
 		SLIDE_INPUT.setValue('');
 		SLIDE_NAME.val('');
@@ -56,6 +70,34 @@ function set_editor_inputs(slide) {
 		SLIDE_INDEX.val(slide.get('index'));
 	}
 	SLIDE_INPUT.clearSelection(); // Deselect new text.
+}
+
+function selected_slide_is_modified() {
+	/*
+	*  Check whether the selected slide has been modified and
+	*  return true in case it has been modified. False is returned
+	*  otherwise.
+	*/
+	if (_selected_slide == null) {
+		return false;
+	}
+
+	if (SLIDE_INPUT.getValue() != _selected_slide.get('markup')) {
+		return true;
+	}
+	if (SLIDE_NAME.val() != _selected_slide.get('name')) {
+		return true;
+	}
+	if (SLIDE_OWNER.val() != _selected_slide.get('owner')) {
+		return true;
+	}
+	if (SLIDE_TIME.val() != _selected_slide.get('time')/1000) {
+		return true;
+	}
+	if (SLIDE_INDEX.val() != _selected_slide.get('index')) {
+		return true;
+	}
+	return false;
 }
 
 function disable_editor_controls() {
@@ -84,77 +126,126 @@ function enable_editor_controls() {
 }
 
 function slide_show(slide) {
-	console.log("LibreSignage: Show slide '" + slide + "'");
-
-	_selected_slide = new Slide();
-	_selected_slide.load(slide, function(ret) {
-		if (ret) {
-			console.log("LibreSignage: API error!");
-			set_editor_status("Failed to load slide!");
-			set_editor_inputs(null);
-			disable_editor_controls();
+	/*
+	*  Show the slide 'slide'.
+	*/
+	var cb = function(status, val) {
+		if (!status) {
 			return;
 		}
-		set_editor_inputs(_selected_slide);
-		enable_editor_controls();
-	});
+
+		console.log("LibreSignage: Show slide '" + slide + "'");
+		_selected_slide = new Slide();
+		_selected_slide.load(slide, function(ret) {
+			if (ret) {
+				console.log("LibreSignage: API error!");
+				set_editor_status(
+					"Failed to load slide!"
+				);
+				set_editor_inputs(null);
+				disable_editor_controls();
+				return;
+			}
+			set_editor_inputs(_selected_slide);
+			enable_editor_controls();
+		});
+	}
+
+	if (selected_slide_is_modified()) {
+		DIALOG_SLIDE_NOT_SAVED(cb).show();
+	} else {
+		cb(true, null);
+	}
 }
 
 function slide_rm() {
+	/*
+	*  Remove the selected slide.
+	*/
 	if (!_selected_slide) {
 		dialog(DIALOG.ALERT,
 			"Please select a slide",
 			"Please select a slide to remove first.",
-			null);
+			null
+		);
 		return;
 	}
-	set_editor_status("Deleting slide...");
 
+	set_editor_status("Deleting slide...");
 	dialog(DIALOG.CONFIRM,
 		"Delete slide?",
 		"Are you sure you want to delete slide '" +
 		_selected_slide.get("name") + "'.", (status, val) => {
-		if (status) {
-			_selected_slide.remove(null, (stat) => {
-				if (api_handle_disp_error(stat)) {
-					set_editor_status("Failed to " +
-							"remove slide!");
-					return;
-				}
-				$('#slide-btn-' + _selected_slide.get('id')).remove();
-
-				console.log("LibreSignage: Deleted slide '" +
-						_selected_slide.get('id') + "'.");
-				_selected_slide = null;
-				slidelist_trigger_update();
-				set_editor_inputs(null);
-				disable_editor_controls();
-				set_editor_status("Slide deleted!");
-			});
+		if (!status) {
+			return;
 		}
+		_selected_slide.remove(null, (stat) => {
+			if (api_handle_disp_error(stat)) {
+				set_editor_status(
+					"Failed to remove slide!"
+				);
+				return;
+			}
+
+			var id = _selected_slide.get('id');
+			$('#slide-btn-' + id).remove();
+
+			console.log(
+				"LibreSignage: Deleted slide '" +
+				_selected_slide.get('id') +
+				"'."
+			);
+
+			_selected_slide = null;
+
+			slidelist_trigger_update();
+			set_editor_inputs(null);
+			disable_editor_controls();
+			set_editor_status("Slide deleted!");
+		});
 	});
 }
 
 function slide_new() {
-	console.log("LibreSignage: Create slide!");
-	set_editor_status("Creating new slide...");
-
-	_selected_slide = new Slide();
-	_selected_slide.set(NEW_SLIDE_DEFAULTS);
-
-	set_editor_inputs(_selected_slide);
-	enable_editor_controls();
-
 	/*
-	*  Leave the remove button disabled since the
-	*  new slide is not yet saved and can't be removed.
+	*  Create a new slide. Note that this function doesn't save
+	*  the slide server-side. The user must manually save the
+	*  slide afterwards.
 	*/
-	SLIDE_REMOVE.prop('disabled', true);
+	var cb = function(status, val) {
+		if (status) {
+			console.log("LibreSignage: Create slide!");
+			set_editor_status("Creating new slide...");
 
-	set_editor_status("Slide created!");
+			_selected_slide = new Slide();
+			_selected_slide.set(NEW_SLIDE_DEFAULTS);
+
+			set_editor_inputs(_selected_slide);
+			enable_editor_controls();
+
+			/*
+			*  Leave the remove button disabled since the
+			*  new slide is not saved yet and can't be
+			*  removed.
+			*/
+			SLIDE_REMOVE.prop('disabled', true);
+
+			set_editor_status("Slide created!");
+		}
+	};
+
+	if (selected_slide_is_modified()) {
+		DIALOG_SLIDE_NOT_SAVED(cb).show();
+	} else {
+		cb(true, null);
+	}
+
 }
 
 function slide_save() {
+	/*
+	*  Save the currently selected slide.
+	*/
 	console.log("LibreSignage: Save slide");
 	set_editor_status("Saving...");
 
@@ -180,8 +271,10 @@ function slide_save() {
 			set_editor_status("Save failed!");
 			return;
 		}
-		console.log("LibreSignage: Saved slide '" +
-				_selected_slide.get("id") + "'.");
+		console.log(
+			"LibreSignage: Saved slide '" +
+			_selected_slide.get("id") + "'."
+		);
 		set_editor_status("Saved!");
 
 		/*
@@ -254,6 +347,22 @@ function editor_setup() {
 			SLIDE_SAVE.prop('disabled', !valid);
 		}
 	);
+
+	/*
+	*  Add a listener for the 'beforeunload' event to make sure
+	*  the user doesn't accidentally exit the page and lose changes.
+	*/
+	window.addEventListener('beforeunload', function(e) {
+		if (!selected_slide_is_modified()) {
+			return;
+		}
+
+		e.returnValue = "The selected slide is not saved. " +
+				"Any changes will be lost if you exit " +
+				"the page. Are you sure you want to " +
+				"continue?";
+		return e.returnValue;
+	});
 
 	/*
 	*  Setup the ACE editor with the Dawn theme
