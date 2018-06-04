@@ -20,9 +20,9 @@ function js_include_popper() {
 function js_include_jquery() {
 	echo '<script src="https://code.jquery.com/jquery-3.3.1.min.js"'.
 	'integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="'.
-	'crossorigin="anonymous"></script>"';
+	'crossorigin="anonymous"></script>';
 }
 
 function js_include_ace() {
-	echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>';
+	echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>';
 }

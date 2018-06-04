@@ -27,6 +27,8 @@ Miscellaneous
 
 `Markup </doc?doc=markup>`_
 
+`Display Setup </doc?doc=display_setup>`_
+
 Development
 -----------
 
