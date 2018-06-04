@@ -1,1 +1,0 @@
-src/doc/rst/LICENSE.rst
