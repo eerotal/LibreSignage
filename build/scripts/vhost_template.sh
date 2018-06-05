@@ -12,4 +12,8 @@ fi
 echo '	DocumentRoot '${INSTC[DOCROOT]}'/'${INSTC[NAME]};
 echo '	ErrorLog ${APACHE_LOG_DIR}/error.log';
 echo '	CustomLog ${APACHE_LOG_DIR}/access.log combined';
+
+echo '	RewriteEngine on';
+echo '	RewriteRule ^/$ control [L,R=301]';
+
 echo '</VirtualHost>';
