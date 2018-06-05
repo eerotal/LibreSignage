@@ -117,6 +117,9 @@ fi
 . 'build/scripts/vhost_template.sh' > $APACHE_SITES'/'${INSTC[NAME]}'.conf';
 echo 'LibreSignage installed!';
 
+echo 'Enable apache2 mod_rewrite...';
+a2enmod rewrite;
+
 read -p 'Enable the created VHost and restart apache2? (Y\N): ' EN_VHOST;
 case $EN_VHOST in
 	[Yy]* )
