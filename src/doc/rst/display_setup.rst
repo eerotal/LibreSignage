@@ -39,6 +39,7 @@ Workaround 2
 
 1. Install *unclutter*. On Debian systems this can be accomplised by
 running ``sudo apt install unclutter``.
+
 2. Configure *unclutter* to start with the X windowing system. First
 copy the file ``/etc/X11/xinit/xinitrc`` to ``~/.xinitrc`` and add the
 line below to the end of the file.
