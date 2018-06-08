@@ -16,4 +16,8 @@ echo '	CustomLog ${APACHE_LOG_DIR}/access.log combined';
 echo '	RewriteEngine on';
 echo '	RewriteRule ^/$ control [L,R=301]';
 
+echo '	ErrorDocument 403 /errors/403/index.php';
+echo '	ErrorDocument 404 /errors/404/index.php';
+echo '	ErrorDocument 500 /errors/500/index.php';
+
 echo '</VirtualHost>';
