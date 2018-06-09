@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# A script for building LibreSignage and installing an
-# apache2 virtual host for hosting a LibreSignage instance.
+##
+## A script for building LibreSignage and installing an
+## apache2 virtual host for hosting a LibreSignage instance.
+##
 
 INSTC_LOADED=0;
 
@@ -83,13 +85,8 @@ if [ -n "`ls -A $VHOST_DIR`" ]; then
 fi
 
 mkdir -p $VHOST_DIR;
-if [ -n $SUDO_USER ]; then
-	echo 'Set virtual host permissions to "'$SUDO_USER':'$SUDO_USER'"';
-	chown -R $SUDO_USER:$SUDO_USER $VHOST_DIR
-else
-	echo 'Set virtual host permissions to "'$USER':'$USER'"';
-	chown -R $USER:$USER $VHOST_DIR
-fi
+echo 'Set virtual host permissions to "'$OWNER':'$OWNER'"';
+chown -R $OWNER:$OWNER $VHOST_DIR
 
 echo 'Install LibreSignage to '$VHOST_DIR;
 echo 'Copy files.';

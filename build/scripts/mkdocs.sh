@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# LibreSignage documentation generation script
+##
+## Generate LibreSignage documentation files.
+##
 
 shopt -s globstar;
 set -e
@@ -23,7 +25,7 @@ function gen_api_doc {
 }
 
 ##
-# Generate the API documentation files.
+## Generate the API documentation files.
 ##
 
 echo "Generate API documentation...";
@@ -63,8 +65,8 @@ for f in $API_ENDPOINTS_DIR/**; do
 done
 
 ##
-#  Generate the HTML documentation files from the
-#  reStructuredText files.
+## Generate the HTML documentation files from the
+## reStructuredText files.
 ##
 
 echo "Generate HTML documentation...";
