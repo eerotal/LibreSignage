@@ -24,7 +24,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
 
 $SLIDE_SAVE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
@@ -95,6 +95,10 @@ try {
 	$slide->set_time($SLIDE_SAVE->get('time'));
 	$slide->set_markup($SLIDE_SAVE->get('markup'));
 } catch (ArgException $e) {
+	/*
+	*  Throw an API_E_INVALID_REQUEST exception if
+	*  the Slide::set_* functions throw ArgExceptions.
+	*/
 	throw new APIException(
 		API_E_INVALID_REQUEST,
 		$e->getMessage()

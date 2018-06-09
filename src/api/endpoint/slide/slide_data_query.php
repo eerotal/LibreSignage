@@ -7,7 +7,8 @@
 *
 *  GET parameters
 *    * Data can be requested by assigning 1 to the
-*      requested key.
+*      requested key. The following keys are accepted:
+*      id, markup, name, index, time, owner
 *
 *  Return value
 *    * data  = The requested data as nested dictionaries.
@@ -17,7 +18,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
 
 $SLIDE_DATA_QUERY = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
