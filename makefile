@@ -13,7 +13,7 @@ ifndef DIST_DIR
 $(error DIST_DIR not set)
 endif
 
-dist: $(shell find $(SRC_DIR))
+dist: verify $(shell find $(SRC_DIR))
 	echo '## Create LibreSignage distribution...'
 	rm -rfv $(DIST_DIR)
 	./build/scripts/mkdist.sh

@@ -1,6 +1,10 @@
 <?php
 
 /*
+*  !!BUILD_VERIFY_NOCONFIG!!
+*/
+
+/*
 *  Convenience functions for including JS libraries
 *  in frontend PHP files.
 */

@@ -3,6 +3,7 @@
 *  Authentication functionality for LibreSignage.
 */
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 
 const COOKIE_AUTH_TOKEN = 'session_token';
