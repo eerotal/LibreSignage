@@ -120,7 +120,7 @@
 						</div>
 						<p id="editor-status"></p>
 					</div>
-					<div class="col-md">
+					<div class="col-md pt-2">
 						<label for="slide-input">Markup</label>
 						<div id="slide-input" class="no-font rounded"></div>
 					</div>
