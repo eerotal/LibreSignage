@@ -8,6 +8,7 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/uid.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
 function get_slides_id_list() {
@@ -40,9 +41,9 @@ function get_slides_list() {
 
 function sort_slides_by_index(array &$slides) {
 	usort($slides, function(Slide $a, Slide $b) {
-		if ($a->get('index') > $b->get('index')) {
+		if ($a->get_index() > $b->get_index()) {
 			return 1;
-		} else if ($a->get('index') < $b->get('index')) {
+		} else if ($a->get_index() < $b->get_index()) {
 			return -1;
 		} else {
 			return 0;
@@ -60,7 +61,7 @@ function normalize_slide_indices(array &$slides) {
 	sort_slides_by_index($slides);
 	for ($i = 0; $i < count($slides); $i++) {
 		$s = $slides[$i];
-		$s->set('index', $i);
+		$s->set_index($i);
 	}
 }
 
@@ -97,7 +98,7 @@ function juggle_slide_indices(string $force_index_for) {
 
 	// Store the forced slide separately.
 	for ($i = 0; $i < count($slides); $i++) {
-		if ($slides[$i]->get('id') == $force_index_for) {
+		if ($slides[$i]->get_id() == $force_index_for) {
 			$forced = $slides[$i];
 			unset($slides[$i]);
 			$slides = array_values($slides);
@@ -118,11 +119,11 @@ function juggle_slide_indices(string $force_index_for) {
 		$s_i = 0;
 		$f_i = 0;
 		foreach ($slides as $s) {
-			$s_i = $s->get('index');
-			$f_i = $forced->get('index');
+			$s_i = $s->get_index();
+			$f_i = $forced->get_index();
 			if ($s_i >= $f_i) {
 				// Advance indices after $forced by one.
-				$s->set('index', $s_i + 1);
+				$s->set_index($s_i + 1);
 			}
 			if ($s_i == $f_i && $unused == -1) {
 				// Store the unused index.
@@ -138,196 +139,254 @@ function juggle_slide_indices(string $force_index_for) {
 			*/
 			$unused = $s_i + 1;
 		}
-		$forced->set('index', $unused);
+		$forced->set_index($unused);
 		$forced->write();
 	}
 }
 
 class Slide {
-	const REQ_KEYS = array(
-		'id',
+	// Required keys in a slide config file.
+	const CONF_KEYS = array(
 		'name',
 		'index',
 		'time',
-		'markup',
 		'owner'
 	);
 
-	const K_CONF = 'config';
-	const K_MARKUP = 'markup';
-	const K_ID = 'id';
+	// Slide file paths.
+	private $conf_path = NULL;
+	private $markup_path = NULL;
+	private $dir_path = NULL;
 
-	const K_DIR = 'dir';
-
-	private $files = NULL;
-	private $dirs = NULL;
-	private $data = NULL;
+	// Slide data variables.
+	private $id = NULL;
+	private $name = NULL;
+	private $index = NULL;
+	private $time = NULL;
+	private $markup = NULL;
+	private $owner = NULL;
 
 	private function _mk_paths(string $id) {
-		$this->dirs = array(
-			self::K_DIR => LIBRESIGNAGE_ROOT.SLIDES_DIR.'/'.$id
-		);
-		$this->files = array(
-			self::K_CONF => $this->dirs[self::K_DIR].
-						'/conf.json',
-			self::K_MARKUP => $this->dirs[self::K_DIR].
-						'/markup.dat'
-		);
+		/*
+		*  Create the file path strings needed for
+		*  data storage.
+		*/
+		$this->dir_path = LIBRESIGNAGE_ROOT.SLIDES_DIR.'/'.$id;
+		$this->conf_path = $this->dir_path.'/conf.json';
+		$this->markup_path = $this->dir_path.'/markup.dat';
 	}
 
 	private function _paths_exist() {
-		// Check that all required files and dirs exist.
-		foreach ($this->files as $f) {
-			if (!is_file($f)) {
-				return FALSE;
-			}
-		}
-
-		foreach ($this->dirs as $d) {
-			if (!is_dir($d)) {
-				return FALSE;
-			}
+		/*
+		*  Check that all the required files and
+		*  directories exist.
+		*/
+		if (!is_dir($this->dir_path) ||
+			!is_file($this->conf_path) ||
+			!is_file($this->markup_path)) {
+			return FALSE;
 		}
 		return TRUE;
 	}
 
-	private function _verify() {
-		/*
-		*  Verify the currently stored data.
-		*/
-		if (array_is_equal(array_keys($this->data),
-					self::REQ_KEYS)) {
-			return TRUE;
-		}
-		return FALSE;
-	}
-
 	function load(string $id) {
 		/*
-		*  Load the decoded data of a slide. This function
-		*  throws errors on exceptions. No value is returned.
+		*  Load the decoded data of a slide. This
+		*  function throws errors on exceptions.
 		*/
-		$dstr = '';
-		$this->data = NULL;
+		$cstr = NULL;
+		$conf = NULL;
+		$mu = NULL;
 
 		$this->_mk_paths($id);
 		if (!$this->_paths_exist()) {
 			return FALSE;
 		}
 
-		// Read data.
-		$dstr = file_lock_and_get($this->files[self::K_CONF]);
-		if ($dstr === FALSE) {
-			throw new IntException("Slide config read error!");
+		// Read config.
+		$cstr = file_lock_and_get($this->conf_path);
+		if ($cstr === FALSE) {
+			throw new IntException(
+				"Slide config read error!"
+			);
+		}
+		$conf = json_decode($cstr, $assoc=TRUE);
+		if ($conf === NULL &&
+			json_last_error() != JSON_ERROR_NONE) {
+			throw new IntException(
+				"Slide config decode error!"
+			);
 		}
 
-		$this->data = json_decode($dstr, $assoc=TRUE);
-		if ($this->data == NULL &&
-			json_last_error() != JSON_ERROR_NONE) {
-
-			throw new IntException("Slide config decode error!");
+		// Check config validity.
+		if (!array_is_equal(array_keys($conf),
+					self::CONF_KEYS)) {
+			throw new IntException(
+				"Invalid slide config."
+			);
 		}
 
 		// Read markup.
-		$this->data[self::K_MARKUP] = file_lock_and_get(
-			$this->files[self::K_MARKUP]
-		);
-		if ($this->data[self::K_MARKUP] === FALSE) {
-			throw new IntException("Slide markup read error!");
+		$mu = file_lock_and_get($this->markup_path);
+		if ($mu === FALSE) {
+			throw new IntException(
+				"Slide markup read error!"
+			);
 		}
 
-		$this->data[self::K_ID] = $id;
+		// Copy all loaded data to this object.
+		$this->set_id($id);
+		$this->set_markup($mu);
+		$this->set_name($conf['name']);
+		$this->set_index($conf['index']);
+		$this->set_time($conf['time']);
+		$this->set_owner($conf['owner']);
 
-		if (!$this->_verify()) {
-			throw new IntException("Slide data is invalid!");
-		}
 		return TRUE;
 	}
 
-	function get($key) {
-		return $this->data[$key];
-	}
-
-	function get_data() {
-		return $this->data;
-	}
-
-	function get_json_data() {
-		return json_encode($this->data);
-	}
-
-	function set($key, $val) {
+	function gen_id() {
 		/*
-		*  Set the slide data key $key to $val.
-		*  Returns the result of this->_verify()
-		*  on the slide data afterwards.
+		*  Generate a new slide ID.
 		*/
-		$this->data[$key] = $val;
-		return $this->_verify($this->data);
+		$this->id = get_uid();
+		$this->_mk_paths($this->id);
 	}
 
-	function set_data(array $data) {
+	function set_id(string $id) {
 		/*
-		*  Set the slide data. This function automatically
-		*  verifies the data after it has been set and returns
-		*  TRUE if the data is valid. If the data is invalid,
-		*  FALSE is returned and no changes are made to the
-		*  Slide object.
-		*
-		*  Extra: Normally the $data array must contain exactly
-		*  the keys in REQ_KEYS in order for it to be considered
-		*  valid, however this function makes an exception.
-		*  If the 'id' key is not set in $data, this function
-		*  automatically generates a new UID using the UID
-		*  generator. This basicaly means creating a new slide.
-		*  If the 'id' key is set, this function checks whether
-		*  a slide with the ID actually exists and if it does,
-		*  that slide is modified when saving etc. If the slide
-		*  doesn't exist, however, this function returns FALSE.
+		*  Set the slide id. Note that the requested slide
+		*  ID must already exist. Otherwise an error is
+		*  thrown. This basically means that new slide IDs
+		*  can't be set manually and they are always randomly
+		*  generated.
 		*/
-		$tmp = $data;
-		$this->data = NULL;
+		if (!in_array($id, get_slides_id_list())) {
+			throw new ArgException(
+				"Slide $id doesn't exist."
+			);
+		}
+		$this->id = $id;
+		$this->_mk_paths($id);
+	}
 
-		if (empty($tmp[self::K_ID])) {
-			/*
-			*  If the ID isn't defined, generate it.
-			*  This creates a new slide.
-			*/
-			$tmp[self::K_ID] = get_uid();
-		} else if (!in_array($tmp[self::K_ID],
-			get_slides_id_list(), TRUE)) {
-			// Provided slide ID doesn't exist.
-			return FALSE;
+	function set_markup(string $markup) {
+		// Check markup length.
+		if (strlen($markup) > gtlim('SLIDE_MARKUP_MAX_LEN')) {
+			throw new ArgException(
+				"Slide markup too long."
+			);
+		}
+		$this->markup = $markup;
+	}
+
+	function set_name(string $name) {
+		// Check name for invalid chars.
+		$tmp = preg_match('/[^a-zA-Z0-9_-]/', $name);
+		if ($tmp) {
+			throw new ArgException(
+				"Invalid chars in slide name."
+			);
+		} else if ($tmp === NULL) {
+			throw new IntException(
+				"Regex match failed."
+			);
 		}
 
-		$this->_mk_paths($tmp[self::K_ID]);
-		$this->data = $tmp;
-		return $this->_verify();
+		// Check name length.
+		if (strlen($name) > gtlim('SLIDE_NAME_MAX_LEN')) {
+			throw new ArgException(
+				"Slide name too long."
+			);
+		}
+		$this->name = $name;
+	}
+
+	function set_index(int $index) {
+		// Check index bounds.
+		if ($index < 0 || $index > gtlim('SLIDE_MAX_INDEX')) {
+			throw new ArgException(
+				"Slide index $index out of bounds."
+			);
+		}
+		$this->index = $index;
+	}
+
+	function set_time(int $time) {
+		// Check time bounds.
+		if ($time < gtlim('SLIDE_MIN_TIME') ||
+			$time > gtlim('SLIDE_MAX_TIME')) {
+			throw new ArgException(
+				"Slide time $time out of bounds."
+			);
+		}
+		$this->time = $time;
+	}
+
+	function set_owner(string $owner) {
+		if (!user_exists($owner)) {
+			throw new ArgException(
+				"User $owner doesn't exist."
+			);
+		}
+		$this->owner = $owner;
+	}
+
+	function get_id() { return $this->id; }
+	function get_markup() { return $this->markup; }
+	function get_name() { return $this->name; }
+	function get_index() { return $this->index; }
+	function get_time() { return $this->time; }
+	function get_owner() { return $this->owner; }
+
+	function get_data_array() {
+		return array(
+			'id' => $this->id,
+			'markup' => $this->markup,
+			'name' => $this->name,
+			'index' => $this->index,
+			'time' => $this->time,
+			'owner' => $this->owner
+		);
 	}
 
 	function write() {
 		/*
 		*  Write the currently stored data into the
-		*  correct storage files. This function automatically
-		*  overwrites files if they already exist. On failure
-		*  exceptions are thrown.
+		*  correct storage files. This function
+		*  automatically overwrites files if they
+		*  already exist.
 		*/
-		$tmp = $this->data;
-		unset($tmp[self::K_MARKUP]);
-		$cstr = json_encode($tmp);
+		$conf = array(
+			'name' => $this->get_name(),
+			'index' => $this->get_index(),
+			'time' => $this->get_time(),
+			'owner' => $this->get_owner()
+		);
+
+		$cstr = json_encode($conf);
 		if ($cstr === FALSE &&
 			json_last_error() != JSON_ERROR_NONE) {
-			throw new IntException("Slide config ".
-						"encode failed!");
+			throw new IntException(
+				"Slide config encoding failed."
+			);
 		}
-		file_lock_and_put($this->files[self::K_CONF], $cstr);
-		file_lock_and_put($this->files[self::K_MARKUP],
-				$this->data[self::K_MARKUP]);
+		file_lock_and_put(
+			$this->conf_path,
+			$cstr
+		);
+		file_lock_and_put(
+			$this->markup_path,
+			$this->get_markup()
+		);
 	}
 
 	function remove() {
-		if (!empty($this->dirs[self::K_DIR])) {
-			rmdir_recursive($this->dirs[self::K_DIR]);
+		/*
+		*  Remove the files associated with this slide.
+		*/
+		if (!empty($this->dir_path)) {
+			rmdir_recursive($this->dir_path);
 		}
 	}
 }

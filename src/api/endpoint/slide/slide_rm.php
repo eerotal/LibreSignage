@@ -38,7 +38,7 @@ if (!$slide->load($SLIDE_RM->get('id'))) {
 
 // Get the slide owner's quota for freeing some of it.
 try {
-	$slide_owner = new User($slide->get('owner'));
+	$slide_owner = new User($slide->get_owner());
 } catch (ArgException $e){
 	throw new APIException(
 		API_E_INVALID_REQUEST,
@@ -52,7 +52,7 @@ $flag_auth = $SLIDE_RM->get_caller()->is_in_group('admin');
 
 // Allow the owner to remove a slide if they are in the editor group.
 $flag_auth |= ($SLIDE_RM->get_caller()->is_in_group('editor') &&
-	$SLIDE_RM->get_caller()->get_name() === $slide->get('owner'));
+	$SLIDE_RM->get_caller()->get_name() === $slide->get_owner());
 
 if (!$flag_auth) {
 	throw new APIException(
