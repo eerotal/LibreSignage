@@ -28,7 +28,8 @@ const NEW_SLIDE_DEFAULTS = {
 	'owner': null,
 	'time': 5000,
 	'markup': '',
-	'index': 0
+	'index': 0,
+	'enabled': true
 };
 
 const SLIDE_SAVE = $("#btn-slide-save");
@@ -40,6 +41,7 @@ const SLIDE_TIME = $("#slide-time");
 const SLIDE_TIME_GRP = $("#slide-time-group");
 const SLIDE_INDEX = $("#slide-index");
 const SLIDE_INDEX_GRP = $("#slide-index-group");
+const SLIDE_EN = $("#slide-enabled");
 const EDITOR_STATUS = $("#editor-status");
 var SLIDE_INPUT = null;
 
@@ -62,12 +64,14 @@ function set_editor_inputs(slide) {
 		SLIDE_OWNER.val('');
 		SLIDE_TIME.val(1);
 		SLIDE_INDEX.val('');
+		SLIDE_EN.prop('checked', false);
 	} else {
 		SLIDE_INPUT.setValue(slide.get('markup'));
 		SLIDE_NAME.val(slide.get('name'));
 		SLIDE_OWNER.val(slide.get('owner'));
 		SLIDE_TIME.val(slide.get('time')/1000);
 		SLIDE_INDEX.val(slide.get('index'));
+		SLIDE_EN.prop('checked', slide.get('enabled'));
 	}
 	SLIDE_INPUT.clearSelection(); // Deselect new text.
 }
@@ -97,6 +101,9 @@ function selected_slide_is_modified() {
 	if (SLIDE_INDEX.val() != _selected_slide.get('index')) {
 		return true;
 	}
+	if (SLIDE_EN.prop('checked') != _selected_slide.get('enabled')) {
+		return true;
+	}
 	return false;
 }
 
@@ -107,6 +114,7 @@ function disable_editor_controls() {
 	SLIDE_INDEX.prop("disabled", true);
 	SLIDE_SAVE.prop("disabled", true);
 	SLIDE_REMOVE.prop("disabled", true);
+	SLIDE_EN.prop("disabled", true);
 
 	// Make sure the ValidatorSelectors don't enable the save button.
 	name_sel.disable();
@@ -120,6 +128,7 @@ function enable_editor_controls() {
 	SLIDE_INDEX.prop("disabled", false);
 	SLIDE_SAVE.prop("disabled", false);
 	SLIDE_REMOVE.prop("disabled", false);
+	SLIDE_EN.prop("disabled", false);
 
 	name_sel.enable();
 	index_sel.enable();
@@ -263,7 +272,8 @@ function slide_save() {
 		'name': SLIDE_NAME.val(),
 		'time': parseInt(SLIDE_TIME.val())*1000,
 		'index': parseInt(SLIDE_INDEX.val()),
-		'markup': SLIDE_INPUT.getValue()
+		'markup': SLIDE_INPUT.getValue(),
+		'enabled': SLIDE_EN.prop('checked')
 	});
 
 	_selected_slide.save((stat) => {

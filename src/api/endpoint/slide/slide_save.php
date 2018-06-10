@@ -43,7 +43,8 @@ $SLIDE_SAVE = new APIEndpoint(array(
 		'index' => API_P_INT,
 		'markup' => API_P_STR|API_P_EMPTY_STR_OK,
 		'owner' => API_P_UNUSED,
-		'time' => API_P_INT
+		'time' => API_P_INT,
+		'enabled' => API_P_BOOL
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
@@ -102,6 +103,7 @@ try {
 	$slide->set_index($SLIDE_SAVE->get('index'));
 	$slide->set_time($SLIDE_SAVE->get('time'));
 	$slide->set_markup($SLIDE_SAVE->get('markup'));
+	$slide->set_enabled($SLIDE_SAVE->get('enabled'));
 } catch (ArgException $e) {
 	/*
 	*  Throw an API_E_INVALID_REQUEST exception if

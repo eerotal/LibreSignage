@@ -89,6 +89,19 @@
 							<div class="invalid-feedback"></div>
 						</div>
 
+						<!-- Slide enabled checkbox -->
+						<div class="form-check" id="slide-enabled-group">
+							<input type="checkbox"
+								class="form-check-input"
+								id="slide-enabled"
+								data-toggle="tooltip"
+								title="Select whether the slide is enabled or not.">
+							<label class="form-check-label"
+								for="slide-enabled">
+								Enabled
+							</label>
+						</div>
+
 						<!-- Control buttons -->
 						<div class="form-group container-fluid d-flex justify-content-center">
 							<button id="btn-slide-save"
