@@ -116,7 +116,8 @@ class Slide {
 		'name',
 		'index',
 		'time',
-		'owner'
+		'owner',
+		'enabled'
 	);
 
 	// Slide file paths.
@@ -131,6 +132,7 @@ class Slide {
 	private $time = NULL;
 	private $markup = NULL;
 	private $owner = NULL;
+	private $enabled = FALSE;
 
 	private function _mk_paths(string $id) {
 		/*
@@ -207,6 +209,7 @@ class Slide {
 		$this->set_index($conf['index']);
 		$this->set_time($conf['time']);
 		$this->set_owner($conf['owner']);
+		$this->set_enabled($conf['enabled']);
 
 		return TRUE;
 	}
@@ -298,12 +301,17 @@ class Slide {
 		$this->owner = $owner;
 	}
 
+	function set_enabled(bool $enabled) {
+		$this->enabled = $enabled;
+	}
+
 	function get_id() { return $this->id; }
 	function get_markup() { return $this->markup; }
 	function get_name() { return $this->name; }
 	function get_index() { return $this->index; }
 	function get_time() { return $this->time; }
 	function get_owner() { return $this->owner; }
+	function get_enabled() { return $this->enabled; }
 
 	function get_data_array() {
 		return array(
@@ -312,7 +320,8 @@ class Slide {
 			'name' => $this->name,
 			'index' => $this->index,
 			'time' => $this->time,
-			'owner' => $this->owner
+			'owner' => $this->owner,
+			'enabled' => $this->enabled
 		);
 	}
 
@@ -327,7 +336,8 @@ class Slide {
 			'name' => $this->get_name(),
 			'index' => $this->get_index(),
 			'time' => $this->get_time(),
-			'owner' => $this->get_owner()
+			'owner' => $this->get_owner(),
+			'enabled' => $this->get_enabled()
 		);
 
 		$cstr = json_encode($conf);

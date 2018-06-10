@@ -16,14 +16,17 @@
 *    * index   = The index of the slide.
 *    * time    = The amount of time the slide is shown.
 *    * markup  = The markup of the slide.
+*    * enabled = Whether the slide is enabled or not.
 *
 *  Return value
-*    * id     = The ID of the slide.
-*    * name   = The name of the slide.
-*    * index  = The index of the created slide.
-*    * time   = The amount of time the slide is shown.
-*    * owner  = The owner of the slide.
-*    * error  = An error code or API_E_OK on success.
+*    * id      = The ID of the slide.
+*    * name    = The name of the slide.
+*    * index   = The index of the created slide.
+*    * time    = The amount of time the slide is shown.
+*    * markup  = The markup of the slide.
+*    * enabled = Whether the slide is enabled or not.
+*    * owner   = The owner of the slide.
+*    * error   = An error code or API_E_OK on success.
 *
 *  <====
 */
