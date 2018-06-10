@@ -1,6 +1,10 @@
 <?php
 
 /*
+*  !!BUILD_VERIFY_NOCONFIG!!
+*/
+
+/*
 *  ====>
 *
 *  *Get the messages corresponding to different API error codes.

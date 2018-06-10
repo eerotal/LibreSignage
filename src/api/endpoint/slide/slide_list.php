@@ -1,4 +1,9 @@
 <?php
+
+/*
+*  !!BUILD_VERIFY_NOCONFIG!!
+*/
+
 /*
 *  ====>
 *
@@ -11,7 +16,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
 
 $SLIDE_LIST = new APIEndpoint(array(
 	APIEndpoint::METHOD 		=> API_METHOD['GET'],
@@ -23,7 +28,7 @@ $SLIDE_LIST = new APIEndpoint(array(
 api_endpoint_init($SLIDE_LIST);
 
 $SLIDE_LIST->resp_set(array(
-	'slides' => get_slides_id_list()
+	'slides' => slides_id_list()
 ));
 $SLIDE_LIST->send();
 

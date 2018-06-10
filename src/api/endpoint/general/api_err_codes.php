@@ -1,6 +1,10 @@
 <?php
 
 /*
+*  !!BUILD_VERIFY_NOCONFIG!!
+*/
+
+/*
 *  ====>
 *
 *  *Get the defined API error codes. This endpoint doesn't require
