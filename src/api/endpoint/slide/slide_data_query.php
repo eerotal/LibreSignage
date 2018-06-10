@@ -44,7 +44,7 @@ api_endpoint_init($SLIDE_DATA_QUERY);
 
 $ret = array('data' => array());
 $tmp = new Slide();
-$s_ids = get_slides_id_list();
+$s_ids = slides_id_list();
 
 foreach($s_ids as $s) {
 	$tmp->load($s);

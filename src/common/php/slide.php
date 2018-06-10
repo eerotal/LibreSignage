@@ -11,35 +11,32 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/uid.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
-function get_slides_id_list() {
-	$slides_dir_abs = LIBRESIGNAGE_ROOT.SLIDES_DIR;
-	$slide_ids = scandir($slides_dir_abs);
-	$slide_ids = array_values(array_diff($slide_ids,
-					array('.', '..')));
-	$i = 0;
-	while ($i < count($slide_ids)) {
-		if (substr($slide_ids[$i], 0, 1) == ".") {
-			array_splice($slide_ids, $i, 1);
-			continue;
-		}
-		$slide_ids[$i] = $slide_ids[$i];
-		$i++;
-	}
-	return $slide_ids;
+function slides_id_list() {
+	$ids = scandir(LIBRESIGNAGE_ROOT.SLIDES_DIR);
+
+	// Remove '.', '..' and hidden files.
+	return array_filter($ids, function(string $val) {
+		return substr($val, 0, 1) != '.';
+	});
 }
 
-function get_slides_list() {
-	$slide_ids = get_slides_id_list();
+function slides_list() {
+	$ids = slides_id_list();
 	$slides = array();
+	$tmp = NULL;
 
-	for ($i = 0; $i < count($slide_ids); $i++) {
-		$slides[$i] = new Slide();
-		$slides[$i]->load($slide_ids[$i]);
+	foreach ($ids as $id) {
+		$tmp = new Slide();
+		$tmp->load($id);
+		$slides[] = $tmp;
 	}
 	return $slides;
 }
 
 function sort_slides_by_index(array &$slides) {
+	/*
+	*  Sort the slides in $slides by their indices.
+	*/
 	usort($slides, function(Slide $a, Slide $b) {
 		if ($a->get_index() > $b->get_index()) {
 			return 1;
@@ -53,94 +50,63 @@ function sort_slides_by_index(array &$slides) {
 
 function normalize_slide_indices(array &$slides) {
 	/*
-	*  Sort the slide array $slides and recalculate
-	*  the slide indices so that no unused indices remain.
-	*  This function works on the $slides array reference
-	*  and doesn't return any value.
+	*  Normalize and sort the slide array $slides.
 	*/
 	sort_slides_by_index($slides);
 	for ($i = 0; $i < count($slides); $i++) {
-		$s = $slides[$i];
-		$s->set_index($i);
+		$slides[$i]->set_index($i);
+		$slides[$i]->write();
 	}
 }
 
-function juggle_slide_indices(string $force_index_for) {
+function juggle_slide_indices(string $keep_id = "") {
 	/*
-	*  Recalculate slide indices and preserve the apparent
-	*  index of the slide with the ID $force_index_for but
-	*  do it so that no unused indices remain.
-	*  If $force_index_for is not set, the slide indices
-	*  are just recalculated so that no unused indices remain.
-	*  Below is an illustration of how this algorithm works.
-	*  The lines represent arrays of slide indices.
-	*
-	*  F = forced index (= eg. 3)
-	*  U = unused index.
-	*
-	*  -> Normalize and sort slide array based on indices.
-	*
-	*  1    2    3    4    5    6    7
-	*
-	*  -> Increment indices starting from F.
-	*
-	*  1    2    U    3+1  4+1  5+1  6+1  7+1
-	*  1    2    U    4    5    6    7    8
-	*
-	*  -> U = F
-	*
-	*  1    2    F    4    5    6    7    8
-	*  1    2    3    4    5    6    7    8
+	*  Recalculate slide indices so that the position of the
+	*  slide with the id $keep_id stays the same, no unused
+	*  indices remain and slides are sorted based on the
+	*  indices. If $keep_id is empty, the indices are just
+	*  normalized and sorted.
 	*/
-	$unused = -1;
-	$forced = NULL;
-	$slides = get_slides_list();
 
-	// Store the forced slide separately.
-	for ($i = 0; $i < count($slides); $i++) {
-		if ($slides[$i]->get_id() == $force_index_for) {
-			$forced = $slides[$i];
-			unset($slides[$i]);
-			$slides = array_values($slides);
-			break;
+	$slides = slides_list();
+	$keep = NULL;
+	$clash = FALSE;
+	$i = 0;
+
+	// Remove the the slide with ID $keep_id initially.
+	if (!empty($keep_id)) {
+		foreach ($slides as $k => $s) {
+			if ($s->get_id() == $keep_id) {
+				$keep = $s;
+				unset($slides[$k]);
+				$slides = array_values($slides);
+				break;
+			}
 		}
 	}
 
 	normalize_slide_indices($slides);
-
-	if ($forced) {
+	if (!empty($keep_id)) {
 		/*
-		*  Recalculate the slide indices including the
-		*  $forced slide in the calculations. Note that
-		*  this part depends on the assumption that $slides
-		*  is sorted, which is done by normalize_slide_indices().
-		*
+		*  Shift indices so that the index of $keep_id is
+		*  left free.
 		*/
-		$s_i = 0;
-		$f_i = 0;
-		foreach ($slides as $s) {
-			$s_i = $s->get_index();
-			$f_i = $forced->get_index();
-			if ($s_i >= $f_i) {
-				// Advance indices after $forced by one.
-				$s->set_index($s_i + 1);
+		foreach ($slides as $k => $s) {
+			$clash |= $s->get_index() == $keep->get_index();
+			if ($s->get_index() >= $keep->get_index()) {
+				$i = $s->get_index() + 1;
+				$s->set_index($i);
+				$s->write();
 			}
-			if ($s_i == $f_i && $unused == -1) {
-				// Store the unused index.
-				$unused = $s_i;
-			}
-			$s->write();
 		}
-		if ($unused == -1) {
+		if (!$clash) {
 			/*
-			*  If the unused index is not set at this point,
-			*  it means $forced should have the last index,
-			*  which is $s_i + 1.
+			*  $keep_id didn't have the same index as any of
+			*  the other slides -> make it the last one.
 			*/
-			$unused = $s_i + 1;
+			$keep->set_index($i + 1);
+			$keep->write();
 		}
-		$forced->set_index($unused);
-		$forced->write();
 	}
 }
 
@@ -261,7 +227,7 @@ class Slide {
 		*  can't be set manually and they are always randomly
 		*  generated.
 		*/
-		if (!in_array($id, get_slides_id_list())) {
+		if (!in_array($id, slides_id_list())) {
 			throw new ArgException(
 				"Slide $id doesn't exist."
 			);

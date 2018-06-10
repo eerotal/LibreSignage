@@ -28,7 +28,7 @@ $SLIDE_LIST = new APIEndpoint(array(
 api_endpoint_init($SLIDE_LIST);
 
 $SLIDE_LIST->resp_set(array(
-	'slides' => get_slides_id_list()
+	'slides' => slides_id_list()
 ));
 $SLIDE_LIST->send();
 

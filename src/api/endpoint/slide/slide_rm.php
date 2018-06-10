@@ -67,6 +67,7 @@ if (!$flag_auth) {
 }
 
 $slide->remove();
+juggle_slide_indices();
 $slide_owner_quota->free_quota('slides');
 $slide_owner_quota->flush();
 
