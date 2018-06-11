@@ -2,39 +2,39 @@ const DEFAULT_RENDERER_UPDATE_INTERVAL = 5000;
 const SLIDES_RETRIEVE_INTERVAL = 30000;
 const DISPLAY = $('#display');
 
-var c_slide = null;
+var c_slide_i = 0;
 
-function _renderer_next_slide(c_slide, wrap) {
-	var slides = slides_get();
-	if (!slides.length) {
-		return null;
-	}
-	return array_next(
-		slides,
-		c_slide,
-		(array, key) => {
-			return array[key].get('index');
-		},
-		-1, // Start index when !c_slide.
-		() => {
-			/*
-			*  If no next exists, attempt to wrap
-			*  the 'search'. Note the wrap=false
-			*  argument on the _renderer_next_slide()
-			*  call below. This makes sure the
-			*  array_next calls don't create infinite
-			*  recursion if the slides array is empty,
-			*  since the next _renderer_next_slide()
-			*  call won't attempt to wrap and will
-			*  just return null instead.
-			*/
-			if (!wrap) {
-				return null;
-			}
-			return _renderer_next_slide(null,
-						false);
+function renderer_next_slide(slides, wrap) {
+	var n_diff = -1;
+	var diff = -1;
+
+	if (!slides.length) { return null; }
+
+	for (let slide of slides) {
+		n_diff = slide.get('index') - c_slide_i;
+		if (n_diff > 0 && (n_diff < diff || diff == -1)) {
+			diff = n_diff;
 		}
-	);
+	}
+	if (diff == -1 && wrap) {
+		c_slide_i = -1;
+		return renderer_next_slide(slides, false);
+	} else if (diff > 0) {
+		c_slide_i += diff;
+		for (let slide of slides) {
+			if (slide.get('index') == c_slide_i) {
+				if (slide.get('enabled')) {
+					return slide;
+				} else {
+					return renderer_next_slide(
+						slides,
+						false
+					);
+				}
+			}
+		}
+	}
+	return null;
 }
 
 function renderer_animate(elem, animation, end_callback) {
@@ -43,7 +43,6 @@ function renderer_animate(elem, animation, end_callback) {
 	*  on 'elem'. If 'end_callback' is not null, it's called when
 	*  the animation has finished.
 	*/
-
 	elem.addClass(animation);
 	elem.one("animationend", (event) => {
 		event.target.classList.remove(animation);
@@ -57,27 +56,36 @@ function renderer_update() {
 	/*
 	*  Render the next slide.
 	*/
+	var slide = null;
+	var slides = slides_get();
+
+	slide = renderer_next_slide(slides, true);
+	if (!slide) {
+		/*
+		*  Set the next update interval if no next
+		*  slide exists.
+		*/
+		setTimeout(
+			renderer_update,
+			DEFAULT_RENDERER_UPDATE_INTERVAL
+		);
+		return;
+	}
+
 	renderer_animate(DISPLAY, 'swipe-left', () => {
-		c_slide = _renderer_next_slide(c_slide, true);
-		if (!c_slide) {
-			/*
-			*  Make sure the renderer continues to
-			*  update even if no slides currently exist.
-			*/
-			setTimeout(renderer_update,
-				DEFAULT_RENDERER_UPDATE_INTERVAL);
-			return;
-		}
-
-		DISPLAY.html(markup_parse(sanitize_html(
-			c_slide.get('markup')
-		)));
-
+		DISPLAY.html(
+			markup_parse(
+				sanitize_html(
+					slide.get('markup')
+				)
+			)
+		);
 		renderer_animate(DISPLAY, 'swipe-from-right', null);
-
-		console.log("LibreSignage: Changing slide in " +
-				c_slide.get('time') + "ms.");
-		setTimeout(renderer_update, c_slide.get('time'));
+		console.log(
+			"LibreSignage: Changing slide in " +
+			slide.get('time') + "ms."
+		);
+		setTimeout(renderer_update, slide.get('time'));
 	});
 }
 
@@ -85,24 +93,31 @@ function display_setup() {
 	var params = get_GET_parameters();
 	if ("preview" in params) {
 		// Preview a slide without starting the renderer.
-		console.log("LibreSignage: Preview slide " +
-				params["preview"] + ".");
+		console.log(
+			"LibreSignage: Preview slide " +
+			params["preview"] + "."
+		);
+
 		var slide = new Slide();
 		slide.load(params["preview"], (err) => {
 			if (err) {
-				console.log("LibreSignage: " +
-						"Failed to " +
-						"preview slide!");
+				console.log(
+					"LibreSignage: Failed to " +
+					"preview slide!"
+				);
 				return;
 			}
-			DISPLAY.html(markup_parse(sanitize_html(
-				slide.get("markup")
-			)));
+			DISPLAY.html(
+				markup_parse(
+					sanitize_html(
+						slide.get("markup")
+					)
+				)
+			);
 		});
 	} else {
 		// Start the normal renderer 'loop'.
-		console.log("LibreSignage: Start the " +
-				"renderer loop.");
+		console.log("LibreSignage: Start the renderer loop.");
 		setInterval(() => {
 			list_retrieve(slides_retrieve);
 		}, SLIDES_RETRIEVE_INTERVAL);
