@@ -62,7 +62,7 @@ html, body {
 
 /* Editor styling */
 #slide-input {
-	height: 50vh;
+	height: calc(1em*45); /* Height: 45 lines */
 	border: 1px solid var(--gray-1);
 }
 
