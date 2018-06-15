@@ -15,12 +15,14 @@
 *  Return value
 *    * slide
 *
-*      * id      = The ID of the slide.
-*      * name    = The name of the slide.
-*      * index   = The index of the slide.
-*      * time    = The time the slide is shown.
-*      * markup  = The markup of the slide.
-*      * owner   = The owner of the slide.
+*      * id       = The ID of the slide.
+*      * name     = The name of the slide.
+*      * index    = The index of the slide.
+*      * time     = The time the slide is shown.
+*      * markup   = The markup of the slide.
+*      * owner    = The owner of the slide.
+*      * expires  = Whether the slide expires on a set time or not.
+*      * expire_t = The slide expiration timestamp.
 *
 *    * error   = An error code or API_E_OK on success.
 *

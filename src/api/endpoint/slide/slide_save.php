@@ -10,21 +10,20 @@
 *  *Save a slide.*
 *
 *  POST JSON parameters
-*    * id      = The ID of the slide to modify or either
+*    * id       = The ID of the slide to modify or either
 *      undefined or null for new slide.
-*    * name    = The name of the slide.
-*    * index   = The index of the slide.
-*    * time    = The amount of time the slide is shown.
-*    * markup  = The markup of the slide.
-*    * enabled = Whether the slide is enabled or not.
+*    * name     = The name of the slide.
+*    * index    = The index of the slide.
+*    * time     = The amount of time the slide is shown.
+*    * markup   = The markup of the slide.
+*    * enabled  = Whether the slide is enabled or not.
+*    * expires  = Whether the slide expires or not.
+*    * expire_t = The slide expiration timestamp.
 *
 *  Return value
-*    * id      = The ID of the slide.
-*    * name    = The name of the slide.
-*    * index   = The index of the created slide.
-*    * time    = The amount of time the slide is shown.
-*    * markup  = The markup of the slide.
-*    * enabled = Whether the slide is enabled or not.
+*    This endpoint returns all the parameters above as well as
+*    two additional parameters:
+*
 *    * owner   = The owner of the slide.
 *    * error   = An error code or API_E_OK on success.
 *
@@ -104,6 +103,8 @@ try {
 	$slide->set_time($SLIDE_SAVE->get('time'));
 	$slide->set_markup($SLIDE_SAVE->get('markup'));
 	$slide->set_enabled($SLIDE_SAVE->get('enabled'));
+	$slide->set_expires($SLIDE_SAVE->get('expires'));
+	$slide->set_expire_t($SLIDE_SAVE->get('expire_t'));
 } catch (ArgException $e) {
 	/*
 	*  Throw an API_E_INVALID_REQUEST exception if

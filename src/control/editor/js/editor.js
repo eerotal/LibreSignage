@@ -42,6 +42,8 @@ const SLIDE_TIME_GRP = $("#slide-time-group");
 const SLIDE_INDEX = $("#slide-index");
 const SLIDE_INDEX_GRP = $("#slide-index-group");
 const SLIDE_EN = $("#slide-enabled");
+const SLIDE_EXPIRE_EN = $("#slide-expire-enable");
+const SLIDE_EXPIRE_DATE = $("#slide-expire");
 const EDITOR_STATUS = $("#editor-status");
 var SLIDE_INPUT = null;
 

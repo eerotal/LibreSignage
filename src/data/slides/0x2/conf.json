@@ -3,5 +3,7 @@
 	"index": 1,
 	"time": 8000,
 	"owner": "admin",
-	"enabled": true
+	"enabled": true,
+	"expires": false,
+	"expire_t": 0
 }
