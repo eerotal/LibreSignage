@@ -43,7 +43,9 @@ $SLIDE_SAVE = new APIEndpoint(array(
 		'markup' => API_P_STR|API_P_EMPTY_STR_OK,
 		'owner' => API_P_UNUSED,
 		'time' => API_P_INT,
-		'enabled' => API_P_BOOL
+		'enabled' => API_P_BOOL,
+		'expires' => API_P_BOOL,
+		'expire_t' => API_P_INT
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE

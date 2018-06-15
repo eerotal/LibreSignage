@@ -45,3 +45,66 @@ function setup_defaults() {
 		'trigger': 'hover'
 	});
 }
+
+function datetime_to_tstamp(date, time) {
+	var d = null;
+	var t = null;
+
+	if (date == null || date.length == 0) {
+		throw new Error(
+			"Invalid date string."
+		);
+	}
+	if (time == null || time.length == 0) {
+		throw new Error(
+			"Invalid time string."
+		);
+	}
+	d = date.split('-');
+	t = time.split(':');
+
+	return new Date(
+		d[0], '0' + (parseInt(d[1]) - 1).toString(), d[2],
+		t[0], t[1], t[2]
+	).getTime()/1000;
+}
+
+function tstamp_to_datetime(tstamp) {
+	var y, m, d, hour, min, sec;
+	var ret = [];
+	var date = null;
+	if (tstamp == null || tstamp.length == 0) {
+		throw new Error(
+			"Invalid timestamp."
+		);
+	}
+
+	date = new Date(tstamp*1000);
+	y = date.getFullYear();
+
+	m = date.getMonth() + 1;
+	if (m.toString().length == 1) {
+		m = '0' + m;
+	}
+	d = date.getDate();
+	if (d.toString().length == 1) {
+		d = '0' + d;
+	}
+	hour = date.getHours();
+	if (hour.toString().length == 1) {
+		hour = '0' + hour;
+	}
+	min = date.getMinutes();
+	if (min.toString().length == 1) {
+		min = '0' + min;
+	}
+	sec = date.getSeconds();
+	if (sec.toString().length == 1) {
+		sec = '0' + sec;
+	}
+
+	ret[0] = y + '-' + m + '-' + d;
+	ret[1] = hour + ':' + min + ':' + sec;
+
+	return ret;
+}

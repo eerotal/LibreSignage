@@ -93,7 +93,7 @@
 						<div class="form-group form-check" id="slide-expire-enabled-group">
 							<input type="checkbox"
 								class="form-check-input"
-								id="slide-expire-enabled"
+								id="slide-expires"
 								data-toggle="tooltip"
 								title="Select whether the slide should expire automatically.">
 							<label class="form-check-label"
@@ -102,13 +102,23 @@
 							</label>
 						</div>
 
-						<!-- Expiration date selector -->
-						<div class="form-group pl-4" id="slide-expire-group">
-							<input type="datetime-local"
-								id="slide-expire"
-								class="form-control w-100"
-								data-toggle="tooltip"
-								title="The slide expiration date.">
+						<!-- Expiration date/time selector -->
+						<div class="row form-group pl-4" id="slide-expire-group">
+							<div class="col-6">
+								<input type="date"
+									id="slide-expire-date"
+									class="form-control d-inline"
+									data-toggle="tooltip"
+									title="The slide expiration date.">
+							</div>
+							<div class="col-6">
+								<input type="time"
+									id="slide-expire-time"
+									class="form-control d-inline"
+									data-toggle="tooltip"
+									title="The slide expiration time."
+									step="1">
+							</div>
 						</div>
 
 						<!-- Slide enabled checkbox -->

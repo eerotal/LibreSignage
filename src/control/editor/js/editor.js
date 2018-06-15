@@ -42,8 +42,9 @@ const SLIDE_TIME_GRP = $("#slide-time-group");
 const SLIDE_INDEX = $("#slide-index");
 const SLIDE_INDEX_GRP = $("#slide-index-group");
 const SLIDE_EN = $("#slide-enabled");
-const SLIDE_EXPIRE_EN = $("#slide-expire-enable");
-const SLIDE_EXPIRE_DATE = $("#slide-expire");
+const SLIDE_EXPIRES = $("#slide-expires");
+const SLIDE_EXPIRE_DATE = $("#slide-expire-date");
+const SLIDE_EXPIRE_TIME = $("#slide-expire-time");
 const EDITOR_STATUS = $("#editor-status");
 var SLIDE_INPUT = null;
 
@@ -67,6 +68,9 @@ function set_editor_inputs(slide) {
 		SLIDE_TIME.val(1);
 		SLIDE_INDEX.val('');
 		SLIDE_EN.prop('checked', false);
+		SLIDE_EXPIRES.prop('checked', false);
+		SLIDE_EXPIRE_DATE.val('');
+		SLIDE_EXPIRE_TIME.val('');
 	} else {
 		SLIDE_INPUT.setValue(slide.get('markup'));
 		SLIDE_NAME.val(slide.get('name'));
@@ -74,6 +78,11 @@ function set_editor_inputs(slide) {
 		SLIDE_TIME.val(slide.get('time')/1000);
 		SLIDE_INDEX.val(slide.get('index'));
 		SLIDE_EN.prop('checked', slide.get('enabled'));
+		SLIDE_EXPIRES.prop('checked', slide.get('expires'));
+
+		var exp = tstamp_to_datetime(slide.get('expire_t'));
+		SLIDE_EXPIRE_DATE.val(exp[0]);
+		SLIDE_EXPIRE_TIME.val(exp[1]);
 	}
 	SLIDE_INPUT.clearSelection(); // Deselect new text.
 }
@@ -84,28 +93,44 @@ function selected_slide_is_modified() {
 	*  return true in case it has been modified. False is returned
 	*  otherwise.
 	*/
-	if (_selected_slide == null) {
+	var s = _selected_slide;
+	var tmp = null;
+
+	if (s == null) {
 		return false;
 	}
 
-	if (SLIDE_INPUT.getValue() != _selected_slide.get('markup')) {
+	if (SLIDE_INPUT.getValue() != s.get('markup')) {
 		return true;
 	}
-	if (SLIDE_NAME.val() != _selected_slide.get('name')) {
+	if (SLIDE_NAME.val() != s.get('name')) {
 		return true;
 	}
-	if (SLIDE_OWNER.val() != _selected_slide.get('owner')) {
+	if (SLIDE_OWNER.val() != s.get('owner')) {
 		return true;
 	}
-	if (SLIDE_TIME.val() != _selected_slide.get('time')/1000) {
+	if (SLIDE_TIME.val() != s.get('time')/1000) {
 		return true;
 	}
-	if (SLIDE_INDEX.val() != _selected_slide.get('index')) {
+	if (SLIDE_INDEX.val() != s.get('index')) {
 		return true;
 	}
-	if (SLIDE_EN.prop('checked') != _selected_slide.get('enabled')) {
+	if (SLIDE_EN.prop('checked') != s.get('enabled')) {
+		console.log('b');
 		return true;
 	}
+	if (SLIDE_EXPIRES.prop('checked') != s.get('expires')) {
+		return true;
+	}
+
+	tmp = datetime_to_tstamp(
+		SLIDE_EXPIRE_DATE.val(),
+		SLIDE_EXPIRE_TIME.val()
+	);
+	if (tmp != s.get('expire_t')) {
+		return true;
+	}
+
 	return false;
 }
 
@@ -117,6 +142,9 @@ function disable_editor_controls() {
 	SLIDE_SAVE.prop("disabled", true);
 	SLIDE_REMOVE.prop("disabled", true);
 	SLIDE_EN.prop("disabled", true);
+	SLIDE_EXPIRES.prop("disabled", true);
+	SLIDE_EXPIRE_DATE.prop("disabled", true);
+	SLIDE_EXPIRE_TIME.prop("disabled", true);
 
 	// Make sure the ValidatorSelectors don't enable the save button.
 	name_sel.disable();
@@ -131,6 +159,9 @@ function enable_editor_controls() {
 	SLIDE_SAVE.prop("disabled", false);
 	SLIDE_REMOVE.prop("disabled", false);
 	SLIDE_EN.prop("disabled", false);
+	SLIDE_EXPIRES.prop("disabled", false);
+	SLIDE_EXPIRE_DATE.prop("disabled", false);
+	SLIDE_EXPIRE_TIME.prop("disabled", false);
 
 	name_sel.enable();
 	index_sel.enable();
@@ -275,7 +306,12 @@ function slide_save() {
 		'time': parseInt(SLIDE_TIME.val())*1000,
 		'index': parseInt(SLIDE_INDEX.val()),
 		'markup': SLIDE_INPUT.getValue(),
-		'enabled': SLIDE_EN.prop('checked')
+		'enabled': SLIDE_EN.prop('checked'),
+		'expires': SLIDE_EXPIRES.prop('checked'),
+		'expire_t': datetime_to_tstamp(
+				SLIDE_EXPIRE_DATE.val(),
+				SLIDE_EXPIRE_TIME.val()
+			)
 	});
 
 	_selected_slide.save((stat) => {
