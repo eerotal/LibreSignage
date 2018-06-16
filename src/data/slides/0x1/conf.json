@@ -4,6 +4,6 @@
 	"time": 3000,
 	"owner": "admin",
 	"enabled": true,
-	"expires": true,
-	"expire_t": 100
+	"expires": false,
+	"expire_t": 0
 }

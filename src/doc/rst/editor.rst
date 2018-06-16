@@ -58,6 +58,19 @@ instance config, however it shouldn't be changed without investigating
 the consequences (ie. don't change it if you don't know what you are
 doing). The *SLIDE_MAX_INDEX* limit controls the maximum index.
 
+**Automatic expiration** - This checkbox controls whether the slide
+expires (and is disabled) after a set date and time. The date/time
+can be configured in the input boxes below the checkbox. The first
+box is a date input and the second one is a time input. Note that
+these inputs are only enabled when the *Automatic expiration* checkbox
+is selected.
+
+**Enabled** - Select whether the slide is enabled or not. The slide will
+only be shown on the display page if this checkbox is selected. The
+enabled/disabled state is additionally indicated in the slide list
+at the top of the page: Grey slides are disabled and white slides
+are enabled.
+
 **Markup** - The markup field contains the actual slide content.
 The markup field accepts a special markup sytax described in
 `LibreSignage Markup </doc?doc=markup>`_. The maximum length of the
