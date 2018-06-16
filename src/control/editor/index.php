@@ -90,7 +90,7 @@
 						</div>
 
 						<!-- Automatic expiration enable -->
-						<div class="form-group form-check" id="slide-expire-enabled-group">
+						<div class="form-group form-check mb-1" id="slide-expire-enabled-group">
 							<input type="checkbox"
 								class="form-check-input"
 								id="slide-expires"
@@ -104,14 +104,14 @@
 
 						<!-- Expiration date/time selector -->
 						<div class="row form-group pl-4" id="slide-expire-group">
-							<div class="col-6">
+							<div class="col-12 py-1">
 								<input type="date"
 									id="slide-expire-date"
 									class="form-control d-inline"
 									data-toggle="tooltip"
 									title="The slide expiration date.">
 							</div>
-							<div class="col-6">
+							<div class="col-12 py-1">
 								<input type="time"
 									id="slide-expire-time"
 									class="form-control d-inline"

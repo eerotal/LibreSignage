@@ -160,8 +160,14 @@ function enable_editor_controls() {
 	SLIDE_REMOVE.prop("disabled", false);
 	SLIDE_EN.prop("disabled", false);
 	SLIDE_EXPIRES.prop("disabled", false);
-	SLIDE_EXPIRE_DATE.prop("disabled", false);
-	SLIDE_EXPIRE_TIME.prop("disabled", false);
+
+	if (SLIDE_EXPIRES.prop('checked')) {
+		SLIDE_EXPIRE_DATE.prop("disabled", false);
+		SLIDE_EXPIRE_TIME.prop("disabled", false);
+	} else {
+		SLIDE_EXPIRE_DATE.prop("disabled", true);
+		SLIDE_EXPIRE_TIME.prop("disabled", true);
+	}
 
 	name_sel.enable();
 	index_sel.enable();
@@ -332,6 +338,8 @@ function slide_save() {
 		*/
 		SLIDE_REMOVE.prop('disabled', false);
 		slidelist_trigger_update();
+
+		slide_show(_selected_slide.get('id'));
 	});
 }
 
@@ -400,7 +408,7 @@ function editor_setup() {
 	*  Add a listener for the 'beforeunload' event to make sure
 	*  the user doesn't accidentally exit the page and lose changes.
 	*/
-	window.addEventListener('beforeunload', function(e) {
+	$(window).on('beforeunload', function(e) {
 		if (!selected_slide_is_modified()) {
 			return;
 		}
@@ -410,6 +418,20 @@ function editor_setup() {
 				"the page. Are you sure you want to " +
 				"continue?";
 		return e.returnValue;
+	});
+
+	/*
+	*  Add a listener for the 'Automatic expiration' checkbox for
+	*  disabling the expiration date inputs automatically.
+	*/
+	SLIDE_EXPIRES.change(function() {
+		if (SLIDE_EXPIRES.prop('checked')) {
+			SLIDE_EXPIRE_DATE.prop('disabled', false);
+			SLIDE_EXPIRE_TIME.prop('disabled', false);
+		} else {
+			SLIDE_EXPIRE_DATE.prop('disabled', true);
+			SLIDE_EXPIRE_TIME.prop('disabled', true);
+		}
 	});
 
 	/*
