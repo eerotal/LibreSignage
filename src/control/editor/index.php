@@ -135,33 +135,39 @@
 						</div>
 
 						<!-- Control buttons -->
-						<div class="form-group container-fluid d-flex justify-content-center">
-							<button id="btn-slide-save"
-								type="button"
-								class="btn btn-success btn-slide-ctrl"
-								onclick="slide_save()"
-								data-toggle="tooltip"
-								title="Save the selected slide.">Save</button>
-							<button id="btn-slide-new"
-								type="button"
-								class="btn btn-success btn-slide-ctrl"
-								onclick="slide_new()"
-								data-toggle="tooltip"
-								title="Create a new slide.">New</button>
-							<button id="btn-slide-remove"
-								type="button"
-								class="btn btn-danger btn-slide-ctrl"
-								onclick="slide_rm()"
-								data-toggle="tooltip"
-								title="Remove the selected slide.">Remove</button>
-						</div>
-						<div class="container-fluid d-flex justify-content-center">
-							<button id="btn-slide-preview"
-								type="button"
-								class="btn btn-success btn-slide-ctrl"
-								onclick="slide_preview()"
-								data-toggle="tooltip"
-								title="Preview the selected slide in a new window.">Preview Slide</button>
+						<div class="row form-group container-fluid d-flex justify-content-center mx-0">
+							<div class="col-auto px-0 py-1">
+								<button id="btn-slide-save"
+									type="button"
+									class="btn btn-success btn-slide-ctrl"
+									onclick="slide_save()"
+									data-toggle="tooltip"
+									title="Save the selected slide.">Save</button>
+							</div>
+							<div class="col-auto px-0 py-1">
+								<button id="btn-slide-new"
+									type="button"
+									class="btn btn-success btn-slide-ctrl"
+									onclick="slide_new()"
+									data-toggle="tooltip"
+									title="Create a new slide.">New</button>
+							</div>
+							<div class="col-auto px-0 py-1">
+								<button id="btn-slide-remove"
+									type="button"
+									class="btn btn-danger btn-slide-ctrl"
+									onclick="slide_rm()"
+									data-toggle="tooltip"
+									title="Remove the selected slide.">Remove</button>
+							</div>
+							<div class="col-auto px-0 py-1">
+								<button id="btn-slide-preview"
+									type="button"
+									class="btn btn-success btn-slide-ctrl"
+									onclick="slide_preview()"
+									data-toggle="tooltip"
+									title="Preview the selected slide in a new window.">Preview</button>
+							</div>
 						</div>
 						<p id="editor-status"></p>
 					</div>
