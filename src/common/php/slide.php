@@ -315,7 +315,6 @@ class Slide {
 
 	function set_expires(bool $expires) {
 		$this->expires = $expires;
-		$this->check_expired();
 	}
 
 	function set_expire_t(int $tstamp) {
@@ -325,7 +324,6 @@ class Slide {
 			);
 		}
 		$this->expire_t = $tstamp;
-		$this->check_expired();
 	}
 
 	function get_id() { return $this->id; }

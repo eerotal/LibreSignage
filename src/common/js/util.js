@@ -60,8 +60,13 @@ function datetime_to_tstamp(date, time) {
 			"Invalid time string."
 		);
 	}
+
 	d = date.split('-');
 	t = time.split(':');
+
+	if (t.length == 2) {
+		t[2] = '00';
+	}
 
 	return new Date(
 		d[0], '0' + (parseInt(d[1]) - 1).toString(), d[2],
