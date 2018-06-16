@@ -2,5 +2,8 @@
 	"name": "LibreSignage1",
 	"index": 0,
 	"time": 3000,
-	"owner": "admin"
+	"owner": "admin",
+	"enabled": true,
+	"expires": false,
+	"expire_t": 0
 }

@@ -5,8 +5,8 @@ var _slidelist_current = {};
 var _slidelist_old = {};
 var _slidelist_ready = true;
 
-const slidelist_btn = (id, index, name) => `
-	<div class="btn slide-cont"
+const slidelist_btn = (id, index, name, enabled) => `
+	<div class="btn slide-cont ${!enabled ? 'slide-cont-dis' : ''}"
 		id="slide-btn-${id}"
 		onclick="slide_show('${id}')">
 		<div class="row m-0 p-0 h-100">
@@ -39,7 +39,7 @@ function slidelist_retrieve(ready_callback) {
 	*/
 	_slidelist_ready = false;
 	api_call(API_ENDP.SLIDE_DATA_QUERY,
-		{'name': 1, 'index': 1},
+		{'name': 1, 'index': 1, 'enabled': 1},
 		(resp) => {
 			if (resp.error) {
 				throw new Error("LibreSignage: " +
@@ -109,7 +109,8 @@ function _slidelist_update() {
 			slidelist_btn(
 				id,
 				list[id]['index'],
-				list[id]['name']
+				list[id]['name'],
+				list[id]['enabled']
 			)
 		);
 	}

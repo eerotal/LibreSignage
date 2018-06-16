@@ -116,7 +116,10 @@ class Slide {
 		'name',
 		'index',
 		'time',
-		'owner'
+		'owner',
+		'enabled',
+		'expires',
+		'expire_t'
 	);
 
 	// Slide file paths.
@@ -131,6 +134,9 @@ class Slide {
 	private $time = NULL;
 	private $markup = NULL;
 	private $owner = NULL;
+	private $enabled = FALSE;
+	private $expires = FALSE;
+	private $expire_t = 0;
 
 	private function _mk_paths(string $id) {
 		/*
@@ -207,6 +213,11 @@ class Slide {
 		$this->set_index($conf['index']);
 		$this->set_time($conf['time']);
 		$this->set_owner($conf['owner']);
+		$this->set_enabled($conf['enabled']);
+		$this->set_expires($conf['expires']);
+		$this->set_expire_t($conf['expire_t']);
+
+		$this->check_expired();
 
 		return TRUE;
 	}
@@ -298,12 +309,32 @@ class Slide {
 		$this->owner = $owner;
 	}
 
+	function set_enabled(bool $enabled) {
+		$this->enabled = $enabled;
+	}
+
+	function set_expires(bool $expires) {
+		$this->expires = $expires;
+	}
+
+	function set_expire_t(int $tstamp) {
+		if ($tstamp < 0) {
+			throw new ArgException(
+				"Invalid negative expiration timestamp."
+			);
+		}
+		$this->expire_t = $tstamp;
+	}
+
 	function get_id() { return $this->id; }
 	function get_markup() { return $this->markup; }
 	function get_name() { return $this->name; }
 	function get_index() { return $this->index; }
 	function get_time() { return $this->time; }
 	function get_owner() { return $this->owner; }
+	function get_enabled() { return $this->enabled; }
+	function get_expires() { return $this->expires; }
+	function get_expire_t() { return $this->expire_t; }
 
 	function get_data_array() {
 		return array(
@@ -312,8 +343,26 @@ class Slide {
 			'name' => $this->name,
 			'index' => $this->index,
 			'time' => $this->time,
-			'owner' => $this->owner
+			'owner' => $this->owner,
+			'enabled' => $this->enabled,
+			'expires' => $this->expires,
+			'expire_t' => $this->expire_t
 		);
+	}
+
+	function check_expired() {
+		/*
+		*  Check whether the slide has expired and set
+		*  the enabled flag correspondingly. This function
+		*  writes the modifications to disk.
+		*/
+		if ($this->get_expires() &&
+			time() >= $this->get_expire_t()) {
+
+			// Expired -> disable the slide.
+			$this->set_enabled(FALSE);
+			$this->write();
+		}
 	}
 
 	function write() {
@@ -327,7 +376,10 @@ class Slide {
 			'name' => $this->get_name(),
 			'index' => $this->get_index(),
 			'time' => $this->get_time(),
-			'owner' => $this->get_owner()
+			'owner' => $this->get_owner(),
+			'enabled' => $this->get_enabled(),
+			'expires' => $this->get_expires(),
+			'expire_t' => $this->get_expire_t()
 		);
 
 		$cstr = json_encode($conf);

@@ -89,6 +89,51 @@
 							<div class="invalid-feedback"></div>
 						</div>
 
+						<!-- Automatic expiration enable -->
+						<div class="form-group form-check mb-1" id="slide-expire-enabled-group">
+							<input type="checkbox"
+								class="form-check-input"
+								id="slide-expires"
+								data-toggle="tooltip"
+								title="Select whether the slide should expire automatically.">
+							<label class="form-check-label"
+								for="slide-expire-enabled">
+								Automatic expiration
+							</label>
+						</div>
+
+						<!-- Expiration date/time selector -->
+						<div class="row form-group pl-4" id="slide-expire-group">
+							<div class="col-12 py-1">
+								<input type="date"
+									id="slide-expire-date"
+									class="form-control d-inline"
+									data-toggle="tooltip"
+									title="The slide expiration date.">
+							</div>
+							<div class="col-12 py-1">
+								<input type="time"
+									id="slide-expire-time"
+									class="form-control d-inline"
+									data-toggle="tooltip"
+									title="The slide expiration time."
+									step="1">
+							</div>
+						</div>
+
+						<!-- Slide enabled checkbox -->
+						<div class="form-group form-check" id="slide-enabled-group">
+							<input type="checkbox"
+								class="form-check-input"
+								id="slide-enabled"
+								data-toggle="tooltip"
+								title="Select whether the slide is enabled or not.">
+							<label class="form-check-label"
+								for="slide-enabled">
+								Enabled
+							</label>
+						</div>
+
 						<!-- Control buttons -->
 						<div class="form-group container-fluid d-flex justify-content-center">
 							<button id="btn-slide-save"

@@ -28,17 +28,21 @@ function list_retrieve(ready_callback) {
 	*  'ready_callback' is called after the list is ready.
 	*/
 	_list_ready = false;
-	_list_old = _list_current.slice();
+	_list_old = Object.assign(_list_current);
 	_list_current = [];
 	api_call(API_ENDP.SLIDE_LIST, null, (resp) => {
 		if (resp.error) {
-			throw new Error('API error while fetching ' +
-					'slide list.')
+			throw new Error(
+				'API error while fetching ' +
+				'slide list.'
+			);
 		}
 		_list_current = resp.slides;
 		_list_ready = true;
-		console.log("LibreSignage: Slide list retrieved. (" +
-				_list_current.length + " slides)");
+		console.log(
+			"LibreSignage: Slide list retrieved. (" +
+			Object.keys(_list_current).length + " slides)"
+		);
 		if (ready_callback) {
 			ready_callback();
 		}

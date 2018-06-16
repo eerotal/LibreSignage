@@ -23,6 +23,10 @@ html, body {
 	border: 1px solid var(--gray-1);
 }
 
+.slide-cont-dis {
+	background-color: var(--gray-1);
+}
+
 .slide-cont:hover {
 	background-color: var(--secondary);
 	color: var(--white);
@@ -58,7 +62,7 @@ html, body {
 
 /* Editor styling */
 #slide-input {
-	height: 50vh;
+	height: calc(1em*45); /* Height: 45 lines */
 	border: 1px solid var(--gray-1);
 }
 

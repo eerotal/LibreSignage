@@ -10,20 +10,22 @@
 *  *Save a slide.*
 *
 *  POST JSON parameters
-*    * id      = The ID of the slide to modify or either
+*    * id       = The ID of the slide to modify or either
 *      undefined or null for new slide.
-*    * name    = The name of the slide.
-*    * index   = The index of the slide.
-*    * time    = The amount of time the slide is shown.
-*    * markup  = The markup of the slide.
+*    * name     = The name of the slide.
+*    * index    = The index of the slide.
+*    * time     = The amount of time the slide is shown.
+*    * markup   = The markup of the slide.
+*    * enabled  = Whether the slide is enabled or not.
+*    * expires  = Whether the slide expires or not.
+*    * expire_t = The slide expiration timestamp.
 *
 *  Return value
-*    * id     = The ID of the slide.
-*    * name   = The name of the slide.
-*    * index  = The index of the created slide.
-*    * time   = The amount of time the slide is shown.
-*    * owner  = The owner of the slide.
-*    * error  = An error code or API_E_OK on success.
+*    This endpoint returns all the parameters above as well as
+*    two additional parameters:
+*
+*    * owner   = The owner of the slide.
+*    * error   = An error code or API_E_OK on success.
 *
 *  <====
 */
@@ -40,7 +42,10 @@ $SLIDE_SAVE = new APIEndpoint(array(
 		'index' => API_P_INT,
 		'markup' => API_P_STR|API_P_EMPTY_STR_OK,
 		'owner' => API_P_UNUSED,
-		'time' => API_P_INT
+		'time' => API_P_INT,
+		'enabled' => API_P_BOOL,
+		'expires' => API_P_BOOL,
+		'expire_t' => API_P_INT
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
@@ -99,6 +104,9 @@ try {
 	$slide->set_index($SLIDE_SAVE->get('index'));
 	$slide->set_time($SLIDE_SAVE->get('time'));
 	$slide->set_markup($SLIDE_SAVE->get('markup'));
+	$slide->set_enabled($SLIDE_SAVE->get('enabled'));
+	$slide->set_expires($SLIDE_SAVE->get('expires'));
+	$slide->set_expire_t($SLIDE_SAVE->get('expire_t'));
 } catch (ArgException $e) {
 	/*
 	*  Throw an API_E_INVALID_REQUEST exception if

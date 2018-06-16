@@ -192,13 +192,13 @@ function api_call(endpoint, data, callback) {
 	switch (endpoint.method) {
 		case "POST":
 			ajax_settings.data = JSON.stringify(data);
-			ajax_settings.content =
+			ajax_settings.contentType =
 				'application/json';
 			break;
 		case "GET":
 			// Let jQuery encode the data.
 			ajax_settings.data = data;
-			ajax_settings.content =
+			ajax_settings.contentType =
 				'application/x-www-form-urlencoded';
 			break;
 		default:
