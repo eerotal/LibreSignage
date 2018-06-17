@@ -33,8 +33,13 @@ are listed below.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
    The repository will be cloned into the directory *LibreSignage/*.
 4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
-5. Run ``sudo make dist docs install``, read the instructions and answer
-   the questions.
+5. Run ``sudo make install``, read the instructions and answer the
+   questions. This command saves the config values it asks to a file
+   in the *build/* directory with the name *<DOMAIN>.instconf* where
+   *<DOMAIN>* is the domain name you gave. On subsequent invocations
+   of ``sudo make install`` you can add ``INST=<DOMAIN>.instconf``
+   to the command to use the same config values that you specified
+   earlier.
 
 After this the LibreSignage instance is fully installed and ready to be
 used via the web interface. If you specified a domain name you don't

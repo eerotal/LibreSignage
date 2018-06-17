@@ -2,7 +2,7 @@ SRC_DIR=src
 DIST_DIR=dist
 DIST_DOCS_DIR=$(DIST_DIR)/doc
 
-.PHONY: LOC clean realclean verify install
+.PHONY: LOC clean realclean verify
 .SILENT: install verify LOC dist clean docs
 
 ifndef SRC_DIR
