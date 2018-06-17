@@ -33,7 +33,7 @@
 					</div>
 				</div>
 				<div class="container-fluid row m-0">
-					<div class="col-md-auto pt-2">
+					<div class="col-md-3 container-fluid pt-2" id="editor-col-l">
 						<!-- Slide name input -->
 						<div class="form-group" id="slide-name-group">
 							<label for="slide-name">Name</label>
@@ -135,35 +135,35 @@
 						</div>
 
 						<!-- Control buttons -->
-						<div class="row form-group container-fluid d-flex justify-content-center mx-0">
-							<div class="col-auto px-0 py-1">
+						<div class="row form-group container-fluid d-flex justify-content-center mx-0 px-0">
+							<div class="col-auto btn-slide-ctrl px-0 py-1">
 								<button id="btn-slide-save"
 									type="button"
-									class="btn btn-success btn-slide-ctrl"
+									class="btn btn-success w-100"
 									onclick="slide_save()"
 									data-toggle="tooltip"
 									title="Save the selected slide.">Save</button>
 							</div>
-							<div class="col-auto px-0 py-1">
+							<div class="col-auto btn-slide-ctrl px-0 py-1">
 								<button id="btn-slide-new"
 									type="button"
-									class="btn btn-success btn-slide-ctrl"
+									class="btn btn-success w-100"
 									onclick="slide_new()"
 									data-toggle="tooltip"
 									title="Create a new slide.">New</button>
 							</div>
-							<div class="col-auto px-0 py-1">
+							<div class="col-auto btn-slide-ctrl px-0 py-1">
 								<button id="btn-slide-remove"
 									type="button"
-									class="btn btn-danger btn-slide-ctrl"
+									class="btn btn-danger w-100"
 									onclick="slide_rm()"
 									data-toggle="tooltip"
 									title="Remove the selected slide.">Remove</button>
 							</div>
-							<div class="col-auto px-0 py-1">
+							<div class="col-auto btn-slide-ctrl px-0 py-1">
 								<button id="btn-slide-preview"
 									type="button"
-									class="btn btn-success btn-slide-ctrl"
+									class="btn btn-success w-100"
 									onclick="slide_preview()"
 									data-toggle="tooltip"
 									title="Preview the selected slide in a new window.">Preview</button>
@@ -171,7 +171,7 @@
 						</div>
 						<p id="editor-status"></p>
 					</div>
-					<div class="col-md pt-2">
+					<div class="col-md container-fluid pt-2" id="editor-col-r">
 						<label for="slide-input">Markup</label>
 						<div id="slide-input" class="no-font rounded"></div>
 					</div>
