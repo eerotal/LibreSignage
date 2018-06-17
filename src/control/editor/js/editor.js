@@ -53,8 +53,9 @@ var SLIDE_INPUT = null;
 
 var name_sel = null;
 var index_sel = null;
+var sel_slide = null;
 
-var _selected_slide = null;
+var flag_slide_loading = false; // Slide loading flag, used by slide_show().
 
 function set_editor_status(str) {
 	EDITOR_STATUS.text(str);
@@ -96,7 +97,7 @@ function selected_slide_is_modified() {
 	*  return true in case it has been modified. False is returned
 	*  otherwise.
 	*/
-	var s = _selected_slide;
+	var s = sel_slide;
 	var tmp = null;
 
 	if (s == null) {
@@ -185,14 +186,10 @@ function slide_show(slide, no_popup) {
 	/*
 	*  Show the slide 'slide'.
 	*/
-	var cb = function(status, val) {
-		if (!status) {
-			return;
-		}
-
-		console.log("LibreSignage: Show slide '" + slide + "'");
-		_selected_slide = new Slide();
-		_selected_slide.load(slide, function(ret) {
+	var cb = function() {
+		console.log(`LibreSignage: Show slide '${slide}'.`);
+		sel_slide = new Slide();
+		sel_slide.load(slide, function(ret) {
 			if (ret) {
 				console.log("LibreSignage: API error!");
 				set_editor_status(
@@ -202,15 +199,24 @@ function slide_show(slide, no_popup) {
 				disable_editor_controls();
 				return;
 			}
-			set_editor_inputs(_selected_slide);
+			set_editor_inputs(sel_slide);
 			enable_editor_controls();
+
+			flag_slide_loading = false;
 		});
 	}
 
-	if (!no_popup && selected_slide_is_modified()) {
-		DIALOG_SLIDE_NOT_SAVED(cb).show();
-	} else {
-		cb(true, null);
+	if (!flag_slide_loading) {
+		if (!no_popup && selected_slide_is_modified()) {
+			DIALOG_SLIDE_NOT_SAVED((status, val) => {
+				if (!status) { return; }
+				flag_slide_loading = true;
+				cb();
+			}).show();
+		} else {
+			flag_slide_loading = true;
+			cb();
+		}
 	}
 }
 
@@ -218,7 +224,7 @@ function slide_rm() {
 	/*
 	*  Remove the selected slide.
 	*/
-	if (!_selected_slide) {
+	if (!sel_slide) {
 		dialog(DIALOG.ALERT,
 			"Please select a slide",
 			"Please select a slide to remove first.",
@@ -230,12 +236,12 @@ function slide_rm() {
 	set_editor_status("Deleting slide...");
 	dialog(DIALOG.CONFIRM,
 		"Delete slide?",
-		"Are you sure you want to delete slide '" +
-		_selected_slide.get("name") + "'.", (status, val) => {
+		`Are you sure you want to delete ` +
+		`slide '${sel_slide.get("name")}'.`, (status, val) => {
 		if (!status) {
 			return;
 		}
-		_selected_slide.remove(null, (stat) => {
+		sel_slide.remove(null, (stat) => {
 			if (api_handle_disp_error(stat)) {
 				set_editor_status(
 					"Failed to remove slide!"
@@ -243,16 +249,15 @@ function slide_rm() {
 				return;
 			}
 
-			var id = _selected_slide.get('id');
-			$('#slide-btn-' + id).remove();
+			var id = sel_slide.get('id');
+			$(`#slide-btn-${id}`).remove();
 
 			console.log(
-				"LibreSignage: Deleted slide '" +
-				_selected_slide.get('id') +
-				"'."
+				`LibreSignage: Deleted slide ` +
+				`'${sel_slide.get('id')}'.`
 			);
 
-			_selected_slide = null;
+			sel_slide = null;
 
 			slidelist_trigger_update();
 			set_editor_inputs(null);
@@ -273,10 +278,10 @@ function slide_new() {
 			console.log("LibreSignage: Create slide!");
 			set_editor_status("Creating new slide...");
 
-			_selected_slide = new Slide();
-			_selected_slide.set(NEW_SLIDE_DEFAULTS);
+			sel_slide = new Slide();
+			sel_slide.set(NEW_SLIDE_DEFAULTS);
 
-			set_editor_inputs(_selected_slide);
+			set_editor_inputs(sel_slide);
 			enable_editor_controls();
 
 			/*
@@ -315,7 +320,7 @@ function slide_save() {
 		return;
 	}
 
-	_selected_slide.set({
+	sel_slide.set({
 		'name': SLIDE_NAME.val(),
 		'time': parseInt(SLIDE_TIME.val())*1000,
 		'index': parseInt(SLIDE_INDEX.val()),
@@ -328,14 +333,14 @@ function slide_save() {
 			)
 	});
 
-	_selected_slide.save((stat) => {
+	sel_slide.save((stat) => {
 		if (api_handle_disp_error(stat)) {
 			set_editor_status("Save failed!");
 			return;
 		}
 		console.log(
 			"LibreSignage: Saved slide '" +
-			_selected_slide.get("id") + "'."
+			sel_slide.get("id") + "'."
 		);
 		set_editor_status("Saved!");
 
@@ -347,7 +352,7 @@ function slide_save() {
 		SLIDE_REMOVE.prop('disabled', false);
 		slidelist_trigger_update();
 
-		slide_show(_selected_slide.get('id'), true);
+		slide_show(sel_slide.get('id'), true);
 	});
 }
 
@@ -355,10 +360,10 @@ function slide_preview() {
 	/*
 	*  Preview the current slide in a new window.
 	*/
-	if (_selected_slide && _selected_slide.get('id')) {
-		if (_selected_slide.get('id') != "__API_K_NULL__") {
+	if (sel_slide && sel_slide.get('id')) {
+		if (sel_slide.get('id') != "__API_K_NULL__") {
 			window.open("/app/?preview=" +
-				_selected_slide.get('id'));
+				sel_slide.get('id'));
 		} else {
 			dialog(DIALOG.ALERT, "Please save the slide first",
 				"Slides can't be previewed before they " +
