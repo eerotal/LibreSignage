@@ -1,8 +1,8 @@
 SRC_DIR=src
 DIST_DIR=dist
-SRC_DOCS_DIR=$(SRC_DIR)/doc
+DIST_DOCS_DIR=$(DIST_DIR)/doc
 
-.PHONY: LOC clean realclean
+.PHONY: LOC clean realclean verify install
 .SILENT: install verify LOC dist clean docs
 
 ifndef SRC_DIR
@@ -13,22 +13,22 @@ ifndef DIST_DIR
 $(error DIST_DIR not set)
 endif
 
-dist: verify $(shell find $(SRC_DIR))
+install: $(DIST_DIR) $(DIST_DOCS_DIR)/html
+	echo '## Install LibreSignage...'
+	./build/scripts/install.sh $(INST)
+
+$(DIST_DIR): verify
 	echo '## Create LibreSignage distribution...'
 	rm -rfv $(DIST_DIR)
 	./build/scripts/mkdist.sh
 
-docs: README.rst $(shell find $(SRC_DOCS_DIR))
+$(DIST_DOCS_DIR)/html: README.rst $(DIST_DOCS_DIR)
 	echo '## Compile LibreSignage documentation...'
 	./build/scripts/mkdocs.sh
 
 verify: $(shell find $(SRC_DIR))
 	echo '## Verify LibreSignage sources...'
 	./build/scripts/verify.sh
-
-install: dist $(shell if [ -d $(DIST_DIR) ]; then find $(DIST_DIR) ! -name '*.swp'; fi)
-	echo '## Install LibreSignage...'
-	./build/scripts/install.sh $(INST)
 
 clean:
 	echo '## Clean LibreSignage build files...'
