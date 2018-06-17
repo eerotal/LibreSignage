@@ -6,12 +6,15 @@ LibreSignage is a free and open source, lightweight and easy-to-use
 digital signage solution. LibreSignage runs on a HTTP web server serving
 content to normal web browsers. This makes it possible to use basically
 any device with the ability to display web pages from the internet as
-a client for a LibreSignage instance.
+a client for a LibreSignage instance. Development takes place on
+`GitHub <https://github.com/eerotal/LibreSignage>`_. You can view the
+source, report bugs and collaborate there.
 
 LibreSignage includes an intuitive but powerful web interface for
 creating, editing and deleting slides as well as managing users of
 the LibreSignage instance. Extensive LibreSignage help and documentation
 can be found `here </doc>`_.
+
 
 LibreSignage is made possible by the fantastic open source libraries
 Bootstrap_, jQuery_, Popper.js_ and Ace_ and the open fonts Raleway_

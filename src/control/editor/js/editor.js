@@ -408,7 +408,6 @@ function editor_setup() {
 	val_trigger = new ValidatorTrigger(
 		[name_sel, index_sel],
 		(valid) => {
-			console.log('vs');
 			SLIDE_SAVE.prop('disabled', !valid);
 		}
 	);

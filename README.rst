@@ -11,6 +11,14 @@ client for a LibreSignage instance.
 Installation
 ------------
 
+LibreSignage has currently only been tested on Linux based systems,
+however it should be possible to run it on other systems aswell. Running
+LibreSignage on other systems will require some manual configuration though,
+since the build and installation systems won't work out of the box. The only
+requirement for running a LibreSignage server instance is the Apache web
+server with PHP support, which should be available on most systems. Building
+LibreSignage on the other hand requires some additional software.
+
 LibreSignage is designed to be used with Apache 2.0 and the default install
 system is programmed to use Apache's Virtual Host configuration features.
 
