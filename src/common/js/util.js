@@ -52,12 +52,12 @@ function datetime_to_tstamp(date, time) {
 
 	if (date == null || date.length == 0) {
 		throw new Error(
-			"Invalid date string."
+			`Invalid date string '${date}'.`
 		);
 	}
 	if (time == null || time.length == 0) {
 		throw new Error(
-			"Invalid time string."
+			`Invalid time '${time}'.`
 		);
 	}
 
@@ -80,7 +80,7 @@ function tstamp_to_datetime(tstamp) {
 	var date = null;
 	if (tstamp == null || tstamp.length == 0) {
 		throw new Error(
-			"Invalid timestamp."
+			`Invalid timestamp '${tstamp}'.`
 		);
 	}
 

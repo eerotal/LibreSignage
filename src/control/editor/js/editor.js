@@ -29,9 +29,12 @@ const NEW_SLIDE_DEFAULTS = {
 	'time': 5000,
 	'markup': '',
 	'index': 0,
-	'enabled': true
+	'enabled': true,
+	'expires': false,
+	'expire_t': Math.round(Date.now()/1000)
 };
 
+const SLIDE_PREVIEW = $("#btn-slide-preview");
 const SLIDE_SAVE = $("#btn-slide-save");
 const SLIDE_REMOVE = $("#btn-slide-remove");
 const SLIDE_NAME = $("#slide-name");
@@ -135,20 +138,24 @@ function selected_slide_is_modified() {
 }
 
 function disable_editor_controls() {
+	/*
+	*  Make sure the ValidatorSelectors
+	*  don't enable the save button.
+	*/
+	name_sel.disable();
+	index_sel.disable();
+
 	SLIDE_INPUT.setReadOnly(true);
 	SLIDE_NAME.prop("disabled", true);
 	SLIDE_TIME.prop("disabled", true);
 	SLIDE_INDEX.prop("disabled", true);
+	SLIDE_PREVIEW.prop("disabled", true);
 	SLIDE_SAVE.prop("disabled", true);
 	SLIDE_REMOVE.prop("disabled", true);
 	SLIDE_EN.prop("disabled", true);
 	SLIDE_EXPIRES.prop("disabled", true);
 	SLIDE_EXPIRE_DATE.prop("disabled", true);
 	SLIDE_EXPIRE_TIME.prop("disabled", true);
-
-	// Make sure the ValidatorSelectors don't enable the save button.
-	name_sel.disable();
-	index_sel.disable();
 }
 
 function enable_editor_controls() {
@@ -156,6 +163,7 @@ function enable_editor_controls() {
 	SLIDE_NAME.prop("disabled", false);
 	SLIDE_TIME.prop("disabled", false);
 	SLIDE_INDEX.prop("disabled", false);
+	SLIDE_PREVIEW.prop("disabled", false);
 	SLIDE_SAVE.prop("disabled", false);
 	SLIDE_REMOVE.prop("disabled", false);
 	SLIDE_EN.prop("disabled", false);
@@ -173,7 +181,7 @@ function enable_editor_controls() {
 	index_sel.enable();
 }
 
-function slide_show(slide) {
+function slide_show(slide, no_popup) {
 	/*
 	*  Show the slide 'slide'.
 	*/
@@ -199,7 +207,7 @@ function slide_show(slide) {
 		});
 	}
 
-	if (selected_slide_is_modified()) {
+	if (!no_popup && selected_slide_is_modified()) {
 		DIALOG_SLIDE_NOT_SAVED(cb).show();
 	} else {
 		cb(true, null);
@@ -339,7 +347,7 @@ function slide_save() {
 		SLIDE_REMOVE.prop('disabled', false);
 		slidelist_trigger_update();
 
-		slide_show(_selected_slide.get('id'));
+		slide_show(_selected_slide.get('id'), true);
 	});
 }
 
@@ -400,6 +408,7 @@ function editor_setup() {
 	val_trigger = new ValidatorTrigger(
 		[name_sel, index_sel],
 		(valid) => {
+			console.log('vs');
 			SLIDE_SAVE.prop('disabled', !valid);
 		}
 	);

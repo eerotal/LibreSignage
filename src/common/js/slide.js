@@ -40,13 +40,15 @@ function Slide() {
 		*/
 		api_call(API_ENDP.SLIDE_SAVE, this.data, (resp) => {
 			if (resp.error) {
-				console.error("LibreSignage: API error!");
+				console.error(
+					"LibreSignage: API error!"
+				);
 				if (callback) {
 					callback(resp.error);
 				}
 				return;
 			}
-			this.set(resp['slide']);
+			this.set(resp);
 			if (callback) {
 				callback(resp.error);
 			}
