@@ -58,18 +58,21 @@ instance config, however it shouldn't be changed without investigating
 the consequences (ie. don't change it if you don't know what you are
 doing). The *SLIDE_MAX_INDEX* limit controls the maximum index.
 
-**Automatic expiration** - This checkbox controls whether the slide
-expires (and is disabled) after a set date and time. The date/time
-can be configured in the input boxes below the checkbox. The first
-box is a date input and the second one is a time input. Note that
-these inputs are only enabled when the *Automatic expiration* checkbox
-is selected.
+**Slide scheduling** - Selecting this checkbox enables a feature
+called slide scheduling. This feature makes it possible to configure
+a specific time-frame when the slide should be enabled. The server
+then automatically enables the slide when needed. Note that the manual
+*Enable* checbox is disabled when this checkbox is checked. The start
+and end dates for the scheduling feature can be entered in the inputs
+below this checkbox.
 
-**Enabled** - Select whether the slide is enabled or not. The slide will
-only be shown on the display page if this checkbox is selected. The
-enabled/disabled state is additionally indicated in the slide list
-at the top of the page: Grey slides are disabled and white slides
-are enabled.
+**Enabled** - Select whether the slide is enabled or not. The slide
+will only be shown on the display page if this checkbox is selected.
+The enabled/disabled state is additionally indicated in the slide
+list at the top of the page: Grey slides are disabled and white slides
+are enabled. This checkbox is disabled when *Slide scheduling* is
+enabled. If slide scheduling is enabled, the server automatically
+enables the slide when needed.
 
 **Markup** - The markup field contains the actual slide content.
 The markup field accepts a special markup sytax described in

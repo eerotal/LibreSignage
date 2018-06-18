@@ -103,7 +103,7 @@
 						</div>
 
 						<!-- Schedule date/time selector -->
-						<div class="row form-group pl-4" id="slide-expire-group">
+						<div class="row form-group pl-4" id="slide-sched-group">
 							<div class="col-12 py-1">
 								<label for="slide-sched-date-s">
 									Start date
