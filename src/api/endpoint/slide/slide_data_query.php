@@ -14,7 +14,7 @@
 *    * Data can be requested by assigning 1 to the
 *      requested key. The following keys are accepted:
 *      id, markup, name, index, time, owner, enabled,
-*      expires, expire_t
+*      sched, sched_t_s, sched_t_e
 *
 *  Return value
 *    * data  = The requested data as nested dictionaries.
@@ -37,8 +37,9 @@ $SLIDE_DATA_QUERY = new APIEndpoint(array(
 		'time' => API_P_INT|API_P_OPT,
 		'owner' => API_P_INT|API_P_OPT,
 		'enabled' => API_P_INT|API_P_OPT,
-		'expires' => API_P_INT|API_P_OPT,
-		'expire_t' => API_P_INT|API_P_OPT
+		'sched' => API_P_INT|API_P_OPT,
+		'sched_t_s' => API_P_INT|API_P_OPT,
+		'sched_t_e' => API_P_INT|API_P_OPT
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE,

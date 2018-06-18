@@ -30,8 +30,9 @@ const NEW_SLIDE_DEFAULTS = {
 	'markup': '',
 	'index': 0,
 	'enabled': true,
-	'expires': false,
-	'expire_t': Math.round(Date.now()/1000)
+	'sched': false,
+	'sched_t_s': Math.round(Date.now()/1000),
+	'sched_t_e': Math.round(Date.now()/1000)
 };
 
 const SLIDE_PREVIEW = $("#btn-slide-preview");
@@ -45,9 +46,11 @@ const SLIDE_TIME_GRP = $("#slide-time-group");
 const SLIDE_INDEX = $("#slide-index");
 const SLIDE_INDEX_GRP = $("#slide-index-group");
 const SLIDE_EN = $("#slide-enabled");
-const SLIDE_EXPIRES = $("#slide-expires");
-const SLIDE_EXPIRE_DATE = $("#slide-expire-date");
-const SLIDE_EXPIRE_TIME = $("#slide-expire-time");
+const SLIDE_SCHED = $("#slide-sched");
+const SLIDE_SCHED_DATE_S = $("#slide-sched-date-s");
+const SLIDE_SCHED_TIME_S = $("#slide-sched-time-s");
+const SLIDE_SCHED_DATE_E = $("#slide-sched-date-e");
+const SLIDE_SCHED_TIME_E = $("#slide-sched-time-e");
 const EDITOR_STATUS = $("#editor-status");
 var SLIDE_INPUT = null;
 
@@ -72,9 +75,11 @@ function set_editor_inputs(slide) {
 		SLIDE_TIME.val(1);
 		SLIDE_INDEX.val('');
 		SLIDE_EN.prop('checked', false);
-		SLIDE_EXPIRES.prop('checked', false);
-		SLIDE_EXPIRE_DATE.val('');
-		SLIDE_EXPIRE_TIME.val('');
+		SLIDE_SCHED.prop('checked', false);
+		SLIDE_SCHED_DATE_S.val('');
+		SLIDE_SCHED_TIME_S.val('');
+		SLIDE_SCHED_DATE_E.val('');
+		SLIDE_SCHED_TIME_E.val('');
 	} else {
 		SLIDE_INPUT.setValue(slide.get('markup'));
 		SLIDE_NAME.val(slide.get('name'));
@@ -82,11 +87,15 @@ function set_editor_inputs(slide) {
 		SLIDE_TIME.val(slide.get('time')/1000);
 		SLIDE_INDEX.val(slide.get('index'));
 		SLIDE_EN.prop('checked', slide.get('enabled'));
-		SLIDE_EXPIRES.prop('checked', slide.get('expires'));
+		SLIDE_SCHED.prop('checked', slide.get('sched'));
 
-		var exp = tstamp_to_datetime(slide.get('expire_t'));
-		SLIDE_EXPIRE_DATE.val(exp[0]);
-		SLIDE_EXPIRE_TIME.val(exp[1]);
+		var sched_s = tstamp_to_datetime(slide.get('sched_t_s'));
+		SLIDE_SCHED_DATE_S.val(sched_s[0]);
+		SLIDE_SCHED_TIME_S.val(sched_s[1]);
+
+		var sched_e = tstamp_to_datetime(slide.get('sched_t_e'));
+		SLIDE_SCHED_DATE_E.val(sched_e[0]);
+		SLIDE_SCHED_TIME_E.val(sched_e[1]);
 	}
 	SLIDE_INPUT.clearSelection(); // Deselect new text.
 }
@@ -123,15 +132,23 @@ function selected_slide_is_modified() {
 		console.log('b');
 		return true;
 	}
-	if (SLIDE_EXPIRES.prop('checked') != s.get('expires')) {
+	if (SLIDE_SCHED.prop('checked') != s.get('sched')) {
 		return true;
 	}
 
 	tmp = datetime_to_tstamp(
-		SLIDE_EXPIRE_DATE.val(),
-		SLIDE_EXPIRE_TIME.val()
+		SLIDE_SCHED_DATE_S.val(),
+		SLIDE_SCHED_TIME_S.val()
 	);
-	if (tmp != s.get('expire_t')) {
+	if (tmp != s.get('sched_t_s')) {
+		return true;
+	}
+
+	tmp = datetime_to_tstamp(
+		SLIDE_SCHED_DATE_E.val(),
+		SLIDE_SCHED_TIME_E.val()
+	);
+	if (tmp != s.get('sched_t_e')) {
 		return true;
 	}
 
@@ -154,9 +171,11 @@ function disable_editor_controls() {
 	SLIDE_SAVE.prop("disabled", true);
 	SLIDE_REMOVE.prop("disabled", true);
 	SLIDE_EN.prop("disabled", true);
-	SLIDE_EXPIRES.prop("disabled", true);
-	SLIDE_EXPIRE_DATE.prop("disabled", true);
-	SLIDE_EXPIRE_TIME.prop("disabled", true);
+	SLIDE_SCHED.prop("disabled", true);
+	SLIDE_SCHED_DATE_S.prop("disabled", true);
+	SLIDE_SCHED_TIME_S.prop("disabled", true);
+	SLIDE_SCHED_DATE_E.prop("disabled", true);
+	SLIDE_SCHED_TIME_E.prop("disabled", true);
 }
 
 function enable_editor_controls() {
@@ -167,19 +186,49 @@ function enable_editor_controls() {
 	SLIDE_PREVIEW.prop("disabled", false);
 	SLIDE_SAVE.prop("disabled", false);
 	SLIDE_REMOVE.prop("disabled", false);
-	SLIDE_EN.prop("disabled", false);
-	SLIDE_EXPIRES.prop("disabled", false);
+	SLIDE_SCHED.prop("disabled", false);
 
-	if (SLIDE_EXPIRES.prop('checked')) {
-		SLIDE_EXPIRE_DATE.prop("disabled", false);
-		SLIDE_EXPIRE_TIME.prop("disabled", false);
-	} else {
-		SLIDE_EXPIRE_DATE.prop("disabled", true);
-		SLIDE_EXPIRE_TIME.prop("disabled", true);
-	}
+	scheduling_handle_input_enable();
 
 	name_sel.enable();
 	index_sel.enable();
+}
+
+function scheduling_handle_input_enable() {
+	/*
+	*  Enable/disable various inputs based on whether
+	*  scheduling is enabled. This function is called
+	*  by the onchange event of SLIDE_SCHED and also
+	*  by the enable_editor_controls function.
+	*/
+	if (SLIDE_SCHED.prop('checked')) {
+		// Scheduling -> enable checkbox disabled
+		SLIDE_EN.prop("disabled", true);
+
+		/*
+		*  Make sure the slide enable checkbox has
+		*  the correct value even if the user has
+		*  changed it. This can be done since the
+		*  user can't manually enable slides when
+		*  scheduling is enabled.
+		*/
+		SLIDE_EN.prop('checked', sel_slide.get('enabled'));
+
+		// Enable scheduling inputs.
+		SLIDE_SCHED_DATE_S.prop('disabled', false);
+		SLIDE_SCHED_TIME_S.prop('disabled', false);
+		SLIDE_SCHED_DATE_E.prop('disabled', false);
+		SLIDE_SCHED_TIME_E.prop('disabled', false);
+	} else {
+		// No scheduling -> enable checkbox enabled
+		SLIDE_EN.prop("disabled", false);
+
+		// Disable scheduling inputs.
+		SLIDE_SCHED_DATE_S.prop('disabled', true);
+		SLIDE_SCHED_TIME_S.prop('disabled', true);
+		SLIDE_SCHED_DATE_E.prop('disabled', true);
+		SLIDE_SCHED_TIME_E.prop('disabled', true);
+	}
 }
 
 function slide_show(slide, no_popup) {
@@ -326,10 +375,14 @@ function slide_save() {
 		'index': parseInt(SLIDE_INDEX.val()),
 		'markup': SLIDE_INPUT.getValue(),
 		'enabled': SLIDE_EN.prop('checked'),
-		'expires': SLIDE_EXPIRES.prop('checked'),
-		'expire_t': datetime_to_tstamp(
-				SLIDE_EXPIRE_DATE.val(),
-				SLIDE_EXPIRE_TIME.val()
+		'sched': SLIDE_SCHED.prop('checked'),
+		'sched_t_s': datetime_to_tstamp(
+				SLIDE_SCHED_DATE_S.val(),
+				SLIDE_SCHED_TIME_S.val()
+			),
+		'sched_t_e': datetime_to_tstamp(
+				SLIDE_SCHED_DATE_E.val(),
+				SLIDE_SCHED_TIME_E.val()
 			)
 	});
 
@@ -434,18 +487,10 @@ function editor_setup() {
 	});
 
 	/*
-	*  Add a listener for the 'Automatic expiration' checkbox for
-	*  disabling the expiration date inputs automatically.
+	*  Handle enabling/disabling editor inputs when
+	*  scheduling is enabled/disabled.
 	*/
-	SLIDE_EXPIRES.change(function() {
-		if (SLIDE_EXPIRES.prop('checked')) {
-			SLIDE_EXPIRE_DATE.prop('disabled', false);
-			SLIDE_EXPIRE_TIME.prop('disabled', false);
-		} else {
-			SLIDE_EXPIRE_DATE.prop('disabled', true);
-			SLIDE_EXPIRE_TIME.prop('disabled', true);
-		}
-	});
+	SLIDE_SCHED.change(scheduling_handle_input_enable);
 
 	/*
 	*  Setup the ACE editor with the Dawn theme

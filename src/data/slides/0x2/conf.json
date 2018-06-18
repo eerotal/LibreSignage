@@ -4,6 +4,7 @@
 	"time": 8000,
 	"owner": "admin",
 	"enabled": true,
-	"expires": false,
-	"expire_t": 0
+	"sched": false,
+	"sched_t_s": 0,
+	"sched_t_e": 0
 }
