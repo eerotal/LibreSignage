@@ -89,34 +89,55 @@
 							<div class="invalid-feedback"></div>
 						</div>
 
-						<!-- Automatic expiration enable -->
-						<div class="form-group form-check mb-1" id="slide-expire-enabled-group">
+						<!-- Schedule enable -->
+						<div class="form-group form-check mb-1" id="slide-sched-group">
 							<input type="checkbox"
 								class="form-check-input"
-								id="slide-expires"
+								id="slide-sched"
 								data-toggle="tooltip"
-								title="Select whether the slide should expire automatically.">
+								title="Select whether the slide is scheduled.">
 							<label class="form-check-label"
-								for="slide-expire-enabled">
-								Automatic expiration
+								for="slide-sched">
+								Slide scheduling
 							</label>
 						</div>
 
-						<!-- Expiration date/time selector -->
+						<!-- Schedule date/time selector -->
 						<div class="row form-group pl-4" id="slide-expire-group">
 							<div class="col-12 py-1">
+								<label for="slide-sched-date-s">
+									Start date
+								</label>
 								<input type="date"
-									id="slide-expire-date"
+									id="slide-sched-date-s"
 									class="form-control d-inline"
 									data-toggle="tooltip"
-									title="The slide expiration date.">
+									title="The slide schedule start date.">
 							</div>
 							<div class="col-12 py-1">
 								<input type="time"
-									id="slide-expire-time"
+									id="slide-sched-time-s"
 									class="form-control d-inline"
 									data-toggle="tooltip"
-									title="The slide expiration time."
+									title="The slide schedule start time."
+									step="1">
+							</div>
+							<div class="col-12 py-1">
+								<label for="slide-sched-date-e">
+									End date
+								</label>
+								<input type="date"
+									id="slide-sched-date-e"
+									class="form-control d-inline"
+									data-toggle="tooltip"
+									title="The slide schedule end date.">
+							</div>
+							<div class="col-12 py-1">
+								<input type="time"
+									id="slide-sched-time-e"
+									class="form-control d-inline"
+									data-toggle="tooltip"
+									title="The slide schedule end time."
 									step="1">
 							</div>
 						</div>

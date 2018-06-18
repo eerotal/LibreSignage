@@ -118,8 +118,9 @@ class Slide {
 		'time',
 		'owner',
 		'enabled',
-		'expires',
-		'expire_t'
+		'sched',
+		'sched_t_s',
+		'sched_t_e'
 	);
 
 	// Slide file paths.
@@ -135,8 +136,9 @@ class Slide {
 	private $markup = NULL;
 	private $owner = NULL;
 	private $enabled = FALSE;
-	private $expires = FALSE;
-	private $expire_t = 0;
+	private $sched = FALSE;
+	private $sched_t_s = 0;
+	private $sched_t_e = 0;
 
 	private function _mk_paths(string $id) {
 		/*
@@ -193,6 +195,7 @@ class Slide {
 		// Check config validity.
 		if (!array_is_equal(array_keys($conf),
 					self::CONF_KEYS)) {
+			var_dump(array_keys($conf));
 			throw new IntException(
 				"Invalid slide config."
 			);
@@ -214,10 +217,11 @@ class Slide {
 		$this->set_time($conf['time']);
 		$this->set_owner($conf['owner']);
 		$this->set_enabled($conf['enabled']);
-		$this->set_expires($conf['expires']);
-		$this->set_expire_t($conf['expire_t']);
+		$this->set_sched($conf['sched']);
+		$this->set_sched_t_s($conf['sched_t_s']);
+		$this->set_sched_t_e($conf['sched_t_e']);
 
-		$this->check_expired();
+		$this->check_sched_enabled();
 
 		return TRUE;
 	}
@@ -313,17 +317,26 @@ class Slide {
 		$this->enabled = $enabled;
 	}
 
-	function set_expires(bool $expires) {
-		$this->expires = $expires;
+	function set_sched(bool $sched) {
+		$this->sched = $sched;
 	}
 
-	function set_expire_t(int $tstamp) {
+	function set_sched_t_s(int $tstamp) {
 		if ($tstamp < 0) {
 			throw new ArgException(
-				"Invalid negative expiration timestamp."
+				"Invalid negative schedule start timestamp."
 			);
 		}
-		$this->expire_t = $tstamp;
+		$this->sched_t_s = $tstamp;
+	}
+
+	function set_sched_t_e(int $tstamp) {
+		if ($tstamp < 0) {
+			throw new ArgException(
+				"Invalid negative schedule end timestamp."
+			);
+		}
+		$this->sched_t_e = $tstamp;
 	}
 
 	function get_id() { return $this->id; }
@@ -333,8 +346,9 @@ class Slide {
 	function get_time() { return $this->time; }
 	function get_owner() { return $this->owner; }
 	function get_enabled() { return $this->enabled; }
-	function get_expires() { return $this->expires; }
-	function get_expire_t() { return $this->expire_t; }
+	function get_sched() { return $this->sched; }
+	function get_sched_t_s() { return $this->sched_t_s; }
+	function get_sched_t_e() { return $this->sched_t_e; }
 
 	function get_data_array() {
 		return array(
@@ -345,21 +359,28 @@ class Slide {
 			'time' => $this->time,
 			'owner' => $this->owner,
 			'enabled' => $this->enabled,
-			'expires' => $this->expires,
-			'expire_t' => $this->expire_t
+			'sched' => $this->sched,
+			'sched_t_s' => $this->sched_t_s,
+			'sched_t_e' => $this->sched_t_e
 		);
 	}
 
-	function check_expired() {
+	function check_sched_enabled() {
 		/*
-		*  Check whether the slide has expired and set
-		*  the enabled flag correspondingly. This function
-		*  writes the modifications to disk.
+		*  Check whether the slide is enabled based on
+		*  the scheduling config. This function basically
+		*  overrides the manual 'enabled' control.
 		*/
-		if ($this->get_expires() &&
-			time() >= $this->get_expire_t()) {
+		$t = time();
+		if ($this->get_sched() &&
+			$t >= $this->get_sched_t_s() &&
+			$t <= $this->get_sched_t_e()) {
 
-			// Expired -> disable the slide.
+			// Scheduling active -> enable.
+			$this->set_enabled(TRUE);
+			$this->write();
+		} else if ($this->get_sched()){
+			// Scheduling inactive -> disable.
 			$this->set_enabled(FALSE);
 			$this->write();
 		}
@@ -372,15 +393,9 @@ class Slide {
 		*  automatically overwrites files if they
 		*  already exist.
 		*/
-		$conf = array(
-			'name' => $this->get_name(),
-			'index' => $this->get_index(),
-			'time' => $this->get_time(),
-			'owner' => $this->get_owner(),
-			'enabled' => $this->get_enabled(),
-			'expires' => $this->get_expires(),
-			'expire_t' => $this->get_expire_t()
-		);
+		$conf = $this->get_data_array();
+		unset($conf['id']);
+		unset($conf['markup']);
 
 		$cstr = json_encode($conf);
 		if ($cstr === FALSE &&
