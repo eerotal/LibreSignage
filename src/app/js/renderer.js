@@ -130,8 +130,17 @@ function display_setup() {
 }
 
 $(document).ready(() => {
+	var params = get_GET_parameters();
+	var noui = false;
+
+	if ('noui' in params && params['noui'] == '1') {
+		noui = true;
+	} else {
+		noui = false;
+	}
+
 	api_init(
-		null,	// Use default config.
+		{'noui': noui},
 		display_setup
 	)
 });

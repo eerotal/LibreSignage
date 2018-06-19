@@ -15,7 +15,7 @@ const slidelist_btn = (id, index, name, enabled) => `
 			</div>
 			<div class="col-10 slide-thumb-cont">
 				<iframe class="slide-thumb"
-					src="/app?preview=${id}"
+					src="/app?preview=${id}&noui=1"
 					frameborder="0">
 				</iframe>
 			</div>

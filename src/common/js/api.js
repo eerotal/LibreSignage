@@ -10,7 +10,8 @@ var API_CONFIG = {
 	protocol: null,
 	hostname: null,
 	configured: false,
-	authenticated: false
+	authenticated: false,
+	noui: false
 }
 
 var SERVER_LIMITS = null;
@@ -236,7 +237,9 @@ function api_handle_disp_error(err, callback) {
 		h = "Unknown error";
 		p = "The server encountered an unknown error.";
 	}
-	dialog(DIALOG.ALERT, h, p, callback);
+	if (!API_CONFIG.noui) {
+		dialog(DIALOG.ALERT, h, p, callback);
+	}
 	console.error("API: " + p);
 	return err;
 }
@@ -304,7 +307,7 @@ function api_apply_config(config) {
 	}
 
 	if (tmp.protocol) {
-		console.log("API: Protocol: " + tmp.protocol);
+		console.log(`API: Protocol: ${tmp.protocol}`);
 		API_CONFIG.protocol = tmp.protocol;
 	} else {
 		console.log("API: Using default protocol.")
@@ -312,12 +315,17 @@ function api_apply_config(config) {
 	}
 
 	if (tmp.hostname) {
-		console.log("API: Hostname: " + tmp.hostname);
+		console.log(`API: Hostname: ${tmp.hostname}`);
 		API_CONFIG.hostname = tmp.hostname;
 	} else {
 		console.log("API: Using default hostname.");
 		API_CONFIG.hostname = window.location.hostname;
 	}
+
+	if ('noui' in tmp) {
+		API_CONFIG.noui = tmp.noui;
+	}
+	console.log(`API: UI enabled: ${!API_CONFIG.noui}`);
 }
 
 function session_schedule_renewal() {
