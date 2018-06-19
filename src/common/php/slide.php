@@ -71,7 +71,6 @@ function juggle_slide_indices(string $keep_id = "") {
 	$slides = slides_list();
 	$keep = NULL;
 	$clash = FALSE;
-	$i = 0;
 
 	// Remove the the slide with ID $keep_id initially.
 	if (!empty($keep_id)) {
@@ -94,8 +93,7 @@ function juggle_slide_indices(string $keep_id = "") {
 		foreach ($slides as $k => $s) {
 			$clash |= $s->get_index() == $keep->get_index();
 			if ($s->get_index() >= $keep->get_index()) {
-				$i = $s->get_index() + 1;
-				$s->set_index($i);
+				$s->set_index($s->get_index() + 1);
 				$s->write();
 			}
 		}
@@ -104,7 +102,7 @@ function juggle_slide_indices(string $keep_id = "") {
 			*  $keep_id didn't have the same index as any of
 			*  the other slides -> make it the last one.
 			*/
-			$keep->set_index($i + 1);
+			$keep->set_index(count($slides));
 			$keep->write();
 		}
 	}
