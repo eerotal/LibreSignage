@@ -5,7 +5,7 @@
 ##
 
 set -e
-. build/scripts/build_conf.sh
+. build/scripts/build_setup.sh
 
 mkdir -p $DIST_DIR;
 
@@ -41,3 +41,10 @@ chown -R $OWNER:www-data "$DIST_DIR/data";
 find "$DIST_DIR/data" -type d -exec chmod 775 "{}" ";";
 find "$DIST_DIR/data" -type f -exec chmod 664 "{}" ";";
 
+# Apply build time string constants to the config file.
+CONF=`cat "$DIST_DIR/common/php/config.php"`
+echo "$CONF" | grep -o '!!BCONST_.*!!' | while read -r line; do
+	VN=`echo "$line" | cut -c10- | rev | cut -c3- | rev`;
+	sed -i 's/!!BCONST_'"$VN"'!!/'"${INSTC[$VN]}"'/g' \
+		"$DIST_DIR/common/php/config.php";
+done

@@ -5,65 +5,14 @@
 ## apache2 virtual host for hosting a LibreSignage instance.
 ##
 
-INSTC_LOADED=0;
-
 set -e
-. build/scripts/build_conf.sh
-
-# Load saved configuration if it is supplied;
-if [ -n "$1" ]; then
-	echo 'Load install config from "'$1'".';
-	. $1;
-
-	# Check the required values are set.
-	if [ -z ${INSTC[DOCROOT]} ]; then
-		echo '[ERROR] No document root in config.';
-		exit 1;
-	elif [ -z ${INSTC[NAME]} ]; then
-		echo '[ERROR] No server name in config.';
-		exit 1;
-	fi
-	INSTC_LOADED=1;
-else
-	declare -A INSTC;
-fi
+. build/scripts/build_setup.sh
 
 # Check that the APACHE_SITES directory exists.
 if [ ! -d "$APACHE_SITES" ]; then
 	echo "[ERROR] Apache2 sites-available directory doesn't exist.";
 	echo "[ERROR] Are you sure you have installed Apache 2?";
 	exit 1;
-fi
-
-if [ "$INSTC_LOADED" -ne "1" ]; then
-	# Get config information.
-	read -p 'Document root (DEF: /var/www): ' INSTC[DOCROOT];
-	if [ -z "${INSTC[DOCROOT]}" ]; then
-		INSTC[DOCROOT]='/var/www';
-	fi
-
-	read -p 'Server name (domain): ' INSTC[NAME];
-	if [ -z "${INSTC[NAME]}" ]; then
-		echo '[ERROR] Empty server name. Aborting!';
-		exit 1;
-	fi
-
-	read -p 'Server name aliases (space separated): ' INSTC[ALIAS];
-	read -p 'Admin name: ' INSTC[ADMIN_NAME];
-	read -p 'Admin email: ' INSTC[ADMIN_EMAIL];
-
-	# Write the install config to file.
-
-	INSTC_FILE_NAME='build/'${INSTC[NAME]}$INSTC_FILE_EXT;
-	echo 'Write config to "'$INSTC_FILE_NAME'".';
-
-	echo '#!/bin/bash' > $INSTC_FILE_NAME;
-	echo "# Generated on `date` by install.sh." >> $INSTC_FILE_NAME;
-	echo 'declare -A INSTC=( \' >> $INSTC_FILE_NAME;
-	for i in ${!INSTC[@]}; do
-		echo "	[$i]=\"${INSTC[$i]}\" \\" >> $INSTC_FILE_NAME;
-	done
-	echo ');' >> $INSTC_FILE_NAME;
 fi
 
 VHOST_DIR=`echo ${INSTC[DOCROOT]}'/'${INSTC[NAME]} | sed "s/\/\+/\//g"`;
@@ -92,12 +41,6 @@ echo 'Install LibreSignage to '$VHOST_DIR;
 echo 'Copy files.';
 cp -Rp $DIST_DIR/* $VHOST_DIR'/.';
 echo 'Done!';
-
-echo "Create instance config ($VHOST_DIR/$LS_INSTANCE_CONF)...";
-sed -i "s/<<ADMIN_NAME>>/${INSTC[ADMIN_NAME]}/g" \
-		$VHOST_DIR'/'$LS_INSTANCE_CONF;
-sed -i "s/<<ADMIN_EMAIL>>/${INSTC[ADMIN_EMAIL]}/g" \
-		$VHOST_DIR'/'$LS_INSTANCE_CONF;
 
 echo 'Create VHost config. ('$APACHE_SITES'/'${INSTC[NAME]}'.conf)';
 if [ -f $APACHE_SITES'/'${INSTCONF[NAME]}'.conf' ]; then

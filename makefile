@@ -2,7 +2,7 @@ SRC_DIR=src
 DIST_DIR=dist
 DIST_DOCS_DIR=$(DIST_DIR)/doc
 
-.PHONY: LOC clean realclean verify
+.PHONY: LOC clean realclean verify configure
 .SILENT: install verify LOC dist clean docs
 
 ifndef SRC_DIR
@@ -13,6 +13,10 @@ ifndef DIST_DIR
 $(error DIST_DIR not set)
 endif
 
+configure:
+	echo '## Configure LibreSignage...'
+	./build/scripts/build_setup.sh
+
 install: $(DIST_DIR) $(DIST_DOCS_DIR)/html
 	echo '## Install LibreSignage...'
 	./build/scripts/install.sh $(INST)
@@ -20,7 +24,7 @@ install: $(DIST_DIR) $(DIST_DOCS_DIR)/html
 $(DIST_DIR): verify
 	echo '## Create LibreSignage distribution...'
 	rm -rfv $(DIST_DIR)
-	./build/scripts/mkdist.sh
+	./build/scripts/mkdist.sh $(INST)
 
 $(DIST_DOCS_DIR)/html: README.rst $(DIST_DOCS_DIR)
 	echo '## Compile LibreSignage documentation...'

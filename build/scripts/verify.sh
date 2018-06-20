@@ -8,7 +8,7 @@
 #
 
 set -e
-. build/scripts/build_conf.sh
+. build/scripts/conf.sh
 
 WFLAG=0
 

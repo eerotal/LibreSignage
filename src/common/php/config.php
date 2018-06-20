@@ -9,12 +9,15 @@
 	*/
 
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/error.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/ls_instance.php');
 
 	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT']);
 
-	// Enable debugging. Never set this to TRUE on a production system.
-	const LIBRESIGNAGE_DEBUG = TRUE;
+	// Setup debugging. Don't touch, set by mkdist.sh.
+	const LIBRESIGNAGE_DEBUG = !!BCONST_LS_DEBUG!!;
+
+	// Instance owner config. Don't touch, set by mkdist.sh.
+	const ADMIN_EMAIL = "!!BCONST_ADMIN_EMAIL!!";
+	const ADMIN_NAME = "!!BCONST_ADMIN_NAME!!";
 
 	/*
 	*  Paths relative to document root. DO NOT make these absolute

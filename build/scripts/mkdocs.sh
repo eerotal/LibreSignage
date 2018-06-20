@@ -6,7 +6,7 @@
 
 shopt -s globstar;
 set -e
-. build/scripts/build_conf.sh
+. build/scripts/conf.sh
 
 if [ ! -d "$DIST_DIR" ]; then
         echo "DIST_DIR doesn't exist!";

@@ -13,7 +13,6 @@ CLIENT_DIR="$DIST_DIR/client";
 API_DOC="$RST_DIR/api.rst";
 API_ENDPOINTS_DIR="$DIST_DIR/api/endpoint";
 LS_README="README.rst";
-LS_INSTANCE_CONF="common/php/ls_instance.php";
 
 if [ -z "$SUDO_USER" ]; then
 	OWNER=$USER;
