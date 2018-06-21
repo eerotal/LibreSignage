@@ -12,11 +12,8 @@
 *  POST parameters
 *    * username    = Username
 *    * password    = Password
-*    * who         = A string that identifies the caller. For example
-*                    the name of the software that's using the API.
-*    * permanent   = Whether to create a permanent session or not.
-*                    true = permanent, false = normal (Optional,
-*                    false if not supplied)
+*    * who         = A string that identifies the caller.
+*    * permanent   = Create permanent session. False by default.
 *
 *  Return value
 *    * session = A session data array.

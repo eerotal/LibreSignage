@@ -11,7 +11,7 @@
 *  is automatically expired when this endpoint is called.*
 *
 *  Return value
-*    * auth_token = A newly generated authentication token.
+*    * session = An associative array with the latest session data.
 *    * error = An error code or API_E_OK on success.
 *
 *  <====

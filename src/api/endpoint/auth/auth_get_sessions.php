@@ -10,8 +10,7 @@
 *  *Get a list of the active sessions for the current user.*
 *
 *  Return value
-*    * sessions = An array of sessions without the actual
-*                 authentication token data.
+*    * sessions = An array of sessions.
 *    * error = An error code or API_E_OK on success.
 *
 *  <====
