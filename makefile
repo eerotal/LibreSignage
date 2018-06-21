@@ -41,6 +41,7 @@ clean:
 realclean: clean
 	echo '## Clean all LibreSignage build files...'
 	rm -fv build/*.iconf
+	rm -rfv build/link
 
 LOC:
 	# Count the lines of code in LibreSignage.

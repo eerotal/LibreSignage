@@ -2,3 +2,4 @@
 *.save
 dist
 *.iconf
+build/link

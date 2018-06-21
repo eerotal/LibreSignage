@@ -1,1 +1,0 @@
-/home/eero/LibreSignage/build/192.168.1.8.iconf
