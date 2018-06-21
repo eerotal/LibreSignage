@@ -89,6 +89,20 @@
 							<div class="invalid-feedback"></div>
 						</div>
 
+						<!-- Slide animation selector -->
+						<div class="form-group" id="slide-animation-group">
+							<label for="slide-animation">Animation</label>
+							<select class="custom-select w-100"
+								id="slide-animation"
+								data-toggle="tooltip"
+								title="Slide transition animation.">
+								<option value="0">Swipe left</option>
+								<option value="1">Swipe right</option>
+								<option value="2">Swipe up</option>
+								<option value="3">Swipe down</option>
+							</select>
+						</div>
+
 						<!-- Schedule enable -->
 						<div class="form-group form-check mb-1" id="slide-sched-group">
 							<input type="checkbox"

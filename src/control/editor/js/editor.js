@@ -32,27 +32,29 @@ const NEW_SLIDE_DEFAULTS = {
 	'enabled': true,
 	'sched': false,
 	'sched_t_s': Math.round(Date.now()/1000),
-	'sched_t_e': Math.round(Date.now()/1000)
+	'sched_t_e': Math.round(Date.now()/1000),
+	'animation': 0
 };
 
-const SLIDE_PREVIEW = $("#btn-slide-preview");
-const SLIDE_SAVE = $("#btn-slide-save");
-const SLIDE_REMOVE = $("#btn-slide-remove");
-const SLIDE_NAME = $("#slide-name");
-const SLIDE_NAME_GRP = $("#slide-name-group");
-const SLIDE_OWNER = $("#slide-owner");
-const SLIDE_TIME = $("#slide-time");
-const SLIDE_TIME_GRP = $("#slide-time-group");
-const SLIDE_INDEX = $("#slide-index");
-const SLIDE_INDEX_GRP = $("#slide-index-group");
-const SLIDE_EN = $("#slide-enabled");
-const SLIDE_SCHED = $("#slide-sched");
-const SLIDE_SCHED_DATE_S = $("#slide-sched-date-s");
-const SLIDE_SCHED_TIME_S = $("#slide-sched-time-s");
-const SLIDE_SCHED_DATE_E = $("#slide-sched-date-e");
-const SLIDE_SCHED_TIME_E = $("#slide-sched-time-e");
-const EDITOR_STATUS = $("#editor-status");
-var SLIDE_INPUT = null;
+const SLIDE_PREVIEW		= $("#btn-slide-preview");
+const SLIDE_SAVE		= $("#btn-slide-save");
+const SLIDE_REMOVE		= $("#btn-slide-remove");
+const SLIDE_NAME		= $("#slide-name");
+const SLIDE_NAME_GRP		= $("#slide-name-group");
+const SLIDE_OWNER		= $("#slide-owner");
+const SLIDE_TIME		= $("#slide-time");
+const SLIDE_TIME_GRP		= $("#slide-time-group");
+const SLIDE_INDEX		= $("#slide-index");
+const SLIDE_INDEX_GRP		= $("#slide-index-group");
+const SLIDE_EN			= $("#slide-enabled");
+const SLIDE_SCHED		= $("#slide-sched");
+const SLIDE_SCHED_DATE_S	= $("#slide-sched-date-s");
+const SLIDE_SCHED_TIME_S	= $("#slide-sched-time-s");
+const SLIDE_SCHED_DATE_E	= $("#slide-sched-date-e");
+const SLIDE_SCHED_TIME_E	= $("#slide-sched-time-e");
+const SLIDE_ANIMATION		= $("#slide-animation")
+const EDITOR_STATUS		= $("#editor-status");
+var SLIDE_INPUT			= null;
 
 var name_sel = null;
 var index_sel = null;
@@ -72,7 +74,7 @@ function set_editor_inputs(slide) {
 		SLIDE_INPUT.setValue('');
 		SLIDE_NAME.val('');
 		SLIDE_OWNER.val('');
-		SLIDE_TIME.val(1);
+		SLIDE_TIME.val('1');
 		SLIDE_INDEX.val('');
 		SLIDE_EN.prop('checked', false);
 		SLIDE_SCHED.prop('checked', false);
@@ -80,6 +82,7 @@ function set_editor_inputs(slide) {
 		SLIDE_SCHED_TIME_S.val('');
 		SLIDE_SCHED_DATE_E.val('');
 		SLIDE_SCHED_TIME_E.val('');
+		SLIDE_ANIMATION.val('0');
 	} else {
 		SLIDE_INPUT.setValue(slide.get('markup'));
 		SLIDE_NAME.val(slide.get('name'));
@@ -96,6 +99,8 @@ function set_editor_inputs(slide) {
 		var sched_e = tstamp_to_datetime(slide.get('sched_t_e'));
 		SLIDE_SCHED_DATE_E.val(sched_e[0]);
 		SLIDE_SCHED_TIME_E.val(sched_e[1]);
+
+		SLIDE_ANIMATION.val(slide.get('animation'));
 	}
 	SLIDE_INPUT.clearSelection(); // Deselect new text.
 }
@@ -122,7 +127,7 @@ function selected_slide_is_modified() {
 	if (SLIDE_OWNER.val() != s.get('owner')) {
 		return true;
 	}
-	if (SLIDE_TIME.val() != s.get('time')/1000) {
+	if (parseInt(SLIDE_TIME.val(), 10) != s.get('time')/1000) {
 		return true;
 	}
 	if (SLIDE_INDEX.val() != s.get('index')) {
@@ -152,6 +157,10 @@ function selected_slide_is_modified() {
 		return true;
 	}
 
+	if (parseInt(SLIDE_ANIMATION.val(), 10) != s.get('animation')) {
+		return true;
+	}
+
 	return false;
 }
 
@@ -176,6 +185,7 @@ function disable_editor_controls() {
 	SLIDE_SCHED_TIME_S.prop("disabled", true);
 	SLIDE_SCHED_DATE_E.prop("disabled", true);
 	SLIDE_SCHED_TIME_E.prop("disabled", true);
+	SLIDE_ANIMATION.prop("disabled", true);
 }
 
 function enable_editor_controls() {
@@ -187,6 +197,7 @@ function enable_editor_controls() {
 	SLIDE_SAVE.prop("disabled", false);
 	SLIDE_REMOVE.prop("disabled", false);
 	SLIDE_SCHED.prop("disabled", false);
+	SLIDE_ANIMATION.prop("disabled", false);
 
 	scheduling_handle_input_enable();
 
@@ -383,7 +394,8 @@ function slide_save() {
 		'sched_t_e': datetime_to_tstamp(
 				SLIDE_SCHED_DATE_E.val(),
 				SLIDE_SCHED_TIME_E.val()
-			)
+			),
+		'animation': parseInt(SLIDE_ANIMATION.val(), 10)
 	});
 
 	sel_slide.save((stat) => {
@@ -415,17 +427,26 @@ function slide_preview() {
 	*/
 	if (sel_slide && sel_slide.get('id')) {
 		if (sel_slide.get('id') != "__API_K_NULL__") {
-			window.open("/app/?preview=" +
-				sel_slide.get('id'));
+			window.open(
+				`/app/?preview=${sel_slide.get('id')}`
+			);
 		} else {
-			dialog(DIALOG.ALERT, "Please save the slide first",
-				"Slides can't be previewed before they " +
-				"are saved.", null);
+			dialog(
+				DIALOG.ALERT,
+				"Please save the slide first",
+				"Slides can't be previewed before " +
+				"they are saved.",
+				null
+			);
 		}
 	} else {
-		dialog(DIALOG.ALERT, "No slide selected",
+		dialog(
+			DIALOG.ALERT,
+			"No slide selected",
 			"Please select a slide to preview or " +
-			"save the current slide first.", null);
+			"save the current slide first.",
+			null
+		);
 	}
 }
 
