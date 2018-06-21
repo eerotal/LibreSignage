@@ -72,7 +72,7 @@ function renderer_update() {
 		return;
 	}
 
-	renderer_animate(DISPLAY, 'swipe-left', () => {
+	renderer_animate(DISPLAY, slide.anim_hide(), () => {
 		DISPLAY.html(
 			markup_parse(
 				sanitize_html(
@@ -80,7 +80,7 @@ function renderer_update() {
 				)
 			)
 		);
-		renderer_animate(DISPLAY, 'swipe-from-right', null);
+		renderer_animate(DISPLAY, slide.anim_show(), null);
 		console.log(
 			"LibreSignage: Changing slide in " +
 			slide.get('time') + "ms."

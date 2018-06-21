@@ -118,7 +118,8 @@ class Slide {
 		'enabled',
 		'sched',
 		'sched_t_s',
-		'sched_t_e'
+		'sched_t_e',
+		'animation'
 	);
 
 	// Slide file paths.
@@ -137,6 +138,7 @@ class Slide {
 	private $sched = FALSE;
 	private $sched_t_s = 0;
 	private $sched_t_e = 0;
+	private $animation = 0;
 
 	private function _mk_paths(string $id) {
 		/*
@@ -218,6 +220,7 @@ class Slide {
 		$this->set_sched($conf['sched']);
 		$this->set_sched_t_s($conf['sched_t_s']);
 		$this->set_sched_t_e($conf['sched_t_e']);
+		$this->set_animation($conf['animation']);
 
 		$this->check_sched_enabled();
 
@@ -337,6 +340,15 @@ class Slide {
 		$this->sched_t_e = $tstamp;
 	}
 
+	function set_animation(int $anim) {
+		if ($anim < 0) {
+			throw new ArgException(
+				"Invalid negative animation."
+			);
+		}
+		$this->animation = $anim;
+	}
+
 	function get_id() { return $this->id; }
 	function get_markup() { return $this->markup; }
 	function get_name() { return $this->name; }
@@ -347,6 +359,7 @@ class Slide {
 	function get_sched() { return $this->sched; }
 	function get_sched_t_s() { return $this->sched_t_s; }
 	function get_sched_t_e() { return $this->sched_t_e; }
+	function get_animation() { return $this->animation; }
 
 	function get_data_array() {
 		return array(
@@ -359,7 +372,8 @@ class Slide {
 			'enabled' => $this->enabled,
 			'sched' => $this->sched,
 			'sched_t_s' => $this->sched_t_s,
-			'sched_t_e' => $this->sched_t_e
+			'sched_t_e' => $this->sched_t_e,
+			'animation' => $this->animation
 		);
 	}
 
