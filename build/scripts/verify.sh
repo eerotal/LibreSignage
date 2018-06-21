@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #
 #  Build verification code for LibreSignage. Implemented
@@ -15,7 +15,7 @@ WFLAG=0
 for f in `find $SRC_DIR -type f -name '*.php'`; do
 	if [ -z "`grep /common/php/config.php $f`" ]; then
 		if [ -z "`grep !!BUILD_VERIFY_NOCONFIG!! $f`" ]; then
-			echo "Warning: config.php not included in "$f".";
+			echo "Warning: config.php not included in $f.";
 			WFLAG=1;
 		fi
 	elif [ -n "`grep !!BUILD_VERIFY_NOCONFIG!! $f`" ]; then
@@ -26,9 +26,9 @@ for f in `find $SRC_DIR -type f -name '*.php'`; do
 done
 
 # Ask the user whether to abort the build process.
-if [ $WFLAG == 1 ]; then
+if [ "$WFLAG" = "1" ]; then
 	read -p "Abort the build process? (Y/N) " uinput;
-	if [ "$uinput" == "y" ] || [ "$uinput" == "Y" ]; then
+	if [ "$uinput" = "y" ] || [ "$uinput" = "Y" ]; then
 		exit 1;
 	fi
 fi

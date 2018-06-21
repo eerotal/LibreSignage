@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ##
 ## Create the LibreSignage distribution directory and files.
@@ -10,7 +10,7 @@ set -e
 mkdir -p $DIST_DIR;
 
 # Copy LibreSignage files to dist/.
-echo '[INFO] Copy LibreSignage files to "'$DIST_DIR'".';
+echo "[INFO] Copy LibreSignage files to '$DIST_DIR'.";
 
 # Exclude *.swp files created by Nano.
 find $SRC_DIR/ -type d -exec sh -c \

@@ -1,8 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
-# Common configuration values for the LibreSignage build system.
+# Configuration values for the LibreSignage build system.
 
-# Path constants.
 SRC_DIR='src';
 DIST_DIR='dist';
 APACHE_SITES='/etc/apache2/sites-available';

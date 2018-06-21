@@ -1,19 +1,18 @@
-#!/bin/bash
+#!/bin/sh
 
 ##
 ## Generate LibreSignage documentation files.
 ##
 
-shopt -s globstar;
 set -e
 . build/scripts/conf.sh
 
 if [ ! -d "$DIST_DIR" ]; then
-        echo "DIST_DIR doesn't exist!";
+        echo "Distribution directory '$DIST_DIR' doesn't exist!";
         exit 1;
 fi
 
-function gen_api_doc {
+gen_api_doc() {
 	# Get the documentation text from the filepath in $1.
         if [ -z "$1" ]; then
                 return '';
@@ -46,21 +45,23 @@ Endpoint documentation
 EndOfText
 
 heading='';
-for f in $API_ENDPOINTS_DIR/**; do
-	if [ "${f##*.}" == "php" ] && [ -f "$f" ]; then
+for f in $(find $API_ENDPOINTS_DIR -type f -name "*.php"); do
+	if [ "${f##*.}" = "php" ] && [ -f "$f" ]; then
 		line="";
 		heading=${f#*/};
 
-		echo 'Gen API doc from "'$f'".';
+		echo "Gen API doc from '$f'.";
 		echo $heading >> $API_DOC;
 
 		# Add the line of dashes below the heading.
-		for (( i=0; i<${#heading}; i++ )); do
+		i=0;
+		while [ "$i" -lt "$(echo $heading|wc -m)" ]; do
 			line="$line-";
+			i=$((i+1));
 		done
-		echo $line >> $API_DOC;
 
-		gen_api_doc "$f" >> $API_DOC;
+		echo $line >> $API_DOC;
+		gen_api_doc $f >> $API_DOC;
 	fi
 done
 
@@ -71,12 +72,12 @@ done
 
 echo "Generate HTML documentation...";
 
-mkdir -p $DIST_DIR'/doc/html';
-for f in $RST_DIR/**; do
+mkdir -p "$DIST_DIR/doc/html";
+for f in $(find $RST_DIR -type f -name "*.rst"); do
 	FNAME=${f##*/};
 	FNAME=${FNAME%.*};
 	if [ -f "$f" ]; then
-		echo $f' ==> '$FNAME'.html';
+		echo "$f ==> $FNAME.html";
 		pandoc -o "$HTML_DIR/$FNAME.html" -f rst -t html $f;
 	fi
 done

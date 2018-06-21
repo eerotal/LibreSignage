@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ##
 ##  Prompt the user for a build system configuration. The
@@ -21,14 +21,14 @@ check_config() {
 
 if [ -n "$1" ]; then
 	# Load saved config if supplied.
-	echo 'Load instance config from "'$1'".';
-	. $1;
+	echo "Load instance config from '$1'.";
+	. "$1";
 	check_config;
 else
 	FLAG_LAST_LOADED=0;
 	if [ -f 'build/link/last.sh' ]; then
 		read -p "Load last config? (Y/N): " LOAD_LAST
-		case $LOAD_LAST in
+		case "$LOAD_LAST" in
 			[Yy])
 				echo '[INFO] Load config.';
 				. 'build/link/last.sh';
@@ -41,8 +41,7 @@ else
 		esac
 
 		if [ "$FLAG_LAST_LOADED" = "1" ]; then
-			if [ "$(basename -- "$0")" = "configure.sh" ]
-			then
+			if [ "$(basename "$0")" = "configure.sh" ]; then
 				exit 0;
 			else
 				return 0;
@@ -67,7 +66,7 @@ else
 	read -p 'Admin email: ' ICONF_ADMIN_EMAIL;
 
 	read -p 'Enable debugging? (Y/N): ' TMP_IN;
-	case $TMP_IN in
+	case "$TMP_IN" in
 		[Yy])
 			ICONF_DEBUG="TRUE";
 			;;
@@ -80,7 +79,7 @@ else
 	ICONF_F="build/$ICONF_NAME$ICONF_FILE_EXT";
 	echo "Write config to '$ICONF_F'.";
 
-	echo '#!/bin/bash'                                >  $ICONF_F;
+	echo '#!/bin/sh'                                  >  $ICONF_F;
 	echo "# Generated on `date` by configure.sh."     >> $ICONF_F;
 
 	echo "ICONF_DOCROOT=\"$ICONF_DOCROOT\";"          >> $ICONF_F;
@@ -89,6 +88,7 @@ else
 	echo "ICONF_ADMIN_EMAIL=\"$ICONF_ADMIN_EMAIL\";"  >> $ICONF_F;
 	echo "ICONF_DEBUG=\"$ICONF_DEBUG\";"              >> $ICONF_F;
 
+	# Create the last config file symlink in build/link/last.sh.
 	mkdir -p "build/link";
 	rm -f "build/link/last.sh"
 	ln -s "`pwd`/$ICONF_F" "build/link/last.sh";
