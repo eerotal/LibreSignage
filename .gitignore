@@ -1,4 +1,4 @@
 *.swp
 *.save
 dist
-*.instconf
+*.iconf

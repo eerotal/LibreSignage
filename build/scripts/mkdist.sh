@@ -5,7 +5,7 @@
 ##
 
 set -e
-. build/scripts/build_setup.sh
+. build/scripts/configure.sh
 
 mkdir -p $DIST_DIR;
 
@@ -41,10 +41,22 @@ chown -R $OWNER:www-data "$DIST_DIR/data";
 find "$DIST_DIR/data" -type d -exec chmod 775 "{}" ";";
 find "$DIST_DIR/data" -type f -exec chmod 664 "{}" ";";
 
-# Apply build time string constants to the config file.
+##
+## Apply build time string constants to the config file.
+##
+
+echo '[INFO] Replace build constants in config.php.';
 CONF=`cat "$DIST_DIR/common/php/config.php"`
 echo "$CONF" | grep -o '!!BCONST_.*!!' | while read -r line; do
 	VN=`echo "$line" | cut -c10- | rev | cut -c3- | rev`;
-	sed -i 's/!!BCONST_'"$VN"'!!/'"${INSTC[$VN]}"'/g' \
-		"$DIST_DIR/common/php/config.php";
+	eval FN="\$ICONF_$VN";
+
+	if [ -z "$FN" ]; then
+		echo "[Error] Constant $VN is not set.";
+		exit 1;
+	else
+		echo "[INFO] BCONF_$VN ==> $FN";
+		sed -i "s/!!BCONST_$VN!!/$FN/g" \
+			"$DIST_DIR/common/php/config.php";
+	fi
 done

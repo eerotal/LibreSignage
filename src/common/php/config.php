@@ -13,7 +13,7 @@
 	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT']);
 
 	// Setup debugging. Don't touch, set by mkdist.sh.
-	const LIBRESIGNAGE_DEBUG = !!BCONST_LS_DEBUG!!;
+	const LIBRESIGNAGE_DEBUG = !!BCONST_DEBUG!!;
 
 	// Instance owner config. Don't touch, set by mkdist.sh.
 	const ADMIN_EMAIL = "!!BCONST_ADMIN_EMAIL!!";

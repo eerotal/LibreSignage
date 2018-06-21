@@ -15,7 +15,7 @@ endif
 
 configure:
 	echo '## Configure LibreSignage...'
-	./build/scripts/build_setup.sh
+	./build/scripts/configure.sh
 
 install: $(DIST_DIR) $(DIST_DOCS_DIR)/html
 	echo '## Install LibreSignage...'
@@ -40,7 +40,7 @@ clean:
 
 realclean: clean
 	echo '## Clean all LibreSignage build files...'
-	rm -fv build/*.instconf
+	rm -fv build/*.iconf
 
 LOC:
 	# Count the lines of code in LibreSignage.

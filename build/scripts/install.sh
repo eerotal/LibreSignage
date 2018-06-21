@@ -6,7 +6,7 @@
 ##
 
 set -e
-. build/scripts/build_setup.sh
+. build/scripts/configure.sh
 
 # Check that the APACHE_SITES directory exists.
 if [ ! -d "$APACHE_SITES" ]; then
@@ -15,7 +15,7 @@ if [ ! -d "$APACHE_SITES" ]; then
 	exit 1;
 fi
 
-VHOST_DIR=`echo ${INSTC[DOCROOT]}'/'${INSTC[NAME]} | sed "s/\/\+/\//g"`;
+VHOST_DIR=`echo "$ICONF_DOCROOT/$ICONF_NAME" | sed "s/\/\+/\//g"`;
 echo "Virtual host dir: "$VHOST_DIR;
 
 # Check whether VHOST_DIR already has files.
@@ -42,9 +42,9 @@ echo 'Copy files.';
 cp -Rp $DIST_DIR/* $VHOST_DIR'/.';
 echo 'Done!';
 
-echo 'Create VHost config. ('$APACHE_SITES'/'${INSTC[NAME]}'.conf)';
-if [ -f $APACHE_SITES'/'${INSTCONF[NAME]}'.conf' ]; then
-	read -p 'Virtual host config exists. Replace? (Y\N): ' repl_vhost_conf
+echo "Create VHost config. ($APACHE_SITES/$ICONF_NAME.conf)";
+if [ -f "$APACHE_SITES/$ICONF_NAME.conf" ]; then
+	read -p 'Replace existing VHost config? (Y\N): ' repl_vhost_conf
 	case $repl_vhost_conf in
 		[Yy]* )
 			;;
@@ -54,7 +54,7 @@ if [ -f $APACHE_SITES'/'${INSTCONF[NAME]}'.conf' ]; then
 	esac
 fi
 
-. 'build/scripts/vhost_template.sh' > $APACHE_SITES'/'${INSTC[NAME]}'.conf';
+. 'build/scripts/vhost_template.sh' > "$APACHE_SITES/$ICONF_NAME.conf";
 echo 'LibreSignage installed!';
 
 echo 'Enable apache2 mod_rewrite...';
@@ -63,8 +63,8 @@ a2enmod rewrite;
 read -p 'Enable the created VHost and restart apache2? (Y\N): ' EN_VHOST;
 case $EN_VHOST in
 	[Yy]* )
-		echo 'Enabling site "'${INSTC[NAME]}'.conf"...';
-		a2ensite ${INSTC[NAME]}'.conf';
+		echo "Enabling site '$ICONF_NAME.conf'...";
+		a2ensite "$ICONF_NAME.conf";
 		echo 'Restarting apache2...';
 		systemctl stop apache2
 		systemctl start apache2

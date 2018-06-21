@@ -6,7 +6,7 @@
 SRC_DIR='src';
 DIST_DIR='dist';
 APACHE_SITES='/etc/apache2/sites-available';
-INSTC_FILE_EXT='.instconf';
+ICONF_FILE_EXT='.iconf';
 RST_DIR="$DIST_DIR/doc/rst";
 HTML_DIR="$DIST_DIR/doc/html";
 CLIENT_DIR="$DIST_DIR/client";
