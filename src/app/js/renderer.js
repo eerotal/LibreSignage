@@ -82,8 +82,8 @@ function renderer_update() {
 		);
 		renderer_animate(DISPLAY, slide.anim_show(), null);
 		console.log(
-			"LibreSignage: Changing slide in " +
-			slide.get('time') + "ms."
+			`LibreSignage: Changing slide ` +
+			`in ${slide.get('time')}ms.`
 		);
 		setTimeout(renderer_update, slide.get('time'));
 	});
@@ -94,8 +94,8 @@ function display_setup() {
 	if ("preview" in params) {
 		// Preview a slide without starting the renderer.
 		console.log(
-			"LibreSignage: Preview slide " +
-			params["preview"] + "."
+			`LibreSignage: Preview slide ` +
+			` ${params["preview"]}.`
 		);
 
 		var slide = new Slide();

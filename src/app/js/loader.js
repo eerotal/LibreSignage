@@ -40,8 +40,8 @@ function list_retrieve(ready_callback) {
 		_list_current = resp.slides;
 		_list_ready = true;
 		console.log(
-			"LibreSignage: Slide list retrieved. (" +
-			Object.keys(_list_current).length + " slides)"
+			`LibreSignage: Slide list retrieved. (` +
+			`${Object.keys(_list_current).length} slides)`
 		);
 		if (ready_callback) {
 			ready_callback();
@@ -66,8 +66,9 @@ function slides_retrieve(ready_callback) {
 		_slides_current[i] = new Slide();
 		_slides_current[i].load(list[i], (err) => {
 			if (err) {
-				throw new Error('Error while loading ' +
-						'slide!');
+				throw new Error(
+					'Error while loading slide!'
+				);
 				_slides_current[i] = null;
 			}
 
@@ -82,10 +83,11 @@ function slides_retrieve(ready_callback) {
 				);
 
 				_slides_ready = true;
-				console.log("LibreSignage: Slides " +
-					"retrieved. (" +
-					_slides_current.length +
-					" slides)");
+				console.log(
+					`LibreSignage: Retrieved ` +
+					`${_slides_current.length} ` +
+					`slides`
+				);
 
 				if (ready_callback) {
 					ready_callback();

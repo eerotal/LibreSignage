@@ -4,6 +4,7 @@
 */
 
 function Slide() {
+	// Map animation identifiers to CSS classes.
 	this.ANIM_MAP = {
 		0: {
 			hide: 'swipe-left',
@@ -121,6 +122,7 @@ function Slide() {
 	this.anim_hide = function() {
 		return this.ANIM_MAP[this.get('animation')].hide;
 	}
+
 	this.anim_show = function() {
 		return this.ANIM_MAP[this.get('animation')].show;
 	}
