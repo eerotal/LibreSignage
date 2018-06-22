@@ -96,10 +96,11 @@
 								id="slide-animation"
 								data-toggle="tooltip"
 								title="Slide transition animation.">
-								<option value="0">Swipe left</option>
-								<option value="1">Swipe right</option>
-								<option value="2">Swipe up</option>
-								<option value="3">Swipe down</option>
+								<option value="0">No animation</option>
+								<option value="1">Swipe left</option>
+								<option value="2">Swipe right</option>
+								<option value="3">Swipe up</option>
+								<option value="4">Swipe down</option>
 							</select>
 						</div>
 

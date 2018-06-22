@@ -42,6 +42,7 @@ function renderer_animate(elem, animation, end_callback) {
 	*  on 'elem'. If 'end_callback' is not null, it's called when
 	*  the animation has finished.
 	*/
+	if (!animation) { end_callback(); }
 	elem.addClass(animation);
 	elem.one("animationend", (event) => {
 		event.target.classList.remove(animation);

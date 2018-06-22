@@ -7,18 +7,22 @@ function Slide() {
 	// Map animation identifiers to CSS classes.
 	this.ANIM_MAP = {
 		0: {
+			hide: null,
+			show: null,
+		},
+		1: {
 			hide: 'swipe-left',
 			show: 'swipe-from-right'
 		},
-		1: {
+		2: {
 			hide: 'swipe-right',
 			show: 'swipe-from-left'
 		},
-		2: {
+		3: {
 			hide: 'swipe-up',
 			show: 'swipe-from-below'
 		},
-		3: {
+		4: {
 			hide: 'swipe-down',
 			show: 'swipe-from-above'
 		}
