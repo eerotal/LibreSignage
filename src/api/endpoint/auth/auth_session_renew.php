@@ -71,6 +71,9 @@ setcookie(
 	$path = '/'
 );
 
+// Don't leak authentication token hashes.
+unset($session['token_hash']);
+
 $AUTH_SESSION_RENEW->resp_set(array(
 	'session' => $session,
 	'error' => API_E_OK
