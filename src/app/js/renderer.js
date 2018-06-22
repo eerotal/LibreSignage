@@ -1,15 +1,14 @@
-const DEFAULT_RENDERER_UPDATE_INTERVAL = 5000;
+const DEFAULT_RENDERER_UPDATE_INTERVAL = 2000;
 const SLIDES_RETRIEVE_INTERVAL = 30000;
 const DISPLAY = $('#display');
 
-var c_slide_i = 0;
+var c_slide_i = -1;
 
 function renderer_next_slide(slides, wrap) {
 	var n_diff = -1;
 	var diff = -1;
 
 	if (!slides.length) { return null; }
-
 	for (let slide of slides) {
 		n_diff = slide.get('index') - c_slide_i;
 		if (n_diff > 0 && (n_diff < diff || diff == -1)) {
@@ -43,6 +42,7 @@ function renderer_animate(elem, animation, end_callback) {
 	*  on 'elem'. If 'end_callback' is not null, it's called when
 	*  the animation has finished.
 	*/
+	if (!animation) { end_callback(); }
 	elem.addClass(animation);
 	elem.one("animationend", (event) => {
 		event.target.classList.remove(animation);
@@ -72,7 +72,7 @@ function renderer_update() {
 		return;
 	}
 
-	renderer_animate(DISPLAY, 'swipe-left', () => {
+	renderer_animate(DISPLAY, slide.anim_hide(), () => {
 		DISPLAY.html(
 			markup_parse(
 				sanitize_html(
@@ -80,12 +80,13 @@ function renderer_update() {
 				)
 			)
 		);
-		renderer_animate(DISPLAY, 'swipe-from-right', null);
-		console.log(
-			"LibreSignage: Changing slide in " +
-			slide.get('time') + "ms."
-		);
-		setTimeout(renderer_update, slide.get('time'));
+		renderer_animate(DISPLAY, slide.anim_show(), () => {
+			console.log(
+				`LibreSignage: Changing slide ` +
+				`in ${slide.get('time')}ms.`
+			);
+			setTimeout(renderer_update, slide.get('time'));
+		});
 	});
 }
 
@@ -94,8 +95,8 @@ function display_setup() {
 	if ("preview" in params) {
 		// Preview a slide without starting the renderer.
 		console.log(
-			"LibreSignage: Preview slide " +
-			params["preview"] + "."
+			`LibreSignage: Preview slide ` +
+			` ${params["preview"]}.`
 		);
 
 		var slide = new Slide();
@@ -121,10 +122,8 @@ function display_setup() {
 		setInterval(() => {
 			list_retrieve(slides_retrieve);
 		}, SLIDES_RETRIEVE_INTERVAL);
-			list_retrieve(() => {
-			slides_retrieve(() => {
-				renderer_update();
-			});
+		list_retrieve(() => {
+			slides_retrieve(renderer_update);
 		});
 	}
 }

@@ -24,6 +24,7 @@
 *      * sched     = Whether the slide is scheduled or not.
 *      * sched_t_s = The slide schedule starting timestamp.
 *      * sched_t_e = The slide schedule ending timestamp.
+*      * animation = The slide animation identifier.
 *
 *    * error   = An error code or API_E_OK on success.
 *

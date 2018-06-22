@@ -58,6 +58,12 @@ instance config, however it shouldn't be changed without investigating
 the consequences (ie. don't change it if you don't know what you are
 doing). The *SLIDE_MAX_INDEX* limit controls the maximum index.
 
+**Animation** - Select a transition animation for the slide. If no
+animation is needed, 'No animation' can be selected. Note that these
+animations are used when the display begins showing the slide in
+question. When the slide is hidden, the animation of the next slide
+is used.
+
 **Slide scheduling** - Selecting this checkbox enables a feature
 called slide scheduling. This feature makes it possible to configure
 a specific time-frame when the slide should be enabled. The server

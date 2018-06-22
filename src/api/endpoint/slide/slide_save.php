@@ -20,6 +20,7 @@
 *    * sched     = Whether the slide is scheduled or not.
 *    * sched_t_s = The slide schedule starting timestamp.
 *    * sched_t_e = The slide schedule ending timestamp.
+*    * animation = The slide animation identifier.
 *
 *  Return value
 *    This endpoint returns all the parameters above as well as
@@ -47,7 +48,8 @@ $SLIDE_SAVE = new APIEndpoint(array(
 		'enabled' => API_P_BOOL,
 		'sched' => API_P_BOOL,
 		'sched_t_s' => API_P_INT,
-		'sched_t_e' => API_P_INT
+		'sched_t_e' => API_P_INT,
+		'animation' => API_P_INT
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
@@ -110,6 +112,7 @@ try {
 	$slide->set_sched($SLIDE_SAVE->get('sched'));
 	$slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
 	$slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
+	$slide->set_animation($SLIDE_SAVE->get('animation'));
 } catch (ArgException $e) {
 	/*
 	*  Throw an API_E_INVALID_REQUEST exception if

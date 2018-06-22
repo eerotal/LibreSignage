@@ -4,6 +4,29 @@
 */
 
 function Slide() {
+	// Map animation identifiers to CSS classes.
+	this.ANIM_MAP = {
+		0: {
+			hide: null,
+			show: null,
+		},
+		1: {
+			hide: 'swipe-left',
+			show: 'swipe-from-right'
+		},
+		2: {
+			hide: 'swipe-right',
+			show: 'swipe-from-left'
+		},
+		3: {
+			hide: 'swipe-up',
+			show: 'swipe-from-below'
+		},
+		4: {
+			hide: 'swipe-down',
+			show: 'swipe-from-above'
+		}
+	};
 	this.data = {};
 
 	this.load = function(id, callback) {
@@ -97,11 +120,14 @@ function Slide() {
 		Object.assign(this.data, data);
 	}
 
-	this.clear = function() {
-		this.data = {};
+	this.clear = function() { this.data = {}; }
+	this.get = function(key) { return this.data[key]; }
+
+	this.anim_hide = function() {
+		return this.ANIM_MAP[this.get('animation')].hide;
 	}
 
-	this.get = function(key) {
-		return this.data[key];
+	this.anim_show = function() {
+		return this.ANIM_MAP[this.get('animation')].show;
 	}
 }
