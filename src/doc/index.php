@@ -80,5 +80,14 @@
 			js_include_popper();
 			js_include_bootstrap();
 		?>
+		<script src="/common/js/util.js"></script>
+		<script src="/common/js/dialog.js"></script>
+		<script src="/common/js/cookie.js"></script>
+		<script src="/common/js/api.js"></script>
+		<script>
+			$(document).ready(() => {
+				api_init(null, null);
+			});
+		</script>
 	</body>
 </html>

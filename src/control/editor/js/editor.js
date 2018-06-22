@@ -530,7 +530,9 @@ function editor_setup() {
 	);
 }
 
-api_init(
-	null,	// Use default config.
-	editor_setup
-)
+$(document).ready(() => {
+	api_init(
+		null,	// Use default config.
+		editor_setup
+	);
+});
