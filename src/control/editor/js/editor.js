@@ -36,25 +36,25 @@ const NEW_SLIDE_DEFAULTS = {
 	'animation': 0
 };
 
-const SLIDE_PREVIEW		= $("#btn-slide-preview");
-const SLIDE_SAVE		= $("#btn-slide-save");
-const SLIDE_REMOVE		= $("#btn-slide-remove");
-const SLIDE_NAME		= $("#slide-name");
-const SLIDE_NAME_GRP		= $("#slide-name-group");
-const SLIDE_OWNER		= $("#slide-owner");
-const SLIDE_TIME		= $("#slide-time");
-const SLIDE_TIME_GRP		= $("#slide-time-group");
-const SLIDE_INDEX		= $("#slide-index");
-const SLIDE_INDEX_GRP		= $("#slide-index-group");
-const SLIDE_EN			= $("#slide-enabled");
-const SLIDE_SCHED		= $("#slide-sched");
-const SLIDE_SCHED_DATE_S	= $("#slide-sched-date-s");
-const SLIDE_SCHED_TIME_S	= $("#slide-sched-time-s");
-const SLIDE_SCHED_DATE_E	= $("#slide-sched-date-e");
-const SLIDE_SCHED_TIME_E	= $("#slide-sched-time-e");
-const SLIDE_ANIMATION		= $("#slide-animation")
-const EDITOR_STATUS		= $("#editor-status");
-var SLIDE_INPUT			= null;
+const SLIDE_PREVIEW             = $("#btn-slide-preview");
+const SLIDE_SAVE                = $("#btn-slide-save");
+const SLIDE_REMOVE              = $("#btn-slide-remove");
+const SLIDE_NAME                = $("#slide-name");
+const SLIDE_NAME_GRP            = $("#slide-name-group");
+const SLIDE_OWNER               = $("#slide-owner");
+const SLIDE_TIME                = $("#slide-time");
+const SLIDE_TIME_GRP            = $("#slide-time-group");
+const SLIDE_INDEX               = $("#slide-index");
+const SLIDE_INDEX_GRP           = $("#slide-index-group");
+const SLIDE_EN                  = $("#slide-enabled");
+const SLIDE_SCHED               = $("#slide-sched");
+const SLIDE_SCHED_DATE_S        = $("#slide-sched-date-s");
+const SLIDE_SCHED_TIME_S        = $("#slide-sched-time-s");
+const SLIDE_SCHED_DATE_E        = $("#slide-sched-date-e");
+const SLIDE_SCHED_TIME_E        = $("#slide-sched-time-e");
+const SLIDE_ANIMATION           = $("#slide-animation")
+const EDITOR_STATUS             = $("#editor-status");
+var SLIDE_INPUT                 = null;
 
 var name_sel = null;
 var index_sel = null;

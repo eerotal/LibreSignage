@@ -56,13 +56,13 @@ function slides_retrieve(ready_callback) {
 	*  is called after all slides are ready.
 	*/
 	var list = list_get();
-	var ready_cnt = list.length;
+	var cnt = Object.keys(list).length;
 
 	_slides_ready = false;
 	_slides_old = _slides_current.slice();
 	_slides_current = [];
 
-	for (i in list) {
+	for (var i in list) {
 		_slides_current[i] = new Slide();
 		_slides_current[i].load(list[i], (err) => {
 			if (err) {
@@ -71,13 +71,8 @@ function slides_retrieve(ready_callback) {
 				);
 				_slides_current[i] = null;
 			}
-
-			ready_cnt--;
-			if (!ready_cnt) {
-				/*
-				*  Remove null slides resulting from
-				*  failed Slide.load() calls.
-				*/
+			if (!(--cnt)) {
+				// Remove null slides.
 				_slides_current = _slides_current.filter(
 					(s) => { return s != null; }
 				);
@@ -86,13 +81,13 @@ function slides_retrieve(ready_callback) {
 				console.log(
 					`LibreSignage: Retrieved ` +
 					`${_slides_current.length} ` +
-					`slides`
+					`slides.`
 				);
-
 				if (ready_callback) {
 					ready_callback();
 				}
 			}
 		});
 	}
+
 }

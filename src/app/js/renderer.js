@@ -1,15 +1,14 @@
-const DEFAULT_RENDERER_UPDATE_INTERVAL = 5000;
+const DEFAULT_RENDERER_UPDATE_INTERVAL = 2000;
 const SLIDES_RETRIEVE_INTERVAL = 30000;
 const DISPLAY = $('#display');
 
-var c_slide_i = 0;
+var c_slide_i = -1;
 
 function renderer_next_slide(slides, wrap) {
 	var n_diff = -1;
 	var diff = -1;
 
 	if (!slides.length) { return null; }
-
 	for (let slide of slides) {
 		n_diff = slide.get('index') - c_slide_i;
 		if (n_diff > 0 && (n_diff < diff || diff == -1)) {
@@ -80,12 +79,13 @@ function renderer_update() {
 				)
 			)
 		);
-		renderer_animate(DISPLAY, slide.anim_show(), null);
-		console.log(
-			`LibreSignage: Changing slide ` +
-			`in ${slide.get('time')}ms.`
-		);
-		setTimeout(renderer_update, slide.get('time'));
+		renderer_animate(DISPLAY, slide.anim_show(), () => {
+			console.log(
+				`LibreSignage: Changing slide ` +
+				`in ${slide.get('time')}ms.`
+			);
+			setTimeout(renderer_update, slide.get('time'));
+		});
 	});
 }
 
@@ -121,10 +121,8 @@ function display_setup() {
 		setInterval(() => {
 			list_retrieve(slides_retrieve);
 		}, SLIDES_RETRIEVE_INTERVAL);
-			list_retrieve(() => {
-			slides_retrieve(() => {
-				renderer_update();
-			});
+		list_retrieve(() => {
+			slides_retrieve(renderer_update);
 		});
 	}
 }
