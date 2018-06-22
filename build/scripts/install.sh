@@ -5,6 +5,11 @@
 ## apache2 virtual host for hosting a LibreSignage instance.
 ##
 
+if [ ! "$(ps -o comm= $PPID)" = "make" ]; then
+	echo "[Error] LibreSignage build scripts must be run with make!"
+	exit 1;
+fi
+
 set -e
 . build/scripts/configure.sh
 

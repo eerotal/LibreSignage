@@ -4,6 +4,11 @@
 ## Generate LibreSignage documentation files.
 ##
 
+if [ ! "$(ps -o comm= $PPID)" = "make" ]; then
+	echo "[Error] LibreSignage build scripts must be run with make!"
+	exit 1;
+fi
+
 set -e
 . build/scripts/conf.sh
 

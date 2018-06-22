@@ -4,6 +4,11 @@
 ## Create the LibreSignage distribution directory and files.
 ##
 
+if [ ! "$(ps -o comm= $PPID)" = "make" ]; then
+	echo "[Error] LibreSignage build scripts must be run with make!"
+	exit 1;
+fi
+
 set -e
 . build/scripts/configure.sh
 
