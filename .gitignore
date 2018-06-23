@@ -6,3 +6,4 @@ build/link
 
 __pycache__
 .mypy_cache
+.pyc

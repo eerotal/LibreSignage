@@ -45,7 +45,10 @@ realclean: clean
 
 LOC:
 	# Count the lines of code in LibreSignage.
-	wc -l `find .	-name "dist" -prune                   \
+	wc -l `find .	\( -path "./dist/*" -o                   \
+			   -path "./utests/api/.mypy_cache/*" \) \
+			   -prune                                \
+			-o -name "*.py" -print                   \
 			-o -name "*.php" -print                  \
 			-o -name "*.js"	-print                   \
 			-o -name "*.html" -print                 \
@@ -53,4 +56,4 @@ LOC:
 			-o -name "*.sh"	-print                   \
 			-o -name "*.json" -print                 \
 			-o -name "*.py" -print                   \
-			-o -name "makefile" -print`
+			-o -name "makefile" -print`              \
