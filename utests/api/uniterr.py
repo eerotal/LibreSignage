@@ -20,29 +20,43 @@ class UnitStatusError(UnitError):
 
 class UnitHeaderError(UnitError):
 	def __init__(self, name, got, expected):
-		self.message = ("Expected '" + name + ": " + expected +
-				"'. Got '" + name + ": " + got + "'.");
+		self.message = ("Expected '" + name + ": " +
+				repr(expected) + "'. Got '" +
+				name + ": " + type(got).__name__ +
+				"(" + got + ")'.");
 
 class UnitHeaderKeyError(UnitError):
-	def __init__(self, got, expected):
+	def __init__(self, got, expected, strict):
 		got_str = ', '.join(list(got));
 		expected_str = ', '.join(list(expected));
-		self.message = ("Expected keys: '" + expected_str +
-				"'. Got: '" + got_str + "'.");
+		if strict:
+			self.message = ("Expected exactly keys: '" +
+					expected_str + "'. Got: '" +
+					got_str + "'.");
+		else:
+			self.message = ("Expected at least keys: '" +
+					expected_str + "'. Got: '" +
+					got_str + "'.");
 
 class UnitJsonDataError(UnitError):
-	def __init__(self, name, got, expected, resp):
+	def __init__(self, name, got, expected):
 		self.message = ("Expected '" + name + ": " +
 				repr(expected) + "'. Got '" +
 				name + ": " + type(got).__name__ +
 				"(" + str(got) + ")'.");
 
 class UnitJsonDataKeyError(UnitError):
-	def __init__(self, got, expected, resp):
+	def __init__(self, got, expected, strict):
 		got_str = ', '.join(list(got));
 		expected_str = ', '.join(list(expected));
-		self.message = ("Expected keys: '" + expected_str +
-				"'. Got: '" + got_str + "'.");
+		if strict:
+			self.message = ("Expected exactly keys: '" +
+					expected_str + "'. Got: '" +
+					got_str + "'.");
+		else:
+			self.message = ("Expected at least keys: '" +
+					expected_str + "'. Got: '" +
+					got_str + "'.");
 
 class UnitTextDataError(UnitError):
 	def __init__(self, got, expected):

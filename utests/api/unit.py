@@ -18,7 +18,11 @@ class Unit:
 	METHOD_GET: str = "GET";
 	METHOD_POST: str = "POST";
 
-	resp_type: str = "";
+	# Response mimetypes.
+	MIME_TEXT: str = "text/plain";
+	MIME_JSON: str = "application/json";
+
+	resp_mime: str = "";
 
 	def __init__(	self,
 			name: str,
@@ -32,6 +36,8 @@ class Unit:
 			headers_request: Dict[str, str],
 			cookies_request: Any,
 
+			data_expect_strict: bool,
+			headers_expect_strict: bool,
 			status_expect: int,
 			data_expect: Any,
 			headers_expect: Dict[str, RespVal]) -> None:
@@ -50,6 +56,8 @@ class Unit:
 		self.headers_request = headers_request;
 		self.cookies_request = cookies_request;
 
+		self.headers_expect_strict = headers_expect_strict;
+		self.data_expect_strict = data_expect_strict;
 		self.status_expect = status_expect;
 		self.data_expect = data_expect;
 		self.headers_expect = headers_expect;
@@ -79,13 +87,12 @@ class Unit:
 				);
 
 		# Convert data to the correct format.
+		req_ct = self.get_req_header('Content-Type');
 		if (self.request_method == self.METHOD_POST):
 			params = {};
-			if (self.get_req_header('Content-Type')
-						== 'application/json'):
+			if (req_ct == self.MIME_JSON):
 				data = json.dumps(self.data_request);
 			else:
-				# Default to Content-Type: text/plain.
 				data = self.data_request;
 		elif (self.request_method == self.METHOD_GET):
 			data = "";
@@ -108,6 +115,15 @@ class Unit:
 			);
 			sys.exit(1);
 
+		# Store the response mimetype.
+		resp_ct = req.headers['Content-Type'];
+		if (not resp_ct or
+			re.match('^' + self.MIME_TEXT + '.*', resp_ct)):
+			self.resp_mime = self.MIME_TEXT;
+		elif (re.match('^' + self.MIME_JSON + '.*', resp_ct)):
+			self.resp_mime = self.MIME_JSON;
+
+		# Validate response.
 		ret += self.handle_status(req);
 		ret += self.handle_headers(req);
 		ret += self.handle_data(req);
@@ -146,7 +162,7 @@ class Unit:
 			));
 
 			print(">> Body dump:");
-			if (self.resp_type == "json"):
+			if (self.resp_mime == self.MIME_JSON):
 				try:
 					print(json.dumps(
 						req.json(),
@@ -157,12 +173,11 @@ class Unit:
 						"failed. Printing " +
 						"raw dump.");
 					print(req.text);
-			elif (self.resp_type == "text"):
+			elif (self.resp_mime == self.MIME_TEXT):
 				print(req.text);
 			else:
-				print(
-					">>> Unknown body " +
-					"content type."
+				raise Exception(
+					"Unknown response mime type."
 				);
 
 			print("========================\n")
@@ -181,12 +196,6 @@ class Unit:
 		else:
 			return None;
 
-	def get_expected_header(self, header):
-		if (header in self.headers_expect):
-			return self.headers_expect[header];
-		else:
-			return None;
-
 	def handle_status(self, req: Response) -> List[UnitError]:
 		if not self.status_expect == req.status_code:
 			return [UnitStatusError(
@@ -202,41 +211,44 @@ class Unit:
 		#  expected headers.
 		#
 		ret: List[UnitError] = [];
-		rhead = req.headers;
-		ehead = self.headers_expect;
+		r = req.headers;
+		e = self.headers_expect;
 
 		# Check expected header keys.
-		if not set(rhead.keys()) == set(ehead.keys()):
-			ret.append(UnitHeaderKeyError(
-				rhead,
-				ehead
-			));
-			return ret;
+		if self.headers_expect_strict:
+			if not set(r.keys()) == set(e.keys()):
+				ret.append(UnitHeaderKeyError(
+					r.keys(), e.keys(), True
+				));
+				return ret;
+		else:
+			if not (set(r.keys()) & set(e.keys())
+						== set(e.keys())):
+				ret.append(UnitHeaderKeyError(
+					r.keys(), e.keys(), False
+				));
+				return ret;
 
 		# Check expected header values.
-		for k in ehead.keys():
-			if not (ehead[k].validate(rhead[k])):
+		for k in e.keys():
+			if not (e[k].validate(r[k])):
 				ret.append(UnitHeaderError(
-					k,
-					rhead[k],
-					ehead[k]
+					k, r[k], e[k]
 				));
 		return ret;
 
 	def handle_data(self, req: Response) -> List[UnitError]:
 		#
-		#  Handle response data. The response type (text/json)
-		#  is stored in self.resp_type for use in run().
+		#  Handle response data.
 		#
-		if (re.match('application/json.*',
-			req.headers['Content-Type'])):
-			self.resp_type = 'json';
+		if (self.resp_mime == self.MIME_JSON):
 			return self.handle_json(req);
-		elif (re.match('text/plain.*',
-			req.headers['Content-Type'])):
-			self.resp_type = 'text';
+		elif (self.resp_mime == self.MIME_TEXT):
 			return self.handle_text(req);
-		return [];
+		else:
+			raise Exception(
+				"Unknown response mimetype."
+			);
 
 	def handle_json(self, req: Response) -> List[UnitError]:
 		#
@@ -244,33 +256,36 @@ class Unit:
 		#  expected JSON response.
 		#
 		ret: List[UnitError] = [];
-		rdata = None;
-		edata = self.data_expect;
+		r = None;
+		e = self.data_expect;
 
 		# Parse JSON response.
 		try:
-			rdata = req.json();
+			r = req.json();
 		except ValueError:
 			ret.append(UnitDataTypeError("JSON").printerr());
 			return ret;
 
 		# Check expected keys.
-		if not (set(edata.keys()) == set(rdata.keys())):
-			ret.append(UnitJsonDataKeyError(
-				rdata.keys(),
-				edata.keys(),
-				rdata
-			));
-			return ret;
+		if (self.data_expect_strict):
+			if not (set(e.keys()) == set(r.keys())):
+				ret.append(UnitJsonDataKeyError(
+					r.keys(), e.keys(), True
+				));
+				return ret;
+		else:
+			if not (set(e.keys()) & set(r.keys())
+						== set(e.keys())):
+				ret.append(UnitJsonDataKeyError(
+					r.keys(), e.keys(), False
+				));
+				return ret;
 
 		# Check expected data.
-		for k in edata.keys():
-			if not edata[k].validate(rdata[k]):
+		for k in e.keys():
+			if not e[k].validate(r[k]):
 				ret.append(UnitJsonDataError(
-					k,
-					rdata[k],
-					edata[k],
-					rdata
+					k, r[k], e[k]
 				));
 		return ret;
 

@@ -48,6 +48,8 @@ tests = [
 		cookies_request = None,
 
 		# Expected response.
+		data_expect_strict = True,
+		headers_expect_strict = False,
 		status_expect = 200,
 		data_expect = {
 			"session": RespDict({
@@ -61,13 +63,8 @@ tests = [
 			"error": RespInt(0)
 		},
 		headers_expect = {
-			'Date': RespRe('.*'),
-			'Server': RespRe('.*'),
 			'Access-Control-Allow-Origin': RespRe('.*'),
 			'Set-Cookie': RespRe('.*'),
-			'Content-Length': RespRe('.*'),
-			'Keep-Alive': RespRe('.*'),
-			'Connection': RespRe('.*'),
 			'Content-Type': RespStr('application/json')
 		}
 
@@ -87,18 +84,15 @@ tests = [
 		cookies_request = None,
 
 		# Expected response.
+		data_expect_strict = True,
+		headers_expect_strict = False,
 		status_expect = 200,
 		data_expect = {
 			"sessions": RespDict(None),
 			"error": RespInt(0)
 		},
 		headers_expect = {
-			'Date': RespRe('.*'),
-			'Server': RespRe('.*'),
 			'Access-Control-Allow-Origin': RespRe('.*'),
-			'Content-Length': RespRe('.*'),
-			'Keep-Alive': RespRe('.*'),
-			'Connection': RespRe('.*'),
 			'Content-Type': RespStr('application/json')
 		}
 	),
@@ -116,19 +110,16 @@ tests = [
 		},
 		cookies_request = None,
 
+		data_expect_strict = True,
+		headers_expect_strict = False,
 		status_expect = 200,
 		data_expect= {
 			'session': RespDict(None),
 			'error': RespInt(0)
 		},
 		headers_expect = {
-			'Date': RespRe('.*'),
-			'Server': RespRe('.*'),
 			'Access-Control-Allow-Origin': RespRe('.*'),
 			'Set-Cookie': RespRe('.*'),
-			'Content-Length': RespRe('.*'),
-			'Keep-Alive': RespRe('.*'),
-			'Connection': RespRe('.*'),
 			'Content-Type': RespStr('application/json')
 		}
 	),
@@ -146,17 +137,14 @@ tests = [
 		},
 		cookies_request = None,
 
+		data_expect_strict = True,
+		headers_expect_strict = False,
 		status_expect = 200,
 		data_expect= {
 			'error': RespInt(0)
 		},
 		headers_expect = {
-			'Date': RespRe('.*'),
-			'Server': RespRe('.*'),
 			'Access-Control-Allow-Origin': RespRe('.*'),
-			'Content-Length': RespRe('.*'),
-			'Keep-Alive': RespRe('.*'),
-			'Connection': RespRe('.*'),
 			'Content-Type': RespStr('application/json')
 		}
 	),
@@ -172,18 +160,15 @@ tests = [
 		headers_request = {},
 		cookies_request = None,
 
+		data_expect_strict = True,
+		headers_expect_strict = False,
 		status_expect = 200,
 		data_expect = {
 			'codes': RespDict(None),
 			'error': RespInt(0)
 		},
 		headers_expect = {
-			'Date': RespRe('.*'),
-			'Server': RespRe('.*'),
 			'Access-Control-Allow-Origin': RespRe('.*'),
-			'Content-Length': RespRe('.*'),
-			'Keep-Alive': RespRe('.*'),
-			'Connection': RespRe('.*'),
 			'Content-Type': RespStr('application/json')
 		}
 	),
@@ -199,18 +184,15 @@ tests = [
 		headers_request = {},
 		cookies_request = None,
 
+		data_expect_strict = True,
+		headers_expect_strict = False,
 		status_expect = 200,
 		data_expect = {
 			'messages': RespDict(None),
 			'error': RespInt(0)
 		},
 		headers_expect = {
-			'Date': RespRe('.*'),
-			'Server': RespRe('.*'),
 			'Access-Control-Allow-Origin': RespRe('.*'),
-			'Content-Length': RespRe('.*'),
-			'Keep-Alive': RespRe('.*'),
-			'Connection': RespRe('.*'),
 			'Content-Type': RespStr('application/json')
 		}
 	),
@@ -226,17 +208,12 @@ tests = [
 		headers_request = {},
 		cookies_request = None,
 
+		data_expect_strict = True,
+		headers_expect_strict = False,
 		status_expect = 200,
 		data_expect = RespRe('.*'),
 		headers_expect = {
-			'Date': RespRe('.*'),
-			'Server': RespRe('.*'),
 			'Access-Control-Allow-Origin': RespRe('.*'),
-			'Content-Length': RespRe('.*'),
-			'Content-Encoding': RespRe('.*'),
-			'Vary': RespRe('.*'),
-			'Keep-Alive': RespRe('.*'),
-			'Connection': RespRe('.*'),
 			'Content-Type': RespRe('text/plain;.*')
 		}
 	),
@@ -252,17 +229,12 @@ tests = [
 		headers_request = {},
 		cookies_request = None,
 
+		data_expect_strict = True,
+		headers_expect_strict = False,
 		status_expect = 200,
 		data_expect = RespRe('.*'),
 		headers_expect = {
-			'Date': RespRe('.*'),
-			'Server': RespRe('.*'),
 			'Access-Control-Allow-Origin': RespRe('.*'),
-			'Content-Length': RespRe('.*'),
-			'Content-Encoding': RespRe('.*'),
-			'Vary': RespRe('.*'),
-			'Keep-Alive': RespRe('.*'),
-			'Connection': RespRe('.*'),
 			'Content-Type': RespRe('text/plain;.*')
 		}
 	),
@@ -281,18 +253,15 @@ tests = [
 		cookies_request = None,
 
 		# Expected response.
+		data_expect_strict = True,
+		headers_expect_strict = False,
 		status_expect = 200,
 		data_expect = {
 			"limits": RespDict(None),
 			"error": RespInt(0)
 		},
 		headers_expect = {
-			'Date': RespRe('.*'),
-			'Server': RespRe('.*'),
 			'Access-Control-Allow-Origin': RespRe('.*'),
-			'Content-Length': RespRe('.*'),
-			'Keep-Alive': RespRe('.*'),
-			'Connection': RespRe('.*'),
 			'Content-Type': RespStr('application/json')
 		}
 	),
@@ -311,17 +280,14 @@ tests = [
 		cookies_request = None,
 
 		# Expected response.
+		data_expect_strict = True,
+		headers_expect_strict = False,
 		status_expect = 200,
 		data_expect = {
 			"error": RespInt(0)
 		},
 		headers_expect = {
-			'Date': RespRe('.*'),
-			'Server': RespRe('.*'),
 			'Access-Control-Allow-Origin': RespRe('.*'),
-			'Content-Length': RespRe('.*'),
-			'Keep-Alive': RespRe('.*'),
-			'Connection': RespRe('.*'),
 			'Content-Type': RespStr('application/json')
 		}
 	)
