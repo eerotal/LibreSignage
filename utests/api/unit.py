@@ -10,6 +10,7 @@ from typing import Callable, Dict, Any, List;
 from resptypes import RespVal;
 from uniterr import *;
 import json;
+import sys;
 
 class Unit:
 	# HTTP methods.
@@ -25,15 +26,19 @@ class Unit:
 			postexec: Callable[[bool, Response], None],
 
 			data_request: Any,
-			headers_request: Dict[str, Any],
+			headers_request: Dict[str, str],
 			cookies_request: Any,
 
+			status_expect: int,
 			data_expect: Dict[str, RespVal],
-			headers_expect: Dict[str, Any]) -> None:
+			headers_expect: Dict[str, RespVal]) -> None:
 
 		self.name = name;
 		self.url = url;
-		self.request_method = request_method;
+
+		if (request_method == self.METHOD_GET or
+			request_method == self.METHOD_POST):
+			self.request_method = request_method;
 
 		self.preexec = preexec;
 		self.postexec = postexec;
@@ -42,14 +47,16 @@ class Unit:
 		self.headers_request = headers_request;
 		self.cookies_request = cookies_request;
 
+		self.status_expect = status_expect;
 		self.data_expect = data_expect;
 		self.headers_expect = headers_expect;
 
 	def run(self) -> None:
 		ret: List[UnitError] = [];
 		req = Response();
-		data: str = "";
 		status = True;
+		data: str = "";
+		params: Dict[str, str] = {};
 
 		print("== " + self.name + ": ");
 
@@ -68,32 +75,37 @@ class Unit:
 					tmp['headers_request']
 				);
 
-		# Convert data to the correct format for POST reqs.
-		if (self.get_request_header('Content-Type')
-					== 'application/json'):
-			data = json.dumps(self.data_request);
-		elif (self.get_request_header('Content-Type')
-					== 'text/plain'):
-			data = self.data_request;
+		# Convert data to the correct format.
+		if (self.request_method == self.METHOD_POST):
+			params = {};
+			if (self.get_req_header('Content-Type')
+						== 'application/json'):
+				data = json.dumps(self.data_request);
+			else:
+				# Default to Content-Type: text/plain.
+				data = self.data_request;
+		elif (self.request_method == self.METHOD_GET):
+			data = "";
+			params = self.data_request;
 
 		# Send the correct request.
-		if (self.request_method == self.METHOD_POST):
+		try:
 			req = requests.request(
-				method = 'POST',
+				method = self.request_method,
 				url = self.url,
 				data = data,
+				params = params,
 				cookies = self.cookies_request,
 				headers = self.headers_request
 			);
-		elif (self.request_method == self.METHOD_GET):
-			req = requests.request(
-				method = 'GET',
-				url = self.url,
-				params = self.data_request,
-				cookies = self.cookies_request,
-				headers = self.headers_request
+		except requests.exceptions.ConnectionError:
+			print(
+				"[ERROR] Failed to connect to server. " +
+				"Is the server running?"
 			);
+			sys.exit(1);
 
+		ret += self.handle_status(req);
 		ret += self.handle_headers(req);
 		ret += self.handle_data(req);
 
@@ -102,36 +114,40 @@ class Unit:
 			for err in ret:
 				err.printerr();
 
-			print("=== Error information ===\n");
+			print("############ Information ############\n");
 
 			# Dump request and response.
-			print(">> Request URL:");
-			print(req.url + "\n");
+			print("======= Request =======");
+			print(">> URL: " + req.url);
 
-			print(">> Request header dump:");
-			print(json.dumps(self.headers_request, indent=4)
-				+ "\n");
+			print(">> Header dump:");
+			print(json.dumps(self.headers_request, indent=4));
 
-			print(">> Request body dump:");
-			print(json.dumps(self.data_request, indent=4)
-				+ "\n");
+			print(">> Body dump:");
+			print(json.dumps(self.data_request, indent=4));
 
-			print(">> Response header dump:");
+			print("========================\n");
+			print("======= Response =======");
+			print(">> Status code: " +
+				str(req.status_code));
+
+			print(">> Header dump:");
 			print(json.dumps(dict(req.headers.items()),
-				indent=4) + "\n");
+				indent=4));
 
-			print(">> Response body dump:");
-			print(json.dumps(req.json(), indent=4) + "\n");
+			print(">> Body dump:");
+			print(json.dumps(req.json(), indent=4));
+			print("========================\n")
 
+			print("#####################################");
 
-			print("=========================")
 
 		# Run the postexec function.
 		if (self.postexec):
 			print("[INFO] Running postexec.");
 			self.postexec(len(ret) == 0, req);
 
-	def get_request_header(self, header):
+	def get_req_header(self, header):
 		if (header in self.headers_request):
 			return self.headers_request[header];
 		else:
@@ -143,7 +159,16 @@ class Unit:
 		else:
 			return None;
 
-	def handle_headers(self, req: Response) -> list:
+	def handle_status(self, req: Response) -> List[UnitError]:
+		if not self.status_expect == req.status_code:
+			return [UnitStatusError(
+				req.status_code,
+				self.status_expect
+			)];
+		else:
+			return [];
+
+	def handle_headers(self, req: Response) -> List[UnitError]:
 		#
 		#  Compare the response headers of 'req' with the
 		#  expected headers.
@@ -162,8 +187,7 @@ class Unit:
 
 		# Check expected header values.
 		for k in ehead.keys():
-			if (not ehead[k] == None and
-				not rhead[k] == ehead[k]):
+			if not (ehead[k].validate(rhead[k])):
 				ret.append(UnitHeaderError(
 					k,
 					rhead[k],
@@ -171,7 +195,7 @@ class Unit:
 				));
 		return ret;
 
-	def handle_data(self, req: Response) -> list:
+	def handle_data(self, req: Response) -> List[UnitError]:
 		#
 		#  Handle response data.
 		#
@@ -181,7 +205,7 @@ class Unit:
 			return self.handle_text(req);
 		return [];
 
-	def handle_json(self, req: Response) -> list:
+	def handle_json(self, req: Response) -> List[UnitError]:
 		#
 		#  Compare the response JSON of 'req' with the
 		#  expected JSON response.
@@ -217,7 +241,7 @@ class Unit:
 				));
 		return ret;
 
-	def handle_text(self, req: Response) -> list:
+	def handle_text(self, req: Response) -> List[UnitError]:
 		return [];
 
 def run_tests(tests: list) -> None:

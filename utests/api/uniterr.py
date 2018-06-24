@@ -13,6 +13,11 @@ class UnitError:
 	def printerr(self):
 		print(str(self));
 
+class UnitStatusError(UnitError):
+	def __init__(self, got, expected):
+		self.message = ("Expected HTTP status " + str(expected) +
+				". Got " + str(got) + " instead.");
+
 class UnitHeaderError(UnitError):
 	def __init__(self, name, got, expected):
 		self.message = ("Expected '" + name + ": " + expected +

@@ -4,6 +4,8 @@
 # Response validation types.
 #
 
+import re;
+
 class RespVal: # General type, extend this.
 	type = type(None);
 	realname = "";
@@ -17,6 +19,16 @@ class RespVal: # General type, extend this.
 
 	def __repr__(self):
 		return self.realname + '(' + str(self.proto) + ')';
+
+class RespRe(RespVal): # Regex
+	type = type("");
+	realname = "regex";
+
+	def validate(self, val):
+		if not self.proto:
+			return True;
+
+		return not (re.match(self.proto, val) == None);
 
 class RespDict(RespVal): # Dictionary
 	type = type({});
