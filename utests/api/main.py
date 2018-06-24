@@ -227,7 +227,7 @@ tests = [
 		cookies_request = None,
 
 		status_expect = 200,
-		data_expect = {},
+		data_expect = RespRe('.*'),
 		headers_expect = {
 			'Date': RespRe('.*'),
 			'Server': RespRe('.*'),
@@ -253,7 +253,7 @@ tests = [
 		cookies_request = None,
 
 		status_expect = 200,
-		data_expect = {},
+		data_expect = RespRe('.*'),
 		headers_expect = {
 			'Date': RespRe('.*'),
 			'Server': RespRe('.*'),

@@ -30,19 +30,25 @@ class UnitHeaderKeyError(UnitError):
 		self.message = ("Expected keys: '" + expected_str +
 				"'. Got: '" + got_str + "'.");
 
-class UnitDataError(UnitError):
+class UnitJsonDataError(UnitError):
 	def __init__(self, name, got, expected, resp):
 		self.message = ("Expected '" + name + ": " +
 				repr(expected) + "'. Got '" +
 				name + ": " + type(got).__name__ +
 				"(" + str(got) + ")'.");
 
-class UnitDataKeyError(UnitError):
+class UnitJsonDataKeyError(UnitError):
 	def __init__(self, got, expected, resp):
 		got_str = ', '.join(list(got));
 		expected_str = ', '.join(list(expected));
 		self.message = ("Expected keys: '" + expected_str +
 				"'. Got: '" + got_str + "'.");
+
+class UnitTextDataError(UnitError):
+	def __init__(self, got, expected):
+		self.message = ("Expected " + repr(expected) +
+				". Got " + type(got).__name__ +
+				"(" + str(got)) + ").";
 
 class UnitDataTypeError(UnitError):
 	def __init__(self, expected):

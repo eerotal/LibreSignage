@@ -11,11 +11,14 @@ from resptypes import RespVal;
 from uniterr import *;
 import json;
 import sys;
+import re;
 
 class Unit:
 	# HTTP methods.
-	METHOD_GET = "GET";
-	METHOD_POST = "POST";
+	METHOD_GET: str = "GET";
+	METHOD_POST: str = "POST";
+
+	resp_type: str = "";
 
 	def __init__(	self,
 			name: str,
@@ -30,7 +33,7 @@ class Unit:
 			cookies_request: Any,
 
 			status_expect: int,
-			data_expect: Dict[str, RespVal],
+			data_expect: Any,
 			headers_expect: Dict[str, RespVal]) -> None:
 
 		self.name = name;
@@ -121,22 +124,47 @@ class Unit:
 			print(">> URL: " + req.url);
 
 			print(">> Header dump:");
-			print(json.dumps(self.headers_request, indent=4));
+			print(json.dumps(
+				self.headers_request,
+				indent=4
+			));
 
 			print(">> Body dump:");
-			print(json.dumps(self.data_request, indent=4));
+			print(json.dumps(
+				self.data_request,
+				indent=4
+			));
 
 			print("========================\n");
 			print("======= Response =======");
-			print(">> Status code: " +
-				str(req.status_code));
+			print(">> Status code: " + str(req.status_code));
 
 			print(">> Header dump:");
-			print(json.dumps(dict(req.headers.items()),
-				indent=4));
+			print(json.dumps(
+				dict(req.headers.items()),
+				indent=4
+			));
 
 			print(">> Body dump:");
-			print(json.dumps(req.json(), indent=4));
+			if (self.resp_type == "json"):
+				try:
+					print(json.dumps(
+						req.json(),
+						indent=4
+					));
+				except json.decoder.JSONDecodeError:
+					print(">>> JSON decoding " +
+						"failed. Printing " +
+						"raw dump.");
+					print(req.text);
+			elif (self.resp_type == "text"):
+				print(req.text);
+			else:
+				print(
+					">>> Unknown body " +
+					"content type."
+				);
+
 			print("========================\n")
 
 			print("#####################################");
@@ -197,11 +225,16 @@ class Unit:
 
 	def handle_data(self, req: Response) -> List[UnitError]:
 		#
-		#  Handle response data.
+		#  Handle response data. The response type (text/json)
+		#  is stored in self.resp_type for use in run().
 		#
-		if (req.headers['Content-Type'] == 'application/json'):
+		if (re.match('application/json.*',
+			req.headers['Content-Type'])):
+			self.resp_type = 'json';
 			return self.handle_json(req);
-		elif (req.headers['Content-Type'] == 'text/plain'):
+		elif (re.match('text/plain.*',
+			req.headers['Content-Type'])):
+			self.resp_type = 'text';
 			return self.handle_text(req);
 		return [];
 
@@ -223,7 +256,7 @@ class Unit:
 
 		# Check expected keys.
 		if not (set(edata.keys()) == set(rdata.keys())):
-			ret.append(UnitDataKeyError(
+			ret.append(UnitJsonDataKeyError(
 				rdata.keys(),
 				edata.keys(),
 				rdata
@@ -233,7 +266,7 @@ class Unit:
 		# Check expected data.
 		for k in edata.keys():
 			if not edata[k].validate(rdata[k]):
-				ret.append(UnitDataError(
+				ret.append(UnitJsonDataError(
 					k,
 					rdata[k],
 					edata[k],
@@ -242,6 +275,13 @@ class Unit:
 		return ret;
 
 	def handle_text(self, req: Response) -> List[UnitError]:
+		if self.data_expect == None:
+			return [];
+		elif not self.data_expect.validate(req.text):
+			return [UnitTextDataError(
+				req.text,
+				self.data_expect
+			)];
 		return [];
 
 def run_tests(tests: list) -> None:
