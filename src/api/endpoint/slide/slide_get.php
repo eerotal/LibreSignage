@@ -21,6 +21,7 @@
 *      * time      = The time the slide is shown.
 *      * markup    = The markup of the slide.
 *      * owner     = The owner of the slide.
+*      * enabled   = Whether the slide is enabled or not.
 *      * sched     = Whether the slide is scheduled or not.
 *      * sched_t_s = The slide schedule starting timestamp.
 *      * sched_t_e = The slide schedule ending timestamp.

@@ -27,9 +27,7 @@ $AUTH_GET_SESSIONS = new APIEndpoint(array(
 ));
 api_endpoint_init($AUTH_GET_SESSIONS);
 
-$resp = array(
-	'active' => array()
-);
+$resp = array();
 $tok = $AUTH_GET_SESSIONS->get_auth_token();
 $sd = $AUTH_GET_SESSIONS->get_caller()->get_session_data();
 foreach ($sd as $k => $d) {

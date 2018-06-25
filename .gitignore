@@ -1,5 +1,9 @@
 *.swp
 *.save
 dist
-*.iconf
 build/link
+*.iconf
+
+__pycache__
+.mypy_cache
+.pyc

@@ -14,7 +14,7 @@
 *    * user = The username to query.
 *
 *  Return value
-*    * users
+*    * user
 *
 *      * user     = The name of the user.
 *      * groups   = The groups the user is in.
