@@ -34,9 +34,14 @@ verify: $(DIST_DIR)
 	echo '## Verify LibreSignage sources...'
 	./build/scripts/verify.sh
 
+utest: install
+	echo '## Unit testing LibreSignage...'
+	./utests/api/main.py
+
 clean:
 	echo '## Clean LibreSignage build files...'
 	rm -rfv $(DIST_DIR)
+
 
 realclean: clean
 	echo '## Clean all LibreSignage build files...'

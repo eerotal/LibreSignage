@@ -31,6 +31,3 @@ for f in `find $DIST_DIR -type f -name '*.php'`; do
 	# Check syntax.
 	php -l $f;
 done
-
-# Run the API unit testing system.
-./utests/api/main.py
