@@ -25,6 +25,7 @@ class Unit:
 	resp_mime: str = "";
 
 	def __init__(	self,
+			host: str,
 			name: str,
 			url: str,
 			request_method: str,
@@ -42,6 +43,7 @@ class Unit:
 			data_expect: Any,
 			headers_expect: Dict[str, RespVal]) -> None:
 
+		self.host = host;
 		self.name = name;
 		self.url = url;
 
@@ -102,7 +104,7 @@ class Unit:
 		try:
 			req = requests.request(
 				method = self.request_method,
-				url = self.url,
+				url = self.host + self.url,
 				data = data,
 				params = params,
 				cookies = self.cookies_request,
@@ -122,6 +124,12 @@ class Unit:
 			self.resp_mime = self.MIME_TEXT;
 		elif (re.match('^' + self.MIME_JSON + '.*', resp_ct)):
 			self.resp_mime = self.MIME_JSON;
+		else:
+			print(
+				"Unknown response mimetype: '" + resp_ct +
+				"'. Using '" + self.MIME_TEXT + "'."
+			);
+			self.resp_mime = self.MIME_TEXT;
 
 		# Validate response.
 		ret += self.handle_status(req);
@@ -245,10 +253,6 @@ class Unit:
 			return self.handle_json(req);
 		elif (self.resp_mime == self.MIME_TEXT):
 			return self.handle_text(req);
-		else:
-			raise Exception(
-				"Unknown response mimetype."
-			);
 
 	def handle_json(self, req: Response) -> List[UnitError]:
 		#
@@ -300,6 +304,5 @@ class Unit:
 		return [];
 
 def run_tests(tests: list) -> None:
-	print("[INFO]: Running unit tests.");
 	for t in tests:
 		t.run();

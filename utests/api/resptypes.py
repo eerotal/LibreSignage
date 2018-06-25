@@ -57,8 +57,8 @@ class RespList(RespVal): # List
 
 		if not (len(val) == len(self.proto)):
 			return False;
-		for i in range(len(proto)):
-			if not (proto[i] == val[i]):
+		for i in range(len(self.proto)):
+			if not (self.proto[i] == val[i]):
 				return False;
 		return True;
 
