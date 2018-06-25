@@ -34,14 +34,91 @@ def setup(host: str,
 			headers_expect_strict = False,
 			status_expect = 200,
 			data_expect = {
-				'data': RespDict({
-					'0x1': RespDict({
-						'id': RespStr('0x1')
-					}),
-					'0x2': RespDict({
-						'id': RespStr('0x2')
-					})
-				}),
+				'data': RespDict(None),
+				'error': RespInt(0)
+			},
+			headers_expect = {
+				'Access-Control-Allow-Origin': RespRe(
+					'.*'
+				),
+				'Content-Type': RespRe(
+					'application/json.*'
+				)
+			}
+		),
+		unit.Unit(
+			name = "slide_save.php",
+			host = host,
+			url = "/api/endpoint/slide/slide_save.php",
+			request_method = unit.Unit.METHOD_POST,
+
+			preexec = f_session_use,
+			postexec = lambda a, b: None,
+
+			data_request = {
+				'id': None,
+				'name': 'LS-Utest-Slide',
+				'index': 0,
+				'time': 5000,
+				'markup': 'Unit testing...',
+				'enabled': True,
+				'sched': False,
+				'sched_t_s': 0,
+				'sched_t_e': 0,
+				'animation': 1
+			},
+			headers_request = {
+				'Content-Type': 'application/json'
+			},
+			cookies_request = None,
+
+			data_expect_strict = True,
+			headers_expect_strict = False,
+			status_expect = 200,
+			data_expect = {
+				'id': RespRe('.*'),
+				'name': RespStr('LS-Utest-Slide'),
+				'index': RespInt(0),
+				'time': RespInt(5000),
+				'markup': RespRe('Unit testing...'),
+				'enabled': RespBool(True),
+				'sched': RespBool(False),
+				'sched_t_s': RespInt(0),
+				'sched_t_e': RespInt(0),
+				'animation': RespInt(1),
+				'owner': RespStr('admin'),
+				'error': RespInt(0)
+			},
+			headers_expect = {
+				'Access-Control-Allow-Origin': RespRe(
+					'.*'
+				),
+				'Content-Type': RespRe(
+					'application/json.*'
+				)
+			}
+		),
+		unit.Unit(
+			name = "slide_rm.php",
+			host = host,
+			url = "/api/endpoint/slide/slide_rm.php",
+			request_method = unit.Unit.METHOD_POST,
+
+			preexec = f_session_use,
+			postexec = lambda a, b: None,
+
+			data_request = {
+				'id': '0x3'
+			},
+			headers_request = {
+				'Content-Type': 'application/json'
+			},
+			cookies_request = None,
+
+			data_expect_strict = True,
+			headers_expect_strict = False,
+			status_expect = 200,
+			data_expect = {
 				'error': RespInt(0)
 			},
 			headers_expect = {
@@ -75,11 +152,11 @@ def setup(host: str,
 			status_expect = 200,
 			data_expect = {
 				'slide': RespDict({
-					'id': RespStr('0x1'),
+					'id': RespRe('0x1'),
 					'name': RespRe('.*'),
 					'index': RespInt(None),
 					'time': RespInt(None),
-					'markup': RespRe('.*'),
+					'markup': RespRe(None),
 					'owner': RespRe('.*'),
 					'enabled': RespBool(None),
 					'sched': RespBool(None),
@@ -126,6 +203,6 @@ def setup(host: str,
 					'application/json.*'
 				)
 			}
-		)
+		),
 	];
 

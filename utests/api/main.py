@@ -8,7 +8,7 @@ import importlib;
 from os import listdir;
 from os.path import isfile, join, splitext;
 
-UPATH = 'units';
+UPATH = 'utests/api/units';
 HOST = 'http://192.168.1.8';
 DATA: Dict[str, Any] = {};
 
@@ -36,6 +36,8 @@ if __name__ == '__main__':
 	queues = sorted(queues, key=lambda x: x.split('_')[0]);
 	for q in queues:
 		print("[INFO] Loading '" + q + "'.");
-		mod = importlib.import_module('units.' + splitext(q)[0]);
+		mod = importlib.import_module(
+			'units.' + splitext(q)[0]
+		);
 		mod.setup(HOST, session_use, session_store);
 		unit.run_tests(mod.tests);

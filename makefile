@@ -21,7 +21,7 @@ install: $(DIST_DIR) $(DIST_DOCS_DIR)/html
 	echo '## Install LibreSignage...'
 	./build/scripts/install.sh $(INST)
 
-$(DIST_DIR): verify
+$(DIST_DIR): $(shell find $(SRC_DIR))
 	echo '## Create LibreSignage distribution...'
 	rm -rfv $(DIST_DIR)
 	./build/scripts/mkdist.sh $(INST)
@@ -30,7 +30,7 @@ $(DIST_DOCS_DIR)/html: README.rst $(DIST_DOCS_DIR)
 	echo '## Compile LibreSignage documentation...'
 	./build/scripts/mkdocs.sh
 
-verify: $(shell find $(SRC_DIR))
+verify: $(DIST_DIR)
 	echo '## Verify LibreSignage sources...'
 	./build/scripts/verify.sh
 
