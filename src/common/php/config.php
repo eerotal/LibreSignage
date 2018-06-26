@@ -24,6 +24,7 @@
 	*  or system path information might be leaked to users.
 	*/
 	const SLIDES_DIR 			= "/data/slides";
+	const QUEUES_DIR			= "/data/queues";
 	const DOC_HTML_DIR			= "/doc/html";
 	const DOC_RST_DIR			= "/doc/rst";
 	const LICENSE_LS_RST	 		= "/doc/rst/LICENSE.rst";

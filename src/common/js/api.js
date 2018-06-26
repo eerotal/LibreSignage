@@ -83,6 +83,13 @@ var API_ENDP = {
 		auth:	true
 	},
 
+	// -- Queue API endpoints --
+	QUEUE_GET: {
+		uri:	"/api/endpoint/queue/queue_get.php",
+		method: "GET",
+		auth:	true
+	},
+
 	// -- Authentication API endpoints --
 	AUTH_LOGIN: {
 		uri:	"/api/endpoint/auth/auth_login.php",
