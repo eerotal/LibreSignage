@@ -1,31 +1,32 @@
-const DEFAULT_RENDERER_UPDATE_INTERVAL = 2000;
-const SLIDES_RETRIEVE_INTERVAL = 30000;
+const DISPLAY_UPDATE_INTERVAL = 2000;
+const QUEUE_UPDATE_INTERVAL = 30000;
 const DISPLAY = $('#display');
 
+var queue = null;
 var c_slide_i = -1;
 
-function renderer_next_slide(slides, wrap) {
+function display_next_slide(slides, wrap) {
 	var n_diff = -1;
 	var diff = -1;
 
-	if (!slides.length) { return null; }
-	for (let slide of slides) {
-		n_diff = slide.get('index') - c_slide_i;
+	if (!Object.keys(slides).length) { return null; }
+	for (var k in slides) {
+		n_diff = slides[k].get('index') - c_slide_i;
 		if (n_diff > 0 && (n_diff < diff || diff == -1)) {
 			diff = n_diff;
 		}
 	}
 	if (diff == -1 && wrap) {
 		c_slide_i = -1;
-		return renderer_next_slide(slides, false);
+		return display_next_slide(slides, false);
 	} else if (diff > 0) {
 		c_slide_i += diff;
-		for (let slide of slides) {
-			if (slide.get('index') == c_slide_i) {
-				if (slide.get('enabled')) {
-					return slide;
+		for (var k in slides) {
+			if (slides[k].get('index') == c_slide_i) {
+				if (slides[k].get('enabled')) {
+					return slides[k];
 				} else {
-					return renderer_next_slide(
+					return display_next_slide(
 						slides,
 						false
 					);
@@ -36,9 +37,9 @@ function renderer_next_slide(slides, wrap) {
 	return null;
 }
 
-function renderer_animate(elem, animation, end_callback) {
+function display_animate(elem, animation, end_callback) {
 	/*
-	*  Trigger one of the animations defined in 'css/renderer.css'
+	*  Trigger one of the animations defined in 'css/display.css'
 	*  on 'elem'. If 'end_callback' is not null, it's called when
 	*  the animation has finished.
 	*/
@@ -52,27 +53,21 @@ function renderer_animate(elem, animation, end_callback) {
 	});
 }
 
-function renderer_update() {
+function display_update() {
 	/*
 	*  Render the next slide.
 	*/
-	var slide = null;
-	var slides = slides_get();
+	var slide = display_next_slide(
+		queue.filter({'enabled': true}),
+		true
+	);
 
-	slide = renderer_next_slide(slides, true);
 	if (!slide) {
-		/*
-		*  Set the next update interval if no next
-		*  slide exists.
-		*/
-		setTimeout(
-			renderer_update,
-			DEFAULT_RENDERER_UPDATE_INTERVAL
-		);
+		setTimeout(display_update, DISPLAY_UPDATE_INTERVAL);
 		return;
 	}
 
-	renderer_animate(DISPLAY, slide.anim_hide(), () => {
+	display_animate(DISPLAY, slide.anim_hide(), () => {
 		DISPLAY.html(
 			markup_parse(
 				sanitize_html(
@@ -80,20 +75,16 @@ function renderer_update() {
 				)
 			)
 		);
-		renderer_animate(DISPLAY, slide.anim_show(), () => {
-			console.log(
-				`LibreSignage: Changing slide ` +
-				`in ${slide.get('time')}ms.`
-			);
-			setTimeout(renderer_update, slide.get('time'));
+		display_animate(DISPLAY, slide.anim_show(), () => {
+			setTimeout(display_update, slide.get('time'));
 		});
 	});
 }
 
 function display_setup() {
 	var params = get_GET_parameters();
-	if ("preview" in params) {
-		// Preview a slide without starting the renderer.
+	if ('preview' in params) {
+		// Preview a slide without starting the display.
 		console.log(
 			`LibreSignage: Preview slide ` +
 			` ${params["preview"]}.`
@@ -116,14 +107,19 @@ function display_setup() {
 				)
 			);
 		});
-	} else {
-		// Start the normal renderer 'loop'.
-		console.log("LibreSignage: Start the renderer loop.");
-		setInterval(() => {
-			list_retrieve(slides_retrieve);
-		}, SLIDES_RETRIEVE_INTERVAL);
-		list_retrieve(() => {
-			slides_retrieve(renderer_update);
+	} else if ('q' in params){
+		console.log("LibreSignage: Start the display loop.");
+		queue = new Queue();
+		queue.load(params['q'], () => {
+			console.log(
+				`LibreSignage: Queue ` +
+				`'${params['q']}' loaded. ` +
+				`(${queue.length()} slides)`
+			);
+			setInterval(() => {
+				queue.update();
+			}, QUEUE_UPDATE_INTERVAL);
+			display_update();
 		});
 	}
 }

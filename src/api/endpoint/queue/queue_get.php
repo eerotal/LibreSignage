@@ -34,14 +34,11 @@ $QUEUE_GET = new APIEndpoint(array(
 api_endpoint_init($QUEUE_GET);
 
 $queue = (new Queue())->load($QUEUE_GET->get('name'));
-$QUEUE_GET->resp_set(
-	array(
-		'slides' => array_map(
-			function($s) {
-				return $s->get_id();
-			},
-			$queue->slides()
-		)
-	)
-);
+
+$slides = $queue->slides();
+$ret = array();
+foreach ($slides as $s) {
+	$ret[$s->get_id()] = $s->get_data_array();
+}
+$QUEUE_GET->resp_set(array('slides' => $ret));
 $QUEUE_GET->send();
