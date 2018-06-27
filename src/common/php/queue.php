@@ -10,23 +10,24 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
 class Queue {
-	private $inited = FALSE;
 	private $queue = NULL;
 	private $slides = NULL;
+	private $path = NULL;
 
-	private function get_path($queue) {
-		return LIBRESIGNAGE_ROOT.QUEUES_DIR.'/'.$queue.'.json';
+	function __construct(string $queue) {
+		$this->queue = $queue;
+		$this->slides = array();
+		$this->path = LIBRESIGNAGE_ROOT.QUEUES_DIR.
+				'/'.$queue.'.json';
 	}
 
-	function load(string $queue) {
-		$path = $this->get_path($queue);
-		if (!file_exists($path)) {
+	function load() {
+		if (!file_exists($this->path)) {
 			throw new ArgException(
 				"Queue doesn't exist."
 			);
 		}
-		$this->queue = $queue;
-		$json = file_lock_and_get($path);
+		$json = file_lock_and_get($this->path);
 		$data = json_decode($json, $assoc=TRUE);
 		if (json_last_error() != JSON_ERROR_NONE &&
 			$data === NULL) {
@@ -46,16 +47,10 @@ class Queue {
 			}
 			$this->slides[] = $tmp;
 		}
-
-		$this->inited = TRUE;
-
 		return $this;
 	}
 
 	function write() {
-		assert($this->inited);
-
-		$path = $this->get_path($this->queue);
 		$ids = array_map(
 			function($s) {
 				return $s->get_id();
@@ -70,9 +65,7 @@ class Queue {
 				json_last_error_msg()
 			);
 		}
-		file_lock_and_put($path, $json);
-
-		return $this;
+		file_lock_and_put($this->path, $json);
 	}
 
 	function add(Slide $slide) {

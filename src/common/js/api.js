@@ -89,6 +89,11 @@ var API_ENDP = {
 		method: "GET",
 		auth:	true
 	},
+	QUEUE_CREATE: {
+		uri:	"/api/endpoint/queue/queue_create.php",
+		method:	"POST",
+		auth:	true
+	},
 
 	// -- Authentication API endpoints --
 	AUTH_LOGIN: {
@@ -193,7 +198,9 @@ function api_call(endpoint, data, callback) {
 			callback({'error': API_E.API_E_INTERNAL});
 		},
 		success: function(data, status, jqxhr) {
-			callback(data);
+			if (callback) {
+				callback(data);
+			}
 		}
 	};
 

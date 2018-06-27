@@ -117,7 +117,15 @@ function display_setup() {
 				`(${queue.length()} slides)`
 			);
 			setInterval(() => {
-				queue.update();
+				console.log(
+					"LibreSignage: Queue update."
+				);
+				queue.update(() => {
+					console.log(
+						"LibreSignage: Queue " +
+						"update complete."
+					);
+				});
 			}, QUEUE_UPDATE_INTERVAL);
 			display_update();
 		});
