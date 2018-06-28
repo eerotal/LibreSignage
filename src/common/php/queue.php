@@ -47,7 +47,6 @@ class Queue {
 			}
 			$this->slides[] = $tmp;
 		}
-		return $this;
 	}
 
 	function write() {

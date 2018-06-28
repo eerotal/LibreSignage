@@ -50,6 +50,7 @@
 		<script src="/common/js/cookie.js"></script>
 		<script src="/common/js/api.js"></script>
 		<script src="/common/js/markup.js"></script>
+		<script src="/common/js/slidelist.js"></script>
 		<script src="/common/js/queue.js"></script>
 		<script src="/app/js/display.js"></script>
 	</body>

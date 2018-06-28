@@ -5,38 +5,6 @@ const DISPLAY = $('#display');
 var queue = null;
 var c_slide_i = -1;
 
-function display_next_slide(slides, wrap) {
-	var n_diff = -1;
-	var diff = -1;
-
-	if (!Object.keys(slides).length) { return null; }
-	for (var k in slides) {
-		n_diff = slides[k].get('index') - c_slide_i;
-		if (n_diff > 0 && (n_diff < diff || diff == -1)) {
-			diff = n_diff;
-		}
-	}
-	if (diff == -1 && wrap) {
-		c_slide_i = -1;
-		return display_next_slide(slides, false);
-	} else if (diff > 0) {
-		c_slide_i += diff;
-		for (var k in slides) {
-			if (slides[k].get('index') == c_slide_i) {
-				if (slides[k].get('enabled')) {
-					return slides[k];
-				} else {
-					return display_next_slide(
-						slides,
-						false
-					);
-				}
-			}
-		}
-	}
-	return null;
-}
-
 function display_animate(elem, animation, end_callback) {
 	/*
 	*  Trigger one of the animations defined in 'css/display.css'
@@ -57,12 +25,14 @@ function display_update() {
 	/*
 	*  Render the next slide.
 	*/
-	var slide = display_next_slide(
-		queue.filter({'enabled': true}),
-		true
-	);
+	var slide = queue.slides.filter(
+		{'enabled': true}
+	).next(c_slide_i, true);
 
-	if (!slide) {
+	if (slide) {
+		c_slide_i = slide.get('index');
+	} else {
+		c_slide_i = -1;
 		setTimeout(display_update, DISPLAY_UPDATE_INTERVAL);
 		return;
 	}
@@ -87,11 +57,11 @@ function display_setup() {
 		// Preview a slide without starting the display.
 		console.log(
 			`LibreSignage: Preview slide ` +
-			` ${params["preview"]}.`
+			` ${params['preview']}.`
 		);
 
 		var slide = new Slide();
-		slide.load(params["preview"], (err) => {
+		slide.load(params['preview'], (err) => {
 			if (err) {
 				console.log(
 					"LibreSignage: Failed to " +
@@ -102,7 +72,7 @@ function display_setup() {
 			DISPLAY.html(
 				markup_parse(
 					sanitize_html(
-						slide.get("markup")
+						slide.get('markup')
 					)
 				)
 			);
@@ -114,7 +84,7 @@ function display_setup() {
 			console.log(
 				`LibreSignage: Queue ` +
 				`'${params['q']}' loaded. ` +
-				`(${queue.length()} slides)`
+				`(${queue.slides.length()} slides)`
 			);
 			setInterval(() => {
 				console.log(
