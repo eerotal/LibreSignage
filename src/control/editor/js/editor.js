@@ -1,5 +1,3 @@
-const SLIDELIST_UPDATE_INTERVAL = 60000;
-
 const DIALOG_MARKUP_TOO_LONG = (max) => {
 	return new Dialog(
 		DIALOG.ALERT,
@@ -60,7 +58,7 @@ var name_sel = null;
 var index_sel = null;
 var sel_slide = null;
 
-var flag_slide_loading = false; // Slide loading flag, used by slide_show().
+var flag_slide_loading = false; // Used by slide_show().
 
 function set_editor_status(str) {
 	EDITOR_STATUS.text(str);
@@ -319,7 +317,7 @@ function slide_rm() {
 
 			sel_slide = null;
 
-			slidelist_trigger_update();
+			timeline_update()
 			set_editor_inputs(null);
 			disable_editor_controls();
 			set_editor_status("Slide deleted!");
@@ -415,7 +413,7 @@ function slide_save() {
 		*  editor controls except the Remove button.
 		*/
 		SLIDE_REMOVE.prop('disabled', false);
-		slidelist_trigger_update();
+		timeline_update()
 
 		slide_show(sel_slide.get('id'), true);
 	});
@@ -523,11 +521,7 @@ function editor_setup() {
 
 	// Disable inputs initially and setup update intevals.
 	disable_editor_controls();
-	slidelist_trigger_update();
-	setInterval(
-		slidelist_trigger_update,
-		SLIDELIST_UPDATE_INTERVAL
-	);
+	timeline_setup('default');
 }
 
 $(document).ready(() => {

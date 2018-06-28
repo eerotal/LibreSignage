@@ -28,7 +28,7 @@
 				</div>
 				<div class="container-fluid row m-0">
 					<div class="col-12">
-						<div id="slidelist" class="d-flex flex-row flex-nowrap">
+						<div id="timeline" class="d-flex flex-row flex-nowrap">
 						</div>
 					</div>
 				</div>
@@ -228,7 +228,9 @@
 		<script src="/common/js/dialog.js"></script>
 		<script src="/common/js/cookie.js"></script>
 		<script src="/common/js/api.js"></script>
-		<script src="/control/editor/js/slidelist.js"></script>
+		<script src="/common/js/slidelist.js"></script>
+		<script src="/common/js/queue.js"></script>
+		<script src="/control/editor/js/timeline.js"></script>
 		<script src="/control/editor/js/editor.js"></script>
 	</body>
 </html>

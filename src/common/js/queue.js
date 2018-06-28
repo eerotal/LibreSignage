@@ -15,13 +15,14 @@ class Queue {
 		var tmp = null;
 		var cnt = 0;
 		var id = '';
+
+		this.name = name;
+		this.slides = new SlideList();
+
 		api_call(API_ENDP.QUEUE_GET, {'name': name}, (data) => {
 			if (api_handle_disp_error(data.error)) {
 				return;
 			}
-
-			this.name = name;
-			this.slides = new SlideList();
 
 			cnt = Object.keys(data['slides']).length;
 			for (let s of Object.values(data['slides'])) {
