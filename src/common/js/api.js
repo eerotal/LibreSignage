@@ -94,6 +94,11 @@ var API_ENDP = {
 		method:	"POST",
 		auth:	true
 	},
+	QUEUE_LIST: {
+		uri:	"/api/endpoint/queue/queue_list.php",
+		method:	"GET",
+		auth:	true
+	},
 
 	// -- Authentication API endpoints --
 	AUTH_LOGIN: {

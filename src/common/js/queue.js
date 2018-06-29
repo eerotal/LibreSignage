@@ -25,6 +25,13 @@ class Queue {
 			}
 
 			cnt = Object.keys(data['slides']).length;
+
+			if (cnt == 0 && ready) {
+				// Execute callback for empty queues.
+				ready(this);
+				return
+			}
+
 			for (let s of Object.values(data['slides'])) {
 				id = s['id'];
 				this.slides.slides[id] = new Slide();

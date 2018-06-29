@@ -3,7 +3,16 @@ html, body {
 }
 
 /* Controls styling. */
-#slidelist {
+#queue-select-cont {
+	min-width: 250px;
+}
+
+#queue-select {
+	min-width: 100px;
+	max-width: 250px;
+}
+
+#timeline {
 	padding: 0;
 	padding-top: 5px;
 	padding-bottom: 5px;

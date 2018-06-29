@@ -9,6 +9,28 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
+function queue_list() {
+	/*
+	*  Get a list of the existing slide queue names.
+	*/
+	$queues = array();
+	$queues = array_map(
+		function(string $val) {
+			if (substr($val, 1, 1) != '.' &&
+				substr($val, -5) == '.json') {
+				return substr($val, 0, strlen($val) - 5);
+			} else {
+				return NULL;
+			}
+		},
+		scandir(LIBRESIGNAGE_ROOT.QUEUES_DIR)
+	);
+	$queues = array_values(array_filter($queues, function($val) {
+		return $val != NULL;
+	}));
+	return $queues;
+}
+
 class Queue {
 	private $queue = NULL;
 	private $slides = NULL;
@@ -50,12 +72,14 @@ class Queue {
 	}
 
 	function write() {
-		$ids = array_map(
-			function($s) {
-				return $s->get_id();
-			},
-			$this->slides
-		);
+		$ids = array(
+				'slides' => array_map(
+					function($s) {
+						return $s->get_id();
+					},
+					$this->slides
+				)
+			);
 		$json = json_encode($ids);
 		if (json_last_error() != JSON_ERROR_NONE &&
 			$json === FALSE) {

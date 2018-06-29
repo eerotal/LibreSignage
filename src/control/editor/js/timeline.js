@@ -57,9 +57,11 @@ function timeline_update_html() {
 	});
 }
 
-function timeline_setup(queue) {
+function timeline_show(queue) {
 	timeline_queue = new Queue();
-	timeline_queue.load(queue);
-	timeline_update();
+	timeline_queue.load(queue, timeline_update_html);
+}
+
+function timeline_setup(queue) {
 	setInterval(timeline_update, TIMELINE_UPDATE_INTERVAL);
 }

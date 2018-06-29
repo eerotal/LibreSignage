@@ -31,9 +31,11 @@ const NEW_SLIDE_DEFAULTS = {
 	'sched': false,
 	'sched_t_s': Math.round(Date.now()/1000),
 	'sched_t_e': Math.round(Date.now()/1000),
-	'animation': 0
+	'animation': 0,
+	'queue_name': ''
 };
 
+const QUEUE_SELECT		= $("#queue-select");
 const SLIDE_PREVIEW             = $("#btn-slide-preview");
 const SLIDE_SAVE                = $("#btn-slide-save");
 const SLIDE_REMOVE              = $("#btn-slide-remove");
@@ -448,6 +450,29 @@ function slide_preview() {
 	}
 }
 
+function update_queue_selector(show_initial) {
+	/*
+	*  Update the queue selector options.
+	*/
+	api_call(API_ENDP.QUEUE_LIST, {}, (data) => {
+		if (api_handle_disp_error(data.error)) {
+			return;
+		}
+
+		QUEUE_SELECT.html('');
+		for (var k in data['queues']) {
+			QUEUE_SELECT.append(
+				`<option value="${data['queues'][k]}">` +
+				`${data['queues'][k]}</option>`
+			);
+		}
+
+		if (show_initial && data['queues'].length) {
+			timeline_show(data['queues'][0]);
+		}
+	});
+}
+
 function editor_setup() {
 	setup_defaults();
 
@@ -512,6 +537,15 @@ function editor_setup() {
 	SLIDE_SCHED.change(scheduling_handle_input_enable);
 
 	/*
+	*  Handle changing queues when an onchange event is fired
+	*  on QUEUE_SELECT.
+	*/
+	QUEUE_SELECT.change(() => {
+		console.log("LibreSignage: Change timeline.");
+		timeline_show(QUEUE_SELECT.val());
+	});
+
+	/*
 	*  Setup the ACE editor with the Dawn theme
 	*  and plaintext mode.
 	*/
@@ -521,7 +555,8 @@ function editor_setup() {
 
 	// Disable inputs initially and setup update intevals.
 	disable_editor_controls();
-	timeline_setup('default');
+	update_queue_selector(true);
+	timeline_setup();
 }
 
 $(document).ready(() => {

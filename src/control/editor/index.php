@@ -23,8 +23,13 @@
 		?>
 		<main class="container-fluid">
 			<div class="container-main container-fluid w-100 h-100">
-				<div class="container-fluid row m-0">
-					<span class="col">Slides</span>
+				<div id="queue-select-cont" class="container-fluid row m-0">
+					<div class="col-auto d-inline-block my-auto pl-3 pr-2 mb-2">
+						Queue:
+					</div>
+					<select class="col-3 d-inline-block my-auto custom-select small-select"
+						id="queue-select">
+					</select>
 				</div>
 				<div class="container-fluid row m-0">
 					<div class="col-12">

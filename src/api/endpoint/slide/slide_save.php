@@ -10,17 +10,18 @@
 *  *Save a slide.*
 *
 *  POST JSON parameters
-*    * id        = The ID of the slide to modify or either
+*    * id         = The ID of the slide to modify or either
 *      undefined or null for new slide.
-*    * name      = The name of the slide.
-*    * index     = The index of the slide.
-*    * time      = The amount of time the slide is shown.
-*    * markup    = The markup of the slide.
-*    * enabled   = Whether the slide is enabled or not.
-*    * sched     = Whether the slide is scheduled or not.
-*    * sched_t_s = The slide schedule starting timestamp.
-*    * sched_t_e = The slide schedule ending timestamp.
-*    * animation = The slide animation identifier.
+*    * name       = The name of the slide.
+*    * index      = The index of the slide.
+*    * time       = The amount of time the slide is shown.
+*    * markup     = The markup of the slide.
+*    * enabled    = Whether the slide is enabled or not.
+*    * sched      = Whether the slide is scheduled or not.
+*    * sched_t_s  = The slide schedule starting timestamp.
+*    * sched_t_e  = The slide schedule ending timestamp.
+*    * animation  = The slide animation identifier.
+*    * queue_name = The name of the slide queue of this slide.
 *
 *  Return value
 *    This endpoint returns all the parameters above as well as
@@ -49,7 +50,8 @@ $SLIDE_SAVE = new APIEndpoint(array(
 		'sched' => API_P_BOOL,
 		'sched_t_s' => API_P_INT,
 		'sched_t_e' => API_P_INT,
-		'animation' => API_P_INT
+		'animation' => API_P_INT,
+		'queue_name' => API_P_STR
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
@@ -113,6 +115,7 @@ try {
 	$slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
 	$slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
 	$slide->set_animation($SLIDE_SAVE->get('animation'));
+	$slide->set_queue($SLIDE_SAVE->get('queue_name'));
 } catch (ArgException $e) {
 	/*
 	*  Throw an API_E_INVALID_REQUEST exception if
