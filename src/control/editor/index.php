@@ -27,9 +27,21 @@
 					<div class="col-auto d-inline-block my-auto pl-3 pr-2 mb-2">
 						Queue:
 					</div>
-					<select class="col-3 d-inline-block my-auto custom-select small-select"
+					<select class="col-3 d-inline-block my-auto custom-select small-select ml-1 mr-2"
 						id="queue-select">
 					</select>
+					<button class="btn btn-primary small-btn mx-1"
+						type="button"
+						id="queue-create"
+						onclick="queue_create()">
+						+
+					</button>
+					<button class="btn btn-danger small-btn mx-1"
+						type="button"
+						id="queue-remove"
+						onclick="queue_remove()">
+						-
+					</button>
 				</div>
 				<div class="container-fluid row m-0">
 					<div class="col-12">
@@ -237,5 +249,6 @@
 		<script src="/common/js/queue.js"></script>
 		<script src="/control/editor/js/timeline.js"></script>
 		<script src="/control/editor/js/editor.js"></script>
+		<script src="/control/editor/js/queue_selector.js"></script>
 	</body>
 </html>

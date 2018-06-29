@@ -118,3 +118,7 @@ h1, h2, h3, h4, h5, h6 {
 	padding-left: 8px;
 	padding-right: 8px;
 }
+
+.small-btn {
+	height: 2em;
+}
