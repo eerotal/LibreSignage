@@ -35,8 +35,15 @@ class Queue {
 	private $queue = NULL;
 	private $slides = NULL;
 	private $path = NULL;
+	private $loaded = FALSE;
 
 	function __construct(string $queue) {
+		if (!strlen($queue)) {
+			throw new ArgException(
+				'Invalid queue name.'
+			);
+		}
+
 		$this->queue = $queue;
 		$this->slides = array();
 		$this->path = LIBRESIGNAGE_ROOT.QUEUES_DIR.
@@ -69,6 +76,7 @@ class Queue {
 			}
 			$this->slides[] = $tmp;
 		}
+		$this->loaded = TRUE;
 	}
 
 	function write() {
@@ -91,11 +99,36 @@ class Queue {
 		file_lock_and_put($this->path, $json);
 	}
 
+	function remove() {
+		if (!$this->loaded) {
+			throw new IntException(
+				'Queue not loaded.'
+			);
+		}
+		if (!file_exists($this->path)) {
+			throw new ArgException(
+				"Queue doesn't exist."
+			);
+		}
+
+		// Remove slides.
+		foreach ($this->slides() as $s) {
+			$s->remove();
+		}
+
+		// Remove the queue.
+		if (!unlink($this->path)) {
+			throw new ArgException(
+				"Failed to remove queue."
+			);
+		}
+	}
+
 	function add(Slide $slide) {
 		$this->slides[] = $slide;
 	}
 
-	function remove(Slide $slide) {
+	function remove_slide(Slide $slide) {
 		array_filter(
 			$this->slides,
 			function($s) {

@@ -26,7 +26,11 @@ function timeline_update() {
 	/*
 	*  Update timeline information and HTML.
 	*/
-	timeline_queue.update(timeline_update_html);
+	if (timeline_queue) {
+		timeline_queue.update(timeline_update_html);
+	} else {
+		timeline_update_html();
+	}
 }
 
 function timeline_update_html() {
@@ -35,7 +39,14 @@ function timeline_update_html() {
 	*/
 	var c_i = -1;
 	var slide = null;
-	var list = timeline_queue.slides;
+	var list = null;
+
+	if (!timeline_queue) {
+		TIMELINE.html('');
+		return;
+	}
+
+	list = timeline_queue.slides;
 
 	TIMELINE.html('');
 	while (slide = list.next(c_i, false)) {
@@ -58,10 +69,15 @@ function timeline_update_html() {
 }
 
 function timeline_show(queue) {
+	if (!queue) {
+		timeline_queue = null;
+		timeline_update_html();
+		return;
+	}
 	timeline_queue = new Queue();
 	timeline_queue.load(queue, timeline_update_html);
 }
 
-function timeline_setup(queue) {
+function timeline_setup() {
 	setInterval(timeline_update, TIMELINE_UPDATE_INTERVAL);
 }

@@ -1,4 +1,7 @@
 function queue_create() {
+	/*
+	*  Create a new queue and select it.
+	*/
 	dialog(
 		DIALOG.PROMPT,
 		'Create queue',
@@ -9,11 +12,12 @@ function queue_create() {
 				API_ENDP.QUEUE_CREATE,
 				{'name': val},
 				(data) => {
-					err = api_handle_disp_error(
+					var err = api_handle_disp_error(
 						data['error']
 					);
 					if (err) { return; }
 
+					// Select the new queue.
 					update_queue_selector(false);
 					QUEUE_SELECT.val(val);
 					timeline_show(val);
@@ -29,7 +33,29 @@ function queue_create() {
 }
 
 function queue_remove() {
-	// TODO
+	/*
+	*  Remove the selected queue.
+	*/
+	dialog(
+		DIALOG.CONFIRM,
+		'Delete queue',
+		'Delete the selected queue and all the slides in it?',
+		(status) => {
+			if (!status) { return; }
+			api_call(
+				API_ENDP.QUEUE_REMOVE,
+				{'name': timeline_queue.name},
+				(data) => {
+					var err = api_handle_disp_error(
+						data['error']
+					);
+					if (err) { return; }
+
+					update_queue_selector(true);
+				}
+			);
+		}
+	);
 }
 
 function update_queue_selector(show_initial) {

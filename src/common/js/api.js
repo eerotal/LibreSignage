@@ -99,6 +99,11 @@ var API_ENDP = {
 		method:	"GET",
 		auth:	true
 	},
+	QUEUE_REMOVE: {
+		uri:	"/api/endpoint/queue/queue_remove.php",
+		method:	"POST",
+		auth:	true
+	},
 
 	// -- Authentication API endpoints --
 	AUTH_LOGIN: {
