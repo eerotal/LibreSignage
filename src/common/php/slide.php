@@ -355,11 +355,13 @@ class Slide {
 
 	function set_queue(string $name) {
 		if ($this->queue_name != $name) {
-			// Remove slide from the old queue.
-			$o = new Queue($this->queue_name);
-			$o->load();
-			$o->remove($this);
-			$o->write();
+			if ($this->queue_name) {
+				// Remove slide from the old queue.
+				$o = new Queue($this->queue_name);
+				$o->load();
+				$o->remove($this);
+				$o->write();
+			}
 
 			// Add slide to the the new queue.
 			$this->queue_name = $name;

@@ -355,12 +355,22 @@ function slide_new() {
 		}
 	};
 
+	if (!timeline_queue) {
+		dialog(
+			DIALOG.ALERT,
+			'Please create a queue',
+			'You must create a queue before you can ' +
+			'add a slide to one.',
+			null
+		);
+		return;
+	}
+
 	if (selected_slide_is_modified()) {
 		DIALOG_SLIDE_NOT_SAVED(cb).show();
 	} else {
 		cb(true, null);
 	}
-
 }
 
 function slide_save() {
@@ -395,7 +405,8 @@ function slide_save() {
 				SLIDE_SCHED_DATE_E.val(),
 				SLIDE_SCHED_TIME_E.val()
 			),
-		'animation': parseInt(SLIDE_ANIMATION.val(), 10)
+		'animation': parseInt(SLIDE_ANIMATION.val(), 10),
+		'queue_name': timeline_queue.name
 	});
 
 	sel_slide.save((stat) => {

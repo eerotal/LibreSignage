@@ -77,6 +77,8 @@ function update_queue_selector(show_initial) {
 
 		if (show_initial && data['queues'].length) {
 			timeline_show(data['queues'][0]);
+		} else if (show_initial) {
+			timeline_show(null);
 		}
 	});
 }
