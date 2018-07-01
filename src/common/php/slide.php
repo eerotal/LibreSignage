@@ -455,8 +455,16 @@ class Slide {
 
 	function remove() {
 		/*
-		*  Remove the files associated with this slide.
+		*  Remove this slide.
 		*/
+
+		// Remove slide from its queue.
+		$q = new Queue($this->queue_name);
+		$q->load();
+		$q->remove_slide($this);
+		$q->write();
+
+		// Remove slide data files.
 		if (!empty($this->dir_path)) {
 			rmdir_recursive($this->dir_path);
 		}

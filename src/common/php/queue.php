@@ -71,7 +71,7 @@ class Queue {
 			$tmp = new Slide();
 			if (!$tmp->load($n)) {
 				throw new IntException(
-					"Slide in queue doesn't exist."
+					"No such slide in queue."
 				);
 			}
 			$this->slides[] = $tmp;
@@ -129,9 +129,9 @@ class Queue {
 	}
 
 	function remove_slide(Slide $slide) {
-		array_filter(
+		$this->slides = array_filter(
 			$this->slides,
-			function($s) {
+			function($s) use ($slide) {
 				return $s->get_id() != $slide->get_id();
 			}
 		);
