@@ -13,6 +13,7 @@
 *    * name = The name of the queue to get.
 *
 *  Return value
+*    * owner  = The owner of the queue.
 *    * slides = A list containing the IDs of the slides in the queue.
 *    * error  = An error code or API_E_OK on success.
 *
@@ -48,10 +49,5 @@ if ($tmp) {
 $queue = new Queue($QUEUE_GET->get('name'));
 $queue->load();
 
-$slides = $queue->slides();
-$ret = array();
-foreach ($slides as $s) {
-	$ret[$s->get_id()] = $s->get_data_array();
-}
-$QUEUE_GET->resp_set(array('slides' => $ret));
+$QUEUE_GET->resp_set($queue->get_data_array());
 $QUEUE_GET->send();

@@ -46,6 +46,30 @@ if ($tmp) {
 
 $queue = new Queue($QUEUE_REMOVE->get('name'));
 $queue->load();
-$queue->remove();
 
+$caller = $QUEUE_REMOVE->get_caller();
+
+$ALLOW = FALSE;
+
+// Allow admins to remove the queue.
+$ALLOW |= $caller->is_in_group('admin');
+
+/*
+*  Allow users in the group editor that own the queue and
+*  all the slides in it to remove the queue.
+*/
+$ALLOW |= $caller->is_in_group('editor') &&
+	$caller->get_name() == $queue->get_owner() &&
+	array_check($queue->slides(), function($s) use($caller) {
+		return $s->get_owner() == $caller->get_name();
+	});
+
+if (!$ALLOW) {
+	throw new APIException(
+		API_E_NOT_AUTHORIZED,
+		"Not authorized."
+	);
+}
+
+$queue->remove();
 $QUEUE_REMOVE->send();

@@ -132,3 +132,12 @@ function gen_passwd(int $len) {
 	}
 	return $ret;
 }
+
+function array_check(array $arr, Callable $func) {
+	foreach ($arr as $a) {
+		if (!$func($a)) {
+			return FALSE;
+		}
+	}
+	return TRUE;
+}

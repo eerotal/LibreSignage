@@ -33,6 +33,7 @@ function queue_list() {
 
 class Queue {
 	private $queue = NULL;
+	private $owner = NULL;
 	private $slides = NULL;
 	private $path = NULL;
 	private $loaded = FALSE;
@@ -66,6 +67,8 @@ class Queue {
 			);
 		}
 
+		$this->set_owner($data['owner']);
+
 		$this->slides = array();
 		foreach ($data['slides'] as $n) {
 			$tmp = new Slide();
@@ -80,7 +83,13 @@ class Queue {
 	}
 
 	function write() {
-		$ids = array(
+		if (!$this->owner) {
+			throw new ArgException(
+				"Queue doesn't have an owner."
+			);
+		}
+		$data = array(
+				'owner' => $this->owner,
 				'slides' => array_map(
 					function($s) {
 						return $s->get_id();
@@ -88,7 +97,7 @@ class Queue {
 					$this->slides
 				)
 			);
-		$json = json_encode($ids);
+		$json = json_encode($data);
 		if (json_last_error() != JSON_ERROR_NONE &&
 			$json === FALSE) {
 			throw new IntException(
@@ -116,12 +125,16 @@ class Queue {
 			$s->remove();
 		}
 
-		// Remove the queue.
+		// Remove queue.
 		if (!unlink($this->path)) {
 			throw new ArgException(
 				"Failed to remove queue."
 			);
 		}
+	}
+
+	function set_owner(string $owner) {
+		$this->owner = $owner;
 	}
 
 	function add(Slide $slide) {
@@ -139,5 +152,20 @@ class Queue {
 
 	function slides() {
 		return $this->slides;
+	}
+
+	function get_owner() {
+		return $this->owner;
+	}
+
+	function get_data_array() {
+		$sret = [];
+		foreach ($this->slides as $s) {
+			$sret[$s->get_id()] = $s->get_data_array();
+		}
+		return [
+			'owner' => $this->owner,
+			'slides' => $sret
+		];
 	}
 }
