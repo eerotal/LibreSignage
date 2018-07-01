@@ -33,14 +33,30 @@ $QUEUE_CREATE = new APIEndpoint(array(
 ));
 api_endpoint_init($QUEUE_CREATE);
 
+if (!check_perm('grp:admin|grp:editor;', $QUEUE_CREATE->get_caller())) {
+	throw new APIException(
+		API_E_NOT_AUTHORIZED,
+		'Not authorized.'
+	);
+}
+
 $tmp = preg_match('/[^a-zA-Z0-9_-]/', $QUEUE_CREATE->get('name'));
 if ($tmp) {
-	throw new ArgException(
+	throw new APIException(
+		API_E_INVALID_REQUEST,
 		"Invalid chars in queue name."
 	);
 } else if ($tmp === NULL) {
-	throw new IntException(
+	throw new APIException(
+		API_E_INTERNAL,
 		"Regex match failed."
+	);
+}
+
+if (queue_exists($QUEUE_CREATE->get('name'))) {
+	throw new APIException(
+		API_E_INVALID_REQUEST,
+		'Queue already exists.'
 	);
 }
 

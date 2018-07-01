@@ -9,6 +9,10 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
+function queue_exists(string $name) {
+	return in_array($name, queue_list());
+}
+
 function queue_list() {
 	/*
 	*  Get a list of the existing slide queue names.

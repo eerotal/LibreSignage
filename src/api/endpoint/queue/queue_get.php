@@ -37,11 +37,13 @@ api_endpoint_init($QUEUE_GET);
 
 $tmp = preg_match('/[^a-zA-Z0-9_-]/', $QUEUE_GET->get('name'));
 if ($tmp) {
-	throw new ArgException(
+	throw new APIException(
+		API_E_INVALID_REQUEST,
 		"Invalid chars in queue name."
 	);
 } else if ($tmp === NULL) {
-	throw new IntException(
+	throw new APIException(
+		API_E_INTERNAL,
 		"Regex match failed."
 	);
 }

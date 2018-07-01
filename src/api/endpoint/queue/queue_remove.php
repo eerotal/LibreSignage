@@ -35,11 +35,13 @@ api_endpoint_init($QUEUE_REMOVE);
 
 $tmp = preg_match('/[^a-zA-Z0-9_-]/', $QUEUE_REMOVE->get('name'));
 if ($tmp) {
-	throw new ArgException(
+	throw new APIException(
+		API_E_INVALID_REQUEST,
 		"Invalid chars in queue name."
 	);
 } else if ($tmp === NULL) {
-	throw new IntException(
+	throw new APIException(
+		API_E_INTERNAL,
 		"Regex match failed."
 	);
 }
@@ -47,22 +49,24 @@ if ($tmp) {
 $queue = new Queue($QUEUE_REMOVE->get('name'));
 $queue->load();
 
+$owner = $queue->get_owner();
 $caller = $QUEUE_REMOVE->get_caller();
 
 $ALLOW = FALSE;
 
-// Allow admins to remove the queue.
-$ALLOW |= $caller->is_in_group('admin');
+// Allow users in the admin group.
+$ALLOW = check_perm('grp:admin;', $caller);
 
 /*
-*  Allow users in the group editor that own the queue and
-*  all the slides in it to remove the queue.
+*  Allow users in the editor group if they own
+*  the queue and all the slides in it.
 */
-$ALLOW |= $caller->is_in_group('editor') &&
-	$caller->get_name() == $queue->get_owner() &&
-	array_check($queue->slides(), function($s) use($caller) {
-		return $s->get_owner() == $caller->get_name();
-	});
+$ALLOW = $ALLOW || (
+		check_perm("grp:editor&usr:$owner;", $caller) &&
+		array_check($queue->slides(), function($s) use($caller) {
+			return $s->get_owner() == $caller->get_name();
+		})
+	);
 
 if (!$ALLOW) {
 	throw new APIException(
