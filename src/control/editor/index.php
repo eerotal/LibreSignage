@@ -1,6 +1,7 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js_include.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/css.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 	web_auth(NULL, array('editor'), TRUE);
 ?>
@@ -10,6 +11,9 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+		<?php
+			css_include(['font-awesome', 'bootstrap']);
+		?>
 		<link rel="stylesheet" href="/common/css/footer.css">
 		<link rel="stylesheet" href="/common/css/nav.css">
 		<link rel="stylesheet" href="/common/css/default.css">
@@ -34,13 +38,13 @@
 						type="button"
 						id="queue-create"
 						onclick="queue_create()">
-						+
+						<i class="fas fa-plus-circle"></i>
 					</button>
 					<button class="btn btn-danger small-btn mx-1"
 						type="button"
 						id="queue-remove"
 						onclick="queue_remove()">
-						-
+						<i class="fas fa-trash-alt"></i>
 					</button>
 				</div>
 				<div class="container-fluid row m-0">
@@ -190,20 +194,24 @@
 						<!-- Control buttons -->
 						<div class="row form-group container-fluid d-flex justify-content-center mx-0 px-0">
 							<div class="col-auto btn-slide-ctrl px-0 py-1">
-								<button id="btn-slide-save"
-									type="button"
-									class="btn btn-success w-100"
-									onclick="slide_save()"
-									data-toggle="tooltip"
-									title="Save the selected slide.">Save</button>
-							</div>
-							<div class="col-auto btn-slide-ctrl px-0 py-1">
 								<button id="btn-slide-new"
 									type="button"
 									class="btn btn-success w-100"
 									onclick="slide_new()"
 									data-toggle="tooltip"
-									title="Create a new slide.">New</button>
+									title="Create slide.">
+									<i class="fas fa-plus-circle"></i>
+								</button>
+							</div>
+							<div class="col-auto btn-slide-ctrl px-0 py-1">
+								<button id="btn-slide-save"
+									type="button"
+									class="btn btn-success w-100"
+									onclick="slide_save()"
+									data-toggle="tooltip"
+									title="Save slide.">
+									<i class="fas fa-save"></i>
+								</button>
 							</div>
 							<div class="col-auto btn-slide-ctrl px-0 py-1">
 								<button id="btn-slide-remove"
@@ -211,7 +219,9 @@
 									class="btn btn-danger w-100"
 									onclick="slide_rm()"
 									data-toggle="tooltip"
-									title="Remove the selected slide.">Remove</button>
+									title="Remove slide.">
+									<i class="fas fa-trash-alt"></i>
+								</button>
 							</div>
 							<div class="col-auto btn-slide-ctrl px-0 py-1">
 								<button id="btn-slide-preview"
@@ -219,7 +229,9 @@
 									class="btn btn-success w-100"
 									onclick="slide_preview()"
 									data-toggle="tooltip"
-									title="Preview the selected slide in a new window.">Preview</button>
+									title="Preview slide.">
+									<i class="fas fa-eye"></i>
+								</button>
 							</div>
 						</div>
 						<p id="editor-status"></p>
@@ -234,10 +246,7 @@
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
 
-			js_include_jquery();
-			js_include_popper();
-			js_include_bootstrap();
-			js_include_ace();
+			js_include(['jquery', 'popper', 'bootstrap', 'ace']);
 		?>
 		<script src="/common/js/slide.js"></script>
 		<script src="/common/js/util.js"></script>
