@@ -36,6 +36,9 @@ const NEW_SLIDE_DEFAULTS = {
 };
 
 const QUEUE_SELECT		= $("#queue-select");
+const QUEUE_VIEW		= $("#queue-view");
+const QUEUE_REMOVE		= $("#queue-remove");
+
 const SLIDE_PREVIEW             = $("#btn-slide-preview");
 const SLIDE_SAVE                = $("#btn-slide-save");
 const SLIDE_REMOVE              = $("#btn-slide-remove");

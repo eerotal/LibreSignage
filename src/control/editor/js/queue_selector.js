@@ -71,8 +71,13 @@ function queue_remove() {
 					update_queue_selector(true);
 				}
 			);
-		}
+		},
+		null
 	);
+}
+
+function queue_view() {
+	window.open('/app/?q=' + timeline_queue.name);
 }
 
 function update_queue_selector(show_initial) {
@@ -92,6 +97,16 @@ function update_queue_selector(show_initial) {
 			);
 		}
 
+		// Enable/disable buttons.
+		if (data['queues'].length) {
+			QUEUE_REMOVE.prop('disabled', false);
+			QUEUE_VIEW.prop('disabled', false);
+		} else {
+			QUEUE_REMOVE.prop('disabled', true);
+			QUEUE_VIEW.prop('disabled', true);
+		}
+
+		// Select the first queue.
 		if (show_initial && data['queues'].length) {
 			timeline_show(data['queues'][0]);
 		} else if (show_initial) {

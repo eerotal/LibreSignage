@@ -46,6 +46,12 @@
 						onclick="queue_remove()">
 						<i class="fas fa-trash-alt"></i>
 					</button>
+					<button class="btn btn-primary small-btn mx-1"
+						type="button"
+						id="queue-view"
+						onclick="queue_view()">
+						<i class="fas fa-eye"></i>
+					</button>
 				</div>
 				<div class="container-fluid row m-0">
 					<div class="col-12">
