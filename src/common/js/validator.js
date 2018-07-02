@@ -27,7 +27,7 @@ class ValidatorSelector {
 		this.validators = [];
 		this.callbacks = [];
 		this.enabled = true;
-		this.valid = null; // Initially null, validate() sets this.
+		this.valid = null; // validate() sets this.
 		this.query = $(query);
 		this.style = $(style);
 
@@ -41,19 +41,21 @@ class ValidatorSelector {
 			'input',
 			() => { this.validate(); }
 		);
-		for (var i in validators) {
-			this.add(validators[i]);
+		if (validators) {
+			for (let v of validators) {
+				this.add(v);
+			}
 		}
-		for (var i in callbacks) {
-			this.add_callback(callbacks[i]);
+		if (callbacks) {
+			for (let c of callbacks) {
+				this.add_callback(c);
+			}
 		}
 		this.validate();
 	}
 
 	add(validator) {
-		/*
-		*  Add a validator to the ValidatorSelector object.
-		*/
+		// Add a validator to the ValidatorSelector object.
 		if (!validator || validator != Object(validator)) {
 			throw new Error('Invalid validator object.');
 		}
@@ -61,21 +63,9 @@ class ValidatorSelector {
 	}
 
 	add_callback(callback) {
-		/*
-		*  Add a callback to the ValidatorSelector object.
-		*/
-		if (!callback) {
-			return;
-		}
+		// Add a callback to the ValidatorSelector object.
+		if (!callback) { return; }
 		this.callbacks.push(callback);
-	}
-
-	state() {
-		if (this.state == null) {
-			return false;
-		} else {
-			return this.valid;
-		}
 	}
 
 	set_dom_msg(msg) {
@@ -87,18 +77,17 @@ class ValidatorSelector {
 
 	set_state(valid) {
 		if (this.valid != valid) {
+			this.valid = valid;
 			if (!valid) {
-				this.valid = false;
 				this.query.addClass('is-invalid');
 			} else if (valid) {
-				this.valid = true;
 				this.query.removeClass('is-invalid');
 			}
-			for (var i in this.callbacks) {
-				this.callbacks[i](this);
-			}
+			for (let c of this.callbacks) { c(this); }
 		}
 	}
+
+	get_state() { return this.valid; }
 
 	disable() {
 		this.enabled = false;
@@ -111,17 +100,15 @@ class ValidatorSelector {
 	}
 
 	validate() {
-		var m = null;
-		var s = true;
 		if (!this.enabled) { return; }
-		for (var i in this.validators) {
-			if (!this.validators[i].validate(this)) {
-				m = this.validators[i].get_msg();
-				this.set_dom_msg(m);
-				s = false;
+		for (let v of this.validators) {
+			if (!v.validate(this)) {
+				this.set_dom_msg(v.get_msg());
+				this.set_state(false);
+				return;
 			}
 		}
-		this.set_state(s);
+		this.set_state(true);
 	}
 }
 
@@ -129,24 +116,31 @@ class ValidatorTrigger {
 	/*
 	*  This class creates a trigger for calling functions based
 	*  on whether all of the specified ValidatorSelectors are
-	*  valid or not.
+	*  valid.
 	*/
 	constructor(selectors, callback) {
 		/*
 		*  Construct the ValidatorTrigger object.
 		*
-		*  * 'selectors' is an array of selectors to user for
+		*  * 'selectors' is an array of selectors to use for
 		*    this trigger.
 		*  * 'callback' is the callback function to call when
 		*    a change occurs.
 		*/
 		this.callback = callback;
 		this.selectors = selectors;
-		for (var i in this.selectors) {
-			this.selectors[i].add_callback((sel) => {
+		for (let s of this.selectors) {
+			s.add_callback((sel) => {
 				this.trigger();
 			});
 		}
+
+		// Call the callback using the initial state.
+		var tmp = true;
+		for (let s of this.selectors) {
+			tmp = tmp && s.get_state();
+		}
+		this.callback(tmp);
 	}
 
 	trigger() {
@@ -154,15 +148,14 @@ class ValidatorTrigger {
 		*  Check the validation state of the ValidatorSelectors
 		*  and call the callback function if needed.
 		*/
-		var s = this.selectors;
-		for (var i in s) {
-			if (this.valid && !s[i].state()) {
+		for (let s of this.selectors) {
+			if (this.valid && !s.get_state()) {
 				this.valid = false;
 				if (this.callback) {
 					this.callback(false);
 				}
 				break;
-			} else if (!this.valid && s[i].state()) {
+			} else if (!this.valid && s.get_state()) {
 				this.valid = true;
 				if (this.callback) {
 					this.callback(true);
