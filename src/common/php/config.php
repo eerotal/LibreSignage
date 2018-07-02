@@ -64,6 +64,7 @@
 		"SLIDE_MAX_INDEX"		=> 65536,
 		"SLIDE_NAME_MAX_LEN" 		=> 32,
 		"SLIDE_MARKUP_MAX_LEN"	 	=> 2048,
+		"QUEUE_NAME_MAX_LEN"		=> 32,
 
 		"MAX_USERS" 			=> 64,
 		"MAX_USER_GROUPS" 		=> 32,

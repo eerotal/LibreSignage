@@ -28,7 +28,24 @@ function queue_create() {
 					);
 				}
 			);
-		}
+		},
+		[
+			new StrValidator({
+				min: null,
+				max: null,
+				regex: /^[A-Za-z0-9_-]*$/
+			}, "Invalid characters in queue name."),
+			new StrValidator({
+				min: 1,
+				max: null,
+				regex: null,
+			}, "The queue name is too short."),
+			new StrValidator({
+				min: null,
+				max: SERVER_LIMITS.QUEUE_NAME_MAX_LEN,
+				regex: null
+			}, "The queue name is too long.")
+		]
 	);
 }
 
