@@ -15,7 +15,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<?php
-			css_include(['bootstrap']);
+			css_include(['bootstrap', 'font-awesome']);
 		?>
 		<link rel="stylesheet" href="/common/css/footer.css">
 		<link rel="stylesheet" href="/common/css/default.css">
@@ -77,9 +77,7 @@
 								aria-expanded="false"
 								aria-controls="collapse-adv">
 								Advanced
-								<span style="font-size: 0.9rem">
-									&#9660;
-								</span>
+								<i class="fas fa-caret-down"></i>
 							</a>
 						</div>
 					</div>

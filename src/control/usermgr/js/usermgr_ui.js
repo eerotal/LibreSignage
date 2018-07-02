@@ -87,8 +87,7 @@ const usr_table_row = (index, name, groups, pass) => `
 				data-target="#usr-edit-${name}"
 				aria-expanded="false"
 				aria-controls="usr-collapse-${name}">
-
-				Edit
+				<i class="fas fa-edit"></i>
 			</button>
 		</div>
 	</div>
