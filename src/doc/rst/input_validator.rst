@@ -46,10 +46,6 @@ The ``ValidatorSelector`` class also has the following useful functions.
 
   * Add a ``Validator`` object to the ``ValidatorSelector`` object.
 
-``state()``
-
-  * Get the validation state of the ``ValidatorSelector`` object.
-
 ``add_callback(callback)``
 
   * Add a callback function to the ``ValidatorSelector`` object.
@@ -59,6 +55,10 @@ The ``ValidatorSelector`` class also has the following useful functions.
   * Set the validation state of the ``ValidatorSelector`` object.
     This function also applies the HTML DOM styling and calls the
     callback functions when needed.
+
+``get_state()``
+
+  * Get the validation state of the ``ValidatorSelector`` object.
 
 ``enable()``
 

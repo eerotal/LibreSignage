@@ -242,6 +242,7 @@ class Dialog {
 		*/
 
 		if (this._create()) {
+			document.activeElement.blur();
 			$("body #dialog-overlay").show();
 			$(document).keydown(function(event) {
 				if (event.keyCode == 9) {
