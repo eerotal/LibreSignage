@@ -7,7 +7,7 @@
 
 function queue_get_list(ready) {
 	api_call(API_ENDP.QUEUE_LIST, {}, (data) => {
-		if (api_handle_disp_error(data.error)) { return; }
+		if (api_handle_disp_error(data['error'])) { return; }
 		if (ready) { ready(data.queues); }
 	});
 }
@@ -27,7 +27,7 @@ class Queue {
 		this.slides = new SlideList();
 
 		api_call(API_ENDP.QUEUE_GET, {'name': name}, (data) => {
-			if (api_handle_disp_error(data.error)) {
+			if (api_handle_disp_error(data['error'])) {
 				return;
 			}
 

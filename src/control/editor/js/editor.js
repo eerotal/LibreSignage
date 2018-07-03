@@ -42,6 +42,7 @@ const QUEUE_REMOVE		= $("#queue-remove");
 const SLIDE_PREVIEW             = $("#btn-slide-preview");
 const SLIDE_SAVE                = $("#btn-slide-save");
 const SLIDE_REMOVE              = $("#btn-slide-remove");
+const SLIDE_CH_QUEUE		= $("#btn-slide-ch-queue");
 const SLIDE_NAME                = $("#slide-name");
 const SLIDE_NAME_GRP            = $("#slide-name-group");
 const SLIDE_OWNER               = $("#slide-owner");
@@ -182,6 +183,7 @@ function disable_editor_controls() {
 	SLIDE_PREVIEW.prop("disabled", true);
 	SLIDE_SAVE.prop("disabled", true);
 	SLIDE_REMOVE.prop("disabled", true);
+	SLIDE_CH_QUEUE.prop("disabled", true);
 	SLIDE_EN.prop("disabled", true);
 	SLIDE_SCHED.prop("disabled", true);
 	SLIDE_SCHED_DATE_S.prop("disabled", true);
@@ -199,6 +201,7 @@ function enable_editor_controls() {
 	SLIDE_PREVIEW.prop("disabled", false);
 	SLIDE_SAVE.prop("disabled", false);
 	SLIDE_REMOVE.prop("disabled", false);
+	SLIDE_CH_QUEUE.prop("disabled", false);
 	SLIDE_SCHED.prop("disabled", false);
 	SLIDE_ANIMATION.prop("disabled", false);
 
@@ -321,7 +324,6 @@ function slide_rm() {
 			);
 
 			sel_slide = null;
-
 			timeline_update()
 			set_editor_inputs(null);
 			disable_editor_controls();
@@ -462,6 +464,37 @@ function slide_preview() {
 			null
 		);
 	}
+}
+
+function slide_ch_queue() {
+	queue_get_list((qd) => {
+		var queues = {};
+		qd.sort();
+		for (let q of qd) {
+			if (q != sel_slide.get('queue_name')) {
+				queues[q] = q;
+			}
+		}
+		dialog(
+			DIALOG.SELECT,
+			'Select queue',
+			'Please select a queue to move the slide to.',
+			(status, val) => {
+				if (!status) { return; }
+				sel_slide.set({'queue_name': val});
+				sel_slide.save((err) => {
+					api_handle_disp_error(err);
+					if (err) { return; }
+
+					sel_slide = null;
+					set_editor_inputs(null);
+					disable_editor_controls();
+					timeline_update();
+				});
+			},
+			queues
+		);
+	});
 }
 
 function editor_setup() {

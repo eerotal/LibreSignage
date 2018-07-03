@@ -245,6 +245,16 @@
 									<i class="fas fa-eye"></i>
 								</button>
 							</div>
+							<div class="col-auto btn-slide-ctrl px-0 py-1">
+								<button id="btn-slide-ch-queue"
+									type="button"
+									class="btn btn-success w-100"
+									onclick="slide_ch_queue()"
+									data-toggle="tooltip"
+									title="Change queue.">
+									<i class="fas fa-arrow-circle-right"></i>
+								</button>
+							</div>
 						</div>
 						<p id="editor-status"></p>
 					</div>

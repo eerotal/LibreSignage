@@ -259,7 +259,7 @@ function api_handle_disp_error(err, callback) {
 		p = API_E_MESSAGES[err].long;
 	} else {
 		h = "Unknown error";
-		p = "The server encountered an unknown error.";
+		p = `The server encountered an unknown error. (${err})`;
 	}
 	if (!API_CONFIG.noui) {
 		dialog(DIALOG.ALERT, h, p, callback);

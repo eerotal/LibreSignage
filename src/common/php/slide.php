@@ -359,7 +359,7 @@ class Slide {
 				// Remove slide from the old queue.
 				$o = new Queue($this->queue_name);
 				$o->load();
-				$o->remove($this);
+				$o->remove_slide($this);
 				$o->write();
 			}
 
