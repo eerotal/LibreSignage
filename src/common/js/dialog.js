@@ -12,16 +12,17 @@ var DIALOG_TEMPLATE = `
 var DIALOG = {
 	ALERT: 0,
 	CONFIRM: 1,
-	PROMPT: 2
+	PROMPT: 2,
+	SELECT: 3
 }
 
 class Dialog {
-	constructor(type, header, text, callback, validators) {
+	constructor(type, header, text, callback, data) {
 		this.type = type;
 		this.header = header;
 		this.text = text;
 		this.callback = callback;
-		this.validators = validators;
+		this.data = data;
 	}
 
 	dialog_callback(obj, status, val) {
@@ -174,13 +175,13 @@ class Dialog {
 		$("body #dialog-interaction").append(cancel);
 		$("body #dialog-interaction").append(ok);
 
-		// Setup input validators.
-		if (this.validators) {
+		// Add input validators from this.data.
+		if (this.data) {
 			this.val_trig = new ValidatorTrigger(
 				[new ValidatorSelector(
 					$('#dialog-input'),
 					$('#dialog-input-grp'),
-					this.validators
+					this.data
 				)],
 				(valid) => {
 					$('#dialog-btn-ok').prop(
@@ -193,7 +194,71 @@ class Dialog {
 
 	}
 
-	_create() {
+	select() {
+		// Create select HTML.
+		var select = $(
+			'<select>', {
+				class: 'form-control mb-2',
+				id: 'dialog-select'
+			}
+		);
+
+		// Add the individual options from this.data.
+		var opt = null;
+		for (var k in this.data) {
+			opt = $(
+				'<option>', {
+					'value': k
+				}
+			);
+			opt.text(this.data[k]);
+			select.append(opt);
+		}
+
+		var ok = $(
+			'<button>', {
+				class: 'btn btn-primary btn-dialog',
+				id: 'dialog-btn-ok',
+				text: 'Ok'
+			}
+		);
+		ok.on(
+			'click',
+			{obj: this},
+			function(event) {
+				event.data.obj.dialog_callback(
+					event.data.obj,
+					"ok",
+					$("body #dialog-select").val()
+				);
+			}
+		);
+
+		var cancel = $(
+			"<button>", {
+				class: 'btn btn-primary btn-dialog',
+				id: 'dialog-btn-cancel',
+				text: 'Cancel'
+			}
+		);
+		cancel.on(
+			'click',
+			{ obj: this },
+			function(event) {
+				event.data.obj.dialog_callback(
+					event.data.obj,
+					"cancel",
+					null
+				);
+			}
+		);
+
+		$("body #dialog-interaction").before(select);
+		$("body #dialog-interaction").append(cancel);
+		$("body #dialog-interaction").append(ok);
+	}
+
+	create() {
 		/*
 		*  Create the HTML DOM elements required for the
 		*  different dialog types and add them to the
@@ -224,6 +289,9 @@ class Dialog {
 			case DIALOG.PROMPT:
 				this.prompt();
 				break;
+			case DIALOG.SELECT:
+				this.select();
+				break;
 			default:
 				break;
 		}
@@ -241,7 +309,7 @@ class Dialog {
 		*  the overlay div that catches all mouse click events.
 		*/
 
-		if (this._create()) {
+		if (this.create()) {
 			document.activeElement.blur();
 			$("body #dialog-overlay").show();
 			$(document).keydown(function(event) {
@@ -256,12 +324,12 @@ class Dialog {
 	}
 }
 
-function dialog(type, header, text, callback, validators) {
+function dialog(type, header, text, callback, data) {
 	return new Dialog(
 		type,
 		header,
 		text,
 		callback,
-		validators
+		data
 	).show();
 }

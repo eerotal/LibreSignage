@@ -37,19 +37,25 @@
 					<button class="btn btn-primary small-btn mx-1"
 						type="button"
 						id="queue-create"
-						onclick="queue_create()">
+						onclick="queue_create()"
+						data-toggle="tooltip"
+						title="Create queue.">
 						<i class="fas fa-plus-circle"></i>
 					</button>
 					<button class="btn btn-danger small-btn mx-1"
 						type="button"
 						id="queue-remove"
-						onclick="queue_remove()">
+						onclick="queue_remove()"
+						data-toggle="tooltip"
+						title="Remove queue.">
 						<i class="fas fa-trash-alt"></i>
 					</button>
 					<button class="btn btn-primary small-btn mx-1"
 						type="button"
 						id="queue-view"
-						onclick="queue_view()">
+						onclick="queue_view()"
+						data-toggle="tooltip"
+						title="View queue.">
 						<i class="fas fa-eye"></i>
 					</button>
 				</div>

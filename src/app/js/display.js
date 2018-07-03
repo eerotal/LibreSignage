@@ -99,6 +99,25 @@ function display_setup() {
 			}, QUEUE_UPDATE_INTERVAL);
 			display_update();
 		});
+	} else {
+		queue_get_list((qd) => {
+			var queues = {};
+			for (let q of qd) {
+				queues[q] = q;
+			}
+			dialog(
+				DIALOG.SELECT,
+				'Select a queue',
+				'',
+				(status, val) => {
+					if (!status) { return; }
+					window.location.replace(
+						`/app/?q=${val}`
+					);
+				},
+				queues
+			);
+		});
 	}
 }
 

@@ -60,7 +60,7 @@ function user_settings_setup() {
 				min: 1,
 				max: null,
 				regex: null
-			}, "The password length is too short."),
+			}, "The password is too short."),
 			new StrValidator({
 				min: null,
 				max: 10,

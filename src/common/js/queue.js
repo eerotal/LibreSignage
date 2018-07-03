@@ -5,6 +5,13 @@
 *  very easy.
 */
 
+function queue_get_list(ready) {
+	api_call(API_ENDP.QUEUE_LIST, {}, (data) => {
+		if (api_handle_disp_error(data.error)) { return; }
+		if (ready) { ready(data.queues); }
+	});
+}
+
 class Queue {
 	constructor() {
 		this.name = null;

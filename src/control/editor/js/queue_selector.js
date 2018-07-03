@@ -84,21 +84,16 @@ function update_queue_selector(show_initial) {
 	/*
 	*  Update the queue selector options.
 	*/
-	api_call(API_ENDP.QUEUE_LIST, {}, (data) => {
-		if (api_handle_disp_error(data.error)) {
-			return;
-		}
-
+	queue_get_list((queues) => {
 		QUEUE_SELECT.html('');
-		for (var k in data['queues']) {
+		for (let q of queues) {
 			QUEUE_SELECT.append(
-				`<option value="${data['queues'][k]}">` +
-				`${data['queues'][k]}</option>`
+				`<option value="${q}">${q}</option>`
 			);
 		}
 
 		// Enable/disable buttons.
-		if (data['queues'].length) {
+		if (queues.length) {
 			QUEUE_REMOVE.prop('disabled', false);
 			QUEUE_VIEW.prop('disabled', false);
 		} else {
@@ -107,8 +102,8 @@ function update_queue_selector(show_initial) {
 		}
 
 		// Select the first queue.
-		if (show_initial && data['queues'].length) {
-			timeline_show(data['queues'][0]);
+		if (show_initial && queues.length) {
+			timeline_show(queues[0]);
 		} else if (show_initial) {
 			timeline_show(null);
 		}
