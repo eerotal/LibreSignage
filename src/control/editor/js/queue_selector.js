@@ -18,10 +18,10 @@ function queue_create() {
 					if (err) { return; }
 
 					// Select the new queue.
-					update_queue_selector(false);
-					QUEUE_SELECT.val(val);
-					timeline_show(val);
-
+					update_qsel(false, () => {
+						QUEUE_SELECT.val(val);
+						timeline_show(val);
+					});
 					console.log(
 						`LibreSignage: Created` +
 						`queue '${val}'.`
@@ -68,7 +68,7 @@ function queue_remove() {
 					);
 					if (err) { return; }
 
-					update_queue_selector(true);
+					update_qsel(true);
 				}
 			);
 		},
@@ -80,11 +80,12 @@ function queue_view() {
 	window.open('/app/?q=' + timeline_queue.name);
 }
 
-function update_queue_selector(show_initial) {
+function update_qsel(show_initial, ready) {
 	/*
 	*  Update the queue selector options.
 	*/
 	queue_get_list((queues) => {
+		queues.sort();
 		QUEUE_SELECT.html('');
 		for (let q of queues) {
 			QUEUE_SELECT.append(
@@ -107,6 +108,8 @@ function update_queue_selector(show_initial) {
 		} else if (show_initial) {
 			timeline_show(null);
 		}
+
+		if (ready) { ready(); }
 	});
 }
 
@@ -117,6 +120,6 @@ function queue_setup() {
 		timeline_show(QUEUE_SELECT.val());
 	});
 
-	update_queue_selector(true);
+	update_qsel(true);
 	timeline_setup();
 }

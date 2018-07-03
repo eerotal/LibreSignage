@@ -102,6 +102,7 @@ function display_setup() {
 	} else {
 		queue_get_list((qd) => {
 			var queues = {};
+			qd.sort();
 			for (let q of qd) {
 				queues[q] = q;
 			}

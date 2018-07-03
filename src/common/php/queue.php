@@ -20,7 +20,7 @@ function queue_list() {
 	$queues = array();
 	$queues = array_map(
 		function(string $val) {
-			if (substr($val, 1, 1) != '.' &&
+			if (substr($val, 0, 1) != '.' &&
 				substr($val, -5) == '.json') {
 				return substr($val, 0, strlen($val) - 5);
 			} else {
