@@ -1,0 +1,52 @@
+/* Timeline styling */
+
+#timeline {
+	padding: 0;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	overflow: scroll;
+	width: 100%;
+}
+
+.tl-slide-cont {
+	margin: 5px;
+	padding: 0;
+	min-width: 200px;
+	min-height: 90px;
+	max-width: 200px;
+	max-height: 90px;
+	background-color: var(--white);
+	color: var(--secondary);
+	border: 1px solid var(--gray-1);
+}
+
+.tl-slide-cont-dis {
+	background-color: var(--gray-1);
+}
+
+.tl-slide-cont:hover {
+	background-color: var(--secondary);
+	color: var(--white);
+}
+
+.tl-slide-index-cont {
+	margin: 0;
+	padding: 4px;
+	text-align: center;
+}
+
+.tl-slide-thumb-cont {
+	margin: 0;
+	padding: 4px;
+	padding-left: 0px;
+	height: 100%;
+	width: 100%;
+}
+
+.tl-slide-thumb {
+	display: block;
+	pointer-events: none;
+	height: 100%;
+	width: 100%;
+	border: 1px solid var(--gray-1);
+}

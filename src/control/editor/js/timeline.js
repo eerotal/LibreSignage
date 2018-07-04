@@ -5,15 +5,15 @@ var TIMELINE_THUMB_SEL = '.slide-thumb';
 var timeline_queue = null;
 
 const timeline_btn = (id, index, name, enabled) => `
-	<div class="btn slide-cont ${!enabled ? 'slide-cont-dis' : ''}"
+	<div class="btn tl-slide-cont ${!enabled ? 'tl-slide-cont-dis' : ''}"
 		id="slide-btn-${id}"
 		onclick="slide_show('${id}')">
 		<div class="row m-0 p-0 h-100">
-			<div class="col-2 slide-index-cont">
+			<div class="col-2 tl-slide-index-cont">
 				${index}
 			</div>
-			<div class="col-10 slide-thumb-cont">
-				<iframe class="slide-thumb"
+			<div class="col-10 tl-slide-thumb-cont">
+				<iframe class="tl-slide-thumb"
 					src="/app?preview=${id}&noui=1"
 					frameborder="0">
 				</iframe>

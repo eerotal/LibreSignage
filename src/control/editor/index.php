@@ -19,6 +19,7 @@
 		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/common/css/dialog.css">
 		<link rel="stylesheet" href="/control/editor/css/editor.css">
+		<link rel="stylesheet" href="/control/editor/css/timeline.css">
 		<title>LibreSignage Editor</title>
 	</head>
 	<body>
@@ -42,14 +43,6 @@
 						title="Create queue.">
 						<i class="fas fa-plus-circle"></i>
 					</button>
-					<button class="btn btn-danger small-btn mx-1"
-						type="button"
-						id="queue-remove"
-						onclick="queue_remove()"
-						data-toggle="tooltip"
-						title="Remove queue.">
-						<i class="fas fa-trash-alt"></i>
-					</button>
 					<button class="btn btn-primary small-btn mx-1"
 						type="button"
 						id="queue-view"
@@ -58,6 +51,15 @@
 						title="View queue.">
 						<i class="fas fa-eye"></i>
 					</button>
+					<button class="btn btn-danger small-btn mx-1"
+						type="button"
+						id="queue-remove"
+						onclick="queue_remove()"
+						data-toggle="tooltip"
+						title="Remove queue.">
+						<i class="fas fa-trash-alt"></i>
+					</button>
+
 				</div>
 				<div class="container-fluid row m-0">
 					<div class="col-12">
@@ -205,56 +207,46 @@
 
 						<!-- Control buttons -->
 						<div class="row form-group container-fluid d-flex justify-content-center mx-0 px-0">
-							<div class="col-auto btn-slide-ctrl px-0 py-1">
-								<button id="btn-slide-new"
-									type="button"
-									class="btn btn-success w-100"
-									onclick="slide_new()"
-									data-toggle="tooltip"
-									title="Create slide.">
-									<i class="fas fa-plus-circle"></i>
-								</button>
-							</div>
-							<div class="col-auto btn-slide-ctrl px-0 py-1">
-								<button id="btn-slide-save"
-									type="button"
-									class="btn btn-success w-100"
-									onclick="slide_save()"
-									data-toggle="tooltip"
-									title="Save slide.">
-									<i class="fas fa-save"></i>
-								</button>
-							</div>
-							<div class="col-auto btn-slide-ctrl px-0 py-1">
-								<button id="btn-slide-remove"
-									type="button"
-									class="btn btn-danger w-100"
-									onclick="slide_rm()"
-									data-toggle="tooltip"
-									title="Remove slide.">
-									<i class="fas fa-trash-alt"></i>
-								</button>
-							</div>
-							<div class="col-auto btn-slide-ctrl px-0 py-1">
-								<button id="btn-slide-preview"
-									type="button"
-									class="btn btn-success w-100"
-									onclick="slide_preview()"
-									data-toggle="tooltip"
-									title="Preview slide.">
-									<i class="fas fa-eye"></i>
-								</button>
-							</div>
-							<div class="col-auto btn-slide-ctrl px-0 py-1">
-								<button id="btn-slide-ch-queue"
-									type="button"
-									class="btn btn-success w-100"
-									onclick="slide_ch_queue()"
-									data-toggle="tooltip"
-									title="Change queue.">
-									<i class="fas fa-arrow-circle-right"></i>
-								</button>
-							</div>
+							<button id="btn-slide-new"
+								type="button"
+								class="btn btn-success btn-slide-ctrl"
+								onclick="slide_new()"
+								data-toggle="tooltip"
+								title="Create slide.">
+								<i class="fas fa-plus-circle"></i>
+							</button>
+							<button id="btn-slide-save"
+								type="button"
+								class="btn btn-success btn-slide-ctrl"
+								onclick="slide_save()"
+								data-toggle="tooltip"
+								title="Save slide.">
+								<i class="fas fa-save"></i>
+							</button>
+							<button id="btn-slide-preview"
+								type="button"
+								class="btn btn-success btn-slide-ctrl"
+								onclick="slide_preview()"
+								data-toggle="tooltip"
+								title="Preview slide.">
+								<i class="fas fa-eye"></i>
+							</button>
+							<button id="btn-slide-ch-queue"
+								type="button"
+								class="btn btn-success btn-slide-ctrl"
+								onclick="slide_ch_queue()"
+								data-toggle="tooltip"
+								title="Change queue.">
+								<i class="fas fa-arrow-circle-right"></i>
+							</button>
+							<button id="btn-slide-remove"
+								type="button"
+								class="btn btn-danger btn-slide-ctrl"
+								onclick="slide_rm()"
+								data-toggle="tooltip"
+								title="Remove slide.">
+								<i class="fas fa-trash-alt"></i>
+							</button>
 						</div>
 						<p id="editor-status"></p>
 					</div>
