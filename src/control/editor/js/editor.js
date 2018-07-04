@@ -519,9 +519,14 @@ function editor_setup() {
 		SLIDE_NAME_GRP,
 		[new StrValidator({
 			min: 1,
+			max: null,
+			regex: null
+		}, "The name is too short."),
+		new StrValidator({
+			min: null,
 			max: SERVER_LIMITS.SLIDE_NAME_MAX_LEN,
 			regex: null
-		}, "The name is too short or too long."),
+		}, "The name is too long."),
 		new StrValidator({
 			min: null,
 			max: null,
@@ -533,14 +538,20 @@ function editor_setup() {
 		SLIDE_INDEX_GRP,
 		[new NumValidator({
 			min: 0,
-			max: SERVER_LIMITS.SLIDE_MAX_INDEX,
-			nan: false,
+			max: null,
+			nan: true,
 			float: true
-		}, "The index is outside the accepted bounds."),
+		}, "The index is too small."),
+		new NumValidator({
+			min: null,
+			max: SERVER_LIMITS.SLIDE_MAX_INDEX,
+			nan: true,
+			float: true
+		}, "The index is too large."),
 		new NumValidator({
 			min: null,
 			max: null,
-			nan: true,
+			nan: false,
 			float: false
 		}, "The index must be an integer value.")]
 	);
