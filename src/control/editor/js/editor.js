@@ -12,7 +12,7 @@ const DIALOG_SLIDE_NOT_SAVED = (callback) => {
 	return new Dialog(
 		DIALOG.CONFIRM,
 		'Slide not saved',
-		'The current slide is not saved yet. All changes ' +
+		'The selected slide has unsaved changes. All changes ' +
 		'will be lost if you continue. Are you sure you want ' +
 		'to continue?',
 		callback
@@ -109,7 +109,7 @@ function set_editor_inputs(slide) {
 	SLIDE_INPUT.clearSelection(); // Deselect new text.
 }
 
-function selected_slide_is_modified() {
+function sel_slide_is_modified() {
 	/*
 	*  Check whether the selected slide has been modified and
 	*  return true in case it has been modified. False is returned
@@ -168,7 +168,26 @@ function selected_slide_is_modified() {
 	return false;
 }
 
-function disable_editor_controls() {
+function sel_slide_unsaved_confirm(callback) {
+	/*
+	*  Ask the user whether to continue or not if the selected
+	*  slide has unsaved changes. 'callback' is a function that's
+	*  called if the user chooses to continue after seeing the
+	*  dialog. This function returns true if the dialog is shown
+	*  and false otherwise.
+	*/
+	if (sel_slide_is_modified()) {
+		DIALOG_SLIDE_NOT_SAVED((status, val) => {
+			if (!status) { return; }
+			if (callback) { callback(); }
+		}).show();
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function disable_controls() {
 	/*
 	*  Make sure the ValidatorSelectors
 	*  don't enable the save button.
@@ -254,33 +273,29 @@ function slide_show(slide, no_popup) {
 	*/
 	var cb = function() {
 		console.log(`LibreSignage: Show slide '${slide}'.`);
+
+		flag_slide_loading = true;
 		sel_slide = new Slide();
-		sel_slide.load(slide, function(ret) {
+		sel_slide.load(slide, (ret) => {
 			if (ret) {
 				console.log("LibreSignage: API error!");
 				set_editor_status(
 					"Failed to load slide!"
 				);
 				set_editor_inputs(null);
-				disable_editor_controls();
+				disable_controls();
 				return;
 			}
 			set_editor_inputs(sel_slide);
 			enable_editor_controls();
-
 			flag_slide_loading = false;
 		});
 	}
 
 	if (!flag_slide_loading) {
-		if (!no_popup && selected_slide_is_modified()) {
-			DIALOG_SLIDE_NOT_SAVED((status, val) => {
-				if (!status) { return; }
-				flag_slide_loading = true;
-				cb();
-			}).show();
+		if (!no_popup) {
+			if (!sel_slide_unsaved_confirm(cb)) { cb(); }
 		} else {
-			flag_slide_loading = true;
 			cb();
 		}
 	}
@@ -326,7 +341,7 @@ function slide_rm() {
 			sel_slide = null;
 			timeline_update()
 			set_editor_inputs(null);
-			disable_editor_controls();
+			disable_controls();
 			set_editor_status("Slide deleted!");
 		});
 	});
@@ -338,26 +353,23 @@ function slide_new() {
 	*  the slide server-side. The user must manually save the
 	*  slide afterwards.
 	*/
-	var cb = function(status, val) {
-		if (status) {
-			console.log("LibreSignage: Create slide!");
-			set_editor_status("Creating new slide...");
+	var cb = () => {
+		console.log("LibreSignage: Create slide!");
+		set_editor_status("Creating new slide...");
 
-			sel_slide = new Slide();
-			sel_slide.set(NEW_SLIDE_DEFAULTS);
+		sel_slide = new Slide();
+		sel_slide.set(NEW_SLIDE_DEFAULTS);
 
-			set_editor_inputs(sel_slide);
-			enable_editor_controls();
+		set_editor_inputs(sel_slide);
+		enable_editor_controls();
 
-			/*
-			*  Leave the remove button disabled since the
-			*  new slide is not saved yet and can't be
-			*  removed.
-			*/
-			SLIDE_REMOVE.prop('disabled', true);
-
-			set_editor_status("Slide created!");
-		}
+		/*
+		*  Leave the remove button disabled since the
+		*  new slide is not saved yet and can't be
+		*  removed.
+		*/
+		SLIDE_REMOVE.prop('disabled', true);
+		set_editor_status("Slide created!");
 	};
 
 	if (!timeline_queue) {
@@ -370,12 +382,7 @@ function slide_new() {
 		);
 		return;
 	}
-
-	if (selected_slide_is_modified()) {
-		DIALOG_SLIDE_NOT_SAVED(cb).show();
-	} else {
-		cb(true, null);
-	}
+	if (!sel_slide_unsaved_confirm(cb)) { cb(); }
 }
 
 function slide_save() {
@@ -482,15 +489,22 @@ function slide_ch_queue() {
 			(status, val) => {
 				if (!status) { return; }
 				sel_slide.set({'queue_name': val});
-				sel_slide.save((err) => {
-					api_handle_disp_error(err);
-					if (err) { return; }
+				var cb = () => {
+					sel_slide.save((err) => {
+						api_handle_disp_error(
+							err
+						);
+						if (err) { return; }
 
-					sel_slide = null;
-					set_editor_inputs(null);
-					disable_editor_controls();
-					timeline_update();
-				});
+						sel_slide = null;
+						set_editor_inputs(null);
+						disable_controls();
+						timeline_update();
+					});
+				}
+				if (!sel_slide_unsaved_confirm(cb)) {
+					cb();
+				}
 			},
 			queues
 		);
@@ -543,7 +557,7 @@ function editor_setup() {
 	*  the user doesn't accidentally exit the page and lose changes.
 	*/
 	$(window).on('beforeunload', function(e) {
-		if (!selected_slide_is_modified()) {
+		if (!sel_slide_is_modified()) {
 			return;
 		}
 
@@ -569,7 +583,7 @@ function editor_setup() {
 	SLIDE_INPUT.$blockScrolling = Infinity;
 
 	// Disable inputs initially and setup update intevals.
-	disable_editor_controls();
+	disable_controls();
 	queue_setup();
 }
 
