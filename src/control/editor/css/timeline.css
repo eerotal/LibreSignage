@@ -4,7 +4,8 @@
 	padding: 0;
 	padding-top: 5px;
 	padding-bottom: 5px;
-	overflow: scroll;
+	overflow-x: auto;
+	overflow-y: hidden;
 	width: 100%;
 }
 

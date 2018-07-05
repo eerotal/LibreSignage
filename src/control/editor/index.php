@@ -28,46 +28,47 @@
 		?>
 		<main class="container-fluid">
 			<div class="container-main container-fluid w-100 h-100">
-				<div id="queue-select-cont" class="container-fluid row m-0">
-					<div class="col-auto d-inline-block my-auto pl-3 pr-2 mb-2">
-						Queue:
+				<div class="container-fluid row mx-0 my-1">
+					<div class="col-12">
+						<div id="queue-select-cont">
+							<label for="queue-select">Queue:</label>
+							<select class="d-inline-block custom-select small-select mx-2"
+								id="queue-select">
+							</select>
+							<button class="btn btn-primary small-btn mx-1"
+								type="button"
+								id="queue-create"
+								onclick="queue_create()"
+								data-toggle="tooltip"
+								title="Create queue.">
+								<i class="fas fa-plus-circle"></i>
+							</button>
+							<button class="btn btn-primary small-btn mx-1"
+								type="button"
+								id="queue-view"
+								onclick="queue_view()"
+								data-toggle="tooltip"
+								title="View queue.">
+								<i class="fas fa-eye"></i>
+							</button>
+							<button class="btn btn-danger small-btn mx-1"
+								type="button"
+								id="queue-remove"
+								onclick="queue_remove()"
+								data-toggle="tooltip"
+								title="Remove queue.">
+								<i class="fas fa-trash-alt"></i>
+							</button>
+						</div>
 					</div>
-					<select class="col-3 d-inline-block my-auto custom-select small-select ml-1 mr-2"
-						id="queue-select">
-					</select>
-					<button class="btn btn-primary small-btn mx-1"
-						type="button"
-						id="queue-create"
-						onclick="queue_create()"
-						data-toggle="tooltip"
-						title="Create queue.">
-						<i class="fas fa-plus-circle"></i>
-					</button>
-					<button class="btn btn-primary small-btn mx-1"
-						type="button"
-						id="queue-view"
-						onclick="queue_view()"
-						data-toggle="tooltip"
-						title="View queue.">
-						<i class="fas fa-eye"></i>
-					</button>
-					<button class="btn btn-danger small-btn mx-1"
-						type="button"
-						id="queue-remove"
-						onclick="queue_remove()"
-						data-toggle="tooltip"
-						title="Remove queue.">
-						<i class="fas fa-trash-alt"></i>
-					</button>
-
 				</div>
-				<div class="container-fluid row m-0">
+				<div class="container-fluid row mx-0 my-1">
 					<div class="col-12">
 						<div id="timeline" class="d-flex flex-row flex-nowrap">
 						</div>
 					</div>
 				</div>
-				<div class="container-fluid row m-0">
+				<div class="container-fluid row mx-0 my-1">
 					<div class="col-md-3 container-fluid pt-2" id="editor-col-l">
 						<!-- Slide name input -->
 						<div class="form-group" id="slide-name-group">

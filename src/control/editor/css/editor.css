@@ -4,12 +4,14 @@ html, body {
 
 /* Controls styling. */
 #queue-select-cont {
-	min-width: 250px;
+	width: 100%;
+	white-space: nowrap;
+	overflow-x: auto;
+	overflow-y: hidden;
 }
 
 #queue-select {
-	min-width: 100px;
-	max-width: 250px;
+	width: 150px;
 }
 
 #editor-col-l {
