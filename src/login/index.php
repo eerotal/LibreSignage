@@ -1,7 +1,8 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js_include.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/css.php');
 
 	if (web_auth()) {
 		header('Location: '.LOGIN_LANDING);
@@ -13,10 +14,9 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet"
-			href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css"
-			integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy"
-			crossorigin="anonymous">
+		<?php
+			css_include(['bootstrap', 'font-awesome']);
+		?>
 		<link rel="stylesheet" href="/common/css/footer.css">
 		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/common/css/dialog.css">
@@ -77,9 +77,7 @@
 								aria-expanded="false"
 								aria-controls="collapse-adv">
 								Advanced
-								<span style="font-size: 0.9rem">
-									&#9660;
-								</span>
+								<i class="fas fa-caret-down"></i>
 							</a>
 						</div>
 					</div>
@@ -100,9 +98,7 @@
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
 
-			js_include_jquery();
-			js_include_popper();
-			js_include_bootstrap();
+			js_include(['jquery', 'popper', 'bootstrap']);
 		?>
 		<script src="/common/js/util.js"></script>
 		<script src="/common/js/dialog.js"></script>

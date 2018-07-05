@@ -11,30 +11,38 @@ graphical elements etc. This is because these types of elements aren't
 really needed in a digital signage system. Images can, however, be used
 to replace elements like graphs etc.
 
+Slide queues
+------------
+
+Every LibreSignage slide belongs to a specific queue. Queues can be
+created and removed by users who are in the *editor* group. Note that
+queues can be removed by a user only if the user has created the queue
+and all slides in it. Alternatively users of the *admin* group can
+remove any queue.
+
+Queues can be selected in the editor using the *Queue* select box.
+Next to the box are the *Create queue*, *Remove queue* and *View queue*
+buttons. The *View queue* button opens the display page showing the
+selected queue.
+
 Editing and creating slides
 ---------------------------
 
 Slides can be edited in the *Editor* page of LibreSignage. LibreSignage
 users can create and edit slides if they are in the group *editor*.
-Users of the group *admin* can change the groups of other users using
-the `LibreSignage User Manager </doc?doc=user_manager>`_.
-
-If the slide data fields like *Name* and *Index* are invalid, the *Save*
-button is disabled. This means the slide can't be saved until the fields
-have valid values.
 
 Creating a slide
 ++++++++++++++++
 
-Slides are created with the *New* button. This button creates a new slide
-but doesn't save it yet. The slide must be saved manually by pressing the
-*Save* button.
+Slides are created with the + button at the bottom of the page. This
+button creates a new slide but doesn't save it yet. The slide must be
+saved manually by pressing the save button (the floppy icon).
 
 Editing an existing slide
 +++++++++++++++++++++++++
 
-Existing slides can be edited by selecting them in the *Slides* list,
-editing the values and saving them using the *Save* button.
+Existing slides can be edited by selecting them in the timeline,
+editing the values and saving them using the save button.
 
 Data fields
 +++++++++++
@@ -44,8 +52,7 @@ LibreSignage editor. This name is only visible in the editor. The *Name*
 field only accepts alphanumeric characters (A-Z, a-z, 0-9) and the dash
 (-) and underscore (_) characters. The maximum length of the name is set
 in the LibreSignage instance config and by default it's set to 32
-characters. This length limit can be changed by editing the
-*SLIDE_NAME_MAX_LEN* limit value.
+characters.
 
 **Time** - The *Time* selector controls how long the slide is shown in
 the slideshow. The values in the selector are in seconds.
@@ -53,10 +60,7 @@ the slideshow. The values in the selector are in seconds.
 **Index** - The index value controls the order of the slides in the
 slideshow. The slide with index 0 is the first slide, index 1 is the
 second slide etc. The *Index* field only accepts numbers in the range
-0-65536 by default. This range can be changed in the LibreSignage
-instance config, however it shouldn't be changed without investigating
-the consequences (ie. don't change it if you don't know what you are
-doing). The *SLIDE_MAX_INDEX* limit controls the maximum index.
+0-65536 by default.
 
 **Animation** - Select a transition animation for the slide. If no
 animation is needed, 'No animation' can be selected. Note that these
@@ -84,21 +88,7 @@ enables the slide when needed.
 The markup field accepts a special markup sytax described in
 `LibreSignage Markup </doc?doc=markup>`_. The maximum length of the
 markup is set in the LibreSignage instance config and by default it's
-set to 2048 characters. The amount of space the markup takes should
-be taken into account when fiddling with the markup length limit. The
-*SLIDE_MARKUP_MAX_LEN* limit controls the length limit.
-
-Buttons
-+++++++
-
-**Save** - Save the current slide.
-
-**New** - Create a new slide. Note that this doesn't save the slide.
-
-**Remove** - Remove the selected slide.
-
-**Preview Slide** - Preview the current slide in a separate tab. The
-slide must be saved before it can be previewed.
+set to 2048 characters.
 
 Slide quotas
 ------------

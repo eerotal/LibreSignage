@@ -7,5 +7,6 @@
 	"sched": false,
 	"sched_t_s": 0,
 	"sched_t_e": 0,
-	"animation": 0
+	"animation": 1,
+	"queue_name": "default"
 }

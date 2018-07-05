@@ -49,7 +49,7 @@ var USER_SESSIONS = $("#user-sessions");
 var BTN_LOGOUT_OTHER = $("#btn-logout-other");
 
 var pass_sel = null;
-var _usr = null;
+var usr = null;
 
 function user_settings_setup() {
 	pass_sel = new ValidatorSelector(
@@ -58,9 +58,14 @@ function user_settings_setup() {
 		[
 			new StrValidator({
 				min: 1,
+				max: null,
+				regex: null
+			}, "The password is too short."),
+			new StrValidator({
+				min: null,
 				max: 10,
 				regex: null
-			},"The password length is invalid."),
+			}, "The password is too long."),
 			new EqValidator(
 				null,
 				"The passwords don't match."
@@ -68,12 +73,15 @@ function user_settings_setup() {
 		],
 		[
 			(sel) => {
-				USER_SAVE.attr('disabled', !sel.state());
+				USER_SAVE.prop(
+					'disabled',
+					!sel.get_state()
+				);
 			}
 		]
 	);
-	USER_NAME.val(_usr.get_name());
-	USER_GROUPS.val(_usr.get_groups());
+	USER_NAME.val(usr.get_name());
+	USER_GROUPS.val(usr.get_groups());
 
 	// Setup the sessions tables.
 	user_sessions_populate();
@@ -84,13 +92,13 @@ function user_settings_save(usr) {
 	/*
 	*  Save the modified user settings (password etc).
 	*/
-	if (!_usr) {
+	if (!usr) {
 		throw new Error("Current user not loaded.");
 	}
 
 	// Change password using the API.
-	_usr.pass = USER_PASS.val();
-	_usr.save((ret) => {
+	usr.pass = USER_PASS.val();
+	usr.save((ret) => {
 		if (api_handle_disp_error(ret)) {
 			return;
 		}
@@ -99,10 +107,13 @@ function user_settings_save(usr) {
 		USER_PASS.val('');
 		USER_PASS_CONFIRM.val('');
 
-		dialog(DIALOG.ALERT,
+		dialog(
+			DIALOG.ALERT,
 			'Changes saved',
 			'Changes to user settings saved.',
-			null);
+			null,
+			null
+		);
 	});
 }
 
@@ -153,8 +164,8 @@ $(document).ready(() => {
 		null,	// Use default config.
 		() => {
 			// Load the current (logged in) user.
-			_usr = new User();
-			_usr.load(null, user_settings_setup);
+			usr = new User();
+			usr.load(null, user_settings_setup);
 		}
 	);
 });

@@ -43,20 +43,24 @@ const API_E_MSG = array(
 	),
 	API_E_INTERNAL => array(
 		"short" => "Internal server error",
-		"long" => "The server encountered an internal server error."
+		"long" => "The server encountered an internal ".
+			"server error."
 	),
 	API_E_INVALID_REQUEST => array(
 		"short" => "Invalid request",
-		"long" => "The server responded with and invalid request ".
-			"error. This is probably due to a software bug."
+		"long" => "The server responded with an invalid ".
+			"request error. This is probably due to a ".
+			"software bug."
 	),
 	API_E_NOT_AUTHORIZED => array(
 		"short" => "Not authorized",
-		"long" => "You are not authorized to perform this action."
+		"long" => "You are not authorized to perform this ".
+			"action."
 	),
 	API_E_QUOTA_EXCEEDED => array(
 		"short" => "Quota exceeded",
-		"long" => "You have exceeded your quota for this action."
+		"long" => "You have exceeded your quota for this ".
+			"action."
 	),
 	API_E_LIMITED => array(
 		"short" => "Limited",
@@ -74,8 +78,8 @@ const API_E_MSG = array(
 	),
 	API_E_INCORRECT_CREDS => array(
 		"short" => "Incorrect credentials received",
-		"long" => "The authentication system received incorrect ".
-			"credentials."
+		"long" => "The authentication system received ".
+			"incorrect credentials."
 	)
 );
 

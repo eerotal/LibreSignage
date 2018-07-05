@@ -83,6 +83,28 @@ var API_ENDP = {
 		auth:	true
 	},
 
+	// -- Queue API endpoints --
+	QUEUE_GET: {
+		uri:	"/api/endpoint/queue/queue_get.php",
+		method: "GET",
+		auth:	true
+	},
+	QUEUE_CREATE: {
+		uri:	"/api/endpoint/queue/queue_create.php",
+		method:	"POST",
+		auth:	true
+	},
+	QUEUE_LIST: {
+		uri:	"/api/endpoint/queue/queue_list.php",
+		method:	"GET",
+		auth:	true
+	},
+	QUEUE_REMOVE: {
+		uri:	"/api/endpoint/queue/queue_remove.php",
+		method:	"POST",
+		auth:	true
+	},
+
 	// -- Authentication API endpoints --
 	AUTH_LOGIN: {
 		uri:	"/api/endpoint/auth/auth_login.php",
@@ -186,7 +208,9 @@ function api_call(endpoint, data, callback) {
 			callback({'error': API_E.API_E_INTERNAL});
 		},
 		success: function(data, status, jqxhr) {
-			callback(data);
+			if (callback) {
+				callback(data);
+			}
 		}
 	};
 
@@ -235,7 +259,7 @@ function api_handle_disp_error(err, callback) {
 		p = API_E_MESSAGES[err].long;
 	} else {
 		h = "Unknown error";
-		p = "The server encountered an unknown error.";
+		p = `The server encountered an unknown error. (${err})`;
 	}
 	if (!API_CONFIG.noui) {
 		dialog(DIALOG.ALERT, h, p, callback);

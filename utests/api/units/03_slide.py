@@ -23,7 +23,7 @@ def setup(host: str,
 			postexec = lambda a, b: None,
 
 			data_request = {
-				'id': '0x1',
+				'id': 1,
 			},
 			headers_request = {
 				'Content-Type': 'application/json'
@@ -65,7 +65,8 @@ def setup(host: str,
 				'sched': False,
 				'sched_t_s': 0,
 				'sched_t_e': 0,
-				'animation': 1
+				'animation': 1,
+				'queue_name': 'default'
 			},
 			headers_request = {
 				'Content-Type': 'application/json'
@@ -87,6 +88,7 @@ def setup(host: str,
 				'sched_t_e': RespInt(0),
 				'animation': RespInt(1),
 				'owner': RespStr('admin'),
+				'queue_name': RespStr('default'),
 				'error': RespInt(0)
 			},
 			headers_expect = {
@@ -162,7 +164,8 @@ def setup(host: str,
 					'sched': RespBool(None),
 					'sched_t_s': RespInt(None),
 					'sched_t_e': RespInt(None),
-					'animation': RespInt(None)
+					'animation': RespInt(None),
+					'queue_name': RespStr('default')
 				}),
 				'error': RespInt(0)
 			},

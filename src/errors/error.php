@@ -1,13 +1,16 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js_include.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/css.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+		<?php
+			css_include(['bootstrap']);
+		?>
 		<link rel="stylesheet" href="/common/css/footer.css">
 		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/errors/css/error.css">
@@ -23,9 +26,7 @@
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
 
-			js_include_jquery();
-			js_include_popper();
-			js_include_bootstrap();
+			js_include(['jquery', 'popper', 'bootstrap']);
 		?>
 	</body>
 </html>

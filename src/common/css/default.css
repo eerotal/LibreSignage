@@ -110,3 +110,19 @@ h1, h2, h3, h4, h5, h6 {
 	color: var(--secondary);
 	text-decoration: none;
 }
+
+.small-select {
+	height: 2em;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 8px;
+	padding-right: 8px;
+}
+
+.small-btn {
+	padding-left: 0.6em;
+	padding-right: 0.6em;
+	padding-top: 0.25em;
+	padding-bottom: 0.25em;
+	height: 2em;
+}

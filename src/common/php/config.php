@@ -24,6 +24,7 @@
 	*  or system path information might be leaked to users.
 	*/
 	const SLIDES_DIR 			= "/data/slides";
+	const QUEUES_DIR			= "/data/queues";
 	const DOC_HTML_DIR			= "/doc/html";
 	const DOC_RST_DIR			= "/doc/rst";
 	const LICENSE_LS_RST	 		= "/doc/rst/LICENSE.rst";
@@ -63,6 +64,7 @@
 		"SLIDE_MAX_INDEX"		=> 65536,
 		"SLIDE_NAME_MAX_LEN" 		=> 32,
 		"SLIDE_MARKUP_MAX_LEN"	 	=> 2048,
+		"QUEUE_NAME_MAX_LEN"		=> 32,
 
 		"MAX_USERS" 			=> 64,
 		"MAX_USER_GROUPS" 		=> 32,

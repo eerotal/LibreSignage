@@ -9,6 +9,7 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/uid.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/queue.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
 function slides_id_list() {
@@ -119,7 +120,8 @@ class Slide {
 		'sched',
 		'sched_t_s',
 		'sched_t_e',
-		'animation'
+		'animation',
+		'queue_name'
 	);
 
 	// Slide file paths.
@@ -139,6 +141,7 @@ class Slide {
 	private $sched_t_s = 0;
 	private $sched_t_e = 0;
 	private $animation = 0;
+	private $queue_name = NULL;
 
 	private function _mk_paths(string $id) {
 		/*
@@ -221,6 +224,7 @@ class Slide {
 		$this->set_sched_t_s($conf['sched_t_s']);
 		$this->set_sched_t_e($conf['sched_t_e']);
 		$this->set_animation($conf['animation']);
+		$this->set_queue_name($conf['queue_name']);
 
 		$this->check_sched_enabled();
 
@@ -349,6 +353,29 @@ class Slide {
 		$this->animation = $anim;
 	}
 
+	function set_queue(string $name) {
+		if ($this->queue_name != $name) {
+			if ($this->queue_name) {
+				// Remove slide from the old queue.
+				$o = new Queue($this->queue_name);
+				$o->load();
+				$o->remove_slide($this);
+				$o->write();
+			}
+
+			// Add slide to the the new queue.
+			$this->queue_name = $name;
+			$n = new Queue($name);
+			$n->load();
+			$n->add($this);
+			$n->write();
+		}
+	}
+
+	private function set_queue_name(string $name) {
+		$this->queue_name = $name;
+	}
+
 	function get_id() { return $this->id; }
 	function get_markup() { return $this->markup; }
 	function get_name() { return $this->name; }
@@ -360,6 +387,7 @@ class Slide {
 	function get_sched_t_s() { return $this->sched_t_s; }
 	function get_sched_t_e() { return $this->sched_t_e; }
 	function get_animation() { return $this->animation; }
+	function get_queue_name() { return $this->queue_name; }
 
 	function get_data_array() {
 		return array(
@@ -373,7 +401,8 @@ class Slide {
 			'sched' => $this->sched,
 			'sched_t_s' => $this->sched_t_s,
 			'sched_t_e' => $this->sched_t_e,
-			'animation' => $this->animation
+			'animation' => $this->animation,
+			'queue_name' => $this->queue_name
 		);
 	}
 
@@ -428,8 +457,16 @@ class Slide {
 
 	function remove() {
 		/*
-		*  Remove the files associated with this slide.
+		*  Remove this slide.
 		*/
+
+		// Remove slide from its queue.
+		$q = new Queue($this->queue_name);
+		$q->load();
+		$q->remove_slide($this);
+		$q->write();
+
+		// Remove slide data files.
 		if (!empty($this->dir_path)) {
 			rmdir_recursive($this->dir_path);
 		}

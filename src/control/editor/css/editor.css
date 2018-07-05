@@ -3,33 +3,15 @@ html, body {
 }
 
 /* Controls styling. */
-#slidelist {
-	padding: 0;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	overflow: scroll;
+#queue-select-cont {
 	width: 100%;
+	white-space: nowrap;
+	overflow-x: auto;
+	overflow-y: hidden;
 }
 
-.slide-cont {
-	margin: 5px;
-	padding: 0;
-	min-width: 200px;
-	min-height: 90px;
-	max-width: 200px;
-	max-height: 90px;
-	background-color: var(--white);
-	color: var(--secondary);
-	border: 1px solid var(--gray-1);
-}
-
-.slide-cont-dis {
-	background-color: var(--gray-1);
-}
-
-.slide-cont:hover {
-	background-color: var(--secondary);
-	color: var(--white);
+#queue-select {
+	width: 150px;
 }
 
 #editor-col-l {
@@ -37,31 +19,7 @@ html, body {
 }
 
 .btn-slide-ctrl {
-	margin-left: 5px;
-	margin-right: 5px;
-	width: 90px;
-}
-
-.slide-index-cont {
-	margin: 0;
-	padding: 4px;
-	text-align: center;
-}
-
-.slide-thumb-cont {
-	margin: 0;
-	padding: 4px;
-	padding-left: 0px;
-	height: 100%;
-	width: 100%;
-}
-
-.slide-thumb {
-	display: block;
-	pointer-events: none;
-	height: 100%;
-	width: 100%;
-	border: 1px solid var(--gray-1);
+	margin: 5px;
 }
 
 /* Editor styling */
