@@ -57,7 +57,6 @@ const SLIDE_SCHED_TIME_S        = $("#slide-sched-time-s");
 const SLIDE_SCHED_DATE_E        = $("#slide-sched-date-e");
 const SLIDE_SCHED_TIME_E        = $("#slide-sched-time-e");
 const SLIDE_ANIMATION           = $("#slide-animation")
-const EDITOR_STATUS             = $("#editor-status");
 var SLIDE_INPUT                 = null;
 
 var name_sel = null;
@@ -65,10 +64,6 @@ var index_sel = null;
 var sel_slide = null;
 
 var flag_slide_loading = false; // Used by slide_show().
-
-function set_editor_status(str) {
-	EDITOR_STATUS.text(str);
-}
 
 function set_editor_inputs(slide) {
 	/*
@@ -279,9 +274,6 @@ function slide_show(slide, no_popup) {
 		sel_slide.load(slide, (ret) => {
 			if (ret) {
 				console.log("LibreSignage: API error!");
-				set_editor_status(
-					"Failed to load slide!"
-				);
 				set_editor_inputs(null);
 				disable_controls();
 				return;
@@ -314,7 +306,6 @@ function slide_rm() {
 		return;
 	}
 
-	set_editor_status("Deleting slide...");
 	dialog(DIALOG.CONFIRM,
 		"Delete slide?",
 		`Are you sure you want to delete ` +
@@ -324,9 +315,6 @@ function slide_rm() {
 		}
 		sel_slide.remove(null, (stat) => {
 			if (api_handle_disp_error(stat)) {
-				set_editor_status(
-					"Failed to remove slide!"
-				);
 				return;
 			}
 
@@ -342,7 +330,6 @@ function slide_rm() {
 			timeline_update()
 			set_editor_inputs(null);
 			disable_controls();
-			set_editor_status("Slide deleted!");
 		});
 	});
 }
@@ -355,7 +342,6 @@ function slide_new() {
 	*/
 	var cb = () => {
 		console.log("LibreSignage: Create slide!");
-		set_editor_status("Creating new slide...");
 
 		sel_slide = new Slide();
 		sel_slide.set(NEW_SLIDE_DEFAULTS);
@@ -369,7 +355,6 @@ function slide_new() {
 		*  removed.
 		*/
 		SLIDE_REMOVE.prop('disabled', true);
-		set_editor_status("Slide created!");
 	};
 
 	if (!timeline_queue) {
@@ -390,7 +375,6 @@ function slide_save() {
 	*  Save the currently selected slide.
 	*/
 	console.log("LibreSignage: Save slide");
-	set_editor_status("Saving...");
 
 	if (SLIDE_INPUT.getValue().length >
 		SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN) {
@@ -398,7 +382,6 @@ function slide_save() {
 		DIALOG_MARKUP_TOO_LONG(
 			SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN
 		).show();
-		set_editor_status("Save failed!");
 		return;
 	}
 
@@ -423,14 +406,12 @@ function slide_save() {
 
 	sel_slide.save((stat) => {
 		if (api_handle_disp_error(stat)) {
-			set_editor_status("Save failed!");
 			return;
 		}
 		console.log(
-			"LibreSignage: Saved slide '" +
-			sel_slide.get("id") + "'."
+			`LibreSignage: Saved slide '` +
+			`${sel_slide.get("id")}'.`
 		);
-		set_editor_status("Saved!");
 
 		/*
 		*  Make sure the Remove button is enabled. This

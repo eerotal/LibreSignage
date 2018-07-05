@@ -249,7 +249,6 @@
 								<i class="fas fa-trash-alt"></i>
 							</button>
 						</div>
-						<p id="editor-status"></p>
 					</div>
 					<div class="col-md container-fluid pt-2" id="editor-col-r">
 						<label for="slide-input">Markup</label>
