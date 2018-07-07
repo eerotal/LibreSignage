@@ -92,6 +92,16 @@
 								disabled>
 						</div>
 
+						<!-- Slide collaborators input -->
+						<div class="form-group" id="slide-collab-group">
+							<label for="slide-collab">Collaborators</label>
+							<input type="text"
+								class="form-control w-100"
+								id="slide-collab"
+								data-toggle="tooltip"
+								title="Slide collaborators.">
+						</div>
+
 						<!-- Slide time selector -->
 						<div class="form-group" id="slide-time-group">
 							<label for="slide-time">Time (seconds)</label>

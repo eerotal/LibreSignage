@@ -25,18 +25,35 @@ const API_RESPONSE = array(
 const API_P_STR			= 0x1;
 const API_P_INT			= 0x2;
 const API_P_FLOAT		= 0x4;
-const API_P_ARR			= 0x8;
-const API_P_OPT			= 0x10;
-const API_P_NULL		= 0x20;
-const API_P_BOOL		= 0x40;
+const API_P_OPT			= 0x8;
+const API_P_NULL		= 0x10;
+const API_P_BOOL		= 0x20;
+
+// API array type flags.
+const API_P_ARR_INT		= 0x40;
+const API_P_ARR_STR		= 0x80;
+const API_P_ARR_FLOAT		= 0x100;
+const API_P_ARR_BOOL		= 0x200;
 
 // API data flags.
-const API_P_EMPTY_STR_OK	= 0x80;
+const API_P_EMPTY_STR_OK	= 0x400;
 
 // API convenience flags.
-const API_P_ANY			= API_P_STR|API_P_INT|API_P_FLOAT
-				|API_P_ARR|API_P_NULL;
-const API_P_UNUSED 		= API_P_ANY|API_P_EMPTY_STR_OK|API_P_OPT;
+const API_P_ARR_ANY		= API_P_ARR_STR
+				|API_P_ARR_INT
+				|API_P_ARR_FLOAT
+				|API_P_ARR_BOOL;
+
+const API_P_ANY			= API_P_STR
+				|API_P_INT
+				|API_P_FLOAT
+				|API_P_BOOL
+				|API_P_NULL
+				|API_P_ARR_ANY;
+
+const API_P_UNUSED 		= API_P_ANY
+				|API_P_EMPTY_STR_OK
+				|API_P_OPT;
 
 class APIEndpoint {
 	// Config options.
@@ -139,34 +156,73 @@ class APIEndpoint {
 		}
 	}
 
+	private function _chk_arr_types(array $vals, string $type) {
+		foreach ($vals as $k => $v) {
+			if (gettype($v) != $type) {
+				return FALSE;
+			}
+		}
+		return TRUE;
+	}
+
 	private function _chk_type(array $data, array $format, $i) {
 		/*
 		*  Check the value at $i in $data against the
 		*  configured type flags in $format and throw an
 		*  ArgException if the types don't match.
 		*/
-		$bitmask = $format[$i];
-		$type = gettype($data[$i]);
 		$ok = FALSE;
+		$bm = $format[$i];
+		$d = $data[$i];
+		$t = gettype($d);
 
-		if (API_P_NULL & $bitmask && $type == 'NULL') {
+		if (API_P_NULL & $bm && $t == 'NULL') {
 			$ok = TRUE;
-		} elseif (API_P_STR & $bitmask && $type == 'string') {
+		} else if (API_P_STR & $bm && $t == 'string') {
 			$ok = TRUE;
-		} elseif (API_P_INT & $bitmask && $type == 'integer') {
+		} else if (API_P_INT & $bm && $t == 'integer') {
 			$ok = TRUE;
-		} elseif (API_P_ARR & $bitmask && $type == 'array') {
+		} else if (API_P_BOOL & $bm && $t == 'boolean') {
 			$ok = TRUE;
-		} elseif (API_P_BOOL & $bitmask && $type == 'boolean') {
+		} else if (API_P_FLOAT & $bm && $t == 'double') {
 			$ok = TRUE;
-		} elseif (API_P_FLOAT & $bitmask && $type == 'double') {
+		} else if (
+			API_P_ARR_STR & $bm
+			&& $t == 'array'
+			&& $this->_chk_arr_types($d, 'string')
+		) {
+			$ok = TRUE;
+		} else if (
+			API_P_ARR_INT & $bm
+			&& $t == 'array'
+			&& $this->_chk_arr_types($d, 'integer')
+		) {
+			$ok = TRUE;
+		} else if (
+			API_P_ARR_BOOL & $bm
+			&& $t == 'array'
+			&& $this->_chk_arr_types($d, 'boolean')
+		) {
+			$ok = TRUE;
+		} else if (
+			API_P_ARR_FLOAT & $bm
+			&& $t == 'array'
+			&& $this->_chk_arr_types($d, 'double')
+		) {
 			$ok = TRUE;
 		}
 
 		if (!$ok) {
-			throw new ArgException(
-				"Invalid type '$type' for '$i'."
-			);
+			if ($t == 'array') {
+				throw new ArgException(
+					"Invalid type 'array' for '$i' ".
+					"or invalid array value types."
+				);
+			} else {
+				throw new ArgException(
+					"Invalid type '$t' for '$i'."
+				);
+			}
 		}
 	}
 

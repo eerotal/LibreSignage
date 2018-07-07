@@ -32,7 +32,8 @@ const NEW_SLIDE_DEFAULTS = {
 	'sched_t_s': Math.round(Date.now()/1000),
 	'sched_t_e': Math.round(Date.now()/1000),
 	'animation': 0,
-	'queue_name': ''
+	'queue_name': '',
+	'collaborators': []
 };
 
 const QUEUE_SELECT		= $("#queue-select");
@@ -46,6 +47,7 @@ const SLIDE_CH_QUEUE		= $("#btn-slide-ch-queue");
 const SLIDE_NAME                = $("#slide-name");
 const SLIDE_NAME_GRP            = $("#slide-name-group");
 const SLIDE_OWNER               = $("#slide-owner");
+const SLIDE_COLLAB		= $("#slide-collab");
 const SLIDE_TIME                = $("#slide-time");
 const SLIDE_TIME_GRP            = $("#slide-time-group");
 const SLIDE_INDEX               = $("#slide-index");
@@ -401,7 +403,8 @@ function slide_save() {
 				SLIDE_SCHED_TIME_E.val()
 			),
 		'animation': parseInt(SLIDE_ANIMATION.val(), 10),
-		'queue_name': timeline_queue.name
+		'queue_name': timeline_queue.name,
+		'collaborators': sel_slide.get('collaborators') // TODO
 	});
 
 	sel_slide.save((stat) => {
