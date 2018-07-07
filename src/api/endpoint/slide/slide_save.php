@@ -138,7 +138,11 @@ if ($flag_new_slide) {
 }
 
 $slide->write();
-juggle_slide_indices($slide->get_id());
+
+// Jugle slide indices.
+$queue = new Queue($slide->get_queue_name());
+$queue->load();
+$queue->juggle($slide->get_id());
 
 $SLIDE_SAVE->resp_set($slide->get_data_array());
 $SLIDE_SAVE->send();

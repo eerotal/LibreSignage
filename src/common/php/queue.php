@@ -112,6 +112,81 @@ class Queue {
 		file_lock_and_put($this->path, $json);
 	}
 
+	function normalize() {
+		/*
+		*  Normalize and sort the slide array of this queue.
+		*/
+		usort($this->slides, function(Slide $a, Slide $b) {
+			if ($a->get_index() > $b->get_index()) {
+				return 1;
+			} else if ($a->get_index() < $b->get_index()) {
+				return -1;
+			} else {
+				return 0;
+			}
+		});
+		for ($i = 0; $i < count($this->slides); $i++) {
+			$this->slides[$i]->set_index($i);
+			$this->slides[$i]->write();
+		}
+	}
+
+	function juggle(string $keep_id) {
+		/*
+		*  Recalculate slide indices so that the position of the
+		*  slide with the id $keep_id stays the same, no unused
+		*  indices remain and slides are sorted based on the
+		*  indices.
+		*/
+		$keep = NULL;
+		$clash = FALSE;
+
+		// Remove the slide with ID $keep_id initially.
+		foreach ($this->slides as $k => $s) {
+			if ($s->get_id() == $keep_id) {
+				$keep = $s;
+				unset($this->slides[$k]);
+				$this->slides = array_values(
+					$this->slides
+				);
+				break;
+			}
+		}
+
+		$this->normalize();
+
+		/*
+		*  Shift indices so that the index of
+		*  $keep_id is left free.
+		*/
+		$keep_i = $keep->get_index();
+		foreach ($this->slides as $k => $s) {
+			$s_i = $s->get_index();
+			$clash |= $s_i == $keep_i;
+			if ($s_i >= $keep_i) {
+				$s->set_index($s_i + 1);
+				$s->write();
+			}
+		}
+		if (!$clash) {
+			/*
+			*  $keep_id didn't have the same
+			*  index as any of the other slides
+			*  -> make it the last one.
+			*/
+			$keep->set_index(count($this->slides));
+			$keep->write();
+		}
+
+		// Add $keep back to $this->slides at the correct index.
+		array_splice(
+			$this->slides,
+			$keep->get_index(),
+			0,
+			$keep
+		);
+	}
+
 	function remove() {
 		if (!$this->loaded) {
 			throw new IntException(

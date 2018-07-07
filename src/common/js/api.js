@@ -77,6 +77,11 @@ var API_ENDP = {
 		method: "POST",
 		auth:	true
 	},
+	SLIDE_DUP: {
+		uri:	"/api/endpoint/slide/slide_dup.php",
+		method: "POST",
+		auth:	true
+	},
 	SLIDE_RM: {
 		uri:	"/api/endpoint/slide/slide_rm.php",
 		method: "POST",

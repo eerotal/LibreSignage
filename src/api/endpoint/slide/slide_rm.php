@@ -67,7 +67,12 @@ if (!$flag_auth) {
 }
 
 $slide->remove();
-juggle_slide_indices();
+
+// Normalize slide indices now that one is left unused.
+$queue = new Queue($slide->get_queue_name());
+$queue->load();
+$queue->normalize();
+
 $slide_owner_quota->free_quota('slides');
 $slide_owner_quota->flush();
 

@@ -34,81 +34,6 @@ function slides_list() {
 	return $slides;
 }
 
-function sort_slides_by_index(array &$slides) {
-	/*
-	*  Sort the slides in $slides by their indices.
-	*/
-	usort($slides, function(Slide $a, Slide $b) {
-		if ($a->get_index() > $b->get_index()) {
-			return 1;
-		} else if ($a->get_index() < $b->get_index()) {
-			return -1;
-		} else {
-			return 0;
-		}
-	});
-}
-
-function normalize_slide_indices(array &$slides) {
-	/*
-	*  Normalize and sort the slide array $slides.
-	*/
-	sort_slides_by_index($slides);
-	for ($i = 0; $i < count($slides); $i++) {
-		$slides[$i]->set_index($i);
-		$slides[$i]->write();
-	}
-}
-
-function juggle_slide_indices(string $keep_id = "") {
-	/*
-	*  Recalculate slide indices so that the position of the
-	*  slide with the id $keep_id stays the same, no unused
-	*  indices remain and slides are sorted based on the
-	*  indices. If $keep_id is empty, the indices are just
-	*  normalized and sorted.
-	*/
-
-	$slides = slides_list();
-	$keep = NULL;
-	$clash = FALSE;
-
-	// Remove the the slide with ID $keep_id initially.
-	if (!empty($keep_id)) {
-		foreach ($slides as $k => $s) {
-			if ($s->get_id() == $keep_id) {
-				$keep = $s;
-				unset($slides[$k]);
-				$slides = array_values($slides);
-				break;
-			}
-		}
-	}
-
-	normalize_slide_indices($slides);
-	if (!empty($keep_id)) {
-		/*
-		*  Shift indices so that the index of $keep_id is
-		*  left free.
-		*/
-		foreach ($slides as $k => $s) {
-			$clash |= $s->get_index() == $keep->get_index();
-			if ($s->get_index() >= $keep->get_index()) {
-				$s->set_index($s->get_index() + 1);
-				$s->write();
-			}
-		}
-		if (!$clash) {
-			/*
-			*  $keep_id didn't have the same index as any of
-			*  the other slides -> make it the last one.
-			*/
-			$keep->set_index(count($slides));
-			$keep->write();
-		}
-	}
-}
-
 class Slide {
 	// Required keys in a slide config file.
 	const CONF_KEYS = array(
@@ -229,6 +154,22 @@ class Slide {
 		$this->check_sched_enabled();
 
 		return TRUE;
+	}
+
+	function dup() {
+		/*
+		*  Duplicate a slide.
+		*/
+		$slide = clone $this;
+		$slide->gen_id();
+		$slide->set_index($slide->get_index() + 1);
+		$slide->write();
+
+		$queue = $slide->get_queue();
+		$queue->add($slide);
+		$queue->write();
+
+		return $slide;
 	}
 
 	function gen_id() {
@@ -357,8 +298,7 @@ class Slide {
 		if ($this->queue_name != $name) {
 			if ($this->queue_name) {
 				// Remove slide from the old queue.
-				$o = new Queue($this->queue_name);
-				$o->load();
+				$o = $this->get_queue();
 				$o->remove_slide($this);
 				$o->write();
 			}
@@ -388,6 +328,12 @@ class Slide {
 	function get_sched_t_e() { return $this->sched_t_e; }
 	function get_animation() { return $this->animation; }
 	function get_queue_name() { return $this->queue_name; }
+
+	function get_queue() {
+		$queue = new Queue($this->queue_name);
+		$queue->load();
+		return $queue;
+	}
 
 	function get_data_array() {
 		return array(
@@ -461,10 +407,9 @@ class Slide {
 		*/
 
 		// Remove slide from its queue.
-		$q = new Queue($this->queue_name);
-		$q->load();
-		$q->remove_slide($this);
-		$q->write();
+		$queue = $this->get_queue();
+		$queue->remove_slide($this);
+		$queue->write();
 
 		// Remove slide data files.
 		if (!empty($this->dir_path)) {
