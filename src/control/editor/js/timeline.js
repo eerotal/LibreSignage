@@ -1,6 +1,6 @@
 var TIMELINE_UPDATE_INTERVAL = 60000;
 var TIMELINE = $("#timeline");
-var TIMELINE_THUMB_SEL = '.slide-thumb';
+var TIMELINE_THUMB_SEL = '.tl-slide-thumb';
 
 var timeline_queue = null;
 
