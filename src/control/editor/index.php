@@ -224,6 +224,14 @@
 								title="Save slide.">
 								<i class="fas fa-save"></i>
 							</button>
+							<button id="btn-slide-dup"
+								type="button"
+								class="btn btn-success btn-slide-ctrl"
+								onclick="slide_dup()"
+								data-toggle="tooltip"
+								title="Duplicate slide.">
+								<i class="fas fa-copy"></i>
+							</button>
 							<button id="btn-slide-preview"
 								type="button"
 								class="btn btn-success btn-slide-ctrl"

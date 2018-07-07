@@ -179,12 +179,8 @@ class Queue {
 		}
 
 		// Add $keep back to $this->slides at the correct index.
-		array_splice(
-			$this->slides,
-			$keep->get_index(),
-			0,
-			$keep
-		);
+		$this->slides[] = $keep;
+		$this->normalize();
 	}
 
 	function remove() {

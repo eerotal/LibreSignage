@@ -38,17 +38,15 @@ function Slide() {
 		*  argument.
 		*/
 		api_call(API_ENDP.SLIDE_GET, { 'id': id }, (resp) => {
-			var keys = [];
-			if (resp.error) {
-				throw new Error("LibreSignage API error!");
+			if (api_handle_disp_error(resp['error'])) {
 				if (callback) {
-					callback(resp.error);
+					callback(resp['error']);
 				}
 				return;
 			}
-			Object.assign(this.data, resp['slide']);
+			this.set(resp['slide']);
 			if (callback) {
-				callback(resp.error);
+				callback(resp['error']);
 			}
 		});
 	}
@@ -94,13 +92,17 @@ function Slide() {
 		} else if (this.data.id) {
 			r_id = this.data.id;
 		} else {
-			throw new Error("No slide ID specified " +
-					"for removal.");
+			throw new Error(
+				"No slide ID specified " +
+				"for removal."
+			);
 		}
 
 		api_call(API_ENDP.SLIDE_RM, { 'id': r_id }, (resp) => {
 			if (resp.error) {
-				console.error("LibreSignage: API error.");
+				console.error(
+					"LibreSignage: API error."
+				);
 				if (callback) {
 					callback(resp.error);
 				}
@@ -110,6 +112,24 @@ function Slide() {
 				callback(resp.error);
 			}
 		});
+	}
+
+	this.dup = function(callback) {
+		api_call(
+			API_ENDP.SLIDE_DUP,
+			{'id': this.get('id')},
+			(resp) => {
+				var err = api_handle_disp_error(
+					resp['error']
+				);
+				if (err) { return; }
+				if (callback) {
+					s = new Slide();
+					s.set(resp['slide']);
+					callback(s);
+				}
+			}
+		);
 	}
 
 	this.set = function(data) {

@@ -123,7 +123,6 @@ class Slide {
 		// Check config validity.
 		if (!array_is_equal(array_keys($conf),
 					self::CONF_KEYS)) {
-			var_dump(array_keys($conf));
 			throw new IntException(
 				"Invalid slide config."
 			);

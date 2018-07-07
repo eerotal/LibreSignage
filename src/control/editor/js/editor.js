@@ -476,7 +476,6 @@ function slide_ch_queue() {
 							err
 						);
 						if (err) { return; }
-
 						sel_slide = null;
 						set_editor_inputs(null);
 						disable_controls();
@@ -489,6 +488,17 @@ function slide_ch_queue() {
 			},
 			queues
 		);
+	});
+}
+
+function slide_dup() {
+	/*
+	*  Duplicate the selected slide.
+	*/
+	sel_slide.dup((s) => {
+		sel_slide = s;
+		set_editor_inputs(s);
+		timeline_update();
 	});
 }
 
