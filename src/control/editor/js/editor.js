@@ -75,6 +75,7 @@ function set_editor_inputs(slide) {
 		SLIDE_INPUT.setValue('');
 		SLIDE_NAME.val('');
 		SLIDE_OWNER.val('');
+		SLIDE_COLLAB.set([]);
 		SLIDE_TIME.val('1');
 		SLIDE_INDEX.val('');
 		SLIDE_EN.prop('checked', false);
@@ -88,6 +89,7 @@ function set_editor_inputs(slide) {
 		SLIDE_INPUT.setValue(slide.get('markup'));
 		SLIDE_NAME.val(slide.get('name'));
 		SLIDE_OWNER.val(slide.get('owner'));
+		SLIDE_COLLAB.set(slide.get('collaborators'));
 		SLIDE_TIME.val(slide.get('time')/1000);
 		SLIDE_INDEX.val(slide.get('index'));
 		SLIDE_EN.prop('checked', slide.get('enabled'));
@@ -159,6 +161,10 @@ function sel_slide_is_modified() {
 	}
 
 	if (parseInt(SLIDE_ANIMATION.val(), 10) != s.get('animation')) {
+		return true;
+	}
+
+	if (!sets_eq(SLIDE_COLLAB.selected, s.get('collaborators'))) {
 		return true;
 	}
 
@@ -406,7 +412,7 @@ function slide_save() {
 			),
 		'animation': parseInt(SLIDE_ANIMATION.val(), 10),
 		'queue_name': timeline_queue.name,
-		'collaborators': SLIDE_COLLAB.values()
+		'collaborators': SLIDE_COLLAB.selected
 	});
 
 	sel_slide.save((stat) => {
@@ -581,7 +587,7 @@ function inputs_setup(ready) {
 			'slide-collab',
 			[new WhitelistValidator({
 				wh: data['users']
-			}, "No such user.")]
+			}, '')]
 		);
 		if (ready) { ready(); }
 	});

@@ -3,7 +3,7 @@
 */
 
 class MultiSelect {
-	constructor(id, validators) {
+	constructor(id, validators, nodups) {
 		if (!id) {
 			throw new Error(
 				'Invalid empty ID for multiselector.'
@@ -13,6 +13,7 @@ class MultiSelect {
 		this.enabled = true;
 		this.val_valid = true;
 		this.selected = [];
+		this.nodups = nodups;
 		this.root = $(`#${id}`);
 		this.input = $(`#${id} > .ms-controls > .ms-input`);
 		this.btn_add = $(`#${id} > .ms-controls > .ms-add`);
@@ -53,13 +54,22 @@ class MultiSelect {
 	}
 
 	add(option) {
+		/*
+		*  Select a new option.
+		*/
+		if (this.nodups && this.selected.includes(option)) {
+			return;
+		}
 		if (!option) { return; }
+
 		var cont = $('<div>', {
 			'id': `ms-opt-${option}`,
 			'class': 'ms-val',
 			'text': option
 		});
-		var rm = $('<span>', { 'class': 'ms-rm fas fa-times' });
+		var rm = $('<span>', {
+			'class': 'ms-rm fas fa-times'
+		});
 		cont.append(rm);
 		rm.on('click', () => { this.remove(option); });
 
@@ -68,7 +78,23 @@ class MultiSelect {
 
 	}
 
+	set(options) {
+		/*
+		*  Select all the options in 'values'.
+		*/
+
+		// Clear existing selections.
+		this.selected = [];
+		this.values.html('');
+
+		// Add new selections.
+		for (let o of options) { this.add(o); }
+	}
+
 	remove(option) {
+		/*
+		*  Remove the selection 'option'.
+		*/
 		if (!this.selected.includes(option)) {
 			throw new Error(
 				'Option not selected.'
@@ -79,6 +105,9 @@ class MultiSelect {
 	}
 
 	enable() {
+		/*
+		*  Enable the MultiSelect.
+		*/
 		this.enabled = true;
 		this.values.css('background-color', 'white');
 		this.input.prop('disabled', false);
@@ -89,6 +118,9 @@ class MultiSelect {
 	}
 
 	disable() {
+		/*
+		*  Disable the MultiSelect.
+		*/
 		this.enabled = false;
 		this.values.css('background-color', 'var(--gray-3)');
 		this.input.prop('disabled', true);
