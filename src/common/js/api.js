@@ -55,6 +55,11 @@ var API_ENDP = {
 		method:	"GET",
 		auth:	true
 	},
+	USERS_LIST: {
+		uri:	"/api/endpoint/user/users_list.php",
+		method:	"GET",
+		auth:	true
+	},
 
 	// -- Slide API endpoints --
 	SLIDE_LIST: {

@@ -574,8 +574,20 @@ function editor_setup() {
 	});
 
 
-	// Setup the collaborators multiselector.
-	SLIDE_COLLAB = new MultiSelect('slide-collab');
+	/*
+	*  Setup the collaborators multiselector
+	*  with the correct validators.
+	*/
+	api_call(API_ENDP.USERS_LIST, {}, (data) => {
+		if (api_handle_disp_error(data['error'])) { return; }
+
+		SLIDE_COLLAB = new MultiSelect(
+			'slide-collab',
+			[new WhitelistValidator({
+				wh: data['users']
+			}, "No such user.")]
+		);
+	});
 
 	/*
 	*  Handle enabling/disabling editor inputs when

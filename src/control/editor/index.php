@@ -102,6 +102,7 @@
 										type="button">
 										<i class="fas fa-plus-circle"></i>
 									</button>
+									<div class="invalid-feedback"></div>
 								</div>
 								<div class="ms-values container-fluid"></div>
 							</div>

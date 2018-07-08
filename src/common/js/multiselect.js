@@ -3,24 +3,52 @@
 */
 
 class MultiSelect {
-	constructor(id) {
+	constructor(id, validators) {
+		if (!id) {
+			throw new Error(
+				'Invalid empty ID for multiselector.'
+			);
+		}
+
+		this.val_valid = true;
 		this.selected = [];
 		this.root = $(`#${id}`);
 		this.input = $(`#${id} > .ms-controls > .ms-input`);
 		this.btn_add = $(`#${id} > .ms-controls > .ms-add`);
 		this.values = $(`#${id} > .ms-values`);
 
+		// Add listener for Enter keypresses.
 		this.input.on('keypress', (event) => {
-			if (event.key == 'Enter') {
+			if (event.key == 'Enter' && this.val_valid) {
 				this.add(this.input.val());
 				this.input.val('');
 			}
 		});
 
+		// Add listener for the (+) button.
 		this.btn_add.on('click', () => {
 			this.add(this.input.val());
 			this.input.val('');
 		});
+
+		// Add validators for the input.
+		if (validators && validators.length) {
+			this.vtrig = new ValidatorTrigger(
+				[new ValidatorSelector(
+					this.input,
+					this.root,
+					validators,
+					null
+				)],
+				(valid) => {
+					this.val_valid = valid;
+					this.btn_add.prop(
+						'disabled',
+						!valid
+					);
+				}
+			);
+		}
 	}
 
 	add(option) {
@@ -47,13 +75,5 @@ class MultiSelect {
 		}
 		$(`#ms-opt-${option}`).remove();
 		this.selected.splice(this.selected.indexOf(option), 1);
-	}
-
-	enable() {
-		// TODO
-	}
-
-	disable() {
-		// TODO
 	}
 }

@@ -314,3 +314,27 @@ class EqValidator extends Validator {
 		return ret;
 	}
 }
+class WhitelistValidator extends Validator {
+	/*
+	*  Validate against a set of values.
+	*
+	*  Settings:
+	*    * wh = The whitelist to use.  (array)
+	*/
+	constructor(...args) {
+		super(...args);
+		this.chk_settings(['wh']);
+	}
+
+	validate(elem) {
+		var ret = true;
+		var wh = this.settings.wh;
+		elem.query.each(function() {
+			if (!wh.includes($(this).val())) {
+				ret = false;
+				return false;
+			}
+		});
+		return ret;
+	}
+}
