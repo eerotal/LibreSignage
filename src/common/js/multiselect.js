@@ -10,6 +10,7 @@ class MultiSelect {
 			);
 		}
 
+		this.enabled = true;
 		this.val_valid = true;
 		this.selected = [];
 		this.root = $(`#${id}`);
@@ -75,5 +76,23 @@ class MultiSelect {
 		}
 		$(`#ms-opt-${option}`).remove();
 		this.selected.splice(this.selected.indexOf(option), 1);
+	}
+
+	enable() {
+		this.enabled = true;
+		this.values.css('background-color', 'white');
+		this.input.prop('disabled', false);
+		for (let s of this.vtrig.selectors) { s.enable(); }
+		if (this.vtrig.is_valid()) {
+			this.btn_add.prop('disabled', false);
+		}
+	}
+
+	disable() {
+		this.enabled = false;
+		this.values.css('background-color', 'var(--gray-3)');
+		this.input.prop('disabled', true);
+		this.btn_add.prop('disabled', true);
+		for (let s of this.vtrig.selectors) { s.disable(); }
 	}
 }

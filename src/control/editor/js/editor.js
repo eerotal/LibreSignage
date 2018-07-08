@@ -194,6 +194,7 @@ function disable_controls() {
 
 	SLIDE_INPUT.setReadOnly(true);
 	SLIDE_NAME.prop("disabled", true);
+	SLIDE_COLLAB.disable();
 	SLIDE_TIME.prop("disabled", true);
 	SLIDE_INDEX.prop("disabled", true);
 	SLIDE_PREVIEW.prop("disabled", true);
@@ -212,6 +213,7 @@ function disable_controls() {
 function enable_editor_controls() {
 	SLIDE_INPUT.setReadOnly(false);
 	SLIDE_NAME.prop("disabled", false);
+	SLIDE_COLLAB.enable();
 	SLIDE_TIME.prop("disabled", false);
 	SLIDE_INDEX.prop("disabled", false);
 	SLIDE_PREVIEW.prop("disabled", false);
@@ -505,9 +507,12 @@ function slide_dup() {
 	});
 }
 
-function editor_setup() {
-	setup_defaults();
+function inputs_setup(ready) {
+	/*
+	*  Setup all editor inputs and input validators etc.
+	*/
 
+	// Setup validators for the name and index inputs.
 	name_sel = new ValidatorSelector(
 		SLIDE_NAME,
 		SLIDE_NAME_GRP,
@@ -558,6 +563,34 @@ function editor_setup() {
 	);
 
 	/*
+	*  Handle enabling/disabling editor inputs when
+	*  scheduling is enabled/disabled.
+	*/
+	SLIDE_SCHED.change(scheduling_handle_input_enable);
+
+	// Setup the ACE editor with the Dawn theme + plaintext mode.
+	SLIDE_INPUT = ace.edit('slide-input');
+	SLIDE_INPUT.setTheme('ace/theme/dawn');
+	SLIDE_INPUT.$blockScrolling = Infinity;
+
+	// Setup the collaborators multiselector w/ validators.
+	api_call(API_ENDP.USERS_LIST, {}, (data) => {
+		if (api_handle_disp_error(data['error'])) { return; }
+
+		SLIDE_COLLAB = new MultiSelect(
+			'slide-collab',
+			[new WhitelistValidator({
+				wh: data['users']
+			}, "No such user.")]
+		);
+		if (ready) { ready(); }
+	});
+}
+
+function editor_setup() {
+	setup_defaults();
+
+	/*
 	*  Add a listener for the 'beforeunload' event to make sure
 	*  the user doesn't accidentally exit the page and lose changes.
 	*/
@@ -573,39 +606,11 @@ function editor_setup() {
 		return e.returnValue;
 	});
 
-
-	/*
-	*  Setup the collaborators multiselector
-	*  with the correct validators.
-	*/
-	api_call(API_ENDP.USERS_LIST, {}, (data) => {
-		if (api_handle_disp_error(data['error'])) { return; }
-
-		SLIDE_COLLAB = new MultiSelect(
-			'slide-collab',
-			[new WhitelistValidator({
-				wh: data['users']
-			}, "No such user.")]
-		);
+	inputs_setup(() => {
+		// Disable inputs and setup update intervals.
+		disable_controls();
+		queue_setup();
 	});
-
-	/*
-	*  Handle enabling/disabling editor inputs when
-	*  scheduling is enabled/disabled.
-	*/
-	SLIDE_SCHED.change(scheduling_handle_input_enable);
-
-	/*
-	*  Setup the ACE editor with the Dawn theme
-	*  and plaintext mode.
-	*/
-	SLIDE_INPUT = ace.edit('slide-input');
-	SLIDE_INPUT.setTheme('ace/theme/dawn');
-	SLIDE_INPUT.$blockScrolling = Infinity;
-
-	// Disable inputs initially and setup update intevals.
-	disable_controls();
-	queue_setup();
 }
 
 $(document).ready(() => {

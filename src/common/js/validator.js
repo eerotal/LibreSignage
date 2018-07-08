@@ -164,6 +164,8 @@ class ValidatorTrigger {
 			}
 		}
 	}
+
+	is_valid() { return this.valid; }
 }
 
 class Validator {
