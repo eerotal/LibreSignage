@@ -37,6 +37,7 @@
 	border: 1px solid var(--gray-2);
 	border-radius: 2px;
 	background-color: white;
+	min-height: 2.5em;
 }
 
 .ms-val {

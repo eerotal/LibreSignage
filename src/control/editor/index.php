@@ -103,12 +103,7 @@
 										<i class="fas fa-plus-circle"></i>
 									</button>
 								</div>
-								<div class="ms-values container-fluid">
-									<div class="ms-val">
-										Test option
-										<span class="ms-rm fas fa-times"></span>
-									</div>
-								</div>
+								<div class="ms-values container-fluid"></div>
 							</div>
 						</div>
 
@@ -298,6 +293,7 @@
 		<script src="/common/js/api.js"></script>
 		<script src="/common/js/slidelist.js"></script>
 		<script src="/common/js/queue.js"></script>
+		<script src="/common/js/multiselect.js"></script>
 		<script src="/control/editor/js/timeline.js"></script>
 		<script src="/control/editor/js/editor.js"></script>
 		<script src="/control/editor/js/queue_selector.js"></script>

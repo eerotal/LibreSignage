@@ -47,7 +47,6 @@ const SLIDE_CH_QUEUE		= $("#btn-slide-ch-queue");
 const SLIDE_NAME                = $("#slide-name");
 const SLIDE_NAME_GRP            = $("#slide-name-group");
 const SLIDE_OWNER               = $("#slide-owner");
-const SLIDE_COLLAB		= $("#slide-collab");
 const SLIDE_TIME                = $("#slide-time");
 const SLIDE_TIME_GRP            = $("#slide-time-group");
 const SLIDE_INDEX               = $("#slide-index");
@@ -59,6 +58,7 @@ const SLIDE_SCHED_TIME_S        = $("#slide-sched-time-s");
 const SLIDE_SCHED_DATE_E        = $("#slide-sched-date-e");
 const SLIDE_SCHED_TIME_E        = $("#slide-sched-time-e");
 const SLIDE_ANIMATION           = $("#slide-animation")
+var SLIDE_COLLAB		= null;
 var SLIDE_INPUT                 = null;
 
 var name_sel = null;
@@ -404,7 +404,7 @@ function slide_save() {
 			),
 		'animation': parseInt(SLIDE_ANIMATION.val(), 10),
 		'queue_name': timeline_queue.name,
-		'collaborators': sel_slide.get('collaborators') // TODO
+		'collaborators': SLIDE_COLLAB.values()
 	});
 
 	sel_slide.save((stat) => {
@@ -572,6 +572,10 @@ function editor_setup() {
 				"continue?";
 		return e.returnValue;
 	});
+
+
+	// Setup the collaborators multiselector.
+	SLIDE_COLLAB = new MultiSelect('slide-collab');
 
 	/*
 	*  Handle enabling/disabling editor inputs when
