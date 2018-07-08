@@ -10,7 +10,6 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 		<?php
 			css_include(['font-awesome', 'bootstrap']);
 		?>
@@ -18,6 +17,7 @@
 		<link rel="stylesheet" href="/common/css/nav.css">
 		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/common/css/dialog.css">
+		<link rel="stylesheet" href="/common/css/multiselect.css">
 		<link rel="stylesheet" href="/control/editor/css/editor.css">
 		<link rel="stylesheet" href="/control/editor/css/timeline.css">
 		<title>LibreSignage Editor</title>
@@ -92,14 +92,24 @@
 								disabled>
 						</div>
 
-						<!-- Slide collaborators input -->
+						<!-- Slide collaborators multiselect -->
 						<div class="form-group" id="slide-collab-group">
 							<label for="slide-collab">Collaborators</label>
-							<input type="text"
-								class="form-control w-100"
-								id="slide-collab"
-								data-toggle="tooltip"
-								title="Slide collaborators.">
+							<div id="slide-collab" class="multiselect container-fluid">
+								<div class="ms-controls container-fluid">
+									<input class="col ms-input form-control" type="text">
+									<button class="col ms-add btn btn-primary"
+										type="button">
+										<i class="fas fa-plus-circle"></i>
+									</button>
+								</div>
+								<div class="ms-values container-fluid">
+									<div class="ms-val">
+										Test option
+										<span class="ms-rm fas fa-times"></span>
+									</div>
+								</div>
+							</div>
 						</div>
 
 						<!-- Slide time selector -->
