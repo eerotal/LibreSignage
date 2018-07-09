@@ -47,14 +47,8 @@ $SLIDE_GET = new APIEndpoint(array(
 api_endpoint_init($SLIDE_GET);
 
 $slide = new Slide();
-if ($slide->load($SLIDE_GET->get('id'))) {
-	$SLIDE_GET->resp_set(
-		array('slide' => $slide->get_data_array())
-	);
-	$SLIDE_GET->send();
-}
-
-throw new APIException(
-	API_E_INVALID_REQUEST,
-	"Slide doesn't exist."
+$slide->load($SLIDE_GET->get('id'));
+$SLIDE_GET->resp_set(
+	['slide' => $slide->get_data_array()]
 );
+$SLIDE_GET->send();

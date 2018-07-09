@@ -48,13 +48,13 @@ $SLIDE_DATA_QUERY = new APIEndpoint(array(
 ));
 api_endpoint_init($SLIDE_DATA_QUERY);
 
-$ret = array('data' => array());
+$ret = ['data' => []];
 $tmp = new Slide();
 $s_ids = slides_id_list();
 
 foreach($s_ids as $s) {
 	$tmp->load($s);
-	$ret['data'][$s] = array();
+	$ret['data'][$s] = [];
 
 	foreach($SLIDE_DATA_QUERY->get() as $k => $v) {
 		$ret['data'][$s][$k] = $tmp->get_data_array()[$k];

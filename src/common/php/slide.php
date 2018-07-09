@@ -104,7 +104,9 @@ class Slide {
 
 		$this->_mk_paths($id);
 		if (!$this->_paths_exist()) {
-			return FALSE;
+			throw new ArgException(
+				"Slide $id doesn't exist."
+			);
 		}
 
 		// Read config.
@@ -154,8 +156,6 @@ class Slide {
 		$this->set_collaborators($conf['collaborators']);
 
 		$this->check_sched_enabled();
-
-		return TRUE;
 	}
 
 	function dup() {

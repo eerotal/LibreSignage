@@ -19,7 +19,9 @@ class UserQuota {
 
 	public function __construct(User $user, $def_lim = NULL) {
 		if (!$user) {
-			throw new ArgException('Invalid user for quota.');
+			throw new ArgException(
+				'Invalid user for quota.'
+			);
 		}
 
 		if (file_exists($this->_quota_path($user))) {
@@ -223,9 +225,7 @@ class User {
 		*  If $name != NULL, load the userdata for the
 		*  user. Otherwise do nothing.
 		*/
-		if (empty($name)) {
-			return;
-		}
+		if (empty($name)) { return; }
 		$this->load($name);
 	}
 
@@ -253,14 +253,16 @@ class User {
 		}
 		$json = file_lock_and_get($dir.'/data.json');
 		if ($json === FALSE) {
-			throw new IntException('Failed to read '.
-						'user data!');
+			throw new IntException(
+				'Failed to read user data!'
+			);
 		}
 		$data = json_decode($json, $assoc=TRUE);
 		if ($data === NULL &&
 			json_last_error() != JSON_ERROR_NONE) {
-			throw new IntException('JSON user data '.
-						'decode error!');
+			throw new IntException(
+				'JSON user data decode error!'
+			);
 		}
 
 		$this->set_name($data['user']);

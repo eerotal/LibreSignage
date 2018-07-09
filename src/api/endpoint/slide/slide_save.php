@@ -60,77 +60,77 @@ $SLIDE_SAVE = new APIEndpoint(array(
 ));
 api_endpoint_init($SLIDE_SAVE);
 
-$flag_new_slide = FALSE;
-$flag_auth = FALSE;
 
 $user = $SLIDE_SAVE->get_caller();
 $quota = new UserQuota($user);
 $slide = new Slide();
 
+$OP = '';
+$ALLOW = FALSE;
+
+/*
+*  Check permissions.
+*/
 if ($SLIDE_SAVE->has('id', TRUE)) {
-	if ($slide->load($SLIDE_SAVE->get('id'))) {
-		// Allow admins to modify slides.
-		$flag_auth = $user->is_in_group('admin');
-
-		// Allow owner to modify slide.
-		$flag_auth |= ($user->is_in_group('editor') &&
-			$user->get_name() === $slide->get_owner());
-		if (!$flag_auth) {
-			throw new APIException(
-				API_E_NOT_AUTHORIZED,
-				"Not authorized."
-			);
-		}
-	} else {
-		// Slide with the supplied ID doesn't exist.
-		throw new APIException(
-			API_E_INVALID_REQUEST,
-			"No such slide."
-		);
-	}
+	// admin or editor+owner => ALLOW modifying.
+	$ALLOW |= check_perm(
+		'grp:admin;',
+		$SLIDE_SAVE->get_caller()
+	);
+	$ALLOW |= check_perm(
+		'grp:editor&usr:'.$slide->get_owner().';',
+		$SLIDE_SAVE->get_caller()
+	);
+	$OP = 'modify';
 } else {
-	/*
-	*  Allow users in the editor and admin groups
-	*  to create slides.
-	*/
-	if (!$user->is_in_group('editor') &&
-		!$user->is_in_group('admin')) {
-		throw new APIException(
-			API_E_NOT_AUTHORIZED,
-			"Not authorized."
-		);
-	}
-
-	// Set the current user as the owner.
-	$slide->gen_id();
-	$slide->set_owner($user->get_name());
-	$flag_new_slide = TRUE;
+	// admin or editor => ALLOW creation.
+	$ALLOW |= check_perm(
+		'grp:admin|grp:editor;',
+		$SLIDE_SAVE->get_caller()
+	);
+	$OP = 'create';
 }
-
-try {
-	$slide->set_name($SLIDE_SAVE->get('name'));
-	$slide->set_index($SLIDE_SAVE->get('index'));
-	$slide->set_time($SLIDE_SAVE->get('time'));
-	$slide->set_markup($SLIDE_SAVE->get('markup'));
-	$slide->set_enabled($SLIDE_SAVE->get('enabled'));
-	$slide->set_sched($SLIDE_SAVE->get('sched'));
-	$slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
-	$slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
-	$slide->set_animation($SLIDE_SAVE->get('animation'));
-	$slide->set_queue($SLIDE_SAVE->get('queue_name'));
-	$slide->set_collaborators($SLIDE_SAVE->get('collaborators'));
-} catch (ArgException $e) {
-	/*
-	*  Throw an API_E_INVALID_REQUEST exception if
-	*  the Slide::set_* functions throw ArgExceptions.
-	*/
+if (!$ALLOW) {
 	throw new APIException(
-		API_E_INVALID_REQUEST,
-		$e->getMessage()
+		API_E_NOT_AUTHORIZED,
+		"Not authorized."
 	);
 }
 
-if ($flag_new_slide) {
+switch ($OP) {
+	case 'modify':
+		/*
+		*  Load the existing slide data. Note that
+		*  Slide::load() throws an exception if
+		*  the slide doesn't exist.
+		*/
+		$slide->load($SLIDE_SAVE->get('id'));
+		break;
+	case 'create':
+		/*
+		*  Set the current user as the owner and
+		*  generate an ID for the slide.
+		*/
+		$slide->gen_id();
+		$slide->set_owner($user->get_name());
+		break;
+	default:
+		break;
+}
+
+$slide->set_name($SLIDE_SAVE->get('name'));
+$slide->set_index($SLIDE_SAVE->get('index'));
+$slide->set_time($SLIDE_SAVE->get('time'));
+$slide->set_markup($SLIDE_SAVE->get('markup'));
+$slide->set_enabled($SLIDE_SAVE->get('enabled'));
+$slide->set_sched($SLIDE_SAVE->get('sched'));
+$slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
+$slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
+$slide->set_animation($SLIDE_SAVE->get('animation'));
+$slide->set_queue($SLIDE_SAVE->get('queue_name'));
+$slide->set_collaborators($SLIDE_SAVE->get('collaborators'));
+
+if ($OP === 'create') {
 	if (!$quota->use_quota('slides')) {
 		throw new APIException(
 			API_E_QUOTA_EXCEEDED,
@@ -142,7 +142,7 @@ if ($flag_new_slide) {
 
 $slide->write();
 
-// Jugle slide indices.
+// Juggle slide indices.
 $queue = new Queue($slide->get_queue_name());
 $queue->load();
 $queue->juggle($slide->get_id());
