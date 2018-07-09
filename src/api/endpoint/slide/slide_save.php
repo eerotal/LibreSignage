@@ -7,7 +7,20 @@
 /*
 *  ====>
 *
-*  *Save a slide.*
+*  *Save a slide. Whether a user is allowed to access this
+*   API endpoint depends on the parameters passed to the
+*   endpoint.*
+*
+*  Permissions
+*   * id != null => Allow if the caller is in the admin
+*     group or the caller is the owner of the slide and is
+*     in the editor group.
+*   * id == null => Allow if the caller is in the admin or
+*     editor group.
+*   * Otherwise allow restricted access if the caller is in
+*     the collaborators array of the slide. In this case the
+*     queue_name and collaborators parameters of the API
+*     call are silently discarded.
 *
 *  POST JSON parameters
 *    * id            = The ID of the slide to modify or either
@@ -37,11 +50,11 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
 
-$SLIDE_SAVE = new APIEndpoint(array(
+$SLIDE_SAVE = new APIEndpoint([
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
-		'id' => API_P_STR|API_P_NULL|API_P_OPT,
+	APIEndpoint::FORMAT => [
+		'id' => API_P_STR|API_P_NULL,
 		'name' => API_P_STR,
 		'index' => API_P_INT,
 		'markup' => API_P_STR|API_P_EMPTY_STR_OK,
@@ -54,19 +67,21 @@ $SLIDE_SAVE = new APIEndpoint(array(
 		'animation' => API_P_INT,
 		'queue_name' => API_P_STR,
 		'collaborators' => API_P_ARR_STR
-	),
+	],
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
-));
+]);
 api_endpoint_init($SLIDE_SAVE);
 
 
-$user = $SLIDE_SAVE->get_caller();
-$quota = new UserQuota($user);
-$slide = new Slide();
-
 $OP = '';
 $ALLOW = FALSE;
+
+$user = $SLIDE_SAVE->get_caller();
+$quota = new UserQuota($user);
+
+$slide = new Slide();
+$slide->load($SLIDE_SAVE->get('id'));
 
 /*
 *  Check permissions.
@@ -91,31 +106,22 @@ if ($SLIDE_SAVE->has('id', TRUE)) {
 	$OP = 'create';
 }
 if (!$ALLOW) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		"Not authorized."
-	);
-}
-
-switch ($OP) {
-	case 'modify':
-		/*
-		*  Load the existing slide data. Note that
-		*  Slide::load() throws an exception if
-		*  the slide doesn't exist.
-		*/
-		$slide->load($SLIDE_SAVE->get('id'));
-		break;
-	case 'create':
-		/*
-		*  Set the current user as the owner and
-		*  generate an ID for the slide.
-		*/
-		$slide->gen_id();
-		$slide->set_owner($user->get_name());
-		break;
-	default:
-		break;
+	// Allow restricted access for collaborators.
+	if (
+		check_perm('grp:editor;', $SLIDE_SAVE->get_caller())
+		&& in_array(
+			$SLIDE_SAVE->get_caller()->get_name(),
+			$slide->get_collaborators()
+		)
+	) {
+		$ALLOW = TRUE;
+		$OP = 'modify_collab';
+	} else {
+		throw new APIException(
+			API_E_NOT_AUTHORIZED,
+			"Not authorized."
+		);
+	}c
 }
 
 $slide->set_name($SLIDE_SAVE->get('name'));
@@ -127,10 +133,25 @@ $slide->set_sched($SLIDE_SAVE->get('sched'));
 $slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
 $slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
 $slide->set_animation($SLIDE_SAVE->get('animation'));
-$slide->set_queue($SLIDE_SAVE->get('queue_name'));
-$slide->set_collaborators($SLIDE_SAVE->get('collaborators'));
+
+/*
+*  Silently discard attempts to modify queue_name and collaborators
+*  if a collaborator is saving the slide.
+*/
+if ($OP !== 'modify_collab') {
+	$slide->set_queue($SLIDE_SAVE->get('queue_name'));
+	$slide->set_collaborators($SLIDE_SAVE->get('collaborators'));
+}
 
 if ($OP === 'create') {
+	/*
+	*  Set the current user as the owner and
+	*  generate an ID for the new slide.
+	*/
+	$slide->gen_id();
+	$slide->set_owner($user->get_name());
+
+	// Use quota.
 	if (!$quota->use_quota('slides')) {
 		throw new APIException(
 			API_E_QUOTA_EXCEEDED,
