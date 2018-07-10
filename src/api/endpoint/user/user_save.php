@@ -45,7 +45,7 @@ $USER_SAVE = new APIEndpoint(array(
 	APIEndpoint::FORMAT => array(
 		'user' => API_P_STR,
 		'pass' => API_P_STR|API_P_OPT|API_P_NULL,
-		'groups' => API_P_ARR|API_P_OPT|API_P_NULL
+		'groups' => API_P_ARR_STR|API_P_OPT|API_P_NULL
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE

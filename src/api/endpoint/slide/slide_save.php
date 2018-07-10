@@ -81,7 +81,9 @@ $user = $SLIDE_SAVE->get_caller();
 $quota = new UserQuota($user);
 
 $slide = new Slide();
-$slide->load($SLIDE_SAVE->get('id'));
+if ($SLIDE_SAVE->has('id', TRUE)) {
+	$slide->load($SLIDE_SAVE->get('id'));
+}
 
 /*
 *  Check permissions.
@@ -105,6 +107,7 @@ if ($SLIDE_SAVE->has('id', TRUE)) {
 	);
 	$OP = 'create';
 }
+
 if (!$ALLOW) {
 	// Allow restricted access for collaborators.
 	if (
@@ -124,15 +127,17 @@ if (!$ALLOW) {
 	}
 }
 
-$slide->set_name($SLIDE_SAVE->get('name'));
-$slide->set_index($SLIDE_SAVE->get('index'));
-$slide->set_time($SLIDE_SAVE->get('time'));
-$slide->set_markup($SLIDE_SAVE->get('markup'));
-$slide->set_enabled($SLIDE_SAVE->get('enabled'));
-$slide->set_sched($SLIDE_SAVE->get('sched'));
-$slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
-$slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
-$slide->set_animation($SLIDE_SAVE->get('animation'));
+if ($OP === 'create') {
+	/*
+	*  Set the current user as the owner and
+	*  generate an ID for the new slide. Note
+	*  that Slide::set_owner() must be called before
+	*  Slide::set_collaborators(), which is why
+	*  this if statement is here. Don't move it.
+	*/
+	$slide->gen_id();
+	$slide->set_owner($user->get_name());
+}
 
 /*
 *  Silently discard attempts to modify queue_name and collaborators
@@ -143,14 +148,17 @@ if ($OP !== 'modify_collab') {
 	$slide->set_collaborators($SLIDE_SAVE->get('collaborators'));
 }
 
-if ($OP === 'create') {
-	/*
-	*  Set the current user as the owner and
-	*  generate an ID for the new slide.
-	*/
-	$slide->gen_id();
-	$slide->set_owner($user->get_name());
+$slide->set_name($SLIDE_SAVE->get('name'));
+$slide->set_index($SLIDE_SAVE->get('index'));
+$slide->set_time($SLIDE_SAVE->get('time'));
+$slide->set_markup($SLIDE_SAVE->get('markup'));
+$slide->set_enabled($SLIDE_SAVE->get('enabled'));
+$slide->set_sched($SLIDE_SAVE->get('sched'));
+$slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
+$slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
+$slide->set_animation($SLIDE_SAVE->get('animation'));
 
+if ($OP === 'create') {
 	// Use quota.
 	if (!$quota->use_quota('slides')) {
 		throw new APIException(

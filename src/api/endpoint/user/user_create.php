@@ -36,7 +36,7 @@ $USER_CREATE = new APIEndpoint(array(
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
 		'user' => API_P_STR,
-		'groups' => API_P_ARR|API_P_OPT|API_P_NULL
+		'groups' => API_P_ARR_STR|API_P_OPT|API_P_NULL
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE

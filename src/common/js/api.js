@@ -142,11 +142,6 @@ var API_ENDP = {
 		method: "GET",
 		auth:	true
 	},
-	AUTH_USER: {
-		uri:	"/api/endpoint/auth/auth_user.php",
-		method: "GET",
-		auth:	true
-	},
 
 	// -- General information API endpoints --
 	API_ERR_CODES: {
@@ -465,11 +460,11 @@ function session_check(ready) {
 		*  Get the current username and check that
 		*  the session actually is valid.
 		*/
-		api_call(API_ENDP.AUTH_USER, {}, (data) => {
+		api_call(API_ENDP.USER_GET_CURRENT, {}, (data) => {
 			var e = data['error'];
 			if (e == API_E.API_E_OK) {
 				API_CONFIG.authenticated = true;
-				API_CONFIG.user = data['user'];
+				API_CONFIG.user = data['user']['user'];
 			} else if (e == API_E.API_E_NOT_AUTHORIZED) {
 				session_remove();
 				console.log('API: Session not valid.');
