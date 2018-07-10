@@ -316,23 +316,49 @@ class EqValidator extends Validator {
 		return ret;
 	}
 }
+
 class WhitelistValidator extends Validator {
 	/*
-	*  Validate against a set of values.
+	*  Validate against a set of allowed values.
 	*
 	*  Settings:
-	*    * wh = The whitelist to use.  (array)
+	*    * wl = The whitelist to use.  (array)
 	*/
 	constructor(...args) {
 		super(...args);
-		this.chk_settings(['wh']);
+		this.chk_settings(['wl']);
 	}
 
 	validate(elem) {
 		var ret = true;
-		var wh = this.settings.wh;
+		var wl = this.settings.wl;
 		elem.query.each(function() {
-			if (!wh.includes($(this).val())) {
+			if (!wl.includes($(this).val())) {
+				ret = false;
+				return false;
+			}
+		});
+		return ret;
+	}
+}
+
+class BlacklistValidator extends Validator {
+	/*
+	*  Validate against a set of disallowed values.
+	*
+	*  Settings:
+	*    * bl = The blacklist to use.  (array)
+	*/
+	constructor(...args) {
+		super(...args);
+		this.chk_settings(['bl']);
+	}
+
+	validate(elem) {
+		var ret = true;
+		var bl = this.settings.bl;
+		elem.query.each(function() {
+			if (bl.includes($(this).val())) {
 				ret = false;
 				return false;
 			}

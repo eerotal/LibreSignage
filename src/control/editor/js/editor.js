@@ -597,9 +597,15 @@ function inputs_setup(ready) {
 
 		SLIDE_COLLAB = new MultiSelect(
 			'slide-collab',
-			[new WhitelistValidator({
-				wh: data['users']
-			}, '')]
+			[new WhitelistValidator(
+				{ wl: data['users'] },
+				"This user doesn't exist."
+			),
+			new BlacklistValidator(
+				{ bl: [API_CONFIG.user] },
+				"You can't add yourself " +
+				"as a collaborator."
+			)]
 		);
 		if (ready) { ready(); }
 	});
