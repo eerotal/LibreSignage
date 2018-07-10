@@ -121,7 +121,7 @@ if (!$ALLOW) {
 			API_E_NOT_AUTHORIZED,
 			"Not authorized."
 		);
-	}c
+	}
 }
 
 $slide->set_name($SLIDE_SAVE->get('name'));

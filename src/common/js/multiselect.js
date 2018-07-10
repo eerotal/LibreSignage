@@ -111,10 +111,9 @@ class MultiSelect {
 		this.enabled = true;
 		this.values.css('background-color', 'white');
 		this.input.prop('disabled', false);
+
+		// This also enables the add button if needed.
 		for (let s of this.vtrig.selectors) { s.enable(); }
-		if (this.vtrig.is_valid()) {
-			this.btn_add.prop('disabled', false);
-		}
 	}
 
 	disable() {
@@ -122,9 +121,9 @@ class MultiSelect {
 		*  Disable the MultiSelect.
 		*/
 		this.enabled = false;
+		for (let s of this.vtrig.selectors) { s.disable(); }
 		this.values.css('background-color', 'var(--gray-3)');
 		this.input.prop('disabled', true);
 		this.btn_add.prop('disabled', true);
-		for (let s of this.vtrig.selectors) { s.disable(); }
 	}
 }

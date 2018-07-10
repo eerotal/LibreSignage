@@ -44,6 +44,7 @@ const SLIDE_PREVIEW             = $("#btn-slide-preview");
 const SLIDE_SAVE                = $("#btn-slide-save");
 const SLIDE_REMOVE              = $("#btn-slide-remove");
 const SLIDE_CH_QUEUE		= $("#btn-slide-ch-queue");
+const SLIDE_DUP			= $("#btn-slide-dup");
 const SLIDE_NAME                = $("#slide-name");
 const SLIDE_NAME_GRP            = $("#slide-name-group");
 const SLIDE_OWNER               = $("#slide-owner");
@@ -207,6 +208,7 @@ function disable_controls() {
 	SLIDE_SAVE.prop("disabled", true);
 	SLIDE_REMOVE.prop("disabled", true);
 	SLIDE_CH_QUEUE.prop("disabled", true);
+	SLIDE_DUP.prop("disabled", true);
 	SLIDE_EN.prop("disabled", true);
 	SLIDE_SCHED.prop("disabled", true);
 	SLIDE_SCHED_DATE_S.prop("disabled", true);
@@ -219,15 +221,25 @@ function disable_controls() {
 function enable_editor_controls() {
 	SLIDE_INPUT.setReadOnly(false);
 	SLIDE_NAME.prop("disabled", false);
-	SLIDE_COLLAB.enable();
 	SLIDE_TIME.prop("disabled", false);
 	SLIDE_INDEX.prop("disabled", false);
 	SLIDE_PREVIEW.prop("disabled", false);
 	SLIDE_SAVE.prop("disabled", false);
 	SLIDE_REMOVE.prop("disabled", false);
-	SLIDE_CH_QUEUE.prop("disabled", false);
+	SLIDE_DUP.prop("disabled", false);
 	SLIDE_SCHED.prop("disabled", false);
 	SLIDE_ANIMATION.prop("disabled", false);
+
+	/*
+	*  Only enable the collaborators selector and the
+	*  queue change button for the owner of the slide
+	*  since the API will discard these for other users
+	*  anyway.
+	*/
+	if (sel_slide.get('owner') == API_CONFIG.user) {
+		SLIDE_COLLAB.enable();
+		SLIDE_CH_QUEUE.prop("disabled", false);
+	}
 
 	scheduling_handle_input_enable();
 

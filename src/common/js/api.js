@@ -11,6 +11,7 @@ var API_CONFIG = {
 	hostname: null,
 	configured: false,
 	authenticated: false,
+	user: '',
 	noui: false
 }
 
@@ -138,6 +139,11 @@ var API_ENDP = {
 	},
 	AUTH_GET_SESSIONS: {
 		uri:	"/api/endpoint/auth/auth_get_sessions.php",
+		method: "GET",
+		auth:	true
+	},
+	AUTH_USER: {
+		uri:	"/api/endpoint/auth/auth_user.php",
 		method: "GET",
 		auth:	true
 	},
@@ -444,28 +450,39 @@ function session_remove() {
 	rm_cookie({"session_permanent": "", "path": "/"});
 }
 
-function session_check() {
+function session_check(ready) {
 	/*
-	*  Check the authentication cookies and flag the API
-	*  as authenticated if the cookies are valid. A session
-	*  renewal is also scheduled if the cookies are valid.
+	*  Check the authentication status of the API. This
+	*  function also schedules a session renewal.
 	*/
 	console.log("API: Check authentication status.");
-	if (cookie_exists('session_token') &&
-		cookie_exists('session_created') &&
-		cookie_exists('session_max_age')) {
+	if (
+		cookie_exists('session_token')
+		&& cookie_exists('session_created')
+		&& cookie_exists('session_max_age')
+	) {
 		/*
-		*  Because the cookies exist, the session is not
-		*  expired yet. (The cookie parameter 'expire' is
-		*  set by the server.)
+		*  Get the current username and check that
+		*  the session actually is valid.
 		*/
-		console.log("API: Already authenticated.")
-		API_CONFIG.authenticated = true;
-		session_schedule_renewal();
+		api_call(API_ENDP.AUTH_USER, {}, (data) => {
+			var e = data['error'];
+			if (e == API_E.API_E_OK) {
+				API_CONFIG.authenticated = true;
+				API_CONFIG.user = data['user'];
+			} else if (e == API_E.API_E_NOT_AUTHORIZED) {
+				session_remove();
+				console.log('API: Session not valid.');
+			} else {
+				api_handle_disp_error(e);
+			}
+			if (ready) { ready(); }
+		});
 	} else {
 		// Remove invalid cookies.
-		console.log("API: Invalid or no session data.");
+		console.log("API: No valid session data.");
 		session_remove();
+		if (ready) { ready(); }
 	}
 }
 
@@ -487,6 +504,7 @@ function api_login(user, pass, perm, ready_callback) {
 		(resp) => {
 			if (resp.error == API_E.API_E_OK) {
 				API_CONFIG.authenticated = true;
+				API_CONFIG.user = user;
 				session_schedule_renewal();
 			} else {
 				console.error("API: Auth failed.");
@@ -531,15 +549,15 @@ function api_init(config, callback) {
 	api_apply_config(config);
 	API_CONFIG.configured = true;
 
-	session_check();
-
 	api_load_error_codes(() => {
 		api_load_error_msgs(() => {
 			api_load_limits(() => {
-				console.log("API: Initialized.");
-				if (callback) {
-					callback();
-				}
+				session_check(() => {
+					console.log("API: Initialized.");
+					if (callback) {
+						callback();
+					}
+				});
 			});
 		});
 	});
