@@ -66,7 +66,8 @@ def setup(host: str,
 				'sched_t_s': 0,
 				'sched_t_e': 0,
 				'animation': 1,
-				'queue_name': 'default'
+				'queue_name': 'default',
+				'collaborators': []
 			},
 			headers_request = {
 				'Content-Type': 'application/json'
@@ -89,6 +90,7 @@ def setup(host: str,
 				'animation': RespInt(1),
 				'owner': RespStr('admin'),
 				'queue_name': RespStr('default'),
+				'collaborators': RespList([]),
 				'error': RespInt(0)
 			},
 			headers_expect = {
@@ -158,14 +160,62 @@ def setup(host: str,
 					'name': RespRe('.*'),
 					'index': RespInt(None),
 					'time': RespInt(None),
-					'markup': RespRe(None),
+					'markup': RespRe('.*'),
 					'owner': RespRe('.*'),
 					'enabled': RespBool(None),
 					'sched': RespBool(None),
 					'sched_t_s': RespInt(None),
 					'sched_t_e': RespInt(None),
 					'animation': RespInt(None),
-					'queue_name': RespStr('default')
+					'queue_name': RespStr('default'),
+					'collaborators': RespList([])
+				}),
+				'error': RespInt(0)
+			},
+			headers_expect = {
+				'Access-Control-Allow-Origin': RespRe(
+					'.*'
+				),
+				'Content-Type': RespRe(
+					'application/json.*'
+				)
+			}
+		),
+		unit.Unit(
+			name = "slide_dup.php",
+			host = host,
+			url = "/api/endpoint/slide/slide_dup.php",
+			request_method = unit.Unit.METHOD_POST,
+
+			preexec = f_session_use,
+			postexec = lambda a, b: None,
+
+			data_request = {
+				'id': '0x1',
+			},
+			headers_request = {
+				'Content-Type': 'application/json'
+			},
+			cookies_request = None,
+
+			data_expect_strict = True,
+			headers_expect_strict = False,
+			status_expect = 200,
+			data_expect = {
+				'slide': RespDict({
+					'id': RespRe('.*'),
+					'name': RespRe('.*'),
+					'index': RespInt(None),
+					'time': RespInt(None),
+					'markup': RespRe('.*'),
+					'owner': RespRe('.*'),
+					'enabled': RespBool(None),
+					'sched': RespBool(None),
+					'sched_t_s': RespInt(None),
+					'sched_t_e': RespInt(None),
+					'animation': RespInt(None),
+					'queue_name': RespStr('default'),
+					'collaborators': RespList([])
 				}),
 				'error': RespInt(0)
 			},

@@ -15,17 +15,18 @@
 *  Return value
 *    * slide
 *
-*      * id        = The ID of the slide.
-*      * name      = The name of the slide.
-*      * index     = The index of the slide.
-*      * time      = The time the slide is shown.
-*      * markup    = The markup of the slide.
-*      * owner     = The owner of the slide.
-*      * enabled   = Whether the slide is enabled or not.
-*      * sched     = Whether the slide is scheduled or not.
-*      * sched_t_s = The slide schedule starting timestamp.
-*      * sched_t_e = The slide schedule ending timestamp.
-*      * animation = The slide animation identifier.
+*      * id            = The ID of the slide.
+*      * name          = The name of the slide.
+*      * index         = The index of the slide.
+*      * time          = The time the slide is shown.
+*      * markup        = The markup of the slide.
+*      * owner         = The owner of the slide.
+*      * enabled       = Whether the slide is enabled or not.
+*      * sched         = Whether the slide is scheduled or not.
+*      * sched_t_s     = The slide schedule starting timestamp.
+*      * sched_t_e     = The slide schedule ending timestamp.
+*      * animation     = The slide animation identifier.
+*      * collaborators = The collaborators of the slide.
 *
 *    * error   = An error code or API_E_OK on success.
 *
@@ -47,14 +48,8 @@ $SLIDE_GET = new APIEndpoint(array(
 api_endpoint_init($SLIDE_GET);
 
 $slide = new Slide();
-if ($slide->load($SLIDE_GET->get('id'))) {
-	$SLIDE_GET->resp_set(
-		array('slide' => $slide->get_data_array())
-	);
-	$SLIDE_GET->send();
-}
-
-throw new APIException(
-	API_E_INVALID_REQUEST,
-	"Slide doesn't exist."
+$slide->load($SLIDE_GET->get('id'));
+$SLIDE_GET->resp_set(
+	['slide' => $slide->get_data_array()]
 );
+$SLIDE_GET->send();

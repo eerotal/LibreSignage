@@ -113,3 +113,14 @@ function tstamp_to_datetime(tstamp) {
 
 	return ret;
 }
+
+function set_contains(a, E) {
+	for (let i of a) {
+		if (!E.includes(i)) { return false; }
+	}
+	return true;
+}
+
+function sets_eq(a, b) {
+	return set_contains(a, b) && set_contains(b, a);
+}

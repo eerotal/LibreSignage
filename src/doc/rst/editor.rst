@@ -54,6 +54,12 @@ field only accepts alphanumeric characters (A-Z, a-z, 0-9) and the dash
 in the LibreSignage instance config and by default it's set to 32
 characters.
 
+**Owner (read-only)** - The owner of the slide.
+
+**Collaborators** - A list of slide collaborators. This selector can
+be used to give other users the permission to modify a slide. Slide
+collaborators can't delete or change the queue of the slide.
+
 **Time** - The *Time* selector controls how long the slide is shown in
 the slideshow. The values in the selector are in seconds.
 

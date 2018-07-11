@@ -46,7 +46,8 @@ class Slide {
 		'sched_t_s',
 		'sched_t_e',
 		'animation',
-		'queue_name'
+		'queue_name',
+		'collaborators'
 	);
 
 	// Slide file paths.
@@ -67,6 +68,7 @@ class Slide {
 	private $sched_t_e = 0;
 	private $animation = 0;
 	private $queue_name = NULL;
+	private $collaborators = NULL;
 
 	private function _mk_paths(string $id) {
 		/*
@@ -102,7 +104,9 @@ class Slide {
 
 		$this->_mk_paths($id);
 		if (!$this->_paths_exist()) {
-			return FALSE;
+			throw new ArgException(
+				"Slide $id doesn't exist."
+			);
 		}
 
 		// Read config.
@@ -149,10 +153,9 @@ class Slide {
 		$this->set_sched_t_e($conf['sched_t_e']);
 		$this->set_animation($conf['animation']);
 		$this->set_queue_name($conf['queue_name']);
+		$this->set_collaborators($conf['collaborators']);
 
 		$this->check_sched_enabled();
-
-		return TRUE;
 	}
 
 	function dup() {
@@ -269,7 +272,8 @@ class Slide {
 	function set_sched_t_s(int $tstamp) {
 		if ($tstamp < 0) {
 			throw new ArgException(
-				"Invalid negative schedule start timestamp."
+				"Invalid negative schedule ".
+				"start timestamp."
 			);
 		}
 		$this->sched_t_s = $tstamp;
@@ -278,7 +282,8 @@ class Slide {
 	function set_sched_t_e(int $tstamp) {
 		if ($tstamp < 0) {
 			throw new ArgException(
-				"Invalid negative schedule end timestamp."
+				"Invalid negative schedule ".
+				"end timestamp."
 			);
 		}
 		$this->sched_t_e = $tstamp;
@@ -315,6 +320,34 @@ class Slide {
 		$this->queue_name = $name;
 	}
 
+	function set_collaborators(array $collaborators) {
+		if (count($collaborators) > gtlim('SLIDE_MAX_COLLAB')) {
+			throw new ArgException(
+				"Too many collaborators."
+			);
+		}
+		if (empty($this->get_owner())) {
+			throw new ArgException(
+				"Can't set collaborators ".
+				"before owner."
+			);
+		}
+		foreach ($collaborators as $k => $c) {
+			if ($c == $this->get_owner()) {
+				throw new ArgException(
+					"Can't set owner ".
+					"as collaborator."
+				);
+			}
+			if (!user_exists($c)) {
+				throw new ArgException(
+					"User $c doesn't exist."
+				);
+			}
+		}
+		$this->collaborators = $collaborators;
+	}
+
 	function get_id() { return $this->id; }
 	function get_markup() { return $this->markup; }
 	function get_name() { return $this->name; }
@@ -327,6 +360,7 @@ class Slide {
 	function get_sched_t_e() { return $this->sched_t_e; }
 	function get_animation() { return $this->animation; }
 	function get_queue_name() { return $this->queue_name; }
+	function get_collaborators() { return $this->collaborators; }
 
 	function get_queue() {
 		$queue = new Queue($this->queue_name);
@@ -347,7 +381,8 @@ class Slide {
 			'sched_t_s' => $this->sched_t_s,
 			'sched_t_e' => $this->sched_t_e,
 			'animation' => $this->animation,
-			'queue_name' => $this->queue_name
+			'queue_name' => $this->queue_name,
+			'collaborators' => $this->collaborators
 		);
 	}
 

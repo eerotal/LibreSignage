@@ -164,6 +164,8 @@ class ValidatorTrigger {
 			}
 		}
 	}
+
+	is_valid() { return this.valid; }
 }
 
 class Validator {
@@ -307,6 +309,56 @@ class EqValidator extends Validator {
 			if (v == null) {
 				v = $(this).val();
 			} else if (v != $(this).val()) {
+				ret = false;
+				return false;
+			}
+		});
+		return ret;
+	}
+}
+
+class WhitelistValidator extends Validator {
+	/*
+	*  Validate against a set of allowed values.
+	*
+	*  Settings:
+	*    * wl = The whitelist to use.  (array)
+	*/
+	constructor(...args) {
+		super(...args);
+		this.chk_settings(['wl']);
+	}
+
+	validate(elem) {
+		var ret = true;
+		var wl = this.settings.wl;
+		elem.query.each(function() {
+			if (!wl.includes($(this).val())) {
+				ret = false;
+				return false;
+			}
+		});
+		return ret;
+	}
+}
+
+class BlacklistValidator extends Validator {
+	/*
+	*  Validate against a set of disallowed values.
+	*
+	*  Settings:
+	*    * bl = The blacklist to use.  (array)
+	*/
+	constructor(...args) {
+		super(...args);
+		this.chk_settings(['bl']);
+	}
+
+	validate(elem) {
+		var ret = true;
+		var bl = this.settings.bl;
+		elem.query.each(function() {
+			if (bl.includes($(this).val())) {
 				ret = false;
 				return false;
 			}

@@ -10,7 +10,6 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 		<?php
 			css_include(['font-awesome', 'bootstrap']);
 		?>
@@ -18,6 +17,7 @@
 		<link rel="stylesheet" href="/common/css/nav.css">
 		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/common/css/dialog.css">
+		<link rel="stylesheet" href="/common/css/multiselect.css">
 		<link rel="stylesheet" href="/control/editor/css/editor.css">
 		<link rel="stylesheet" href="/control/editor/css/timeline.css">
 		<title>LibreSignage Editor</title>
@@ -70,6 +70,12 @@
 				</div>
 				<div class="container-fluid row mx-0 my-1">
 					<div class="col-md-3 container-fluid pt-2" id="editor-col-l">
+						<div id="slide-cant-edit">
+							You can't edit this slide.
+						</div>
+						<div id="slide-edit-as-collab">
+							You can edit this slide as a collaborator.
+						</div>
 						<!-- Slide name input -->
 						<div class="form-group" id="slide-name-group">
 							<label for="slide-name">Name</label>
@@ -90,6 +96,22 @@
 								data-toggle="tooltip"
 								title="The owner of the slide."
 								disabled>
+						</div>
+
+						<!-- Slide collaborators multiselect -->
+						<div class="form-group" id="slide-collab-group">
+							<label for="slide-collab">Collaborators</label>
+							<div id="slide-collab" class="multiselect container-fluid">
+								<div class="ms-controls container-fluid">
+									<input class="col ms-input form-control" type="text">
+									<button class="col ms-add btn btn-primary"
+										type="button">
+										<i class="fas fa-plus-circle"></i>
+									</button>
+									<div class="invalid-feedback"></div>
+								</div>
+								<div class="ms-values container-fluid"></div>
+							</div>
 						</div>
 
 						<!-- Slide time selector -->
@@ -278,6 +300,7 @@
 		<script src="/common/js/api.js"></script>
 		<script src="/common/js/slidelist.js"></script>
 		<script src="/common/js/queue.js"></script>
+		<script src="/common/js/multiselect.js"></script>
 		<script src="/control/editor/js/timeline.js"></script>
 		<script src="/control/editor/js/editor.js"></script>
 		<script src="/control/editor/js/queue_selector.js"></script>

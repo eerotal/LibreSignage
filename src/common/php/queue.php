@@ -76,11 +76,7 @@ class Queue {
 		$this->slides = array();
 		foreach ($data['slides'] as $n) {
 			$tmp = new Slide();
-			if (!$tmp->load($n)) {
-				throw new IntException(
-					"No such slide in queue."
-				);
-			}
+			$tmp->load($n);
 			$this->slides[] = $tmp;
 		}
 		$this->loaded = TRUE;
@@ -151,6 +147,12 @@ class Queue {
 				);
 				break;
 			}
+		}
+
+		if (!$keep) {
+			throw new ArgException(
+				"Slide $keep_id doesn't exist in queue."
+			);
 		}
 
 		$this->normalize();

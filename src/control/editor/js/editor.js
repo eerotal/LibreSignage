@@ -32,7 +32,8 @@ const NEW_SLIDE_DEFAULTS = {
 	'sched_t_s': Math.round(Date.now()/1000),
 	'sched_t_e': Math.round(Date.now()/1000),
 	'animation': 0,
-	'queue_name': ''
+	'queue_name': '',
+	'collaborators': []
 };
 
 const QUEUE_SELECT		= $("#queue-select");
@@ -43,6 +44,9 @@ const SLIDE_PREVIEW             = $("#btn-slide-preview");
 const SLIDE_SAVE                = $("#btn-slide-save");
 const SLIDE_REMOVE              = $("#btn-slide-remove");
 const SLIDE_CH_QUEUE		= $("#btn-slide-ch-queue");
+const SLIDE_DUP			= $("#btn-slide-dup");
+const SLIDE_CANT_EDIT		= $("#slide-cant-edit");
+const SLIDE_EDIT_AS_COLLAB	= $("#slide-edit-as-collab");
 const SLIDE_NAME                = $("#slide-name");
 const SLIDE_NAME_GRP            = $("#slide-name-group");
 const SLIDE_OWNER               = $("#slide-owner");
@@ -57,6 +61,7 @@ const SLIDE_SCHED_TIME_S        = $("#slide-sched-time-s");
 const SLIDE_SCHED_DATE_E        = $("#slide-sched-date-e");
 const SLIDE_SCHED_TIME_E        = $("#slide-sched-time-e");
 const SLIDE_ANIMATION           = $("#slide-animation")
+var SLIDE_COLLAB		= null;
 var SLIDE_INPUT                 = null;
 
 var name_sel = null;
@@ -73,6 +78,7 @@ function set_editor_inputs(slide) {
 		SLIDE_INPUT.setValue('');
 		SLIDE_NAME.val('');
 		SLIDE_OWNER.val('');
+		SLIDE_COLLAB.set([]);
 		SLIDE_TIME.val('1');
 		SLIDE_INDEX.val('');
 		SLIDE_EN.prop('checked', false);
@@ -86,6 +92,7 @@ function set_editor_inputs(slide) {
 		SLIDE_INPUT.setValue(slide.get('markup'));
 		SLIDE_NAME.val(slide.get('name'));
 		SLIDE_OWNER.val(slide.get('owner'));
+		SLIDE_COLLAB.set(slide.get('collaborators'));
 		SLIDE_TIME.val(slide.get('time')/1000);
 		SLIDE_INDEX.val(slide.get('index'));
 		SLIDE_EN.prop('checked', slide.get('enabled'));
@@ -160,6 +167,10 @@ function sel_slide_is_modified() {
 		return true;
 	}
 
+	if (!sets_eq(SLIDE_COLLAB.selected, s.get('collaborators'))) {
+		return true;
+	}
+
 	return false;
 }
 
@@ -192,12 +203,14 @@ function disable_controls() {
 
 	SLIDE_INPUT.setReadOnly(true);
 	SLIDE_NAME.prop("disabled", true);
+	SLIDE_COLLAB.disable();
 	SLIDE_TIME.prop("disabled", true);
 	SLIDE_INDEX.prop("disabled", true);
 	SLIDE_PREVIEW.prop("disabled", true);
 	SLIDE_SAVE.prop("disabled", true);
 	SLIDE_REMOVE.prop("disabled", true);
 	SLIDE_CH_QUEUE.prop("disabled", true);
+	SLIDE_DUP.prop("disabled", true);
 	SLIDE_EN.prop("disabled", true);
 	SLIDE_SCHED.prop("disabled", true);
 	SLIDE_SCHED_DATE_S.prop("disabled", true);
@@ -205,24 +218,43 @@ function disable_controls() {
 	SLIDE_SCHED_DATE_E.prop("disabled", true);
 	SLIDE_SCHED_TIME_E.prop("disabled", true);
 	SLIDE_ANIMATION.prop("disabled", true);
+
+	SLIDE_CANT_EDIT.css("display", "none");
+	SLIDE_EDIT_AS_COLLAB.css("display", "none");
 }
 
 function enable_editor_controls() {
-	SLIDE_INPUT.setReadOnly(false);
-	SLIDE_NAME.prop("disabled", false);
-	SLIDE_TIME.prop("disabled", false);
-	SLIDE_INDEX.prop("disabled", false);
+	var owner = sel_slide.get('owner') == API_CONFIG.user;
+	var collab = sel_slide.get('collaborators').includes(
+		API_CONFIG.user
+	);
+
+	if (collab) {
+		SLIDE_EDIT_AS_COLLAB.css("display", "block");
+	}
+	if (owner) {
+		SLIDE_COLLAB.enable();
+		SLIDE_CH_QUEUE.prop("disabled", false);
+		SLIDE_REMOVE.prop("disabled", false);
+	}
+	if (owner || collab) {
+		SLIDE_INPUT.setReadOnly(false);
+		SLIDE_NAME.prop("disabled", false);
+		SLIDE_TIME.prop("disabled", false);
+		SLIDE_INDEX.prop("disabled", false);
+		SLIDE_SAVE.prop("disabled", false);
+		SLIDE_SCHED.prop("disabled", false);
+		SLIDE_ANIMATION.prop("disabled", false);
+
+		scheduling_handle_input_enable();
+		name_sel.enable();
+		index_sel.enable();
+	}
+	if (!owner && !collab) {
+		SLIDE_CANT_EDIT.css("display", "block");
+	}
+	SLIDE_DUP.prop("disabled", false);
 	SLIDE_PREVIEW.prop("disabled", false);
-	SLIDE_SAVE.prop("disabled", false);
-	SLIDE_REMOVE.prop("disabled", false);
-	SLIDE_CH_QUEUE.prop("disabled", false);
-	SLIDE_SCHED.prop("disabled", false);
-	SLIDE_ANIMATION.prop("disabled", false);
-
-	scheduling_handle_input_enable();
-
-	name_sel.enable();
-	index_sel.enable();
 }
 
 function scheduling_handle_input_enable() {
@@ -401,7 +433,8 @@ function slide_save() {
 				SLIDE_SCHED_TIME_E.val()
 			),
 		'animation': parseInt(SLIDE_ANIMATION.val(), 10),
-		'queue_name': timeline_queue.name
+		'queue_name': timeline_queue.name,
+		'collaborators': SLIDE_COLLAB.selected
 	});
 
 	sel_slide.save((stat) => {
@@ -502,9 +535,12 @@ function slide_dup() {
 	});
 }
 
-function editor_setup() {
-	setup_defaults();
+function inputs_setup(ready) {
+	/*
+	*  Setup all editor inputs and input validators etc.
+	*/
 
+	// Setup validators for the name and index inputs.
 	name_sel = new ValidatorSelector(
 		SLIDE_NAME,
 		SLIDE_NAME_GRP,
@@ -555,6 +591,40 @@ function editor_setup() {
 	);
 
 	/*
+	*  Handle enabling/disabling editor inputs when
+	*  scheduling is enabled/disabled.
+	*/
+	SLIDE_SCHED.change(scheduling_handle_input_enable);
+
+	// Setup the ACE editor with the Dawn theme + plaintext mode.
+	SLIDE_INPUT = ace.edit('slide-input');
+	SLIDE_INPUT.setTheme('ace/theme/dawn');
+	SLIDE_INPUT.$blockScrolling = Infinity;
+
+	// Setup the collaborators multiselector w/ validators.
+	api_call(API_ENDP.USERS_LIST, {}, (data) => {
+		if (api_handle_disp_error(data['error'])) { return; }
+
+		SLIDE_COLLAB = new MultiSelect(
+			'slide-collab',
+			[new WhitelistValidator(
+				{ wl: data['users'] },
+				"This user doesn't exist."
+			),
+			new BlacklistValidator(
+				{ bl: [API_CONFIG.user] },
+				"You can't add yourself " +
+				"as a collaborator."
+			)]
+		);
+		if (ready) { ready(); }
+	});
+}
+
+function editor_setup() {
+	setup_defaults();
+
+	/*
 	*  Add a listener for the 'beforeunload' event to make sure
 	*  the user doesn't accidentally exit the page and lose changes.
 	*/
@@ -570,23 +640,11 @@ function editor_setup() {
 		return e.returnValue;
 	});
 
-	/*
-	*  Handle enabling/disabling editor inputs when
-	*  scheduling is enabled/disabled.
-	*/
-	SLIDE_SCHED.change(scheduling_handle_input_enable);
-
-	/*
-	*  Setup the ACE editor with the Dawn theme
-	*  and plaintext mode.
-	*/
-	SLIDE_INPUT = ace.edit('slide-input');
-	SLIDE_INPUT.setTheme('ace/theme/dawn');
-	SLIDE_INPUT.$blockScrolling = Infinity;
-
-	// Disable inputs initially and setup update intevals.
-	disable_controls();
-	queue_setup();
+	inputs_setup(() => {
+		// Disable inputs and setup update intervals.
+		disable_controls();
+		queue_setup();
+	});
 }
 
 $(document).ready(() => {

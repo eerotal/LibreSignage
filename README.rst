@@ -11,14 +11,22 @@ client for a LibreSignage instance.
 Features
 --------
 
-* Web interface for editing slides and managing the LibreSignage instance.
-* Configurable slide duration, transition animations and other parameters.
+* Web interface for editing slides and managing the
+  LibreSignage instance.
+* Configurable slide duration, transition animations
+  and other parameters.
 * Special markup syntax for easily formatting slides.
 * Possibility to schedule slides for a specific time-frame.
-* Separate slide queues for different digital signage screens.
-* Multiple user accounts with permissions based on user groups.
-* User settings view for changing passwords and viewing logged in sessions.
-* User management/creation/deletion via the web intarface for admin users.
+* Possibility to give slide modification permissions to
+  other users.
+* Separate slide queues for different digital signage
+  screens.
+* Multiple user accounts with permissions based on
+  user groups.
+* User settings view for changing passwords and viewing
+  logged insessions.
+* User management/creation/deletion via the web intarface
+  for admin users.
 * Configurable quotas for actions such as creating slides.
 * Rate limited API for reducing server load.
 * Extensive documentation of all features.

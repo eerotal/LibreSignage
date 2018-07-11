@@ -1,6 +1,10 @@
 <?php
 
 /*
+*  !!BUILD_VERIFY_NOCONFIG!!
+*/
+
+/*
 *  Authentication utility functions.
 */
 
