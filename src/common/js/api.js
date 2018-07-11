@@ -279,43 +279,50 @@ function api_handle_disp_error(err, callback) {
 	return err;
 }
 
-function api_load_error_codes(callback) {
-	api_call(API_ENDP.API_ERR_CODES, null, (resp) => {
-		if (api_handle_disp_error(resp.error)) {
-			throw new Error("API: Failed to load " +
-					"error codes.");
-			return;
-		}
-		API_E = resp.codes;
-		if (callback) {
-			callback();
-		}
+function api_load_capabilities(ready) {
+	/*
+	*  Load the API error codes, messages and the server limits.
+	*  'ready' is called after the function is finished.
+	*/
+	var codes = new Promise((resolve,reject) => {
+		api_call(API_ENDP.API_ERR_CODES, null, (resp) => {
+			if (api_handle_disp_error(resp.error)) {
+				reject(new Error(
+					"Failed to load API " +
+					"error codes."
+				));
+			}
+			API_E = resp.codes;
+			resolve();
+		});
+	})
+	var msgs = new Promise((resolve, reject) => {
+		api_call(API_ENDP.API_ERR_MSGS, null, (resp) => {
+			if (api_handle_disp_error(resp.error)) {
+				reject(new Error(
+					"Failed to load API " +
+					"error messages"
+				));
+			}
+			API_E_MESSAGES = resp.messages;
+			resolve();
+		});
 	});
-}
+	var limits = new Promise((resolve, reject) => {
+		api_call(API_ENDP.SERVER_LIMITS, null, (resp) => {
+			if (api_handle_disp_error(resp.error)) {
+				reject(new Error(
+					"Failed to load server limits"
+				));
+			}
+			SERVER_LIMITS = resp.limits;
+			resolve();
+		});
+	});
 
-function api_load_error_msgs(callback) {
-	api_call(API_ENDP.API_ERR_MSGS, null, (resp) => {
-		if (api_handle_disp_error(resp.error)) {
-			throw new Error("API: Failed to load " +
-					"error messages.");
-		}
-		API_E_MESSAGES = resp.messages;
-		if (callback) {
-			callback();
-		}
-	});
-}
-
-function api_load_limits(callback) {
-	api_call(API_ENDP.SERVER_LIMITS, null, (resp) => {
-		if (api_handle_disp_error(resp.error)) {
-			throw new Error("API: Failed to load limits.");
-		}
-		SERVER_LIMITS = resp.limits;
-		if (callback) {
-			callback();
-		}
-	});
+	Promise.all([codes, msgs, limits])
+		.then(ready)
+		.catch((error) => { throw error; });
 }
 
 function api_host() {
@@ -544,16 +551,12 @@ function api_init(config, callback) {
 	api_apply_config(config);
 	API_CONFIG.configured = true;
 
-	api_load_error_codes(() => {
-		api_load_error_msgs(() => {
-			api_load_limits(() => {
-				session_check(() => {
-					console.log("API: Initialized.");
-					if (callback) {
-						callback();
-					}
-				});
-			});
+	api_load_capabilities(() => {
+		session_check(() => {
+			console.log("API: Initialized.");
+			if (callback) {
+				callback();
+			}
 		});
 	});
 }
