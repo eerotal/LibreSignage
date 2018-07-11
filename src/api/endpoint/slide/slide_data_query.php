@@ -14,7 +14,7 @@
 *    * Data can be requested by assigning 1 to the
 *      requested key. The following keys are accepted:
 *      id, markup, name, index, time, owner, enabled,
-*      sched, sched_t_s, sched_t_e, animation
+*      sched, sched_t_s, sched_t_e, animation, collaborators
 *
 *  Return value
 *    * data  = The requested data as nested dictionaries.
