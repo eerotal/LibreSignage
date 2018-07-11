@@ -23,6 +23,20 @@ html, body {
 }
 
 /* Editor styling */
+#slide-cant-edit {
+	color: orange;
+	width: 100%;
+	text-align: center;
+	display: none; /* Initial */
+}
+
+#slide-edit-as-collab {
+	color: darkgreen;
+	width: 100%;
+	text-align: center;
+	display: none; /* Initial */
+}
+
 #slide-input {
 	min-height: calc(1em*25); /* min-height: 25 lines */
 	height: 95%;

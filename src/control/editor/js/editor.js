@@ -45,6 +45,8 @@ const SLIDE_SAVE                = $("#btn-slide-save");
 const SLIDE_REMOVE              = $("#btn-slide-remove");
 const SLIDE_CH_QUEUE		= $("#btn-slide-ch-queue");
 const SLIDE_DUP			= $("#btn-slide-dup");
+const SLIDE_CANT_EDIT		= $("#slide-cant-edit");
+const SLIDE_EDIT_AS_COLLAB	= $("#slide-edit-as-collab");
 const SLIDE_NAME                = $("#slide-name");
 const SLIDE_NAME_GRP            = $("#slide-name-group");
 const SLIDE_OWNER               = $("#slide-owner");
@@ -216,35 +218,43 @@ function disable_controls() {
 	SLIDE_SCHED_DATE_E.prop("disabled", true);
 	SLIDE_SCHED_TIME_E.prop("disabled", true);
 	SLIDE_ANIMATION.prop("disabled", true);
+
+	SLIDE_CANT_EDIT.css("display", "none");
+	SLIDE_EDIT_AS_COLLAB.css("display", "none");
 }
 
 function enable_editor_controls() {
-	SLIDE_INPUT.setReadOnly(false);
-	SLIDE_NAME.prop("disabled", false);
-	SLIDE_TIME.prop("disabled", false);
-	SLIDE_INDEX.prop("disabled", false);
-	SLIDE_PREVIEW.prop("disabled", false);
-	SLIDE_SAVE.prop("disabled", false);
-	SLIDE_REMOVE.prop("disabled", false);
-	SLIDE_DUP.prop("disabled", false);
-	SLIDE_SCHED.prop("disabled", false);
-	SLIDE_ANIMATION.prop("disabled", false);
+	var owner = sel_slide.get('owner') == API_CONFIG.user;
+	var collab = sel_slide.get('collaborators').includes(
+		API_CONFIG.user
+	);
 
-	/*
-	*  Only enable the collaborators selector and the
-	*  queue change button for the owner of the slide
-	*  since the API will discard these for other users
-	*  anyway.
-	*/
-	if (sel_slide.get('owner') == API_CONFIG.user) {
+	if (collab) {
+		SLIDE_EDIT_AS_COLLAB.css("display", "block");
+	}
+	if (owner) {
 		SLIDE_COLLAB.enable();
 		SLIDE_CH_QUEUE.prop("disabled", false);
+		SLIDE_REMOVE.prop("disabled", false);
 	}
+	if (owner || collab) {
+		SLIDE_INPUT.setReadOnly(false);
+		SLIDE_NAME.prop("disabled", false);
+		SLIDE_TIME.prop("disabled", false);
+		SLIDE_INDEX.prop("disabled", false);
+		SLIDE_SAVE.prop("disabled", false);
+		SLIDE_SCHED.prop("disabled", false);
+		SLIDE_ANIMATION.prop("disabled", false);
 
-	scheduling_handle_input_enable();
-
-	name_sel.enable();
-	index_sel.enable();
+		scheduling_handle_input_enable();
+		name_sel.enable();
+		index_sel.enable();
+	}
+	if (!owner && !collab) {
+		SLIDE_CANT_EDIT.css("display", "block");
+	}
+	SLIDE_DUP.prop("disabled", false);
+	SLIDE_PREVIEW.prop("disabled", false);
 }
 
 function scheduling_handle_input_enable() {

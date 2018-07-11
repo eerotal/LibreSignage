@@ -70,6 +70,12 @@
 				</div>
 				<div class="container-fluid row mx-0 my-1">
 					<div class="col-md-3 container-fluid pt-2" id="editor-col-l">
+						<div id="slide-cant-edit">
+							You can't edit this slide.
+						</div>
+						<div id="slide-edit-as-collab">
+							You can edit this slide as a collaborator.
+						</div>
 						<!-- Slide name input -->
 						<div class="form-group" id="slide-name-group">
 							<label for="slide-name">Name</label>
