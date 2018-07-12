@@ -64,6 +64,112 @@ const SLIDE_ANIMATION           = $("#slide-animation")
 var SLIDE_COLLAB		= null;
 var SLIDE_INPUT                 = null;
 
+/*
+*  Permissions for using the various editor controls. Each control
+*  has a 'perm' function for checking whether a user has permissions
+*  to use it and a 'state' function for enabling/disabling the control.
+*  The arguments to 'perm' are booleans that represent whether the user
+*  is the slide owner (o) or a collaborator (c). Note that some
+*  scheduling related functions are excluded from this list since
+*  they are handled by scheduling_handle_input_enable().
+*/
+const SLIDE_CTRL_PERMS = {
+	'SLIDE_PREVIEW':  {
+		'perm': (o, c) => { return true; },
+		'state': (s) => { SLIDE_PREVIEW.prop('disabled', !s); }
+	},
+	'SLIDE_SAVE': {
+		'perm': (o, c) => { return o || c; },
+		'state': (s) => { SLIDE_SAVE.prop('disabled', !s); }
+	},
+	'SLIDE_REMOVE': {
+		'perm': (o, c) => { return o; },
+		'state': (s) => { SLIDE_REMOVE.prop('disabled', !s); }
+	},
+	'SLIDE_CH_QUEUE': {
+		'perm': (o, c) => { return o; },
+		'state': (s) => { SLIDE_CH_QUEUE.prop('disabled', !s); }
+	},
+	'SLIDE_DUP': {
+		'perm': (o, c) => { return true; },
+		'state': (s) => { SLIDE_DUP.prop('disabled', !s); }
+	},
+	'SLIDE_CANT_EDIT': {
+		'perm': (o, c) => { return !o && !c; },
+		'state': (s) => {
+			SLIDE_CANT_EDIT.css(
+				'display',
+				s ? 'block': 'none'
+			);
+		}
+	},
+	'SLIDE_EDIT_AS_COLLAB': {
+		'perm': (o, c) => { return c; },
+		'state': (s) => {
+			SLIDE_EDIT_AS_COLLAB.css(
+				'display',
+				s ? 'block': 'none'
+			);
+		}
+	},
+	'SLIDE_NAME': {
+		'perm': (o, c) => { return o || c; },
+		'state': (s) => {
+			SLIDE_NAME.prop('disabled', !s);
+			if (s) {
+				name_sel.enable();
+			} else {
+				name_sel.disable();
+			}
+		}
+	},
+	'SLIDE_OWNER': {
+		'perm': (o, c) => { return false; },
+		'state': (s) => { SLIDE_OWNER.prop('disabled', !s); }
+	},
+	'SLIDE_TIME': {
+		'perm': (o, c) => { return o || c; },
+		'state': (s) => { SLIDE_TIME.prop('disabled', !s); }
+	},
+	'SLIDE_INDEX': {
+		'perm': (o, c) => { return o || c; },
+		'state': (s) => {
+			SLIDE_INDEX.prop('disabled', !s);
+			if (s) {
+				index_sel.enable();
+			} else {
+				index_sel.disable();
+			}
+		}
+	},
+	'SLIDE_EN': {
+		'perm': (o, c) => { return o || c; },
+		'state': (s) => { SLIDE_EN.prop('disabled', !s); }
+	},
+	'SLIDE_SCHED': {
+		'perm': (o, c) => { return o || c; },
+		'state': (s) => { SLIDE_SCHED.prop('disabled', !s); }
+	},
+	'SLIDE_ANIMATION': {
+		'perm': (o, c) => { return o || c; },
+		'state': (s) => { SLIDE_ANIMATION.prop('disabled', !s); }
+	},
+	'SLIDE_COLLAB': {
+		'perm': (o, c) => { return o; },
+		'state': (s) => {
+			if (s) {
+				SLIDE_COLLAB.enable();
+			} else {
+				SLIDE_COLLAB.disable();
+			}
+		}
+	},
+	'SLIDE_INPUT': {
+		'perm': (o, c) => { return o || c; },
+		'state': (s) => { SLIDE_INPUT.setReadOnly(!s); }
+	}
+}
+
 var name_sel = null;
 var index_sel = null;
 var sel_slide = null;
@@ -194,67 +300,20 @@ function sel_slide_unsaved_confirm(callback) {
 }
 
 function disable_controls() {
-	/*
-	*  Make sure the ValidatorSelectors
-	*  don't enable the save button.
-	*/
-	name_sel.disable();
-	index_sel.disable();
-
-	SLIDE_INPUT.setReadOnly(true);
-	SLIDE_NAME.prop("disabled", true);
-	SLIDE_COLLAB.disable();
-	SLIDE_TIME.prop("disabled", true);
-	SLIDE_INDEX.prop("disabled", true);
-	SLIDE_PREVIEW.prop("disabled", true);
-	SLIDE_SAVE.prop("disabled", true);
-	SLIDE_REMOVE.prop("disabled", true);
-	SLIDE_CH_QUEUE.prop("disabled", true);
-	SLIDE_DUP.prop("disabled", true);
-	SLIDE_EN.prop("disabled", true);
-	SLIDE_SCHED.prop("disabled", true);
-	SLIDE_SCHED_DATE_S.prop("disabled", true);
-	SLIDE_SCHED_TIME_S.prop("disabled", true);
-	SLIDE_SCHED_DATE_E.prop("disabled", true);
-	SLIDE_SCHED_TIME_E.prop("disabled", true);
-	SLIDE_ANIMATION.prop("disabled", true);
-
-	SLIDE_CANT_EDIT.css("display", "none");
-	SLIDE_EDIT_AS_COLLAB.css("display", "none");
+	for (let k of Object.keys(SLIDE_CTRL_PERMS)) {
+		SLIDE_CTRL_PERMS[k]['state'](false);
+	}
 }
 
-function enable_editor_controls() {
-	var owner = sel_slide.get('owner') == API_CONFIG.user;
-	var collab = sel_slide.get('collaborators').includes(
-		API_CONFIG.user
-	);
-
-	if (collab) {
-		SLIDE_EDIT_AS_COLLAB.css("display", "block");
+function enable_controls() {
+	var o = sel_slide.get('owner') == API_CONFIG.user;
+	var c = sel_slide.get('collaborators').includes(API_CONFIG.user);
+	var cont = null;
+	for (let k of Object.keys(SLIDE_CTRL_PERMS)) {
+		cont = SLIDE_CTRL_PERMS[k];
+		cont['state'](cont['perm'](o, c));
 	}
-	if (owner) {
-		SLIDE_COLLAB.enable();
-		SLIDE_CH_QUEUE.prop("disabled", false);
-		SLIDE_REMOVE.prop("disabled", false);
-	}
-	if (owner || collab) {
-		SLIDE_INPUT.setReadOnly(false);
-		SLIDE_NAME.prop("disabled", false);
-		SLIDE_TIME.prop("disabled", false);
-		SLIDE_INDEX.prop("disabled", false);
-		SLIDE_SAVE.prop("disabled", false);
-		SLIDE_SCHED.prop("disabled", false);
-		SLIDE_ANIMATION.prop("disabled", false);
-
-		scheduling_handle_input_enable();
-		name_sel.enable();
-		index_sel.enable();
-	}
-	if (!owner && !collab) {
-		SLIDE_CANT_EDIT.css("display", "block");
-	}
-	SLIDE_DUP.prop("disabled", false);
-	SLIDE_PREVIEW.prop("disabled", false);
+	scheduling_handle_input_enable();
 }
 
 function scheduling_handle_input_enable() {
@@ -262,7 +321,7 @@ function scheduling_handle_input_enable() {
 	*  Enable/disable various inputs based on whether
 	*  scheduling is enabled. This function is called
 	*  by the onchange event of SLIDE_SCHED and also
-	*  by the enable_editor_controls function.
+	*  by the enable_controls function.
 	*/
 	if (SLIDE_SCHED.prop('checked')) {
 		// Scheduling -> enable checkbox disabled
@@ -311,7 +370,7 @@ function slide_show(slide, no_popup) {
 				return;
 			}
 			set_editor_inputs(sel_slide);
-			enable_editor_controls();
+			enable_controls();
 			flag_slide_loading = false;
 		});
 	}
@@ -379,7 +438,7 @@ function slide_new() {
 		sel_slide.set(NEW_SLIDE_DEFAULTS);
 
 		set_editor_inputs(sel_slide);
-		enable_editor_controls();
+		enable_controls();
 
 		/*
 		*  Leave the remove button disabled since the
