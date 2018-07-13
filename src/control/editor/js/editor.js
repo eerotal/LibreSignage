@@ -65,109 +65,180 @@ var SLIDE_COLLAB		= null;
 var SLIDE_INPUT                 = null;
 
 /*
-*  Permissions for using the various editor controls. Each control
-*  has a 'perm' function for checking whether a user has permissions
-*  to use it and a 'state' function for enabling/disabling the control.
-*  The arguments to 'perm' are booleans that represent whether the user
-*  is the slide owner (o) or a collaborator (c). Note that some
-*  scheduling related functions are excluded from this list since
-*  they are handled by scheduling_handle_input_enable().
+*  Editor UI definitions using the UIControl class.
 */
-const SLIDE_CTRL_PERMS = {
-	'SLIDE_PREVIEW':  {
-		'perm': (o, c) => { return true; },
-		'state': (s) => { SLIDE_PREVIEW.prop('disabled', !s); }
-	},
-	'SLIDE_SAVE': {
-		'perm': (o, c) => { return o || c; },
-		'state': (s) => { SLIDE_SAVE.prop('disabled', !s); }
-	},
-	'SLIDE_REMOVE': {
-		'perm': (o, c) => { return o; },
-		'state': (s) => { SLIDE_REMOVE.prop('disabled', !s); }
-	},
-	'SLIDE_CH_QUEUE': {
-		'perm': (o, c) => { return o; },
-		'state': (s) => { SLIDE_CH_QUEUE.prop('disabled', !s); }
-	},
-	'SLIDE_DUP': {
-		'perm': (o, c) => { return true; },
-		'state': (s) => { SLIDE_DUP.prop('disabled', !s); }
-	},
-	'SLIDE_CANT_EDIT': {
-		'perm': (o, c) => { return !o && !c; },
-		'state': (s) => {
-			SLIDE_CANT_EDIT.css(
-				'display',
-				s ? 'block': 'none'
-			);
-		}
-	},
-	'SLIDE_EDIT_AS_COLLAB': {
-		'perm': (o, c) => { return c; },
-		'state': (s) => {
-			SLIDE_EDIT_AS_COLLAB.css(
-				'display',
-				s ? 'block': 'none'
-			);
-		}
-	},
-	'SLIDE_NAME': {
-		'perm': (o, c) => { return o || c; },
-		'state': (s) => {
-			SLIDE_NAME.prop('disabled', !s);
+const UI_DEFS= {
+	'SLIDE_PREVIEW': new UIControl(
+		elem = SLIDE_PREVIEW,
+		perm = (d) => { return true; },
+		enabler = (elem, s) => { elem.prop('disable', !s); },
+		mod = null,
+		getter = null,
+		setter = null
+	),
+	'SLIDE_SAVE': new UIControl(
+		elem = SLIDE_SAVE,
+		perm = (d) => { return true; },
+		enabler = (elem, s) => { elem.prop('disable', !s); },
+		mod = null,
+		getter = null,
+		setter = null
+	),
+	'SLIDE_REMOVE': new UIControl(
+		elem = SLIDE_REMOVE,
+		perm = (d) => { return true; },
+		enabler = (elem, s) => {elem.prop('disable', !s); },
+		mod = null,
+		getter = null,
+		setter = null
+	),
+	'SLIDE_CH_QUEUE': new UIControl(
+		elem = SLIDE_CH_QUEUE,
+		perm = (d) => { return true; },
+		enabler = (elem, s) => {elem.prop('disable', !s); },
+		mod = null,
+		getter = null,
+		setter = null
+	),
+	'SLIDE_DUP': new UIControl(
+		elem = SLIDE_DUP,
+		perm = (d) => { return true; },
+		enabler = (elem, s) => {elem.prop('disable', !s); },
+		mod = null,
+		getter = null,
+		setter = null
+	),
+	'SLIDE_CANT_EDIT': new UIControl(
+		elem = SLIDE_CANT_EDIT,
+		perm = (d) => { return !d['o'] && !d['c']; },
+		state = (elem, s) => {
+			elem.css('display', s ? 'block': 'none');
+		},
+		mod = null,
+		getter = null,
+		setter = null
+	),
+	'SLIDE_EDIT_AS_COLLAB': new UIControl(
+		elem = SLIDE_EDIT_AS_COLLAB,
+		perm = (d) => { return d['c']; },
+		state = (elem, s) => {
+			elem.css('display', s ? 'block': 'none');
+		},
+		mod = null,
+		getter = null,
+		setter = null
+	),
+	'SLIDE_NAME': new UIControl(
+		elem = SLIDE_NAME,
+		perm = (d) => { return d['o'] || d['c']; },
+		enabler = (elem, s) => {
+			elem.prop('disabled', !s);
 			if (s) {
 				name_sel.enable();
 			} else {
 				name_sel.disable();
 			}
-		}
-	},
-	'SLIDE_OWNER': {
-		'perm': (o, c) => { return false; },
-		'state': (s) => { SLIDE_OWNER.prop('disabled', !s); }
-	},
-	'SLIDE_TIME': {
-		'perm': (o, c) => { return o || c; },
-		'state': (s) => { SLIDE_TIME.prop('disabled', !s); }
-	},
-	'SLIDE_INDEX': {
-		'perm': (o, c) => { return o || c; },
-		'state': (s) => {
-			SLIDE_INDEX.prop('disabled', !s);
+		},
+		mod = (elem, data) => {
+			return elem.val() != data.get('name');
+		},
+		getter = (elem) => { return elem.val(); },
+		setter = (elem, value) => { elem.val(value); }
+	),
+	'SLIDE_OWNER': new UIControl(
+		elem = SLIDE_OWNER,
+		perm = null,
+		state = null,
+		mod = null,
+		getter = null,
+		setter = null
+	),
+	'SLIDE_TIME': new UIControl(
+		elem = SLIDE_TIME,
+		perm = (d) => { return d['o'] || d['c']; },
+		state = (elem, s) => { elem.prop('disabled', !s); },
+		mod = (elem, slide) => {
+			var time = parseInt(elem.val(), 10);
+			return time != slide.get('time')/1000;
+		},
+		getter = (elem) => { return parseInt(elem.val(), 10); },
+		setter = (elem, value) => { elem.val(value); }
+	),
+	'SLIDE_INDEX': new UIControl(
+		elem = SLIDE_INDEX,
+		perm = (d) => { return d['o'] || d['c']; },
+		state = (elem, s) => {
+			elem.prop('disabled', !s);
 			if (s) {
 				index_sel.enable();
 			} else {
 				index_sel.disable();
 			}
+		},
+		mod = (elem, slide) => {
+			return elem.val() != slide.get('index');
+		},
+		getter = (elem) => { return elem.val(); },
+		setter = (elem, value) => { elem.val(value); }
+	),
+	'SLIDE_EN': new UIControl(
+		elem = SLIDE_EN,
+		perm = (d) => { return d['o'] || d['c']; },
+		state = (elem, s) => { elem.prop('disabled', !s); },
+		mod = (elem, slide) => {
+			return elem.prop('checked')
+				!= slide.get('enabled');
 		}
-	},
-	'SLIDE_EN': {
-		'perm': (o, c) => { return o || c; },
-		'state': (s) => { SLIDE_EN.prop('disabled', !s); }
-	},
-	'SLIDE_SCHED': {
-		'perm': (o, c) => { return o || c; },
-		'state': (s) => { SLIDE_SCHED.prop('disabled', !s); }
-	},
-	'SLIDE_ANIMATION': {
-		'perm': (o, c) => { return o || c; },
-		'state': (s) => { SLIDE_ANIMATION.prop('disabled', !s); }
-	},
-	'SLIDE_COLLAB': {
-		'perm': (o, c) => { return o; },
-		'state': (s) => {
+	),
+	'SLIDE_SCHED': new UIControl(
+		elem = SLIDE_SCHED,
+		perm = (d) => { return d['o'] || d['c']; },
+		state = (elem, s) => { elem.prop('disabled', !s); },
+		mod = (elem, slide) => {
+			return elem.prop('checked')
+				!= slide.get('sched');
+		}
+	),
+	'SLIDE_ANIMATION': new UIControl(
+		elem = SLIDE_ANIMATION,
+		perm = (d) => { return d['o'] || d['c']; },
+		state = (elem, s) => { elem.prop('disabled', !s); },
+		mod = (elem, slide) => {
+			var anim = parseInt(elem.val(), 10);
+			return anim != slide.get('animation');
+		},
+		getter = (elem) => { return parseInt(elem.val(), 10); },
+		setter = (elem, value) => { elem.val(value); }
+	),
+	'SLIDE_COLLAB': new UIControl(
+		elem = () => { return SLIDE_COLLAB; },
+		perm = (d) => { return d['o']; },
+		state = (elem, s) => {
 			if (s) {
-				SLIDE_COLLAB.enable();
+				elem.enable();
 			} else {
-				SLIDE_COLLAB.disable();
+				elem.disable();
 			}
-		}
-	},
-	'SLIDE_INPUT': {
-		'perm': (o, c) => { return o || c; },
-		'state': (s) => { SLIDE_INPUT.setReadOnly(!s); }
-	}
+		},
+		mod = (elem, slide) => {
+			return sets_eq(
+				elem.selected,
+				slide.get('collaborators')
+			);
+		},
+		getter = (elem) => { return elem.selected; },
+		setter = (elem, value) => { elem.set(value); }
+	),
+	'SLIDE_INPUT': new UIControl(
+		elem = () => { return SLIDE_INPUT; },
+		perm = (d) => { return d['o'] || d['c']; },
+		state = (elem, s) => { elem.setReadOnly(!s); },
+		mod = (elem, slide) => {
+			return elem.getValue() != slide.get('markup');
+		},
+		getter = (elem) => { return elem.getValue(); },
+		setter = (elem, value) => { elem.setValue(value); }
+	)
 }
 
 var name_sel = null;
@@ -300,8 +371,8 @@ function sel_slide_unsaved_confirm(callback) {
 }
 
 function disable_controls() {
-	for (let k of Object.keys(SLIDE_CTRL_PERMS)) {
-		SLIDE_CTRL_PERMS[k]['state'](false);
+	for (let k of Object.keys(UI_DEFS)) {
+		UI_DEFS[k].set_state(false);
 	}
 }
 
@@ -309,9 +380,8 @@ function enable_controls() {
 	var o = sel_slide.get('owner') == API_CONFIG.user;
 	var c = sel_slide.get('collaborators').includes(API_CONFIG.user);
 	var cont = null;
-	for (let k of Object.keys(SLIDE_CTRL_PERMS)) {
-		cont = SLIDE_CTRL_PERMS[k];
-		cont['state'](cont['perm'](o, c));
+	for (let k of Object.keys(UI_DEFS)) {
+		UI_DEFS[k].update_state({'o': o, 'c': c});
 	}
 	scheduling_handle_input_enable();
 }

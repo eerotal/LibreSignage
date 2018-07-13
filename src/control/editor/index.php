@@ -301,6 +301,7 @@
 		<script src="/common/js/slidelist.js"></script>
 		<script src="/common/js/queue.js"></script>
 		<script src="/common/js/multiselect.js"></script>
+		<script src="/common/js/uicontrol.js"></script>
 		<script src="/control/editor/js/timeline.js"></script>
 		<script src="/control/editor/js/editor.js"></script>
 		<script src="/control/editor/js/queue_selector.js"></script>
