@@ -203,7 +203,13 @@ const UI_DEFS= {
 	),
 	'SLIDE_EN': new UIControl(
 		_elem = SLIDE_EN,
-		_perm = (d) => { return d['o'] || d['c']; },
+		_perm = (d) => {
+			if (!UI_DEFS['SLIDE_SCHED'].get()) {
+				return d['o'] || d['c'];
+			} else {
+				return false;
+			}
+		},
 		_enabler = (elem, s) => { elem.prop('disabled', !s); },
 		_mod = (elem, slide) => {
 			return elem.prop('checked')
@@ -231,7 +237,10 @@ const UI_DEFS= {
 	),
 	'SLIDE_SCHED_DATE_S': new UIControl(
 		_elem = SLIDE_SCHED_DATE_S,
-		_perm = null,
+		_perm = (d) => {
+			return UI_DEFS['SLIDE_SCHED'].get()
+				&& (d['o'] || d['c']);
+		},
 		_enabler = (elem, s) => { elem.prop('disabled', !s); },
 		_mod = (elem, slide) => {
 			var tmp = tstamp_to_datetime(
@@ -250,7 +259,10 @@ const UI_DEFS= {
 	),
 	'SLIDE_SCHED_TIME_S': new UIControl(
 		_elem = SLIDE_SCHED_TIME_S,
-		_perm = null,
+		_perm = (d) => {
+			return UI_DEFS['SLIDE_SCHED'].get()
+				&& (d['o'] || d['c']);
+		},
 		_enabler = (elem, s) => { elem.prop('disabled', !s); },
 		_mod = (elem, slide) => {
 			var tmp = tstamp_to_datetime(
@@ -269,7 +281,10 @@ const UI_DEFS= {
 	),
 	'SLIDE_SCHED_DATE_E': new UIControl(
 		_elem = SLIDE_SCHED_DATE_E,
-		_perm = null,
+		_perm = (d) => {
+			return UI_DEFS['SLIDE_SCHED'].get()
+				&& (d['o'] || d['c']);
+		},
 		_enabler = (elem, s) => { elem.prop('disabled', !s); },
 		_mod = (elem, slide) => {
 			var tmp = tstamp_to_datetime(
@@ -288,7 +303,10 @@ const UI_DEFS= {
 	),
 	'SLIDE_SCHED_TIME_E': new UIControl(
 		_elem = SLIDE_SCHED_TIME_E,
-		_perm = null,
+		_perm = (d) => {
+			return UI_DEFS['SLIDE_SCHED'].get()
+				&& (d['o'] || d['c']);
+		},
 		_enabler = (elem, s) => { elem.prop('disabled', !s); },
 		_mod = (elem, slide) => {
 			var tmp = tstamp_to_datetime(
@@ -379,7 +397,6 @@ function enable_controls() {
 	for (let k of Object.keys(UI_DEFS)) {
 		UI_DEFS[k].state({'o': o, 'c': c});
 	}
-	scheduling_handle_input_enable();
 }
 
 function set_inputs(slide) {
