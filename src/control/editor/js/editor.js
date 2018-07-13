@@ -443,43 +443,6 @@ function sel_slide_unsaved_confirm(callback) {
 	}
 }
 
-function scheduling_handle_input_enable() {
-	/*
-	*  Enable/disable various inputs based on whether
-	*  scheduling is enabled. This function is called
-	*  by the onchange event of SLIDE_SCHED and also
-	*  by the enable_controls function.
-	*/
-	if (SLIDE_SCHED.prop('checked')) {
-		// Scheduling -> enable checkbox disabled
-		SLIDE_EN.prop("disabled", true);
-
-		/*
-		*  Make sure the slide enable checkbox has
-		*  the correct value even if the user has
-		*  changed it. This can be done since the
-		*  user can't manually enable slides when
-		*  scheduling is enabled.
-		*/
-		SLIDE_EN.prop('checked', sel_slide.get('enabled'));
-
-		// Enable scheduling inputs.
-		SLIDE_SCHED_DATE_S.prop('disabled', false);
-		SLIDE_SCHED_TIME_S.prop('disabled', false);
-		SLIDE_SCHED_DATE_E.prop('disabled', false);
-		SLIDE_SCHED_TIME_E.prop('disabled', false);
-	} else {
-		// No scheduling -> enable checkbox enabled
-		SLIDE_EN.prop("disabled", false);
-
-		// Disable scheduling inputs.
-		SLIDE_SCHED_DATE_S.prop('disabled', true);
-		SLIDE_SCHED_TIME_S.prop('disabled', true);
-		SLIDE_SCHED_DATE_E.prop('disabled', true);
-		SLIDE_SCHED_TIME_E.prop('disabled', true);
-	}
-}
-
 function slide_show(slide, no_popup) {
 	/*
 	*  Show the slide 'slide'.
@@ -777,10 +740,9 @@ function inputs_setup(ready) {
 	);
 
 	/*
-	*  Handle enabling/disabling editor inputs when
-	*  scheduling is enabled/disabled.
+	*  Update enabled controls when scheduling is enabled.
 	*/
-	SLIDE_SCHED.change(scheduling_handle_input_enable);
+	SLIDE_SCHED.change(enable_controls);
 
 	// Setup the ACE editor with the Dawn theme + plaintext mode.
 	SLIDE_INPUT = ace.edit('slide-input');
