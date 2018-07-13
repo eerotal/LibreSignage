@@ -69,69 +69,76 @@ var SLIDE_INPUT                 = null;
 */
 const UI_DEFS= {
 	'SLIDE_PREVIEW': new UIControl(
-		elem = SLIDE_PREVIEW,
-		perm = (d) => { return true; },
-		enabler = (elem, s) => { elem.prop('disable', !s); },
-		mod = null,
-		getter = null,
-		setter = null
+		_elem = SLIDE_PREVIEW,
+		_perm = (d) => { return true; },
+		_enabler = (elem, s) => { elem.prop('disable', !s); },
+		_mod = null,
+		_getter = null,
+		_setter = null,
+		_clear = null
 	),
 	'SLIDE_SAVE': new UIControl(
-		elem = SLIDE_SAVE,
-		perm = (d) => { return true; },
-		enabler = (elem, s) => { elem.prop('disable', !s); },
-		mod = null,
-		getter = null,
-		setter = null
+		_elem = SLIDE_SAVE,
+		_perm = (d) => { return true; },
+		_enabler = (elem, s) => { elem.prop('disable', !s); },
+		_mod = null,
+		_getter = null,
+		_setter = null,
+		_clear = null
 	),
 	'SLIDE_REMOVE': new UIControl(
-		elem = SLIDE_REMOVE,
-		perm = (d) => { return true; },
-		enabler = (elem, s) => {elem.prop('disable', !s); },
-		mod = null,
-		getter = null,
-		setter = null
+		_elem = SLIDE_REMOVE,
+		_perm = (d) => { return true; },
+		_enabler = (elem, s) => {elem.prop('disable', !s); },
+		_mod = null,
+		_getter = null,
+		_setter = null,
+		_clear = null
 	),
 	'SLIDE_CH_QUEUE': new UIControl(
-		elem = SLIDE_CH_QUEUE,
-		perm = (d) => { return true; },
-		enabler = (elem, s) => {elem.prop('disable', !s); },
-		mod = null,
-		getter = null,
-		setter = null
+		_elem = SLIDE_CH_QUEUE,
+		_perm = (d) => { return true; },
+		_enabler = (elem, s) => {elem.prop('disable', !s); },
+		_mod = null,
+		_getter = null,
+		_setter = null,
+		_clear = null
 	),
 	'SLIDE_DUP': new UIControl(
-		elem = SLIDE_DUP,
-		perm = (d) => { return true; },
-		enabler = (elem, s) => {elem.prop('disable', !s); },
-		mod = null,
-		getter = null,
-		setter = null
+		_elem = SLIDE_DUP,
+		_perm = (d) => { return true; },
+		_enabler = (elem, s) => {elem.prop('disable', !s); },
+		_mod = null,
+		_getter = null,
+		_setter = null,
+		_clear = null
 	),
 	'SLIDE_CANT_EDIT': new UIControl(
-		elem = SLIDE_CANT_EDIT,
-		perm = (d) => { return !d['o'] && !d['c']; },
-		state = (elem, s) => {
+		_elem = SLIDE_CANT_EDIT,
+		_perm = (d) => { return !d['o'] && !d['c']; },
+		_enabler = (elem, s) => {
 			elem.css('display', s ? 'block': 'none');
 		},
-		mod = null,
-		getter = null,
-		setter = null
+		_mod = null,
+		_getter = null,
+		_setter = null,
+		_clear = null
 	),
 	'SLIDE_EDIT_AS_COLLAB': new UIControl(
-		elem = SLIDE_EDIT_AS_COLLAB,
-		perm = (d) => { return d['c']; },
-		state = (elem, s) => {
+		_elem = SLIDE_EDIT_AS_COLLAB,
+		_perm = (d) => { return d['c']; },
+		_enabler = (elem, s) => {
 			elem.css('display', s ? 'block': 'none');
 		},
-		mod = null,
-		getter = null,
-		setter = null
+		_mod = null,
+		_getter = null,
+		_setter = null,
+		_clear = null
 	),
 	'SLIDE_NAME': new UIControl(
-		elem = SLIDE_NAME,
-		perm = (d) => { return d['o'] || d['c']; },
-		enabler = (elem, s) => {
+		_elem = SLIDE_NAME,
+		_perm = (d) => { return d['o'] || d['c']; },
+		_enabler = (elem, s) => {
 			elem.prop('disabled', !s);
 			if (s) {
 				name_sel.enable();
@@ -139,35 +146,45 @@ const UI_DEFS= {
 				name_sel.disable();
 			}
 		},
-		mod = (elem, data) => {
+		_mod = (elem, data) => {
 			return elem.val() != data.get('name');
 		},
-		getter = (elem) => { return elem.val(); },
-		setter = (elem, value) => { elem.val(value); }
+		_getter = (elem) => { return elem.val(); },
+		_setter = (elem, slide) => {
+			elem.val(slide.get('name'));
+		},
+		_clear = (elem) => { elem.val(''); }
 	),
 	'SLIDE_OWNER': new UIControl(
-		elem = SLIDE_OWNER,
-		perm = null,
-		state = null,
-		mod = null,
-		getter = null,
-		setter = null
+		_elem = SLIDE_OWNER,
+		_perm = null,
+		_enabler = null,
+		_mod = null,
+		_getter = null,
+		_setter = (elem, slide) => {
+			elem.val(slide.get('owner'));
+		},
+		_clear = (elem) => { elem.val(''); }
 	),
 	'SLIDE_TIME': new UIControl(
-		elem = SLIDE_TIME,
-		perm = (d) => { return d['o'] || d['c']; },
-		state = (elem, s) => { elem.prop('disabled', !s); },
-		mod = (elem, slide) => {
+		_elem = SLIDE_TIME,
+		_perm = (d) => { return d['o'] || d['c']; },
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
+		_mod = (elem, slide) => {
 			var time = parseInt(elem.val(), 10);
 			return time != slide.get('time')/1000;
 		},
-		getter = (elem) => { return parseInt(elem.val(), 10); },
-		setter = (elem, value) => { elem.val(value); }
+		_getter = (elem) => { return parseInt(elem.val(), 10); },
+		_setter = (elem, slide) => {
+			var time = parseInt(slide.get('time'), 10);
+			elem.val(time/1000);
+		},
+		_clear = (elem ) => { elem.val('1'); }
 	),
 	'SLIDE_INDEX': new UIControl(
-		elem = SLIDE_INDEX,
-		perm = (d) => { return d['o'] || d['c']; },
-		state = (elem, s) => {
+		_elem = SLIDE_INDEX,
+		_perm = (d) => { return d['o'] || d['c']; },
+		_enabler = (elem, s) => {
 			elem.prop('disabled', !s);
 			if (s) {
 				index_sel.enable();
@@ -175,69 +192,171 @@ const UI_DEFS= {
 				index_sel.disable();
 			}
 		},
-		mod = (elem, slide) => {
+		_mod = (elem, slide) => {
 			return elem.val() != slide.get('index');
 		},
-		getter = (elem) => { return elem.val(); },
-		setter = (elem, value) => { elem.val(value); }
+		_getter = (elem) => { return elem.val(); },
+		_setter = (elem, slide) => {
+			elem.val(slide.get('index'));
+		},
+		_clear = (elem) => { elem.val(''); }
 	),
 	'SLIDE_EN': new UIControl(
-		elem = SLIDE_EN,
-		perm = (d) => { return d['o'] || d['c']; },
-		state = (elem, s) => { elem.prop('disabled', !s); },
-		mod = (elem, slide) => {
+		_elem = SLIDE_EN,
+		_perm = (d) => { return d['o'] || d['c']; },
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
+		_mod = (elem, slide) => {
 			return elem.prop('checked')
 				!= slide.get('enabled');
-		}
+		},
+		_getter = (elem) => { return elem.prop('checked'); },
+		_setter = (elem, slide) => {
+			elem.prop('checked', slide.get('enabled'));
+		},
+		_clear = (elem) => { elem.prop('checked', false); }
 	),
 	'SLIDE_SCHED': new UIControl(
-		elem = SLIDE_SCHED,
-		perm = (d) => { return d['o'] || d['c']; },
-		state = (elem, s) => { elem.prop('disabled', !s); },
-		mod = (elem, slide) => {
+		_elem = SLIDE_SCHED,
+		_perm = (d) => { return d['o'] || d['c']; },
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
+		_mod = (elem, slide) => {
 			return elem.prop('checked')
 				!= slide.get('sched');
-		}
+		},
+		_getter = (elem) => { return elem.prop('checked'); },
+		_setter = (elem, slide) => {
+			elem.prop('checked', slide.get('sched'));
+		},
+		_clear = (elem) => { elem.prop('checked', false); }
+	),
+	'SLIDE_SCHED_DATE_S': new UIControl(
+		_elem = SLIDE_SCHED_DATE_S,
+		_perm = null,
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
+		_mod = (elem, slide) => {
+			var tmp = tstamp_to_datetime(
+				slide.get('sched_t_s')
+			)[0];
+			return elem.val() != tmp;
+		},
+		_getter = (elem) => { return elem.val(); },
+		_setter = (elem, slide) => {
+			var tmp = tstamp_to_datetime(
+				slide.get('sched_t_s')
+			)[0];
+			elem.val(tmp);
+		},
+		_clear = (elem) => { elem.val(''); }
+	),
+	'SLIDE_SCHED_TIME_S': new UIControl(
+		_elem = SLIDE_SCHED_TIME_S,
+		_perm = null,
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
+		_mod = (elem, slide) => {
+			var tmp = tstamp_to_datetime(
+				slide.get('sched_t_s')
+			)[1];
+			return elem.val() != tmp;
+		},
+		_getter = (elem) => { return elem.val(); },
+		_setter = (elem, slide) => {
+			var tmp = tstamp_to_datetime(
+				slide.get('sched_t_s')
+			)[1];
+			elem.val(tmp);
+		},
+		_clear = (elem) => { elem.val(''); }
+	),
+	'SLIDE_SCHED_DATE_E': new UIControl(
+		_elem = SLIDE_SCHED_DATE_E,
+		_perm = null,
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
+		_mod = (elem, slide) => {
+			var tmp = tstamp_to_datetime(
+				slide.get('sched_t_e')
+			)[0];
+			return elem.val() != tmp;
+		},
+		_getter = (elem) => { return elem.val(); },
+		_setter = (elem, slide) => {
+			var tmp = tstamp_to_datetime(
+				slide.get('sched_t_e')
+			)[0];
+			elem.val(tmp);
+		},
+		_clear = (elem) => { elem.val(''); }
+	),
+	'SLIDE_SCHED_TIME_E': new UIControl(
+		_elem = SLIDE_SCHED_TIME_E,
+		_perm = null,
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
+		_mod = (elem, slide) => {
+			var tmp = tstamp_to_datetime(
+				slide.get('sched_t_e')
+			)[1];
+			return elem.val() != tmp;
+		},
+		_getter = (elem) => { return elem.val(); },
+		_setter = (elem, slide) => {
+			var tmp = tstamp_to_datetime(
+				slide.get('sched_t_e')
+			)[1];
+			elem.val(tmp);
+		},
+		_clear = (elem) => { elem.val(''); }
 	),
 	'SLIDE_ANIMATION': new UIControl(
-		elem = SLIDE_ANIMATION,
-		perm = (d) => { return d['o'] || d['c']; },
-		state = (elem, s) => { elem.prop('disabled', !s); },
-		mod = (elem, slide) => {
+		_elem = SLIDE_ANIMATION,
+		_perm = (d) => { return d['o'] || d['c']; },
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
+		_mod = (elem, slide) => {
 			var anim = parseInt(elem.val(), 10);
 			return anim != slide.get('animation');
 		},
-		getter = (elem) => { return parseInt(elem.val(), 10); },
-		setter = (elem, value) => { elem.val(value); }
+		_getter = (elem) => { return parseInt(elem.val(), 10); },
+		_setter = (elem, slide) => {
+			elem.val(slide.get('animation'));
+		},
+		_clear = (elem) => { elem.val('0'); }
 	),
 	'SLIDE_COLLAB': new UIControl(
-		elem = () => { return SLIDE_COLLAB; },
-		perm = (d) => { return d['o']; },
-		state = (elem, s) => {
+		_elem = () => { return SLIDE_COLLAB; },
+		_perm = (d) => { return d['o']; },
+		_enabler = (elem, s) => {
 			if (s) {
 				elem.enable();
 			} else {
 				elem.disable();
 			}
 		},
-		mod = (elem, slide) => {
-			return sets_eq(
+		_mod = (elem, slide) => {
+			return !sets_eq(
 				elem.selected,
 				slide.get('collaborators')
 			);
 		},
-		getter = (elem) => { return elem.selected; },
-		setter = (elem, value) => { elem.set(value); }
+		_getter = (elem) => { return elem.selected; },
+		_setter = (elem, slide) => {
+			elem.set(slide.get('collaborators'));
+		},
+		_clear = (elem) => { elem.set([]); }
 	),
 	'SLIDE_INPUT': new UIControl(
-		elem = () => { return SLIDE_INPUT; },
-		perm = (d) => { return d['o'] || d['c']; },
-		state = (elem, s) => { elem.setReadOnly(!s); },
-		mod = (elem, slide) => {
+		_elem = () => { return SLIDE_INPUT; },
+		_perm = (d) => { return d['o'] || d['c']; },
+		_enabler = (elem, s) => { elem.setReadOnly(!s); },
+		_mod = (elem, slide) => {
 			return elem.getValue() != slide.get('markup');
 		},
-		getter = (elem) => { return elem.getValue(); },
-		setter = (elem, value) => { elem.setValue(value); }
+		_getter = (elem) => { return elem.getValue(); },
+		_setter = (elem, slide) => {
+			elem.setValue(slide.get('markup'));
+			SLIDE_INPUT.clearSelection();
+		},
+		_clear = (elem) => {
+			elem.setValue('');
+			SLIDE_INPUT.clearSelection();
+		}
 	)
 }
 
@@ -247,107 +366,44 @@ var sel_slide = null;
 
 var flag_slide_loading = false; // Used by slide_show().
 
-function set_editor_inputs(slide) {
+function disable_controls() {
+	for (let k of Object.keys(UI_DEFS)) {
+		UI_DEFS[k].set_state(false);
+	}
+}
+
+function enable_controls() {
+	var o = sel_slide.get('owner') == API_CONFIG.user;
+	var c = sel_slide.get('collaborators').includes(API_CONFIG.user);
+	var cont = null;
+	for (let k of Object.keys(UI_DEFS)) {
+		UI_DEFS[k].state({'o': o, 'c': c});
+	}
+	scheduling_handle_input_enable();
+}
+
+function set_inputs(slide) {
 	/*
 	*  Display the data of 'slide' on the editor inputs.
 	*/
 	if (!slide) {
-		SLIDE_INPUT.setValue('');
-		SLIDE_NAME.val('');
-		SLIDE_OWNER.val('');
-		SLIDE_COLLAB.set([]);
-		SLIDE_TIME.val('1');
-		SLIDE_INDEX.val('');
-		SLIDE_EN.prop('checked', false);
-		SLIDE_SCHED.prop('checked', false);
-		SLIDE_SCHED_DATE_S.val('');
-		SLIDE_SCHED_TIME_S.val('');
-		SLIDE_SCHED_DATE_E.val('');
-		SLIDE_SCHED_TIME_E.val('');
-		SLIDE_ANIMATION.val('0');
+		for (let key of Object.keys(UI_DEFS)) {
+			UI_DEFS[key].clear();
+		}
 	} else {
-		SLIDE_INPUT.setValue(slide.get('markup'));
-		SLIDE_NAME.val(slide.get('name'));
-		SLIDE_OWNER.val(slide.get('owner'));
-		SLIDE_COLLAB.set(slide.get('collaborators'));
-		SLIDE_TIME.val(slide.get('time')/1000);
-		SLIDE_INDEX.val(slide.get('index'));
-		SLIDE_EN.prop('checked', slide.get('enabled'));
-		SLIDE_SCHED.prop('checked', slide.get('sched'));
-
-		var sched_s = tstamp_to_datetime(slide.get('sched_t_s'));
-		SLIDE_SCHED_DATE_S.val(sched_s[0]);
-		SLIDE_SCHED_TIME_S.val(sched_s[1]);
-
-		var sched_e = tstamp_to_datetime(slide.get('sched_t_e'));
-		SLIDE_SCHED_DATE_E.val(sched_e[0]);
-		SLIDE_SCHED_TIME_E.val(sched_e[1]);
-
-		SLIDE_ANIMATION.val(slide.get('animation'));
+		for (let key of Object.keys(UI_DEFS)) {
+			UI_DEFS[key].set(slide);
+		}
 	}
-	SLIDE_INPUT.clearSelection(); // Deselect new text.
 }
 
 function sel_slide_is_modified() {
-	/*
-	*  Check whether the selected slide has been modified and
-	*  return true in case it has been modified. False is returned
-	*  otherwise.
-	*/
-	var s = sel_slide;
-	var tmp = null;
-
-	if (s == null) {
-		return false;
+	if (!sel_slide) { return; }
+	for (let key of Object.keys(UI_DEFS)) {
+		if (UI_DEFS[key].is_mod(sel_slide)) {
+			return true;
+		}
 	}
-
-	if (SLIDE_INPUT.getValue() != s.get('markup')) {
-		return true;
-	}
-	if (SLIDE_NAME.val() != s.get('name')) {
-		return true;
-	}
-	if (SLIDE_OWNER.val() != s.get('owner')) {
-		return true;
-	}
-	if (parseInt(SLIDE_TIME.val(), 10) != s.get('time')/1000) {
-		return true;
-	}
-	if (SLIDE_INDEX.val() != s.get('index')) {
-		return true;
-	}
-	if (SLIDE_EN.prop('checked') != s.get('enabled')) {
-		console.log('b');
-		return true;
-	}
-	if (SLIDE_SCHED.prop('checked') != s.get('sched')) {
-		return true;
-	}
-
-	tmp = datetime_to_tstamp(
-		SLIDE_SCHED_DATE_S.val(),
-		SLIDE_SCHED_TIME_S.val()
-	);
-	if (tmp != s.get('sched_t_s')) {
-		return true;
-	}
-
-	tmp = datetime_to_tstamp(
-		SLIDE_SCHED_DATE_E.val(),
-		SLIDE_SCHED_TIME_E.val()
-	);
-	if (tmp != s.get('sched_t_e')) {
-		return true;
-	}
-
-	if (parseInt(SLIDE_ANIMATION.val(), 10) != s.get('animation')) {
-		return true;
-	}
-
-	if (!sets_eq(SLIDE_COLLAB.selected, s.get('collaborators'))) {
-		return true;
-	}
-
 	return false;
 }
 
@@ -368,22 +424,6 @@ function sel_slide_unsaved_confirm(callback) {
 	} else {
 		return false;
 	}
-}
-
-function disable_controls() {
-	for (let k of Object.keys(UI_DEFS)) {
-		UI_DEFS[k].set_state(false);
-	}
-}
-
-function enable_controls() {
-	var o = sel_slide.get('owner') == API_CONFIG.user;
-	var c = sel_slide.get('collaborators').includes(API_CONFIG.user);
-	var cont = null;
-	for (let k of Object.keys(UI_DEFS)) {
-		UI_DEFS[k].update_state({'o': o, 'c': c});
-	}
-	scheduling_handle_input_enable();
 }
 
 function scheduling_handle_input_enable() {
@@ -435,11 +475,11 @@ function slide_show(slide, no_popup) {
 		sel_slide.load(slide, (ret) => {
 			if (ret) {
 				console.log("LibreSignage: API error!");
-				set_editor_inputs(null);
+				set_inputs(null);
 				disable_controls();
 				return;
 			}
-			set_editor_inputs(sel_slide);
+			set_inputs(sel_slide);
 			enable_controls();
 			flag_slide_loading = false;
 		});
@@ -489,7 +529,7 @@ function slide_rm() {
 
 			sel_slide = null;
 			timeline_update()
-			set_editor_inputs(null);
+			set_inputs(null);
 			disable_controls();
 		});
 	});
@@ -507,7 +547,7 @@ function slide_new() {
 		sel_slide = new Slide();
 		sel_slide.set(NEW_SLIDE_DEFAULTS);
 
-		set_editor_inputs(sel_slide);
+		set_inputs(sel_slide);
 		enable_controls();
 
 		/*
@@ -639,7 +679,7 @@ function slide_ch_queue() {
 						);
 						if (err) { return; }
 						sel_slide = null;
-						set_editor_inputs(null);
+						set_inputs(null);
 						disable_controls();
 						timeline_update();
 					});
@@ -659,7 +699,7 @@ function slide_dup() {
 	*/
 	sel_slide.dup((s) => {
 		sel_slide = s;
-		set_editor_inputs(s);
+		set_inputs(s);
 		timeline_update();
 	});
 }

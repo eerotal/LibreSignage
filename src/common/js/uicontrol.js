@@ -4,56 +4,67 @@
 */
 
 class UIControl {
-	constructor(elem, perm, enabler, mod, getter, setter) {
-		this.elem = elem;
-		this.perm = perm;
-		this.enabler = enabler;
-		this.mod = mod;
-		this.getter = getter;
-		this.setter = setter;
+	constructor(_elem, _perm, _enabler, _mod, _getter, _setter, _clear) {
+		this._elem = _elem;
+		this._perm = _perm;
+		this._enabler = _enabler;
+		this._mod = _mod;
+		this._getter = _getter;
+		this._setter = _setter;
+		this._clear = _clear;
 	}
 
 	get_elem() {
-		if (typeof this.elem == 'function') {
-			return this.elem();
+		if (typeof this._elem == 'function') {
+			return this._elem();
 		} else {
-			return this.elem;
+			return this._elem;
 		}
 	}
 
 	enable(state) {
-		if (this.enabler) {
-			this.enabler(elem, state);
+		if (this._enabler) {
+			this._enabler(this.get_elem(), state);
 		}
 	}
 
 	get() {
-		if (this.getter) {
-			return this.getter(elem);
+		if (this._getter) {
+			return this._getter(this.get_elem());
 		} else {
 			return null;
 		}
 	}
 
-	set(value) {
-		if (this.setter) {
-			this.setter(elem, value);
+	set(data) {
+		if (this._setter) {
+			this._setter(this.get_elem(), data);
 		}
 	}
 
 	set_state(state) {
-		if (this.enabler) {
-			this.enabler(this.get_elem(), state);
+		if (this._enabler) {
+			this._enabler(this.get_elem(), state);
 		}
 	}
 
-	update_state(perm_data) {
-		if (this.enabler && this.perm) {
-			this.enabler(this.get_elem(), this.perm(perm_data));
+	state(perm_data) {
+		if (this._enabler && this._perm) {
+			this._enabler(this.get_elem(), this._perm(perm_data));
 		}
 	}
 
-	check_mod(data) {
-		return this.mod(elem, data);
+	is_mod(data) {
+		if (this._mod) {
+			return this._mod(this.get_elem(), data);
+		} else {
+			return false;
+		}
+	}
+
+	clear() {
+		if (this._clear) {
+			this._clear(this.get_elem());
+		}
 	}
 }
