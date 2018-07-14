@@ -80,7 +80,7 @@ const UI_DEFS= {
 	),
 	'SLIDE_SAVE': new UIControl(
 		_elem = SLIDE_SAVE,
-		_perm = (d) => { return true; },
+		_perm = (d) => { return d['o'] || d['c']; },
 		_enabler = (elem, s) => { elem.prop('disabled', !s); },
 		_mod = null,
 		_getter = null,
@@ -89,7 +89,9 @@ const UI_DEFS= {
 	),
 	'SLIDE_REMOVE': new UIControl(
 		_elem = SLIDE_REMOVE,
-		_perm = (d) => { return d['o']; },
+		_perm = (d) => {
+			return d['o'] && sel_slide.get('id') != null;
+		},
 		_enabler = (elem, s) => {elem.prop('disabled', !s); },
 		_mod = null,
 		_getter = null,
@@ -521,19 +523,10 @@ function slide_new() {
 	*/
 	var cb = () => {
 		console.log("LibreSignage: Create slide!");
-
 		sel_slide = new Slide();
 		sel_slide.set(NEW_SLIDE_DEFAULTS);
-
 		set_inputs(sel_slide);
 		enable_controls();
-
-		/*
-		*  Leave the remove button disabled since the
-		*  new slide is not saved yet and can't be
-		*  removed.
-		*/
-		SLIDE_REMOVE.prop('disabled', true);
 	};
 
 	if (!timeline_queue) {
@@ -555,9 +548,10 @@ function slide_save() {
 	*/
 	console.log("LibreSignage: Save slide");
 
-	if (SLIDE_INPUT.getValue().length >
-		SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN) {
-
+	if (
+		UI_DEFS['SLIDE_INPUT'].get().length >
+		SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN
+	) {
 		DIALOG_MARKUP_TOO_LONG(
 			SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN
 		).show();
@@ -593,14 +587,10 @@ function slide_save() {
 			`${sel_slide.get("id")}'.`
 		);
 
-		/*
-		*  Make sure the Remove button is enabled. This
-		*  is needed because the New button enables all other
-		*  editor controls except the Remove button.
-		*/
-		SLIDE_REMOVE.prop('disabled', false);
-		timeline_update()
+		// Enable all controls now that the slide is saved.
+		enable_controls();
 
+		timeline_update();
 		slide_show(sel_slide.get('id'), true);
 	});
 }
