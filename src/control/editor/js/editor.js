@@ -37,6 +37,7 @@ const NEW_SLIDE_DEFAULTS = {
 };
 
 const QUEUE_SELECT		= $("#queue-select");
+const QUEUE_CREATE		= $("#queue-create");
 const QUEUE_VIEW		= $("#queue-view");
 const QUEUE_REMOVE		= $("#queue-remove");
 

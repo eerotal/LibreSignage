@@ -1,3 +1,45 @@
+const QUEUE_UI_DEFS = {
+	'QUEUE_SELECT': new UIControl(
+		_elem = QUEUE_SELECT,
+		_perm = (d) => { return true; },
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
+		_mod = null,
+		_getter = (elem) => { return elem.val(); },
+		_setter = (elem, value) => { elem.val(value); },
+		_clear = () => { elem.val(''); }
+	),
+	'QUEUE_CREATE': new UIControl(
+		_elem = QUEUE_CREATE,
+		_perm = (d) => { return true; },
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
+		_mod = null,
+		_getter = null,
+		_setter = null,
+		_clear = null
+	),
+	'QUEUE_VIEW': new UIControl(
+		_elem = QUEUE_VIEW,
+		_perm = (d) => { return true; },
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
+		_mod = null,
+		_getter = null,
+		_setter = null,
+		_clear = null
+	),
+	'QUEUE_REMOVE': new UIControl(
+		_elem = QUEUE_REMOVE,
+		_perm = (d) => { return d['o']; },
+		_enabler = (elem, s) => {
+			console.log(s);
+			elem.prop('disabled', !s);
+		},
+		_mod = null,
+		_getter = null,
+		_setter = null,
+		_clear = null
+	),
+}
+
 function queue_create() {
 	/*
 	*  Create a new queue and select it.
@@ -67,7 +109,6 @@ function queue_remove() {
 						data['error']
 					);
 					if (err) { return; }
-
 					update_qsel(true);
 				}
 			);
@@ -109,6 +150,28 @@ function update_qsel(show_initial, ready) {
 			timeline_show(null);
 		}
 
+		// Update queue controls.
+		if (!timeline_queue) {
+			for (let key of (Object.keys(QUEUE_UI_DEFS))) {
+				if ([
+					'QUEUE_SELECT',
+					'QUEUE_CREATE'
+				].includes(key)) { continue; }
+				QUEUE_UI_DEFS[key].set_state(false);
+			}
+		}
+		for (let key of Object.keys(QUEUE_UI_DEFS)) {
+			if ([
+				'QUEUE_SELECT',
+				'QUEUE_CREATE'
+			].includes(key)) { continue; }
+
+			QUEUE_UI_DEFS[key].state({
+				'o': timeline_queue.owner
+					== API_CONFIG.user
+			});
+		}
+
 		if (ready) { ready(); }
 	});
 }
@@ -118,8 +181,8 @@ function queue_setup() {
 	QUEUE_SELECT.change(() => {
 		console.log("LibreSignage: Change timeline.");
 		timeline_show(QUEUE_SELECT.val());
+		update_qsel();
 	});
-
-	update_qsel(true);
 	timeline_setup();
+	update_qsel(true);
 }
