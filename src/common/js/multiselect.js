@@ -68,7 +68,7 @@ class MultiSelect {
 			'text': option
 		});
 		var rm = $('<span>', {
-			'class': 'ms-rm fas fa-times'
+			'class': 'opt-rm ms-rm fas fa-times'
 		});
 		cont.append(rm);
 		rm.on('click', () => { this.remove(option); });
@@ -96,9 +96,7 @@ class MultiSelect {
 		*  Remove the selection 'option'.
 		*/
 		if (!this.selected.includes(option)) {
-			throw new Error(
-				'Option not selected.'
-			);
+			throw new Error('Option not selected.');
 		}
 		$(`#ms-opt-${option}`).remove();
 		this.selected.splice(this.selected.indexOf(option), 1);
@@ -111,6 +109,7 @@ class MultiSelect {
 		this.enabled = true;
 		this.values.css('background-color', 'white');
 		this.input.prop('disabled', false);
+		this.root.find('.opt-rm').css('display', 'inline');
 
 		// This also enables the add button if needed.
 		for (let s of this.vtrig.selectors) { s.enable(); }
@@ -125,5 +124,7 @@ class MultiSelect {
 		this.values.css('background-color', 'var(--gray-3)');
 		this.input.prop('disabled', true);
 		this.btn_add.prop('disabled', true);
+		this.root.find('.opt-rm').css('display', 'none');
 	}
 }
+

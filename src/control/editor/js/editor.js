@@ -727,9 +727,7 @@ function inputs_setup(ready) {
 		}
 	);
 
-	/*
-	*  Update enabled controls when scheduling is enabled.
-	*/
+	// Update enabled controls when scheduling is enabled.
 	SLIDE_SCHED.change(enable_controls);
 
 	// Setup the ACE editor with the Dawn theme + plaintext mode.
