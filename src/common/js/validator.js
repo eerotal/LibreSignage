@@ -87,8 +87,6 @@ class ValidatorSelector {
 		}
 	}
 
-	get_state() { return this.valid; }
-
 	disable() {
 		this.enabled = false;
 		this.set_state(true);
@@ -110,6 +108,8 @@ class ValidatorSelector {
 		}
 		this.set_state(true);
 	}
+
+	get_state() { return this.valid; }
 }
 
 class ValidatorTrigger {
@@ -222,15 +222,15 @@ class NumValidator extends Validator {
 		this.chk_settings(['min', 'max', 'nan']);
 	}
 
-	validate(elem) {
+	validate(selector) {
 		var val = null;
 		var min = this.settings.min;
 		var max = this.settings.max;
 		var nan = this.settings.nan;
 		var float = this.settings.float;
 		var a, b;
-		var ret = null;
-		elem.query.each(function() {
+		var ret = true;
+		selector.query.each(function() {
 			if (float) {
 				val = parseFloat($(this).val());
 			} else {
@@ -269,16 +269,16 @@ class StrValidator extends Validator {
 		this.chk_settings(['min', 'max', 'regex']);
 	}
 
-	validate(elem) {
+	validate(selector) {
 		var val = null;
 		var min = this.settings.min;
 		var max = this.settings.max;
 		var regex = this.settings.regex;
 		var a, b, c;
-		var ret = false;
+		var ret = true;
 		var tmp = null;
 
-		elem.query.each(function() {
+		selector.query.each(function() {
 			val = $(this).val();
 			a = (min == null || val.length >= min);
 			b = (max == null || val.length <= max);
@@ -289,9 +289,7 @@ class StrValidator extends Validator {
 				c = (tmp && tmp[0].length == val.length);
 			}
 			ret = a && b && c;
-			if (!ret) {
-				return false;
-			}
+			if (!ret) { return false; }
 		});
 		return ret;
 	}
@@ -302,10 +300,10 @@ class EqValidator extends Validator {
 	*  Validate all the selected inputs to have the same value.
 	*  This validator doesn't need any settings.
 	*/
-	validate(elem) {
+	validate(selector) {
 		var ret = true;
 		var v = null;
-		elem.query.each(function() {
+		selector.query.each(function() {
 			if (v == null) {
 				v = $(this).val();
 			} else if (v != $(this).val()) {
@@ -329,10 +327,10 @@ class WhitelistValidator extends Validator {
 		this.chk_settings(['wl']);
 	}
 
-	validate(elem) {
+	validate(selector) {
 		var ret = true;
 		var wl = this.settings.wl;
-		elem.query.each(function() {
+		selector.query.each(function() {
 			if (!wl.includes($(this).val())) {
 				ret = false;
 				return false;
@@ -354,10 +352,10 @@ class BlacklistValidator extends Validator {
 		this.chk_settings(['bl']);
 	}
 
-	validate(elem) {
+	validate(selector) {
 		var ret = true;
 		var bl = this.settings.bl;
-		elem.query.each(function() {
+		selector.query.each(function() {
 			if (bl.includes($(this).val())) {
 				ret = false;
 				return false;
