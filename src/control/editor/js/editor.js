@@ -383,8 +383,13 @@ function disable_controls() {
 }
 
 function enable_controls() {
-	var o = sel_slide.get('owner') == API_CONFIG.user;
-	var c = sel_slide.get('collaborators').includes(API_CONFIG.user);
+	var o = (
+		!sel_slide.get('owner') // New slide.
+		|| sel_slide.get('owner') == API_CONFIG.user
+	);
+	var c = (
+		sel_slide.get('collaborators').includes(API_CONFIG.user)
+	);
 	for (let k of Object.keys(UI_DEFS)) {
 		UI_DEFS[k].state({'o': o, 'c': c});
 	}

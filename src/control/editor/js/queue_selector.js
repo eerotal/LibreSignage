@@ -29,10 +29,7 @@ const QUEUE_UI_DEFS = {
 	'QUEUE_REMOVE': new UIControl(
 		_elem = QUEUE_REMOVE,
 		_perm = (d) => { return d['o']; },
-		_enabler = (elem, s) => {
-			console.log(s);
-			elem.prop('disabled', !s);
-		},
+		_enabler = (elem, s) => { elem.prop('disabled', !s); },
 		_mod = null,
 		_getter = null,
 		_setter = null,
