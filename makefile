@@ -1,14 +1,19 @@
 SRC_DIR=src
+SRC_DOCS_DIR=$(SRC_DIR)/doc/rst
+
 DIST_DIR=dist
-DIST_DOCS_DIR=$(DIST_DIR)/doc
+DIST_DOCS_DIR=$(DIST_DIR)/doc/html
+
 BUILD_CONF=build/scripts/conf.sh
 NPMBIN=$(shell build/scripts/npmbin.sh)
 
-JS_MAINS=$(shell find $(SRC_DIR) -name 'main.js' -exec sh -c 'echo -n "$$0 "|sed "s/src/dist/g"' '{}' ';')
+SRC_NO_JS=$(shell find $(SRC_DIR) ! -name "*.js") README.rst
 
-.PHONY: LOC clean realclean verify configure
-.SILENT: install verify LOC dist clean docs
-.ONESHELL:
+JS_SRC=$(shell find $(SRC_DIR) -name "main.js")
+DOC_SRC=$(shell find $(SRC_DOCS_DIR) -name "*.rst")
+
+JS_DIST=$(shell echo $(JS_SRC)|sed 's/src/dist/g')
+DOC_DIST=$(shell echo $(DOC_SRC)|sed 's/src/dist/g')
 
 ifndef SRC_DIR
 $(error SRC_DIR not set)
@@ -18,24 +23,31 @@ ifndef DIST_DIR
 $(error DIST_DIR not set)
 endif
 
-all: $(DIST_DIR) install
+.PHONY: LOC clean realclean verify utest configure
 
-configure:
-	@. $(BUILD_CONF)
-	echo '[INFO] Configure LibreSignage...'
-	sudo -u $$OWNER ./build/scripts/configure.sh
+.SILENT: install distrib $(DIST_DIR) $(DIST_DOCS_DIR)
+	configure verify utest clean realclean LOC
+
+.ONESHELL:
+
+all: distrib
 
 install:
 	# Uses root, no need to source BUILD_CONF.
 	@echo '[INFO] Install LibreSignage...'
 	./build/scripts/install.sh $(INST)
 
+distrib: $(DIST_DIR) $(JS_DIST) $(DIST_DOCS_DIR)
+
 # Setup dist/.
-$(DIST_DIR): $(JS_MAINS)
+$(DIST_DIR): $(SRC_NO_JS)
 	@. $(BUILD_CONF)
 	echo '[INFO] Create LibreSignage distribution...'
 	sudo -u $$OWNER ./build/scripts/dist.sh $(INST)
 
+# Compile docs.
+$(DIST_DOCS_DIR): $(DOC_DIST) README.rst
+	@. $(BUILD_CONF)
 	if [ "$$NODOCS" != "y" ]; then
 		echo '[INFO] Compile LibreSignage documentation...'
 		sudo -u $$OWNER ./build/scripts/docs.sh
@@ -44,16 +56,21 @@ $(DIST_DIR): $(JS_MAINS)
 	fi
 
 # Compile JavaScript files.
-$(JS_MAINS): $(shell $(NPMBIN)/browserify --list $@)
+$(JS_DIST): $(shell $(NPMBIN)/browserify --list $(shell echo "$@"|sed 's/dist/src/g'))
 	@. $(BUILD_CONF)
 	sudo -u $$OWNER ./build/scripts/compilejs.sh $(shell echo "$@"|sed 's/dist/src/g');
+
+configure:
+	@. $(BUILD_CONF)
+	echo '[INFO] Configure LibreSignage...'
+	sudo -u $$OWNER ./build/scripts/configure.sh
 
 verify: $(DIST_DIR)
 	@. $(BUILD_CONF)
 	echo '[INFO] Verify LibreSignage sources...'
 	sudo -u $$OWNER ./build/scripts/verify.sh
 
-utest: install
+utest:
 	@. $(BUILD_CONF)
 	echo '[INFO] Unit testing LibreSignage...'
 	sudo -u $$OWNER ./utests/api/main.py
