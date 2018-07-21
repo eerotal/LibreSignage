@@ -1,3 +1,7 @@
+var $ = require('jquery');
+var api = require('ls-api');
+
+var API = null;
 const LOGOUT_REDIR_TIME = 2000;
 
 function logout_redirect() {
@@ -7,9 +11,9 @@ function logout_redirect() {
 }
 
 function logout() {
-	if (api_authenticated()) {
-		api_logout((resp) => {
-			if (api_handle_disp_error(resp.error)) {
+	if (API.authenticated()) {
+		API.logout((resp) => {
+			if (API.handle_disp_error(resp.error)) {
 				return;
 			} else {
 				logout_redirect();
@@ -20,10 +24,11 @@ function logout() {
 			"Logout: Not logged in, won't " +
 			"attempt to logout."
 		);
+		logout_redirect();
 	}
 }
 
 $(document).ready(() => {
-	api_init(null, logout);
+	API = new api.API(null, logout);
 });
 

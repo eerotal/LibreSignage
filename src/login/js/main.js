@@ -1,3 +1,7 @@
+var $ = require('jquery');
+var api = require('ls-api');
+
+var API = null;
 var LOGIN_LANDING = "/control";
 var INPUT_USERNAME = $("#input-user");
 var INPUT_PASSWORD = $("#input-pass");
@@ -9,21 +13,21 @@ function login_redirect(uri) {
 }
 
 function login() {
-	api_login(
+	API.login(
 		INPUT_USERNAME.val(),
 		INPUT_PASSWORD.val(),
 		CHECK_PERM.is(":checked"),
 		(resp) => {
-			if (resp.error == API_E.API_E_INCORRECT_CREDS) {
+			if (resp.error == API.ERR.API_E_INCORRECT_CREDS) {
 				login_redirect("/login?failed=1");
-			} else if (resp.error == API_E.API_E_OK) {
+			} else if (resp.error == API.ERR.API_E_OK) {
 				if (CHECK_PERM.is(":checked")) {
 					login_redirect('/app');
 					return;
 				}
 				login_redirect(LOGIN_LANDING);
 			} else {
-				api_handle_disp_error(resp.error);
+				API.handle_disp_error(resp.error);
 			}
 		}
 	)
@@ -44,8 +48,5 @@ function login_setup() {
 }
 
 $(document).ready(() => {
-	api_init(
-		null,	// Use default config.
-		login_setup
-	);
+	API = new api.API(null, login_setup);
 });

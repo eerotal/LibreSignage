@@ -1,8 +1,18 @@
-USERS_TABLE = $('#users-table');
+var $ = require('jquery');
+var api = require('ls-api');
+var user = require('ls-user');
+var dialog = require('ls-dialog');
+var bootstrap = require('bootstrap');
+
+const USER_SAVE_QUERY = (name) => `#btn-user-${name}-save`;
+const USER_REMOVE_QUERY = (name) => `#btn-user-${name}-remove`;
+const USER_CREATE = $('#btn-create-user');
+
+const USERS_TABLE = $('#users-table');
 
 // Dialog messages.
-const DIALOG_GROUPS_INVALID_CHARS = new Dialog(
-	DIALOG.ALERT,
+const DIALOG_GROUPS_INVALID_CHARS = new dialog.Dialog(
+	dialog.TYPE.ALERT,
 	'Invalid user groups',
 	`The user groups contain invalid characters. Only A-Z, a-z, 0-9
 	and _ are allowed. Additionally the comma character can be used
@@ -12,8 +22,8 @@ const DIALOG_GROUPS_INVALID_CHARS = new Dialog(
 );
 
 const DIALOG_TOO_MANY_GROUPS = (max) => {
-	return new Dialog(
-		DIALOG.ALERT,
+	return new dialog.Dialog(
+		dialog.TYPE.ALERT,
 		'Too many user groups',
 		`You have specified too many groups for one user. The
 		maximum number of groups is ${max}.`,
@@ -21,44 +31,44 @@ const DIALOG_TOO_MANY_GROUPS = (max) => {
 	);
 }
 
-const DIALOG_USER_SAVED = new Dialog(
-	DIALOG.ALERT,
+const DIALOG_USER_SAVED = new dialog.Dialog(
+	dialog.TYPE.ALERT,
 	'User saved',
 	'User information was successfully saved!',
 	null
 );
 
-const DIALOG_TOO_MANY_USERS = new Dialog(
-	DIALOG.ALERT,
+const DIALOG_TOO_MANY_USERS = new dialog.Dialog(
+	dialog.TYPE.ALERT,
 	'Too many users',
 	`The maximum number of users on the server has been reached.
 	No more users can be created.`,
 	null
 );
 
-const DIALOG_USER_REMOVED = new Dialog(
-	DIALOG.ALERT,
+const DIALOG_USER_REMOVED = new dialog.Dialog(
+	dialog.TYPE.ALERT,
 	'User removed',
 	'The user was successfully removed',
 	null
 );
 
-const DIALOG_USER_REMOVE_FAILED = new Dialog(
-	DIALOG.ALERT,
+const DIALOG_USER_REMOVE_FAILED = new dialog.Dialog(
+	dialog.TYPE.ALERT,
 	'User removal failed',
 	'Failed to remove user.',
 	null
 );
 
-const DIALOG_USER_NO_NAME = new Dialog(
-	DIALOG.ALERT,
+const DIALOG_USER_NO_NAME = new dialog.Dialog(
+	dialog.TYPE.ALERT,
 	'Invalid username',
 	'You must specify a username for the user to be created.',
 	null
 );
 
-const DIALOG_USERNAME_TOO_LONG = new Dialog(
-	DIALOG.ALERT,
+const DIALOG_USERNAME_TOO_LONG = new dialog.Dialog(
+	dialog.TYPE.ALERT,
 	'Invalid username',
 	'The specified username is too long.',
 	null
@@ -122,14 +132,16 @@ const usr_table_row = (index, name, groups, pass) => `
 			</div>
 			<div class="row usr-edit-input-row">
 					<div class="col-12 d-flex flex-row justify-content-center">
-					<input class="btn btn-primary usr-edit-btn"
+					<input
+						id="btn-user-${name}-save"
+						class="btn btn-primary usr-edit-btn"
 						type="submit"
-						onclick="usermgr_save('${name}');"
 						value="Save">
 					</input>
-					<input class="btn btn-danger usr-edit-btn"
+					<input
+						id="btn-user-${name}-remove"
+						class="btn btn-danger usr-edit-btn"
 						type="button"
-						onclick="usermgr_remove('${name}');"
 						value="Remove">
 					</input>
 				</div>
@@ -138,20 +150,20 @@ const usr_table_row = (index, name, groups, pass) => `
 	</div>
 `;
 
-function usermgr_assign_new_user_data(user) {
+function usermgr_assign_userdata(name) {
 	/*
 	*  Assign the edited user data to 'user' from
 	*  the user manager UI.
 	*/
 	var tmp = '';
-	var usrs = users_get();
-	if (!user_exists(user)) {
+	var users = user.users_get();
+	if (!user.user_exists(name)) {
 		throw new Error("User doesn't exist!");
 	}
-	for (var u in usrs) {
-		if (usrs[u].get_name() == user) {
-			tmp = $("#usr-groups-input-" +
-				usrs[u].get_name()).val();
+
+	for (var u in users) {
+		if (users[u].get_name() == name) {
+			tmp = $(`#usr-groups-input-${users[u].get_name()}`).val();
 			/*
 			*  Only allow alphanumerics, underscore,
 			*  space and comma in group names.
@@ -165,13 +177,13 @@ function usermgr_assign_new_user_data(user) {
 			tmp = tmp.replace(/\s+/g, '');
 			tmp = tmp.replace(/,+/g, ',');
 			tmp = tmp.replace(/,$/, '');
-			usrs[u].groups = tmp.split(',');
+			users[u].groups = tmp.split(',');
 
 			// Check that the number of groups is valid.
-			if (usrs[u].groups.length >
-				SERVER_LIMITS.MAX_GROUPS_PER_USER) {
+			if (users[u].groups.length >
+				API.SERVER_LIMITS.MAX_GROUPS_PER_USER) {
 				DIALOG_TOO_MANY_GROUPS(
-					SERVER_LIMITS.MAX_GROUPS_PER_USER
+					API.SERVER_LIMITS.MAX_GROUPS_PER_USER
 				).show();
 				return false;
 			}
@@ -180,61 +192,58 @@ function usermgr_assign_new_user_data(user) {
 	}
 }
 
-function usermgr_save(name) {
+function usermgr_save(event) {
 	/*
-	*  Save the user 'name'.
+	*  Save a user. The username is stored in the
+	*  'user' data attribute of the button that fires
+	*  the event. These attributes are set in
+	*  usermgr_make_ui().
 	*/
-	var usrs = users_get();
-	var ret = false;
-	for (var u in usrs) {
-		if (usrs[u].get_name() == name) {
-			ret = usermgr_assign_new_user_data(
-					usrs[u].get_name()
-			);
-			if (!ret) {
+	var name = $(event.target).data('user');
+	var users = user.users_get();
+	for (var u in users) {
+		if (users[u].get_name() == name) {
+			if (!usermgr_assign_userdata(name)) {
 				console.error('Failed to save userdata.');
 				return;
 			}
-			usrs[u].save((err) => {
-				if (api_handle_disp_error(err)) {
-					return;
-				}
-				// Update the UI.
+			users[u].save((err) => {
+				if (API.handle_disp_error(err)) { return; }
+				// Update UI.
 				usermgr_make_ui();
 				DIALOG_USER_SAVED.show();
 			});
 			break;
 		}
 	}
-
 }
 
-function usermgr_remove(name) {
+function usermgr_remove(event) {
 	/*
-	*  Remove the user named 'user'.
+	*  Remove a user. The username is stored in the
+	*  'user' data attribute of the button that fires
+	*  the event. These attributes are set in
+	*  usermgr_make_ui().
 	*/
+	var name = $(event.target).data('user');
+	var users = user.users_get();
 
-	dialog(DIALOG.CONFIRM,
-		'Remove user ' + name + '?',
-		"Are you really sure you want to remove the " +
-		"user " + name + "? All user data for " + name +
-		" will be lost and won't be recoverable.",
+	dialog.dialog(dialog.TYPE.CONFIRM,
+		`Remove user ${name}?`,
+		`Are you sure you want to remove the user ${name}? ` +
+		`All user data for ${name} will be lost and won't be ` +
+		`recoverable.`,
 		(status, val) => {
-			var usrs = users_get();
-			for (var u in usrs) {
-				if (usrs[u].get_name() != name) {
+			for (var u in users) {
+				if (users[u].get_name() != name) {
 					continue;
 				}
-
-				usrs[u].remove((resp) => {
-					if (api_handle_disp_error(resp)) {
+				users[u].remove((resp) => {
+					if (API.handle_disp_error(resp)) {
 						return;
 					}
-					users_load(() => {
-						usermgr_make_ui();
-					});
+					user.users_load(API, usermgr_make_ui);
 				});
-
 				DIALOG_USER_REMOVED.show();
 				return;
 			}
@@ -244,37 +253,36 @@ function usermgr_remove(name) {
 }
 
 function usermgr_create() {
-	dialog(DIALOG.PROMPT,
+	dialog.dialog(
+		dialog.TYPE.PROMPT,
 		'Create a user',
 		'Enter a name for the new user.', (status, val) => {
-		if (!status) {
-			return;
-		}
+		if (!status) { return; }
 		if (!val.length) {
 			DIALOG_USER_NO_NAME.show();
 			return;
 		}
-		if (val.length > SERVER_LIMITS.USERNAME_MAX_LEN) {
+		if (val.length > API.SERVER_LIMITS.USERNAME_MAX_LEN) {
 			DIALOG_USERNAME_TOO_LONG.show();
 			return;
 		}
 
-		api_call(API_ENDP.USER_CREATE,
-			{'user': val}, (resp) => {
-			if (resp.error == API_E.LIMITED) {
+		API.call(API.ENDP.USER_CREATE, {'user': val}, (resp) => {
+			if (resp.error == API.ERR.LIMITED) {
 				DIALOG_TOO_MANY_USERS.show();
 				return;
-			} else if (api_handle_disp_error(resp.error)) {
+			} else if (API.handle_disp_error(resp.error)) {
 				return;
 			}
 
-			var tmp = new User();
-			tmp.set(resp.user.name,
+			var tmp = new user.User(API);
+			tmp.set(
+				resp.user.name,
 				resp.user.groups,
-				null);
-			tmp.set_info('Password: ' +
-				resp.user.pass);
-			users_add(tmp);
+				null
+			);
+			tmp.set_info('Password: ' + resp.user.pass);
+			user.users_add(tmp);
 			usermgr_make_ui();
 		});
 	});
@@ -284,33 +292,38 @@ function usermgr_make_ui() {
 	/*
 	*  Render the user manager UI.
 	*/
+	var users = user.users_get();
+	var name = null;
 	var grps = null;
 	var info = null;
 	var i = 0;
-	var usrs = users_get();
 	USERS_TABLE.empty();
-	for (var u in usrs) {
-		grps = usrs[u].get_groups();
-		info = usrs[u].get_info();
+	for (var u in users) {
+		name = users[u].get_name();
+		grps = users[u].get_groups();
+		info = users[u].get_info();
 		USERS_TABLE.append(usr_table_row(
 			i,
-			usrs[u].get_name(),
+			name,
 			!grps || !grps.length ? '' : grps.join(', '),
 			!info ? '' : info,
 		));
+
+		// Setup button event listeners and data attrs.
+		$(USER_SAVE_QUERY(name)).data('user', name);
+		$(USER_SAVE_QUERY(name)).click(usermgr_save);
+		$(USER_REMOVE_QUERY(name)).data('user', name);
+		$(USER_REMOVE_QUERY(name)).click(usermgr_remove);
 		i++;
 	}
 }
 
-function usermgr_ui_setup() {
-	api_init(
-		null,	// Use default config.
+$(document).ready(() => {
+	API = new api.API(
+		null,
 		() => {
-			users_load(function() {
-				usermgr_make_ui();
-			});
+			USER_CREATE.click(usermgr_create);
+			user.users_load(API, usermgr_make_ui);
 		}
 	);
-}
-
-usermgr_ui_setup();
+});

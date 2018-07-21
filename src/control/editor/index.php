@@ -38,7 +38,6 @@
 							<button class="btn btn-primary small-btn mx-1"
 								type="button"
 								id="queue-create"
-								onclick="queue_create()"
 								data-toggle="tooltip"
 								title="Create queue.">
 								<i class="fas fa-plus-circle"></i>
@@ -46,7 +45,6 @@
 							<button class="btn btn-primary small-btn mx-1"
 								type="button"
 								id="queue-view"
-								onclick="queue_view()"
 								data-toggle="tooltip"
 								title="View queue.">
 								<i class="fas fa-eye"></i>
@@ -54,7 +52,6 @@
 							<button class="btn btn-danger small-btn mx-1"
 								type="button"
 								id="queue-remove"
-								onclick="queue_remove()"
 								data-toggle="tooltip"
 								title="Remove queue.">
 								<i class="fas fa-trash-alt"></i>
@@ -233,7 +230,6 @@
 							<button id="btn-slide-new"
 								type="button"
 								class="btn btn-success btn-slide-ctrl"
-								onclick="slide_new()"
 								data-toggle="tooltip"
 								title="Create slide.">
 								<i class="fas fa-plus-circle"></i>
@@ -241,7 +237,6 @@
 							<button id="btn-slide-save"
 								type="button"
 								class="btn btn-success btn-slide-ctrl"
-								onclick="slide_save()"
 								data-toggle="tooltip"
 								title="Save slide.">
 								<i class="fas fa-save"></i>
@@ -249,7 +244,6 @@
 							<button id="btn-slide-dup"
 								type="button"
 								class="btn btn-success btn-slide-ctrl"
-								onclick="slide_dup()"
 								data-toggle="tooltip"
 								title="Duplicate slide.">
 								<i class="fas fa-copy"></i>
@@ -257,7 +251,6 @@
 							<button id="btn-slide-preview"
 								type="button"
 								class="btn btn-success btn-slide-ctrl"
-								onclick="slide_preview()"
 								data-toggle="tooltip"
 								title="Preview slide.">
 								<i class="fas fa-eye"></i>
@@ -265,7 +258,6 @@
 							<button id="btn-slide-ch-queue"
 								type="button"
 								class="btn btn-success btn-slide-ctrl"
-								onclick="slide_ch_queue()"
 								data-toggle="tooltip"
 								title="Change queue.">
 								<i class="fas fa-arrow-circle-right"></i>
@@ -273,7 +265,6 @@
 							<button id="btn-slide-remove"
 								type="button"
 								class="btn btn-danger btn-slide-ctrl"
-								onclick="slide_rm()"
 								data-toggle="tooltip"
 								title="Remove slide.">
 								<i class="fas fa-trash-alt"></i>
@@ -289,21 +280,8 @@
 		</main>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
-
-			js_include(['jquery', 'popper', 'bootstrap', 'ace']);
 		?>
-		<script src="/common/js/slide.js"></script>
-		<script src="/common/js/util.js"></script>
-		<script src="/common/js/validator.js"></script>
-		<script src="/common/js/dialog.js"></script>
-		<script src="/common/js/cookie.js"></script>
-		<script src="/common/js/api.js"></script>
-		<script src="/common/js/slidelist.js"></script>
-		<script src="/common/js/queue.js"></script>
-		<script src="/common/js/multiselect.js"></script>
-		<script src="/common/js/uicontrol.js"></script>
-		<script src="/control/editor/js/timeline.js"></script>
-		<script src="/control/editor/js/editor.js"></script>
-		<script src="/control/editor/js/queue_selector.js"></script>
+		<script src="/libs/ace-builds/src/ace.js"></script>
+		<script src="/control/editor/js/main.js"></script>
 	</body>
 </html>

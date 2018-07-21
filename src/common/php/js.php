@@ -7,16 +7,10 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
 const JS_LIBS = array(
-	'bootstrap' => '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"'.
-			'integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"'.
-			'crossorigin="anonymous"></script>',
-	'popper'    => '<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"'.
-			'integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"'.
-			'crossorigin="anonymous"></script>',
-	'jquery'    => '<script src="https://code.jquery.com/jquery-3.3.1.min.js"'.
-			'integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="'.
-			'crossorigin="anonymous"></script>',
-	'ace'       => '<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>'
+	'bootstrap' => '<script src="/libs/bootstrap/dist/js/bootstrap.min.js"></script>',
+	'popper'    => '<script src="/libs/popper.js/dist/popper.min.js"></script>',
+	'jquery'    => '<script src="/libs/jquery/dist/jquery.min.js"></script>',
+	'ace'       => '<script src="/libs/ace-builds/src-noconflict/ace.js"></script>'
 );
 
 function js_include(array $libs) {

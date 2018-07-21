@@ -1,4 +1,8 @@
-QUOTA_CONTAINER = $("#user-quota-cont");
+var $ = require('jquery');
+var api = require('ls-api');
+
+var API = null;
+const QUOTA_CONTAINER = $("#user-quota-cont");
 
 const quota_bar = (name, val, min, max) => `
 	<h6>${name}</h6>
@@ -21,8 +25,8 @@ const quota_bar = (name, val, min, max) => `
 `;
 
 function ctrl_setup() {
-	api_call(API_ENDP.USER_GET_QUOTA, null, (resp) => {
-		if (api_handle_disp_error(resp.error)) {
+	API.call(API.ENDP.USER_GET_QUOTA, null, (resp) => {
+		if (API.handle_disp_error(resp.error)) {
 			throw new Error("API exception while loading " +
 					"user quota.");
 		}
@@ -37,9 +41,6 @@ function ctrl_setup() {
 	});
 }
 
-api_init(
-	null,	// Use default config.
-	() => {
-		ctrl_setup();
-	}
-);
+$(document).ready(() => {
+	API = new api.API(null, ctrl_setup);
+});

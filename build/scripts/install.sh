@@ -5,11 +5,6 @@
 ## apache2 virtual host for hosting a LibreSignage instance.
 ##
 
-if [ ! "$(ps -o comm= $PPID)" = "make" ]; then
-	echo "[Error] LibreSignage build scripts must be run with make!"
-	exit 1;
-fi
-
 set -e
 . build/scripts/configure.sh
 
@@ -30,7 +25,7 @@ if [ -n "`ls -A $VHOST_DIR`" ]; then
 	case "$read_val" in
 		[Yy]* )
 			echo '[INFO] Remove existing files.';
-			rm -rfv $VHOST_DIR;
+			rm -rf $VHOST_DIR;
 			;;
 		* )
 			echo '[ERROR] Aborting install!';
@@ -39,14 +34,36 @@ if [ -n "`ls -A $VHOST_DIR`" ]; then
 	esac
 fi
 
+##
+##  Copy LibreSignage files.
+##
+
 mkdir -p $VHOST_DIR;
-echo "[INFO]: Set virtual host permissions to $OWNER:$OWNER.";
-chown -R $OWNER:$OWNER $VHOST_DIR
 
 echo "Install LibreSignage to $VHOST_DIR";
 echo 'Copy files.';
 cp -Rp $DIST_DIR/* $VHOST_DIR/.;
 echo 'Done!';
+
+##
+## Set the correct file permissions.
+##
+
+# Default file permissions.
+echo "[INFO] Set default file permissions.";
+chown -R $OWNER:$OWNER $VHOST_DIR
+find $VHOST_DIR -type d -exec chmod 755 "{}" ";";
+find $VHOST_DIR -type f -exec chmod 644 "{}" ";";
+
+# Permissions for the 'data' directory.
+echo "[INFO] Set file permissions for the 'data' directory.";
+chown -R $OWNER:www-data "$VHOST_DIR/data";
+find "$VHOST_DIR/data" -type d -exec chmod 775 "{}" ";";
+find "$VHOST_DIR/data" -type f -exec chmod 664 "{}" ";";
+
+##
+##  Create config and setup Apache.
+##
 
 echo "Create VHost config. ($APACHE_SITES/$ICONF_NAME.conf)";
 if [ -f "$APACHE_SITES/$ICONF_NAME.conf" ]; then

@@ -49,10 +49,11 @@
 				<div class="container-fluid mt-3 md-5">
 					<div class="usr-table-row">
 						<div class="usr-table-col">
-							<input type="button"
+							<input
+								id="btn-create-user"
+								type="button"
 								class="btn btn-primary"
-								value="Create user"
-								onclick="usermgr_create()">
+								value="Create user">
 							</input>
 						</div>
 					</div>
@@ -61,15 +62,7 @@
 		</main>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
-
-			js_include(['jquery', 'popper', 'bootstrap']);
 		?>
-
-		<script src="/common/js/util.js"></script>
-		<script src="/common/js/cookie.js"></script>
-		<script src="/common/js/api.js"></script>
-		<script src="/common/js/dialog.js"></script>
-		<script src="/common/js/user.js"></script>
-		<script src="/control/usermgr/js/usermgr_ui.js"></script>
+		<script src="/control/usermgr/js/main.js"></script>
 	</body>
 </html>

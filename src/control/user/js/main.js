@@ -2,6 +2,14 @@
 *  Functionality for controlling user settings like passwords.
 */
 
+var $ = require('jquery');
+var api = require('ls-api');
+var val = require('ls-validator');
+var user = require('ls-user');
+var dialog = require('ls-dialog');
+
+var API = null;
+
 const user_session_row = (who, from, created, cur) => `
 <tr><td>
 	<table class="user-session-row">
@@ -52,21 +60,21 @@ var pass_sel = null;
 var usr = null;
 
 function user_settings_setup() {
-	pass_sel = new ValidatorSelector(
+	pass_sel = new val.ValidatorSelector(
 		USER_PASS.add(USER_PASS_CONFIRM),
 		USER_PASS_GRP.add(USER_PASS_CONFIRM_GRP),
 		[
-			new StrValidator({
+			new val.StrValidator({
 				min: 1,
 				max: null,
 				regex: null
 			}, "The password is too short."),
-			new StrValidator({
+			new val.StrValidator({
 				min: null,
 				max: 10,
 				regex: null
 			}, "The password is too long."),
-			new EqValidator(
+			new val.EqValidator(
 				null,
 				"The passwords don't match."
 			)
@@ -88,44 +96,15 @@ function user_settings_setup() {
 	BTN_LOGOUT_OTHER.on("click", user_sessions_logout);
 }
 
-function user_settings_save(usr) {
-	/*
-	*  Save the modified user settings (password etc).
-	*/
-	if (!usr) {
-		throw new Error("Current user not loaded.");
-	}
-
-	// Change password using the API.
-	usr.pass = USER_PASS.val();
-	usr.save((ret) => {
-		if (api_handle_disp_error(ret)) {
-			return;
-		}
-
-		// Empty input boxes.
-		USER_PASS.val('');
-		USER_PASS_CONFIRM.val('');
-
-		dialog(
-			DIALOG.ALERT,
-			'Changes saved',
-			'Changes to user settings saved.',
-			null,
-			null
-		);
-	});
-}
-
 function user_sessions_populate() {
 	/*
 	*  Display the active sessions.
 	*/
-	api_call(
-		API_ENDP.AUTH_GET_SESSIONS,
+	API.call(
+		API.ENDP.AUTH_GET_SESSIONS,
 		null,
 		(resp) => {
-			if (api_handle_disp_error(resp.error)) {
+			if (API.handle_disp_error(resp.error)) {
 				return;
 			}
 			USER_SESSIONS.html("");
@@ -147,11 +126,11 @@ function user_sessions_logout() {
 	/*
 	*  Event handler for the 'Logout other sessions' button.
 	*/
-	api_call(
-		API_ENDP.AUTH_LOGOUT_OTHER,
+	API.call(
+		API.ENDP.AUTH_LOGOUT_OTHER,
 		null,
 		(resp) => {
-			if (api_handle_disp_error(resp.error)) {
+			if (API.handle_disp_error(resp.error)) {
 				return;
 			}
 			user_sessions_populate();
@@ -159,12 +138,41 @@ function user_sessions_logout() {
 	);
 }
 
+window.user_settings_save = function() {
+	/*
+	*  Save the modified user settings (password etc).
+	*/
+	if (!usr) {
+		throw new Error("Current user not loaded.");
+	}
+
+	// Change password using the API.
+	usr.pass = USER_PASS.val();
+	usr.save((ret) => {
+		if (API.handle_disp_error(ret)) {
+			return;
+		}
+
+		// Empty input boxes.
+		USER_PASS.val('');
+		USER_PASS_CONFIRM.val('');
+
+		dialog.dialog(
+			dialog.TYPE.ALERT,
+			'Changes saved',
+			'Changes to user settings saved.',
+			null,
+			null
+		);
+	});
+}
+
 $(document).ready(() => {
-	api_init(
+	API = new api.API(
 		null,	// Use default config.
 		() => {
 			// Load the current (logged in) user.
-			usr = new User();
+			usr = new user.User(API);
 			usr.load(null, user_settings_setup);
 		}
 	);

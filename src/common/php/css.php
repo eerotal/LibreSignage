@@ -7,14 +7,12 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
 const CSS_LIBS = array(
-	'font-awesome' => '<link rel="stylesheet" '.
-				'href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" '.
-				'integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" '.
+	'font-awesome' => '<link rel="stylesheet"'.
+				'href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"'.
+				'integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt"'.
 				'crossorigin="anonymous">',
 	'bootstrap'    => '<link rel="stylesheet" '.
-				'href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" '.
-				'integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" '.
-				'crossorigin="anonymous">'
+				'href="/libs/bootstrap/dist/css/bootstrap.min.css">'
 );
 
 function css_include(array $libs) {
