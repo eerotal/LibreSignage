@@ -159,7 +159,7 @@ Make rules
 The following ``make`` rules are implemented in the makefile.
 
 all
-  The default rule. Builds and installs LibreSignage.
+  The default rule that builds LibreSignage.
 
 configure
   Run the LibreSignage configuration utility. Running this manually
@@ -171,7 +171,7 @@ install
   into a virtual host directory in */var/www*.
 
 distrib
-  Build the LibreSignage distribution. You can pass NODOCS=y with this
+  Build the LibreSignage distribution. You can pass ``NODOCS=y`` with this
   rule if you don't wan't to compile the LibreSignage documentation files.
 
 verify
@@ -192,7 +192,7 @@ realclean
 LOC
   Count the lines of code in LibreSignage.
 
-You can also pass INST=[CONFIG FILE] with all the build/installation rules
+You can also pass ``INST=[CONFIG FILE]`` with all the build/installation rules
 to specify an existing install config to use. 
 
 Used third-party libraries and resources

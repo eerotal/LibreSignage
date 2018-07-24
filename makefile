@@ -1,105 +1,155 @@
-SRC_DIR=src
-SRC_DOCS_DIR=$(SRC_DIR)/doc/rst
+##
+##  LibreSignage makefile
+##
 
-DIST_DIR=dist
-DIST_DOCS_DIR=$(DIST_DIR)/doc/html
+NPMBIN=$(shell ./build/scripts/npmbin.sh)
+ROOT=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-BUILD_CONF=build/scripts/conf.sh
-NPMBIN=$(shell build/scripts/npmbin.sh)
+# Source file lists.
+SRC_NORMAL := $(shell find src 							\
+	\( -type f -path 'src/node_modules/*' -prune \)		\
+	-o \( -type f -path 'src/api/endpoint/*' -prune \) 	\
+	-o \(												\
+		-type f ! -name '*.js'							\
+		-a -type f ! -name 'config.php' -print 			\
+	\)													\
+)
+SRC_JS := $(shell find src 							\
+	\( -type f -path 'src/node_modules/*' -prune \)	\
+	-o \( -type f -name 'main.js' -print \)			\
+)
+SRC_ENDPOINT := $(shell find src/api/endpoint 		\
+	\( -type f -path 'src/node_modules/*' -prune \)	\
+	-o \( -type f -name '*.php' -print \)			\
+)
 
-SRC_NO_JS=$(shell find $(SRC_DIR) ! -name "*.js") README.rst
+FILES := $(shell find src							\
+	\( -type f -path 'src/node_modules/*' -prune \)	\
+	-o \( -type f -print \)							\
+)
+DIRS := $(shell find src 							\
+	\( -type d -path 'src/node_modules' -prune \)	\
+	-o \( -type d -print \)							\
+)
 
-JS_SRC=$(shell find $(SRC_DIR) -name "main.js")
-DOC_SRC=$(shell find $(SRC_DOCS_DIR) -name "*.rst")
+# Documentation sources.
+HTML_DOCS := $(shell find src -type f -name '*.rst')
+HTML_DOCS := $(addprefix dist/doc/html/,$(notdir $(HTML_DOCS)))
+HTML_DOCS := $(HTML_DOCS:.rst=.html) dist/doc/html/README.html
 
-JS_DIST=$(shell echo $(JS_SRC)|sed 's/src/dist/g')
-DOC_DIST=$(shell echo $(DOC_SRC)|sed 's/src/dist/g')
-
-ifndef SRC_DIR
-$(error SRC_DIR not set)
+ifndef INST
+INST := ""
 endif
 
-ifndef DIST_DIR
-$(error DIST_DIR not set)
+ifndef NOHTMLDOCS
+NOHTMLDOCS := N
 endif
 
-.PHONY: LOC clean realclean verify utest configure
+ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
+$(info [INFO] Won't generate HTML documentation.)
+endif
 
-.SILENT: install distrib $(DIST_DIR) $(DIST_DOCS_DIR)
-	configure verify utest clean realclean LOC
-
+.PHONY: clean
 .ONESHELL:
 
-all: distrib
+all:: $(subst src,dist,$(DIRS))				\
+		$(subst src,dist,$(SRC_NORMAL))		\
+		$(subst src,dist,$(SRC_JS))			\
+		$(subst src,dist,$(SRC_ENDPOINT))	\
+		dist/common/php/config.php			\
+		dist/libs							\
+		$(HTML_DOCS); @:
 
-install:
-	# Uses root, no need to source BUILD_CONF.
-	@echo '[INFO] Install LibreSignage...'
-	./build/scripts/install.sh $(INST)
+# Create directory structure in 'dist/'.
+$(subst src,dist,$(DIRS)):: dist%: src%
+	@:
+	mkdir -p $@;
 
-distrib: $(DIST_DIR) $(JS_DIST) $(DIST_DOCS_DIR)
+# Copy non-JS, non API endpoint, non-docs files to 'dist/'.
+$(subst src,dist,$(SRC_NORMAL)):: dist%: src%
+	@:
+	cp -p $< $@;
 
-# Setup dist/.
-$(DIST_DIR): $(SRC_NO_JS)
-	@. $(BUILD_CONF)
-	echo '[INFO] Create LibreSignage distribution...'
-	sudo -u $$OWNER ./build/scripts/dist.sh $(INST)
+# Copy normal PHP files to 'dist/.' and check the PHP syntax.
+$(filter %.php,$(subst src,dist,$(SRC_NORMAL))):: dist%: src%
+	@:
+	php -l $< > /dev/null;
+	cp -p $< $@;
 
-# Compile docs.
-$(DIST_DOCS_DIR): $(DOC_DIST) README.rst
-	@. $(BUILD_CONF)
-	if [ "$$NODOCS" != "y" ]; then
-		echo '[INFO] Compile LibreSignage documentation...'
-		sudo -u $$OWNER ./build/scripts/docs.sh
-	else
-		echo "[INFO] Won't compile docs."
+# Copy API endpoint PHP files and generate corresponding docs.
+$(subst src,dist,$(SRC_ENDPOINT)):: dist%: src%
+	@:
+	php -l $< > /dev/null;
+	cp -p $< $@;
+
+	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
+		# Generate reStructuredText documentation.
+		mkdir -p dist/doc/rst/api;
+		mkdir -p dist/doc/html/api;
+		./build/scripts/gendoc.sh $(INST) $@ dist/doc/rst/api/
+
+		# Compile rst docs into HTML.
+		pandoc -f rst -t html \
+			-o dist/doc/html/api/$(notdir $(@:.php=.rst)) \
+			dist/doc/rst/api/$(notdir $(@:.php=.rst))
 	fi
 
+# Copy and prepare 'config.php'.
+dist/common/php/config.php:: src/common/php/config.php
+	@:
+	echo "[INFO] Prepare 'config.php'.";
+	cp -p $< $@;
+	./build/scripts/prep.sh $(INST) $@
+	php -l $@ > /dev/null;
+
+# Generate makefiles w/ dependencies for JavaScript files.
+dist/%/main.d:: src/%/main.js
+	@:
+	echo "[INFO] Gen makefile "$@;
+	echo -n '$(notdir $<): ' > $@;
+	$(NPMBIN)/browserify --list $<|tr '\n' ' ' >> $@;
+	echo '\n\t@$(NPMBIN)/browserify $(ROOT)$< \
+			-o $(ROOT)$(subst src,dist,$<)' >> $@;
+
 # Compile JavaScript files.
-$(JS_DIST): $(shell $(NPMBIN)/browserify --list $(shell echo "$@"|sed 's/dist/src/g'))
-	@. $(BUILD_CONF)
-	sudo -u $$OWNER ./build/scripts/compilejs.sh $(shell echo "$@"|sed 's/dist/src/g');
+dist/%/main.js: dist/%/main.d src/%/main.js
+	@:
+	make -C $(dir $<) -f main.d
 
-configure:
-	@. $(BUILD_CONF)
-	echo '[INFO] Configure LibreSignage...'
-	sudo -u $$OWNER ./build/scripts/configure.sh
+# Compile normal (non-API) documentation files.
+dist/doc/html/%.html:: src/doc/rst/%.rst
+	@:
+	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
+		mkdir -p dist/doc/html;
+		pandoc -o $@ -f rst -t html $<;
+	fi
 
-verify: $(DIST_DIR)
-	@. $(BUILD_CONF)
-	echo '[INFO] Verify LibreSignage sources...'
-	sudo -u $$OWNER ./build/scripts/verify.sh
+# Compile README.rst
+dist/doc/html/README.html:: README.rst
+	@:
+	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
+		mkdir -p dist/doc/html;
+		pandoc -o $@ -f rst -t html $<;
+	fi
 
-utest:
-	@. $(BUILD_CONF)
-	echo '[INFO] Unit testing LibreSignage...'
-	sudo -u $$OWNER ./utests/api/main.py
+# Copy node_modules to 'dist/libs/'.
+dist/libs:: node_modules
+	@mkdir -p dist/libs
+	@cp -Rp $</* dist/libs
+
+install:; ./build/scripts/install.sh $(INST)
+
+utest:; ./utests/api/main.py
 
 clean:
-	@. $(BUILD_CONF)
-	echo '[INFO] Clean LibreSignage build files...'
-	sudo -u $$OWNER rm -rf $(DIST_DIR)
+	@:
+	rm -rf dist;
 
-realclean: clean
-	@. $(BUILD_CONF)
-	echo '[INFO] Clean all LibreSignage build files...'
-	sudo -u $$OWNER rm -f build/*.iconf
-	sudo -u $$OWNER rm -rf build/link
+realclean:
+	@:
+	rm -f build/*.iconf;
+	rm -rf build/link
 
-LOC:
-	# Count the lines of code in LibreSignage.
-	wc -l `find .                                     \
-            \(                                        \
-                -path "./dist/*" -o                   \
-                -path "./utests/api/.mypy_cache/*" -o \
-                -path "./node_modules/*"              \
-            \) -prune                                 \
-            -o -name "*.py" -print                    \
-            -o -name "*.php" -print                   \
-            -o -name "*.js"	-print                    \
-            -o -name "*.html" -print                  \
-            -o -name "*.css" -print                   \
-            -o -name "*.sh"	-print                    \
-            -o -name "*.json" -print                  \
-            -o -name "*.py" -print                    \
-            -o -name "makefile" -print`               \
+%:
+	@:
+	echo '[INFO] Ignore '$@;

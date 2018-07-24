@@ -73,7 +73,6 @@ $SLIDE_SAVE = new APIEndpoint([
 ]);
 api_endpoint_init($SLIDE_SAVE);
 
-
 $OP = '';
 $ALLOW = FALSE;
 
