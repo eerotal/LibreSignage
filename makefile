@@ -49,7 +49,7 @@ ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [INFO] Won't generate HTML documentation.)
 endif
 
-.PHONY: clean
+.PHONY: install utest clean realclean LOC
 .ONESHELL:
 
 all:: $(subst src,dist,$(DIRS))				\
@@ -149,6 +149,24 @@ realclean:
 	@:
 	rm -f build/*.iconf;
 	rm -rf build/link
+
+LOC:
+	# Count the lines of code in LibreSignage.
+	wc -l `find .									\
+		\(											\
+			-path "./dist/*" -o						\
+			-path "./utests/api/.mypy_cache/*" -o	\
+			-path "./node_modules/*"				\
+		\) -prune 									\
+		-o -name "*.py" -print						\
+		-o -name "*.php" -print						\
+		-o -name "*.js" -print						\
+		-o -name "*.html" -print					\
+		-o -name "*.css" -print						\
+		-o -name "*.sh" -print						\
+		-o -name "*.json" -print					\
+		-o -name "*.py" -print						\
+		-o -name "makefile" -print`
 
 %:
 	@:
