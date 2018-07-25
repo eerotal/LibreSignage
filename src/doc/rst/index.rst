@@ -32,7 +32,7 @@ Miscellaneous
 Development
 -----------
 
-`API Endpoints </doc?doc=api>`_
+`API Endpoints </doc?doc=api_index>`_
 
 `API Errors </doc?doc=api_errors>`_
 

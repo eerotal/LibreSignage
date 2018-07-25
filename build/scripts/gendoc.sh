@@ -9,6 +9,15 @@ gen_api_doc() {
 			return '';
 	fi
 
+	echo "`basename $1`";
+	# Add the line of dashes below the heading.
+	i=0;
+	while [ "$i" -lt "$(echo `basename $1`|wc -m)" ]; do
+		line="$line-";
+		i=$((i+1));
+	done
+	echo "$line";
+
 	sed -n '/====>/,/<====/p' "$1"  | \
 	sed 's/\s*\*\s\{0,2\}//m'       | \
 	sed '/====>/d; /<====/d';
