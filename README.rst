@@ -161,23 +161,9 @@ The following ``make`` rules are implemented in the makefile.
 all
   The default rule that builds LibreSignage.
 
-configure
-  Run the LibreSignage configuration utility. Running this manually
-  is not normally needed since all the scripts run it if no existing
-  config is found.
-
 install
   Install LibreSignage. This copies the LibreSignage disribution files
   into a virtual host directory in */var/www*.
-
-distrib
-  Build the LibreSignage distribution. You can pass ``NODOCS=y`` with this
-  rule if you don't wan't to compile the LibreSignage documentation files.
-
-verify
-  Run the LibreSignage PHP source verification script. This checks the
-  PHP files for syntax errors and also performs some additional source
-  checks.
 
 utest
   Run the LibreSignage unit testing scripts. Note that you must install
