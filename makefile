@@ -152,9 +152,9 @@ dist/libs:: node_modules
 	@mkdir -p dist/libs
 	@cp -Rp $</* dist/libs
 
-install:; ./build/scripts/install.sh $(INST)
+install:; @./build/scripts/install.sh $(INST)
 
-utest:; ./utests/api/main.py
+utest:; @./utests/api/main.py
 
 clean:
 	@:
@@ -165,8 +165,9 @@ realclean:
 	rm -f build/*.iconf;
 	rm -rf build/link
 
+# Count the lines of code in LibreSignage.
 LOC:
-	# Count the lines of code in LibreSignage.
+	@:
 	wc -l `find .									\
 		\(											\
 			-path "./dist/*" -o						\

@@ -13,7 +13,7 @@ const QUEUE_CREATE		= $("#queue-create");
 const QUEUE_VIEW		= $("#queue-view");
 const QUEUE_REMOVE		= $("#queue-remove");
 
-const QUEUE_UI_DEFS = {
+const QUEUE_UI_DEFS = new uic.UIController({
 	'QUEUE_SELECT': new uic.UIInput(
 		_elem = QUEUE_SELECT,
 		_perm = () => { return true; },
@@ -41,13 +41,15 @@ const QUEUE_UI_DEFS = {
 	),
 	'QUEUE_REMOVE': new uic.UIButton(
 		_elem = QUEUE_REMOVE,
-		_perm = (d) => { return d['o'] && TL.queue.slides.length(); },
+		_perm = (d) => {
+			return d['o'] && TL.queue;
+		},
 		_enabler = null,
 		_attach = {
 			'click': queue_remove
 		}
 	),
-}
+});
 
 function queue_create() {
 	/*
@@ -67,7 +69,7 @@ function queue_create() {
 					// Select the new queue.
 					update_qsel(false, () => {
 						QUEUE_SELECT.val(val);
-						TL.show(val);
+						TL.show(val, update_qsel_ctrls);
 					});
 					console.log(
 						`LibreSignage: Created queue '${val}'.`
@@ -112,7 +114,7 @@ function queue_remove() {
 					if (API.handle_disp_error(data['error'])) {
 						return;
 					}
-					update_qsel(true);
+					update_qsel(true, null);
 				}
 			);
 		},
@@ -134,37 +136,32 @@ function update_qsel(show_initial, ready) {
 		for (let q of queues) {
 			QUEUE_SELECT.append(`<option value="${q}">${q}</option>`);
 		}
-
-		// Select the first queue.
 		if (show_initial && queues.length) {
-			TL.show(queues[0]);
-		} else if (show_initial) {
-			TL.show(null);
-		}
-
-		// Update queue controls.
-		if (!TL.queue) {
-			for (let key of (Object.keys(QUEUE_UI_DEFS))) {
-				if ([
-					'QUEUE_SELECT',
-					'QUEUE_CREATE'
-				].includes(key)) { continue; }
-				QUEUE_UI_DEFS[key].set_state(false);
-			}
-		}
-		for (let key of Object.keys(QUEUE_UI_DEFS)) {
-			if ([
-				'QUEUE_SELECT',
-				'QUEUE_CREATE'
-			].includes(key)) { continue; }
-
-			console.log(TL.queue);
-			QUEUE_UI_DEFS[key].state({
-				'o': TL.queue.owner == API.CONFIG.user
+			TL.show(queues[0], () => {
+				update_qsel_ctrls();
+				if (ready) { ready(); }
+			});
+		} else {
+			TL.show(null, () => {
+				update_qsel_ctrls();
+				if (ready) { ready(); }
 			});
 		}
-		if (ready) { ready(); }
 	});
+}
+
+function update_qsel_ctrls(ready) {
+	// Update queue controls.
+	QUEUE_UI_DEFS.all(
+		function() {
+			this.state(
+				{'o': TL.queue && (TL.queue.owner == API.CONFIG.user)}
+			);
+		},
+		null,
+		'button'
+	);
+	if (ready) { ready(); }
 }
 
 exports.setup = function(api, tl) {
@@ -174,8 +171,7 @@ exports.setup = function(api, tl) {
 	// Handle queue selection.
 	QUEUE_SELECT.change(() => {
 		console.log("LibreSignage: Change timeline.");
-		TL.show(QUEUE_SELECT.val());
-		update_qsel();
+		TL.show(QUEUE_SELECT.val(), update_qsel_ctrls);
 	});
 	update_qsel(true);
 }

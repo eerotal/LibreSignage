@@ -83,13 +83,17 @@ exports.Timeline = class Timeline {
 		}
 	}
 
-	show(name) {
+	show(name, ready) {
 		if (!name) {
 			this.queue = null;
 			this.update_html();
+			if (ready) { ready(); }
 			return;
 		}
 		this.queue = new ls_queue.Queue(this.api);
-		this.queue.load(name, () => { this.update_html(); });
+		this.queue.load(name, () => {
+			this.update_html();
+			if (ready) { ready(); }
+		});
 	}
 }
