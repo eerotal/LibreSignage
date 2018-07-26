@@ -14,10 +14,13 @@ SRC_NORMAL := $(shell find src 							\
 		-a -type f ! -name 'config.php' -print 			\
 	\)													\
 )
+
 SRC_JS := $(shell find src 							\
 	\( -type f -path 'src/node_modules/*' -prune \)	\
 	-o \( -type f -name 'main.js' -print \)			\
 )
+DEP_JS := $(subst src,dist,$(SRC_JS:.js=.d))
+
 SRC_ENDPOINT := $(shell find src/api/endpoint 		\
 	\( -type f -path 'src/node_modules/*' -prune \)	\
 	-o \( -type f -name '*.php' -print \)			\
@@ -44,7 +47,7 @@ ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [INFO] Won't generate HTML documentation.)
 endif
 
-.PHONY: install utest clean realclean LOC
+.PHONY: install utest clean realclean LOC $(DEP_JS)
 .ONESHELL:
 
 all:: $(subst src,dist,$(DIRS))				\
@@ -118,7 +121,7 @@ dist/common/php/config.php:: src/common/php/config.php
 	php -l $@ > /dev/null;
 
 # Generate makefiles w/ dependencies for JavaScript files.
-dist/%/main.d:: src/%/main.js
+$(DEP_JS): dist/%/main.d: src/%/main.js
 	@:
 	echo "[INFO] Gen makefile "$@;
 	echo -n '$(notdir $<): ' > $@;
@@ -129,7 +132,7 @@ dist/%/main.d:: src/%/main.js
 # Compile JavaScript files.
 dist/%/main.js: dist/%/main.d src/%/main.js
 	@:
-	make -C $(dir $<) -f main.d
+	make --no-print-directory -C $(dir $<) -f main.d
 
 # Compile normal (non-API) documentation files.
 dist/doc/html/%.html:: src/doc/rst/%.rst
