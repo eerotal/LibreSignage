@@ -166,7 +166,8 @@ clean:
 realclean:
 	@:
 	rm -f build/*.iconf;
-	rm -rf build/link
+	rm -rf build/link;
+	rm -rf node_modules;
 
 # Count the lines of code in LibreSignage.
 LOC:

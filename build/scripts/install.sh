@@ -21,7 +21,7 @@ echo "[INFO] Virtual host dir: '$VHOST_DIR'";
 # Check whether VHOST_DIR already has files.
 if [ -n "`ls -A $VHOST_DIR`" ]; then
 	echo '[INFO] Virtual host directory is not empty.'
-	read -p 'Remove existing files and continue? (Y\N): ' read_val
+	read -p 'Remove existing files and continue? (Y/N): ' read_val
 	case "$read_val" in
 		[Yy]* )
 			echo '[INFO] Remove existing files.';
@@ -67,7 +67,7 @@ find "$VHOST_DIR/data" -type f -exec chmod 664 "{}" ";";
 
 echo "[INFO] Create VHost config in '$APACHE_SITES/$ICONF_NAME.conf'";
 if [ -f "$APACHE_SITES/$ICONF_NAME.conf" ]; then
-	read -p 'Replace existing VHost config? (Y\N): ' repl_vhost_conf
+	read -p 'Replace existing VHost config? (Y/N): ' repl_vhost_conf
 	case "$repl_vhost_conf" in
 		[Yy]* )
 			;;
@@ -83,7 +83,7 @@ echo '[INFO] LibreSignage installed!';
 echo '[INFO] Enable apache2 mod_rewrite...';
 a2enmod rewrite;
 
-read -p 'Enable the created VHost and restart apache2? (Y\N): ' EN_VHOST;
+read -p 'Enable the created VHost and restart apache2? (Y/N): ' EN_VHOST;
 case "$EN_VHOST" in
 	[Yy]* )
 		echo "[INFO] Enabling site '$ICONF_NAME.conf'...";
