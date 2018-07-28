@@ -1,14 +1,31 @@
 var $ = require('jquery');
 var api = require('ls-api');
 var user = require('ls-user');
+var uic = require('ls-uicontrol');
 var dialog = require('ls-dialog');
 var bootstrap = require('bootstrap');
+
+var flag_usermgr_ready = false;
+var defer_usermgr_ready = () => { return !flag_usermgr_ready; }
 
 const USER_SAVE_QUERY = (name) => `#btn-user-${name}-save`;
 const USER_REMOVE_QUERY = (name) => `#btn-user-${name}-remove`;
 const USER_CREATE = $('#btn-create-user');
-
 const USERS_TABLE = $('#users-table');
+
+const USERMGR_UI_DEFS = new uic.UIController({
+	'USER_CREATE': new uic.UIButton(
+		_elem = USER_CREATE,
+		_perm = () => { return true; },
+		_enabler = null,
+		_attach = {
+			'click': usermgr_create
+		},
+		_defer = defer_usermgr_ready
+	)
+})
+
+const USERMGR_LIST_UI_DEFS = new uic.UIController({});
 
 // Dialog messages.
 const DIALOG_GROUPS_INVALID_CHARS = new dialog.Dialog(
@@ -43,13 +60,6 @@ const DIALOG_TOO_MANY_USERS = new dialog.Dialog(
 	'Too many users',
 	`The maximum number of users on the server has been reached.
 	No more users can be created.`,
-	null
-);
-
-const DIALOG_USER_REMOVED = new dialog.Dialog(
-	dialog.TYPE.ALERT,
-	'User removed',
-	'The user was successfully removed',
 	null
 );
 
@@ -192,14 +202,10 @@ function usermgr_assign_userdata(name) {
 	}
 }
 
-function usermgr_save(event) {
+function usermgr_save(name) {
 	/*
-	*  Save a user. The username is stored in the
-	*  'user' data attribute of the button that fires
-	*  the event. These attributes are set in
-	*  usermgr_make_ui().
+	*  Save a user.
 	*/
-	var name = $(event.target).data('user');
 	var users = user.users_get();
 	for (var u in users) {
 		if (users[u].get_name() == name) {
@@ -218,16 +224,11 @@ function usermgr_save(event) {
 	}
 }
 
-function usermgr_remove(event) {
+function usermgr_remove(name) {
 	/*
-	*  Remove a user. The username is stored in the
-	*  'user' data attribute of the button that fires
-	*  the event. These attributes are set in
-	*  usermgr_make_ui().
+	*  Remove a user.
 	*/
-	var name = $(event.target).data('user');
 	var users = user.users_get();
-
 	dialog.dialog(dialog.TYPE.CONFIRM,
 		`Remove user ${name}?`,
 		`Are you sure you want to remove the user ${name}? ` +
@@ -235,16 +236,11 @@ function usermgr_remove(event) {
 		`recoverable.`,
 		(status, val) => {
 			for (var u in users) {
-				if (users[u].get_name() != name) {
-					continue;
-				}
+				if (users[u].get_name() != name) { continue; }
 				users[u].remove((resp) => {
-					if (API.handle_disp_error(resp)) {
-						return;
-					}
+					if (API.handle_disp_error(resp)) { return; }
 					user.users_load(API, usermgr_make_ui);
 				});
-				DIALOG_USER_REMOVED.show();
 				return;
 			}
 			DIALOG_USER_REMOVE_FAILED.show();
@@ -293,37 +289,48 @@ function usermgr_make_ui() {
 	*  Render the user manager UI.
 	*/
 	var users = user.users_get();
-	var name = null;
-	var grps = null;
-	var info = null;
 	var i = 0;
+
+	USERMGR_LIST_UI_DEFS.rm_all();
 	USERS_TABLE.empty();
+
 	for (var u in users) {
-		name = users[u].get_name();
-		grps = users[u].get_groups();
-		info = users[u].get_info();
+		let name = users[u].get_name();
+		let grps = users[u].get_groups();
+		let info = users[u].get_info();
 		USERS_TABLE.append(usr_table_row(
 			i,
 			name,
 			!grps || !grps.length ? '' : grps.join(', '),
 			!info ? '' : info,
 		));
-
-		// Setup button event listeners and data attrs.
-		$(USER_SAVE_QUERY(name)).data('user', name);
-		$(USER_SAVE_QUERY(name)).click(usermgr_save);
-		$(USER_REMOVE_QUERY(name)).data('user', name);
-		$(USER_REMOVE_QUERY(name)).click(usermgr_remove);
+		USERMGR_LIST_UI_DEFS.add(`${name}_save`, new uic.UIButton(
+			_elem = $(USER_SAVE_QUERY(name)),
+			_perm = () => { return true; },
+			_enabler = null,
+			_attach = {
+				'click': () => { usermgr_save(name); }
+			}
+		));
+		USERMGR_LIST_UI_DEFS.add(`${name}_remove`, new uic.UIButton(
+			_elem = $(USER_REMOVE_QUERY(name)),
+			_perm = () => { return name != API.CONFIG.user; },
+			_enabler = null,
+			_attach = {
+				'click': () => { usermgr_remove(name); }
+			}
+		));
 		i++;
 	}
+	USERMGR_LIST_UI_DEFS.all(function() { this.state(); });
 }
 
 $(document).ready(() => {
 	API = new api.API(
 		null,
 		() => {
-			USER_CREATE.click(usermgr_create);
 			user.users_load(API, usermgr_make_ui);
+			flag_usermgr_ready = true;
 		}
 	);
 });
