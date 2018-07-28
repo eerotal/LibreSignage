@@ -63,6 +63,7 @@ function display_update() {
 
 function display_setup() {
 	var params = util.get_GET_parameters();
+
 	if ('preview' in params) {
 		// Preview a slide without starting the display.
 		console.log(`LibreSignage: Preview slide ${params['preview']}.`);
@@ -118,6 +119,14 @@ function display_setup() {
 
 $(document).ready(() => {
 	var params = util.get_GET_parameters();
+
+	// Disable logging if silent=1 is passed in the URL.
+	if ('silent' in params) {
+		console.log = () => {};
+		console.warn = () => {};
+		console.error = () => {};
+	}
+
 	API = new api.API(
 		{'noui': 'noui' in params && params['noui'] == '1'},
 		display_setup

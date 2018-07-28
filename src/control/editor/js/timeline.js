@@ -13,7 +13,7 @@ const timeline_btn = (id, index, name, enabled) => `
 			</div>
 			<div class="col-10 tl-slide-thumb-cont">
 				<iframe class="tl-slide-thumb"
-					src="/app?preview=${id}&noui=1"
+					src="/app?preview=${id}&noui=1&silent=1"
 					frameborder="0">
 				</iframe>
 			</div>
@@ -48,20 +48,14 @@ exports.Timeline = class Timeline {
 
 		while (s = this.queue.slides.next(c_index, false)) {
 			c_index = s.get('index');
-			let cw = this.TL.append(
+			this.TL.append(
 				timeline_btn(
 					s.get('id'),
 					s.get('index'),
 					s.get('name'),
 					s.get('enabled')
 				)
-			).find('iframe')[0].contentWindow;
-
-			// Disable logging for thumbs.
-			cw.console.log = () => {};
-			cw.console.warn = () => {};
-			cw.console.error = () => {};
-
+			);
 			let c_id = s.get('id'); // Solves variable referencing.
 			this.TL_UI_DEFS.add(c_id, new uic.UIButton(
 				_elem = $(`#slide-btn-${c_id}`),
