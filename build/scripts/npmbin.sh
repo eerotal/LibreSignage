@@ -7,4 +7,4 @@
 set -e;
 . build/scripts/conf.sh;
 
-echo `sudo -u $OWNER npm bin --global 2>/dev/null`;
+echo `sudo -u $OWNER npm bin 2>/dev/null`;
