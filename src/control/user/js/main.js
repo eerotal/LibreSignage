@@ -7,6 +7,8 @@ var api = require('ls-api');
 var val = require('ls-validator');
 var user = require('ls-user');
 var dialog = require('ls-dialog');
+var util = require('ls-util');
+var uic = require('ls-uicontrol');
 
 var API = null;
 
@@ -59,6 +61,71 @@ var BTN_LOGOUT_OTHER = $("#btn-logout-other");
 var pass_sel = null;
 var usr = null;
 
+var flag_user_ready = false;
+var defer_user_ready = () => { return !flag_user_ready; }
+
+const USER_UI_DEFS = new uic.UIController({
+	'USER_NAME': new uic.UIInput(
+		_elem = USER_NAME,
+		_perm = () => { return true; },
+		_enabler = null,
+		_mod = (elem, u) => { return elem.val() != u.get_name(); },
+		_getter = (elem) => { return elem.val(); },
+		_setter = (elem, u) => { elem.val(u.get_name()); },
+		_clear = (elem) => { elem.val(''); }
+	),
+	'USER_GROUPS': new uic.UIInput(
+		_elem = USER_GROUPS,
+		_perm = () => { return true; },
+		_enabler = null,
+		_mod = (elem, u) => {
+			let tmp = elem.val().replace(/\s/g, '').split(',');
+			return !sets_eq(tmp, u.get_groups());
+		},
+		_getter = (elem) => {
+			return elem.val().replace(/\s/g, '').split(',');
+		},
+		_setter = (elem, u) => { elem.val(u.get_groups().join()); },
+		_clear = (elem) => { elem.val(''); }
+	),
+	'USER_PASS': new uic.UIInput(
+		_elem = USER_PASS,
+		_perm = () => { return true; },
+		_enabler = null,
+		_mod = (elem, u) => { return elem.val().length != 0; },
+		_getter = (elem) => { return elem.val(); },
+		_setter = () => {},
+		_clear = (elem) => { elem.val(''); }
+	),
+	'USER_PASS_CONFIRM': new uic.UIInput(
+		_elem = USER_PASS_CONFIRM,
+		_perm = () => { return true; },
+		_enabler = null,
+		_mod = (elem, u) => { return elem.val().length != 0; },
+		_getter = (elem) => { return elem.val(); },
+		_setter = () => {},
+		_clear = (elem) => { elem.val(''); }
+	),
+	'USER_SAVE': new uic.UIButton(
+		_elem = USER_SAVE,
+		_perm = () => { return true; },
+		_enabler = null,
+		_attach = {
+			'click': user_settings_save
+		},
+		_defer = defer_user_ready
+	),
+	'BTN_LOGOUT_OTHER': new uic.UIButton(
+		_elem = BTN_LOGOUT_OTHER,
+		_perm = () => { return true; },
+		_enabler = null,
+		_attach = {
+			'click': user_sessions_logout
+		},
+		_defer = defer_user_ready
+	)
+});
+
 function user_settings_setup() {
 	pass_sel = new val.ValidatorSelector(
 		USER_PASS.add(USER_PASS_CONFIRM),
@@ -88,12 +155,12 @@ function user_settings_setup() {
 			}
 		]
 	);
-	USER_NAME.val(usr.get_name());
-	USER_GROUPS.val(usr.get_groups());
 
-	// Setup the sessions tables.
+	USER_UI_DEFS.all(function(data) { this.set(data)}, usr, 'input');
+
+	// Setup the sessions table.
 	user_sessions_populate();
-	BTN_LOGOUT_OTHER.on("click", user_sessions_logout);
+	flag_user_ready = true;
 }
 
 function user_sessions_populate() {
@@ -104,9 +171,7 @@ function user_sessions_populate() {
 		API.ENDP.AUTH_GET_SESSIONS,
 		null,
 		(resp) => {
-			if (API.handle_disp_error(resp.error)) {
-				return;
-			}
+			if (API.handle_disp_error(resp.error)) { return; }
 			USER_SESSIONS.html("");
 			for (let d of resp.sessions) {
 				USER_SESSIONS.append(
@@ -130,32 +195,26 @@ function user_sessions_logout() {
 		API.ENDP.AUTH_LOGOUT_OTHER,
 		null,
 		(resp) => {
-			if (API.handle_disp_error(resp.error)) {
-				return;
-			}
+			if (API.handle_disp_error(resp.error)) { return; }
 			user_sessions_populate();
 		}
 	);
 }
 
-window.user_settings_save = function() {
+function user_settings_save() {
 	/*
 	*  Save the modified user settings (password etc).
 	*/
-	if (!usr) {
-		throw new Error("Current user not loaded.");
-	}
+	if (!usr) { throw new Error("Current user not loaded."); }
 
 	// Change password using the API.
-	usr.pass = USER_PASS.val();
+	usr.pass = USER_UI_DEFS.get('USER_PASS').get();
 	usr.save((ret) => {
-		if (API.handle_disp_error(ret)) {
-			return;
-		}
+		if (API.handle_disp_error(ret)) { return; }
 
 		// Empty input boxes.
-		USER_PASS.val('');
-		USER_PASS_CONFIRM.val('');
+		USER_UI_DEFS.get('USER_PASS').clear();
+		USER_UI_DEFS.get('USER_PASS_CONFIRM').clear();
 
 		dialog.dialog(
 			dialog.TYPE.ALERT,
