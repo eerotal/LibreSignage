@@ -21,6 +21,8 @@ const QUEUE_UI_DEFS = new uic.UIController({
 		_elem = QUEUE_SELECT,
 		_perm = () => { return true; },
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = null,
 		_getter = (elem) => { return elem.val(); },
 		_setter = (elem, value) => { elem.val(value); },

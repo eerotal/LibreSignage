@@ -154,6 +154,8 @@ const UI_DEFS = new uic.UIController({
 		_enabler = (elem, s) => {
 			elem.css('display', s ? 'block': 'none');
 		},
+		_attach = null,
+		_defer = null,
 		_mod = null,
 		_getter = null,
 		_setter = null,
@@ -167,6 +169,8 @@ const UI_DEFS = new uic.UIController({
 		_enabler = (elem, s) => {
 			elem.css('display', s ? 'block': 'none');
 		},
+		_attach = null,
+		_defer = null,
 		_mod = null,
 		_getter = null,
 		_setter = null,
@@ -176,6 +180,8 @@ const UI_DEFS = new uic.UIController({
 		_elem = SLIDE_NAME,
 		_perm = (d) => { return d['o'] || d['c']; },
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, data) => {
 			return elem.val() != data.get('name');
 		},
@@ -189,6 +195,8 @@ const UI_DEFS = new uic.UIController({
 		_elem = SLIDE_OWNER,
 		_perm = null,
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = null,
 		_getter = null,
 		_setter = (elem, s) => {
@@ -200,6 +208,8 @@ const UI_DEFS = new uic.UIController({
 		_elem = SLIDE_TIME,
 		_perm = (d) => { return d['o'] || d['c']; },
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, s) => {
 			var time = parseInt(elem.val(), 10);
 			return time != s.get('time')/1000;
@@ -215,6 +225,8 @@ const UI_DEFS = new uic.UIController({
 		_elem = SLIDE_INDEX,
 		_perm = (d) => { return d['o'] || d['c']; },
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, s) => {
 			var tmp = parseInt(elem.val(), 10);
 			return tmp != s.get('index');
@@ -235,6 +247,8 @@ const UI_DEFS = new uic.UIController({
 			}
 		},
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, s) => {
 			return elem.prop('checked') != s.get('enabled');
 		},
@@ -248,6 +262,8 @@ const UI_DEFS = new uic.UIController({
 		_elem = SLIDE_SCHED,
 		_perm = (d) => { return d['o'] || d['c']; },
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, s) => {
 			return elem.prop('checked') != s.get('sched');
 		},
@@ -264,6 +280,8 @@ const UI_DEFS = new uic.UIController({
 				&& (d['o'] || d['c']);
 		},
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_s'))[0];
 			return elem.val() != tmp;
@@ -282,6 +300,8 @@ const UI_DEFS = new uic.UIController({
 				&& (d['o'] || d['c']);
 		},
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_s'))[1];
 			return elem.val() != tmp;
@@ -300,6 +320,8 @@ const UI_DEFS = new uic.UIController({
 				&& (d['o'] || d['c']);
 		},
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_e'))[0];
 			return elem.val() != tmp;
@@ -318,6 +340,8 @@ const UI_DEFS = new uic.UIController({
 				&& (d['o'] || d['c']);
 		},
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_e'))[1];
 			return elem.val() != tmp;
@@ -333,6 +357,8 @@ const UI_DEFS = new uic.UIController({
 		_elem = SLIDE_ANIMATION,
 		_perm = (d) => { return d['o'] || d['c']; },
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, s) => {
 			var anim = parseInt(elem.val(), 10);
 			return anim != s.get('animation');
@@ -353,6 +379,8 @@ const UI_DEFS = new uic.UIController({
 				elem.disable();
 			}
 		},
+		_attach = null,
+		_defer = null,
 		_mod = (elem, s) => {
 			return !util.sets_eq(
 				elem.selected,
@@ -369,6 +397,8 @@ const UI_DEFS = new uic.UIController({
 		_elem = () => { return SLIDE_INPUT; },
 		_perm = (d) => { return d['o'] || d['c']; },
 		_enabler = (elem, s) => { elem.setReadOnly(!s); },
+		_attach = null,
+		_defer = null,
 		_mod = (elem, s) => {
 			return elem.getValue() != s.get('markup');
 		},

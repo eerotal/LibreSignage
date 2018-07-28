@@ -310,7 +310,8 @@ function usermgr_make_ui() {
 			_enabler = null,
 			_attach = {
 				'click': () => { usermgr_save(name); }
-			}
+			},
+			_defer = null
 		));
 		USERMGR_LIST_UI_DEFS.add(`${name}_remove`, new uic.UIButton(
 			_elem = $(USER_REMOVE_QUERY(name)),
@@ -318,7 +319,8 @@ function usermgr_make_ui() {
 			_enabler = null,
 			_attach = {
 				'click': () => { usermgr_remove(name); }
-			}
+			},
+			_defer = null
 		));
 		i++;
 	}

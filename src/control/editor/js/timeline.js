@@ -63,7 +63,8 @@ exports.Timeline = class Timeline {
 				_enabler = () => {},
 				_attach = {
 					'click': () => { this.func_select_slide(c_id); }
-				}
+				},
+				_defer = null
 			));
 		}
 	}

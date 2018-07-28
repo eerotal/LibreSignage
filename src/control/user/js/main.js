@@ -69,6 +69,8 @@ const USER_UI_DEFS = new uic.UIController({
 		_elem = USER_NAME,
 		_perm = () => { return true; },
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, u) => { return elem.val() != u.get_name(); },
 		_getter = (elem) => { return elem.val(); },
 		_setter = (elem, u) => { elem.val(u.get_name()); },
@@ -78,6 +80,8 @@ const USER_UI_DEFS = new uic.UIController({
 		_elem = USER_GROUPS,
 		_perm = () => { return true; },
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, u) => {
 			let tmp = elem.val().replace(/\s/g, '').split(',');
 			return !sets_eq(tmp, u.get_groups());
@@ -92,18 +96,22 @@ const USER_UI_DEFS = new uic.UIController({
 		_elem = USER_PASS,
 		_perm = () => { return true; },
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, u) => { return elem.val().length != 0; },
 		_getter = (elem) => { return elem.val(); },
-		_setter = () => {},
+		_setter = null,
 		_clear = (elem) => { elem.val(''); }
 	),
 	'USER_PASS_CONFIRM': new uic.UIInput(
 		_elem = USER_PASS_CONFIRM,
 		_perm = () => { return true; },
 		_enabler = null,
+		_attach = null,
+		_defer = null,
 		_mod = (elem, u) => { return elem.val().length != 0; },
 		_getter = (elem) => { return elem.val(); },
-		_setter = () => {},
+		_setter = null,
 		_clear = (elem) => { elem.val(''); }
 	),
 	'USER_SAVE': new uic.UIButton(
