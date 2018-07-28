@@ -8,6 +8,9 @@ var queue = require('ls-queue');
 var API = null;
 var TL = null;
 
+var flag_qsel_ready = false;
+var defer_qsel_ready = () => { return !flag_qsel_ready; };
+
 const QUEUE_SELECT		= $("#queue-select");
 const QUEUE_CREATE		= $("#queue-create");
 const QUEUE_VIEW		= $("#queue-view");
@@ -29,7 +32,8 @@ const QUEUE_UI_DEFS = new uic.UIController({
 		_enabler = null,
 		_attach = {
 			'click': queue_create
-		}
+		},
+		_defer = defer_qsel_ready
 	),
 	'QUEUE_VIEW': new uic.UIButton(
 		_elem = QUEUE_VIEW,
@@ -37,7 +41,8 @@ const QUEUE_UI_DEFS = new uic.UIController({
 		_enabler = null,
 		_attach = {
 			'click': queue_view
-		}
+		},
+		_defer = defer_qsel_ready
 	),
 	'QUEUE_REMOVE': new uic.UIButton(
 		_elem = QUEUE_REMOVE,
@@ -47,7 +52,8 @@ const QUEUE_UI_DEFS = new uic.UIController({
 		_enabler = null,
 		_attach = {
 			'click': queue_remove
-		}
+		},
+		_defer = defer_qsel_ready
 	),
 });
 
@@ -174,4 +180,5 @@ exports.setup = function(api, tl) {
 		TL.show(QUEUE_SELECT.val(), update_qsel_ctrls);
 	});
 	update_qsel(true);
+	flag_qsel_ready = true;
 }

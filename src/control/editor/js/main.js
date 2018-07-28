@@ -79,6 +79,15 @@ const SLIDE_ANIMATION			= $("#slide-animation")
 var SLIDE_COLLAB				= null;
 var SLIDE_INPUT					= null;
 
+var name_sel = null;
+var index_sel = null;
+var sel_slide = null;
+
+var flag_slide_loading = false; // Used by slide_show().
+var flag_editor_ready = false;
+
+var defer_editor_ready = () => { return !flag_editor_ready; };
+
 /*
 *  Editor UI definitions using the UIInput class.
 */
@@ -89,7 +98,8 @@ const UI_DEFS = new uic.UIController({
 		_enabler = null,
 		_attach = {
 			'click': slide_new
-		}
+		},
+		_defer = defer_editor_ready
 	),
 	'SLIDE_PREVIEW': new uic.UIButton(
 		_elem = SLIDE_PREVIEW,
@@ -97,7 +107,8 @@ const UI_DEFS = new uic.UIController({
 		_enabler = null,
 		_attach = {
 			'click': slide_preview
-		}
+		},
+		_defer = defer_editor_ready
 	),
 	'SLIDE_SAVE': new uic.UIButton(
 		_elem = SLIDE_SAVE,
@@ -105,7 +116,8 @@ const UI_DEFS = new uic.UIController({
 		_enabler = null,
 		_attach = {
 			'click': slide_save
-		}
+		},
+		_defer = defer_editor_ready
 	),
 	'SLIDE_REMOVE': new uic.UIButton(
 		_elem = SLIDE_REMOVE,
@@ -115,7 +127,8 @@ const UI_DEFS = new uic.UIController({
 		_enabler = null,
 		_attach = {
 			'click': slide_rm
-		}
+		},
+		_defer = defer_editor_ready
 	),
 	'SLIDE_CH_QUEUE': new uic.UIButton (
 		_elem = SLIDE_CH_QUEUE,
@@ -123,7 +136,8 @@ const UI_DEFS = new uic.UIController({
 		_enabler = null,
 		_attach = {
 			'click': slide_ch_queue
-		}
+		},
+		_defer = defer_editor_ready
 	),
 	'SLIDE_DUP': new uic.UIButton(
 		_elem = SLIDE_DUP,
@@ -131,7 +145,8 @@ const UI_DEFS = new uic.UIController({
 		_enabler = null,
 		_attach = {
 			'click': slide_dup
-		}
+		},
+		_defer = defer_editor_ready
 	),
 	'SLIDE_CANT_EDIT': new uic.UIInput(
 		_elem = SLIDE_CANT_EDIT,
@@ -368,12 +383,6 @@ const UI_DEFS = new uic.UIController({
 		}
 	)
 });
-
-var name_sel = null;
-var index_sel = null;
-var sel_slide = null;
-
-var flag_slide_loading = false; // Used by slide_show().
 
 function disable_controls() {
 	name_sel.disable();
@@ -727,6 +736,7 @@ function editor_setup() {
 		disable_controls();
 		TL = new timeline.Timeline(API, slide_show);
 		qsel.setup(API, TL);
+		flag_editor_ready = true;
 		console.log("LibreSignage: Editor ready.");
 	});
 }
