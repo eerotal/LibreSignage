@@ -1,6 +1,5 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/css.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 	web_auth(NULL, NULL, TRUE);
@@ -87,8 +86,7 @@
 					<input id="user-save"
 						class="btn btn-primary w-100"
 						type="button"
-						value="Save"
-							onclick="user_settings_save()">
+						value="Save">
 					</input>
 				</div>
 
@@ -109,16 +107,7 @@
 		</main>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
-
-			js_include(['jquery', 'popper', 'bootstrap']);
 		?>
-
-		<script src="/common/js/util.js"></script>
-		<script src="/common/js/cookie.js"></script>
-		<script src="/common/js/api.js"></script>
-		<script src="/common/js/dialog.js"></script>
-		<script src="/common/js/user.js"></script>
-		<script src="/common/js/validator.js"></script>
-		<script src="/control/user/js/user.js"></script>
+		<script src="/control/user/js/main.js"></script>
 	</body>
 </html>

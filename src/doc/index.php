@@ -1,6 +1,5 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/css.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
@@ -78,17 +77,7 @@
 		</main>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
-
-			js_include(['jquery', 'popper', 'bootstrap']);
 		?>
-		<script src="/common/js/util.js"></script>
-		<script src="/common/js/dialog.js"></script>
-		<script src="/common/js/cookie.js"></script>
-		<script src="/common/js/api.js"></script>
-		<script>
-			$(document).ready(() => {
-				api_init(null, null);
-			});
-		</script>
+		<script src="/doc/js/main.js"></script>
 	</body>
 </html>

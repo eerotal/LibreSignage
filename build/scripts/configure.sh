@@ -5,11 +5,6 @@
 ##  config is automatically saved to a file in 'build/'.
 ##
 
-if [ ! "$(ps -o comm= $PPID)" = "make" ]; then
-	echo "[Error] LibreSignage build scripts must be run with make!"
-	exit 1;
-fi
-
 set -e
 . build/scripts/conf.sh
 
@@ -32,10 +27,11 @@ if [ -n "$1" ]; then
 else
 	FLAG_LAST_LOADED=0;
 	if [ -f 'build/link/last.sh' ]; then
-		read -p "Load last config? (Y/N): " LOAD_LAST
+		read -p "Load last build config? (Y/N): " LOAD_LAST
 		case "$LOAD_LAST" in
 			[Yy])
-				echo '[INFO] Load config.';
+				P=`readlink -f 'build/link/last.sh'`;
+				echo "[INFO] Load '$P'.";
 				. 'build/link/last.sh';
 				check_config;
 				FLAG_LAST_LOADED=1;

@@ -1,0 +1,29 @@
+{
+  "name": "LibreSignage",
+  "version": "0.1.0",
+  "description": "An open source digital signage solution.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eerotal/LibreSignage.git"
+  },
+  "keywords": [
+    "digital-signage",
+    "signage",
+    "slideshow"
+  ],
+  "author": "Eero Talus",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/eerotal/LibreSignage/issues"
+  },
+  "homepage": "https://github.com/eerotal/LibreSignage#readme",
+  "dependencies": {
+    "bootstrap": "^4.0.0",
+    "jquery": "^3.3.1",
+    "ace-builds": "^1.3.3"
+  },
+  "devDependencies": {
+    "browserify": "^16.2.2"
+  },
+  "private": true
+}

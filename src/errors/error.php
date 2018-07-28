@@ -1,6 +1,5 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/js.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/css.php');
 ?>
 <!DOCTYPE html>

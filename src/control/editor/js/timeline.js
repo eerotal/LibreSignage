@@ -1,20 +1,19 @@
-var TIMELINE_UPDATE_INTERVAL = 60000;
-var TIMELINE = $("#timeline");
-var TIMELINE_THUMB_SEL = '.tl-slide-thumb';
+var $ = require('jquery');
+var ls_queue = require('ls-queue');
+var uic = require('ls-uicontrol');
 
-var timeline_queue = null;
+const TL_UPDATE_INTERVAL = 60000;
 
 const timeline_btn = (id, index, name, enabled) => `
 	<div class="btn tl-slide-cont ${!enabled ? 'tl-slide-cont-dis' : ''}"
-		id="slide-btn-${id}"
-		onclick="slide_show('${id}')">
+		id="slide-btn-${id}">
 		<div class="row m-0 p-0 h-100">
 			<div class="col-2 tl-slide-index-cont">
 				${index}
 			</div>
 			<div class="col-10 tl-slide-thumb-cont">
 				<iframe class="tl-slide-thumb"
-					src="/app?preview=${id}&noui=1"
+					src="/app?preview=${id}&noui=1&silent=1"
 					frameborder="0">
 				</iframe>
 			</div>
@@ -22,62 +21,74 @@ const timeline_btn = (id, index, name, enabled) => `
 	</div>
 `;
 
-function timeline_update() {
-	/*
-	*  Update timeline information and HTML.
-	*/
-	if (timeline_queue) {
-		timeline_queue.update(timeline_update_html);
-	} else {
-		timeline_update_html();
-	}
-}
+exports.Timeline = class Timeline {
+	constructor(api, func_select_slide) {
+		this.api = api;
+		this.func_select_slide = func_select_slide;
+		this.queue = null;
 
-function timeline_update_html() {
-	/*
-	*  Update timeline HTML.
-	*/
-	var c_i = -1;
-	var slide = null;
-	var list = null;
+		this.TL = $("#timeline");
+		this.TL_UI_DEFS = new uic.UIController({});
 
-	if (!timeline_queue) {
-		TIMELINE.html('');
-		return;
+		setInterval(() => { this.update(); }, TL_UPDATE_INTERVAL);
 	}
 
-	list = timeline_queue.slides;
+	update_html() {
+		/*
+		*  Update timeline HTML.
+		*/
+		var c_index = -1;
+		var c_id = null;
+		var s = null;
 
-	TIMELINE.html('');
-	while (slide = list.next(c_i, false)) {
-		c_i = slide.get('index');
-		TIMELINE.append(
-			timeline_btn(
-				slide.get('id'),
-				slide.get('index'),
-				slide.get('name'),
-				slide.get('enabled')
-			)
-		);
+		this.TL.html('');
+		this.TL_UI_DEFS.rm_all();
+
+		if (!this.queue) { return; }
+
+		while (s = this.queue.slides.next(c_index, false)) {
+			c_index = s.get('index');
+			this.TL.append(
+				timeline_btn(
+					s.get('id'),
+					s.get('index'),
+					s.get('name'),
+					s.get('enabled')
+				)
+			);
+			let c_id = s.get('id'); // Solves variable referencing.
+			this.TL_UI_DEFS.add(c_id, new uic.UIButton(
+				_elem = $(`#slide-btn-${c_id}`),
+				_perm = () => { return true; },
+				_enabler = () => {},
+				_attach = {
+					'click': () => { this.func_select_slide(c_id); }
+				},
+				_defer = null
+			));
+		}
 	}
-	console.log("LibreSignage: Disable logging for thumbs.");
-	$(TIMELINE_THUMB_SEL).each(function() {
-		this.contentWindow.console.log = function() {};
-		this.contentWindow.console.warn = function() {};
-		this.contentWindow.console.error = function() {};
-	});
-}
 
-function timeline_show(queue) {
-	if (!queue) {
-		timeline_queue = null;
-		timeline_update_html();
-		return;
+	update() {
+		// Update timeline information and HTML.
+		if (this.queue) {
+			this.queue.update(() => { this.update_html(); });
+		} else {
+			this.update_html();
+		}
 	}
-	timeline_queue = new Queue();
-	timeline_queue.load(queue, timeline_update_html);
-}
 
-function timeline_setup() {
-	setInterval(timeline_update, TIMELINE_UPDATE_INTERVAL);
+	show(name, ready) {
+		if (!name) {
+			this.queue = null;
+			this.update_html();
+			if (ready) { ready(); }
+			return;
+		}
+		this.queue = new ls_queue.Queue(this.api);
+		this.queue.load(name, () => {
+			this.update_html();
+			if (ready) { ready(); }
+		});
+	}
 }

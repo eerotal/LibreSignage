@@ -9,7 +9,7 @@ from os import listdir;
 from os.path import isfile, join, splitext;
 
 UPATH = 'utests/api/units';
-HOST = 'http://192.168.1.8';
+HOST = 'http://localhost';
 DATA: Dict[str, Any] = {};
 
 def session_store(status, req):

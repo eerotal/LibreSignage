@@ -1,9 +1,16 @@
+# Exclude some generated LibreSignage files and
+# temporary text editor files.
 *.swp
 *.save
-dist
-build/link
+/dist
+/build/link
 *.iconf
 
+# Exclude generated Python files.
 __pycache__
 .mypy_cache
 .pyc
+
+# Exclude npm debug logs and external node modules.
+/node_modules
+npm-debug.log
