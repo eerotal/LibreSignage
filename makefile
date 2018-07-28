@@ -162,6 +162,7 @@ utest:; @./utests/api/main.py
 clean:
 	@:
 	rm -rf dist;
+	rm -rf `find . -type d -name '__pycache__'`;
 
 realclean:
 	@:
