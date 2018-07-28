@@ -34,3 +34,6 @@ API_E_CLIENT
 
 API_E_RATE
   The API ignored the request because the rate limit was exceeded.
+
+API_E_UNCORRECT_CREDS
+  The API endpoint received incorrect authentication credentials.
