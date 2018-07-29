@@ -33,16 +33,6 @@ var USERMGR_LIST_UI_DEFS = new uic.UIController({});
 var USERMGR_MULTISELECTS = {};
 
 // Dialog messages.
-const DIALOG_GROUPS_INVALID_CHARS = new dialog.Dialog(
-	dialog.TYPE.ALERT,
-	'Invalid user groups',
-	`The user groups contain invalid characters. Only A-Z, a-z, 0-9
-	and _ are allowed. Additionally the comma character can be used
-	for separating different groups. Spaces can be used too, but they
-	are removed from the group names when the changes are saved.`,
-	null
-);
-
 const DIALOG_TOO_MANY_GROUPS = (max) => {
 	return new dialog.Dialog(
 		dialog.TYPE.ALERT,
@@ -72,20 +62,6 @@ const DIALOG_USER_REMOVE_FAILED = new dialog.Dialog(
 	dialog.TYPE.ALERT,
 	'User removal failed',
 	'Failed to remove user.',
-	null
-);
-
-const DIALOG_USER_NO_NAME = new dialog.Dialog(
-	dialog.TYPE.ALERT,
-	'Invalid username',
-	'You must specify a username for the user to be created.',
-	null
-);
-
-const DIALOG_USERNAME_TOO_LONG = new dialog.Dialog(
-	dialog.TYPE.ALERT,
-	'Invalid username',
-	'The specified username is too long.',
 	null
 );
 
@@ -239,35 +215,42 @@ function usermgr_create() {
 		dialog.TYPE.PROMPT,
 		'Create a user',
 		'Enter a name for the new user.', (status, val) => {
-		if (!status) { return; }
-		if (!val.length) {
-			DIALOG_USER_NO_NAME.show();
-			return;
-		}
-		if (val.length > API.SERVER_LIMITS.USERNAME_MAX_LEN) {
-			DIALOG_USERNAME_TOO_LONG.show();
-			return;
-		}
+			if (!status) { return; }
+			API.call(API.ENDP.USER_CREATE, {'user': val}, (resp) => {
+				if (resp.error == API.ERR.LIMITED) {
+					DIALOG_TOO_MANY_USERS.show();
+					return;
+				} else if (API.handle_disp_error(resp.error)) {
+					return;
+				}
 
-		API.call(API.ENDP.USER_CREATE, {'user': val}, (resp) => {
-			if (resp.error == API.ERR.LIMITED) {
-				DIALOG_TOO_MANY_USERS.show();
-				return;
-			} else if (API.handle_disp_error(resp.error)) {
-				return;
-			}
-
-			var tmp = new user.User(API);
-			tmp.set(
-				resp.user.name,
-				resp.user.groups,
-				null
-			);
-			tmp.set_info('Password: ' + resp.user.pass);
-			user.users_add(tmp);
-			usermgr_make_ui();
-		});
-	});
+				var tmp = new user.User(API);
+				tmp.set(
+					resp.user.name,
+					resp.user.groups,
+					null
+				);
+				tmp.set_info('Password: ' + resp.user.pass);
+				user.users_add(tmp);
+				usermgr_make_ui();
+			});
+		},
+		[new val.StrValidator({
+			min: 1,
+			max: null,
+			regex: null
+		}, "The username is too short."),
+		new val.StrValidator({
+			min: null,
+			max: API.SERVER_LIMITS.USERNAME_MAX_LEN,
+			regex: null
+		}, "The username is too long."),
+		new val.StrValidator({
+			min: null,
+			max: null,
+			regex: /^[A-Za-z0-9_]*$/
+		}, "The username contains invalid characters.")]
+	);
 }
 
 function usermgr_make_ui() {
@@ -286,6 +269,7 @@ function usermgr_make_ui() {
 		let grps = users[u].get_groups();
 		let info = users[u].get_info();
 
+		// Add the HTML DOM elements to the document.
 		USERS_TABLE.append(usr_table_row(
 			i,
 			name,
