@@ -324,7 +324,10 @@ function usermgr_make_ui() {
 						max: null,
 						regex: /^[A-Za-z0-9_]*$/
 					}, "The group name has invalid characters.")],
-					true
+					{
+						'nodups': true,
+						'maxopts': API.SERVER_LIMITS.MAX_USER_GROUPS
+					}
 				),
 				_pass = () => { return true; },
 				_enabler = (elem, state) => {
