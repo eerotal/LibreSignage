@@ -740,7 +740,11 @@ function inputs_setup(ready) {
 				{ bl: [API.CONFIG.user] },
 				"You can't add yourself " +
 				"as a collaborator."
-			)]
+			)],
+			{
+				'nodups': true,
+				'maxopts': API.SERVER_LIMITS.SLIDE_MAX_COLLAB
+			}
 		);
 		if (ready) { ready(); }
 	});
