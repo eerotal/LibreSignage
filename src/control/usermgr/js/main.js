@@ -33,16 +33,6 @@ var USERMGR_LIST_UI_DEFS = new uic.UIController({});
 var USERMGR_MULTISELECTS = {};
 
 // Dialog messages.
-const DIALOG_TOO_MANY_GROUPS = (max) => {
-	return new dialog.Dialog(
-		dialog.TYPE.ALERT,
-		'Too many user groups',
-		`You have specified too many groups for one user. The
-		maximum number of groups is ${max}.`,
-		null
-	);
-}
-
 const DIALOG_USER_SAVED = new dialog.Dialog(
 	dialog.TYPE.ALERT,
 	'User saved',
