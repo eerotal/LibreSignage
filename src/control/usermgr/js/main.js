@@ -3,13 +3,18 @@ var api = require('ls-api');
 var user = require('ls-user');
 var uic = require('ls-uicontrol');
 var dialog = require('ls-dialog');
+var multiselect = require('ls-multiselect');
+var val = require('ls-validator');
 var bootstrap = require('bootstrap');
 
 var flag_usermgr_ready = false;
 var defer_usermgr_ready = () => { return !flag_usermgr_ready; }
 
+const USER_NAME_QUERY = (name) => `#usr-name-input-${name}`;
+const USER_GROUPS_QUERY = (name) => `#usr-groups-input-${name}`;
 const USER_SAVE_QUERY = (name) => `#btn-user-${name}-save`;
 const USER_REMOVE_QUERY = (name) => `#btn-user-${name}-remove`;
+
 const USER_CREATE = $('#btn-create-user');
 const USERS_TABLE = $('#users-table');
 
@@ -23,9 +28,9 @@ const USERMGR_UI_DEFS = new uic.UIController({
 		},
 		_defer = defer_usermgr_ready
 	)
-})
-
-const USERMGR_LIST_UI_DEFS = new uic.UIController({});
+});
+var USERMGR_LIST_UI_DEFS = new uic.UIController({});
+var USERMGR_MULTISELECTS = {};
 
 // Dialog messages.
 const DIALOG_GROUPS_INVALID_CHARS = new dialog.Dialog(
@@ -122,22 +127,15 @@ const usr_table_row = (index, name, groups, pass) => `
 					<input id="usr-name-input-${name}"
 						type="text"
 						class="form-control"
-						value="${name}"
 						readonly>
 					</input>
 				</div>
 			</div>
 			<div class="row usr-edit-input-row">
-				<label class="col-3 col-form-label"
-					for="usr-groups-input-${name}">
+				<label class="col-3 col-form-label" for="usr-groups-input-${name}">
 					Groups
 				</label>
-				<div class="col-9">
-					<input id="usr-groups-input-${name}"
-						type="text"
-						class="form-control"
-						value="${groups}">
-					</input>
+				<div id="usr-groups-input-${name}-cont" class="col-9">
 				</div>
 			</div>
 			<div class="row usr-edit-input-row">
@@ -173,21 +171,9 @@ function usermgr_assign_userdata(name) {
 
 	for (var u in users) {
 		if (users[u].get_name() == name) {
-			tmp = $(`#usr-groups-input-${users[u].get_name()}`).val();
-			/*
-			*  Only allow alphanumerics, underscore,
-			*  space and comma in group names.
-			*/
-			if (tmp.match(/[^A-Za-z0-9_, ]/g)) {
-				DIALOG_GROUPS_INVALID_CHARS.show();
-				return false;
-			}
-
-			// Strip whitespace and empty groups.
-			tmp = tmp.replace(/\s+/g, '');
-			tmp = tmp.replace(/,+/g, ',');
-			tmp = tmp.replace(/,$/, '');
-			users[u].groups = tmp.split(',');
+			users[u].groups = USERMGR_LIST_UI_DEFS.get(
+				`${users[u].get_name()}_groups`
+			).get();
 
 			// Check that the number of groups is valid.
 			if (users[u].groups.length >
@@ -292,38 +278,92 @@ function usermgr_make_ui() {
 	var i = 0;
 
 	USERMGR_LIST_UI_DEFS.rm_all();
+	USERMGR_MULTISELECTS = {};
 	USERS_TABLE.empty();
 
-	for (var u in users) {
+	for (let u in users) {
 		let name = users[u].get_name();
 		let grps = users[u].get_groups();
 		let info = users[u].get_info();
+
 		USERS_TABLE.append(usr_table_row(
 			i,
 			name,
 			!grps || !grps.length ? '' : grps.join(', '),
 			!info ? '' : info,
 		));
+
+		// Create the UI element instances for the inputs & buttons.
 		USERMGR_LIST_UI_DEFS.add(`${name}_save`, new uic.UIButton(
-			_elem = $(USER_SAVE_QUERY(name)),
-			_perm = () => { return true; },
-			_enabler = null,
-			_attach = {
-				'click': () => { usermgr_save(name); }
-			},
-			_defer = null
-		));
+				_elem = $(USER_SAVE_QUERY(name)),
+				_perm = () => { return true; },
+				_enabler = null,
+				_attach = {
+					'click': () => { usermgr_save(name); }
+				},
+				_defer = null
+			)
+		);
 		USERMGR_LIST_UI_DEFS.add(`${name}_remove`, new uic.UIButton(
-			_elem = $(USER_REMOVE_QUERY(name)),
-			_perm = () => { return name != API.CONFIG.user; },
-			_enabler = null,
-			_attach = {
-				'click': () => { usermgr_remove(name); }
-			},
-			_defer = null
-		));
+				_elem = $(USER_REMOVE_QUERY(name)),
+				_perm = () => { return name != API.CONFIG.user; },
+				_enabler = null,
+				_attach = {
+					'click': () => { usermgr_remove(name); }
+				},
+				_defer = null
+			)
+		);
+		USERMGR_LIST_UI_DEFS.add(`${name}_name`, new uic.UIInput(
+				_elem = $(USER_NAME_QUERY(name)),
+				_perm = () => { return false; },
+				_enabler = null,
+				_attach = null,
+				_defer = null,
+				_mod = null,
+				_getter = null,
+				_setter = (elem, usr) => { elem.val(usr.get_name()); },
+				_clear = (elem) => { elem.val(''); }
+			)
+		);
+		USERMGR_LIST_UI_DEFS.add(`${name}_groups`, new uic.UIInput(
+				_elem = new multiselect.MultiSelect(
+					`usr-groups-input-${name}-cont`,
+					`usr-groups-input-${name}`,
+					[new val.StrValidator({
+						min: 1,
+						max: null,
+						regex: null
+					}, "The group name is too short."),
+					new val.StrValidator({
+						min: null,
+						max: null,
+						regex: /^[A-Za-z0-9_]*$/
+					}, "The group name has invalid characters.")],
+					true
+				),
+				_pass = () => { return true; },
+				_enabler = (elem, state) => {
+					if (state) {
+						elem.enable();
+					} else {
+						elem.disable();
+					}
+				},
+				_attach = null,
+				_defer = null,
+				_mod = null,
+				_getter = (elem) => { return elem.selected; },
+				_setter = (elem, usr) => { elem.set(usr.get_groups()); },
+				_clear = (elem) => { elem.remove_all(); }
+			)
+		);
+		// Add the existing user data to the inputs.
+		USERMGR_LIST_UI_DEFS.get(`${name}_name`).set(users[u]);
+		USERMGR_LIST_UI_DEFS.get(`${name}_groups`).set(users[u]);
 		i++;
 	}
+	// Conditionally enable all the inputs.
 	USERMGR_LIST_UI_DEFS.all(function() { this.state(); });
 }
 

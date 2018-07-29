@@ -24,8 +24,6 @@
 		</main>
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
-
-			js_include(['jquery', 'popper', 'bootstrap']);
 		?>
 	</body>
 </html>

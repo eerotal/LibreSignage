@@ -96,18 +96,9 @@
 
 						<!-- Slide collaborators multiselect -->
 						<div class="form-group" id="slide-collab-group">
-							<label for="slide-collab">Collaborators</label>
-							<div id="slide-collab" class="multiselect container-fluid">
-								<div class="ms-controls container-fluid">
-									<input class="col ms-input form-control" type="text">
-									<button class="col ms-add btn btn-primary"
-										type="button">
-										<i class="fas fa-plus-circle"></i>
-									</button>
-									<div class="invalid-feedback"></div>
-								</div>
-								<div class="ms-values container-fluid"></div>
-							</div>
+							<label for="slide-collab">
+								Collaborators
+							</label>
 						</div>
 
 						<!-- Slide time selector -->

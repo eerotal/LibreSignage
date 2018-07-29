@@ -520,13 +520,11 @@ class User {
 			$this->groups = array();
 		} else if (gettype($groups) == 'array') {
 			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
-				throw new ArgException('Too many user '.
-							'groups.');
+				throw new ArgException('Too many user groups.');
 			}
 			$this->groups = $groups;
 		} else {
-			throw new ArgException('Invalid type for '.
-						'$groups.');
+			throw new ArgException("Invalid type for $groups.");
 		}
 	}
 

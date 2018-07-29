@@ -726,10 +726,11 @@ function inputs_setup(ready) {
 	SLIDE_INPUT.setTheme('ace/theme/dawn');
 	SLIDE_INPUT.$blockScrolling = Infinity;
 
-	// Setup the collaborators multiselector w/ validators.
+	// Setup the collaborators multiselect w/ validators.
 	API.call(API.ENDP.USERS_LIST, {}, (data) => {
 		if (API.handle_disp_error(data['error'])) { return; }
 		SLIDE_COLLAB = new multiselect.MultiSelect(
+			'slide-collab-group',
 			'slide-collab',
 			[new val.WhitelistValidator(
 				{ wl: data['users'] },
