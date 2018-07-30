@@ -29,7 +29,6 @@
 		<link rel="stylesheet" href="/common/css/dialog.css">
 		<link rel="stylesheet" href="/app/css/animations.css">
 		<link rel="stylesheet" href="/app/css/display.css">
-		<link rel="stylesheet" href="/common/css/footer_minimal.css">
 		<link rel="stylesheet" href="/common/css/markup.css">
 		<title>LibreSignage Display</title>
 	</head>

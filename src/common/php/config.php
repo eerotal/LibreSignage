@@ -35,7 +35,6 @@
 	const LICENSES_EXT_RST		= "/doc/rst/LICENSES_EXT.rst";
 	const NAV_PATH 				= "/common/php/nav/nav.php";
 	const FOOTER_PATH 			= "/common/php/footer/footer.php";
-	const FOOTER_MINIMAL_PATH 	= "/common/php/footer/footer_minimal.php";
 	const USER_DATA_DIR 		= "/data/users";
 
 	// Page constants.
