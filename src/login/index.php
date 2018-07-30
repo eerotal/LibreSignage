@@ -75,8 +75,7 @@
 								href="#collapse-adv"
 								aria-expanded="false"
 								aria-controls="collapse-adv">
-								Advanced
-								<i class="fas fa-caret-down"></i>
+								<i class="fas fa-angle-right"></i> Advanced
 							</a>
 						</div>
 					</div>

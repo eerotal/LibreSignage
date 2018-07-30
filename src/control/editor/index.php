@@ -150,20 +150,27 @@
 						</div>
 
 						<!-- Schedule enable -->
-						<div class="form-group form-check mb-1" id="slide-sched-group">
-							<input type="checkbox"
-								class="form-check-input"
-								id="slide-sched"
-								data-toggle="tooltip"
-								title="Select whether the slide is scheduled.">
-							<label class="form-check-label"
-								for="slide-sched">
-								Slide scheduling
-							</label>
+						<div class="form-group">
+							<a class="link-nostyle"
+								data-toggle="collapse"
+								href="#slide-sched-group"
+								aria-expanded="false"
+								aria-controls="slide-sched-group">
+								<i class="fas fa-angle-right"></i> Slide scheduling
+							</a>
 						</div>
 
 						<!-- Schedule date/time selector -->
-						<div class="row form-group pl-4" id="slide-sched-group">
+						<div class="row form-group pl-4 collapse" id="slide-sched-group">
+							<div class="col-12 py-1">
+								<input type="checkbox"
+									id="slide-sched"
+									data-toggle="tooltip"
+									title="Select whether the slide is scheduled.">
+								<label class="form-check-label" for="slide-sched">
+									Scheduling enabled
+								</label>
+							</div>
 							<div class="col-12 py-1">
 								<label for="slide-sched-date-s">
 									Start date
@@ -203,15 +210,14 @@
 						</div>
 
 						<!-- Slide enabled checkbox -->
-						<div class="form-group form-check" id="slide-enabled-group">
+						<div class="form-group" id="slide-enabled-group">
 							<input type="checkbox"
-								class="form-check-input"
 								id="slide-enabled"
 								data-toggle="tooltip"
 								title="Select whether the slide is enabled or not.">
 							<label class="form-check-label"
 								for="slide-enabled">
-								Enabled
+								Slide enabled
 							</label>
 						</div>
 
