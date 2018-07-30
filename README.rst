@@ -141,6 +141,12 @@ branch or commit you are viewing.*
    :width: 320 px
    :height: 180 px
 
+**LibreSignage User Settings**
+
+.. image:: http://etal.mbnet.fi/libresignage/settings.png
+   :width: 320 px
+   :height: 180 px
+
 **LibreSignage Display**
 
 .. image:: http://etal.mbnet.fi/libresignage/display.png
