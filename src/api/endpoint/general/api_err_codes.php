@@ -12,6 +12,7 @@
 *
 *  Return value
 *    * codes = A dictionary of error codes.
+*    * error = An error code or API_E_OK on success.
 *
 *  <====
 */

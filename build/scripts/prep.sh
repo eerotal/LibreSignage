@@ -9,7 +9,7 @@
 set -e;
 . build/scripts/configure.sh;
 
-echo "[INFO] Run preprocessor ('$1' => '$2').";
+echo "[INFO] Run preprocessor ('$2').";
 
 CONFIG=`cat "$2"`;
 echo "$CONFIG" | grep -o '!!BCONST_.*!!' | while read -r line; do

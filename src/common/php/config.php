@@ -12,6 +12,10 @@
 
 	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT']);
 
+	// Version information.
+	const LS_VER = "!!BCONST_LS_VER!!";
+	const API_VER = "!!BCONST_API_VER!!";
+
 	// Setup debugging. Don't touch, set by mkdist.sh.
 	const LIBRESIGNAGE_DEBUG = !!BCONST_DEBUG!!;
 
@@ -27,12 +31,12 @@
 	const QUEUES_DIR			= "/data/queues";
 	const DOC_HTML_DIR			= "/doc/html";
 	const DOC_RST_DIR			= "/doc/rst";
-	const LICENSE_LS_RST	 		= "/doc/rst/LICENSE.rst";
-	const LICENSES_EXT_RST		 	= "/doc/rst/LICENSES_EXT.rst";
+	const LICENSE_LS_RST	 	= "/doc/rst/LICENSE.rst";
+	const LICENSES_EXT_RST		= "/doc/rst/LICENSES_EXT.rst";
 	const NAV_PATH 				= "/common/php/nav/nav.php";
 	const FOOTER_PATH 			= "/common/php/footer/footer.php";
-	const FOOTER_MINIMAL_PATH 		= "/common/php/footer/footer_minimal.php";
-	const USER_DATA_DIR 			= "/data/users";
+	const FOOTER_MINIMAL_PATH 	= "/common/php/footer/footer_minimal.php";
+	const USER_DATA_DIR 		= "/data/users";
 
 	// Page constants.
 	const LOGIN_PAGE 			= "/login";
@@ -40,13 +44,13 @@
 	const DOCS_PAGE				= "/doc";
 	const ABOUT_PAGE 			= "/doc?doc=about";
 	const EDITOR_PAGE 			= "/control/editor";
-	const CONTROL_PANEL_PAGE 		= "/control";
+	const CONTROL_PANEL_PAGE 	= "/control";
 	const APP_PAGE 				= "/app";
-	const USER_MGR_PAGE 			= "/control/usermgr";
-	const USER_SETTINGS_PAGE 		= "/control/user";
+	const USER_MGR_PAGE 		= "/control/usermgr";
+	const USER_SETTINGS_PAGE 	= "/control/user";
 	const ERROR_PAGES 			= "/errors";
-	const LOGIN_LANDING 			= CONTROL_PANEL_PAGE;
-	const LOGOUT_LANDING 			= LOGOUT_PAGE;
+	const LOGIN_LANDING 		= CONTROL_PANEL_PAGE;
+	const LOGOUT_LANDING 		= LOGOUT_PAGE;
 
 	/*
 	*  Permanent cookie expiration date.
