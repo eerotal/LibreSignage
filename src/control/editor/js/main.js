@@ -9,6 +9,7 @@ var multiselect = require('ls-multiselect');
 var uic = require('ls-uicontrol');
 var slide = require('ls-slide');
 var queue = require('ls-queue');
+var sc = require('ls-shortcut');
 
 var timeline = require('./timeline.js');
 var qsel = require('./qsel.js');
@@ -413,6 +414,38 @@ const UI_DEFS = new uic.UIController({
 		}
 	)
 });
+
+/*
+*  Editor shortcut definitions.
+*/
+var EDITOR_SHORTCUTS = new sc.ShortcutController([
+	new sc.Shortcut(
+		keys = ['Control', 's'],
+		func = () => {
+			/*
+			*  Only save the slide if the
+			*  save button is also enabled.
+			*/
+			if (!SLIDE_SAVE.prop('disabled')) {
+				slide_save();
+			}
+		},
+		defer = defer_editor_ready
+	),
+	new sc.Shortcut(
+		keys = ['Control', 'd'],
+		func = () => {
+			/*
+			*  Only duplicate the slide if the
+			*  dup button is also enabled.
+			*/
+			if (!SLIDE_DUP.prop('disabled')) {
+				slide_dup();
+			}
+		},
+		defer = defer_editor_ready
+	)
+]);
 
 function disable_controls() {
 	name_sel.disable();
