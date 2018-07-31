@@ -27,7 +27,7 @@ if [ -n "$1" ]; then
 else
 	FLAG_LAST_LOADED=0;
 	if [ -f 'build/link/last.sh' ]; then
-		read -p "Load last build config? (Y/N): " LOAD_LAST
+		read -p "Load last build config? (y/N): " LOAD_LAST
 		case "$LOAD_LAST" in
 			[Yy])
 				P=`readlink -f 'build/link/last.sh'`;
@@ -66,7 +66,7 @@ else
 	read -p 'Admin name: ' ICONF_ADMIN_NAME;
 	read -p 'Admin email: ' ICONF_ADMIN_EMAIL;
 
-	read -p 'Enable debugging? (Y/N): ' TMP_IN;
+	read -p 'Enable debugging? (y/N): ' TMP_IN;
 	case "$TMP_IN" in
 		[Yy])
 			ICONF_DEBUG="TRUE";
