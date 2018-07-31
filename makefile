@@ -47,17 +47,18 @@ ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [INFO] Won't generate HTML documentation.)
 endif
 
-.PHONY: install utest clean realclean LOC $(DEP_JS)
+.PHONY: dirs server js api config libs docs install utest clean realclean LOC $(DEP_JS)
 .ONESHELL:
 
-all:: $(subst src,dist,$(DIRS))				\
-		$(subst src,dist,$(SRC_NORMAL))		\
-		$(subst src,dist,$(SRC_JS))			\
-		$(subst src,dist,$(SRC_ENDPOINT))	\
-		dist/common/php/config.php			\
-		dist/libs							\
-		dist/doc/rst/api_index.rst			\
-		$(HTML_DOCS); @:
+all:: dirs server js api config libs docs
+
+dirs:: $(subst src,dist,$(DIRS)); @:
+server:: $(subst src,dist,$(SRC_NORMAL)); @:
+js:: $(subst src,dist,$(SRC_JS)); @:
+api:: $(subst src,dist,$(SRC_ENDPOINT)); @:
+config:: dist/common/php/config.php; @:
+libs:: dist/libs; @:
+docs:: dist/doc/rst/api_index.rst $(HTML_DOCS); @:
 
 # Create directory structure in 'dist/'.
 $(subst src,dist,$(DIRS)):: dist%: src%

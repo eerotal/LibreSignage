@@ -68,7 +68,7 @@
 						</div>
 					</div>
 					<hr/>
-					<div class="form-group form-row">
+					<div class="form-group form-row m-0">
 						<div class="col text-left">
 							<a class="link-nostyle"
 								data-toggle="collapse"

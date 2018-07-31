@@ -43,40 +43,9 @@ html, body {
 	border: 1px solid var(--gray-1);
 }
 
-#editor-status {
-	margin-top: 20px;
-	margin-bottom: 0;
-	text-align: center;
-}
-
-.multiselect {
-	display: flex;
-	flex-wrap: wrap;
-	flex-direction: row;
-}
-
-.multiselect-input {}
-
-.multiselect-values {
-	margin-top: 4px;
-	border: 1px solid var(--gray-2);
-	border-radius: 2px;
-	background-color: white;
-}
-
-.multiselect-val {
-	background-color: var(--gray-2);
-	border-radius: 2px;
-	padding: 2px 8px;
-	margin: 4px;
-	white-space: nowrap;
-}
-
-.multiselect-rm {
-	padding-left: 3px;
-	color: gray;
-}
-
-.multiselect-rm:hover {
-	color: black;
+#slide-sched-group {
+	margin-top: .5rem;
+	margin-bottom: .5rem;
+	margin-left: 1.5rem;
+	border-left: 1px solid var(--gray-1);
 }

@@ -150,7 +150,7 @@
 						</div>
 
 						<!-- Schedule enable -->
-						<div class="form-group">
+						<div class="form-group mb-0">
 							<a class="link-nostyle"
 								data-toggle="collapse"
 								href="#slide-sched-group"
@@ -161,14 +161,14 @@
 						</div>
 
 						<!-- Schedule date/time selector -->
-						<div class="row form-group pl-4 collapse" id="slide-sched-group">
+						<div class="row form-group collapse" id="slide-sched-group">
 							<div class="col-12 py-1">
 								<input type="checkbox"
 									id="slide-sched"
 									data-toggle="tooltip"
 									title="Select whether the slide is scheduled.">
 								<label class="form-check-label" for="slide-sched">
-									Scheduling enabled
+									Enable
 								</label>
 							</div>
 							<div class="col-12 py-1">
@@ -210,14 +210,14 @@
 						</div>
 
 						<!-- Slide enabled checkbox -->
-						<div class="form-group" id="slide-enabled-group">
+						<div class="form-group mt-3" id="slide-enabled-group">
 							<input type="checkbox"
 								id="slide-enabled"
 								data-toggle="tooltip"
 								title="Select whether the slide is enabled or not.">
 							<label class="form-check-label"
 								for="slide-enabled">
-								Slide enabled
+								Enable slide
 							</label>
 						</div>
 
