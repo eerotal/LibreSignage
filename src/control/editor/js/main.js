@@ -416,31 +416,52 @@ const UI_DEFS = new uic.UIController({
 });
 
 /*
-*  Editor shortcut definitions.
+*  Editor shortcut definitions. Note that the shortcut
+*  callbacks check whether the action should be performed
+*  by checking whether the corresponding button is enabled.
 */
 var EDITOR_SHORTCUTS = new sc.ShortcutController([
-	new sc.Shortcut(
+	new sc.Shortcut( // Ctrl+Alt+n => New slide
+		keys = ['Control', 'Alt', 'n'],
+		func = () => {
+			if (!SLIDE_NEW.prop('disabled')) {
+				slide_new();
+			}
+		},
+		defer = defer_editor_ready
+	),
+	new sc.Shortcut( // Ctrl+s => Save
 		keys = ['Control', 's'],
 		func = () => {
-			/*
-			*  Only save the slide if the
-			*  save button is also enabled.
-			*/
 			if (!SLIDE_SAVE.prop('disabled')) {
 				slide_save();
 			}
 		},
 		defer = defer_editor_ready
 	),
-	new sc.Shortcut(
+	new sc.Shortcut( // Ctrl+d => Duplicate
 		keys = ['Control', 'd'],
 		func = () => {
-			/*
-			*  Only duplicate the slide if the
-			*  dup button is also enabled.
-			*/
 			if (!SLIDE_DUP.prop('disabled')) {
 				slide_dup();
+			}
+		},
+		defer = defer_editor_ready
+	),
+	new sc.Shortcut( // Ctrl+p => Preview
+		keys = ['Control', 'p'],
+		func = () => {
+			if (!SLIDE_PREVIEW.prop('disabled')) {
+				slide_preview();
+			}
+		},
+		defer = defer_editor_ready
+	),
+	new sc.Shortcut( // Ctrl+q => Change queue
+		keys = ['Control', 'q'],
+		func = () => {
+			if (!SLIDE_CH_QUEUE.prop('disabled')) {
+				slide_ch_queue();
 			}
 		},
 		defer = defer_editor_ready

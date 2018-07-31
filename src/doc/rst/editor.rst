@@ -106,3 +106,12 @@ mean a user can create a total of 10 slides. If the user attempts to
 create more slides than they are allowed to, the user is notified that
 their quota is exceeded. The current personal quota limits and the used
 quotas are visible on the main *Control Panel* page for all users.
+
+Keyboard shortcuts
+------------------
+
+:Ctrl+Alt+N:  Create a new slide.
+:Ctrl+S:      Save the selected slide.
+:Ctrl+D:      Duplicate the selected slide.
+:Ctrl+P:      Preview the selected slide.
+:Ctrl+Q:      Change the queue of the selected slide.
