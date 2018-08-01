@@ -2,8 +2,8 @@
 ##  LibreSignage makefile
 ##
 
-NPMBIN=$(shell ./build/scripts/npmbin.sh)
-ROOT=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+NPMBIN := $(shell ./build/scripts/npmbin.sh)
+ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 # Source file lists.
 SRC_NORMAL := $(shell find src 							\

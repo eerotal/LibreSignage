@@ -73,6 +73,18 @@ const usr_table_row = (index, name, groups, pass) => `
 		<div class="usr-table-col col-3">
 			<button type="button"
 				role="button"
+				class="btn btn-success usr-edit-btn"
+				id="btn-user-${name}-save">
+				<i class="fas fa-save"></i>
+			</button>
+			<button type="buttton"
+				role="button"
+				class="btn btn-danger usr-edit-btn"
+				id="btn-user-${name}-remove">
+				<i class="fas fa-trash-alt"></i>
+			</button>
+			<button type="button"
+				role="button"
 				class="btn btn-primary"
 				data-toggle="collapse"
 				data-target="#usr-edit-${name}"
@@ -102,22 +114,6 @@ const usr_table_row = (index, name, groups, pass) => `
 					Groups
 				</label>
 				<div id="usr-groups-input-${name}-cont" class="col-9">
-				</div>
-			</div>
-			<div class="row usr-edit-input-row">
-					<div class="col-12 d-flex flex-row justify-content-center">
-					<input
-						id="btn-user-${name}-save"
-						class="btn btn-primary usr-edit-btn"
-						type="submit"
-						value="Save">
-					</input>
-					<input
-						id="btn-user-${name}-remove"
-						class="btn btn-danger usr-edit-btn"
-						type="button"
-						value="Remove">
-					</input>
 				</div>
 			</div>
 		</div>
@@ -187,6 +183,7 @@ function usermgr_remove(name) {
 		`All user data for ${name} will be lost and won't be ` +
 		`recoverable.`,
 		(status, val) => {
+			if (!status) { return; }
 			for (var u in users) {
 				if (users[u].get_name() != name) { continue; }
 				users[u].remove((resp) => {
