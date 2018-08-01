@@ -147,5 +147,35 @@ def setup(host: str,
 					'application/json.*'
 				)
 			}
+		),
+		unit.Unit(
+			name = 'ver_info.php',
+			host = host,
+			url = '/api/endpoint/general/ver_info.php',
+			request_method = unit.Unit.METHOD_GET,
+
+			preexec = f_session_use,
+			postexec = lambda a, b: None,
+
+			data_request = {},
+			headers_request = {},
+			cookies_request = None,
+
+			data_expect_strict = True,
+			headers_expect_strict = False,
+			status_expect = 200,
+			data_expect = {
+				'ls': RespRe('.*'),
+				'api': RespRe('.*'),
+				'error': RespInt(0)
+			},
+			headers_expect = {
+				'Access-Control-Allow-Origin': RespRe(
+					'.*'
+				),
+				'Content-Type': RespRe(
+					'application/json.*'
+				)
+			}
 		)
 	];
