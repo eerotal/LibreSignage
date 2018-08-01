@@ -62,7 +62,10 @@ exports.Timeline = class Timeline {
 				_perm = () => { return true; },
 				_enabler = () => {},
 				_attach = {
-					'click': () => { this.func_select_slide(c_id); }
+					'click': () => {
+						this.select(c_id);
+						this.func_select_slide(c_id);
+					}
 				},
 				_defer = null
 			));
@@ -90,5 +93,12 @@ exports.Timeline = class Timeline {
 			this.update_html();
 			if (ready) { ready(); }
 		});
+	}
+
+	select(id) {
+		for (let s in this.queue.slides.get()) {
+			$(`#slide-btn-${s}`).removeClass('tl-selected');
+		}
+		$(`#slide-btn-${id}`).addClass('tl-selected');
 	}
 }

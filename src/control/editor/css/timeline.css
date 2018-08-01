@@ -51,3 +51,8 @@
 	width: 100%;
 	border: 1px solid var(--gray-1);
 }
+
+.tl-selected {
+	background-color: var(--teal);
+	color: var(--white);
+}

@@ -541,11 +541,11 @@ function slide_show(s, no_popup) {
 	var cb = () => {
 		console.log(`LibreSignage: Show slide '${s}'.`);
 
-		flag_slide_loading = true;
 		sel_slide = new slide.Slide(API);
+
+		flag_slide_loading = true;
 		sel_slide.load(s, (ret) => {
 			if (ret) {
-				console.log("LibreSignage: API error!");
 				set_inputs(null);
 				disable_controls();
 				return;

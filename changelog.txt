@@ -1,2 +1,3 @@
 v0.1.0
   - Implement keyboard shortcuts for the editor.
+  - Make it possible to preserve instance data when reinstalling.
