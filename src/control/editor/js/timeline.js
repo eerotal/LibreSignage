@@ -23,6 +23,7 @@ const timeline_btn = (id, index, name, enabled) => `
 
 exports.Timeline = class Timeline {
 	constructor(api, func_select_slide) {
+		this.selected = null;
 		this.api = api;
 		this.func_select_slide = func_select_slide;
 		this.queue = null;
@@ -70,6 +71,11 @@ exports.Timeline = class Timeline {
 				_defer = null
 			));
 		}
+
+		if (this.selected) {
+			// Restyle the selected thumb.
+			this.select(this.selected);
+		}
 	}
 
 	update() {
@@ -88,6 +94,8 @@ exports.Timeline = class Timeline {
 			if (ready) { ready(); }
 			return;
 		}
+
+		this.selected = null;
 		this.queue = new ls_queue.Queue(this.api);
 		this.queue.load(name, () => {
 			this.update_html();
@@ -96,9 +104,10 @@ exports.Timeline = class Timeline {
 	}
 
 	select(id) {
-		for (let s in this.queue.slides.get()) {
-			$(`#slide-btn-${s}`).removeClass('tl-selected');
+		if (this.selected) {
+			$(`#slide-btn-${this.selected}`).removeClass('tl-selected');
 		}
 		$(`#slide-btn-${id}`).addClass('tl-selected');
+		this.selected = id;
 	}
 }
