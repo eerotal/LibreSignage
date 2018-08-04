@@ -139,3 +139,7 @@ h1, h2, h3, h4, h5, h6 {
 	padding-bottom: 0.25em;
 	height: 2em;
 }
+
+.btn-border {
+	border: 1px solid var(--gray-1);
+}

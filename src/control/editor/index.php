@@ -270,19 +270,37 @@
 					</div>
 					<div class="col-md container-fluid pt-2" id="editor-col-r">
 						<div class="row">
-							<div class="col-md container-fluid">
+							<div class="col-12 container-fluid">
 								<a class="link-nostyle"
 									data-toggle="collapse"
-									href="#slide-live-preview-cont"
+									href="#slide-live-preview-collapse"
 									aria-expanded="false"
-									aria-controls="slide-live-preview-cont">
+									aria-controls="slide-live-preview-collapse">
 									<i class="fas fa-angle-right"></i> Live preview
 								</a>
-								<div id="slide-live-preview-cont"
-									class="preview-16x9 collapse">
-									<iframe id="slide-live-preview"
-										class="no-font rounded">
-									</iframe>
+								<div id="slide-live-preview-collapse" class="row collapse">
+									<div class="col-12 text-center">
+										<button id="btn-preview-ratio-16x9"
+												class="btn btn-light btn-border small-btn"
+												type="button"
+												value="16x9">
+												16:9
+										</button>
+										<button id="btn-preview-ratio-16x9"
+												class="btn btn-light btn-border small-btn"
+												type="button"
+												value="4x3">
+												4:3
+										</button>
+									</div>
+									<div class="col-12">
+										<div id="slide-live-preview-cont"
+											class="preview-16x9">
+											<iframe id="slide-live-preview"
+												class="no-font rounded">
+											</iframe>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
