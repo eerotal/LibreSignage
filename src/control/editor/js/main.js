@@ -13,6 +13,7 @@ var sc = require('ls-shortcut');
 
 var timeline = require('./timeline.js');
 var qsel = require('./qsel.js');
+var preview = require('./preview.js');
 
 var API = null;
 var TL = null;
@@ -79,6 +80,7 @@ const SLIDE_SCHED_TIME_E		= $("#slide-sched-time-e");
 const SLIDE_ANIMATION			= $("#slide-animation")
 var SLIDE_COLLAB				= null;
 var SLIDE_INPUT					= null;
+var LIVE_PREVIEW				= null;
 
 var name_sel = null;
 var index_sel = null;
@@ -542,16 +544,17 @@ function slide_show(s, no_popup) {
 		console.log(`LibreSignage: Show slide '${s}'.`);
 
 		sel_slide = new slide.Slide(API);
-
 		flag_slide_loading = true;
 		sel_slide.load(s, (ret) => {
 			if (ret) {
 				set_inputs(null);
 				disable_controls();
+				LIVE_PREVIEW.update();
 				return;
 			}
 			set_inputs(sel_slide);
 			enable_controls();
+			LIVE_PREVIEW.update();
 			flag_slide_loading = false;
 		});
 	}
@@ -588,6 +591,7 @@ function slide_rm() {
 				TL.update()
 				set_inputs(null);
 				disable_controls();
+				LIVE_PREVIEW.update();
 		});
 	});
 }
@@ -828,6 +832,13 @@ function editor_setup() {
 		flag_editor_ready = true;
 		console.log("LibreSignage: Editor ready.");
 	});
+
+	// Setup the live preview.
+	LIVE_PREVIEW = new preview.Preview(
+		'#slide-live-preview',
+		'#slide-input',
+		() => { return UI_DEFS.get('SLIDE_INPUT').get(); }
+	);
 }
 
 $(document).ready(() => {
