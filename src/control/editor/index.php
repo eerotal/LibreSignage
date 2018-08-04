@@ -282,22 +282,18 @@
 									<div class="col-12 text-center">
 										<button id="btn-preview-ratio-16x9"
 												class="btn btn-light btn-border small-btn"
-												type="button"
-												value="16x9">
+												type="button">
 												16:9
 										</button>
-										<button id="btn-preview-ratio-16x9"
+										<button id="btn-preview-ratio-4x3"
 												class="btn btn-light btn-border small-btn"
-												type="button"
-												value="4x3">
+												type="button">
 												4:3
 										</button>
 									</div>
 									<div class="col-12">
-										<div id="slide-live-preview-cont"
-											class="preview-16x9">
-											<iframe id="slide-live-preview"
-												class="no-font rounded">
+										<div id="slide-live-preview-cont">
+											<iframe class="preview no-font rounded">
 											</iframe>
 										</div>
 									</div>

@@ -78,6 +78,8 @@ const SLIDE_SCHED_TIME_S		= $("#slide-sched-time-s");
 const SLIDE_SCHED_DATE_E		= $("#slide-sched-date-e");
 const SLIDE_SCHED_TIME_E		= $("#slide-sched-time-e");
 const SLIDE_ANIMATION			= $("#slide-animation")
+const PREVIEW_R_16x9			= $("#btn-preview-ratio-16x9");
+const PREVIEW_R_4x3				= $("#btn-preview-ratio-4x3");
 var SLIDE_COLLAB				= null;
 var SLIDE_INPUT					= null;
 var LIVE_PREVIEW				= null;
@@ -95,6 +97,36 @@ var defer_editor_ready = () => { return !flag_editor_ready; };
 *  Editor UI definitions using the UIInput class.
 */
 const UI_DEFS = new uic.UIController({
+	'PREVIEW_R_16x9': new uic.UIButton(
+		_elem = PREVIEW_R_16x9,
+		_perm = (d) => {
+			return LIVE_PREVIEW.r != '16x9';
+		},
+		_enabler = null,
+		_attach = {
+			'click': (e) => {
+				UI_DEFS.get('PREVIEW_R_16x9').enabled(false);
+				UI_DEFS.get('PREVIEW_R_4x3').enabled(true);
+				LIVE_PREVIEW.ratio('16x9');
+			}
+		},
+		_defer = defer_editor_ready
+	),
+	'PREVIEW_R_4x3': new uic.UIButton(
+		_elem = PREVIEW_R_4x3,
+		_perm = (d) => {
+			return LIVE_PREVIEW.r != '4x3';
+		},
+		_enabler = null,
+		_attach = {
+			'click': () => {
+				UI_DEFS.get('PREVIEW_R_16x9').enabled(true);
+				UI_DEFS.get('PREVIEW_R_4x3').enabled(false);
+				LIVE_PREVIEW.ratio('4x3');
+			}
+		},
+		_defer = defer_editor_ready
+	),
 	'SLIDE_NEW': new uic.UIButton(
 		_elem = SLIDE_NEW,
 		_perm = (d) => { return true; },
@@ -835,7 +867,7 @@ function editor_setup() {
 
 	// Setup the live preview.
 	LIVE_PREVIEW = new preview.Preview(
-		'#slide-live-preview',
+		'#slide-live-preview-cont',
 		'#slide-input',
 		() => { return UI_DEFS.get('SLIDE_INPUT').get(); }
 	);
