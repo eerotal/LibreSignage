@@ -2,3 +2,6 @@ v0.1.0
   - Implement keyboard shortcuts for the editor.
   - Make it possible to preserve instance data when reinstalling.
   - Implement a live slide preview in the editor.
+  - Self host font files. (I actually don't particularly like including
+    binary files in the GIT tree but I don't know of a better way so
+    the font files are now included in the tree.)
