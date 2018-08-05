@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat:300|Raleway|Inconsolata');
+@import url('/common/css/fonts.css');
 
 :root {
 	--gray-1: rgb(210, 210, 210);

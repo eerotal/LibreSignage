@@ -1,0 +1,28 @@
+/*
+*  Font face definitions for LibreSignage.
+*/
+
+@font-face {
+	font-family: Montserrat;
+	src: local('Montserrat'),
+			url('/assets/fonts/Montserrat/Montserrat-Light.ttf');
+	font-style: normal;
+	font-weight: 300;
+}
+
+@font-face {
+	font-family: Inconsolata;
+	src: local('Inconsolata'),
+			url('/assets/fonts/Inconsolata/Inconsolata-Regular.ttf');
+	font-style: normal;
+	font-weight: 400;
+}
+
+@font-face {
+	font-family: Raleway;
+	src: local('Raleway'),
+			url('/assets/fonts/Raleway/Raleway-Regular.ttf');
+	font-style: normal;
+	font-weight: 400;
+}
+
