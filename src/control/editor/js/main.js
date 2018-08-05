@@ -13,6 +13,7 @@ var sc = require('ls-shortcut');
 
 var timeline = require('./timeline.js');
 var qsel = require('./qsel.js');
+var preview = require('./preview.js');
 
 var API = null;
 var TL = null;
@@ -77,8 +78,12 @@ const SLIDE_SCHED_TIME_S		= $("#slide-sched-time-s");
 const SLIDE_SCHED_DATE_E		= $("#slide-sched-date-e");
 const SLIDE_SCHED_TIME_E		= $("#slide-sched-time-e");
 const SLIDE_ANIMATION			= $("#slide-animation")
+const PREVIEW_R_16x9			= $("#btn-preview-ratio-16x9");
+const PREVIEW_R_4x3				= $("#btn-preview-ratio-4x3");
+const MARKUP_ERR_DISPLAY		= $("#markup-err-display");
 var SLIDE_COLLAB				= null;
 var SLIDE_INPUT					= null;
+var LIVE_PREVIEW				= null;
 
 var name_sel = null;
 var index_sel = null;
@@ -93,6 +98,36 @@ var defer_editor_ready = () => { return !flag_editor_ready; };
 *  Editor UI definitions using the UIInput class.
 */
 const UI_DEFS = new uic.UIController({
+	'PREVIEW_R_16x9': new uic.UIButton(
+		_elem = PREVIEW_R_16x9,
+		_perm = (d) => {
+			return LIVE_PREVIEW.ratio != '16x9';
+		},
+		_enabler = null,
+		_attach = {
+			'click': (e) => {
+				UI_DEFS.get('PREVIEW_R_16x9').enabled(false);
+				UI_DEFS.get('PREVIEW_R_4x3').enabled(true);
+				LIVE_PREVIEW.set_ratio('16x9');
+			}
+		},
+		_defer = defer_editor_ready
+	),
+	'PREVIEW_R_4x3': new uic.UIButton(
+		_elem = PREVIEW_R_4x3,
+		_perm = (d) => {
+			return LIVE_PREVIEW.ratio != '4x3';
+		},
+		_enabler = null,
+		_attach = {
+			'click': () => {
+				UI_DEFS.get('PREVIEW_R_16x9').enabled(true);
+				UI_DEFS.get('PREVIEW_R_4x3').enabled(false);
+				LIVE_PREVIEW.set_ratio('4x3');
+			}
+		},
+		_defer = defer_editor_ready
+	),
 	'SLIDE_NEW': new uic.UIButton(
 		_elem = SLIDE_NEW,
 		_perm = (d) => { return true; },
@@ -542,16 +577,17 @@ function slide_show(s, no_popup) {
 		console.log(`LibreSignage: Show slide '${s}'.`);
 
 		sel_slide = new slide.Slide(API);
-
 		flag_slide_loading = true;
 		sel_slide.load(s, (ret) => {
 			if (ret) {
 				set_inputs(null);
 				disable_controls();
+				LIVE_PREVIEW.update();
 				return;
 			}
 			set_inputs(sel_slide);
 			enable_controls();
+			LIVE_PREVIEW.update();
 			flag_slide_loading = false;
 		});
 	}
@@ -588,6 +624,7 @@ function slide_rm() {
 				TL.update()
 				set_inputs(null);
 				disable_controls();
+				LIVE_PREVIEW.update();
 		});
 	});
 }
@@ -828,6 +865,20 @@ function editor_setup() {
 		flag_editor_ready = true;
 		console.log("LibreSignage: Editor ready.");
 	});
+
+	// Setup the live preview.
+	LIVE_PREVIEW = new preview.Preview(
+		'#slide-live-preview',
+		'#slide-input',
+		() => { return UI_DEFS.get('SLIDE_INPUT').get(); },
+		(e) => {
+			if (e) {
+				MARKUP_ERR_DISPLAY.text(`>> Syntax error: ${e.message}`);
+			} else {
+				MARKUP_ERR_DISPLAY.text('');
+			}
+		}
+	);
 }
 
 $(document).ready(() => {

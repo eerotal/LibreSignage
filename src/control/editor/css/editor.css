@@ -1,3 +1,7 @@
+:root {
+	--main-col-mw: 250px;
+}
+
 html, body {
 	min-height: 100%;
 }
@@ -14,8 +18,8 @@ html, body {
 	width: 150px;
 }
 
-#editor-col-l {
-	min-width: 250px;
+#editor-col-l, #editor-col-r {
+	min-width: var(--main-col-mw);
 }
 
 .btn-slide-ctrl {
@@ -37,15 +41,20 @@ html, body {
 	display: none; /* Initial */
 }
 
-#slide-input {
-	min-height: calc(1em*25); /* min-height: 25 lines */
-	height: 95%;
-	border: 1px solid var(--gray-1);
-}
-
 #slide-sched-group {
 	margin-top: .5rem;
 	margin-bottom: .5rem;
 	margin-left: 1.5rem;
 	border-left: 1px solid var(--gray-1);
+}
+
+#slide-input {
+	min-height: calc(1em*30); /* min-height: 30 lines */
+	border: 1px solid var(--gray-1);
+	margin-bottom: var(--s3);
+}
+
+#markup-err-display {
+	font-family: Inconsolata, monospace;
+	color: var(--red);
 }

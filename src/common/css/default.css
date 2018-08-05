@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat:300|Raleway');
+@import url('/common/css/fonts.css');
 
 :root {
 	--gray-1: rgb(210, 210, 210);
@@ -6,6 +6,19 @@
 	--gray-3: rgb(230, 230, 230);
 	--gray-3: rgb(240, 240, 240);
 	--gray-5: rgb(250, 250, 250);
+
+	/* Bootstrap spacings. */
+	--spacer: 1em;
+	--s0: 0;
+	--s1: calc(var(--spacer)*.25);
+	--s2: calc(var(--spacer)*.5);
+	--s3: calc(var(--spacer));
+	--s4: calc(var(--spacer)*1.5);
+	--s5: calc(var(--spacer)*3);
+	--sa: auto;
+
+	/* Default container padding. */
+	--cpad: 15px;
 }
 
 /* Default styling for 'main'. */
@@ -125,4 +138,8 @@ h1, h2, h3, h4, h5, h6 {
 	padding-top: 0.25em;
 	padding-bottom: 0.25em;
 	height: 2em;
+}
+
+.btn-border {
+	border: 1px solid var(--gray-1);
 }

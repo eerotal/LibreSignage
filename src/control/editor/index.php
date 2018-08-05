@@ -19,6 +19,7 @@
 		<link rel="stylesheet" href="/common/css/multiselect.css">
 		<link rel="stylesheet" href="/control/editor/css/editor.css">
 		<link rel="stylesheet" href="/control/editor/css/timeline.css">
+		<link rel="stylesheet" href="/control/editor/css/preview.css">
 		<title>LibreSignage Editor</title>
 	</head>
 	<body>
@@ -268,8 +269,48 @@
 						</div>
 					</div>
 					<div class="col-md container-fluid pt-2" id="editor-col-r">
-						<label for="slide-input">Markup</label>
-						<div id="slide-input" class="no-font rounded"></div>
+						<div class="row">
+							<div class="col-12 container-fluid">
+								<a class="link-nostyle"
+									data-toggle="collapse"
+									href="#slide-live-preview-collapse"
+									aria-expanded="false"
+									aria-controls="slide-live-preview-collapse">
+									<i class="fas fa-angle-right"></i> Live preview
+								</a>
+								<div id="slide-live-preview-collapse" class="row collapse">
+									<div class="col-12 text-center">
+										<button id="btn-preview-ratio-16x9"
+												class="btn btn-light btn-border small-btn"
+												type="button">
+												16:9
+										</button>
+										<button id="btn-preview-ratio-4x3"
+												class="btn btn-light btn-border small-btn"
+												type="button">
+												4:3
+										</button>
+									</div>
+									<div class="col-12">
+										<div id="slide-live-preview"
+											class="preview-cont">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md container-fluid">
+								<label for="slide-input">
+									Markup
+								</label>
+								<div id="slide-input" class="rounded">
+								</div>
+								<div class="container-fluid">
+									<p id="markup-err-display"></p>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

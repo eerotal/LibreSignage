@@ -16,11 +16,12 @@ the LibreSignage instance. Extensive LibreSignage help and documentation
 can be found `here </doc>`_.
 
 LibreSignage is made possible by the fantastic open source libraries
-Bootstrap_, jQuery_, Popper.js_ and Ace_ and the open fonts Raleway_
-and Montserrat_. The cool icons used in the LibreSignage web interface
-are from the Font-Awesome_ project. These libraries and other resources
-are licensed under their respective licenses. The licensing information
-for all third party resources can be found `here </doc?doc=LICENSES_EXT>`_.
+Bootstrap_, jQuery_, Popper.js_ and Ace_ and the open fonts Raleway_,
+Montserrat_ an Inconsolata_. The cool icons used in the LibreSignage web
+interface are from the Font-Awesome_ project. These libraries and other
+resources are licensed under their respective licenses. The licensing
+information for all third party resources can be found
+`here </doc?doc=LICENSES_EXT>`_.
 
 LibreSignage is licensed under the permissive BSD 3-clause license,
 which can be found `here </doc?doc=LICENSE>`_.
@@ -31,5 +32,6 @@ which can be found `here </doc?doc=LICENSE>`_.
 .. _Ace: https://ace.c9.io/
 .. _Raleway: https://github.com/impallari/Raleway/
 .. _Montserrat: https://github.com/JulietaUla/Montserrat
+.. _Inconsolata: https://github.com/googlefonts/Inconsolata
 .. _Font-Awesome: https://fontawesome.com/
 
