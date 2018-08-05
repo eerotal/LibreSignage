@@ -80,6 +80,7 @@ const SLIDE_SCHED_TIME_E		= $("#slide-sched-time-e");
 const SLIDE_ANIMATION			= $("#slide-animation")
 const PREVIEW_R_16x9			= $("#btn-preview-ratio-16x9");
 const PREVIEW_R_4x3				= $("#btn-preview-ratio-4x3");
+const MARKUP_ERR_DISPLAY		= $("#markup-err-display");
 var SLIDE_COLLAB				= null;
 var SLIDE_INPUT					= null;
 var LIVE_PREVIEW				= null;
@@ -100,14 +101,14 @@ const UI_DEFS = new uic.UIController({
 	'PREVIEW_R_16x9': new uic.UIButton(
 		_elem = PREVIEW_R_16x9,
 		_perm = (d) => {
-			return LIVE_PREVIEW.r != '16x9';
+			return LIVE_PREVIEW.ratio != '16x9';
 		},
 		_enabler = null,
 		_attach = {
 			'click': (e) => {
 				UI_DEFS.get('PREVIEW_R_16x9').enabled(false);
 				UI_DEFS.get('PREVIEW_R_4x3').enabled(true);
-				LIVE_PREVIEW.ratio('16x9');
+				LIVE_PREVIEW.set_ratio('16x9');
 			}
 		},
 		_defer = defer_editor_ready
@@ -115,14 +116,14 @@ const UI_DEFS = new uic.UIController({
 	'PREVIEW_R_4x3': new uic.UIButton(
 		_elem = PREVIEW_R_4x3,
 		_perm = (d) => {
-			return LIVE_PREVIEW.r != '4x3';
+			return LIVE_PREVIEW.ratio != '4x3';
 		},
 		_enabler = null,
 		_attach = {
 			'click': () => {
 				UI_DEFS.get('PREVIEW_R_16x9').enabled(true);
 				UI_DEFS.get('PREVIEW_R_4x3').enabled(false);
-				LIVE_PREVIEW.ratio('4x3');
+				LIVE_PREVIEW.set_ratio('4x3');
 			}
 		},
 		_defer = defer_editor_ready
@@ -867,9 +868,16 @@ function editor_setup() {
 
 	// Setup the live preview.
 	LIVE_PREVIEW = new preview.Preview(
-		'#slide-live-preview-cont',
+		'#slide-live-preview',
 		'#slide-input',
-		() => { return UI_DEFS.get('SLIDE_INPUT').get(); }
+		() => { return UI_DEFS.get('SLIDE_INPUT').get(); },
+		(e) => {
+			if (e) {
+				MARKUP_ERR_DISPLAY.text(`>> Syntax error: ${e.message}`);
+			} else {
+				MARKUP_ERR_DISPLAY.text('');
+			}
+		}
 	);
 }
 

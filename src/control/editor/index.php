@@ -292,9 +292,8 @@
 										</button>
 									</div>
 									<div class="col-12">
-										<div id="slide-live-preview-cont">
-											<iframe class="preview no-font rounded">
-											</iframe>
+										<div id="slide-live-preview"
+											class="preview-cont">
 										</div>
 									</div>
 								</div>
@@ -305,8 +304,10 @@
 								<label for="slide-input">
 									Markup
 								</label>
-								<div id="slide-input"
-									class="no-font rounded">
+								<div id="slide-input" class="rounded">
+								</div>
+								<div class="container-fluid">
+									<p id="markup-err-display"></p>
 								</div>
 							</div>
 						</div>

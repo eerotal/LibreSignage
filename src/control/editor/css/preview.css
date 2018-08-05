@@ -1,6 +1,6 @@
 /*
 * Live slide preview styling. The preview-16x9 and preview-4x3 classes
-* are meant to be applied to #slide-live-preview-cont to select the
+* are meant to be applied to #slide-live-preview to select the
 * aspect ratio of the preview.
 */
 
@@ -10,7 +10,7 @@
 	--preview-mw: 600px;
 }
 
-#slide-live-preview-cont {
+.preview-cont {
 	position: relative;
 	width: 100%;
 	margin-top: var(--s2);

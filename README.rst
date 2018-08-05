@@ -213,6 +213,9 @@ Raleway (Font, SIL Open Font License 1.1)
 Montserrat (Font, SIL Open Font License 1.1)
   Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)  
 
+Inconsolata (Font, SIL Open Font License 1.1)
+  Copyright 2006 The Inconsolata Project Authors (https://github.com/cyrealtype/Inconsolata)
+
 Font-Awesome (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
   Font Awesome Free 5.1.0 by @fontawesome - https://fontawesome.com
 

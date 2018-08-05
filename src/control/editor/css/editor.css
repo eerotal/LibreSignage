@@ -51,4 +51,10 @@ html, body {
 #slide-input {
 	min-height: calc(1em*30); /* min-height: 30 lines */
 	border: 1px solid var(--gray-1);
+	margin-bottom: var(--s3);
+}
+
+#markup-err-display {
+	font-family: Inconsolata, monospace;
+	color: var(--red);
 }
