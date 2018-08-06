@@ -58,8 +58,7 @@ are listed below.
 
 1. Install software needed for building LibreSignage. On Debian Stretch
    this can be accomplished by running ``sudo apt install git npm
-   apache2 php7.0 pandoc``. *pandoc* is needed for compiling the
-   reStructuredText documentation files to HTML.
+   apache2 php7.0 pandoc ruby-sass``.
 2. Install the required JavaScript dependencies by running ``npm install``.
    If this command fails to install Browserify because of a permission
    error, you need to fix your npm installation. Check `the npm documentation

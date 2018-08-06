@@ -13,10 +13,7 @@ const META = [
 
 const STYLESHEETS = [
 	'/libs/bootstrap/dist/css/bootstrap.min.css',
-	'/common/css/default.css',
-	'/app/css/animations.css',
-	'/app/css/display.css',
-	'/common/css/markup.css'
+	'/app/css/display.css'
 ];
 
 exports.Preview = class Preview {

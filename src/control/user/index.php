@@ -12,10 +12,6 @@
 		<?php
 			css_include(['bootstrap']);
 		?>
-		<link rel="stylesheet" href="/common/css/footer.css">
-		<link rel="stylesheet" href="/common/css/nav.css">
-		<link rel="stylesheet" href="/common/css/dialog.css">
-		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/control/user/css/user.css">
 		<title>LibreSignage User Settings</title>
 	</head>

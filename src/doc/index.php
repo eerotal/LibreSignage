@@ -51,8 +51,6 @@
 		<?php
 			css_include(['bootstrap']);
 		?>
-		<link rel="stylesheet" href="/common/css/footer.css">
-		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/doc/css/doc.css">
 		<title>LibreSignage Documentation</title>
 	</head>

@@ -14,3 +14,6 @@ __pycache__
 # Exclude npm debug logs and external node modules.
 /node_modules
 npm-debug.log
+
+# Exclude temporary sass files.
+.sass-cache

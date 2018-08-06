@@ -4,33 +4,49 @@
 
 NPMBIN := $(shell ./build/scripts/npmbin.sh)
 ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+SASS_IPATHS := $(ROOT)/src/common/css
 
-# Source file lists.
-SRC_NORMAL := $(shell find src 							\
+# Directories.
+DIRS := $(shell find src 							\
+	\( -type d -path 'src/node_modules' -prune \)	\
+	-o \( -type d -print \)							\
+)
+
+# Non-compiled sources.
+SRC_NO_COMPILE := $(shell find src 						\
 	\( -type f -path 'src/node_modules/*' -prune \)		\
 	-o \( -type f -path 'src/api/endpoint/*' -prune \) 	\
 	-o \(												\
 		-type f ! -name '*.js'							\
+		-a -type f ! -name '*.scss'						\
 		-a -type f ! -name 'config.php' -print 			\
 	\)													\
 )
 
+# SCSS sources.
+SRC_SCSS := $(shell find src 						\
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o \(											\
+		-type f ! -name '_*.scss'					\
+		-a -type f -name '*.scss' -print			\
+	\)												\
+)
+DIST_SCSS := $(subst src,dist,$(SRC_SCSS:.scss=.css))
+
+# JavaScript sources + dependencies.
 SRC_JS := $(shell find src 							\
 	\( -type f -path 'src/node_modules/*' -prune \)	\
 	-o \( -type f -name 'main.js' -print \)			\
 )
 DEP_JS := $(subst src,dist,$(SRC_JS:.js=.d))
 
+# API endpoint sources.
 SRC_ENDPOINT := $(shell find src/api/endpoint 		\
 	\( -type f -path 'src/node_modules/*' -prune \)	\
 	-o \( -type f -name '*.php' -print \)			\
 )
-DIRS := $(shell find src 							\
-	\( -type d -path 'src/node_modules' -prune \)	\
-	-o \( -type d -print \)							\
-)
 
-# Documentation sources.
+# Documentation dist files.
 HTML_DOCS := $(shell find src -type f -name '*.rst')
 HTML_DOCS := $(addprefix dist/doc/html/,$(notdir $(HTML_DOCS)))
 HTML_DOCS := $(HTML_DOCS:.rst=.html) dist/doc/html/README.html
@@ -50,28 +66,29 @@ endif
 .PHONY: dirs server js api config libs docs install utest clean realclean LOC $(DEP_JS)
 .ONESHELL:
 
-all:: dirs server js api config libs docs
+all:: dirs server js api config libs docs css
 
 dirs:: $(subst src,dist,$(DIRS)); @:
-server:: $(subst src,dist,$(SRC_NORMAL)); @:
-js:: $(subst src,dist,$(SRC_JS)); @:
-api:: $(subst src,dist,$(SRC_ENDPOINT)); @:
-config:: dist/common/php/config.php; @:
-libs:: dist/libs; @:
-docs:: dist/doc/rst/api_index.rst $(HTML_DOCS); @:
+server:: dirs $(subst src,dist,$(SRC_NO_COMPILE)); @:
+js:: dirs $(subst src,dist,$(SRC_JS)); @:
+api:: dirs $(subst src,dist,$(SRC_ENDPOINT)); @:
+config:: dirs dist/common/php/config.php; @:
+libs:: dirs dist/libs; @:
+docs:: dirs dist/doc/rst/api_index.rst $(HTML_DOCS); @:
+css:: dirs $(DIST_SCSS); @:
 
 # Create directory structure in 'dist/'.
 $(subst src,dist,$(DIRS)):: dist%: src%
 	@:
 	mkdir -p $@;
 
-# Copy non-JS, non API endpoint, non-docs files to 'dist/'.
-$(subst src,dist,$(SRC_NORMAL)):: dist%: src%
+# Copy over non-compiled sources.
+$(subst src,dist,$(SRC_NO_COMPILE)):: dist%: src%
 	@:
 	cp -p $< $@;
 
 # Copy normal PHP files to 'dist/.' and check the PHP syntax.
-$(filter %.php,$(subst src,dist,$(SRC_NORMAL))):: dist%: src%
+$(filter %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
 	@:
 	php -l $< > /dev/null;
 	cp -p $< $@;
@@ -151,6 +168,12 @@ dist/doc/html/README.html:: README.rst
 		mkdir -p dist/doc/html;
 		pandoc -o $@ -f rst -t html $<;
 	fi
+
+# Compile Sass files.
+dist/%.css:: src/%.scss
+	@:
+	echo "$< >> $@";
+	sass -I $(SASS_IPATHS) --sourcemap=none $< $@;
 
 # Copy node_modules to 'dist/libs/'.
 dist/libs:: node_modules

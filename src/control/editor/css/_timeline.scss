@@ -18,11 +18,11 @@
 	max-height: 90px;
 	background-color: var(--white);
 	color: var(--secondary);
-	border: 1px solid var(--gray-1);
+	border: 1px solid $gray-1;
 }
 
 .tl-slide-cont-dis {
-	background-color: var(--gray-1);
+	background-color: $gray-1;
 }
 
 .tl-slide-cont:hover {
@@ -49,7 +49,7 @@
 	pointer-events: none;
 	height: 100%;
 	width: 100%;
-	border: 1px solid var(--gray-1);
+	border: 1px solid $gray-1;
 }
 
 .tl-selected {

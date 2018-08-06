@@ -1,6 +1,9 @@
-:root {
-	--quota-bar-height: 1.5rem;
-}
+@import 'default';
+@import 'footer';
+@import 'nav';
+@import 'dialog';
+
+$quota-bar-height: 1.5rem;
 
 .header-col {
 	text-align: center;
@@ -24,9 +27,9 @@
 	margin: 0;
 	margin-bottom: 1rem;
 	padding: 0;
-	height: var(--quota-bar-height);
-	font-size: calc(var(--quota-bar-height)*0.5)px;
+	height: $quota-bar-height;
+	font-size: $quota-bar-height*0.5;
 	text-align: center;
-	line-height: var(--quota-bar-height);
+	line-height: $quota-bar-height;
 }
 

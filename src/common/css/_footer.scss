@@ -1,6 +1,4 @@
-:root {
-	--footer-height: 100px;
-}
+$footer-height: 100px;
 
 html {
 	position: relative;
@@ -8,12 +6,12 @@ html {
 }
 
 body {
-	padding-bottom: var(--footer-height);
+	padding-bottom: $footer-height;
 }
 
 .footer {
 	position: absolute;
 	bottom: 0;
-	height: var(--footer-height);
+	height: $footer-height;
 	text-align: center;
 }

@@ -1,3 +1,8 @@
+@import 'default';
+@import 'footer';
+@import 'nav';
+@import 'dialog';
+
 .user-settings-cont {
 	max-width: 750px;
 	padding-bottom: 20px;
@@ -15,6 +20,6 @@
 }
 
 #user-sessions tr {
-	border-top: 1px solid var(--gray-1);
-	border-bottom: 1px solid var(--gray-1);
+	border-top: 1px solid $gray-1;
+	border-bottom: 1px solid $gray-1;
 }

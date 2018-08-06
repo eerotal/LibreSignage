@@ -12,8 +12,6 @@
 		<?php
 			css_include(['bootstrap']);
 		?>
-		<link rel="stylesheet" href="/common/css/footer.css">
-		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/logout/css/logout.css">
 		<title>LibreSignage Logout</title>
 	</head>

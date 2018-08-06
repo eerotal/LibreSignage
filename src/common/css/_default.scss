@@ -1,34 +1,15 @@
-@import url('/common/css/fonts.css');
-
-:root {
-	--gray-1: rgb(210, 210, 210);
-	--gray-2: rgb(220, 220, 220);
-	--gray-3: rgb(230, 230, 230);
-	--gray-3: rgb(240, 240, 240);
-	--gray-5: rgb(250, 250, 250);
-
-	/* Bootstrap spacings. */
-	--spacer: 1em;
-	--s0: 0;
-	--s1: calc(var(--spacer)*.25);
-	--s2: calc(var(--spacer)*.5);
-	--s3: calc(var(--spacer));
-	--s4: calc(var(--spacer)*1.5);
-	--s5: calc(var(--spacer)*3);
-	--sa: auto;
-
-	/* Default container padding. */
-	--cpad: 15px;
-}
+@import 'globals';
+@import 'root';
+@import 'fonts';
 
 /* Default styling for 'main'. */
 main {
 	/* Default spacing */
 	margin: 0;
 	padding-top: 30px;
-	padding-right: 15px;
+	padding-right: $cpad;
 	padding-bottom: 30px;
-	padding-left: 15px;
+	padding-left: $cpad;
 
 	/* Default sizing */
 	height: 100%;
@@ -141,5 +122,5 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-border {
-	border: 1px solid var(--gray-1);
+	border: 1px solid $gray-1;
 }

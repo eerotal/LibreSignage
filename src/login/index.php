@@ -16,9 +16,6 @@
 		<?php
 			css_include(['bootstrap', 'font-awesome']);
 		?>
-		<link rel="stylesheet" href="/common/css/footer.css">
-		<link rel="stylesheet" href="/common/css/default.css">
-		<link rel="stylesheet" href="/common/css/dialog.css">
 		<link rel="stylesheet" href="/login/css/login.css">
 		<title>LibreSignage Login</title>
 	</head>
