@@ -1,3 +1,6 @@
+$dialog-minw: 300px;
+$dialog-maxw: 500px;
+
 #dialog-overlay {
 	position: fixed;
 
@@ -20,8 +23,8 @@
 	position: absolute;
 
 	width: 30%;
-	min-width: 300px;
-	max-width: 500px;
+	min-width: $dialog-minw;
+	max-width: $dialog-maxw;
 
 	top: 50%;
 	left: 50%;
@@ -36,7 +39,9 @@
 }
 
 .btn-dialog {
-	margin-left: 5px;
-	margin-right: 5px;
+	margin: {
+		left: 5px;
+		right: 5px;
+	}
 }
 

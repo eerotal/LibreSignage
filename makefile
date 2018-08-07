@@ -27,8 +27,7 @@ SRC_NO_COMPILE := $(shell find src 						\
 SRC_SCSS := $(shell find src 						\
 	\( -type f -path 'src/node_modules/*' -prune \) \
 	-o \(											\
-		-type f ! -name '_*.scss'					\
-		-a -type f -name '*.scss' -print			\
+		-type f -name '*.scss' -print				\
 	\)												\
 )
 DIST_SCSS := $(subst src,dist,$(SRC_SCSS:.scss=.css))
@@ -172,8 +171,13 @@ dist/doc/html/README.html:: README.rst
 # Compile Sass files.
 dist/%.css:: src/%.scss
 	@:
-	echo "$< >> $@";
-	sass -I $(SASS_IPATHS) --sourcemap=none $< $@;
+	if [ ! "`basename "$(<)" | cut -c 1`" = "_" ]; then
+		echo "$< >> $@";
+		sass -I $(SASS_IPATHS) --sourcemap=none $< $@;
+	else
+		# Don't compile partials.
+		echo "$< >> $@ [SKIP]";
+	fi
 
 # Copy node_modules to 'dist/libs/'.
 dist/libs:: node_modules
@@ -209,6 +213,7 @@ LOC:
 		-o -name "*.js" -print						\
 		-o -name "*.html" -print					\
 		-o -name "*.css" -print						\
+		-o -name "*.scss" -print					\
 		-o -name "*.sh" -print						\
 		-o -name "*.json" -print					\
 		-o -name "*.py" -print						\

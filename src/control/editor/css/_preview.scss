@@ -1,7 +1,9 @@
+@import 'globals';
+
 /*
-* Live slide preview styling. The preview-16x9 and preview-4x3 classes
-* are meant to be applied to #slide-live-preview to select the
-* aspect ratio of the preview.
+* Live slide preview styling. The preview-16x9 and preview-4x3
+* classes are meant to be applied to #slide-live-preview to
+* select the aspect ratio of the preview.
 */
 
 $ratio-16x9-p: 9/16*100%;
@@ -12,8 +14,10 @@ $preview-breakpoint: 1000px;
 .preview-cont {
 	position: relative;
 	width: 100%;
-	margin-top: $s2;
-	margin-bottom: $s2;
+	margin: {
+		top: $s2;
+		bottom: $s2;
+	}
 }
 
 .preview {
@@ -27,7 +31,6 @@ $preview-breakpoint: 1000px;
 
 .preview-16x9 {
 	padding-top: $ratio-16x9-p;
-
 	.preview {
 		margin-top: -1*$ratio-16x9-p;
 	}
@@ -35,7 +38,6 @@ $preview-breakpoint: 1000px;
 
 .preview-4x3 {
 	padding-top: $ratio-4x3-p;
-
 	.preview {
 		margin-top: -1*$ratio-4x3-p;
 	}
@@ -45,11 +47,12 @@ $preview-breakpoint: 1000px;
 	.preview-16x9 {
 		padding-top: 0;
 		height: 9/16*$preview-mw;
-
 		.preview {
-			margin-top: 0;
-			margin-left: auto;
-			margin-right: auto;
+			margin: {
+				top: 0;
+				left: auto;
+				right: auto;
+			}
 			width: $preview-mw;
 			height: 9/16*$preview-mw;
 		}
@@ -58,11 +61,12 @@ $preview-breakpoint: 1000px;
 	.preview-4x3 {
 		padding-top: 0;
 		height: 3/4*$preview-mw;
-
 		.preview {
-			margin-top: 0;
-			margin-left: auto;
-			margin-right: auto;
+			margin: {
+				top: 0;
+				left: auto;
+				right: auto;
+			}
 			width: $preview-mw;
 			height: 3/4*$preview-mw;
 		}

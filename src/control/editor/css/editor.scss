@@ -6,7 +6,8 @@
 @import 'timeline';
 @import 'preview';
 
-$main-col-mw: 250px;
+$main-col-minw: 250px;
+$slide-input-minh: 30; // Min-height in lines.
 
 html, body {
 	min-height: 100%;
@@ -25,7 +26,7 @@ html, body {
 }
 
 #editor-col-l, #editor-col-r {
-	min-width: $main-col-mw;
+	min-width: $main-col-minw;
 }
 
 .btn-slide-ctrl {
@@ -55,9 +56,9 @@ html, body {
 }
 
 #slide-input {
-	min-height: calc(1em*30); /* min-height: 30 lines */
+	min-height: $slide-input-minh*1em;
 	border: 1px solid $gray-1;
-	margin-bottom: var(--s3);
+	margin-bottom: $s3;
 }
 
 #markup-err-display {

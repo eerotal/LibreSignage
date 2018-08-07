@@ -5,14 +5,18 @@
 
 .user-settings-cont {
 	max-width: 750px;
-	padding-bottom: 20px;
-	padding-left: 45px;
-	padding-right: 45px;
+	padding: {
+		bottom: 20px;
+		left: 45px;
+		right: 45px;
+	}
 }
 
 .user-session-row {
-	border-collapse: separate;
-	border-spacing: 5px;
+	border: {
+		collapse: separate;
+		spacing: 5px;
+	}
 }
 
 #user-sessions {
@@ -20,6 +24,8 @@
 }
 
 #user-sessions tr {
-	border-top: 1px solid $gray-1;
-	border-bottom: 1px solid $gray-1;
+	border: {
+		top: 1px solid $gray-1;
+		bottom: 1px solid $gray-1;
+	}
 }

@@ -4,19 +4,16 @@
 
 /* Default styling for 'main'. */
 main {
-	/* Default spacing */
 	margin: 0;
-	padding-top: 30px;
-	padding-right: $cpad;
-	padding-bottom: 30px;
-	padding-left: $cpad;
-
-	/* Default sizing */
+	padding: {
+		top: $dvpad;
+		right: $dhpad;
+		bottom: $dvpad;
+		left: $dhpad;
+	}
 	height: 100%;
 
-	/* Default muted text */
 	color: var(--dark);
-
 }
 
 /* Default background color */
@@ -69,7 +66,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Some predefined styling classes. */
-
 .cont-info-primary {
 	border-left: 3px solid var(--primary);
 	background-color: rgba(0, 123, 255, 0.08);
@@ -107,17 +103,21 @@ h1, h2, h3, h4, h5, h6 {
 
 .small-select {
 	height: 2em;
-	padding-top: 0;
-	padding-bottom: 0;
-	padding-left: 8px;
-	padding-right: 8px;
+	padding: {
+		top: 0;
+		bottom: 0;
+		left: 8px;
+		right: 8px;
+	}
 }
 
 .small-btn {
-	padding-left: 0.6em;
-	padding-right: 0.6em;
-	padding-top: 0.25em;
-	padding-bottom: 0.25em;
+	padding: {
+		left: 0.6em;
+		right: 0.6em;
+		top: 0.25em;
+		bottom: 0.25em;
+	}
 	height: 2em;
 }
 
