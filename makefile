@@ -6,45 +6,43 @@ NPMBIN := $(shell ./build/scripts/npmbin.sh)
 ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 SASS_IPATHS := $(ROOT)src/common/css
-SASSFLAGS := --sourcemap=none
+SASSFLAGS := --sourcemap=none --no-cache
 
 # Directories.
-DIRS := $(shell find src 								\
-	\( -type d -path 'src/node_modules' -prune \)		\
-	-o \( -type d -print \)								\
+DIRS := $(shell find src \
+	\( -type d -path 'src/node_modules' -prune \) \
+	-o \( -type d -print \) \
 )
 
 # Non-compiled sources.
-SRC_NO_COMPILE := $(shell find src 						\
-	\( -type f -path 'src/node_modules/*' -prune \)		\
-	-o \( -type f -path 'src/api/endpoint/*' -prune \) 	\
-	-o \(												\
-		-type f ! -name '*.js'							\
-		-a -type f ! -name '*.scss'						\
-		-a -type f ! -name 'config.php' -print 			\
-	\)													\
+SRC_NO_COMPILE := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o \( -type f -path 'src/api/endpoint/*' -prune \) \
+	-o \( \
+		-type f ! -name '*.js' \
+		-a -type f ! -name '*.scss' \
+		-a -type f ! -name 'config.php' -print \
+	\) \
 )
 
 # SCSS sources.
-SRC_SCSS := $(shell find src 							\
-	\( -type f -path 'src/node_modules/*' -prune \) 	\
-	-o \(												\
-		-type f -name '*.scss' -print					\
-	\)													\
+SRC_SCSS := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o \( \
+		-type f -name '*.scss' -print \
+	\) \
 )
-DEP_SCSS := $(subst src,dist,$(SRC_SCSS:.scss=.scss.dep))
 
 # JavaScript sources + dependencies.
-SRC_JS := $(shell find src 								\
-	\( -type f -path 'src/node_modules/*' -prune \)		\
-	-o \( -type f -name 'main.js' -print \)				\
+SRC_JS := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o \( -type f -name 'main.js' -print \) \
 )
-DEP_JS := $(subst src,dist,$(SRC_JS:.js=.js.dep))
 
 # API endpoint sources.
-SRC_ENDPOINT := $(shell find src/api/endpoint 			\
-	\( -type f -path 'src/node_modules/*' -prune \)		\
-	-o \( -type f -name '*.php' -print \)				\
+SRC_ENDPOINT := $(shell find src/api/endpoint \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o \( -type f -name '*.php' -print \) \
 )
 
 # Documentation dist files.
@@ -64,10 +62,10 @@ ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [INFO] Won't generate HTML documentation.)
 endif
 
-.PHONY: dirs server js api config libs docs install utest clean realclean LOC %.dep
+.PHONY: dirs server js css api config libs docs install utest clean realclean LOC %.dep
 .ONESHELL:
 
-all:: dirs server js api config libs docs css
+all:: dirs server js css api config libs docs; @:
 
 dirs:: $(subst src,dist,$(DIRS)); @:
 server:: dirs $(subst src,dist,$(SRC_NO_COMPILE)); @:
@@ -214,21 +212,21 @@ realclean:
 # Count the lines of code in LibreSignage.
 LOC:
 	@:
-	wc -l `find .									\
-		\(											\
-			-path "./dist/*" -o						\
-			-path "./utests/api/.mypy_cache/*" -o	\
-			-path "./node_modules/*"				\
-		\) -prune 									\
-		-o -name "*.py" -print						\
-		-o -name "*.php" -print						\
-		-o -name "*.js" -print						\
-		-o -name "*.html" -print					\
-		-o -name "*.css" -print						\
-		-o -name "*.scss" -print					\
-		-o -name "*.sh" -print						\
-		-o -name "*.json" -print					\
-		-o -name "*.py" -print						\
+	wc -l `find . \
+		\( \
+			-path "./dist/*" -o \
+			-path "./utests/api/.mypy_cache/*" -o \
+			-path "./node_modules/*" \
+		\) -prune \
+		-o -name "*.py" -print \
+		-o -name "*.php" -print \
+		-o -name "*.js" -print \
+		-o -name "*.html" -print \
+		-o -name "*.css" -print \
+		-o -name "*.scss" -print \
+		-o -name "*.sh" -print \
+		-o -name "*.json" -print \
+		-o -name "*.py" -print \
 		-o -name "makefile" -print`
 
 %:
