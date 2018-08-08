@@ -13,7 +13,7 @@ pattern = re.compile('^@import \'(.*)\';$');
 
 def guess_file(name, import_paths):
 	if (name[:1] == '/' and os.path.isfile(name)):
-		return name;
+		return os.path.abspath(name);
 	elif not (re.match(name, '.scss') and re.match(name, '/')):
 		variants = [
 			name + '.scss',
@@ -22,7 +22,7 @@ def guess_file(name, import_paths):
 		for p in import_paths:
 			for v in variants:
 				if (os.path.isfile(os.path.join(p, v))):
-					return os.path.join(p, v);
+					return os.path.abspath(os.path.join(p, v));
 	return None;
 
 def getdeps(file, ipaths, before):

@@ -4,12 +4,14 @@
 
 NPMBIN := $(shell ./build/scripts/npmbin.sh)
 ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-SASS_IPATHS := $(ROOT)/src/common/css
+
+SASS_IPATHS := $(ROOT)src/common/css
+SASSFLAGS := --sourcemap=none
 
 # Directories.
-DIRS := $(shell find src 							\
-	\( -type d -path 'src/node_modules' -prune \)	\
-	-o \( -type d -print \)							\
+DIRS := $(shell find src 								\
+	\( -type d -path 'src/node_modules' -prune \)		\
+	-o \( -type d -print \)								\
 )
 
 # Non-compiled sources.
@@ -24,25 +26,25 @@ SRC_NO_COMPILE := $(shell find src 						\
 )
 
 # SCSS sources.
-SRC_SCSS := $(shell find src 						\
-	\( -type f -path 'src/node_modules/*' -prune \) \
-	-o \(											\
-		-type f -name '*.scss' -print				\
-	\)												\
+SRC_SCSS := $(shell find src 							\
+	\( -type f -path 'src/node_modules/*' -prune \) 	\
+	-o \(												\
+		-type f -name '*.scss' -print					\
+	\)													\
 )
-DIST_SCSS := $(subst src,dist,$(SRC_SCSS:.scss=.css))
+DEP_SCSS := $(subst src,dist,$(SRC_SCSS:.scss=.scss.dep))
 
 # JavaScript sources + dependencies.
-SRC_JS := $(shell find src 							\
-	\( -type f -path 'src/node_modules/*' -prune \)	\
-	-o \( -type f -name 'main.js' -print \)			\
+SRC_JS := $(shell find src 								\
+	\( -type f -path 'src/node_modules/*' -prune \)		\
+	-o \( -type f -name 'main.js' -print \)				\
 )
-DEP_JS := $(subst src,dist,$(SRC_JS:.js=.d))
+DEP_JS := $(subst src,dist,$(SRC_JS:.js=.js.dep))
 
 # API endpoint sources.
-SRC_ENDPOINT := $(shell find src/api/endpoint 		\
-	\( -type f -path 'src/node_modules/*' -prune \)	\
-	-o \( -type f -name '*.php' -print \)			\
+SRC_ENDPOINT := $(shell find src/api/endpoint 			\
+	\( -type f -path 'src/node_modules/*' -prune \)		\
+	-o \( -type f -name '*.php' -print \)				\
 )
 
 # Documentation dist files.
@@ -62,7 +64,7 @@ ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [INFO] Won't generate HTML documentation.)
 endif
 
-.PHONY: dirs server js api config libs docs install utest clean realclean LOC $(DEP_JS)
+.PHONY: dirs server js api config libs docs install utest clean realclean LOC %.dep
 .ONESHELL:
 
 all:: dirs server js api config libs docs css
@@ -74,7 +76,7 @@ api:: dirs $(subst src,dist,$(SRC_ENDPOINT)); @:
 config:: dirs dist/common/php/config.php; @:
 libs:: dirs dist/libs; @:
 docs:: dirs dist/doc/rst/api_index.rst $(HTML_DOCS); @:
-css:: dirs $(DIST_SCSS); @:
+css:: dirs $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
 
 # Create directory structure in 'dist/'.
 $(subst src,dist,$(DIRS)):: dist%: src%
@@ -138,19 +140,18 @@ dist/common/php/config.php:: src/common/php/config.php
 	./build/scripts/prep.sh $(INST) $@
 	php -l $@ > /dev/null;
 
-# Generate makefiles w/ dependencies for JavaScript files.
-$(DEP_JS): dist/%/main.d: src/%/main.js
+# Generate JavaScript deps.
+dist/%/main.js.dep: src/%/main.js
 	@:
-	echo "[INFO] Gen makefile "$@;
-	echo -n '$(notdir $<): ' > $@;
-	$(NPMBIN)/browserify --list $<|tr '\n' ' ' >> $@;
-	echo '\n\t@$(NPMBIN)/browserify $(ROOT)$< \
-			-o $(ROOT)$(subst src,dist,$<)' >> $@;
+	echo "[DEPS]: $< >> $@";
+	echo "all:: `$(NPMBIN)/browserify --list $<|tr '\n' ' '`" > $@;
+	echo '\n\t@$(NPMBIN)/browserify $(ROOT)$< -o $(ROOT)$(subst src,dist,$<)' >> $@;
 
 # Compile JavaScript files.
-dist/%/main.js: dist/%/main.d src/%/main.js
+dist/%/main.js: dist/%/main.js.dep src/%/main.js
 	@:
-	make --no-print-directory -C $(dir $<) -f main.d
+	echo "[BROWSERIFY]: $(word 2,$^) >> $@";
+	make --no-print-directory -C $(dir $<) -f $(notdir $<);
 
 # Compile normal (non-API) documentation files.
 dist/doc/html/%.html:: src/doc/rst/%.rst
@@ -168,15 +169,26 @@ dist/doc/html/README.html:: README.rst
 		pandoc -o $@ -f rst -t html $<;
 	fi
 
-# Compile Sass files.
-dist/%.css:: src/%.scss
+# Generate SCSS deps.
+dist/%.scss.dep: src/%.scss
 	@:
-	if [ ! "`basename "$(<)" | cut -c 1`" = "_" ]; then
-		echo "$< >> $@";
-		sass -I $(SASS_IPATHS) --sourcemap=none $< $@;
+	# Don't create deps for partials.
+	if [ ! "`basename '$(<)' | cut -c 1`" = "_" ]; then
+		echo "[DEPS]: $< >> $@";
+		echo "all:: `./build/scripts/sassdep.py $< $(SASS_IPATHS)`" > $@;
+		echo "\t@sass -I $(SASS_IPATHS) $(SASSFLAGS)" \
+			"$(ROOT)$< $(ROOT)$(subst src,dist,$(<:.scss=.css));" >> $@;
+	fi
+
+# Compile Sass files.
+dist/%.css: dist/%.scss.dep src/%.scss
+	@:
+	# Don't compile partials.
+	if [ ! "`basename '$(word 2,$^)' | cut -c 1`" = "_" ]; then
+		echo "[SASS]: $(word 2,$^) >> $@";
+		make --no-print-directory -C $(dir $<) -f $(notdir $<);
 	else
-		# Don't compile partials.
-		echo "$< >> $@ [SKIP]";
+		echo "[SKIP] $(word 2,$^) >> $@";
 	fi
 
 # Copy node_modules to 'dist/libs/'.
