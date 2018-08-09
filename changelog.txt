@@ -5,3 +5,4 @@ v0.1.0
   - Self host font files. (I actually don't particularly like including
     binary files in the GIT tree but I don't know of a better way so
     the font files are now included in the tree.)
+  - Use SCSS instead of plain CSS for the stylesheets.

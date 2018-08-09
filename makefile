@@ -8,6 +8,8 @@ ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SASS_IPATHS := $(ROOT)src/common/css
 SASSFLAGS := --sourcemap=none --no-cache
 
+VERBOSE=y
+
 # Directories.
 DIRS := $(shell find src \
 	\( -type d -path 'src/node_modules' -prune \) \
@@ -21,19 +23,24 @@ SRC_NO_COMPILE := $(shell find src \
 	-o \( \
 		-type f ! -name '*.js' \
 		-a -type f ! -name '*.scss' \
+		-a -type f ! -name '*.rst' \
 		-a -type f ! -name 'config.php' -print \
 	\) \
+)
+
+# RST sources.
+SRC_RST := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o -type f -name '*.rst' -print \
 )
 
 # SCSS sources.
 SRC_SCSS := $(shell find src \
 	\( -type f -path 'src/node_modules/*' -prune \) \
-	-o \( \
-		-type f -name '*.scss' -print \
-	\) \
+	-o -type f -name '*.scss' -print \
 )
 
-# JavaScript sources + dependencies.
+# JavaScript sources.
 SRC_JS := $(shell find src \
 	\( -type f -path 'src/node_modules/*' -prune \) \
 	-o \( -type f -name 'main.js' -print \) \
@@ -45,10 +52,10 @@ SRC_ENDPOINT := $(shell find src/api/endpoint \
 	-o \( -type f -name '*.php' -print \) \
 )
 
-# Documentation dist files.
-HTML_DOCS := $(shell find src -type f -name '*.rst')
-HTML_DOCS := $(addprefix dist/doc/html/,$(notdir $(HTML_DOCS)))
-HTML_DOCS := $(HTML_DOCS:.rst=.html) dist/doc/html/README.html
+status = \
+	if [ "$(VERBOSE)" = "y" ]; then \
+		echo "$(1): $(2) >> $(3)"|tr -s ' '|sed 's/^ *$///g'; \
+	fi
 
 ifndef INST
 INST := ""
@@ -62,10 +69,12 @@ ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [INFO] Won't generate HTML documentation.)
 endif
 
-.PHONY: dirs server js css api config libs docs install utest clean realclean LOC %.dep
+.PHONY: dirs server js css api config libs \
+		docs htmldocs install utest clean \
+		realclean LOC %.dep
 .ONESHELL:
 
-all:: dirs server js css api config libs docs; @:
+all:: dirs server docs htmldocs js css api config libs; @:
 
 dirs:: $(subst src,dist,$(DIRS)); @:
 server:: dirs $(subst src,dist,$(SRC_NO_COMPILE)); @:
@@ -73,7 +82,8 @@ js:: dirs $(subst src,dist,$(SRC_JS)); @:
 api:: dirs $(subst src,dist,$(SRC_ENDPOINT)); @:
 config:: dirs dist/common/php/config.php; @:
 libs:: dirs dist/libs; @:
-docs:: dirs dist/doc/rst/api_index.rst $(HTML_DOCS); @:
+docs:: dirs $(subst src,dist,$(SRC_RST)); @:
+htmldocs:: dirs $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html)))
 css:: dirs $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
 
 # Create directory structure in 'dist/'.
@@ -84,35 +94,52 @@ $(subst src,dist,$(DIRS)):: dist%: src%
 # Copy over non-compiled sources.
 $(subst src,dist,$(SRC_NO_COMPILE)):: dist%: src%
 	@:
+	$(call status,cp,$<,$@);
 	cp -p $< $@;
 
-# Copy normal PHP files to 'dist/.' and check the PHP syntax.
+# Copy over normal PHP files and check the PHP syntax.
 $(filter %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
 	@:
 	php -l $< > /dev/null;
+
+	$(call status,cp,$<,$@);
 	cp -p $< $@;
 
 # Copy API endpoint PHP files and generate corresponding docs.
 $(subst src,dist,$(SRC_ENDPOINT)):: dist%: src%
 	@:
 	php -l $< > /dev/null;
+
+	$(call status,cp,$<,$@);
 	cp -p $< $@;
 
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
 		# Generate reStructuredText documentation.
 		mkdir -p dist/doc/rst;
 		mkdir -p dist/doc/html;
+		$(call status,\
+			gendoc.sh,\
+			<generated>,\
+			dist/doc/rst/$(notdir $(@:.php=.rst))\
+		);
 		./build/scripts/gendoc.sh $(INST) $@ dist/doc/rst/
 
 		# Compile rst docs into HTML.
+		$(call status,\
+			pandoc,\
+			dist/doc/rst/$(notdir $(@:.php=.rst)),\
+			dist/doc/html/$(notdir $(@:.php=.html))\
+		)
 		pandoc -f rst -t html \
 			-o dist/doc/html/$(notdir $(@:.php=.html)) \
 			dist/doc/rst/$(notdir $(@:.php=.rst))
 	fi
 
+# Generate the API endpoint documentation index.
 dist/doc/rst/api_index.rst:: $(SRC_ENDPOINT)
 	@:
-	# Generate the API endpoint documentation index.
+	$(call status,makefile,<generated>,$@);
+
 	@. build/scripts/conf.sh
 	echo "LibreSignage API documentation (Ver: $$ICONF_API_VER)" > $@;
 	echo '########################################################' >> $@;
@@ -127,6 +154,7 @@ dist/doc/rst/api_index.rst:: $(SRC_ENDPOINT)
 
 	# Compile into HTML.
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
+		$(call status,pandoc,$(subst /rst/,/html/,$($:.rst=.html)),$@);
 		pandoc -f rst -t html -o $(subst /rst/,/html/,$(@:.rst=.html)) $@;
 	fi
 
@@ -134,28 +162,37 @@ dist/doc/rst/api_index.rst:: $(SRC_ENDPOINT)
 dist/common/php/config.php:: src/common/php/config.php
 	@:
 	echo "[INFO] Prepare 'config.php'.";
+	$(call status,cp,$<,$@);
 	cp -p $< $@;
+	$(call status,prep.sh,<inplace>,$@);
 	./build/scripts/prep.sh $(INST) $@
 	php -l $@ > /dev/null;
 
 # Generate JavaScript deps.
 dist/%/main.js.dep: src/%/main.js
 	@:
-	echo "[DEPS]: $< >> $@";
+	$(call status,deps,$<,$@);
 	echo "all:: `$(NPMBIN)/browserify --list $<|tr '\n' ' '`" > $@;
 	echo '\n\t@$(NPMBIN)/browserify $(ROOT)$< -o $(ROOT)$(subst src,dist,$<)' >> $@;
 
-# Compile JavaScript files.
+# Compile JavaScript sources.
 dist/%/main.js: dist/%/main.js.dep src/%/main.js
 	@:
-	echo "[BROWSERIFY]: $(word 2,$^) >> $@";
+	$(call status,browserify,$(word 2,$^),$@);
 	make --no-print-directory -C $(dir $<) -f $(notdir $<);
 
-# Compile normal (non-API) documentation files.
+# Copy over RST sources.
+dist/doc/rst/%.rst:: src/doc/rst/%.rst
+	@:
+	$(call status,cp,$<,$@);
+	cp -p $< $@;
+
+# Compile RST sources into HTML.
 dist/doc/html/%.html:: src/doc/rst/%.rst
 	@:
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
 		mkdir -p dist/doc/html;
+		$(call status,pandoc,$<,$@);
 		pandoc -o $@ -f rst -t html $<;
 	fi
 
@@ -164,6 +201,7 @@ dist/doc/html/README.html:: README.rst
 	@:
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
 		mkdir -p dist/doc/html;
+		$(call status,pandoc,$<,$@);
 		pandoc -o $@ -f rst -t html $<;
 	fi
 
@@ -172,27 +210,29 @@ dist/%.scss.dep: src/%.scss
 	@:
 	# Don't create deps for partials.
 	if [ ! "`basename '$(<)' | cut -c 1`" = "_" ]; then
-		echo "[DEPS]: $< >> $@";
+		$(call status,deps,$<,$@);
 		echo "all:: `./build/scripts/sassdep.py $< $(SASS_IPATHS)`" > $@;
 		echo "\t@sass -I $(SASS_IPATHS) $(SASSFLAGS)" \
 			"$(ROOT)$< $(ROOT)$(subst src,dist,$(<:.scss=.css));" >> $@;
 	fi
 
-# Compile Sass files.
+# Compile Sass sources.
 dist/%.css: dist/%.scss.dep src/%.scss
 	@:
 	# Don't compile partials.
 	if [ ! "`basename '$(word 2,$^)' | cut -c 1`" = "_" ]; then
-		echo "[SASS]: $(word 2,$^) >> $@";
+		$(call status,sass,$(word 2,$^),$@);
 		make --no-print-directory -C $(dir $<) -f $(notdir $<);
 	else
-		echo "[SKIP] $(word 2,$^) >> $@";
+		$(call status,skip,$(word 2,$^),$@);
 	fi
 
 # Copy node_modules to 'dist/libs/'.
 dist/libs:: node_modules
-	@mkdir -p dist/libs
-	@cp -Rp $</* dist/libs
+	@:
+	mkdir -p dist/libs
+	$(call status,cp,$<,$@);
+	cp -Rp $</* $@
 
 install:; @./build/scripts/install.sh $(INST)
 
@@ -231,4 +271,4 @@ LOC:
 
 %:
 	@:
-	echo '[INFO] Ignore '$@;
+	echo "[INFO]: Ignore $@";
