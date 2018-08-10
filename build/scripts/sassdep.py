@@ -1,32 +1,52 @@
 #!/usr/bin/env python3
 
-# Determine dependencies for a SCSS file based on the @import
-# statements in the file recursively. $1 is the path of the
-# file to read. Include paths can be specified on the CLI after
-# the source file as a list of paths.
+# Determine dependency trees for SCSS files based on the @import
+# statements in the file. Run ./sassdep.py --help for more information.
 
 import sys;
 import re;
 import os.path;
+import argparse;
 
-pattern = re.compile('^@import \'(.*)\';$');
+patterns = [
+	re.compile('^@import \'(.*)\';$'),
+	re.compile('^@import \"(.*)\";$')
+]
 
-def guess_file(name, import_paths):
-	if (name[:1] == '/' and os.path.isfile(name)):
-		return os.path.abspath(name);
-	elif not (re.match(name, '.scss') and re.match(name, '/')):
-		variants = [
-			name + '.scss',
-			'_' + name + '.scss'
-		];
-		for p in import_paths:
-			for v in variants:
-				if (os.path.isfile(os.path.join(p, v))):
-					return os.path.abspath(os.path.join(p, v));
+def check_import_variants(dir, name, ipaths):
+	variants = [
+		name,
+		'_' + name,
+		name + '.scss',
+		'_' + name + '.scss'
+	];
+	for p in ipaths:
+		for v in variants:
+			if (dir == None):
+				tmp = os.path.abspath(os.path.join(p, v));
+			else:
+				tmp = os.path.abspath(os.path.join(p, dir, v));
+
+			if (os.path.isfile(tmp)):
+				return tmp;
 	return None;
 
-def getdeps(file, ipaths, before):
-	global pattern;
+def guess_file(name, ipaths):
+	if (re.search('/', name)):
+		p = os.path.split(name)
+		return check_import_variants(p[0], p[1], ipaths);
+	else:
+		return check_import_variants(None, name, ipaths);
+	return None;
+
+def getdeps(file, ipaths, before, depth, opts):
+	global patterns, DEBUG;
+
+	if (opts.tree):
+		print(
+			' '*depth*opts.indent +
+			re.sub(os.path.join(ipaths[0], ''), '', file)
+		);
 
 	imports = before;
 
@@ -34,20 +54,76 @@ def getdeps(file, ipaths, before):
 	tmp_ipaths.append(os.path.dirname(file));
 
 	with open(file, 'r') as src:
-		tmp = True;
-		while (tmp):
-			tmp = pattern.match(src.readline());
-			if (tmp):
+		ln = True;
+		while (ln):
+			ln = src.readline();
+			for pat in patterns:
+				tmp = pat.match(ln);
+				if (not tmp): continue;
+
 				fname = guess_file(tmp.group(1), tmp_ipaths);
-				if (not fname in imports):
+				if (opts.tree or not fname in imports):
 					if not fname:
 						raise Exception(
-							"Can't find imported file: " + tmp.group(1)
+							"Cannot find imported file: " + tmp.group(1)
 						);
 					imports.append(fname);
-					imports = getdeps(fname, ipaths, imports);
+					imports = getdeps(
+						fname,
+						ipaths,
+						imports,
+						depth + 1,
+						opts
+					);
 	return imports;
 
 if (__name__ == '__main__'):
-	if (sys.argv[1]):
-		print(' '.join(getdeps(sys.argv[1], sys.argv[2:], [])));
+	parser = argparse.ArgumentParser(
+		description='Generate dependency trees from SCSS source files.'
+	);
+	parser.add_argument(
+		'-t', '--tree',
+		action='store_true',
+		help='Print the dependency tree on stdout.'
+	);
+	parser.add_argument(
+		'-i', '--indent',
+		action='store',
+		type=int,
+		default=2,
+		help='Dependency tree indentation depth ' +
+			'for one level. (default: 2)'
+	);
+	parser.add_argument(
+		'-l', '--list',
+		action='store_true',
+		help='Print the dependencies as a list on stdout.'
+	);
+	parser.add_argument('file',
+		nargs=1,
+		help='The source file to read.'
+	);
+	parser.add_argument('src_root',
+		nargs=1,
+		help='The source root of the project.'
+	);
+	parser.add_argument(
+		'import_paths',
+		nargs=argparse.REMAINDER,
+		help='A list of import paths to use.'
+	);
+	opts = parser.parse_args(sys.argv[1:]);
+
+	if (opts.tree and opts.list):
+		raise Exception(
+			"Can't have --tree and --list simultaneously."
+		)
+
+	list = ' '.join(getdeps(
+		opts.file[0],
+		opts.src_root + opts.import_paths,
+		[],
+		0,
+		opts
+	));
+	if (opts.list): print(list);

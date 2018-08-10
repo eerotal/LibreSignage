@@ -49,9 +49,11 @@ html, body {
 }
 
 #slide-sched-group {
-	margin-top: .5rem;
-	margin-bottom: .5rem;
-	margin-left: 1.5rem;
+	margin: {
+		top: .5rem;
+		bottom: .5rem;
+		left: 1.5rem;
+	}
 	border-left: 1px solid $gray-1;
 }
 

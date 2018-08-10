@@ -5,7 +5,7 @@
 NPMBIN := $(shell ./build/scripts/npmbin.sh)
 ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-SASS_IPATHS := $(ROOT)src/common/css
+SASS_IPATHS := $(ROOT) $(ROOT)src/common/css
 SASSFLAGS := --sourcemap=none --no-cache
 
 VERBOSE=y
@@ -211,8 +211,8 @@ dist/%.scss.dep: src/%.scss
 	# Don't create deps for partials.
 	if [ ! "`basename '$(<)' | cut -c 1`" = "_" ]; then
 		$(call status,deps,$<,$@);
-		echo "all:: `./build/scripts/sassdep.py $< $(SASS_IPATHS)`" > $@;
-		echo "\t@sass -I $(SASS_IPATHS) $(SASSFLAGS)" \
+		echo "all:: `./build/scripts/sassdep.py -l $< $(SASS_IPATHS)`" > $@;
+		echo "\t@sass $(addprefix -I ,$(SASS_IPATHS)) $(SASSFLAGS)" \
 			"$(ROOT)$< $(ROOT)$(subst src,dist,$(<:.scss=.css));" >> $@;
 	fi
 
