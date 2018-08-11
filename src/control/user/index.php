@@ -9,9 +9,6 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<?php
-			css_include(['bootstrap']);
-		?>
 		<link rel="stylesheet" href="/control/user/css/user.css">
 		<title>LibreSignage User Settings</title>
 	</head>

@@ -84,7 +84,7 @@ def getdeps(file, ipaths, before, depth, opts):
 				if (opts.tree or not fname in imports):
 					if not fname:
 						raise Exception(
-							"Cannot find imported file: " + tmp.group(1)
+							"Cannot find imported file: " + f
 						);
 					imports.append(fname);
 					imports = getdeps(

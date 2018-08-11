@@ -91,8 +91,8 @@ $(subst src,dist,$(DIRS)):: dist%: src%
 	@:
 	mkdir -p $@;
 
-# Copy over non-compiled sources.
-$(subst src,dist,$(SRC_NO_COMPILE)):: dist%: src%
+# Copy over non-compiled, non-PHP sources.
+$(filter-out %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
 	@:
 	$(call status,cp,$<,$@);
 	cp -p $< $@;

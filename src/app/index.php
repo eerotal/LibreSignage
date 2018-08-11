@@ -22,9 +22,6 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<?php
-			css_include(['bootstrap']);
-		?>
 		<link rel="stylesheet" href="/app/css/display.css">
 		<title>LibreSignage Display</title>
 	</head>
