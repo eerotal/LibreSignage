@@ -8,12 +8,15 @@ import re;
 import os.path;
 import argparse;
 
-patterns = [
-	re.compile('^@import \'(.*)\';$'),
-	re.compile('^@import \"(.*)\";$')
-]
+pattern = re.compile('@import (.*);');
 
 def check_import_variants(dir, name, ipaths):
+	# Try to find a file that corresponds to the filename
+	# in an SCSS @import statement in one of the import
+	# directories in 'ipaths'. The file is searched from the
+	# import directories in the order they are in the 'ipaths'
+	# list.
+
 	variants = [
 		name,
 		'_' + name,
@@ -32,6 +35,8 @@ def check_import_variants(dir, name, ipaths):
 	return None;
 
 def guess_file(name, ipaths):
+	# Wrapper for check_import_variants().
+
 	if (re.search('/', name)):
 		p = os.path.split(name)
 		return check_import_variants(p[0], p[1], ipaths);
@@ -40,7 +45,14 @@ def guess_file(name, ipaths):
 	return None;
 
 def getdeps(file, ipaths, before, depth, opts):
-	global patterns, DEBUG;
+	# Get the dependencies for 'file'.
+	#  ipaths = A list of import paths to use.
+	#  before = A list of previous imports while recursively
+	#           determining the dependencies.
+	#  depth  = The current recursion depth.
+	#  opts   = The CLI options object return by argparse.parse_args().
+
+	global pattern;
 
 	if (opts.tree):
 		print(
@@ -49,19 +61,26 @@ def getdeps(file, ipaths, before, depth, opts):
 		);
 
 	imports = before;
-
-	tmp_ipaths = ipaths;
-	tmp_ipaths.append(os.path.dirname(file));
+	tmp_ipaths = ipaths.copy();
+	tmp_ipaths.insert(0, os.path.dirname(file));
 
 	with open(file, 'r') as src:
 		ln = True;
 		while (ln):
 			ln = src.readline();
-			for pat in patterns:
-				tmp = pat.match(ln);
-				if (not tmp): continue;
+			tmp = pattern.match(ln);
+			if not tmp: continue;
 
-				fname = guess_file(tmp.group(1), tmp_ipaths);
+			files = tmp.group(1).translate(
+				{
+					ord(' '): None,
+					ord('\''): None,
+					ord('"'): None
+				}
+			).split(',');
+
+			for f in files:
+				fname = guess_file(f, tmp_ipaths);
 				if (opts.tree or not fname in imports):
 					if not fname:
 						raise Exception(
