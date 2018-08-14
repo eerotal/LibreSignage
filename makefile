@@ -8,7 +8,7 @@ ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SASS_IPATHS := $(ROOT) $(ROOT)src/common/css
 SASSFLAGS := --sourcemap=none --no-cache
 
-VERBOSE=y
+export VERBOSE=y
 
 # Directories.
 DIRS := $(shell find src \
@@ -32,7 +32,7 @@ SRC_NO_COMPILE := $(shell find src \
 SRC_RST := $(shell find src \
 	\( -type f -path 'src/node_modules/*' -prune \) \
 	-o -type f -name '*.rst' -print \
-)
+) README.rst
 
 # SCSS sources.
 SRC_SCSS := $(shell find src \
@@ -52,7 +52,7 @@ SRC_ENDPOINT := $(shell find src/api/endpoint \
 	-o \( -type f -name '*.php' -print \) \
 )
 
-status = \
+export status = \
 	if [ "$(VERBOSE)" = "y" ]; then \
 		echo "$(1): $(2) >> $(3)"|tr -s ' '|sed 's/^ *$///g'; \
 	fi
@@ -82,7 +82,7 @@ js:: dirs $(subst src,dist,$(SRC_JS)); @:
 api:: dirs $(subst src,dist,$(SRC_ENDPOINT)); @:
 config:: dirs dist/common/php/config.php; @:
 libs:: dirs dist/libs; @:
-docs:: dirs $(subst src,dist,$(SRC_RST)); @:
+docs:: dirs $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))); @:
 htmldocs:: dirs $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html)))
 css:: dirs $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
 
@@ -161,7 +161,6 @@ dist/doc/rst/api_index.rst:: $(SRC_ENDPOINT)
 # Copy and prepare 'config.php'.
 dist/common/php/config.php:: src/common/php/config.php
 	@:
-	echo "[INFO] Prepare 'config.php'.";
 	$(call status,cp,$<,$@);
 	cp -p $< $@;
 	$(call status,prep.sh,<inplace>,$@);
@@ -171,15 +170,23 @@ dist/common/php/config.php:: src/common/php/config.php
 # Generate JavaScript deps.
 dist/%/main.js.dep: src/%/main.js
 	@:
-	$(call status,deps,$<,$@);
+	$(call status,deps-js,$<,$@);
 	echo "all:: `$(NPMBIN)/browserify --list $<|tr '\n' ' '`" > $@;
-	echo '\n\t@$(NPMBIN)/browserify $(ROOT)$< -o $(ROOT)$(subst src,dist,$<)' >> $@;
+	echo "\t@$(NPMBIN)/browserify"\
+		"$(ROOT)$<"\
+		"-o $(ROOT)$(subst src,dist,$<)" >> $@;
 
 # Compile JavaScript sources.
 dist/%/main.js: dist/%/main.js.dep src/%/main.js
 	@:
 	$(call status,browserify,$(word 2,$^),$@);
-	make --no-print-directory -C $(dir $<) -f $(notdir $<);
+	$(MAKE) --no-print-directory -C $(dir $<) -f $(notdir $<);
+
+# Copy over README.rst.
+dist/doc/rst/README.rst:: README.rst
+	@:
+	$(call status,cp,$<,$@);
+	cp -p $< $@;
 
 # Copy over RST sources.
 dist/doc/rst/%.rst:: src/doc/rst/%.rst
@@ -210,10 +217,22 @@ dist/%.scss.dep: src/%.scss
 	@:
 	# Don't create deps for partials.
 	if [ ! "`basename '$(<)' | cut -c 1`" = "_" ]; then
-		$(call status,deps,$<,$@);
+		$(call status,deps-scss,$<,$@);
 		echo "all:: `./build/scripts/sassdep.py -l $< $(SASS_IPATHS)`" > $@;
-		echo "\t@sass $(addprefix -I ,$(SASS_IPATHS)) $(SASSFLAGS)" \
-			"$(ROOT)$< $(ROOT)$(subst src,dist,$(<:.scss=.css));" >> $@;
+
+		# Compile with sass.
+		echo "\t@sass"\
+			"$(addprefix -I,$(SASS_IPATHS))"\
+			"$(SASSFLAGS)"\
+			"$(ROOT)$<"\
+			"$(ROOT)$(subst src,dist,$(<:.scss=.css));" >> $@;
+
+		# Process with postcss.
+		echo "\t@$(NPMBIN)/postcss"\
+			"$(ROOT)$(subst src,dist,$(<:.scss=.css))"\
+			"--config $(ROOT)postcss.config.js"\
+			"--replace"\
+			"--no-map;" >> $@;
 	fi
 
 # Compile Sass sources.
@@ -221,8 +240,8 @@ dist/%.css: dist/%.scss.dep src/%.scss
 	@:
 	# Don't compile partials.
 	if [ ! "`basename '$(word 2,$^)' | cut -c 1`" = "_" ]; then
-		$(call status,sass,$(word 2,$^),$@);
-		make --no-print-directory -C $(dir $<) -f $(notdir $<);
+		$(call status,compile-scss,$(word 2,$^),$@);
+		$(MAKE) --no-print-directory -C $(dir $<) -f $(notdir $<);
 	else
 		$(call status,skip,$(word 2,$^),$@);
 	fi

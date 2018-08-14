@@ -6,3 +6,5 @@ v0.1.0
     binary files in the GIT tree but I don't know of a better way so
     the font files are now included in the tree.)
   - Use SCSS instead of plain CSS for the stylesheets.
+  - Import Bootstrap straight into the _default.scss file instead of
+    including it in the HTML <head> tag.

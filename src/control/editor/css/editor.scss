@@ -10,6 +10,7 @@ $main-col-minw: 250px;
 $slide-input-minh: 30; // Min-height in lines.
 
 html, body {
+	transition: all .5s;
 	min-height: 100%;
 }
 

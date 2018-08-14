@@ -56,15 +56,15 @@ can look up more information about Virtual Hosts on the
 Doing a basic install of LibreSignage is quite simple. The required steps
 are listed below.
 
-1. Install software needed for building LibreSignage. On Debian Stretch
-   this can be accomplished by running ``sudo apt install git npm
-   apache2 php7.0 pandoc ruby-sass``.
-2. Install the required JavaScript dependencies by running ``npm install``.
-   If this command fails to install Browserify because of a permission
-   error, you need to fix your npm installation. Check `the npm documentation
-   page <https://docs.npmjs.com/getting-started/fixing-npm-permissions>`_
-   for instructions. Both of the options on that page should work but
-   at least *Option 2* has been tested.
+1. Install software needed for building LibreSignage. You will need the
+   following packages: ``git, apache2, php7.0, pandoc ruby-sass, npm``.
+   On Debian Stretch all other packages except *npm* can installed by
+   running ``sudo apt install git apache2 php7.0 pandoc ruby-sass``.
+   Currently *npm* is only available in the Debian Sid repos and even
+   there the package is so old it doesn't work correctly. You can, however,
+   download the *node.js* binaries (including npm) from the *node.js*
+   website. See `How to install NPM`_ for more info.
+2. Install dependencies from NPM by running ``npm install``.
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
@@ -92,6 +92,30 @@ line to your */etc/hosts* file.
 
 This will redirect all requests for *example.com* to *localhost*,
 making it possible to access the site by connecting to *example.com*.
+
+How to install npm
+------------------
+
+If npm doesn't exist in the repos of your Linux distribution of choice,
+is very outdated (like in the case of Debian) or you are not using a
+Linux based distribution at all, you must install it by downloading
+the *node.js* package from the
+`node.js website <https://nodejs.org/en/>`_. This, however, requires some
+manual work. Below is a step-by-step guide for installing *npm* on Linux
+based systems. If you use some other OS, you're on your own :(.
+
+1. Download the *node.js* binaries for your system from
+   https://nodejs.org/en/download/.
+2. Extract the tarball with ``tar -xvf <name of tarball>``.
+3. Create a new directory ``/opt/npm`` and copy the extracted
+   files into it.
+4. Run ``ln -s /opt/npm/bin/npm /usr/local/bin/npm`` and
+   ``ln -s /opt/npm/bin/npx /usr/local/bin/npx``. You need to
+   be root when running these commands so prefix them with ``sudo``
+   or log in as root first.
+5. Run ``cd ~/`` to go back to your home directory and verify the
+   installation by running ``npm -v``. This should now print the
+   installed npm version.
 
 Default users
 -------------
@@ -186,8 +210,8 @@ LOC
 You can also pass ``INST=[CONFIG FILE]`` with all the build/installation rules
 to specify an existing install config to use. 
 
-Used third-party libraries and resources
-----------------------------------------
+Third-party dependencies (Libraries & other resources)
+------------------------------------------------------
 
 Bootstrap (Library, MIT License)
   Copyright (c) 2011-2016 Twitter, Inc.
@@ -217,6 +241,14 @@ Inconsolata (Font, SIL Open Font License 1.1)
 
 Font-Awesome (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
   Font Awesome Free 5.1.0 by @fontawesome - https://fontawesome.com
+
+Build system dependecies
+-------------------------
+
+  - SASS (https://sass-lang.com/)
+  - Browserify (http://browserify.org/)
+  - PostCSS (https://postcss.org/)
+    * Autoprefixer (https://github.com/postcss/autoprefixer)
 
 The full licenses for these third party libraries and resources can be found
 in the file *src/doc/rst/LICENSES_EXT.rst* in the source distribution.
