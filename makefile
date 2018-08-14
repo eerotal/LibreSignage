@@ -8,7 +8,7 @@ ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SASS_IPATHS := $(ROOT) $(ROOT)src/common/css
 SASSFLAGS := --sourcemap=none --no-cache
 
-export VERBOSE=y
+VERBOSE=y
 
 # Directories.
 DIRS := $(shell find src \
@@ -52,7 +52,7 @@ SRC_ENDPOINT := $(shell find src/api/endpoint \
 	-o \( -type f -name '*.php' -print \) \
 )
 
-export status = \
+status = \
 	if [ "$(VERBOSE)" = "y" ]; then \
 		echo "$(1): $(2) >> $(3)"|tr -s ' '|sed 's/^ *$///g'; \
 	fi
@@ -69,22 +69,22 @@ ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [INFO] Won't generate HTML documentation.)
 endif
 
-.PHONY: dirs server js css api config libs \
-		docs htmldocs install utest clean \
-		realclean LOC %.dep
+.PHONY: initchk configure dirs server js css api \
+		config libs docs htmldocs install utest \
+		clean realclean LOC %.dep
 .ONESHELL:
 
 all:: dirs server docs htmldocs js css api config libs; @:
 
-dirs:: $(subst src,dist,$(DIRS)); @:
-server:: dirs $(subst src,dist,$(SRC_NO_COMPILE)); @:
-js:: dirs $(subst src,dist,$(SRC_JS)); @:
-api:: dirs $(subst src,dist,$(SRC_ENDPOINT)); @:
-config:: dirs dist/common/php/config.php; @:
-libs:: dirs dist/libs; @:
-docs:: dirs $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))); @:
-htmldocs:: dirs $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html)))
-css:: dirs $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
+dirs:: initchk $(subst src,dist,$(DIRS)); @:
+server:: initchk dirs $(subst src,dist,$(SRC_NO_COMPILE)); @:
+js:: initchk dirs $(subst src,dist,$(SRC_JS)); @:
+api:: initchk dirs $(subst src,dist,$(SRC_ENDPOINT)); @:
+config:: initchk dirs dist/common/php/config.php; @:
+libs:: initchk dirs dist/libs; @:
+docs:: initchk dirs $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))); @:
+htmldocs:: initchk dirs $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html)))
+css:: initchk dirs $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
 
 # Create directory structure in 'dist/'.
 $(subst src,dist,$(DIRS)):: dist%: src%
@@ -287,6 +287,14 @@ LOC:
 		-o -name "*.json" -print \
 		-o -name "*.py" -print \
 		-o -name "makefile" -print`
+
+configure:
+	@:
+	./build/scripts/configure.sh
+
+initchk:
+	@:
+	./build/scripts/ldiconf.sh $(INST);
 
 %:
 	@:

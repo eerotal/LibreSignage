@@ -7,7 +7,8 @@
 ##
 
 set -e;
-. build/scripts/configure.sh;
+. build/scripts/conf.sh
+. build/scripts/ldiconf.sh;
 
 echo "[INFO] Run preprocessor ('$2').";
 

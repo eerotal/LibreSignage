@@ -8,3 +8,4 @@ v0.1.0
   - Use SCSS instead of plain CSS for the stylesheets.
   - Import Bootstrap straight into the _default.scss file instead of
     including it in the HTML <head> tag.
+  - Process CSS using PostCSS /w Autoprefixer.

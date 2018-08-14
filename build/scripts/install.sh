@@ -6,7 +6,8 @@
 ##
 
 set -e
-. build/scripts/configure.sh
+. build/scripts/conf.sh
+. build/scripts/ldiconf.sh
 
 FLAG_PRESERVE_DATA=0;
 
