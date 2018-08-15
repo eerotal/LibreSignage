@@ -1,11 +1,17 @@
 v0.1.0
-  - Implement keyboard shortcuts for the editor.
-  - Make it possible to preserve instance data when reinstalling.
-  - Implement a live slide preview in the editor.
-  - Self host font files. (I actually don't particularly like including
-    binary files in the GIT tree but I don't know of a better way so
-    the font files are now included in the tree.)
-  - Use SCSS instead of plain CSS for the stylesheets.
-  - Import Bootstrap straight into the _default.scss file instead of
-    including it in the HTML <head> tag.
-  - Process CSS using PostCSS /w Autoprefixer.
+  - [feature]  Implement keyboard shortcuts for the editor.
+  - [feature]  Make it possible to preserve instance data when
+               reinstalling.
+  - [feature]  Implement a live slide preview in the editor.
+  - [internal] Self host font files. (I actually don't particularly
+               like including binary files in the GIT tree but I don't
+               know of a better way so the font files are now included
+               in the tree.)
+  - [internal] Use SCSS instead of plain CSS for the stylesheets.
+  - [internal] Import Bootstrap straight into the _default.scss file
+               instead of including it in the HTML <head> tag.
+  - [internal] Process CSS using PostCSS /w Autoprefixer.
+  - [bugfix]   Fix a major security issue where the contents of the
+               'data/' directory were accessible by requesting the
+               different files with eg. a web browser. Even directory
+               listings were enabled.
