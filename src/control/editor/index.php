@@ -10,16 +10,9 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<?php
-			css_include(['font-awesome', 'bootstrap']);
+			require_css(['font-awesome']);
 		?>
-		<link rel="stylesheet" href="/common/css/footer.css">
-		<link rel="stylesheet" href="/common/css/nav.css">
-		<link rel="stylesheet" href="/common/css/default.css">
-		<link rel="stylesheet" href="/common/css/dialog.css">
-		<link rel="stylesheet" href="/common/css/multiselect.css">
 		<link rel="stylesheet" href="/control/editor/css/editor.css">
-		<link rel="stylesheet" href="/control/editor/css/timeline.css">
-		<link rel="stylesheet" href="/control/editor/css/preview.css">
 		<title>LibreSignage Editor</title>
 	</head>
 	<body>

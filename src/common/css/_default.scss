@@ -1,41 +1,20 @@
-@import url('/common/css/fonts.css');
-
-:root {
-	--gray-1: rgb(210, 210, 210);
-	--gray-2: rgb(220, 220, 220);
-	--gray-3: rgb(230, 230, 230);
-	--gray-3: rgb(240, 240, 240);
-	--gray-5: rgb(250, 250, 250);
-
-	/* Bootstrap spacings. */
-	--spacer: 1em;
-	--s0: 0;
-	--s1: calc(var(--spacer)*.25);
-	--s2: calc(var(--spacer)*.5);
-	--s3: calc(var(--spacer));
-	--s4: calc(var(--spacer)*1.5);
-	--s5: calc(var(--spacer)*3);
-	--sa: auto;
-
-	/* Default container padding. */
-	--cpad: 15px;
-}
+@import 'node_modules/bootstrap/scss/bootstrap';
+@import 'globals';
+@import 'root';
+@import 'fonts';
 
 /* Default styling for 'main'. */
 main {
-	/* Default spacing */
 	margin: 0;
-	padding-top: 30px;
-	padding-right: 15px;
-	padding-bottom: 30px;
-	padding-left: 15px;
-
-	/* Default sizing */
+	padding: {
+		top: $dvpad;
+		right: $dhpad;
+		bottom: $dvpad;
+		left: $dhpad;
+	}
 	height: 100%;
 
-	/* Default muted text */
 	color: var(--dark);
-
 }
 
 /* Default background color */
@@ -88,7 +67,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Some predefined styling classes. */
-
 .cont-info-primary {
 	border-left: 3px solid var(--primary);
 	background-color: rgba(0, 123, 255, 0.08);
@@ -126,20 +104,24 @@ h1, h2, h3, h4, h5, h6 {
 
 .small-select {
 	height: 2em;
-	padding-top: 0;
-	padding-bottom: 0;
-	padding-left: 8px;
-	padding-right: 8px;
+	padding: {
+		top: 0;
+		bottom: 0;
+		left: 8px;
+		right: 8px;
+	}
 }
 
 .small-btn {
-	padding-left: 0.6em;
-	padding-right: 0.6em;
-	padding-top: 0.25em;
-	padding-bottom: 0.25em;
+	padding: {
+		left: 0.6em;
+		right: 0.6em;
+		top: 0.25em;
+		bottom: 0.25em;
+	}
 	height: 2em;
 }
 
 .btn-border {
-	border: 1px solid var(--gray-1);
+	border: 1px solid $gray-1;
 }

@@ -7,11 +7,6 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<?php
-			css_include(['bootstrap']);
-		?>
-		<link rel="stylesheet" href="/common/css/footer.css">
-		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/errors/css/error.css">
 		<title>403 Forbidden</title>
 	</head>

@@ -11,6 +11,10 @@ __pycache__
 .mypy_cache
 .pyc
 
-# Exclude npm debug logs and external node modules.
+# Exclude various temporary NPM files.
 /node_modules
 npm-debug.log
+package-lock.json
+
+# Exclude temporary sass files.
+.sass-cache

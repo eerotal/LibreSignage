@@ -1,28 +1,39 @@
+@import 'globals';
+
 /* Timeline styling */
 
 #timeline {
-	padding: 0;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	overflow-x: scroll;
-	overflow-y: hidden;
+	padding: {
+		top: 5px;
+		bottom: 5px;
+		left: 0;
+		right: 0;
+	}
+	overflow: {
+		x: scroll;
+		y: hidden;
+	}
 	width: 100%;
 }
 
 .tl-slide-cont {
 	margin: 5px;
 	padding: 0;
-	min-width: 200px;
-	min-height: 90px;
-	max-width: 200px;
-	max-height: 90px;
+	min: {
+		width: 200px;
+		height: 90px;
+	}
+	max: {
+		width: 200px;
+		height: 90px;
+	}
 	background-color: var(--white);
 	color: var(--secondary);
-	border: 1px solid var(--gray-1);
+	border: 1px solid $gray-1;
 }
 
 .tl-slide-cont-dis {
-	background-color: var(--gray-1);
+	background-color: $gray-1;
 }
 
 .tl-slide-cont:hover {
@@ -38,8 +49,12 @@
 
 .tl-slide-thumb-cont {
 	margin: 0;
-	padding: 4px;
-	padding-left: 0px;
+	padding: {
+		top: 4px;
+		bottom: 4px;
+		left: 0px;
+		right: 4px;
+	}
 	height: 100%;
 	width: 100%;
 }
@@ -49,7 +64,7 @@
 	pointer-events: none;
 	height: 100%;
 	width: 100%;
-	border: 1px solid var(--gray-1);
+	border: 1px solid $gray-1;
 }
 
 .tl-selected {

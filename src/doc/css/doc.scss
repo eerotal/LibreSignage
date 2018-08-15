@@ -1,3 +1,6 @@
+@import 'default';
+@import 'footer';
+
 /* First heading styling */
 h1:first-of-type {
 	text-align: center;
@@ -26,9 +29,9 @@ td, th {
 }
 
 th {
-	border-bottom: 2px solid var(--gray-2);
+	border-bottom: 2px solid $gray-2;
 }
 
 tr:nth-child(even) {
-	background-color: var(--gray-3);
+	background-color: $gray-3;
 }

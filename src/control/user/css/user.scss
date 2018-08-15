@@ -1,0 +1,31 @@
+@import 'default';
+@import 'footer';
+@import 'nav';
+@import 'dialog';
+
+.user-settings-cont {
+	max-width: 750px;
+	padding: {
+		bottom: 20px;
+		left: 45px;
+		right: 45px;
+	}
+}
+
+.user-session-row {
+	border: {
+		collapse: separate;
+		spacing: 5px;
+	}
+}
+
+#user-sessions {
+	border-collapse: collapse;
+}
+
+#user-sessions tr {
+	border: {
+		top: 1px solid $gray-1;
+		bottom: 1px solid $gray-1;
+	}
+}

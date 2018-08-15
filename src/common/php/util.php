@@ -141,3 +141,10 @@ function array_check(array $arr, Callable $func) {
 	}
 	return TRUE;
 }
+
+function htmltag(string $type, string $content, array $params) {
+	$ret = "<$type";
+	foreach ($params as $k => $v) { $ret .= ' '.$k.'="'.$v.'"'; }
+	$ret .= ">$content</$type>";
+	return $ret;
+}

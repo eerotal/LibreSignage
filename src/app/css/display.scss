@@ -1,12 +1,17 @@
+@import 'default';
+@import 'dialog';
+@import 'markup';
+@import 'animations';
+
+/* LibreSignage display styling. */
+
 html {
 	overflow-x: hidden;
 	overflow-y: hidden;
 }
 
 html, body, main, #display {
-	/*
-	*  Make sure the display is only the size of the page.
-	*/
+	/* Make sure the display is only the size of the page. */
 	width: 100%;
 	min-width: 100%;
 	max-width: 100%;
@@ -17,12 +22,4 @@ html, body, main, #display {
 
 	padding: 0;
 	margin: 0;
-}
-
-h1, h2, h3, h4, h5, h6 {
-	margin-bottom: 0.25em;
-}
-
-p {
-	margin-bottom: 1em;
 }

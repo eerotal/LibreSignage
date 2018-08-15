@@ -14,11 +14,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<?php
-			css_include(['bootstrap', 'font-awesome']);
+			require_css(['font-awesome']);
 		?>
-		<link rel="stylesheet" href="/common/css/footer.css">
-		<link rel="stylesheet" href="/common/css/default.css">
-		<link rel="stylesheet" href="/common/css/dialog.css">
 		<link rel="stylesheet" href="/login/css/login.css">
 		<title>LibreSignage Login</title>
 	</head>

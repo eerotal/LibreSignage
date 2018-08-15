@@ -5,35 +5,63 @@
 NPMBIN := $(shell ./build/scripts/npmbin.sh)
 ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-# Source file lists.
-SRC_NORMAL := $(shell find src 							\
-	\( -type f -path 'src/node_modules/*' -prune \)		\
-	-o \( -type f -path 'src/api/endpoint/*' -prune \) 	\
-	-o \(												\
-		-type f ! -name '*.js'							\
-		-a -type f ! -name 'config.php' -print 			\
-	\)													\
+SASS_IPATHS := $(ROOT) $(ROOT)src/common/css
+SASSFLAGS := --sourcemap=none --no-cache
+
+VERBOSE=y
+
+# Directories.
+DIRS := $(shell find src \
+	\( -type d -path 'src/node_modules' -prune \) \
+	-o \( -type d -print \) \
 )
 
-SRC_JS := $(shell find src 							\
-	\( -type f -path 'src/node_modules/*' -prune \)	\
-	-o \( -type f -name 'main.js' -print \)			\
-)
-DEP_JS := $(subst src,dist,$(SRC_JS:.js=.d))
-
-SRC_ENDPOINT := $(shell find src/api/endpoint 		\
-	\( -type f -path 'src/node_modules/*' -prune \)	\
-	-o \( -type f -name '*.php' -print \)			\
-)
-DIRS := $(shell find src 							\
-	\( -type d -path 'src/node_modules' -prune \)	\
-	-o \( -type d -print \)							\
+# Production libraries.
+LIBS := $(filter-out \
+	$(shell echo "$(ROOT)"|sed 's:/$$::g'), \
+	$(shell npm ls --prod --parseable|sed 's/\n/ /g') \
 )
 
-# Documentation sources.
-HTML_DOCS := $(shell find src -type f -name '*.rst')
-HTML_DOCS := $(addprefix dist/doc/html/,$(notdir $(HTML_DOCS)))
-HTML_DOCS := $(HTML_DOCS:.rst=.html) dist/doc/html/README.html
+# Non-compiled sources.
+SRC_NO_COMPILE := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o \( -type f -path 'src/api/endpoint/*' -prune \) \
+	-o \( \
+		-type f ! -name '*.js' \
+		-a -type f ! -name '*.scss' \
+		-a -type f ! -name '*.rst' \
+		-a -type f ! -name 'config.php' -print \
+	\) \
+)
+
+# RST sources.
+SRC_RST := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o -type f -name '*.rst' -print \
+) README.rst
+
+# SCSS sources.
+SRC_SCSS := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o -type f -name '*.scss' -print \
+)
+
+# JavaScript sources.
+SRC_JS := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o \( -type f -name 'main.js' -print \) \
+)
+
+# API endpoint sources.
+SRC_ENDPOINT := $(shell find src/api/endpoint \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o \( -type f -name '*.php' -print \) \
+)
+
+status = \
+	if [ "$(VERBOSE)" = "y" ]; then \
+		echo "$(1): $(2) >> $(3)"|tr -s ' '|sed 's/^ *$///g'; \
+	fi
 
 ifndef INST
 INST := ""
@@ -47,56 +75,78 @@ ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [INFO] Won't generate HTML documentation.)
 endif
 
-.PHONY: dirs server js api config libs docs install utest clean realclean LOC $(DEP_JS)
+.PHONY: initchk configure dirs server js css api \
+		config libs docs htmldocs install utest \
+		clean realclean LOC %.dep
 .ONESHELL:
 
-all:: dirs server js api config libs docs
+all:: dirs server docs htmldocs js css api config libs; @:
 
-dirs:: $(subst src,dist,$(DIRS)); @:
-server:: $(subst src,dist,$(SRC_NORMAL)); @:
-js:: $(subst src,dist,$(SRC_JS)); @:
-api:: $(subst src,dist,$(SRC_ENDPOINT)); @:
-config:: dist/common/php/config.php; @:
-libs:: dist/libs; @:
-docs:: dist/doc/rst/api_index.rst $(HTML_DOCS); @:
+dirs:: initchk $(subst src,dist,$(DIRS)); @:
+server:: initchk dirs $(subst src,dist,$(SRC_NO_COMPILE)); @:
+js:: initchk dirs $(subst src,dist,$(SRC_JS)); @:
+api:: initchk dirs $(subst src,dist,$(SRC_ENDPOINT)); @:
+config:: initchk dirs dist/common/php/config.php; @:
+libs:: initchk dirs dist/libs; @:
+docs:: initchk dirs $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))); @:
+htmldocs:: initchk dirs $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html)))
+css:: initchk dirs $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
+libs:: initchk dirs $(subst $(ROOT)node_modules/,dist/libs/,$(LIBS)); @:
 
 # Create directory structure in 'dist/'.
 $(subst src,dist,$(DIRS)):: dist%: src%
 	@:
 	mkdir -p $@;
 
-# Copy non-JS, non API endpoint, non-docs files to 'dist/'.
-$(subst src,dist,$(SRC_NORMAL)):: dist%: src%
+# Copy over non-compiled, non-PHP sources.
+$(filter-out %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
 	@:
+	$(call status,cp,$<,$@);
 	cp -p $< $@;
 
-# Copy normal PHP files to 'dist/.' and check the PHP syntax.
-$(filter %.php,$(subst src,dist,$(SRC_NORMAL))):: dist%: src%
+# Copy over normal PHP files and check the PHP syntax.
+$(filter %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
 	@:
 	php -l $< > /dev/null;
+
+	$(call status,cp,$<,$@);
 	cp -p $< $@;
 
 # Copy API endpoint PHP files and generate corresponding docs.
 $(subst src,dist,$(SRC_ENDPOINT)):: dist%: src%
 	@:
 	php -l $< > /dev/null;
+
+	$(call status,cp,$<,$@);
 	cp -p $< $@;
 
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
 		# Generate reStructuredText documentation.
 		mkdir -p dist/doc/rst;
 		mkdir -p dist/doc/html;
+		$(call status,\
+			gendoc.sh,\
+			<generated>,\
+			dist/doc/rst/$(notdir $(@:.php=.rst))\
+		);
 		./build/scripts/gendoc.sh $(INST) $@ dist/doc/rst/
 
 		# Compile rst docs into HTML.
+		$(call status,\
+			pandoc,\
+			dist/doc/rst/$(notdir $(@:.php=.rst)),\
+			dist/doc/html/$(notdir $(@:.php=.html))\
+		)
 		pandoc -f rst -t html \
 			-o dist/doc/html/$(notdir $(@:.php=.html)) \
 			dist/doc/rst/$(notdir $(@:.php=.rst))
 	fi
 
+# Generate the API endpoint documentation index.
 dist/doc/rst/api_index.rst:: $(SRC_ENDPOINT)
 	@:
-	# Generate the API endpoint documentation index.
+	$(call status,makefile,<generated>,$@);
+
 	@. build/scripts/conf.sh
 	echo "LibreSignage API documentation (Ver: $$ICONF_API_VER)" > $@;
 	echo '########################################################' >> $@;
@@ -111,36 +161,52 @@ dist/doc/rst/api_index.rst:: $(SRC_ENDPOINT)
 
 	# Compile into HTML.
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
+		$(call status,pandoc,$(subst /rst/,/html/,$($:.rst=.html)),$@);
 		pandoc -f rst -t html -o $(subst /rst/,/html/,$(@:.rst=.html)) $@;
 	fi
 
 # Copy and prepare 'config.php'.
 dist/common/php/config.php:: src/common/php/config.php
 	@:
-	echo "[INFO] Prepare 'config.php'.";
+	$(call status,cp,$<,$@);
 	cp -p $< $@;
+	$(call status,prep.sh,<inplace>,$@);
 	./build/scripts/prep.sh $(INST) $@
 	php -l $@ > /dev/null;
 
-# Generate makefiles w/ dependencies for JavaScript files.
-$(DEP_JS): dist/%/main.d: src/%/main.js
+# Generate JavaScript deps.
+dist/%/main.js.dep: src/%/main.js
 	@:
-	echo "[INFO] Gen makefile "$@;
-	echo -n '$(notdir $<): ' > $@;
-	$(NPMBIN)/browserify --list $<|tr '\n' ' ' >> $@;
-	echo '\n\t@$(NPMBIN)/browserify $(ROOT)$< \
-			-o $(ROOT)$(subst src,dist,$<)' >> $@;
+	$(call status,deps-js,$<,$@);
+	echo "all:: `$(NPMBIN)/browserify --list $<|tr '\n' ' '`" > $@;
+	echo "\t@$(NPMBIN)/browserify"\
+		"$(ROOT)$<"\
+		"-o $(ROOT)$(subst src,dist,$<)" >> $@;
 
-# Compile JavaScript files.
-dist/%/main.js: dist/%/main.d src/%/main.js
+# Compile JavaScript sources.
+dist/%/main.js: dist/%/main.js.dep src/%/main.js
 	@:
-	make --no-print-directory -C $(dir $<) -f main.d
+	$(call status,browserify,$(word 2,$^),$@);
+	$(MAKE) --no-print-directory -C $(dir $<) -f $(notdir $<);
 
-# Compile normal (non-API) documentation files.
+# Copy over README.rst.
+dist/doc/rst/README.rst:: README.rst
+	@:
+	$(call status,cp,$<,$@);
+	cp -p $< $@;
+
+# Copy over RST sources.
+dist/doc/rst/%.rst:: src/doc/rst/%.rst
+	@:
+	$(call status,cp,$<,$@);
+	cp -p $< $@;
+
+# Compile RST sources into HTML.
 dist/doc/html/%.html:: src/doc/rst/%.rst
 	@:
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
 		mkdir -p dist/doc/html;
+		$(call status,pandoc,$<,$@);
 		pandoc -o $@ -f rst -t html $<;
 	fi
 
@@ -149,48 +215,94 @@ dist/doc/html/README.html:: README.rst
 	@:
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
 		mkdir -p dist/doc/html;
+		$(call status,pandoc,$<,$@);
 		pandoc -o $@ -f rst -t html $<;
 	fi
 
-# Copy node_modules to 'dist/libs/'.
-dist/libs:: node_modules
-	@mkdir -p dist/libs
-	@cp -Rp $</* dist/libs
+# Generate SCSS deps.
+dist/%.scss.dep: src/%.scss
+	@:
+	# Don't create deps for partials.
+	if [ ! "`basename '$(<)' | cut -c 1`" = "_" ]; then
+		$(call status,deps-scss,$<,$@);
+		echo "all:: `./build/scripts/sassdep.py -l $< $(SASS_IPATHS)`" > $@;
+
+		# Compile with sass.
+		echo "\t@sass"\
+			"$(addprefix -I,$(SASS_IPATHS))"\
+			"$(SASSFLAGS)"\
+			"$(ROOT)$<"\
+			"$(ROOT)$(subst src,dist,$(<:.scss=.css));" >> $@;
+
+		# Process with postcss.
+		echo "\t@$(NPMBIN)/postcss"\
+			"$(ROOT)$(subst src,dist,$(<:.scss=.css))"\
+			"--config $(ROOT)postcss.config.js"\
+			"--replace"\
+			"--no-map;" >> $@;
+	fi
+
+# Compile Sass sources.
+dist/%.css: dist/%.scss.dep src/%.scss
+	@:
+	# Don't compile partials.
+	if [ ! "`basename '$(word 2,$^)' | cut -c 1`" = "_" ]; then
+		$(call status,compile-scss,$(word 2,$^),$@);
+		$(MAKE) --no-print-directory -C $(dir $<) -f $(notdir $<);
+	else
+		$(call status,skip,$(word 2,$^),$@);
+	fi
+
+# Copy production node modules to 'dist/libs/'.
+dist/libs/%:: node_modules/%
+	@:
+	mkdir -p $@;
+	$(call status,cp,$<,$@);
+	cp -Rp $</* $@;
 
 install:; @./build/scripts/install.sh $(INST)
 
 utest:; @./utests/api/main.py
 
 clean:
-	@:
 	rm -rf dist;
 	rm -rf `find . -type d -name '__pycache__'`;
+	rm -rf `find . -type d -name '.sass-cache'`;
+	rm -f *.log;
 
 realclean:
-	@:
 	rm -f build/*.iconf;
 	rm -rf build/link;
 	rm -rf node_modules;
+	rm package-lock.json
 
 # Count the lines of code in LibreSignage.
 LOC:
 	@:
-	wc -l `find .									\
-		\(											\
-			-path "./dist/*" -o						\
-			-path "./utests/api/.mypy_cache/*" -o	\
-			-path "./node_modules/*"				\
-		\) -prune 									\
-		-o -name "*.py" -print						\
-		-o -name "*.php" -print						\
-		-o -name "*.js" -print						\
-		-o -name "*.html" -print					\
-		-o -name "*.css" -print						\
-		-o -name "*.sh" -print						\
-		-o -name "*.json" -print					\
-		-o -name "*.py" -print						\
-		-o -name "makefile" -print`
+	wc -l `find . \
+		\( \
+			-path "./dist/*" -o \
+			-path "./utests/api/.mypy_cache/*" -o \
+			-path "./node_modules/*" \
+		\) -prune \
+		-o -name "*.py" -print \
+		-o -name "*.php" -print \
+		-o -name "*.js" -print \
+		-o -name "*.html" -print \
+		-o -name "*.css" -print \
+		-o -name "*.scss" -print \
+		-o -name "*.sh" -print \
+		-o ! -name 'package-lock.json' -name "*.json" -print \
+		-o -name "*.py" -print`
+
+configure:
+	@:
+	./build/scripts/configure.sh
+
+initchk:
+	@:
+	./build/scripts/ldiconf.sh $(INST);
 
 %:
 	@:
-	echo '[INFO] Ignore '$@;
+	echo "[INFO]: Ignore $@";

@@ -1,0 +1,24 @@
+@import 'globals';
+
+/* Styling for HTML elements generated from LibreSignage markup. */
+
+main {
+	text-align: justify;
+}
+
+div {
+	width: 100%;
+}
+
+p {
+	font-size: 3vh;
+	margin-bottom: $s3;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	margin-bottom: $s1;
+}
+
+.lead {
+	font-size: 4vh;
+}

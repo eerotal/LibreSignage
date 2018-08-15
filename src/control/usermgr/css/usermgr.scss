@@ -1,6 +1,14 @@
+@import 'default';
+@import 'footer';
+@import 'nav';
+@import 'dialog';
+@import 'multiselect';
+
 #user-manager-heading {
-	margin-top: 30px;
-	margin-bottom: 30px;
+	margin: {
+		top: 30px;
+		bottom: 30px;
+	}
 }
 
 .usr-table-row {
@@ -8,7 +16,7 @@
 	padding: 0;
 	color: var(--black);
 	background-color: var(--white);
-	border-bottom: 1px solid var(--gray-1);
+	border-bottom: 1px solid $gray-1;
 }
 
 .usr-table-col {
@@ -22,16 +30,22 @@
 
 .usr-edit-row-container {
 	width: 75%;
-	margin-left: auto;
-	margin-right: auto;
+	margin: {
+		left: auto;
+		right: auto;
+	}
 }
 
 .usr-edit-input-row {
-	padding-top: 8px;
-	padding-bottom: 8px;
+	padding: {
+		top: 8px;
+		bottom: 8px;
+	}
 }
 
 .usr-edit-btn {
-	margin-left: 5px;
-	margin-right: 5px;
+	margin: {
+		left: 5px;
+		right: 5px;
+	}
 }

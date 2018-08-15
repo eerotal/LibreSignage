@@ -1,10 +1,12 @@
+/* LibreSignage display animations. */
+
 #display {
 	position: absolute;
 	top: 0;
 	right: 0;
 }
 
-/* Swipe left */
+// Swipe left
 
 .swipe-left {
 	animation: swipe-left-k 0.25s forwards !important;

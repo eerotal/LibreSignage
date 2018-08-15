@@ -1,0 +1,49 @@
+@import 'globals';
+
+/* LibreSignage navigation bar styling. */
+
+.nav {
+	padding: {
+		top: 20px !important;
+		bottom: 20px !important;
+		left: 25px !important;
+		right: 25px !important;
+	}
+}
+
+.nav-vdiv {
+	width: 0;
+	padding: 0;
+	margin: {
+		left: 10px;
+		right: 10px;
+		top: 4px;
+		bottom: 4px;
+	}
+}
+
+.nav-vdiv-gray {
+	border: {
+		left: 1px solid var(--gray);
+		right: 1px solid var(--gray);
+	}
+}
+
+.nav-logout-cont {
+	margin: {
+		left: .5rem;
+		right: .5rem;
+		top: .75rem;
+		bottom: .55rem;
+	}
+
+	padding: {
+		top: $s1;
+		bottom: $s1;
+	}
+
+	border: {
+		top: 1px solid var(--secondary);
+		bottom: 1px solid var(--secondary);
+	}
+}

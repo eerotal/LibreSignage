@@ -1,8 +1,16 @@
-:root {
-	--main-col-mw: 250px;
-}
+@import 'default';
+@import 'footer';
+@import 'nav';
+@import 'dialog';
+@import 'multiselect';
+@import 'timeline';
+@import 'preview';
+
+$main-col-minw: 250px;
+$slide-input-minh: 30; // Min-height in lines.
 
 html, body {
+	transition: all .5s;
 	min-height: 100%;
 }
 
@@ -19,7 +27,7 @@ html, body {
 }
 
 #editor-col-l, #editor-col-r {
-	min-width: var(--main-col-mw);
+	min-width: $main-col-minw;
 }
 
 .btn-slide-ctrl {
@@ -42,16 +50,18 @@ html, body {
 }
 
 #slide-sched-group {
-	margin-top: .5rem;
-	margin-bottom: .5rem;
-	margin-left: 1.5rem;
-	border-left: 1px solid var(--gray-1);
+	margin: {
+		top: .5rem;
+		bottom: .5rem;
+		left: 1.5rem;
+	}
+	border-left: 1px solid $gray-1;
 }
 
 #slide-input {
-	min-height: calc(1em*30); /* min-height: 30 lines */
-	border: 1px solid var(--gray-1);
-	margin-bottom: var(--s3);
+	min-height: $slide-input-minh*1em;
+	border: 1px solid $gray-1;
+	margin-bottom: $s3;
 }
 
 #markup-err-display {

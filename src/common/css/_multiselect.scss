@@ -1,3 +1,5 @@
+@import 'globals';
+
 .multiselect {
 	display: flex;
 	flex-wrap: wrap;
@@ -33,7 +35,7 @@
 .ms-values {
 	padding: 4px;
 	margin: 0;
-	border: 1px solid var(--gray-2);
+	border: 1px solid $gray-2;
 	border-radius: 4px;
 	background-color: white;
 	min-height: 2.5em;
@@ -41,7 +43,7 @@
 
 .ms-val {
 	display: inline-block;
-	background-color: var(--gray-2);
+	background-color: $gray-2;
 	border-radius: 2px;
 	padding: 2px 8px;
 	margin: 4px;
