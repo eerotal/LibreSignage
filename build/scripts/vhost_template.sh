@@ -20,4 +20,14 @@ echo '	ErrorDocument 403 /errors/403/index.php';
 echo '	ErrorDocument 404 /errors/404/index.php';
 echo '	ErrorDocument 500 /errors/500/index.php';
 
+echo "	<Directory \"$ICONF_DOCROOT\">";
+echo '		Options -Indexes';
+echo '	</Directory>';
+
+# Send a 404 response when trying to access 'data/'.
+echo "	<DirectoryMatch \"^$ICONF_DOCROOT(/?)$ICONF_NAME(/?)data(.+)\">";
+echo '		RewriteEngine On';
+echo '		RewriteRule .* - [R=404,L]';
+echo '	</DirectoryMatch>';
+
 echo '</VirtualHost>';
