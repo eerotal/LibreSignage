@@ -5,22 +5,22 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
-const CSS_LIBS = array(
-	'font-awesome' => '<link rel="stylesheet"'.
-				'href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"'.
-				'integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt"'.
-				'crossorigin="anonymous">'
-);
+const STYLESHEETS = [
+	'font-awesome' => [
+		'rel' => 'stylesheet',
+		'href' => '/libs/@fortawesome/fontawesome-free/css/all.css'
+	]
+];
 
-function css_include(array $libs) {
-	foreach ($libs as $l) {
-		if (!array_key_exists($l, CSS_LIBS)) {
+function require_css(array $req) {
+	foreach ($req as $l) {
+		if (!array_key_exists($l, STYLESHEETS)) {
 			throw new IntException(
-				"Attempted to include non-existent ".
-				"CSS library '$l'."
+				"Attempted to include non-existent CSS library '$l'."
 			);
 		}
-		echo CSS_LIBS[$l];
+		echo htmltag('link', '', STYLESHEETS[$l]);
 	}
 }

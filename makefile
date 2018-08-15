@@ -16,6 +16,12 @@ DIRS := $(shell find src \
 	-o \( -type d -print \) \
 )
 
+# Production libraries.
+LIBS := $(filter-out \
+	$(shell echo "$(ROOT)"|sed 's:/$$::g'), \
+	$(shell npm ls --prod --parseable|sed 's/\n/ /g') \
+)
+
 # Non-compiled sources.
 SRC_NO_COMPILE := $(shell find src \
 	\( -type f -path 'src/node_modules/*' -prune \) \
@@ -85,6 +91,7 @@ libs:: initchk dirs dist/libs; @:
 docs:: initchk dirs $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))); @:
 htmldocs:: initchk dirs $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html)))
 css:: initchk dirs $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
+libs:: initchk dirs $(subst $(ROOT)node_modules/,dist/libs/,$(LIBS)); @:
 
 # Create directory structure in 'dist/'.
 $(subst src,dist,$(DIRS)):: dist%: src%
@@ -246,27 +253,28 @@ dist/%.css: dist/%.scss.dep src/%.scss
 		$(call status,skip,$(word 2,$^),$@);
 	fi
 
-# Copy node_modules to 'dist/libs/'.
-dist/libs:: node_modules
+# Copy production node modules to 'dist/libs/'.
+dist/libs/%:: node_modules/%
 	@:
-	mkdir -p dist/libs
+	mkdir -p $@;
 	$(call status,cp,$<,$@);
-	cp -Rp $</* $@
+	cp -Rp $</* $@;
 
 install:; @./build/scripts/install.sh $(INST)
 
 utest:; @./utests/api/main.py
 
 clean:
-	@:
 	rm -rf dist;
 	rm -rf `find . -type d -name '__pycache__'`;
+	rm -rf `find . -type d -name '.sass-cache'`;
+	rm -f *.log;
 
 realclean:
-	@:
 	rm -f build/*.iconf;
 	rm -rf build/link;
 	rm -rf node_modules;
+	rm package-lock.json
 
 # Count the lines of code in LibreSignage.
 LOC:
@@ -284,9 +292,8 @@ LOC:
 		-o -name "*.css" -print \
 		-o -name "*.scss" -print \
 		-o -name "*.sh" -print \
-		-o -name "*.json" -print \
-		-o -name "*.py" -print \
-		-o -name "makefile" -print`
+		-o ! -name 'package-lock.json' -name "*.json" -print \
+		-o -name "*.py" -print`
 
 configure:
 	@:
