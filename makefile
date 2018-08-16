@@ -274,7 +274,7 @@ realclean:
 	rm -f build/*.iconf;
 	rm -rf build/link;
 	rm -rf node_modules;
-	rm package-lock.json
+	rm -f package-lock.json
 
 # Count the lines of code in LibreSignage.
 LOC:
