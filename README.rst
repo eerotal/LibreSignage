@@ -217,16 +217,16 @@ LOC
 
 You can also pass some other arguments to the LiberSignage makefile.
 
-INST=<config file> - *(default: Last generated config.)*
+INST=<config file> - (default: Last generated config.)
   Manually specify a config file to use.
 
-VERBOSE=<y/n> - *(default: y)*
+VERBOSE=<y/n> - (default: y)
   Print verbose log output.
 
-NOHTMLDOCS=<y/n> - *(default: n)*
+NOHTMLDOCS=<y/n> - (default: n)
   Don't generate HTML documentation from the reStructuredText docs
   or the API endpoint files. This setting can be used with make rules
-  that compile files. Using it with eg. `make install` has no effect.
+  that compile files. Using it with eg. ``make install`` has no effect.
   
 Third-party dependencies (Libraries & other resources)
 ------------------------------------------------------
