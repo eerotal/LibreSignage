@@ -873,7 +873,7 @@ function editor_setup() {
 		() => { return UI_DEFS.get('SLIDE_INPUT').get(); },
 		(e) => {
 			if (e) {
-				MARKUP_ERR_DISPLAY.text(`>> Syntax error: ${e.message}`);
+				MARKUP_ERR_DISPLAY.text('>> ' + e.toString(1));
 			} else {
 				MARKUP_ERR_DISPLAY.text('');
 			}

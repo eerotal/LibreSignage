@@ -1,6 +1,6 @@
-[container 10 10 10 10]
+[container top=10% right=10% bottom=10% left=10%]
 	[xcenter]
-		[h 12]LibreSignage[/h]
+		[h size=12%]LibreSignage[/h]
 		[lead]An Open Source digital signage solution[/lead]
 	[/xcenter]
 

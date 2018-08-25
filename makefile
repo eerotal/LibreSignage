@@ -77,7 +77,7 @@ endif
 
 .PHONY: initchk configure dirs server js css api \
 		config libs docs htmldocs install utest \
-		clean realclean LOC %.dep
+		clean realclean LOC
 .ONESHELL:
 
 all:: dirs server docs htmldocs js css api config libs; @:
