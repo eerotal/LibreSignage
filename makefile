@@ -279,6 +279,7 @@ realclean:
 # Count the lines of code in LibreSignage.
 LOC:
 	@:
+	echo 'Lines Of Code: ';
 	wc -l `find . \
 		\( \
 			-path "./dist/*" -o \
@@ -294,6 +295,12 @@ LOC:
 		-o -name "*.sh" -print \
 		-o ! -name 'package-lock.json' -name "*.json" -print \
 		-o -name "*.py" -print`
+
+LOD:
+	@:
+	echo '[INFO] Make sure your 'dist/' is up to date!';
+	echo '[INFO] Lines Of Documentation: ';
+	wc -l `find dist -type f -name '*.rst'`
 
 configure:
 	@:
