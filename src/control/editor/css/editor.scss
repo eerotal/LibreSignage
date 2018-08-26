@@ -8,6 +8,7 @@
 
 $main-col-minw: 250px;
 $slide-input-minh: 30; // Min-height in lines.
+$syntax-error-color: #ff6565;
 
 html, body {
 	transition: all .5s;
@@ -64,7 +65,12 @@ html, body {
 	margin-bottom: $s3;
 }
 
+.syntax-error-highlight {
+	position: absolute;
+	background-color: $syntax-error-color;
+}
+
 #markup-err-display {
 	font-family: Inconsolata, monospace;
-	color: var(--red);
+	color: $red;
 }
