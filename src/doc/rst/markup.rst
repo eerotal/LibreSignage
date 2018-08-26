@@ -93,7 +93,7 @@ the viewport height. The font size can be changed using the
 
 Color
   | Syntax: ``[color c=<color>][/color]``
-  | ``c: rstr``
+  | ``c: str``
 
 Set the color of text. All text inside this class will have the color
 set by this class if no nested classes change the color. ``<color>`` is
@@ -158,7 +158,7 @@ Basic classes
       [lead]This is a short lead paragraph.[/lead]
       [p]This is a normal paragraph that contains the
       main content of the slide[/p]
-      [color red]
+      [color c="red"]
           [p]This is a paragraph with red text where
           part of the text is [b]bold[/b] and part
           of it is [i]italic[/i].[/p]

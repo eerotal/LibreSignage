@@ -1,7 +1,7 @@
 {
-	"name": "LibreSignage",
-	"index": 1,
-	"time": 8000,
+	"name": "Columns",
+	"index": 2,
+	"time": 6000,
 	"owner": "admin",
 	"enabled": true,
 	"sched": false,
