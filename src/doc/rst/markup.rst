@@ -42,7 +42,7 @@ Character escaping
 
 In LibreSignage markup the characters =, [ and ] have special meanings
 and they can't be used in strings without escaping. These characters can
-be escaped by prefixing them with a backward slash (*\*). This makes the
+be escaped by prefixing them with a backward slash (*\\*). This makes the
 markup parser treat even the special characters as normal ones, making
 it possible to use them in strings.
 
