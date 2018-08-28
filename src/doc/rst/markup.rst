@@ -37,6 +37,16 @@ Raw string *(rstr)*
   The same thing as a normal string but raw strings don't have quotes
   around them.
 
+Character escaping
+------------------
+
+In LibreSignage markup the characters =, [ and ] have special meanings
+and they can't be used in strings without escaping. These characters can
+be escaped by prefixing them with a backward slash (*\*). This makes the
+markup parser treat even the special characters as normal ones, making
+it possible to use them in strings.
+
+
 Markup classes
 --------------
 
@@ -93,7 +103,7 @@ the viewport height. The font size can be changed using the
 
 Color
   | Syntax: ``[color c=<color>][/color]``
-  | ``c: str``
+  | ``c: rstr``
 
 Set the color of text. All text inside this class will have the color
 set by this class if no nested classes change the color. ``<color>`` is
@@ -158,7 +168,7 @@ Basic classes
       [lead]This is a short lead paragraph.[/lead]
       [p]This is a normal paragraph that contains the
       main content of the slide[/p]
-      [color c="red"]
+      [color c=red]
           [p]This is a paragraph with red text where
           part of the text is [b]bold[/b] and part
           of it is [i]italic[/i].[/p]
