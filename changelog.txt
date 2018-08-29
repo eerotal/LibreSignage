@@ -15,3 +15,10 @@ v0.1.0
                'data/' directory were accessible by requesting the
                different files with eg. a web browser. Even directory
                listings were enabled.
+  - [feature]  Completely rewrite the markup transpiler system to
+               improve its error detecting and reporting capabilities.
+               The rewrite also introduced many other improvements. The
+               transpiler now uses the familiar lexer-parser-evaluator
+               architecture that most compilers use.
+  - [feature]  Improve markup error reporting in the editor UI. Erroneous
+               code lines are now highlighted in the editor input.
