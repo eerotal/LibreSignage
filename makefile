@@ -77,7 +77,7 @@ endif
 
 .PHONY: initchk configure dirs server js css api \
 		config libs docs htmldocs install utest \
-		clean realclean LOC %.dep
+		clean realclean LOC
 .ONESHELL:
 
 all:: dirs server docs htmldocs js css api config libs; @:
@@ -279,6 +279,7 @@ realclean:
 # Count the lines of code in LibreSignage.
 LOC:
 	@:
+	echo 'Lines Of Code: ';
 	wc -l `find . \
 		\( \
 			-path "./dist/*" -o \
@@ -294,6 +295,12 @@ LOC:
 		-o -name "*.sh" -print \
 		-o ! -name 'package-lock.json' -name "*.json" -print \
 		-o -name "*.py" -print`
+
+LOD:
+	@:
+	echo '[INFO] Make sure your 'dist/' is up to date!';
+	echo '[INFO] Lines Of Documentation: ';
+	wc -l `find dist -type f -name '*.rst'`
 
 configure:
 	@:

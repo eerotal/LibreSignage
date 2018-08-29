@@ -11,6 +11,8 @@ var slide = require('ls-slide');
 var queue = require('ls-queue');
 var sc = require('ls-shortcut');
 
+var ace_range = ace.require('ace/range');
+
 var timeline = require('./timeline.js');
 var qsel = require('./qsel.js');
 var preview = require('./preview.js');
@@ -89,6 +91,7 @@ var name_sel = null;
 var index_sel = null;
 var sel_slide = null;
 
+var syn_err_id = null; // Syntax error highlight marker id.
 var flag_slide_loading = false; // Used by slide_show().
 var flag_editor_ready = false;
 
@@ -754,6 +757,28 @@ function slide_dup() {
 	});
 }
 
+function syn_err_highlight(from, to) {
+	/*
+	*  Create an editor syntax error marker for the
+	*  lines from-to. Returns the marker ID.
+	*/
+	var sess = UI_DEFS.get('SLIDE_INPUT').get_elem().session;
+	return syn_err_id = sess.addMarker(
+		new ace_range.Range(from, 0, to, 10),
+		'syntax-error-highlight',
+		'fullLine'
+	);
+}
+
+function syn_err_clear(id) {
+	/*
+	*  Remove the editor syntax error marker 'id'.
+	*/
+	if (id) {
+		UI_DEFS.get('SLIDE_INPUT').get_elem().session.removeMarker(id);
+	}
+}
+
 function inputs_setup(ready) {
 	/*
 	*  Setup all editor inputs and input validators etc.
@@ -873,8 +898,10 @@ function editor_setup() {
 		() => { return UI_DEFS.get('SLIDE_INPUT').get(); },
 		(e) => {
 			if (e) {
-				MARKUP_ERR_DISPLAY.text(`>> Syntax error: ${e.message}`);
+				syn_err_id = syn_err_highlight(e.line(), e.line());
+				MARKUP_ERR_DISPLAY.text('>> ' + e.toString(1));
 			} else {
+				syn_err_id = syn_err_clear(syn_err_id);
 				MARKUP_ERR_DISPLAY.text('');
 			}
 		}

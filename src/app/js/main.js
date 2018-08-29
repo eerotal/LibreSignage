@@ -74,13 +74,20 @@ function display_setup() {
 				console.log("LibreSignage: Failed to preview slide!");
 				return;
 			}
-			DISPLAY.html(
-				markup.parse(
-					util.sanitize_html(
-						s.get('markup')
+			try {
+				DISPLAY.html(
+					markup.parse(
+						util.sanitize_html(
+							s.get('markup')
+						)
 					)
-				)
-			);
+				);
+			} catch (e) {
+				if (e instanceof markup.err.MarkupSyntaxError) {
+					console.error(`LibreSignage: ${e.message}`);
+					DISPLAY.html('');
+				}
+			}
 		});
 	} else if ('q' in params){
 		console.log("LibreSignage: Start the display loop.");

@@ -60,7 +60,7 @@ exports.Preview = class Preview {
 				)
 			);
 		} catch (e) {
-			if (e instanceof markup.MarkupParseError) {
+			if (e instanceof markup.err.MarkupSyntaxError) {
 				if (this.err) { this.err(e); }
 			} else {
 				throw e;
