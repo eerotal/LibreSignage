@@ -763,7 +763,6 @@ function syn_err_highlight(from, to) {
 	*  lines from-to. Returns the marker ID.
 	*/
 	var sess = UI_DEFS.get('SLIDE_INPUT').get_elem().session;
-	console.log(from, to);
 	return syn_err_id = sess.addMarker(
 		new ace_range.Range(from, 0, to, 10),
 		'syntax-error-highlight',
