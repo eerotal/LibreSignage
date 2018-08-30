@@ -3,6 +3,7 @@
 *.swp
 *.save
 /dist
+/dep
 /build/link
 *.iconf
 
