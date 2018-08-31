@@ -24,8 +24,8 @@ Features
 * Multiple user accounts with permissions based on
   user groups.
 * User settings view for changing passwords and viewing
-  logged insessions.
-* User management/creation/deletion via the web intarface
+  logged in sessions.
+* User management/creation/deletion via the web interface
   for admin users.
 * Configurable quotas for actions such as creating slides.
 * Rate limited API for reducing server load.
@@ -64,12 +64,12 @@ are listed below.
    there the package is so old it doesn't work correctly. You can, however,
    download the *node.js* binaries (including npm) from the *node.js*
    website. See `How to install NPM`_ for more info.
-2. Install dependencies from NPM by running ``npm install``.
-3. Use ``cd`` to move to the directory where you want to download the
+2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
-4. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
+3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
    The repository will be cloned into the directory *LibreSignage/*.
-5. Run ``cd LibreSignage`` to move into the LibreSignage repository.
+4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
+5. Install dependencies from NPM by running ``npm install``.
 6. Run ``make configure`` and answer the questions. This generates
    an instance configuration file needed for compiling LibreSignage.
    The file is saved in ``build/`` as ``<DOMAIN>.iconf`` where
