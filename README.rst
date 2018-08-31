@@ -123,6 +123,56 @@ based systems. If you use some other OS, you're on your own :(.
    installation by running ``npm -v``. This should now print the
    installed npm version.
 
+LibreSignage in GIT
+-------------------
+
+LibreSignage uses the GIT version control system. The LibreSignage
+repository contains multiple branches that all have some differences.
+
+master
+  The master branch always contains the latest stable version of
+  LibreSignage with all the latest backported fixes. If you just
+  wan't to use a fully functioning version of LibreSignage, clone
+  this branch. The actual LibreSignage release points are also marked
+  in the GIT tree as annotated tags. You can clone a release tag too
+  but note that the latest patch release doesn't necessarily contain
+  the latest backports if new fixes have just been backported to master.
+
+v<MAJOR>.<MINOR>.<PATCH>
+  These branches are release branches. Development for a specific
+  LibreSignage version happens in the release branch for that specific
+  version. A new release branch is created every time either the major
+  or the minor version number changes. New eelease branches aren't created
+  for patch releases. Release branches are often quite stable and they
+  generally already work, but they might still contain serious bugs from
+  time to time.
+
+feature/*, bugfix/*, ...
+  Branches that start with a category and have the branch name after
+  a forward slash are development branches. You normally shouldn't
+  clone these because they are actively being worked on and even
+  commit history might be rewritten from time to time. These branches
+  aren't meant to be used by anyone else other than the developers
+  working on the branch.
+
+LibreSignage versioning
+-----------------------
+
+Each LibreSignage release has a designated version number of the
+form MAJOR.MINOR.PATCH.
+
+* The PATCH version is incremented for each patch release. Patch
+  releases only contain fixes and never contain new features.
+* The MINOR version is incremented for every release where
+  incrementing the MAJOR number is not justified. Minor releases
+  can contain new features and bugfixes etc.
+* The MAJOR version number is only incremented for very big and
+  major releases.
+
+The LibreSignage API also has its own version number that's just
+an integer which is incremented every time a backwards incompatible
+API change is made.
+
 Default users
 -------------
 

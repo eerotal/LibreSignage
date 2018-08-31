@@ -27,6 +27,7 @@ SRC_NO_COMPILE := $(shell find src \
 	-o \( -type f -path 'src/api/endpoint/*' -prune \) \
 	-o \( \
 		-type f ! -name '*.js' \
+		-a -type f ! -name '*.swp' \
 		-a -type f ! -name '*.scss' \
 		-a -type f ! -name '*.rst' \
 		-a -type f ! -name 'config.php' -print \
@@ -236,7 +237,7 @@ dep/%.scss.dep: src/%.scss
 	if [ ! "`basename '$(<)' | cut -c 1`" = "_" ]; then
 		$(call status,deps-scss,$<,$@)
 		$(call makedir,$@)
-		echo "$(subst src,dist,$(<:.scss=.css)):: `\
+		echo "$(subst src,dist,$(<:.scss=.css)):: $< `\
 			./build/scripts/sassdep.py -l $< $(SASS_IPATHS)|\
 			sed 's:$(ROOT)::g'`" > $@
 
