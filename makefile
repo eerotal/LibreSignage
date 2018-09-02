@@ -83,7 +83,7 @@ endif
 
 all:: server docs htmldocs js css api config libs; @:
 
-server:: initchk dirs $(subst src,dist,$(SRC_NO_COMPILE)); @:
+server:: initchk $(subst src,dist,$(SRC_NO_COMPILE)); @:
 js:: initchk $(subst src,dist,$(SRC_JS)); @:
 api:: initchk $(subst src,dist,$(SRC_ENDPOINT)); @:
 config:: initchk dist/common/php/config.php; @:

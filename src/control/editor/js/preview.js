@@ -17,10 +17,11 @@ const STYLESHEETS = [
 ];
 
 exports.Preview = class Preview {
-	constructor(container, editor, getter, err) {
+	constructor(container, editor, getter, err, noevent) {
 		this.container = $(container);
 		this.editor = $(editor);
 		this.getter = getter;
+		this.onevent = noevent;
 		this.err = err;
 		this.ratio = null;
 
@@ -40,8 +41,11 @@ exports.Preview = class Preview {
 		}
 		this.preview.contents().find('head').append(buf);
 
-		this.editor.on('keyup', () => { this.update(); })
+		if (!this.noevent) {
+			this.editor.on('keyup', () => { this.update(); })
+		}
 		this.set_ratio('16x9');
+		this.update();
 	}
 
 	update() {
@@ -77,13 +81,20 @@ exports.Preview = class Preview {
 		*  Set the aspect ratio of the preview box. Accepted
 		*  values for r are '16x9' and '4x3'.
 		*/
+		this.container.removeClass(
+			'preview-16x9 preview-4x3 preview-16x9-fit preview-4x3-fit'
+		);
 		if (r == '4x3') {
-			this.container.removeClass('preview-16x9');
 			this.container.addClass('preview-4x3');
 			this.ratio = r;
 		} else if (r == '16x9') {
 			this.container.addClass('preview-16x9');
-			this.container.removeClass('preview-4x3');
+			this.ratio = r;
+		} else if (r == '4x3-fit') {
+			this.container.addClass('preview-4x3-fit');
+			this.ratio = r;
+		} else if (r == '16x9-fit') {
+			this.container.addClass('preview-16x9-fit');
 			this.ratio = r;
 		} else {
 			throw new Error(`Unknown aspect ratio '${r}'.`);

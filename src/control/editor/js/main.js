@@ -717,6 +717,9 @@ function slide_preview() {
 }
 
 function slide_ch_queue() {
+	/*
+	*  Change the queue of the selected slide.
+	*/
 	queue.get_list(API, (qd) => {
 		var queues = {};
 		qd.sort();

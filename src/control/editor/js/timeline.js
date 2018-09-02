@@ -1,6 +1,7 @@
 var $ = require('jquery');
 var ls_queue = require('ls-queue');
 var uic = require('ls-uicontrol');
+var preview = require('./preview.js');
 
 const TL_UPDATE_INTERVAL = 60000;
 
@@ -11,11 +12,8 @@ const timeline_btn = (id, index, name, enabled) => `
 			<div class="col-2 tl-slide-index-cont">
 				${index}
 			</div>
-			<div class="col-10 tl-slide-thumb-cont">
-				<iframe class="tl-slide-thumb"
-					src="/app?preview=${id}&noui=1&silent=1"
-					frameborder="0">
-				</iframe>
+			<div id="tl-slide-thumb-cont-${id}"
+				class="col-10 tl-slide-thumb-cont">
 			</div>
 		</div>
 	</div>
@@ -31,22 +29,21 @@ exports.Timeline = class Timeline {
 		this.TL = $("#timeline");
 		this.TL_UI_DEFS = new uic.UIController({});
 
+		this.update_html();
 		setInterval(() => { this.update(); }, TL_UPDATE_INTERVAL);
 	}
 
 	update_html() {
 		/*
-		*  Update timeline HTML.
+		*  Update the timeline HTML elements.
 		*/
-		var c_index = -1;
-		var c_id = null;
-		var s = null;
+		let c_index = -1;
+		let s = null;
 
 		this.TL.html('');
 		this.TL_UI_DEFS.rm_all();
 
 		if (!this.queue) { return; }
-
 		while (s = this.queue.slides.next(c_index, false)) {
 			c_index = s.get('index');
 			this.TL.append(
@@ -57,11 +54,19 @@ exports.Timeline = class Timeline {
 					s.get('enabled')
 				)
 			);
-			let c_id = s.get('id'); // Solves variable referencing.
+			let c_id = s.get('id');
+
+			// Slide button UI definition.
 			this.TL_UI_DEFS.add(c_id, new uic.UIButton(
 				_elem = $(`#slide-btn-${c_id}`),
-				_perm = () => { return true; },
-				_enabler = () => {},
+				_perm = () => { return s.get('enabled'); },
+				_enabler = (elem, s) => {
+					if (s) {
+						elem.removeClass('tl-slide-cont-dis');
+					} else {
+						elem.addClass('tl-slide-cont-dis');
+					}
+				},
 				_attach = {
 					'click': () => {
 						this.select(c_id);
@@ -70,6 +75,34 @@ exports.Timeline = class Timeline {
 				},
 				_defer = null
 			));
+
+			// Thumb UI definition.
+			this.TL_UI_DEFS.add(c_id, new uic.UIStatic(
+				_elem = new preview.Preview(
+					`#tl-slide-thumb-cont-${c_id}`,
+					null,
+					() => { return s.get('markup'); },
+					(e) => {
+						if (e) {
+							$(`#slide-btn-${c_id}`).addClass(
+								'tl-slide-error'
+							);
+						} else {
+							$(`#slide-btn-${c_id}`).removeClass(
+								'tl-slide-error'
+							);
+						}
+					},
+					true
+				),
+				_perm = () => { return true; },
+				_enabler = () => {},
+				_attach = null,
+				_defer = null,
+				_getter = () => {},
+				_setter = () => {}
+			));
+			this.TL_UI_DEFS.get(c_id).get_elem().set_ratio('16x9-fit');
 		}
 
 		if (this.selected) {

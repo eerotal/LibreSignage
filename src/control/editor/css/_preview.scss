@@ -29,6 +29,22 @@ $preview-breakpoint: 1000px;
 	border: 1px solid $gray-1;
 }
 
+.preview-16x9-fit {
+	width: 100%;
+	padding-top: $ratio-16x9-p;
+	.preview {
+		margin-top: -1*$ratio-16x9-p;
+	}
+}
+
+.preview-4x3-fit {
+	width: 100%;
+	padding-top: $ratio-4x3-p;
+	.preview {
+		margin-top: -1*$ratio-4x3-p;
+	}
+}
+
 .preview-16x9 {
 	padding-top: $ratio-16x9-p;
 	.preview {
