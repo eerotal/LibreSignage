@@ -1,4 +1,4 @@
-@import 'node_modules/bootstrap/scss/bootstrap';
+@import 'bootstrap';
 @import 'globals';
 @import 'root';
 @import 'fonts';
@@ -14,12 +14,12 @@ main {
 	}
 	height: 100%;
 
-	color: var(--dark);
+	color: $dark;
 }
 
 /* Default background color */
 body {
-	background-color: var(--light);
+	background-color: $light;
 }
 
 /* Setup fonts */
@@ -68,37 +68,37 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Some predefined styling classes. */
 .cont-info-primary {
-	border-left: 3px solid var(--primary);
+	border-left: 3px solid $primary;
 	background-color: rgba(0, 123, 255, 0.08);
 }
 
 .cont-info-info {
-	border-left: 3px solid var(--info);
+	border-left: 3px solid $info;
 	background-color: rgba(23, 162, 184, 0.08);
 }
 
 .cont-info-success {
-	border-left: 3px solid var(--success);
+	border-left: 3px solid $success;
 	background-color: rgba(40, 167, 69, 0.08);
 }
 
 .cont-info-warning {
-	border-left: 3px solid var(--warning);
+	border-left: 3px solid $warning;
 	background-color: rgba(255, 193, 7, 0.08);
 }
 
 .cont-info-danger {
-	border-left: 3px solid var(--danger);
+	border-left: 3px solid $danger;
 	background-color: rgba(220, 53, 69, 0.08);
 }
 
 .link-nostyle {
-	color: var(--dark);
+	color: $dark;
 	text-decoration: none;
 }
 
 .link-nostyle:hover {
-	color: var(--secondary);
+	color: $secondary;
 	text-decoration: none;
 }
 

@@ -14,8 +14,8 @@
 .usr-table-row {
 	margin: 0;
 	padding: 0;
-	color: var(--black);
-	background-color: var(--white);
+	color: $black;
+	background-color: $white;
 	border-bottom: 1px solid $gray-1;
 }
 

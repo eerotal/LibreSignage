@@ -1,4 +1,5 @@
 @import 'globals';
+@import 'bootstrap';
 
 /* LibreSignage navigation bar styling. */
 
@@ -24,8 +25,8 @@
 
 .nav-vdiv-gray {
 	border: {
-		left: 1px solid var(--gray);
-		right: 1px solid var(--gray);
+		left: 1px solid $gray;
+		right: 1px solid $gray;
 	}
 }
 
@@ -43,7 +44,7 @@
 	}
 
 	border: {
-		top: 1px solid var(--secondary);
-		bottom: 1px solid var(--secondary);
+		top: 1px solid $secondary;
+		bottom: 1px solid $secondary;
 	}
 }
