@@ -13,7 +13,9 @@ ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SASS_IPATHS := $(ROOT) $(ROOT)src/common/css
 SASSFLAGS := --sourcemap=none --no-cache
 
-VERBOSE=y
+VERBOSE ?= Y     # Verobose log output.
+NOHTMLDOCS ?= N  # Don't generate HTML docs.
+INST ?= ""       # Installation config path.
 
 # Production libraries.
 LIBS := $(filter-out \
@@ -59,18 +61,11 @@ SRC_ENDPOINT := $(shell find src/api/endpoint \
 )
 
 status = \
-	if [ "$(VERBOSE)" = "y" ]; then \
+	if [ "`echo '$(VERBOSE)'|cut -zc1|\
+		tr '[:upper:]' '[:lower:]'`" = "y" ]; then \
 		echo "$(1): $(2) >> $(3)"|tr -s ' '|sed 's/^ *$///g'; \
 	fi
 makedir = mkdir -p $(dir $(1))
-
-ifndef INST
-INST := ""
-endif
-
-ifndef NOHTMLDOCS
-NOHTMLDOCS := N
-endif
 
 ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [INFO] Won't generate HTML documentation.)
