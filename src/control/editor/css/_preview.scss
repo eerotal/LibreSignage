@@ -1,15 +1,21 @@
-@import 'globals';
-
 /*
-* Live slide preview styling. The preview-16x9 and preview-4x3
-* classes are meant to be applied to #slide-live-preview to
-* select the aspect ratio of the preview.
+* Live slide preview styling.
+*
+* The preview-[16x9/4x3](-fit) classes are meant to be applied to to
+* the div element with the class preview-cont to select the aspect
+* ratio of the preview. The classes without the -fit suffix have
+* width: 100% when viewport width < $preview-breakpoint. When viewport
+* width > $preview-breakpoint, the minimum width of the preview container
+* is $preview-mw. The *-fit classes always have width: 100%.
+*  
 */
 
-$ratio-16x9-p: 9/16*100%;
-$ratio-4x3-p: 3/4*100%;
-$preview-mw: 600px;
-$preview-breakpoint: 1000px;
+@import 'globals';
+
+$ratio-16x9-p: 9/16*100%;     // 16:9 aspect ratio multiplier.
+$ratio-4x3-p: 3/4*100%;       // 4:3 aspect ratio multiplier.
+$preview-mw: 600px;           // Preview min-width (vw > breakpoint).
+$preview-breakpoint: 1000px;  // Preview sizing breakpoint.
 
 .preview-cont {
 	position: relative;

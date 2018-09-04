@@ -6,13 +6,17 @@
 @import 'timeline';
 @import 'preview';
 
-$main-col-minw: 250px;
-$slide-input-minh: 30; // Min-height in lines.
-$syntax-error-color: #ff6565;
+$main-col-minw: 250px;        // Main column min width.
+$slide-input-minh: 30;        // Minimum height of editor in lines.
+$syntax-error-color: #ff6565; // Syntax error highlight color in editor.
 
 html, body {
 	transition: all .5s;
 	min-height: 100%;
+}
+
+#editor-col-l, #editor-col-r {
+	min-width: $main-col-minw;
 }
 
 /* Controls styling. */
@@ -25,10 +29,6 @@ html, body {
 
 #queue-select {
 	width: 150px;
-}
-
-#editor-col-l, #editor-col-r {
-	min-width: $main-col-minw;
 }
 
 .btn-slide-ctrl {
@@ -65,12 +65,12 @@ html, body {
 	margin-bottom: $s3;
 }
 
-.syntax-error-highlight {
-	position: absolute;
-	background-color: $syntax-error-color;
-}
-
 #markup-err-display {
 	font-family: Inconsolata, monospace;
 	color: $red;
+}
+
+.syntax-error-highlight {
+	position: absolute;
+	background-color: $syntax-error-color;
 }

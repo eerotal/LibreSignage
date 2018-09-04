@@ -1,9 +1,9 @@
+/* LibreSignage editor timeline styling. */
+
 @import 'globals';
 
-/* Timeline styling */
-
-$tl-pad: 4px;
-$tl-slide-cont-width: 200px;
+$tl-pad: 4px;                // Timeline slide default padding.
+$tl-slide-cont-width: 200px; // Timeline slide "box" width.
 
 #timeline {
 	padding: {
