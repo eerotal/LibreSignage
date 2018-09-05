@@ -538,6 +538,10 @@ function set_inputs(s) {
 }
 
 function sel_slide_is_modified() {
+	/*
+	*  Check whether the selected slide is modified. Returns
+	*  true if it is and false otherwise.
+	*/
 	var ret = false;
 	if (!sel_slide) { return false; }
 	UI_DEFS.all(
@@ -553,41 +557,28 @@ function sel_slide_is_modified() {
 	return ret;
 }
 
-function sel_slide_unsaved_confirm(callback) {
+function slide_show(s, no_popup, ready) {
 	/*
-	*  Ask the user whether to continue or not if the selected
-	*  slide has unsaved changes. 'callback' is a function that's
-	*  called if the user chooses to continue after seeing the
-	*  dialog. This function returns true if the dialog is shown
-	*  and false otherwise.
-	*/
-	if (sel_slide_is_modified()) {
-		DIALOG_SLIDE_NOT_SAVED((status, val) => {
-			if (!status) { return; }
-			if (callback) { callback(); }
-		}).show();
-		return true;
-	} else {
-		return false;
-	}
-}
-
-function slide_show(s, no_popup) {
-	/*
-	*  Show the slide 's'.
+	*  Show the slide 's'. If the current slide has unsaved changes,
+	*  this function displays an 'Unsaved changes' dialog and only
+	*  selects the requested slide if the user clicks OK. If the new
+	*  slide is selected, the 'ready' function is called.
 	*/
 	var cb = () => {
 		console.log(`LibreSignage: Show slide '${s}'.`);
 
 		sel_slide = new slide.Slide(API);
 		flag_slide_loading = true;
-		sel_slide.load(s, (ret) => {
-			if (ret) {
+		sel_slide.load(s, (err) => {
+			if (err) {
+				// Remove input data and disable inputs on error.
 				set_inputs(null);
 				disable_controls();
 				LIVE_PREVIEW.update();
 				return;
 			}
+
+			// Show the new input data and update the preview.
 			set_inputs(sel_slide);
 			enable_controls();
 			LIVE_PREVIEW.update();
@@ -595,18 +586,26 @@ function slide_show(s, no_popup) {
 		});
 	}
 
-	if (!flag_slide_loading) {
-		if (!no_popup) {
-			if (!sel_slide_unsaved_confirm(cb)) { cb(); }
-		} else {
-			cb();
-		}
+	if (flag_slide_loading) { return; }
+	if (!no_popup && sel_slide_is_modified()) {
+		DIALOG_SLIDE_NOT_SAVED(
+			(status, val) => {
+				if (status) {
+					cb();
+					if (ready) { ready(); }
+				}
+			}
+		).show();
+	} else {
+		cb();
+		if (ready) { ready(); }
 	}
 }
 
 function slide_rm() {
 	/*
-	*  Remove the selected slide.
+	*  Remove the selected slide. This function asks for confirmation
+	*  from the user before actually removing the slide.
 	*/
 	dialog.dialog(
 		dialog.TYPE.CONFIRM,
@@ -640,6 +639,7 @@ function slide_new() {
 	*/
 	var cb = () => {
 		console.log("LibreSignage: Create slide!");
+		TL.select(null);
 		sel_slide = new slide.Slide(API);
 		sel_slide.set(NEW_SLIDE_DEFAULTS);
 		set_inputs(sel_slide);
@@ -656,7 +656,12 @@ function slide_new() {
 		);
 		return;
 	}
-	if (!sel_slide_unsaved_confirm(cb)) { cb(); }
+
+	if (sel_slide_is_modified()) {
+		DIALOG_SLIDE_NOT_SAVED((status, val) => {
+			if (status) { cb(); }
+		}).show();
+	} else { cb(); }
 }
 
 function slide_save() {
@@ -718,7 +723,8 @@ function slide_preview() {
 
 function slide_ch_queue() {
 	/*
-	*  Change the queue of the selected slide.
+	*  Change the queue of the selected slide. This function
+	*  prompts the user for the new queue.
 	*/
 	queue.get_list(API, (qd) => {
 		var queues = {};
@@ -739,10 +745,15 @@ function slide_ch_queue() {
 						sel_slide = null;
 						set_inputs(null);
 						disable_controls();
+						TL.select(null);
 						TL.update();
 					});
 				}
-				if (!sel_slide_unsaved_confirm(cb)) { cb(); }
+				if (sel_slide_is_modified()) {
+					DIALOG_SLIDE_NOT_SAVED((status, val) => {
+						if (status) { cb(); }
+					}).show();
+				} else { cb(); }
 			},
 			queues
 		);
@@ -885,10 +896,12 @@ function editor_setup() {
 		return e.returnValue;
 	});
 
+	// Setup inputs and other UI elements.
 	inputs_setup(() => {
-		// Disable inputs and setup update intervals.
 		disable_controls();
-		TL = new timeline.Timeline(API, slide_show);
+		TL = new timeline.Timeline(API, (id, f_sel_slide) => {
+			slide_show(id, false, f_sel_slide);
+		});
 		qsel.setup(API, TL);
 		flag_editor_ready = true;
 		console.log("LibreSignage: Editor ready.");

@@ -20,10 +20,20 @@ const timeline_btn = (id, index, name, enabled) => `
 `;
 
 exports.Timeline = class Timeline {
-	constructor(api, func_select_slide) {
+	/*
+	*  LibreSignage Timeline UI element class.
+	*
+	*  api         = An initialized API object.
+	*  f_sel_slide = A function to call when a slide is clicked.
+	*                This function should accept two arguments:
+	*                The first one is the ID of the slide that was clicked.
+	*                The second one is a function that should be called
+	*                if the slide was indeed selected.
+	*/
+	constructor(api, f_sel_slide) {
 		this.selected = null;
 		this.api = api;
-		this.func_select_slide = func_select_slide;
+		this.f_sel_slide = f_sel_slide;
 		this.queue = null;
 
 		this.TL = $("#timeline");
@@ -69,8 +79,9 @@ exports.Timeline = class Timeline {
 				},
 				_attach = {
 					'click': () => {
-						this.select(c_id);
-						this.func_select_slide(c_id);
+						this.f_sel_slide(c_id, () => {
+							this.select(c_id);
+						});
 					}
 				},
 				_defer = null
@@ -140,7 +151,9 @@ exports.Timeline = class Timeline {
 		if (this.selected) {
 			$(`#slide-btn-${this.selected}`).removeClass('tl-selected');
 		}
-		$(`#slide-btn-${id}`).addClass('tl-selected');
+		if (id) {
+			$(`#slide-btn-${id}`).addClass('tl-selected');
+		}
 		this.selected = id;
 	}
 }
