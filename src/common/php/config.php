@@ -84,11 +84,11 @@
 	// User quota limits.
 	const DEFAULT_QUOTA = array(
 		'slides' => array(
-			'limit' => 2,
+			'limit' => 10,
 			'disp' => 'Slides'
 		),
 		'api_rate' => array(
-			'limit' => 100,
+			'limit' => 200,
 			'disp' => 'API quota (calls/'.
 					LS_LIM['API_RATE_T'].'s)'
 		)
