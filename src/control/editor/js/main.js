@@ -1,3 +1,8 @@
+/*
+*  LibreSignage editor interface code. This file contains
+*  all the main UI element handling for the editor.
+*/
+
 var $ = require('jquery');
 var bootstrap = require('bootstrap');
 
@@ -14,32 +19,8 @@ var sc = require('ls-shortcut');
 var ace_range = ace.require('ace/range');
 
 var timeline = require('./timeline.js');
-var qsel = require('./qsel.js');
 var preview = require('./preview.js');
-
-var API = null;
-var TL = null;
-
-const DIALOG_MARKUP_TOO_LONG = (max) => {
-	return new dialog.Dialog(
-		dialog.TYPE.ALERT,
-		'Too long slide markup',
-		`The slide markup is too long. The maximum length is
-		${max} characters.`,
-		null
-	);
-}
-
-const DIALOG_SLIDE_NOT_SAVED = (callback) => {
-	return new dialog.Dialog(
-		dialog.TYPE.CONFIRM,
-		'Slide not saved',
-		'The selected slide has unsaved changes. All changes ' +
-		'will be lost if you continue. Are you sure you want ' +
-		'to continue?',
-		callback
-	);
-}
+var diags = require('./dialogs.js');
 
 // Some sane default values for new slides.
 const NEW_SLIDE_DEFAULTS = {
@@ -57,6 +38,19 @@ const NEW_SLIDE_DEFAULTS = {
 	'queue_name': '',
 	'collaborators': []
 };
+
+// Editor status constants used by editor_status[_check]().
+const ESTATUS = {
+	NOSLIDE: 0,
+	UNSAVED: 1,
+	SAVED: 2
+};
+
+// DOM element jQuery selectors.
+const QUEUE_SELECT				= $("#queue-select");
+const QUEUE_CREATE				= $("#queue-create");
+const QUEUE_VIEW				= $("#queue-view");
+const QUEUE_REMOVE				= $("#queue-remove");
 
 const SLIDE_NEW					= $("#btn-slide-new")
 const SLIDE_PREVIEW				= $("#btn-slide-preview");
@@ -87,19 +81,21 @@ var SLIDE_COLLAB				= null;
 var SLIDE_INPUT					= null;
 var LIVE_PREVIEW				= null;
 
+var API = null; // API interface object.
+var TL = null;  // Timeline object.
+
+// Input validator selectors.
 var name_sel = null;
 var index_sel = null;
 var sel_slide = null;
 
-var syn_err_id = null; // Syntax error highlight marker id.
-var flag_slide_loading = false; // Used by slide_show().
-var flag_editor_ready = false;
+var syn_err_id = null;          // Syntax error marker id.
+var flag_slide_loading = false; // Slide loading flag.
+var flag_editor_ready = false;  // Editor ready flag.
 
 var defer_editor_ready = () => { return !flag_editor_ready; };
 
-/*
-*  Editor UI definitions using the UIInput class.
-*/
+// Editor UI definitions.
 const UI_DEFS = new uic.UIController({
 	'PREVIEW_R_16x9': new uic.UIButton(
 		_elem = PREVIEW_R_16x9,
@@ -453,6 +449,50 @@ const UI_DEFS = new uic.UIController({
 	)
 });
 
+// Queue selector UI definitions.
+const QSEL_UI_DEFS = new uic.UIController({
+	'QUEUE_SELECT': new uic.UIInput(
+		_elem = QUEUE_SELECT,
+		_perm = () => { return true; },
+		_enabler = null,
+		_attach = null,
+		_defer = null,
+		_mod = null,
+		_getter = (elem) => { return elem.val(); },
+		_setter = (elem, value) => { elem.val(value); },
+		_clear = () => { elem.val(''); }
+	),
+	'QUEUE_CREATE': new uic.UIButton(
+		_elem = QUEUE_CREATE,
+		_perm = () => { return true; },
+		_enabler = null,
+		_attach = {
+			'click': queue_create
+		},
+		_defer = defer_editor_ready
+	),
+	'QUEUE_VIEW': new uic.UIButton(
+		_elem = QUEUE_VIEW,
+		_perm = () => { return true; },
+		_enabler = null,
+		_attach = {
+			'click': queue_view
+		},
+		_defer = defer_editor_ready
+	),
+	'QUEUE_REMOVE': new uic.UIButton(
+		_elem = QUEUE_REMOVE,
+		_perm = (d) => {
+			return d['o'] && TL.queue;
+		},
+		_enabler = null,
+		_attach = {
+			'click': queue_remove
+		},
+		_defer = defer_editor_ready
+	),
+});
+
 /*
 *  Editor shortcut definitions. Note that the shortcut
 *  callbacks check whether the action should be performed
@@ -537,32 +577,42 @@ function set_inputs(s) {
 	}
 }
 
-function sel_slide_is_modified() {
-	/*
-	*  Check whether the selected slide is modified. Returns
-	*  true if it is and false otherwise.
-	*/
-	var ret = false;
-	if (!sel_slide) { return false; }
-	UI_DEFS.all(
-		function() {
-			if (this.is_mod(sel_slide)) {
-				ret = true;
-				return false;
-			}
-		},
-		null,
-		'input'
-	);
-	return ret;
+function editor_status() {
+	let ret = false;
+	if (!sel_slide) {
+		return ESTATUS.NOSLIDE;
+	} else {
+		UI_DEFS.all(
+			function() {
+				if (this.is_mod(sel_slide)) {
+					ret = true;
+					return false;
+				}
+			},
+			null,
+			'input'
+		);
+		if (ret) {
+			return ESTATUS.UNSAVED;
+		} else {
+			return ESTATUS.SAVED;
+		}
+	}
 }
 
-function slide_show(s, no_popup, ready) {
+function editor_status_check(arr) {
+	let tmp = editor_status();
+	for (let s of arr) {
+		if (tmp == ESTATUS[s]) { return true; }
+	}
+	return false;
+}
+
+function slide_show(s, no_popup) {
 	/*
 	*  Show the slide 's'. If the current slide has unsaved changes,
 	*  this function displays an 'Unsaved changes' dialog and only
-	*  selects the requested slide if the user clicks OK. If the new
-	*  slide is selected, the 'ready' function is called.
+	*  selects the requested slide if the user clicks OK.
 	*/
 	var cb = () => {
 		console.log(`LibreSignage: Show slide '${s}'.`);
@@ -582,24 +632,34 @@ function slide_show(s, no_popup, ready) {
 			set_inputs(sel_slide);
 			enable_controls();
 			LIVE_PREVIEW.update();
+			TL.select(sel_slide.get('id'));
 			flag_slide_loading = false;
 		});
 	}
 
 	if (flag_slide_loading) { return; }
-	if (!no_popup && sel_slide_is_modified()) {
-		DIALOG_SLIDE_NOT_SAVED(
+	if (!no_popup && editor_status_check(['UNSAVED'])) {
+		diags.DIALOG_SLIDE_UNSAVED(
 			(status, val) => {
-				if (status) {
-					cb();
-					if (ready) { ready(); }
-				}
+				if (status) { cb(); }
 			}
 		).show();
 	} else {
 		cb();
-		if (ready) { ready(); }
 	}
+}
+
+function slide_hide() {
+	/*
+	*  Hide the current slide, ie. set sel_slide = null
+	*  and clear the editor inputs etc.
+	*/
+	console.log('LibreSignage: Hide slide.');
+	sel_slide = null;
+	TL.select(null);
+	set_inputs(null);
+	disable_controls();
+	LIVE_PREVIEW.update();
 }
 
 function slide_rm() {
@@ -621,12 +681,8 @@ function slide_rm() {
 					`LibreSignage: Deleted slide ` +
 					`'${sel_slide.get('id')}'.`
 				);
-
-				sel_slide = null;
+				slide_hide();
 				TL.update()
-				set_inputs(null);
-				disable_controls();
-				LIVE_PREVIEW.update();
 		});
 	});
 }
@@ -657,8 +713,8 @@ function slide_new() {
 		return;
 	}
 
-	if (sel_slide_is_modified()) {
-		DIALOG_SLIDE_NOT_SAVED((status, val) => {
+	if (editor_status_check(['UNSAVED'])) {
+		diags.DIALOG_SLIDE_UNSAVED((status, val) => {
 			if (status) { cb(); }
 		}).show();
 	} else { cb(); }
@@ -674,7 +730,7 @@ function slide_save() {
 		UI_DEFS.get('SLIDE_INPUT').get().length >
 		API.SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN
 	) {
-		DIALOG_MARKUP_TOO_LONG(
+		diags.DIALOG_MARKUP_TOO_LONG(
 			API.SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN
 		).show();
 		return;
@@ -742,15 +798,12 @@ function slide_ch_queue() {
 				var cb = () => {
 					sel_slide.save((err) => {
 						if (API.handle_disp_error(err)) { return; }
-						sel_slide = null;
-						set_inputs(null);
-						disable_controls();
-						TL.select(null);
+						slide_hide();
 						TL.update();
 					});
 				}
-				if (sel_slide_is_modified()) {
-					DIALOG_SLIDE_NOT_SAVED((status, val) => {
+				if (editor_status_check(['UNSAVED'])) {
+					diags.DIALOG_SLIDE_UNSAVED((status, val) => {
 						if (status) { cb(); }
 					}).show();
 				} else { cb(); }
@@ -791,6 +844,161 @@ function syn_err_clear(id) {
 	if (id) {
 		UI_DEFS.get('SLIDE_INPUT').get_elem().session.removeMarker(id);
 	}
+}
+
+function queue_select(name, confirm, ready) {
+	/*
+	*  Select the queue 'name'.
+	*/
+	var callback = () => {
+		console.log(`LibreSignage: Select queue '${name}'.`)
+		TL.show(name, () => {
+			slide_hide();
+			update_qsel_ctrls(ready);
+		});
+	};
+	if (editor_status_check(['UNSAVED']) && confirm) {
+		diags.DIALOG_SLIDE_UNSAVED(
+			(status, val) => {
+				if (status) { callback(); }
+			}
+		).show();
+	} else { callback(); }
+}
+
+function queue_create() {
+	/*
+	*  Create a new queue and select it. If the current slide in
+	*  the editor is unsaved, the user is asked for confirmation
+	*  first.
+	*/
+	var callback = () => {
+		dialog.dialog(
+			dialog.TYPE.PROMPT,
+			'Create queue',
+			'Queue name',
+			(status, val) => {
+				if (!status) { return; }
+				API.call(
+					API.ENDP.QUEUE_CREATE,
+					{'name': val},
+					(data) => {
+						if (API.handle_disp_error(data['error'])) {
+							return;
+						}
+						// Select the new queue.
+						update_qsel(false, () => {
+							QUEUE_SELECT.val(val);
+							queue_select(val, false, null);
+						});
+						console.log(
+							`LibreSignage: Created queue '${val}'.`
+						);
+					}
+				);
+			},
+			[
+				new val.StrValidator({
+					min: null,
+					max: null,
+					regex: /^[A-Za-z0-9_-]*$/
+				}, "Invalid characters in queue name."),
+				new val.StrValidator({
+					min: 1,
+					max: null,
+					regex: null,
+				}, "The queue name is too short."),
+				new val.StrValidator({
+					min: null,
+					max: API.SERVER_LIMITS.QUEUE_NAME_MAX_LEN,
+					regex: null
+				}, "The queue name is too long.")
+			]
+		);
+	};
+
+	if (editor_status_check(['UNSAVED'])) {
+		diags.DIALOG_SLIDE_UNSAVED(
+			(status, val) => {
+				if (status) { callback(); }
+			}
+		).show();
+	} else {
+		callback();
+	}
+}
+
+function queue_remove() {
+	/*
+	*  Remove the selected queue. If the current slide in the
+	*  editor is unsaved, the user is asked for confirmation
+	*  first.
+	*/
+	let callback = () => {
+		dialog.dialog(
+			dialog.TYPE.CONFIRM,
+			'Delete queue',
+			'Delete the selected queue and all the slides in it?',
+			(status) => {
+				if (!status) { return; }
+				API.call(
+					API.ENDP.QUEUE_REMOVE,
+					{'name': TL.queue.name},
+					(data) => {
+						if (API.handle_disp_error(data['error'])) {
+							return;
+						}
+						update_qsel(true, null);
+						slide_hide();
+					}
+				);
+			},
+			null
+		);
+	};
+	if (editor_status_check(['UNSAVED'])) {
+		diags.DIALOG_SLIDE_UNSAVED(
+			(status, val) => {
+				if (status) { callback(); }
+			}
+		).show();
+	} else { callback(); }
+}
+
+function queue_view() {
+	window.open(`/app/?q=${TL.queue.name}`);
+}
+
+function update_qsel(show_initial, ready) {
+	/*
+	*  Update the queue selector options.
+	*/
+	queue.get_list(API, (queues) => {
+		queues.sort();
+		QUEUE_SELECT.html('');
+		for (let q of queues) {
+			QUEUE_SELECT.append(`<option value="${q}">${q}</option>`);
+		}
+		if (show_initial && queues.length) {
+			queue_select(queues[0], false, ready);
+		} else {
+			queue_select(null, false, ready);
+		}
+	});
+}
+
+function update_qsel_ctrls(ready) {
+	// Update queue selector controls.
+	QSEL_UI_DEFS.all(
+		function() {
+			this.state(
+				{'o': TL.queue && (TL.queue.owner == API.CONFIG.user)}
+			);
+		},
+		null,
+		'button'
+	);
+	if (ready) { ready(); }
 }
 
 function inputs_setup(ready) {
@@ -878,9 +1086,14 @@ function inputs_setup(ready) {
 		);
 		if (ready) { ready(); }
 	});
+
+	// Setup the queue selector event listener.
+	QUEUE_SELECT.change(() => {
+		queue_select(QUEUE_SELECT.val(), true, null);
+	});
 }
 
-function editor_setup() {
+function setup() {
 	util.setup_defaults();
 
 	/*
@@ -888,7 +1101,7 @@ function editor_setup() {
 	*  the user doesn't accidentally exit the page and lose changes.
 	*/
 	$(window).on('beforeunload', function(e) {
-		if (!sel_slide_is_modified()) { return; }
+		if (editor_status_check(['NOSLIDE', 'SAVED'])) { return; }
 		e.returnValue = "The selected slide is not saved. " +
 				"Any changes will be lost if you exit " +
 				"the page. Are you sure you want to " +
@@ -899,10 +1112,8 @@ function editor_setup() {
 	// Setup inputs and other UI elements.
 	inputs_setup(() => {
 		disable_controls();
-		TL = new timeline.Timeline(API, (id, f_sel_slide) => {
-			slide_show(id, false, f_sel_slide);
-		});
-		qsel.setup(API, TL);
+		TL = new timeline.Timeline(API, slide_show);
+		update_qsel(true);
 		flag_editor_ready = true;
 		console.log("LibreSignage: Editor ready.");
 	});
@@ -927,6 +1138,6 @@ function editor_setup() {
 $(document).ready(() => {
 	API = new api.API(
 		null,	// Use default config.
-		editor_setup
+		setup
 	);
 });

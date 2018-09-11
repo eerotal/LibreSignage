@@ -25,10 +25,11 @@ exports.Timeline = class Timeline {
 	*
 	*  api         = An initialized API object.
 	*  f_sel_slide = A function to call when a slide is clicked.
-	*                This function should accept two arguments:
-	*                The first one is the ID of the slide that was clicked.
-	*                The second one is a function that should be called
-	*                if the slide was indeed selected.
+	*                The ID of the slide that was clicked is passed
+	*                to this function as the first argument. Note
+	*                that you must call select() on the timeline object
+	*                yourself if you want the selected slide highlighting
+	*                to work.
 	*/
 	constructor(api, f_sel_slide) {
 		this.selected = null;
@@ -77,13 +78,7 @@ exports.Timeline = class Timeline {
 						elem.addClass('tl-slide-cont-dis');
 					}
 				},
-				_attach = {
-					'click': () => {
-						this.f_sel_slide(c_id, () => {
-							this.select(c_id);
-						});
-					}
-				},
+				_attach = { 'click': () => { this.f_sel_slide(c_id); } },
 				_defer = null
 			));
 

@@ -56,7 +56,6 @@ exports.Preview = class Preview {
 
 		// Clear previous errors.
 		if (this.err) { this.err(null); }
-
 		try {
 			html = markup.parse(
 				util.sanitize_html(
@@ -71,7 +70,7 @@ exports.Preview = class Preview {
 			}
 		}
 
-		if (html) {
+		if (html != null) {
 			this.preview.contents().find('body').html(html);
 		}
 	}
