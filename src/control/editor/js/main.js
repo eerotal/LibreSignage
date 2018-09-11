@@ -84,6 +84,8 @@ var LIVE_PREVIEW				= null;
 var API = null; // API interface object.
 var TL = null;  // Timeline object.
 
+var qsel_queues = null; // Queue selector queues list.
+
 // Input validator selectors.
 var name_sel = null;
 var index_sel = null;
@@ -848,7 +850,9 @@ function syn_err_clear(id) {
 
 function queue_select(name, confirm, ready) {
 	/*
-	*  Select the queue 'name'.
+	*  Select the queue 'name'. If 'confirm' == true and an unsaved
+	*  slide is selected, the user will be asked for confirmation
+	*  first.
 	*/
 	var callback = () => {
 		console.log(`LibreSignage: Select queue '${name}'.`)
@@ -912,7 +916,10 @@ function queue_create() {
 					min: null,
 					max: API.SERVER_LIMITS.QUEUE_NAME_MAX_LEN,
 					regex: null
-				}, "The queue name is too long.")
+				}, "The queue name is too long."),
+				new val.BlacklistValidator({
+					bl: qsel_queues
+				}, "This queue already exists.")
 			]
 		);
 	};
@@ -975,6 +982,8 @@ function update_qsel(show_initial, ready) {
 	*/
 	queue.get_list(API, (queues) => {
 		queues.sort();
+		qsel_queues = queues;
+
 		QUEUE_SELECT.html('');
 		for (let q of queues) {
 			QUEUE_SELECT.append(`<option value="${q}">${q}</option>`);
