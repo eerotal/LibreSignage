@@ -22,3 +22,6 @@ v0.1.0
                architecture that most compilers use.
   - [feature]  Improve markup error reporting in the editor UI. Erroneous
                code lines are now highlighted in the editor input.
+  - [bugfix]   Confirm before changing the queue if an unsaved slide
+               is being edited in the editor (#17).
+  - [bugfix]   Prevent creating duplicate queues in the editor.
