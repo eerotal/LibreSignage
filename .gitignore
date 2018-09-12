@@ -1,8 +1,15 @@
 # Exclude some generated LibreSignage files and
 # temporary text editor files.
+
+# Nano
 *.swp
 *.save
+
+# Emacs
 \#*\#
+*~
+
+# Build
 /dist
 /dep
 /build/link
