@@ -1,4 +1,0 @@
-# Mark all node_modules directories except the
-# root one as non-vendored code for linguist.
-node_modules/ linguist-vendored=fals
-/node_modules/ linguist-vendored=true

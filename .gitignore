@@ -2,7 +2,7 @@
 # temporary text editor files.
 *.swp
 *.save
-#.*#
+\#*\#
 /dist
 /dep
 /build/link
