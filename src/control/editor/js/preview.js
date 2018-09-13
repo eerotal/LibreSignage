@@ -46,6 +46,7 @@ exports.Preview = class Preview {
 			));
 			phead.append(tmp);
 		}
+		this.set_ratio('16x9');
 
 		/*
 		*  Run the rest of the setup code once the stylesheets have
@@ -56,7 +57,6 @@ exports.Preview = class Preview {
 			if (!this.noevent) {
 				this.editor.on('keyup', () => { this.update(); })
 			}
-			this.set_ratio('16x9');
 			this.update();
 		});
 	}
