@@ -48,15 +48,19 @@ exports.Timeline = class Timeline {
 		/*
 		*  Update the timeline HTML elements.
 		*/
-		let c_index = -1;
 		let s = null;
+		let index = -1;
 
 		this.TL.html('');
 		this.TL_UI_DEFS.rm_all();
 
 		if (!this.queue) { return; }
-		while (s = this.queue.slides.next(c_index, false)) {
-			c_index = s.get('index');
+		while (s = this.queue.slides.next(index, false)) {
+			index = s.get('index');
+			
+			let id_scoped = s.get('id');
+			let s_scoped = s;
+			
 			this.TL.append(
 				timeline_btn(
 					s.get('id'),
@@ -65,36 +69,39 @@ exports.Timeline = class Timeline {
 					s.get('enabled')
 				)
 			);
-			let c_id = s.get('id');
-
+			
 			// Slide button UI definition.
-			this.TL_UI_DEFS.add(c_id, new uic.UIButton(
-				_elem = $(`#slide-btn-${c_id}`),
-				_perm = () => { return s.get('enabled'); },
+			this.TL_UI_DEFS.add(id_scoped, new uic.UIButton(
+				_elem = $(`#slide-btn-${id_scoped}`),
+				_perm = () => { return s_scoped.get('enabled'); },
 				_enabler = (elem, s) => {
-					if (s) {
+					if (s_scoped) {
 						elem.removeClass('tl-slide-cont-dis');
 					} else {
 						elem.addClass('tl-slide-cont-dis');
 					}
 				},
-				_attach = { 'click': () => { this.f_sel_slide(c_id); } },
+				_attach = {
+					'click': () => {
+						this.f_sel_slide(id_scoped);
+					}
+				},
 				_defer = null
 			));
 
 			// Thumb UI definition.
-			this.TL_UI_DEFS.add(c_id, new uic.UIStatic(
+			this.TL_UI_DEFS.add(id_scoped, new uic.UIStatic(
 				_elem = new preview.Preview(
-					`#tl-slide-thumb-cont-${c_id}`,
+					`#tl-slide-thumb-cont-${id_scoped}`,
 					null,
-					() => { return s.get('markup'); },
+					() => { return s_scoped.get('markup'); },
 					(e) => {
 						if (e) {
-							$(`#slide-btn-${c_id}`).addClass(
+							$(`#slide-btn-${id_scoped}`).addClass(
 								'tl-slide-error'
 							);
 						} else {
-							$(`#slide-btn-${c_id}`).removeClass(
+							$(`#slide-btn-${id_scoped}`).removeClass(
 								'tl-slide-error'
 							);
 						}
@@ -108,7 +115,9 @@ exports.Timeline = class Timeline {
 				_getter = () => {},
 				_setter = () => {}
 			));
-			this.TL_UI_DEFS.get(c_id).get_elem().set_ratio('16x9-fit');
+			this.TL_UI_DEFS.get(id_scoped).get_elem().set_ratio(
+				'16x9-fit'
+			);
 		}
 
 		if (this.selected) {

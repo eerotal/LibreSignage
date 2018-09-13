@@ -10,11 +10,7 @@ const META = [
 	{ charset: 'utf-8' },
 	{ name: 'viewport', content: 'width=device-width, initial-scale=1' }
 ];
-
-const STYLESHEETS = [
-	'/libs/bootstrap/dist/css/bootstrap.min.css',
-	'/app/css/display.css'
-];
+const STYLESHEETS = [ '/app/css/display.css' ];
 
 exports.Preview = class Preview {
 	constructor(container, editor, getter, err, noevent) {
@@ -29,23 +25,40 @@ exports.Preview = class Preview {
 		this.preview = $('<iframe class="preview rounded"></frame>');
 		this.container.append(this.preview);
 
-		// Add the necessary metadata and stylesheets.
-		var buf = '';
-		for (let m of META) {
-			buf += '<meta';
-			for (let k in m) { buf += ` ${k}="${m[k]}"`; }
-			buf += '>';
-		}
-		for (let s of STYLESHEETS) {
-			buf += `<link rel="stylesheet" href="${s}"></link>`;
-		}
-		this.preview.contents().find('head').append(buf);
+		// Add meta tags.
+		let phead = this.preview.contents().find('head');
+		for (let m of META) { phead.append($('<meta>').attr(m)); }
 
-		if (!this.noevent) {
-			this.editor.on('keyup', () => { this.update(); })
+		// Add stylesheets.
+		let tmp = null;
+		let promises = [];
+		for (let s of STYLESHEETS) {
+			tmp = $('<link></link>').attr(
+				{
+					'rel': 'stylesheet',
+					'href': s
+				}
+			);
+			promises.push(new Promise(
+				(resolve, reject) => {
+					tmp.on('load', resolve);
+				}
+			));
+			phead.append(tmp);
 		}
-		this.set_ratio('16x9');
-		this.update();
+
+		/*
+		*  Run the rest of the setup code once the stylesheets have
+		*  loaded. This prevents the user from seeing a preview with
+		*  no styling.
+		*/
+		Promise.all(promises).then(() => {
+			if (!this.noevent) {
+				this.editor.on('keyup', () => { this.update(); })
+			}
+			this.set_ratio('16x9');
+			this.update();
+		});
 	}
 
 	update() {
