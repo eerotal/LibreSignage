@@ -286,10 +286,38 @@ clean:
 	rm -f *.log
 
 realclean:
+	@:
+
+	$(call status,real-clean,various,remove)
 	rm -f build/*.iconf
 	rm -rf build/link
 	rm -rf node_modules
 	rm -f package-lock.json
+
+	# Remove temporary nano files.
+	$(call status,nano-clean,tmp,remove)
+	TMP="`find . \
+		\( -type d -path './node_modules/*' -prune \) \
+		-o \( \
+			-type f -name '*.swp' -printf '%p ' \
+			-o  -type f -name '*.save' -printf '%p ' \
+		\)`"
+	if [ ! -z "$$TMP" ]; then
+		rm -f $$TMP
+	fi
+
+	# Remove temporary emacs files.
+	$(call status,emacs-clean,tmp,remove)
+	TMP="`find . \
+		\( -type d -path './node_modules/*' -prune \) \
+		-o \( \
+			 -type f -name '\#*\#*' -printf '%p ' \
+			-o -type f -name '*~' -printf '%p ' \
+		\)`"
+	if [ ! -z "$$TMP" ]; then
+		rm -f $$TMP
+	fi
+
 
 # Count the lines of code in LibreSignage.
 LOC:
