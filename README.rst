@@ -189,6 +189,25 @@ user         editor, display          user
 display      display                  display
 =========== ======================== ==========
 
+FAQ
+---
+
+Why doesn't LibreSignage use framework/library X?
+  To avoid bloat; LibreSignage is designed to be minimal and lightweight
+  and it only uses external libraries where they are actually needed. 
+  Most UI frameworks for example are huge. LibreSignage does use
+  Bootstrap though, since it's a rather clean and simple framework.
+
+Why doesn't LibreSignage have feature X?
+  You can suggest new features in the bug tracker. If you know a bit
+  about programming in PHP, JS, HTML and CSS, you can also implement
+  the feature yourself and create a pull request.
+
+Is LibreSignage really free?
+  YES! In fact LibreSignage is not only free, it's also open source. You
+  can find information about the LibreSignage license in the License_
+  section.
+
 Screenshots
 -----------
 
