@@ -17,6 +17,9 @@ VERBOSE ?= Y     # Verobose log output.
 NOHTMLDOCS ?= N  # Don't generate HTML docs.
 INST ?= ""       # Installation config path.
 
+# LibreSignage build dependencies.
+DEPS := php7.0 pandoc sass npm
+
 # Production libraries.
 LIBS := $(filter-out \
 	$(shell echo "$(ROOT)"|sed 's:/$$::g'), \
@@ -321,11 +324,19 @@ initchk:
 	@:
 	./build/scripts/ldiconf.sh $(INST)
 
+	# Check that the require dependencies are installed.
+	for d in $(DEPS); do
+		if [ -z "`which $$d`" ]; then
+			echo "[ERROR] Missing dependency: $$d."
+			exit 1
+		fi
+	done
+
 %:
 	@:
 	echo "[INFO]: Ignore $@"
 
-ifeq (,$(filter LOC LOD clean,$(MAKECMDGOALS)))
+ifeq (,$(filter LOC LOD clean realclean configure initchk,$(MAKECMDGOALS)))
 $(info [INFO]: Include dependency makefiles.)
 -include $(subst src,dep,$(SRC_JS:.js=.js.dep))\
 		$(subst src,dep,$(SRC_SCSS:.scss=.scss.dep))
