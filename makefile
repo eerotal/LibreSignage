@@ -17,7 +17,8 @@ VERBOSE ?= Y     # Verobose log output.
 NOHTMLDOCS ?= N  # Don't generate HTML docs.
 INST ?= ""       # Installation config path.
 
-# LibreSignage build dependencies.
+# LibreSignage build dependencies. Note that apache is excluded
+# since checking whether it's installed usually requires root.
 DEPS := php7.0 pandoc sass npm
 
 # Production libraries.
