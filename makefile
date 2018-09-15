@@ -366,7 +366,7 @@ initchk:
 	echo "[INFO]: Ignore $@"
 
 ifeq (,$(filter LOC LOD clean realclean configure initchk,$(MAKECMDGOALS)))
-$(info [INFO]: Include dependency makefiles.)
+$(info [INFO] Include dependency makefiles.)
 -include $(subst src,dep,$(SRC_JS:.js=.js.dep))\
 		$(subst src,dep,$(SRC_SCSS:.scss=.scss.dep))
 endif

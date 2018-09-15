@@ -19,11 +19,10 @@ if [ ! -d "$APACHE_SITES" ]; then
 fi
 
 VHOST_DIR=`echo "$ICONF_DOCROOT/$ICONF_NAME" | sed "s/\/\+/\//g"`;
-echo "[INFO] Virtual host dir: '$VHOST_DIR'";
 
 # Check whether VHOST_DIR already has files.
-if [ -n "`ls -A $VHOST_DIR`" ]; then
-	echo '[INFO] Virtual host directory is not empty.'
+if [ -d "$VHOST_DIR" ]; then
+	echo "[INFO] Virtual host directory '$VHOST_DIR' already exists."
 	read -p 'Remove (y), preserve data (p) or abort (N): ' read_val;
 	case "$read_val" in
 		[Yy]* )
@@ -53,9 +52,7 @@ fi
 mkdir -p $VHOST_DIR;
 
 echo "[INFO] Install LibreSignage to '$VHOST_DIR'";
-echo '[INFO] Copy files.';
 cp -Rp $DIST_DIR/* $VHOST_DIR/.;
-echo '[INFO] Done!';
 
 if [ "$FLAG_PRESERVE_DATA" = "1" ]; then
 	echo '[INFO] Remove new instance data.';
@@ -98,7 +95,7 @@ case "$create_vhost_conf" in
 		. 'build/scripts/templates/vhost.sh' \
 			> $APACHE_SITES/$ICONF_NAME.conf;
 		echo "[INFO] Enabling site '$ICONF_NAME.conf'...";
-		a2ensite "$ICONF_NAME.conf";;
+		a2ensite --quiet "$ICONF_NAME.conf";;
 	*) ;;
 esac
 
@@ -117,12 +114,12 @@ case "$create_conf" in
 		. 'build/scripts/templates/conf.sh' \
 			> $APACHE_CONFIGS/server-global.conf
 		echo '[INFO] Enabling config...'
-		a2enconf 'server-global.conf';;
+		a2enconf --quiet 'server-global.conf';;
 	* ) ;;
 esac
 
-echo '[INFO] Enable apache2 mod_rewrite...';
-a2enmod rewrite;
+echo '[INFO] Enabling apache2 mod_rewrite...';
+a2enmod --quiet rewrite;
 
 read -p 'Restart apache2? (y/N): ' EN_VHOST;
 case "$EN_VHOST" in

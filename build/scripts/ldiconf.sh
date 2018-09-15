@@ -20,16 +20,18 @@ check_config() {
 }
 
 if [ -n "$1" ]; then
-	echo "Load config from '$1'.";
+	echo "[INFO] Load config from '$1'.";
 	. "$1";
 	check_config;
 else
 	if [ -f "build/link/last.sh" ]; then
-		echo "Load config from '`readlink -f "build/link/last.sh"`'";
+		echo "[INFO] Load config from"\
+			"'`readlink -f "build/link/last.sh"`'";
 		. "build/link/last.sh";
 		check_config;
 	else
-		echo "[ERROR] Instance config doesn't exist. Have you run 'make configure'?";
+		echo "[ERROR] Instance config doesn't exist." \
+			"Have you run 'make configure'?";
 		exit 1;
 	fi
 fi
