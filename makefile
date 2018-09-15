@@ -32,8 +32,12 @@ SRC_NO_COMPILE := $(shell find src \
 	\( -type f -path 'src/node_modules/*' -prune \) \
 	-o \( -type f -path 'src/api/endpoint/*' -prune \) \
 	-o \( \
-		-type f ! -name '*.js' \
-		-a -type f ! -name '*.swp' \
+		-type f ! -name '*.swp' \
+		-a -type f ! -name '*.save' \
+		-a -type f ! -name '.\#*' \
+		-a -type f ! -name '\#*\#*' \
+		-a -type f ! -name '*~' \
+		-a -type f ! -name '*.js' \
 		-a -type f ! -name '*.scss' \
 		-a -type f ! -name '*.rst' \
 		-a -type f ! -name 'config.php' -print \
@@ -329,6 +333,7 @@ LOC:
 			-path "./utests/api/.mypy_cache/*" -o \
 			-path "./node_modules/*" \
 		\) -prune \
+		-o -name ".#*" \
 		-o -name "*.py" -print \
 		-o -name "*.php" -print \
 		-o -name "*.js" -print \
