@@ -86,29 +86,47 @@ find "$VHOST_DIR/data" -type f -exec chmod 664 "{}" ";";
 ##  Create config and setup Apache.
 ##
 
-echo "[INFO] Create VHost config in '$APACHE_SITES/$ICONF_NAME.conf'";
+echo "[INFO] Creating VHost config in '$APACHE_SITES/$ICONF_NAME.conf'";
 if [ -f "$APACHE_SITES/$ICONF_NAME.conf" ]; then
-	read -p 'Replace existing VHost config? (y/N): ' repl_vhost_conf
-	case "$repl_vhost_conf" in
-		[Yy]* )
-			;;
-		*)
-			echo '[INFO] Aborting install!';
-			exit 1;;
-	esac
+	read -p 'Replace existing VHost config? (y/N): ' create_vhost_conf
+else
+	read -p 'Create VHost config? (y/N): ' create_vhost_conf	
 fi
 
-. 'build/scripts/vhost_template.sh' > $APACHE_SITES/$ICONF_NAME.conf;
-echo '[INFO] LibreSignage installed!';
+case "$create_vhost_conf" in
+	[Yy]* )
+		. 'build/scripts/templates/vhost.sh' \
+			> $APACHE_SITES/$ICONF_NAME.conf;
+		echo "[INFO] Enabling site '$ICONF_NAME.conf'...";
+		a2ensite "$ICONF_NAME.conf";;
+	*) ;;
+esac
+
+echo "[INFO] Creating global apache2 configuration in" \
+	"'$APACHE_CONFIGS/server-global.conf'. If this is the" \
+	"first virtual host on this server and you haven't" \
+	"configured the server manually, you should answer yes."
+
+if [ -f "$APACHE_CONFIGS/server-global.conf" ]; then
+	read -p 'Config already exists. Replace? (y/N): ' create_conf
+else
+	read -p 'Create config? (y/N): ' create_conf
+fi
+case "$create_conf" in
+	[Yy]* )
+		. 'build/scripts/templates/conf.sh' \
+			> $APACHE_CONFIGS/server-global.conf
+		echo '[INFO] Enabling config...'
+		a2enconf 'server-global.conf';;
+	* ) ;;
+esac
 
 echo '[INFO] Enable apache2 mod_rewrite...';
 a2enmod rewrite;
 
-read -p 'Enable the created VHost and restart apache2? (y/N): ' EN_VHOST;
+read -p 'Restart apache2? (y/N): ' EN_VHOST;
 case "$EN_VHOST" in
 	[Yy]* )
-		echo "[INFO] Enabling site '$ICONF_NAME.conf'...";
-		a2ensite "$ICONF_NAME.conf";
 		echo '[INFO] Restarting apache2...';
 		apache2ctl restart
 		echo '[INFO] Done!';
