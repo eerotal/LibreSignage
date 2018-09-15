@@ -13,8 +13,8 @@ FLAG_PRESERVE_DATA=0;
 
 # Check that the APACHE_SITES directory exists.
 if [ ! -d "$APACHE_SITES" ]; then
-	echo "[ERROR] Apache2 sites-available directory doesn't exist.";
-	echo "[ERROR] Are you sure you have installed Apache 2?";
+	echo "[ERROR] '$APACHE_SITES' doesn't exist.";
+	echo "[ERROR] Is apache2 installed?";
 	exit 1;
 fi
 
@@ -110,8 +110,7 @@ case "$EN_VHOST" in
 		echo "[INFO] Enabling site '$ICONF_NAME.conf'...";
 		a2ensite "$ICONF_NAME.conf";
 		echo '[INFO] Restarting apache2...';
-		systemctl stop apache2
-		systemctl start apache2
+		apache2ctl restart
 		echo '[INFO] Done!';
 		;;
 	*)
