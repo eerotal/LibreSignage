@@ -77,6 +77,9 @@ const SLIDE_ANIMATION			= $("#slide-animation")
 const PREVIEW_R_16x9			= $("#btn-preview-ratio-16x9");
 const PREVIEW_R_4x3				= $("#btn-preview-ratio-4x3");
 const MARKUP_ERR_DISPLAY		= $("#markup-err-display");
+const LINK_QUICK_HELP			= $("#link-quick-help");
+const CONT_QUICK_HELP			= $("#cont-quick-help");
+const CLOSE_QUICK_HELP			= $("#close-quick-help");
 var SLIDE_COLLAB				= null;
 var SLIDE_INPUT					= null;
 var LIVE_PREVIEW				= null;
@@ -448,6 +451,46 @@ const UI_DEFS = new uic.UIController({
 			elem.setValue('');
 			SLIDE_INPUT.clearSelection();
 		}
+	),
+	'LINK_QUICK_HELP': new uic.UIButton(
+		_elem = () => { return LINK_QUICK_HELP; },
+		_perm = () => { return true; },
+		_enabler = null,
+		_attach = {
+			'click': () => {
+				QUICK_HELP_UI_DEFS.get('CONT_QUICK_HELP').enabled(true);
+			}
+		},
+		_defer = defer_editor_ready
+	)
+});
+
+// Quick help box UI definitions.
+const QUICK_HELP_UI_DEFS = new uic.UIController({
+	'CONT_QUICK_HELP': new uic.UIStatic(
+		_elem = () => { return CONT_QUICK_HELP; },
+		_perm = () => { return false; },
+		_enabler = (elem, s) => {
+			if (s) {
+				elem.css('display', 'block');
+			} else {
+				elem.css('display', 'none');
+			}
+		},
+		_attach = null,
+		_defer = null
+	),
+	'CLOSE_QUICK_HELP': new uic.UIButton(
+		_elem = () => { return CLOSE_QUICK_HELP; },
+		_perm = () => { return true; },
+		_enabler = null,
+		_attach = {
+			'click': () => {
+				console.log('Clicked');
+				QUICK_HELP_UI_DEFS.get('CONT_QUICK_HELP').enabled(false);
+			}
+		},
+		_defer = defer_editor_ready
 	)
 });
 

@@ -8,7 +8,7 @@ import re;
 import os.path;
 import argparse;
 
-pattern = re.compile('@import (.*);');
+pattern = re.compile('\s*@import (.*);\s*');
 
 def check_import_variants(dir, name, ipaths):
 	# Try to find a file that corresponds to the filename

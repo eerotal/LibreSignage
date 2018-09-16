@@ -1,0 +1,52 @@
+/* LibreSignage documentation content styling */
+
+/* Main heading styling */
+h1 {
+	text-align: center;
+	margin-bottom: 50px;
+}
+
+.doc-row {
+	width: 75%;
+	margin: {
+		left: auto;
+		right: auto;
+		bottom: 20px;
+		top: 20px;
+	}
+	text-align: justify;
+}
+
+/* Table styling */
+table {
+	margin: {
+		left: auto;
+		right: auto;
+		bottom: 16px;
+	}
+}
+
+td, th {
+	padding: {
+		left: 15px;
+		right: 15px;
+	}
+}
+
+/* Workaround for blockquotes inside table cells. */
+td {
+	> blockquote {
+		> p {
+			margin: 0;
+		}
+		margin: 0;
+	}
+}
+
+th {
+	border-bottom: 2px solid $gray-2;
+}
+
+tr:nth-child(even) {
+	background-color: $gray-3;
+}

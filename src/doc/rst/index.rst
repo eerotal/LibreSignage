@@ -18,6 +18,8 @@ Web Interface
 
 `Editor </doc?doc=editor>`_
 
+`Editor Shortcut Cheatsheet </doc?doc=keyboard_shortcut_cheatsheet>`_
+
 `Settings </doc?doc=settings>`_
 
 `User Manager </doc?doc=user_manager>`_

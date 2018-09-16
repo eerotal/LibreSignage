@@ -5,6 +5,7 @@
 @import 'multiselect';
 @import 'timeline';
 @import 'preview';
+@import 'quick_help';
 
 $main-col-minw: 250px;        // Main column min width.
 $slide-input-minh: 45;        // Minimum height of editor in lines.
@@ -74,3 +75,4 @@ html, body {
 	position: absolute;
 	background-color: $syntax-error-color;
 }
+
