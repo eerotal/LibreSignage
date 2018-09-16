@@ -14,11 +14,11 @@ Features
 * Web interface for editing slides and managing the
   LibreSignage instance.
 * Configurable slide duration, transition animations
-  and other parameters.
+  and other settings.
 * Special markup syntax for easily formatting slides.
 * Possibility to schedule slides for a specific time-frame.
 * Possibility to give slide modification permissions to
-  other users.
+  other users to collaborate with them on creating a slide.
 * Separate slide queues for different digital signage
   screens.
 * Multiple user accounts with permissions based on
@@ -29,22 +29,29 @@ Features
   for admin users.
 * Configurable quotas for actions such as creating slides.
 * Rate limited API for reducing server load.
-* Extensive documentation of all features.
-* Modular design of the codebase.
+* Extensive documentation of all features including docs
+  for developers.
+* Documentation written in reStructuredText, making it
+  possible to read it even outside the web interface. This
+  is especially useful when reading the developer docs.
+* Extensive configuration possibilities.
+* Modular design.
 
 Installation
 ------------
 
 LibreSignage has currently only been tested on Linux based systems,
 however it should be possible to run it on other systems aswell. Running
-LibreSignage on other systems will require some manual configuration though,
-since the build and installation systems won't work out of the box. The only
-requirement for running a LibreSignage server instance is the Apache web
-server with PHP support, which should be available on most systems. Building
-LibreSignage on the other hand requires some additional software.
+LibreSignage on other systems will require some manual configuration
+though, since the build and installation systems won't work out of the
+box. The only requirement for running a LibreSignage server instance is
+the Apache web server with PHP support, which should be available on most
+systems. Building LibreSignage on the other hand requires some additional
+software.
 
-LibreSignage is designed to be used with Apache 2.0 and the default install
-system is programmed to use Apache's Virtual Host configuration features.
+LibreSignage is designed to be used with Apache 2.0 and the default
+install system is programmed to use Apache's Virtual Host configuration
+features.
 
 In a nutshell, Virtual Hosts are a way of hosting multiple websites on
 one server, which is ideal in the case of LibreSignage. Using Virtual
@@ -61,9 +68,9 @@ are listed below.
    On Debian Stretch all other packages except *npm* can installed by
    running ``sudo apt install git apache2 php7.0 pandoc ruby-sass``.
    Currently *npm* is only available in the Debian Sid repos and even
-   there the package is so old it doesn't work correctly. You can, however,
-   download the *node.js* binaries (including npm) from the *node.js*
-   website. See `How to install NPM`_ for more info.
+   there the package is so old it doesn't work correctly. You can,
+   however, download the *node.js* binaries (including npm) from the
+   *node.js* website. See `How to install NPM`_ for more info.
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
@@ -290,7 +297,7 @@ LOD
   are counted from the docs in the dist/ directory. This way the
   generated API endpoint docs can be taken into account too.
 
-You can also pass some other arguments to the LiberSignage makefile.
+You can also pass some other arguments to the LibreSignage makefile.
 
 INST=<config file> - (default: Last generated config.)
   Manually specify a config file to use.
