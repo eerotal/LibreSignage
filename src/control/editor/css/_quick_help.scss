@@ -33,7 +33,7 @@ $qh-left: (100% - $qh-width)/2;		// Quick help left space.
 	@import 'src/doc/css/_content.scss';
 
 	overflow-y: auto;
-	height: calc(#{$qh-height} - #{2*$s2} - 1rem);
+	height: calc(#{$qh-height} - #{4*$s2} - 1rem);
 	margin: {
 		top: $s2;
 		bottom: $s2;
