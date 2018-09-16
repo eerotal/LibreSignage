@@ -8,8 +8,8 @@ var util = require('ls-util');
 var dialog = require('ls-dialog');
 
 var API = null;
-const DISPLAY_UPDATE_INTERVAL = 2000;
-const QUEUE_UPDATE_INTERVAL = 30000;
+const DISPLAY_UPDATE_INTERVAL = 5000;
+const QUEUE_UPDATE_INTERVAL = 60000;
 const DISPLAY = $('#display');
 
 var c_queue = null;
@@ -21,7 +21,10 @@ function display_animate(elem, animation, end_callback) {
 	*  on 'elem'. If 'end_callback' is not null, it's called when
 	*  the animation has finished.
 	*/
-	if (!animation) { end_callback(); }
+	if (!animation) {
+		end_callback();
+		return;
+	}
 	elem.addClass(animation);
 	elem.one("animationend", (event) => {
 		event.target.classList.remove(animation);
