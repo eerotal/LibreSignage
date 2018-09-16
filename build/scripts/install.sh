@@ -99,25 +99,6 @@ case "$create_vhost_conf" in
 	*) ;;
 esac
 
-echo "[INFO] Creating global apache2 configuration in" \
-	"'$APACHE_CONFIGS/server-global.conf'. If this is the" \
-	"first virtual host on this server and you haven't" \
-	"configured the server manually, you should answer yes."
-
-if [ -f "$APACHE_CONFIGS/server-global.conf" ]; then
-	read -p 'Config already exists. Replace? (y/N): ' create_conf
-else
-	read -p 'Create config? (y/N): ' create_conf
-fi
-case "$create_conf" in
-	[Yy]* )
-		. 'build/scripts/templates/conf.sh' \
-			> $APACHE_CONFIGS/server-global.conf
-		echo '[INFO] Enabling config...'
-		a2enconf --quiet 'server-global.conf';;
-	* ) ;;
-esac
-
 echo '[INFO] Enabling apache2 mod_rewrite...';
 a2enmod --quiet rewrite;
 
