@@ -103,438 +103,438 @@ var defer_editor_ready = () => { return !flag_editor_ready; };
 // Editor UI definitions.
 const UI_DEFS = new uic.UIController({
 	'PREVIEW_R_16x9': new uic.UIButton(
-		_elem = PREVIEW_R_16x9,
-		_perm = (d) => {
+		elem = PREVIEW_R_16x9,
+		perm = (d) => {
 			return LIVE_PREVIEW.ratio != '16x9';
 		},
-		_enabler = null,
-		_attach = {
+		enabler = null,
+		attach = {
 			'click': (e) => {
 				UI_DEFS.get('PREVIEW_R_16x9').enabled(false);
 				UI_DEFS.get('PREVIEW_R_4x3').enabled(true);
 				LIVE_PREVIEW.set_ratio('16x9');
 			}
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	),
 	'PREVIEW_R_4x3': new uic.UIButton(
-		_elem = PREVIEW_R_4x3,
-		_perm = (d) => {
+		elem = PREVIEW_R_4x3,
+		perm = (d) => {
 			return LIVE_PREVIEW.ratio != '4x3';
 		},
-		_enabler = null,
-		_attach = {
+		enabler = null,
+		attach = {
 			'click': () => {
 				UI_DEFS.get('PREVIEW_R_16x9').enabled(true);
 				UI_DEFS.get('PREVIEW_R_4x3').enabled(false);
 				LIVE_PREVIEW.set_ratio('4x3');
 			}
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	),
 	'SLIDE_NEW': new uic.UIButton(
-		_elem = SLIDE_NEW,
-		_perm = (d) => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = SLIDE_NEW,
+		perm = (d) => { return true; },
+		enabler = null,
+		attach = {
 			'click': slide_new
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	),
 	'SLIDE_PREVIEW': new uic.UIButton(
-		_elem = SLIDE_PREVIEW,
-		_perm = (d) => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = SLIDE_PREVIEW,
+		perm = (d) => { return true; },
+		enabler = null,
+		attach = {
 			'click': slide_preview
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	),
 	'SLIDE_SAVE': new uic.UIButton(
-		_elem = SLIDE_SAVE,
-		_perm = (d) => { return d['o'] || d['c']; },
-		_enabler = null,
-		_attach = {
+		elem = SLIDE_SAVE,
+		perm = (d) => { return d['o'] || d['c']; },
+		enabler = null,
+		attach = {
 			'click': slide_save
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	),
 	'SLIDE_REMOVE': new uic.UIButton(
-		_elem = SLIDE_REMOVE,
-		_perm = (d) => {
+		elem = SLIDE_REMOVE,
+		perm = (d) => {
 			return d['o'] && sel_slide.get('id') != null;
 		},
-		_enabler = null,
-		_attach = {
+		enabler = null,
+		attach = {
 			'click': slide_rm
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	),
 	'SLIDE_CH_QUEUE': new uic.UIButton (
-		_elem = SLIDE_CH_QUEUE,
-		_perm = (d) => { return d['o']; },
-		_enabler = null,
-		_attach = {
+		elem = SLIDE_CH_QUEUE,
+		perm = (d) => { return d['o']; },
+		enabler = null,
+		attach = {
 			'click': slide_ch_queue
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	),
 	'SLIDE_DUP': new uic.UIButton(
-		_elem = SLIDE_DUP,
-		_perm = (d) => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = SLIDE_DUP,
+		perm = (d) => { return true; },
+		enabler = null,
+		attach = {
 			'click': slide_dup
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	),
 	'SLIDE_CANT_EDIT': new uic.UIInput(
-		_elem = SLIDE_CANT_EDIT,
-		_perm = (d) => { return !d['o'] && !d['c']; },
-		_enabler = (elem, s) => {
+		elem = SLIDE_CANT_EDIT,
+		perm = (d) => { return !d['o'] && !d['c']; },
+		enabler = (elem, s) => {
 			elem.css('display', s ? 'block': 'none');
 		},
-		_attach = null,
-		_defer = null,
-		_mod = null,
-		_getter = null,
-		_setter = null,
-		_clear = null
+		attach = null,
+		defer = null,
+		mod = null,
+		getter = null,
+		setter = null,
+		clearer = null
 	),
 	'SLIDE_EDIT_AS_COLLAB': new uic.UIInput(
-		_elem = SLIDE_EDIT_AS_COLLAB,
-		_perm = (d) => {
+		elem = SLIDE_EDIT_AS_COLLAB,
+		perm = (d) => {
 			return d['c'] && sel_slide != null;
 		},
-		_enabler = (elem, s) => {
+		enabler = (elem, s) => {
 			elem.css('display', s ? 'block': 'none');
 		},
-		_attach = null,
-		_defer = null,
-		_mod = null,
-		_getter = null,
-		_setter = null,
-		_clear = null
+		attach = null,
+		defer = null,
+		mod = null,
+		getter = null,
+		setter = null,
+		clearer = null
 	),
 	'SLIDE_NAME': new uic.UIInput(
-		_elem = SLIDE_NAME,
-		_perm = (d) => { return d['o'] || d['c']; },
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, data) => {
+		elem = SLIDE_NAME,
+		perm = (d) => { return d['o'] || d['c']; },
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, data) => {
 			return elem.val() != data.get('name');
 		},
-		_getter = (elem) => { return elem.val(); },
-		_setter = (elem, s) => {
+		getter = (elem) => { return elem.val(); },
+		setter = (elem, s) => {
 			elem.val(s.get('name'));
 		},
-		_clear = (elem) => { elem.val(''); }
+		clearer = (elem) => { elem.val(''); }
 	),
 	'SLIDE_OWNER': new uic.UIInput(
-		_elem = SLIDE_OWNER,
-		_perm = null,
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = null,
-		_getter = null,
-		_setter = (elem, s) => {
+		elem = SLIDE_OWNER,
+		perm = null,
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = null,
+		getter = null,
+		setter = (elem, s) => {
 			elem.val(s.get('owner'));
 		},
-		_clear = (elem) => { elem.val(''); }
+		clearer = (elem) => { elem.val(''); }
 	),
 	'SLIDE_TIME': new uic.UIInput(
-		_elem = SLIDE_TIME,
-		_perm = (d) => { return d['o'] || d['c']; },
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, s) => {
+		elem = SLIDE_TIME,
+		perm = (d) => { return d['o'] || d['c']; },
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, s) => {
 			var time = parseInt(elem.val(), 10);
 			return time != s.get('time')/1000;
 		},
-		_getter = (elem) => { return parseInt(elem.val(), 10); },
-		_setter = (elem, s) => {
+		getter = (elem) => { return parseInt(elem.val(), 10); },
+		setter = (elem, s) => {
 			var time = parseInt(s.get('time'), 10);
 			elem.val(time/1000);
 		},
-		_clear = (elem) => { elem.val(1); }
+		clearer = (elem) => { elem.val(1); }
 	),
 	'SLIDE_INDEX': new uic.UIInput(
-		_elem = SLIDE_INDEX,
-		_perm = (d) => { return d['o'] || d['c']; },
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, s) => {
+		elem = SLIDE_INDEX,
+		perm = (d) => { return d['o'] || d['c']; },
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, s) => {
 			var tmp = parseInt(elem.val(), 10);
 			return tmp != s.get('index');
 		},
-		_getter = (elem) => { return parseInt(elem.val(), 10); },
-		_setter = (elem, s) => {
+		getter = (elem) => { return parseInt(elem.val(), 10); },
+		setter = (elem, s) => {
 			elem.val(s.get('index'));
 		},
-		_clear = (elem) => { elem.val(''); }
+		clearer = (elem) => { elem.val(''); }
 	),
 	'SLIDE_EN': new uic.UIInput(
-		_elem = SLIDE_EN,
-		_perm = (d) => {
+		elem = SLIDE_EN,
+		perm = (d) => {
 			if (!UI_DEFS.get('SLIDE_SCHED').get()) {
 				return d['o'] || d['c'];
 			} else {
 				return false;
 			}
 		},
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, s) => {
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, s) => {
 			return elem.prop('checked') != s.get('enabled');
 		},
-		_getter = (elem) => { return elem.prop('checked'); },
-		_setter = (elem, s) => {
+		getter = (elem) => { return elem.prop('checked'); },
+		setter = (elem, s) => {
 			elem.prop('checked', s.get('enabled'));
 		},
-		_clear = (elem) => { elem.prop('checked', false); }
+		clearer = (elem) => { elem.prop('checked', false); }
 	),
 	'SLIDE_SCHED': new uic.UIInput(
-		_elem = SLIDE_SCHED,
-		_perm = (d) => { return d['o'] || d['c']; },
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, s) => {
+		elem = SLIDE_SCHED,
+		perm = (d) => { return d['o'] || d['c']; },
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, s) => {
 			return elem.prop('checked') != s.get('sched');
 		},
-		_getter = (elem) => { return elem.prop('checked'); },
-		_setter = (elem, s) => {
+		getter = (elem) => { return elem.prop('checked'); },
+		setter = (elem, s) => {
 			elem.prop('checked', s.get('sched'));
 		},
-		_clear = (elem) => { elem.prop('checked', false); }
+		clearer = (elem) => { elem.prop('checked', false); }
 	),
 	'SLIDE_SCHED_DATE_S': new uic.UIInput(
-		_elem = SLIDE_SCHED_DATE_S,
-		_perm = (d) => {
+		elem = SLIDE_SCHED_DATE_S,
+		perm = (d) => {
 			return UI_DEFS.get('SLIDE_SCHED').get()
 				&& (d['o'] || d['c']);
 		},
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, s) => {
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_s'))[0];
 			return elem.val() != tmp;
 		},
-		_getter = (elem) => { return elem.val(); },
-		_setter = (elem, s) => {
+		getter = (elem) => { return elem.val(); },
+		setter = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_s'))[0];
 			elem.val(tmp);
 		},
-		_clear = (elem) => { elem.val(''); }
+		clearer = (elem) => { elem.val(''); }
 	),
 	'SLIDE_SCHED_TIME_S': new uic.UIInput(
-		_elem = SLIDE_SCHED_TIME_S,
-		_perm = (d) => {
+		elem = SLIDE_SCHED_TIME_S,
+		perm = (d) => {
 			return UI_DEFS.get('SLIDE_SCHED').get()
 				&& (d['o'] || d['c']);
 		},
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, s) => {
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_s'))[1];
 			return elem.val() != tmp;
 		},
-		_getter = (elem) => { return elem.val(); },
-		_setter = (elem, s) => {
+		getter = (elem) => { return elem.val(); },
+		setter = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_s'))[1];
 			elem.val(tmp);
 		},
-		_clear = (elem) => { elem.val(''); }
+		clearer = (elem) => { elem.val(''); }
 	),
 	'SLIDE_SCHED_DATE_E': new uic.UIInput(
-		_elem = SLIDE_SCHED_DATE_E,
-		_perm = (d) => {
+		elem = SLIDE_SCHED_DATE_E,
+		perm = (d) => {
 			return UI_DEFS.get('SLIDE_SCHED').get()
 				&& (d['o'] || d['c']);
 		},
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, s) => {
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_e'))[0];
 			return elem.val() != tmp;
 		},
-		_getter = (elem) => { return elem.val(); },
-		_setter = (elem, s) => {
+		getter = (elem) => { return elem.val(); },
+		setter = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_e'))[0];
 			elem.val(tmp);
 		},
-		_clear = (elem) => { elem.val(''); }
+		clearer = (elem) => { elem.val(''); }
 	),
 	'SLIDE_SCHED_TIME_E': new uic.UIInput(
-		_elem = SLIDE_SCHED_TIME_E,
-		_perm = (d) => {
+		elem = SLIDE_SCHED_TIME_E,
+		perm = (d) => {
 			return UI_DEFS.get('SLIDE_SCHED').get()
 				&& (d['o'] || d['c']);
 		},
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, s) => {
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_e'))[1];
 			return elem.val() != tmp;
 		},
-		_getter = (elem) => { return elem.val(); },
-		_setter = (elem, s) => {
+		getter = (elem) => { return elem.val(); },
+		setter = (elem, s) => {
 			var tmp = util.tstamp_to_datetime(s.get('sched_t_e'))[1];
 			elem.val(tmp);
 		},
-		_clear = (elem) => { elem.val(''); }
+		clearer = (elem) => { elem.val(''); }
 	),
 	'SLIDE_ANIMATION': new uic.UIInput(
-		_elem = SLIDE_ANIMATION,
-		_perm = (d) => { return d['o'] || d['c']; },
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, s) => {
+		elem = SLIDE_ANIMATION,
+		perm = (d) => { return d['o'] || d['c']; },
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, s) => {
 			var anim = parseInt(elem.val(), 10);
 			return anim != s.get('animation');
 		},
-		_getter = (elem) => { return parseInt(elem.val(), 10); },
-		_setter = (elem, s) => {
+		getter = (elem) => { return parseInt(elem.val(), 10); },
+		setter = (elem, s) => {
 			elem.val(s.get('animation'));
 		},
-		_clear = (elem) => { elem.val(0); }
+		clearer = (elem) => { elem.val(0); }
 	),
 	'SLIDE_COLLAB': new uic.UIInput(
-		_elem = () => { return SLIDE_COLLAB; },
-		_perm = (d) => { return d['o']; },
-		_enabler = (elem, s) => {
+		elem = () => { return SLIDE_COLLAB; },
+		perm = (d) => { return d['o']; },
+		enabler = (elem, s) => {
 			if (s) {
 				elem.enable();
 			} else {
 				elem.disable();
 			}
 		},
-		_attach = null,
-		_defer = null,
-		_mod = (elem, s) => {
+		attach = null,
+		defer = null,
+		mod = (elem, s) => {
 			return !util.sets_eq(
 				elem.selected,
 				s.get('collaborators')
 			);
 		},
-		_getter = (elem) => { return elem.selected; },
-		_setter = (elem, s) => {
+		getter = (elem) => { return elem.selected; },
+		setter = (elem, s) => {
 			elem.set(s.get('collaborators'));
 		},
-		_clear = (elem) => { elem.set([]); }
+		clearer = (elem) => { elem.set([]); }
 	),
 	'SLIDE_INPUT': new uic.UIInput(
-		_elem = () => { return SLIDE_INPUT; },
-		_perm = (d) => { return d['o'] || d['c']; },
-		_enabler = (elem, s) => { elem.setReadOnly(!s); },
-		_attach = null,
-		_defer = null,
-		_mod = (elem, s) => {
+		elem = () => { return SLIDE_INPUT; },
+		perm = (d) => { return d['o'] || d['c']; },
+		enabler = (elem, s) => { elem.setReadOnly(!s); },
+		attach = null,
+		defer = null,
+		mod = (elem, s) => {
 			return elem.getValue() != s.get('markup');
 		},
-		_getter = (elem) => { return elem.getValue(); },
-		_setter = (elem, s) => {
+		getter = (elem) => { return elem.getValue(); },
+		setter = (elem, s) => {
 			elem.setValue(s.get('markup'));
 			SLIDE_INPUT.clearSelection();
 		},
-		_clear = (elem) => {
+		clearer = (elem) => {
 			elem.setValue('');
 			SLIDE_INPUT.clearSelection();
 		}
 	),
 	'LINK_QUICK_HELP': new uic.UIButton(
-		_elem = () => { return LINK_QUICK_HELP; },
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = () => { return LINK_QUICK_HELP; },
+		perm = () => { return true; },
+		enabler = null,
+		attach = {
 			'click': () => {
 				QUICK_HELP_UI_DEFS.get('CONT_QUICK_HELP').enabled(true);
 			}
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	)
 });
 
 // Quick help box UI definitions.
 const QUICK_HELP_UI_DEFS = new uic.UIController({
 	'CONT_QUICK_HELP': new uic.UIStatic(
-		_elem = () => { return CONT_QUICK_HELP; },
-		_perm = () => { return false; },
-		_enabler = (elem, s) => {
+		elem = () => { return CONT_QUICK_HELP; },
+		perm = () => { return false; },
+		enabler = (elem, s) => {
 			if (s) {
 				elem.css('display', 'block');
 			} else {
 				elem.css('display', 'none');
 			}
 		},
-		_attach = null,
-		_defer = null
+		attach = null,
+		defer = null
 	),
 	'CLOSE_QUICK_HELP': new uic.UIButton(
-		_elem = () => { return CLOSE_QUICK_HELP; },
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = () => { return CLOSE_QUICK_HELP; },
+		perm = () => { return true; },
+		enabler = null,
+		attach = {
 			'click': () => {
 				console.log('Clicked');
 				QUICK_HELP_UI_DEFS.get('CONT_QUICK_HELP').enabled(false);
 			}
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	)
 });
 
 // Queue selector UI definitions.
 const QSEL_UI_DEFS = new uic.UIController({
 	'QUEUE_SELECT': new uic.UIInput(
-		_elem = QUEUE_SELECT,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = null,
-		_getter = (elem) => { return elem.val(); },
-		_setter = (elem, value) => { elem.val(value); },
-		_clear = () => { elem.val(''); }
+		elem = QUEUE_SELECT,
+		perm = () => { return true; },
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = null,
+		getter = (elem) => { return elem.val(); },
+		setter = (elem, value) => { elem.val(value); },
+		clearer = () => { elem.val(''); }
 	),
 	'QUEUE_CREATE': new uic.UIButton(
-		_elem = QUEUE_CREATE,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = QUEUE_CREATE,
+		perm = () => { return true; },
+		enabler = null,
+		attach = {
 			'click': queue_create
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	),
 	'QUEUE_VIEW': new uic.UIButton(
-		_elem = QUEUE_VIEW,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = QUEUE_VIEW,
+		perm = () => { return true; },
+		enabler = null,
+		attach = {
 			'click': queue_view
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	),
 	'QUEUE_REMOVE': new uic.UIButton(
-		_elem = QUEUE_REMOVE,
-		_perm = (d) => {
+		elem = QUEUE_REMOVE,
+		perm = (d) => {
 			return d['o'] && TL.queue;
 		},
-		_enabler = null,
-		_attach = {
+		enabler = null,
+		attach = {
 			'click': queue_remove
 		},
-		_defer = defer_editor_ready
+		defer = defer_editor_ready
 	),
 });
 

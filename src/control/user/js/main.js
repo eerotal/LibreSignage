@@ -66,71 +66,71 @@ var defer_user_ready = () => { return !flag_user_ready; }
 
 const USER_UI_DEFS = new uic.UIController({
 	'USER_NAME': new uic.UIInput(
-		_elem = USER_NAME,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, u) => { return elem.val() != u.get_name(); },
-		_getter = (elem) => { return elem.val(); },
-		_setter = (elem, u) => { elem.val(u.get_name()); },
-		_clear = (elem) => { elem.val(''); }
+		elem = USER_NAME,
+		perm = () => { return true; },
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, u) => { return elem.val() != u.get_name(); },
+		getter = (elem) => { return elem.val(); },
+		setter = (elem, u) => { elem.val(u.get_name()); },
+		clearer = (elem) => { elem.val(''); }
 	),
 	'USER_GROUPS': new uic.UIInput(
-		_elem = USER_GROUPS,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, u) => {
+		elem = USER_GROUPS,
+		perm = () => { return true; },
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, u) => {
 			let tmp = elem.val().replace(/\s/g, '').split(',');
 			return !sets_eq(tmp, u.get_groups());
 		},
-		_getter = (elem) => {
+		getter = (elem) => {
 			return elem.val().replace(/\s/g, '').split(',');
 		},
-		_setter = (elem, u) => { elem.val(u.get_groups().join()); },
-		_clear = (elem) => { elem.val(''); }
+		setter = (elem, u) => { elem.val(u.get_groups().join()); },
+		clearer = (elem) => { elem.val(''); }
 	),
 	'USER_PASS': new uic.UIInput(
-		_elem = USER_PASS,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, u) => { return elem.val().length != 0; },
-		_getter = (elem) => { return elem.val(); },
-		_setter = null,
-		_clear = (elem) => { elem.val(''); }
+		elem = USER_PASS,
+		perm = () => { return true; },
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, u) => { return elem.val().length != 0; },
+		getter = (elem) => { return elem.val(); },
+		setter = null,
+		clearer = (elem) => { elem.val(''); }
 	),
 	'USER_PASS_CONFIRM': new uic.UIInput(
-		_elem = USER_PASS_CONFIRM,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = null,
-		_defer = null,
-		_mod = (elem, u) => { return elem.val().length != 0; },
-		_getter = (elem) => { return elem.val(); },
-		_setter = null,
-		_clear = (elem) => { elem.val(''); }
+		elem = USER_PASS_CONFIRM,
+		perm = () => { return true; },
+		enabler = null,
+		attach = null,
+		defer = null,
+		mod = (elem, u) => { return elem.val().length != 0; },
+		getter = (elem) => { return elem.val(); },
+		setter = null,
+		clearer = (elem) => { elem.val(''); }
 	),
 	'USER_SAVE': new uic.UIButton(
-		_elem = USER_SAVE,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = USER_SAVE,
+		perm = () => { return true; },
+		enabler = null,
+		attach = {
 			'click': user_settings_save
 		},
-		_defer = defer_user_ready
+		defer = defer_user_ready
 	),
 	'BTN_LOGOUT_OTHER': new uic.UIButton(
-		_elem = BTN_LOGOUT_OTHER,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = BTN_LOGOUT_OTHER,
+		perm = () => { return true; },
+		enabler = null,
+		attach = {
 			'click': user_sessions_logout
 		},
-		_defer = defer_user_ready
+		defer = defer_user_ready
 	)
 });
 

@@ -72,26 +72,26 @@ exports.Timeline = class Timeline {
 			
 			// Slide button UI definition.
 			this.TL_UI_DEFS.add(id_scoped, new uic.UIButton(
-				_elem = $(`#slide-btn-${id_scoped}`),
-				_perm = () => { return s_scoped.get('enabled'); },
-				_enabler = (elem, s) => {
+				elem = $(`#slide-btn-${id_scoped}`),
+				perm = () => { return s_scoped.get('enabled'); },
+				enabler = (elem, s) => {
 					if (s_scoped) {
 						elem.removeClass('tl-slide-cont-dis');
 					} else {
 						elem.addClass('tl-slide-cont-dis');
 					}
 				},
-				_attach = {
+				attach = {
 					'click': () => {
 						this.f_sel_slide(id_scoped);
 					}
 				},
-				_defer = null
+				defer = null
 			));
 
 			// Thumb UI definition.
 			this.TL_UI_DEFS.add(id_scoped, new uic.UIStatic(
-				_elem = new preview.Preview(
+				elem = new preview.Preview(
 					`#tl-slide-thumb-cont-${id_scoped}`,
 					null,
 					() => { return s_scoped.get('markup'); },
@@ -108,12 +108,12 @@ exports.Timeline = class Timeline {
 					},
 					true
 				),
-				_perm = () => { return true; },
-				_enabler = () => {},
-				_attach = null,
-				_defer = null,
-				_getter = () => {},
-				_setter = () => {}
+				perm = () => { return true; },
+				enabler = () => {},
+				attach = null,
+				defer = null,
+				getter = () => {},
+				setter = () => {}
 			));
 			this.TL_UI_DEFS.get(id_scoped).get_elem().set_ratio(
 				'16x9-fit'

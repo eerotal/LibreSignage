@@ -20,13 +20,13 @@ const USERS_TABLE = $('#users-table');
 
 const USERMGR_UI_DEFS = new uic.UIController({
 	'USER_CREATE': new uic.UIButton(
-		_elem = USER_CREATE,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = USER_CREATE,
+		perm = () => { return true; },
+		enabler = null,
+		attach = {
 			'click': usermgr_create
 		},
-		_defer = defer_usermgr_ready
+		defer = defer_usermgr_ready
 	)
 });
 var USERMGR_LIST_UI_DEFS = new uic.UIController({});
@@ -266,39 +266,39 @@ function usermgr_make_ui() {
 
 		// Create the UI element instances for the inputs & buttons.
 		USERMGR_LIST_UI_DEFS.add(`${name}_save`, new uic.UIButton(
-				_elem = $(USER_SAVE_QUERY(name)),
-				_perm = () => { return true; },
-				_enabler = null,
-				_attach = {
+				elem = $(USER_SAVE_QUERY(name)),
+				perm = () => { return true; },
+				enabler = null,
+				attach = {
 					'click': () => { usermgr_save(name); }
 				},
-				_defer = null
+				defer = null
 			)
 		);
 		USERMGR_LIST_UI_DEFS.add(`${name}_remove`, new uic.UIButton(
-				_elem = $(USER_REMOVE_QUERY(name)),
-				_perm = () => { return name != API.CONFIG.user; },
-				_enabler = null,
-				_attach = {
+				elem = $(USER_REMOVE_QUERY(name)),
+				perm = () => { return name != API.CONFIG.user; },
+				enabler = null,
+				attach = {
 					'click': () => { usermgr_remove(name); }
 				},
-				_defer = null
+				defer = null
 			)
 		);
 		USERMGR_LIST_UI_DEFS.add(`${name}_name`, new uic.UIInput(
-				_elem = $(USER_NAME_QUERY(name)),
-				_perm = () => { return false; },
-				_enabler = null,
-				_attach = null,
-				_defer = null,
-				_mod = null,
-				_getter = null,
-				_setter = (elem, usr) => { elem.val(usr.get_name()); },
-				_clear = (elem) => { elem.val(''); }
+				elem = $(USER_NAME_QUERY(name)),
+				perm = () => { return false; },
+				enabler = null,
+				attach = null,
+				defer = null,
+				mod = null,
+				getter = null,
+				setter = (elem, usr) => { elem.val(usr.get_name()); },
+				clearer = (elem) => { elem.val(''); }
 			)
 		);
 		USERMGR_LIST_UI_DEFS.add(`${name}_groups`, new uic.UIInput(
-				_elem = new multiselect.MultiSelect(
+				elem = new multiselect.MultiSelect(
 					`usr-groups-input-${name}-cont`,
 					`usr-groups-input-${name}`,
 					[new val.StrValidator({
@@ -316,20 +316,20 @@ function usermgr_make_ui() {
 						'maxopts': API.SERVER_LIMITS.MAX_USER_GROUPS
 					}
 				),
-				_pass = () => { return true; },
-				_enabler = (elem, state) => {
+				pass = () => { return true; },
+				enabler = (elem, state) => {
 					if (state) {
 						elem.enable();
 					} else {
 						elem.disable();
 					}
 				},
-				_attach = null,
-				_defer = null,
-				_mod = null,
-				_getter = (elem) => { return elem.selected; },
-				_setter = (elem, usr) => { elem.set(usr.get_groups()); },
-				_clear = (elem) => { elem.remove_all(); }
+				attach = null,
+				defer = null,
+				mod = null,
+				getter = (elem) => { return elem.selected; },
+				setter = (elem, usr) => { elem.set(usr.get_groups()); },
+				clearer = (elem) => { elem.remove_all(); }
 			)
 		);
 		// Add the existing user data to the inputs.
