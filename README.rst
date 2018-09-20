@@ -113,12 +113,11 @@ If npm doesn't exist in the repos of your Linux distribution of choice,
 is very outdated (like in the case of Debian) or you are not using a
 Linux based distribution at all, you must install it manually. You can
 follow the installation instructions for your OS on the
-`node.js website` <https://nodejs.org/en/download/package-manager/>.
+`node.js website<https://nodejs.org/en/download/package-manager/>`_.
 
-There are other ways to install npm too, and you can easily find them
-online using a search engine. One alternative way to install npm is
-described below. *Note that if you use this way to install npm, you
-shouldn't update npm via it's own update mechanism
+There are other ways to install npm too. One alternative way to install
+npm is described below. *Note that if you use this method to install
+npm, you shouldn't update npm via it's own update mechanism
 (running npm install npm) since that will install the new version into
 a different directory. To update npm when it's installed this way,
 you should just follow steps 1-3 again.*
