@@ -283,23 +283,35 @@ install:; @./build/scripts/install.sh $(INST)
 utest:; @./utests/api/main.py
 
 clean:
+	@:
+	$(call status,rm,dist,none)
 	rm -rf dist
+	$(call status,rm,dep,none)
 	rm -rf dep
-	rm -rf `find . -type d -name '__pycache__'`
-	rm -rf `find . -type d -name '.sass-cache'`
+	$(call status,rm,*.log,none)
 	rm -f *.log
+
+	for f in '__pycache__' '.sass-cache' '.mypy_cache'; do
+		TMP="`find . -type d -name $$f -printf '%p '`"
+		if [ ! -z "$$TMP" ]; then
+			$(call status,rm,$$TMP,none)
+			rm -rf $$TMP
+		fi
+	done
 
 realclean:
 	@:
 
-	$(call status,real-clean,various,remove)
+	$(call status,rm,build/*.iconf,none);
 	rm -f build/*.iconf
+	$(call status,rm,build/link,none);
 	rm -rf build/link
+	$(call status,rm,node_modules,none);
 	rm -rf node_modules
+	$(call status,rm,package-lock.json,none);
 	rm -f package-lock.json
 
 	# Remove temporary nano files.
-	$(call status,nano-clean,tmp,remove)
 	TMP="`find . \
 		\( -type d -path './node_modules/*' -prune \) \
 		-o \( \
@@ -307,11 +319,11 @@ realclean:
 			-o  -type f -name '*.save' -printf '%p ' \
 		\)`"
 	if [ ! -z "$$TMP" ]; then
+		$(call status,rm,$$TMP,none)
 		rm -f $$TMP
 	fi
 
 	# Remove temporary emacs files.
-	$(call status,emacs-clean,tmp,remove)
 	TMP="`find . \
 		\( -type d -path './node_modules/*' -prune \) \
 		-o \( \
@@ -319,6 +331,7 @@ realclean:
 			-o -type f -name '*~' -printf '%p ' \
 		\)`"
 	if [ ! -z "$$TMP" ]; then
+		$(call status,rm,$$TMP,none)
 		rm -f $$TMP
 	fi
 
