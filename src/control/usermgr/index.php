@@ -23,25 +23,35 @@
 			<div class="container text-center">
 				<div class="container-fluid">
 					<div class="row usr-table-row">
-						<div class="usr-table-col col-1">
-							#
-						</div>
-						<div class="usr-table-col col-2">
+						<div class="usr-table-col col">
 							User
 						</div>
-						<div class="usr-table-col col-3">
+						<div class="usr-table-col col"
+							id="heading-usr-groups">
 							Groups
 						</div>
-						<div class="usr-table-col col-3">
-							Information
+						<div id="heading-usr-comment"
+							class="usr-table-col col">
+							Comment
 						</div>
-						<div class="usr-table-col col-3">
+
+						<!-- Adjust table spacing. -->
+						<div class="usr-table-col col-auto invisible">
+							<div class="btn btn-primary usr-edit-btn small-btn">
+								<i class="fas fa-save"></i>
+							</div>
+							<div class="btn btn-primary usr-edit-btn small-btn">
+								<i class="fas fa-trash-alt"></i>
+							</div>
+							<div class="btn btn-primary usr-edit-btn small-btn">
+								<i class="fas fa-edit"></i>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div id="users-table" class="container-fluid mt-3">
+				<div id="users-table" class="container-fluid">
 				</div>
-				<div class="container-fluid mt-3 md-5">
+				<div class="container-fluid">
 					<div class="usr-table-row">
 						<div class="usr-table-col">
 							<input

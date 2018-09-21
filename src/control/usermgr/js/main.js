@@ -56,36 +56,33 @@ const DIALOG_USER_REMOVE_FAILED = new dialog.Dialog(
 );
 
 // User table row template.
-const usr_table_row = (index, name, groups, pass) => `
+const usr_table_row = (name, groups, pass) => `
 	<div class="row usr-table-row" id="usr-row-${name}">
-		<div id="usr-index-${name}" class="usr-table-col col-1">
-			${index}
-		</div>
-		<div id="usr-name-${name}" class="usr-table-col col-2">
+		<div id="usr-name-col-${name}" class="usr-table-col col">
 			${name}
 		</div>
-		<div id="usr-groups-${name}" class="usr-table-col col-3">
+		<div id="usr-groups-col-${name}" class="usr-table-col col">
 			${groups}
 		</div>
-		<div id="usr-info-${name}" class="usr-table-col col-3">
+		<div id="usr-comment-col-${name}" class="usr-table-col col">
 			${pass}
 		</div>
-		<div class="usr-table-col col-3">
+		<div class="usr-table-col col-auto">
 			<button type="button"
 				role="button"
-				class="btn btn-success usr-edit-btn"
+				class="btn btn-success small-btn usr-edit-btn"
 				id="btn-user-${name}-save">
 				<i class="fas fa-save"></i>
 			</button>
 			<button type="buttton"
 				role="button"
-				class="btn btn-danger usr-edit-btn"
+				class="btn btn-danger small-btn usr-edit-btn"
 				id="btn-user-${name}-remove">
 				<i class="fas fa-trash-alt"></i>
 			</button>
 			<button type="button"
 				role="button"
-				class="btn btn-primary"
+				class="btn btn-primary small-btn usr-edit-btn"
 				data-toggle="collapse"
 				data-target="#usr-edit-${name}"
 				aria-expanded="false"
@@ -97,11 +94,11 @@ const usr_table_row = (index, name, groups, pass) => `
 	<div class="collapse usr-edit-row" id="usr-edit-${name}">
 		<div class="usr-edit-row-container">
 			<div class="row usr-edit-input-row">
-				<label class="col-3 col-form-label"
+				<label class="usr-data-label col-auto col-form-label""
 					for="usr-name-input-${name}">
 					User
 				</label>
-				<div class="col-9">
+				<div class="col px-1">
 					<input id="usr-name-input-${name}"
 						type="text"
 						class="form-control"
@@ -110,10 +107,22 @@ const usr_table_row = (index, name, groups, pass) => `
 				</div>
 			</div>
 			<div class="row usr-edit-input-row">
-				<label class="col-3 col-form-label" for="usr-groups-input-${name}">
+				<label class="usr-data-label col-auto col-form-label""
+						for="usr-groups-input-${name}">
 					Groups
 				</label>
-				<div id="usr-groups-input-${name}-cont" class="col-9">
+				<div id="usr-groups-input-${name}-cont"
+						class="col px-1">
+				</div>
+			</div>
+			<div class="row usr-edit-input-row">
+				<label class="usr-data-label col-auto col-form-label"
+						for="usr-comment-label-${name}">
+					Comment
+				</label>
+				<div id="usr-comment-label-${name}"
+					class="col px-1 text-left my-auto">
+					${pass}
 				</div>
 			</div>
 		</div>
@@ -258,7 +267,6 @@ function usermgr_make_ui() {
 
 		// Add the HTML DOM elements to the document.
 		USERS_TABLE.append(usr_table_row(
-			i,
 			name,
 			!grps || !grps.length ? '' : grps.join(', '),
 			!info ? '' : info,
