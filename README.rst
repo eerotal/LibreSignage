@@ -3,10 +3,21 @@ LibreSignage - An open source digital signage solution
 ######################################################
 
 LibreSignage is a free and open source, lightweight and easy-to-use
-digital signage solution. LibreSignage runs on a HTTP web server serving
-content to normal web browsers. This makes it possible to use basically
-any device with the ability to display web pages from the internet as a
-client for a LibreSignage instance.
+digital signage solution. LibreSignage can be used to control a network
+of digital signage clients that display content from 'Slide queues'.
+The slides in these queues can be edited from the LibreSignage web
+interface.
+
+LibreSignage includes multi-user support and the permissions of
+different users are determined based on the groups they belong to
+ie. users of the group 'editor' can access the LibreSignage slide
+editor. The groups are also used to grant or deny access to different
+API endpoints.
+
+LibreSignage runs on a HTTP web server serving content to normal web
+browsers. This makes it possible to use basically any device with the
+ability to display web pages from the internet as a client for a
+LibreSignage instance.
 
 Features
 --------
@@ -20,7 +31,7 @@ Features
 * Possibility to give slide modification permissions to
   other users to collaborate with them on creating a slide.
 * Separate slide queues for different digital signage
-  screens.
+  clients.
 * Multiple user accounts with permissions based on
   user groups.
 * User settings view for changing passwords and viewing
@@ -29,13 +40,23 @@ Features
   for admin users.
 * Configurable quotas for actions such as creating slides.
 * Rate limited API for reducing server load.
-* Extensive documentation of all features including docs
-  for developers.
+* Extensive documentation of features including docs for
+  developers.
 * Documentation written in reStructuredText, making it
   possible to read it even outside the web interface. This
   is especially useful when reading the developer docs.
 * Extensive configuration possibilities.
 * Modular design.
+
+Goals
+-----
+
+* Create a lightweight alternative to other digital signage solutions.
+* Create a system that's both easy to set up and easy to use.
+* Write a well documented and modular API so that implementing new
+  user interfaces is simple.
+* Document all features.
+* Keep it simple.
 
 Installation
 ------------
@@ -69,27 +90,42 @@ are listed below.
    running ``sudo apt install git apache2 php7.0 pandoc ruby-sass``.
    Currently *npm* is only available in the Debian Sid repos and even
    there the package is so old it doesn't work correctly. You can,
-   however, download the *node.js* binaries (including npm) from the
-   *node.js* website. See `How to install NPM`_ for more info.
+   however, install npm manually. See `How to install NPM`_ for more info.
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
    The repository will be cloned into the directory *LibreSignage/*.
 4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
 5. Install dependencies from NPM by running ``npm install``.
-6. Run ``make configure`` and answer the questions. This generates
-   an instance configuration file needed for building LibreSignage.
-   The file is saved in ``build/`` as ``<DOMAIN>.iconf`` where
-   ``<DOMAIN>`` is the domain name you specified.
+6. Run ``make configure``. This script asks you to enter the
+   following configuration values.
+
+   * Document root (default: /var/www)
+     * The document root to use.
+   * Server name (domain)
+     * The domain name to use for configuring apache2. If you
+       don't have a domain and you are just testing the system,
+       you can either use 'localhost', your machines LAN IP or
+       a testing domain you don't actually own. If you use a testing
+       domain, you can add that domain to your */etc/hosts* file.
+       See the end of this section for more info.
+   * Server name aliases
+   * Admin name
+     * Shown to users on the main page.
+   * Admin email
+     * Shown to users on the main page.
+   * Enable debugging (y/N)
+     *  Whether to enable debugging. N is default.
+
+   This command generates an instance configuration file needed
+   for building LibreSignage. The file is saved in ``build/`` as
+   ``<DOMAIN>.iconf`` where ``<DOMAIN>`` is the domain name you
+   specified.
 7. Run ``make`` to build LibreSignage. You can use the ``-j<MAXJOBS>``
    CLI option to specify a maximum number of parallel jobs to speed up
    the building process. The usual recommended value for the max number
    of jobs is one per CPU core, meaning that for eg. a quad core CPU you
-   should use -j4. You can also tell make to use a specific instance
-   configuration file by adding ``INST=<PATH>`` to the make command
-   line. If no instance config file is specified, the last config
-   generated by ``make configure`` is used. See `Make rules`_ for more
-   info.
+   should use -j4. See `Make rules`_ for more advanced options.
 8. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
 
@@ -103,8 +139,25 @@ line to your */etc/hosts* file.
 
 ``example.com    127.0.0.1``
 
-This will redirect all requests for *example.com* to *localhost*,
-making it possible to access the site by connecting to *example.com*.
+This will redirect all requests for *example.com* to *127.0.0.1*
+(loopback), making it possible to access the site by connecting
+to *example.com*.
+
+Default users
+-------------
+
+The initial configured users and their groups and passwords are listed
+below. It goes without saying that you should create new users and
+change the passwords if you intend to use LibreSignage on a production
+system.
+
+=========== ======================== ==========
+    User             Groups           Password
+=========== ======================== ==========
+admin        admin, editor, display   admin
+user         editor, display          user
+display      display                  display
+=========== ======================== ==========
 
 How to install npm
 ------------------
@@ -113,7 +166,7 @@ If npm doesn't exist in the repos of your Linux distribution of choice,
 is very outdated (like in the case of Debian) or you are not using a
 Linux based distribution at all, you must install it manually. You can
 follow the installation instructions for your OS on the
-`node.js website<https://nodejs.org/en/download/package-manager/>`_.
+`node.js website <https://nodejs.org/en/download/package-manager/>`_.
 
 There are other ways to install npm too. One alternative way to install
 npm is described below. *Note that if you use this method to install
@@ -184,22 +237,6 @@ form MAJOR.MINOR.PATCH.
 The LibreSignage API also has its own version number that's just
 an integer which is incremented every time a backwards incompatible
 API change is made.
-
-Default users
--------------
-
-The initial configured users and their groups and passwords are listed
-below. It goes without saying that you should create new users and
-change the passwords if you intend to use LibreSignage on a production
-system.
-
-=========== ======================== ==========
-    User             Groups           Password
-=========== ======================== ==========
-admin        admin, editor, display   admin
-user         editor, display          user
-display      display                  display
-=========== ======================== ==========
 
 FAQ
 ---
