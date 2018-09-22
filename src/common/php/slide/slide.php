@@ -6,6 +6,7 @@
 *  file data and the API endpoints.
 */
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slidelock.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/uid.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
@@ -34,6 +35,8 @@ function slides_list() {
 	return $slides;
 }
 
+class SlideLockException extends Exception {};
+
 class Slide {
 	// Required keys in a slide config file.
 	const CONF_KEYS = array(
@@ -47,7 +50,8 @@ class Slide {
 		'sched_t_e',
 		'animation',
 		'queue_name',
-		'collaborators'
+		'collaborators',
+		'lock'
 	);
 
 	// Slide file paths.
@@ -69,6 +73,7 @@ class Slide {
 	private $animation = 0;
 	private $queue_name = NULL;
 	private $collaborators = NULL;
+	private $lock = NULL;
 
 	private function _mk_paths(string $id) {
 		/*
@@ -154,6 +159,11 @@ class Slide {
 		$this->set_animation($conf['animation']);
 		$this->set_queue_name($conf['queue_name']);
 		$this->set_collaborators($conf['collaborators']);
+		if ($conf['lock'] !== NULL) {
+			$sl = new SlideLock(null);
+			$sl->load($conf['lock']);
+			$this->set_lock($sl);
+		}
 
 		$this->check_sched_enabled();
 	}
@@ -348,6 +358,42 @@ class Slide {
 		$this->collaborators = $collaborators;
 	}
 
+	private function set_lock(SlideLock $lock) {
+		$this->lock = $lock;
+	}
+
+	function lock_acquire(string $user) {
+		/*
+		*  Attempt to lock this slide. Throws a SlideLockException
+		*  if the slide is already locked by another user.
+		*/
+		if (
+			$this->lock !== NULL
+			&& $this->lock->get_user() !== $user
+		) {
+			throw new SlideLockException(
+				"Slide already locked."
+			);
+		}
+		$this->lock = new SlideLock($user);
+	}
+
+	function lock_release(string $user) {
+		/*
+		*  Attempt to unlock this slide. Throws a SlideLockException
+		*  if the slide is locked by another user.
+		*/
+		if (
+			$this->lock !== NULL
+			&& $this->lock->get_user() !== $user
+		) {
+			throw new SlideLockException(
+				"Can't unlock a slide locked by another user."
+			);
+		}
+		$this->lock = NULL;
+	}
+
 	function get_id() { return $this->id; }
 	function get_markup() { return $this->markup; }
 	function get_name() { return $this->name; }
@@ -361,6 +407,7 @@ class Slide {
 	function get_animation() { return $this->animation; }
 	function get_queue_name() { return $this->queue_name; }
 	function get_collaborators() { return $this->collaborators; }
+	function get_lock() { return $this->lock; }
 
 	function get_queue() {
 		$queue = new Queue($this->queue_name);
@@ -382,7 +429,8 @@ class Slide {
 			'sched_t_e' => $this->sched_t_e,
 			'animation' => $this->animation,
 			'queue_name' => $this->queue_name,
-			'collaborators' => $this->collaborators
+			'collaborators' => $this->collaborators,
+			'lock' => $this->lock === NULL ? NULL : $this->lock->export()
 		);
 	}
 

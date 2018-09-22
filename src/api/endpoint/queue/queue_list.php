@@ -17,7 +17,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/queue.php');
 
 $QUEUE_LIST = new APIEndpoint(array(

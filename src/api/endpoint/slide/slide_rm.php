@@ -19,7 +19,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_RM = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
