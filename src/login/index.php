@@ -32,7 +32,7 @@
 				<div class="container form-login">
 					<div class="form-group form-row">
 						<label for="input-user"
-							class="col-3 col-form-label">
+							class="col col-form-label">
 							Username
 						</label>
 						<div class="col">
@@ -45,7 +45,7 @@
 					</div>
 					<div class="form-group form-row">
 						<label for="input-pass"
-							class="col-3 col-form-label">
+							class="col col-form-label">
 							Password
 						</label>
 						<div class="col">

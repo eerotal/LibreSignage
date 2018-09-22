@@ -2,6 +2,10 @@
 @import 'footer';
 @import 'dialog';
 
+$form-login-minw: 200px;
+$form-login-maxw: 350px;
+$form-label-width: 90px;
+
 html {
 	height: 100%;
 	min-height: 100%;
@@ -21,7 +25,15 @@ html {
 }
 
 .form-login {
-	width: 350px;
+	label {
+		flex-grow: 0;
+		flex-basis: $form-label-width;
+		padding-left: 0;
+	}
+
+	width: 80vw;
+	min-width: $form-login-minw;
+	max-width: $form-login-maxw;
 	margin: {
 		left: auto;
 		right: auto;
