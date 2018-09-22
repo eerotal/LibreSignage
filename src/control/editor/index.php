@@ -314,7 +314,7 @@
 				<div id="cont-quick-help" class="container">
 					<div class="row">
 						<div class="col-12 container text-right">
-							<i id="close-quick-help" class="fas fa-times-circle"></i>
+							<i id="close-quick-help" class="fas fa-times-circle link-nostyle"></i>
 						</div>
 					</div>
 					<div class="row">
