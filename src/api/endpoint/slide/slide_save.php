@@ -22,6 +22,11 @@
 *     queue_name and collaborators parameters of the API
 *     call are silently discarded.
 *
+*  This endpoint only allows slide modification if the caller
+*  has locked the slide by calling slide_lock_acquire.php first.
+*  If the slide is not locked or is locked by someone else, the
+*  API_E_LOCK error is returned in the 'error' value.
+*
 *  POST JSON parameters
 *    * id            = The ID of the slide to modify or either
 *      undefined or null for new slide.
@@ -126,6 +131,27 @@ if (!$ALLOW) {
 	}
 }
 
+/*
+*  Check slide lock.
+*/
+if ($OP === 'modify' || $OP === 'modify_collab') {
+	$lock = $slide->get_lock();
+	if ($lock === NULL) {
+		throw new APIException(
+			API_E_LOCK,
+			"Slide not locked."
+		);
+	} else if (
+		!$lock->is_expired()
+		&& $lock->get_user() != $SLIDE_SAVE->get_caller()->get_name()
+	) {
+		throw new APIException(
+			API_E_LOCK,
+			"Slide locked by another user."
+		);
+	}
+}
+
 if ($OP === 'create') {
 	/*
 	*  Set the current user as the owner and
@@ -175,5 +201,5 @@ $queue = new Queue($slide->get_queue_name());
 $queue->load();
 $queue->juggle($slide->get_id());
 
-$SLIDE_SAVE->resp_set($slide->get_data_array());
+$SLIDE_SAVE->resp_set($slide->get_public_data_array());
 $SLIDE_SAVE->send();

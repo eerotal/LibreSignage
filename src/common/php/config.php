@@ -60,7 +60,7 @@
 	const SESSION_MAX_AGE			= 600;
 	const AUTH_TOKEN_LEN			= 15;
 
-	const SLIDE_LOCK_MAX_AGE		= 600;
+	const SLIDE_LOCK_MAX_AGE		= 60;
 
 	// LibreSignage instance limits.
 	const LS_LIM = array(

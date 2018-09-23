@@ -29,13 +29,13 @@ class SlideLock {
 			throw new ArgException('Invalid SlideLock data.');
 		}
 		$this->user = $data['user'];
-		$this->epxire = $data['expire'];
+		$this->expire = $data['expire'];
 	}
 
 	public function export() {
 		/*
-		*  Export the SlideLock data for storing
-		*  on the filesystem.
+		*  Export the SlideLock data for JSON encoding and
+		*  storing on the filesystem.
 		*/
 		return [
 			'user' => $this->user,
@@ -46,8 +46,12 @@ class SlideLock {
 	public function get_user() {
 		return $this->user;
 	}
+	
+	public function get_expire() {
+		return $this->expire;
+	}
 
 	public function is_expired() {
-		return !empty($this->user) && time() > $this->expire;
+		return empty($this->user) || time() > $this->expire;
 	}
 }

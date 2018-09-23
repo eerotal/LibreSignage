@@ -238,7 +238,7 @@ class Queue {
 	function get_data_array() {
 		$sret = [];
 		foreach ($this->slides as $s) {
-			$sret[$s->get_id()] = $s->get_data_array();
+			$sret[$s->get_id()] = $s->get_public_data_array();
 		}
 		return [
 			'owner' => $this->owner,

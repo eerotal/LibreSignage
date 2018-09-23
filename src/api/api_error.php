@@ -84,7 +84,7 @@ const API_E_MSG = array(
 	),
 	API_E_LOCK => array(
 		"short" => "Slide lock error",
-		"long" => "Slide is already locked by another user."
+		"long" => "A slide locking error occured."
 	)
 );
 
@@ -122,8 +122,10 @@ class APIException extends Exception {
 		}
 
 		$err_str = json_encode($err);
-		if ($err_str == FALSE &&
-			json_last_error() != JSON_ERROR_NONE) {
+		if (
+			$err_str == FALSE
+			&& json_last_error() != JSON_ERROR_NONE
+		) {
 			return '{"error": '.API_E_INTERNAL.'}';
 		}
 		return $err_str;
@@ -138,7 +140,7 @@ function api_error_setup() {
 		try {
 			if (get_class($e) == 'APIException') {
 				echo APIException::_to_api_string(
-						$e->get_api_err(), $e
+					$e->get_api_err(), $e
 				);
 			} else {
 				echo APIException::_to_api_string(

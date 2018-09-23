@@ -362,11 +362,24 @@ class Slide {
 		$this->lock = $lock;
 	}
 
+	private function lock_cleanup() {
+		/*
+		*  Cleanup expired slide locks.
+		*/
+		if (
+			$this->lock !== NULL
+			&& $this->lock->is_expired()
+		) {
+			$this->lock = NULL;
+		}
+	}
+
 	function lock_acquire(string $user) {
 		/*
 		*  Attempt to lock this slide. Throws a SlideLockException
 		*  if the slide is already locked by another user.
 		*/
+		$this->lock_cleanup();
 		if (
 			$this->lock !== NULL
 			&& $this->lock->get_user() !== $user
@@ -383,6 +396,7 @@ class Slide {
 		*  Attempt to unlock this slide. Throws a SlideLockException
 		*  if the slide is locked by another user.
 		*/
+		$this->lock_cleanup();
 		if (
 			$this->lock !== NULL
 			&& $this->lock->get_user() !== $user
@@ -415,8 +429,12 @@ class Slide {
 		return $queue;
 	}
 
-	function get_data_array() {
-		return array(
+	function get_public_data_array() {
+		/*
+		*  Get all the public-to-world data of this slide.
+		*  This is mainly used by API endpoints.
+		*/
+		return [
 			'id' => $this->id,
 			'markup' => $this->markup,
 			'name' => $this->name,
@@ -430,8 +448,18 @@ class Slide {
 			'animation' => $this->animation,
 			'queue_name' => $this->queue_name,
 			'collaborators' => $this->collaborators,
+		];
+	}
+
+	function get_internal_data_array() {
+		/*
+		*  Get the internal data array of this slide. The returned
+		*  array contains data that must be kept strictly server-side.
+		*  DO NOT use this in API endpoints.
+		*/
+		return array_merge($this->get_public_data_array(), [
 			'lock' => $this->lock === NULL ? NULL : $this->lock->export()
-		);
+		]);
 	}
 
 	function check_sched_enabled() {
@@ -462,7 +490,7 @@ class Slide {
 		*  automatically overwrites files if they
 		*  already exist.
 		*/
-		$conf = $this->get_data_array();
+		$conf = $this->get_internal_data_array();
 		unset($conf['id']);
 		unset($conf['markup']);
 

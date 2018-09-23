@@ -660,25 +660,41 @@ function slide_show(s, no_popup) {
 	*  selects the requested slide if the user clicks OK.
 	*/
 	var cb = () => {
-		console.log(`LibreSignage: Show slide '${s}'.`);
-
-		sel_slide = new slide.Slide(API);
-		flag_slide_loading = true;
-		sel_slide.load(s, (err) => {
-			if (err) {
-				// Remove input data and disable inputs on error.
-				set_inputs(null);
-				disable_controls();
-				LIVE_PREVIEW.update();
-				return;
-			}
-
-			// Show the new input data and update the preview.
+		let error = () => {
+			console.error('LibreSignage: API error.');
+			set_inputs(null);
+			disable_controls();
+			LIVE_PREVIEW.update();
+			sel_slide = null;
+		}
+		let success = () => {
 			set_inputs(sel_slide);
 			enable_controls();
 			LIVE_PREVIEW.update();
 			TL.select(sel_slide.get('id'));
 			flag_slide_loading = false;
+		}
+
+		console.log(`LibreSignage: Show slide '${s}'.`);
+
+		/*
+		*  Release the current lock. A callback isn't needed
+		*  because the new slide will be selected whether this
+		*  call causes an error or not.
+		*/
+		if (sel_slide) {
+			sel_slide.lock_release(null);
+		}
+
+		// Load the new slide.
+		sel_slide = new slide.Slide(API);
+		flag_slide_loading = true;
+		sel_slide.load(s, true, true, (load_err) => {
+			if (load_err) {
+				error();
+				return;
+			}
+			success();
 		});
 	}
 

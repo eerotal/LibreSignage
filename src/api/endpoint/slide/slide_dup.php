@@ -64,5 +64,5 @@ $queue = $new_slide->get_queue();
 $queue->juggle($new_slide->get_id());
 $queue->write();
 
-$SLIDE_DUP->resp_set(['slide' => $new_slide->get_data_array()]);
+$SLIDE_DUP->resp_set(['slide' => $new_slide->get_public_data_array()]);
 $SLIDE_DUP->send();

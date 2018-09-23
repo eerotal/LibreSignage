@@ -29,7 +29,7 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
-$SLIDE_LOCK = new APIEndpoint(array(
+$SLIDE_LOCK_RELEASE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
 	APIEndpoint::FORMAT => array(
@@ -38,9 +38,14 @@ $SLIDE_LOCK = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($SLIDE_LOCK);
+api_endpoint_init($SLIDE_LOCK_RELEASE);
 
-if (!check_perm('grp:admin|grp:editor;', $SLIDE_LOCK->get_caller())) {
+if (
+	!check_perm(
+		'grp:admin|grp:editor;',
+		$SLIDE_LOCK_RELEASE->get_caller()
+	)
+) {
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,
 		"Not authorized"
@@ -48,19 +53,18 @@ if (!check_perm('grp:admin|grp:editor;', $SLIDE_LOCK->get_caller())) {
 }
 
 $slide = new Slide();
-$slide->load($SLIDE_LOCK->get('id'));
-
+$slide->load($SLIDE_LOCK_RELEASE->get('id'));
 try {
-	$slide->lock_release($SLIDE_LOCK->get_caller()->get_name());
+	$slide->lock_release($SLIDE_LOCK_RELEASE->get_caller()->get_name());
 } catch (SlideLockException $e) {
 	throw new APIException(
 		API_E_LOCK,
-		"Failed to lock slide.",
+		"Failed to release slide lock.",
 		0,
 		$e
 	);
 }
 $slide->write();
 
-$SLIDE_LOCK->resp_set([]);
-$SLIDE_LOCK->send();
+$SLIDE_LOCK_RELEASE->resp_set([]);
+$SLIDE_LOCK_RELEASE->send();
