@@ -448,18 +448,8 @@ class Slide {
 			'animation' => $this->animation,
 			'queue_name' => $this->queue_name,
 			'collaborators' => $this->collaborators,
-		];
-	}
-
-	function get_internal_data_array() {
-		/*
-		*  Get the internal data array of this slide. The returned
-		*  array contains data that must be kept strictly server-side.
-		*  DO NOT use this in API endpoints.
-		*/
-		return array_merge($this->get_public_data_array(), [
 			'lock' => $this->lock === NULL ? NULL : $this->lock->export()
-		]);
+		];
 	}
 
 	function check_sched_enabled() {
@@ -490,7 +480,7 @@ class Slide {
 		*  automatically overwrites files if they
 		*  already exist.
 		*/
-		$conf = $this->get_internal_data_array();
+		$conf = $this->get_public_data_array();
 		unset($conf['id']);
 		unset($conf['markup']);
 
