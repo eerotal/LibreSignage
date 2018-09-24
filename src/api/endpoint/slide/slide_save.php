@@ -41,6 +41,8 @@
 *    * animation     = The slide animation identifier.
 *    * queue_name    = The name of the slide queue of this slide.
 *    * collaborators = A list of slide collaborators.
+*    * owner         = Unused
+*    * lock          = Unused
 *
 *  Return value
 *    This endpoint returns all the parameters above as well as
@@ -71,7 +73,8 @@ $SLIDE_SAVE = new APIEndpoint([
 		'sched_t_e' => API_P_INT,
 		'animation' => API_P_INT,
 		'queue_name' => API_P_STR,
-		'collaborators' => API_P_ARR_STR
+		'collaborators' => API_P_ARR_STR,
+		'lock' => API_P_UNUSED
 	],
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
