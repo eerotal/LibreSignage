@@ -36,7 +36,8 @@ const NEW_SLIDE_DEFAULTS = {
 	'sched_t_e': Math.round(Date.now()/1000),
 	'animation': 0,
 	'queue_name': '',
-	'collaborators': []
+	'collaborators': [],
+	'lock': null
 };
 
 // Editor status constants used by editor_status[_check]().
@@ -655,9 +656,13 @@ function editor_status_check(arr) {
 
 function slide_show(s, no_popup) {
 	/*
-	*  Show the slide 's'. If the current slide has unsaved changes,
-	*  this function displays an 'Unsaved changes' dialog and only
-	*  selects the requested slide if the user clicks OK.
+	*  Show the slide 's'. If the current slide has unsaved
+	*  changes, this function displays an 'Unsaved changes'
+	*  dialog and only selects the requested slide if the
+	*  user clicks OK. If the slide is not yet locked by
+	*  anyone, this function locks the slide so that it's
+	*  writable by the logged in user. Otherwise the slide
+	*  is not locked and is loaded read-only.
 	*/
 	var cb = () => {
 		let error = () => {
@@ -667,7 +672,8 @@ function slide_show(s, no_popup) {
 			LIVE_PREVIEW.update();
 			sel_slide = null;
 		}
-		let success = () => {
+		let success = (locked) => {
+			console.log('Slide locked: ' + locked);
 			set_inputs(sel_slide);
 			enable_controls();
 			LIVE_PREVIEW.update();
@@ -677,24 +683,26 @@ function slide_show(s, no_popup) {
 
 		console.log(`LibreSignage: Show slide '${s}'.`);
 
-		/*
-		*  Release the current lock. A callback isn't needed
-		*  because the new slide will be selected whether this
-		*  call causes an error or not.
-		*/
-		if (sel_slide) {
-			sel_slide.lock_release(null);
-		}
+		// Release the current lock.
+		if (sel_slide) { sel_slide.lock_release(null); }
 
 		// Load the new slide.
 		sel_slide = new slide.Slide(API);
 		flag_slide_loading = true;
-		sel_slide.load(s, true, true, (load_err) => {
-			if (load_err) {
+		sel_slide.load(s, true, true, lerr_1 => { // w/ lock
+			if (lerr_1 == API.ERR.API_E_LOCK) {
+				sel_slide.load(s, false, false, lerr_2 => { // w/o lock
+					if (lerr_2) {
+						error()
+					} else {
+						success(false);
+					}
+				});
+			} else if (lerr_1){
 				error();
-				return;
+			} else {
+				success(true);
 			}
-			success();
 		});
 	}
 

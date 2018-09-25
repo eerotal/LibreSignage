@@ -28,7 +28,7 @@ $AUTH_LOGOUT_OTHER = new APIEndpoint(array(
 api_endpoint_init($AUTH_LOGOUT_OTHER);
 
 $u = $AUTH_LOGOUT_OTHER->get_caller();
-$u->session_n_rm($AUTH_LOGOUT_OTHER->get_auth_token());
+$u->session_n_rm($AUTH_LOGOUT_OTHER->get_session()->get_id());
 $u->write();
 
 $AUTH_LOGOUT_OTHER->resp_set(array('error' => API_E_OK));

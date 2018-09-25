@@ -30,7 +30,7 @@ api_endpoint_init($AUTH_SESSION_RENEW);
 
 // Renew the current session.
 $session = $AUTH_SESSION_RENEW->get_caller()->session_renew(
-	$AUTH_SESSION_RENEW->get_auth_token()
+	$AUTH_SESSION_RENEW->get_session()->get_id()
 );
 $AUTH_SESSION_RENEW->get_caller()->write();
 

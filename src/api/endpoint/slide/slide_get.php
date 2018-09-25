@@ -49,7 +49,5 @@ api_endpoint_init($SLIDE_GET);
 
 $slide = new Slide();
 $slide->load($SLIDE_GET->get('id'));
-$SLIDE_GET->resp_set(
-	['slide' => $slide->get_public_data_array()]
-);
+$SLIDE_GET->resp_set(['slide' => $slide->get_public_data_array()]);
 $SLIDE_GET->send();

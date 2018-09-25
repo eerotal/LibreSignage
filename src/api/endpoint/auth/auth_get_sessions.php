@@ -27,17 +27,15 @@ $AUTH_GET_SESSIONS = new APIEndpoint(array(
 ));
 api_endpoint_init($AUTH_GET_SESSIONS);
 
-$resp = array();
-$tok = $AUTH_GET_SESSIONS->get_auth_token();
-$sd = $AUTH_GET_SESSIONS->get_caller()->get_session_data();
-foreach ($sd as $k => $d) {
-	$resp['sessions'][] = array(
-		'who' => $d['who'],
-		'from' => $d['from'],
-		'created' => $d['created'],
-		'max_age' => $d['max_age'],
-		'current' => password_verify($tok, $d['token_hash'])
-	);
+$resp = [];
+$tmp = [];
+$current_session = $AUTH_GET_SESSIONS->get_session();
+$sessions = $AUTH_GET_SESSIONS->get_caller()->get_sessions();
+
+foreach ($sessions as $k => $s) {
+	$tmp = $s->export_public();
+	$tmp['current'] = ($current_session->get_id() === $s->get_id());
+	$resp['sessions'][] = $tmp;
 }
 $AUTH_GET_SESSIONS->resp_set($resp);
 $AUTH_GET_SESSIONS->send();

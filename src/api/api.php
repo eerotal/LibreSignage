@@ -77,7 +77,6 @@ class APIEndpoint {
 	private $data		= NULL;
 	private $inited		= FALSE;
 	private $caller		= NULL;
-	private $auth_token	= NULL;
 
 	public function __construct(array $config) {
 		$args = new ArgumentArray(
@@ -323,37 +322,16 @@ class APIEndpoint {
 		}
 	}
 
-	public function is_inited() {
-		return $this->inited;
-	}
+	public function is_inited() { return $this->inited; }
+	public function get_method() { return $this->method; }
+	public function requires_quota() { return $this->req_quota; }
+	public function requires_auth() { return $this->req_auth; }
 
-	public function requires_quota() {
-		return $this->req_quota;
-	}
+	public function set_caller($caller) { $this->caller = $caller; }
+	public function get_caller() { return $this->caller; }
 
-	public function requires_auth() {
-		return $this->req_auth;
-	}
-
-	public function set_caller($caller) {
-		$this->caller = $caller;
-	}
-
-	public function get_caller() {
-		return $this->caller;
-	}
-
-	public function set_auth_token($token) {
-		$this->auth_token = $token;
-	}
-
-	public function get_auth_token() {
-		return $this->auth_token;
-	}
-
-	public function get_method() {
-		return $this->method;
-	}
+	public function set_session($session) { $this->session = $session; }
+	public function get_session() { return $this->session; }
 
 	public function resp_set($resp) {
 		/*
@@ -450,22 +428,22 @@ function api_handle_request(APIEndpoint $endpoint) {
 	}
 
 	$auth_token = getallheaders()["Auth-Token"];
-	$caller = auth_token_verify($auth_token);
-	if ($caller === NULL) {
+	$auth_data = auth_token_verify($auth_token);
+	if ($auth_data === NULL) {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,
 			"Invalid authentication token."
 		);
 	}
 
-	// Store caller data in endpoint.
-	$endpoint->set_caller($caller);
-	$endpoint->set_auth_token($auth_token);
+	// Store caller & session data in endpoint.
+	$endpoint->set_caller($auth_data['user']);
+	$endpoint->set_session($auth_data['session']);
 
 	// Use the API rate quota of the caller if required.
 	if (!$endpoint->requires_quota()) { return; }
 
-	$quota = new UserQuota($caller);
+	$quota = new UserQuota($auth_data['user']);
 	if ($quota->has_state_var('api_t_start')) {
 		$t = $quota->get_state_var('api_t_start');
 		if (time() - $t >= gtlim('API_RATE_T')) {
