@@ -374,7 +374,7 @@ class Slide {
 		}
 	}
 
-	function lock_acquire(string $user) {
+	function lock_acquire(Session $session) {
 		/*
 		*  Attempt to lock this slide. Throws a SlideLockException
 		*  if the slide is already locked by another user.
@@ -382,16 +382,14 @@ class Slide {
 		$this->lock_cleanup();
 		if (
 			$this->lock !== NULL
-			&& $this->lock->get_user() !== $user
+			&& !$this->lock->is_owned_by($session)
 		) {
-			throw new SlideLockException(
-				"Slide already locked."
-			);
+			throw new SlideLockException("Slide already locked.");
 		}
-		$this->lock = new SlideLock($user);
+		$this->lock = new SlideLock($session);
 	}
 
-	function lock_release(string $user) {
+	function lock_release(Session $session) {
 		/*
 		*  Attempt to unlock this slide. Throws a SlideLockException
 		*  if the slide is locked by another user.
@@ -399,10 +397,10 @@ class Slide {
 		$this->lock_cleanup();
 		if (
 			$this->lock !== NULL
-			&& $this->lock->get_user() !== $user
+			&& !$this->lock->is_owned_by($session)
 		) {
 			throw new SlideLockException(
-				"Can't unlock a slide locked by another user."
+				"Can't unlock a slide locked from another session."
 			);
 		}
 		$this->lock = NULL;

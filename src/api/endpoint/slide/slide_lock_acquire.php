@@ -57,7 +57,7 @@ if (
 $slide = new Slide();
 $slide->load($SLIDE_LOCK_ACQUIRE->get('id'));
 try {
-	$slide->lock_acquire($SLIDE_LOCK_ACQUIRE->get_caller()->get_name());
+	$slide->lock_acquire($SLIDE_LOCK_ACQUIRE->get_session());
 } catch (SlideLockException $e) {
 	throw new APIException(
 		API_E_LOCK,

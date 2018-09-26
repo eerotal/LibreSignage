@@ -146,7 +146,7 @@ if ($OP === 'modify' || $OP === 'modify_collab') {
 		);
 	} else if (
 		!$lock->is_expired()
-		&& $lock->get_user() != $SLIDE_SAVE->get_caller()->get_name()
+		&& !$lock->is_owned_by($SLIDE_SAVE->get_session())
 	) {
 		throw new APIException(
 			API_E_LOCK,
