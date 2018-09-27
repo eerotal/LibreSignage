@@ -3,8 +3,22 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/session.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/userquota.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
 
-class User {
+class User extends Exportable{
+	static $PRIVATE = [
+		'user',
+		'hash',
+		'groups',
+		'sessions'
+	];
+
+	static $PUBLIC = [
+		'user',
+		'groups',
+		'sessions'
+	];
+
 	private $user = '';
 	private $hash = '';
 	private $groups = array();
@@ -17,6 +31,14 @@ class User {
 		*/
 		assert(!empty($name));
 		$this->load($name);
+	}
+
+	public function __exportable_set(string $name, $value) {
+		$this->{$name} = $value;
+	}
+
+	public function __exportable_get(string $name) {
+		return $this->{$name};
 	}
 
 	public function load(string $user) {
@@ -45,17 +67,7 @@ class User {
 		) {
 			throw new IntException('JSON user data decode error!');
 		}
-
-		$this->set_name($data['user']);
-		$this->set_groups($data['groups']);
-		$this->set_hash($data['hash']);
-
-		$tmp = NULL;
-		foreach($data['sessions'] as $s) { 
-			$tmp = new Session();
-			$tmp->load($s);
-			$this->sessions[] = $tmp;
-		}
+		$this->import($data);
 	}
 
 	public function remove() {
@@ -78,18 +90,7 @@ class User {
 		*  TRUE otherwise.
 		*/
 		$dir = $this->get_data_dir();
-
-		$data = [
-			'user' => $this->user,
-			'groups' => $this->groups,
-			'hash' => $this->hash,
-			'sessions' => []
-		];
-		foreach ($this->sessions as $s) {
-			$data['sessions'][] = $s->export();
-		}
-
-		$json = json_encode($data);
+		$json = json_encode($this->export(TRUE, TRUE));
 		if (
 			$json === FALSE &&
 			json_last_error() !== JSON_ERROR_NONE

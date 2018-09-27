@@ -63,6 +63,10 @@
 						<div id="slide-cant-edit">
 							You can't edit this slide.
 						</div>
+						<div id="slide-readonly">
+							You can't edit this slide because someone
+							else is already editing it.
+						</div>
 						<div id="slide-edit-as-collab">
 							You can edit this slide as a collaborator.
 						</div>

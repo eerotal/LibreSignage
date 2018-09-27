@@ -285,7 +285,7 @@ function usermgr_make_ui() {
 		);
 		USERMGR_LIST_UI_DEFS.add(`${name}_remove`, new uic.UIButton(
 				elem = $(USER_REMOVE_QUERY(name)),
-				perm = () => { return name != API.CONFIG.user; },
+				perm = () => { return name != API.CONFIG.user.user; },
 				enabler = null,
 				attach = {
 					'click': () => { usermgr_remove(name); }

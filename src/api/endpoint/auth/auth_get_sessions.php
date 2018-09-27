@@ -33,7 +33,7 @@ $current_session = $AUTH_GET_SESSIONS->get_session();
 $sessions = $AUTH_GET_SESSIONS->get_caller()->get_sessions();
 
 foreach ($sessions as $k => $s) {
-	$tmp = $s->export_public();
+	$tmp = $s->export(FALSE, FALSE);
 	$tmp['current'] = ($current_session->get_id() === $s->get_id());
 	$resp['sessions'][] = $tmp;
 }

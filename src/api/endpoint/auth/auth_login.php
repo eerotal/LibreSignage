@@ -16,7 +16,8 @@
 *    * permanent   = Create permanent session. False by default.
 *
 *  Return value
-*    * session = A session data array.
+*    * user = Current user data.
+*    * session = Current session data.
 *    * error = An error code or API_E_OK on success.
 *
 *  <====
@@ -112,7 +113,8 @@ if ($user) {
 	);
 
 	$AUTH_LOGIN->resp_set(array(
-		'session' => $auth_data['session']->export_public(),
+		'user' => $user->export(FALSE, FALSE),
+		'session' => $auth_data['session']->export(FALSE, FALSE),
 		'error' => API_E_OK
 	));
 } else {

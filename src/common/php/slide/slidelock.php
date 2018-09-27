@@ -14,9 +14,6 @@ class SlideLock {
 	private $session_id = NULL;
 	private $expire = NULL;
 
-	public function get_session_id() { return $this->session_id; }
-	public function get_expire() { return $this->expire; }
-
 	public function __construct($session) {
 		if (!empty($session)) {
 			$this->session_id = $session->get_id();
@@ -47,10 +44,13 @@ class SlideLock {
 	}
 
 	public function is_expired() {
-		return empty($this->user) || time() > $this->expire;
+		return empty($this->session_id) || time() > $this->expire;
 	}
 
 	public function is_owned_by(Session $session) {
 		return $this->session_id === $session->get_id();
 	}
+
+	public function get_session_id() { return $this->session_id; }
+	public function get_expire() { return $this->expire; }
 }

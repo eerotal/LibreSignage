@@ -60,6 +60,7 @@ const SLIDE_REMOVE				= $("#btn-slide-remove");
 const SLIDE_CH_QUEUE			= $("#btn-slide-ch-queue");
 const SLIDE_DUP					= $("#btn-slide-dup");
 const SLIDE_CANT_EDIT			= $("#slide-cant-edit");
+const SLIDE_READONLY			= $("#slide-readonly");
 const SLIDE_EDIT_AS_COLLAB		= $("#slide-edit-as-collab");
 const SLIDE_NAME				= $("#slide-name");
 const SLIDE_NAME_GRP			= $("#slide-name-group");
@@ -153,7 +154,7 @@ const UI_DEFS = new uic.UIController({
 	),
 	'SLIDE_SAVE': new uic.UIButton(
 		elem = SLIDE_SAVE,
-		perm = (d) => { return d['o'] || d['c']; },
+		perm = (d) => { return d['l'] && (d['o'] || d['c']); },
 		enabler = null,
 		attach = {
 			'click': slide_save
@@ -163,7 +164,7 @@ const UI_DEFS = new uic.UIController({
 	'SLIDE_REMOVE': new uic.UIButton(
 		elem = SLIDE_REMOVE,
 		perm = (d) => {
-			return d['o'] && sel_slide.get('id') != null;
+			return d['l'] && d['o'] && sel_slide.get('id') != null;
 		},
 		enabler = null,
 		attach = {
@@ -173,7 +174,7 @@ const UI_DEFS = new uic.UIController({
 	),
 	'SLIDE_CH_QUEUE': new uic.UIButton (
 		elem = SLIDE_CH_QUEUE,
-		perm = (d) => { return d['o']; },
+		perm = (d) => { return d['l'] && d['o']; },
 		enabler = null,
 		attach = {
 			'click': slide_ch_queue
@@ -189,7 +190,7 @@ const UI_DEFS = new uic.UIController({
 		},
 		defer = defer_editor_ready
 	),
-	'SLIDE_CANT_EDIT': new uic.UIInput(
+	'SLIDE_CANT_EDIT': new uic.UIStatic(
 		elem = SLIDE_CANT_EDIT,
 		perm = (d) => { return !d['o'] && !d['c']; },
 		enabler = (elem, s) => {
@@ -197,29 +198,36 @@ const UI_DEFS = new uic.UIController({
 		},
 		attach = null,
 		defer = null,
-		mod = null,
 		getter = null,
-		setter = null,
-		clearer = null
+		setter = null
 	),
-	'SLIDE_EDIT_AS_COLLAB': new uic.UIInput(
+	'SLIDE_READONLY': new uic.UIStatic(
+		elem = SLIDE_READONLY,
+		perm = (d) => { return !d['l'] && (d['o'] || d['c']); },
+		enabler = (elem, s) => {
+			elem.css('display', s ? 'block': 'none');
+		},
+		attach = null,
+		defer = null,
+		getter = null,
+		setter = null
+	),
+	'SLIDE_EDIT_AS_COLLAB': new uic.UIStatic(
 		elem = SLIDE_EDIT_AS_COLLAB,
 		perm = (d) => {
-			return d['c'] && sel_slide != null;
+			return d['l'] && d['c'] && sel_slide != null;
 		},
 		enabler = (elem, s) => {
 			elem.css('display', s ? 'block': 'none');
 		},
 		attach = null,
 		defer = null,
-		mod = null,
 		getter = null,
-		setter = null,
-		clearer = null
+		setter = null
 	),
 	'SLIDE_NAME': new uic.UIInput(
 		elem = SLIDE_NAME,
-		perm = (d) => { return d['o'] || d['c']; },
+		perm = (d) => { return d['l'] && (d['o'] || d['c']); },
 		enabler = null,
 		attach = null,
 		defer = null,
@@ -247,7 +255,7 @@ const UI_DEFS = new uic.UIController({
 	),
 	'SLIDE_TIME': new uic.UIInput(
 		elem = SLIDE_TIME,
-		perm = (d) => { return d['o'] || d['c']; },
+		perm = (d) => { return d['l'] && (d['o'] || d['c']); },
 		enabler = null,
 		attach = null,
 		defer = null,
@@ -264,7 +272,7 @@ const UI_DEFS = new uic.UIController({
 	),
 	'SLIDE_INDEX': new uic.UIInput(
 		elem = SLIDE_INDEX,
-		perm = (d) => { return d['o'] || d['c']; },
+		perm = (d) => { return d['l'] && (d['o'] || d['c']); },
 		enabler = null,
 		attach = null,
 		defer = null,
@@ -282,7 +290,7 @@ const UI_DEFS = new uic.UIController({
 		elem = SLIDE_EN,
 		perm = (d) => {
 			if (!UI_DEFS.get('SLIDE_SCHED').get()) {
-				return d['o'] || d['c'];
+				return d['l'] && (d['o'] || d['c']);
 			} else {
 				return false;
 			}
@@ -301,7 +309,7 @@ const UI_DEFS = new uic.UIController({
 	),
 	'SLIDE_SCHED': new uic.UIInput(
 		elem = SLIDE_SCHED,
-		perm = (d) => { return d['o'] || d['c']; },
+		perm = (d) => { return d['l'] && (d['o'] || d['c']); },
 		enabler = null,
 		attach = null,
 		defer = null,
@@ -317,8 +325,11 @@ const UI_DEFS = new uic.UIController({
 	'SLIDE_SCHED_DATE_S': new uic.UIInput(
 		elem = SLIDE_SCHED_DATE_S,
 		perm = (d) => {
-			return UI_DEFS.get('SLIDE_SCHED').get()
-				&& (d['o'] || d['c']);
+			return (
+				UI_DEFS.get('SLIDE_SCHED').get()
+				&& d['l']
+				&& (d['o'] || d['c'])
+			);
 		},
 		enabler = null,
 		attach = null,
@@ -337,8 +348,11 @@ const UI_DEFS = new uic.UIController({
 	'SLIDE_SCHED_TIME_S': new uic.UIInput(
 		elem = SLIDE_SCHED_TIME_S,
 		perm = (d) => {
-			return UI_DEFS.get('SLIDE_SCHED').get()
-				&& (d['o'] || d['c']);
+			return (
+				UI_DEFS.get('SLIDE_SCHED').get()
+				&& d['l']
+				&& (d['o'] || d['c'])
+			);
 		},
 		enabler = null,
 		attach = null,
@@ -357,8 +371,11 @@ const UI_DEFS = new uic.UIController({
 	'SLIDE_SCHED_DATE_E': new uic.UIInput(
 		elem = SLIDE_SCHED_DATE_E,
 		perm = (d) => {
-			return UI_DEFS.get('SLIDE_SCHED').get()
-				&& (d['o'] || d['c']);
+			return (
+				UI_DEFS.get('SLIDE_SCHED').get()
+				&& d['l']
+				&& (d['o'] || d['c'])
+			);
 		},
 		enabler = null,
 		attach = null,
@@ -377,8 +394,11 @@ const UI_DEFS = new uic.UIController({
 	'SLIDE_SCHED_TIME_E': new uic.UIInput(
 		elem = SLIDE_SCHED_TIME_E,
 		perm = (d) => {
-			return UI_DEFS.get('SLIDE_SCHED').get()
-				&& (d['o'] || d['c']);
+			return (
+				UI_DEFS.get('SLIDE_SCHED').get()
+				&& d['l']
+				&& (d['o'] || d['c'])
+			);
 		},
 		enabler = null,
 		attach = null,
@@ -396,7 +416,7 @@ const UI_DEFS = new uic.UIController({
 	),
 	'SLIDE_ANIMATION': new uic.UIInput(
 		elem = SLIDE_ANIMATION,
-		perm = (d) => { return d['o'] || d['c']; },
+		perm = (d) => { return d['l'] && (d['o'] || d['c']); },
 		enabler = null,
 		attach = null,
 		defer = null,
@@ -412,7 +432,7 @@ const UI_DEFS = new uic.UIController({
 	),
 	'SLIDE_COLLAB': new uic.UIInput(
 		elem = () => { return SLIDE_COLLAB; },
-		perm = (d) => { return d['o']; },
+		perm = (d) => { return d['l'] && d['o']; },
 		enabler = (elem, s) => {
 			if (s) {
 				elem.enable();
@@ -436,7 +456,7 @@ const UI_DEFS = new uic.UIController({
 	),
 	'SLIDE_INPUT': new uic.UIInput(
 		elem = () => { return SLIDE_INPUT; },
-		perm = (d) => { return d['o'] || d['c']; },
+		perm = (d) => { return d['l'] && (d['o'] || d['c']); },
 		enabler = (elem, s) => { elem.setReadOnly(!s); },
 		attach = null,
 		defer = null,
@@ -602,12 +622,24 @@ function disable_controls() {
 function enable_controls() {
 	var o = (
 		!sel_slide.get('owner') // New slide.
-		|| sel_slide.get('owner') == API.CONFIG.user
+		|| sel_slide.get('owner') == API.CONFIG.user.user
 	);
 	var c = (
-		sel_slide.get('collaborators').includes(API.CONFIG.user)
+		sel_slide.get('collaborators').includes(API.CONFIG.user.user)
 	);
-	UI_DEFS.all(function(d) { this.state(d); }, {'o': o, 'c': c});
+	var l = sel_slide.is_locked_from_here();
+	console.log('locked: ' + l);
+
+	UI_DEFS.all(
+		function(d) {
+			this.state(d);
+		},
+		{
+			'o': o,
+			'c': c,
+			'l': l
+		}
+	);
 	name_sel.enable();
 	index_sel.disable();
 }
@@ -671,9 +703,9 @@ function slide_show(s, no_popup) {
 			disable_controls();
 			LIVE_PREVIEW.update();
 			sel_slide = null;
+			flag_slide_loading = false;
 		}
-		let success = (locked) => {
-			console.log('Slide locked: ' + locked);
+		let success = () => {
 			set_inputs(sel_slide);
 			enable_controls();
 			LIVE_PREVIEW.update();
@@ -683,25 +715,25 @@ function slide_show(s, no_popup) {
 
 		console.log(`LibreSignage: Show slide '${s}'.`);
 
-		// Release the current lock.
+		flag_slide_loading = true;
 		if (sel_slide) { sel_slide.lock_release(null); }
 
-		// Load the new slide.
+		// Load the new slide w/ lock
 		sel_slide = new slide.Slide(API);
-		flag_slide_loading = true;
-		sel_slide.load(s, true, true, lerr_1 => { // w/ lock
-			if (lerr_1 == API.ERR.API_E_LOCK) {
-				sel_slide.load(s, false, false, lerr_2 => { // w/o lock
-					if (lerr_2) {
+		sel_slide.load(s, true, true, err_1 => {
+			if (err_1 == API.ERR.API_E_LOCK) {
+				// or w/o lock
+				sel_slide.load(s, false, false, err_2 => {
+					if (err_2) {
 						error()
 					} else {
-						success(false);
+						success();
 					}
 				});
-			} else if (lerr_1){
+			} else if (err_1){
 				error();
 			} else {
-				success(true);
+				success();
 			}
 		});
 	}
@@ -709,13 +741,9 @@ function slide_show(s, no_popup) {
 	if (flag_slide_loading) { return; }
 	if (!no_popup && editor_status_check(['UNSAVED'])) {
 		diags.DIALOG_SLIDE_UNSAVED(
-			(status, val) => {
-				if (status) { cb(); }
-			}
+			(status, val) => { if (status) { cb(); } }
 		).show();
-	} else {
-		cb();
-	}
+	} else { cb(); }
 }
 
 function slide_hide() {
@@ -1067,9 +1095,9 @@ function update_qsel_ctrls(ready) {
 	// Update queue selector controls.
 	QSEL_UI_DEFS.all(
 		function() {
-			this.state(
-				{'o': TL.queue && (TL.queue.owner == API.CONFIG.user)}
-			);
+			this.state({
+				'o': TL.queue && (TL.queue.owner == API.CONFIG.user.user)
+			});
 		},
 		null,
 		'button'
@@ -1151,7 +1179,7 @@ function inputs_setup(ready) {
 				"This user doesn't exist."
 			),
 			new val.BlacklistValidator(
-				{ bl: [API.CONFIG.user] },
+				{ bl: [API.CONFIG.user.user] },
 				"You can't add yourself " +
 				"as a collaborator."
 			)],

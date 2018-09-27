@@ -1,0 +1,1816 @@
+node_modules/ls-uicontrol/uicontrol.js:22:		*  - 'func' is the function to execute. Note that 'func'
+node_modules/ls-uicontrol/uicontrol.js:26:		*  - 'data' is passed as the first argument to 'func'.
+node_modules/ls-uicontrol/uicontrol.js:27:		*  - 'type' can be used to filter the elements to execute
+node_modules/ls-uicontrol/uicontrol.js:53:	*    - elem    = The element to attach to.
+node_modules/ls-uicontrol/uicontrol.js:54:	*    - perm    = The permission checking function. This should
+node_modules/ls-uicontrol/uicontrol.js:57:	*    - enabler = The enabler function. This function is called with
+node_modules/ls-uicontrol/uicontrol.js:60:	*    - attach  = A dictionary of event listeners. The keys are
+node_modules/ls-uicontrol/uicontrol.js:62:	*    - defer   = If this function returns true when an event is
+node_modules/ls-uicontrol/package.json:2:  "name": "ls-uicontrol",
+node_modules/ls-util/util.js:40:	$('[data-toggle="tooltip"]').tooltip({
+node_modules/ls-util/util.js:64:	d = date.split('-');
+node_modules/ls-util/util.js:72:		d[0], '0' + (parseInt(d[1]) - 1).toString(), d[2],
+node_modules/ls-util/util.js:111:	ret[0] = y + '-' + m + '-' + d;
+node_modules/ls-util/package.json:2:  "name": "ls-util",
+node_modules/ls-markup/evaluator.js:9:	if (arg.match(/^[0-9]+\%$/)) {
+node_modules/ls-markup/evaluator.js:11:	} else if (arg.match(/^[0-9]*$/)) {
+node_modules/ls-markup/lexer.js:26:	*    { '-2': 'TOKEN_NAME_1', '-1': 'TOKEN_NAME_2'}, // Case 1
+node_modules/ls-markup/lexer.js:27:	*    {'-1': 'TOKEN_NAME_2'}, // Case 2
+node_modules/ls-markup/lexer.js:33:	*  lexeme corresponding to tok, -1 is the previous one
+node_modules/ls-markup/lexer.js:52:	if (!tok.context) { return -1; }
+node_modules/ls-markup/lexer.js:67:				// Match index OOB but matching inverted -> continue.
+node_modules/ls-markup/lexer.js:71:				// Match index OOB -> break.
+node_modules/ls-markup/lexer.js:100:	*  ret array is passed to the post-processing function
+node_modules/ls-markup/parser.js:257:					// Optional subrule didn't match -> continue to next.
+node_modules/ls-markup/parser.js:266:				if (i > lexemes.length - 1) {
+node_modules/ls-markup/parser.js:270:						*  Optional rule -> continue to the next one.
+node_modules/ls-markup/parser.js:280:						*  Optional parent rule -> return without
+node_modules/ls-markup/parser.js:287:							lexemes[lexemes.length - 1],
+node_modules/ls-markup/parser.js:302:					*  specific count didn't match -> continue
+node_modules/ls-markup/parser.js:309:					*  unmatched rule isn't -> Return without
+node_modules/ls-markup/parser.js:315:					*  Required token doesn't match -> throw
+node_modules/ls-markup/parser.js:358:			lexemes[lexemes.length - 1],
+node_modules/ls-markup/eval_defs.js:34:*    - has:    A dictionary of required arguments. The arguments
+node_modules/ls-markup/eval_defs.js:35:*              are defined as key-value pairs where the key is the
+node_modules/ls-markup/eval_defs.js:38:*    - handle: A function for generating the output corresponding
+node_modules/ls-markup/eval_defs.js:57:				`<h1 style="font-size: ${s};">`,
+node_modules/ls-markup/eval_defs.js:75:				'<span style="font-weight: bold;">',
+node_modules/ls-markup/eval_defs.js:84:				'<span style="font-style: italic;">',
+node_modules/ls-markup/eval_defs.js:115:				`<span style="font-size: ${s}">`,
+node_modules/ls-markup/eval_defs.js:151:				`<div style="margin-left: auto;
+node_modules/ls-markup/eval_defs.js:152:							margin-right: auto;
+node_modules/ls-markup/eval_defs.js:153:							text-align: center;
+node_modules/ls-markup/eval_defs.js:165:						flex-direction: row;
+node_modules/ls-markup/eval_defs.js:177:				`<div style="text-align: ${arg.type};">`,
+node_modules/ls-markup/lexer_defs.js:15:		context: [ { '-1': '!BACKWARD_SLASH' } ]
+node_modules/ls-markup/lexer_defs.js:20:		context: [ { '-1': '!BACKWARD_SLASH' } ]
+node_modules/ls-markup/lexer_defs.js:25:		context: [ { '-1': '!BACKWARD_SLASH' } ]
+node_modules/ls-markup/lexer_defs.js:30:		context: [ { '-1': '!BACKWARD_SLASH' } ]
+node_modules/ls-markup/lexer_defs.js:36:			{ '-1': 'LITERAL' },
+node_modules/ls-markup/lexer_defs.js:37:			{ '-2': 'LITERAL', '-1': 'WHITESPACE' }
+node_modules/ls-markup/lexer_defs.js:49:	// Post-processor created tokens.
+node_modules/ls-markup/lexer_defs.js:65:*  the post-processor function modifies and
+node_modules/ls-markup/lexer_defs.js:68:*  type are passed to the post-processor function
+node_modules/ls-markup/lexer_defs.js:87:						ret.length - 1 >= i + 1
+node_modules/ls-markup/lexer_defs.js:92:						ret.length - 1 >= i + 2
+node_modules/ls-markup/lexer_defs.js:112:							ret.length - 1 >= i + 1
+node_modules/ls-markup/lexer_defs.js:116:							ret.length - 1 >= i + 2
+node_modules/ls-markup/error.js:46:	*  'message' is a human-readable error message.
+node_modules/ls-markup/package.json:2:  "name": "ls-markup",
+node_modules/ls-markup/lexer_post.js:2:*  Lexer post-processor functionality for the LibreSignage
+node_modules/ls-markup/lexer_post.js:11:	*  Main lexer post-processing function.
+node_modules/ls-markup/lexer_post.js:14:	*  the post-processing functions defined in ldefs.post.
+node_modules/ls-markup/lexer_post.js:15:	*  Each post-processing function is used called separately
+node_modules/ls-markup/lexer_post.js:17:	*  contains a couple of generic post-processing functions
+node_modules/ls-cookie/package.json:2:  "name": "ls-cookie",
+node_modules/ls-slidelist/slidelist.js:41:		var n_d = -1, d = -1, n_i = 0;
+node_modules/ls-slidelist/slidelist.js:45:			n_d = this.slides[k].get('index') - index;
+node_modules/ls-slidelist/slidelist.js:46:			if (n_d > 0 && (n_d < d || d == -1)) {
+node_modules/ls-slidelist/slidelist.js:50:		if (d == -1 && wrap) {
+node_modules/ls-slidelist/slidelist.js:51:			return this.next(-1, false);
+node_modules/ls-slidelist/package.json:2:  "name": "ls-slidelist",
+node_modules/ls-assert/package.json:2:  "name": "ls-assert",
+node_modules/ls-validator/validator.js:23:		*    'invalid-feedback' along with the actual input element.
+node_modules/ls-validator/validator.js:86:			this.style.find('.invalid-feedback').html(msg);
+node_modules/ls-validator/validator.js:95:					this.query.addClass('is-invalid');
+node_modules/ls-validator/validator.js:97:					this.query.removeClass('is-invalid');
+node_modules/ls-validator/validator.js:209:			if (keys.indexOf(proto[i]) == -1) {
+node_modules/ls-validator/validator.js:246:				if ($(this).val().indexOf('.') != -1) {
+node_modules/ls-validator/package.json:2:  "name": "ls-validator",
+node_modules/ls-queue/queue.js:8:var slide = require('ls-slide');
+node_modules/ls-queue/queue.js:9:var slidelist = require('ls-slidelist');
+node_modules/ls-queue/queue.js:59:						if (--cnt == 0 && ready) {
+node_modules/ls-queue/package.json:2:  "name": "ls-queue",
+node_modules/ls-slide/slide.js:6:var assert = require('ls-assert');
+node_modules/ls-slide/slide.js:17:		hide: 'swipe-left',
+node_modules/ls-slide/slide.js:18:		show: 'swipe-from-right'
+node_modules/ls-slide/slide.js:21:		hide: 'swipe-right',
+node_modules/ls-slide/slide.js:22:		show: 'swipe-from-left'
+node_modules/ls-slide/slide.js:25:		hide: 'swipe-up',
+node_modules/ls-slide/slide.js:26:		show: 'swipe-from-below'
+node_modules/ls-slide/slide.js:29:		hide: 'swipe-down',
+node_modules/ls-slide/slide.js:30:		show: 'swipe-from-above'
+node_modules/ls-slide/slide.js:129:						- SLIDE_LOCK_RENEWAL_HEADROOM
+node_modules/ls-slide/slide.js:130:						- Date.now()/1000;
+node_modules/ls-slide/#slide.js#:6:var assert = require('ls-assert');
+node_modules/ls-slide/#slide.js#:17:		hide: 'swipe-left',
+node_modules/ls-slide/#slide.js#:18:		show: 'swipe-from-right'
+node_modules/ls-slide/#slide.js#:21:		hide: 'swipe-right',
+node_modules/ls-slide/#slide.js#:22:		show: 'swipe-from-left'
+node_modules/ls-slide/#slide.js#:25:		hide: 'swipe-up',
+node_modules/ls-slide/#slide.js#:26:		show: 'swipe-from-below'
+node_modules/ls-slide/#slide.js#:29:		hide: 'swipe-down',
+node_modules/ls-slide/#slide.js#:30:		show: 'swipe-from-above'
+node_modules/ls-slide/#slide.js#:128:						- SLIDE_LOCK_RENEWAL_HEADROOM
+node_modules/ls-slide/#slide.js#:129:						- Date.now()/1000;
+node_modules/ls-slide/package.json:2:  "name": "ls-slide",
+node_modules/ls-shortcut/shortcut.js:6:var util = require('ls-util');
+node_modules/ls-shortcut/package.json:2:  "name": "ls-shortcut",
+node_modules/ls-user/package.json:2:  "name": "ls-user",
+node_modules/ls-multiselect/multiselect.js:6:var val = require('ls-validator');
+node_modules/ls-multiselect/multiselect.js:7:var dialog = require('ls-dialog');
+node_modules/ls-multiselect/multiselect.js:10:	<div id="${id}" class="multiselect container-fluid">
+node_modules/ls-multiselect/multiselect.js:11:		<div class="ms-controls container-fluid">
+node_modules/ls-multiselect/multiselect.js:12:			<input class="ms-input col form-control" type="text">
+node_modules/ls-multiselect/multiselect.js:13:			<button class="ms-add col btn btn-primary" type="button">
+node_modules/ls-multiselect/multiselect.js:14:				<i class="fas fa-plus-circle"></i>
+node_modules/ls-multiselect/multiselect.js:16:			<div class="invalid-feedback"></div>
+node_modules/ls-multiselect/multiselect.js:18:		<div class="ms-values container-fluid"></div>
+node_modules/ls-multiselect/multiselect.js:40:		this.input = $(`#${id} > .ms-controls > .ms-input`);
+node_modules/ls-multiselect/multiselect.js:41:		this.btn_add = $(`#${id} > .ms-controls > .ms-add`);
+node_modules/ls-multiselect/multiselect.js:42:		this.values = $(`#${id} > .ms-values`);
+node_modules/ls-multiselect/multiselect.js:114:			'id': `ms-opt-${option}`,
+node_modules/ls-multiselect/multiselect.js:115:			'class': 'ms-val',
+node_modules/ls-multiselect/multiselect.js:119:			'class': 'ms-rm fas fa-times'
+node_modules/ls-multiselect/multiselect.js:149:		$(`#ms-opt-${option}`).remove();
+node_modules/ls-multiselect/multiselect.js:164:		this.values.css('background-color', 'white');
+node_modules/ls-multiselect/multiselect.js:166:		this.root.find('.ms-rm').css('display', 'inline');
+node_modules/ls-multiselect/multiselect.js:178:		this.values.css('background-color', 'var(--gray-3)');
+node_modules/ls-multiselect/multiselect.js:181:		this.root.find('.ms-rm').css('display', 'none');
+node_modules/ls-multiselect/package.json:2:  "name": "ls-multiselect",
+node_modules/ls-dialog/dialog.js:2:var val = require('ls-validator');
+node_modules/ls-dialog/dialog.js:14:			<div id="dialog-overlay" style="display: none;">
+node_modules/ls-dialog/dialog.js:15:				<div id="dialog" class="container alert alert-info">
+node_modules/ls-dialog/dialog.js:16:					<h3 id="dialog-header" class="display-5"></h3>
+node_modules/ls-dialog/dialog.js:17:					<p id="dialog-text">
+node_modules/ls-dialog/dialog.js:18:					<div id="dialog-interaction"
+node_modules/ls-dialog/dialog.js:19:							class="d-flex flex-row-reverse w-100 mt-3">
+node_modules/ls-dialog/dialog.js:42:		$("body #dialog-overlay").remove();
+node_modules/ls-dialog/dialog.js:63:				class: 'btn btn-primary btn-dialog',
+node_modules/ls-dialog/dialog.js:64:				id: 'dialog-btn-ok',
+node_modules/ls-dialog/dialog.js:79:		$("body #dialog-interaction").append(ok);
+node_modules/ls-dialog/dialog.js:86:				class: 'btn btn-primary btn-dialog',
+node_modules/ls-dialog/dialog.js:87:				id: 'dialog-btn-ok',
+node_modules/ls-dialog/dialog.js:105:				class: 'btn btn-primary btn-dialog',
+node_modules/ls-dialog/dialog.js:106:				id: 'dialog-btn-cancel',
+node_modules/ls-dialog/dialog.js:121:		$("body #dialog-interaction").append(cancel);
+node_modules/ls-dialog/dialog.js:122:		$("body #dialog-interaction").append(ok);
+node_modules/ls-dialog/dialog.js:128:			'<div>', { id: 'dialog-input-grp' }
+node_modules/ls-dialog/dialog.js:132:				class: 'form-control mb-2',
+node_modules/ls-dialog/dialog.js:133:				id: 'dialog-input'
+node_modules/ls-dialog/dialog.js:137:			'<div>', { class: 'invalid-feedback my-0' }
+node_modules/ls-dialog/dialog.js:142:				class: 'btn btn-primary btn-dialog',
+node_modules/ls-dialog/dialog.js:143:				id: 'dialog-btn-ok',
+node_modules/ls-dialog/dialog.js:154:					$("body #dialog-input").val()
+node_modules/ls-dialog/dialog.js:161:				class: 'btn btn-primary btn-dialog',
+node_modules/ls-dialog/dialog.js:162:				id: 'dialog-btn-cancel',
+node_modules/ls-dialog/dialog.js:178:		$("body #dialog-interaction").before(input_grp);
+node_modules/ls-dialog/dialog.js:179:		$("body #dialog-interaction").append(cancel);
+node_modules/ls-dialog/dialog.js:180:		$("body #dialog-interaction").append(ok);
+node_modules/ls-dialog/dialog.js:186:					$('#dialog-input'),
+node_modules/ls-dialog/dialog.js:187:					$('#dialog-input-grp'),
+node_modules/ls-dialog/dialog.js:191:					$('#dialog-btn-ok').prop(
+node_modules/ls-dialog/dialog.js:205:				class: 'form-control mb-2',
+node_modules/ls-dialog/dialog.js:206:				id: 'dialog-select'
+node_modules/ls-dialog/dialog.js:224:				class: 'btn btn-primary btn-dialog',
+node_modules/ls-dialog/dialog.js:225:				id: 'dialog-btn-ok',
+node_modules/ls-dialog/dialog.js:236:					$("body #dialog-select").val()
+node_modules/ls-dialog/dialog.js:243:				class: 'btn btn-primary btn-dialog',
+node_modules/ls-dialog/dialog.js:244:				id: 'dialog-btn-cancel',
+node_modules/ls-dialog/dialog.js:260:		$("body #dialog-interaction").before(select);
+node_modules/ls-dialog/dialog.js:261:		$("body #dialog-interaction").append(cancel);
+node_modules/ls-dialog/dialog.js:262:		$("body #dialog-interaction").append(ok);
+node_modules/ls-dialog/dialog.js:282:		$("body #dialog-header").text(this.header);
+node_modules/ls-dialog/dialog.js:283:		$("body #dialog-text").text(this.text);
+node_modules/ls-dialog/dialog.js:318:			$("body #dialog-overlay").show();
+node_modules/ls-dialog/dialog.js:324:			$("body #dialog-btn-ok").focus();
+node_modules/ls-dialog/package.json:2:  "name": "ls-dialog",
+node_modules/ls-api/api.js:4:*  require('libresignage-api'). The functions defined in this
+node_modules/ls-api/api.js:9:var util = require('ls-util');
+node_modules/ls-api/api.js:10:var cookie = require('ls-cookie');
+node_modules/ls-api/api.js:11:var dialog = require('ls-dialog');
+node_modules/ls-api/api.js:31:			// -- User management API endpoints --
+node_modules/ls-api/api.js:73:			// -- Slide API endpoints --
+node_modules/ls-api/api.js:115:			// -- Queue API endpoints --
+node_modules/ls-api/api.js:137:			// -- Authentication API endpoints --
+node_modules/ls-api/api.js:164:			// -- General information API endpoints --
+node_modules/ls-api/api.js:278:					'application/x-www-form-urlencoded';
+node_modules/ls-api/api.js:289:				'Auth-Token': cookie.get_cookie('session_token')
+node_modules/ls-api/api.js:455:		var left = created + max_age - Date.now()/1000;
+node_modules/ls-api/api.js:456:		var t = left - this.SESSION_RENEWAL_HEADROOM;
+node_modules/ls-api/api.js:561:				who: "LibreSignage-Web-Interface"
+node_modules/ls-api/package.json:2:  "name": "ls-api",
+doc/js/main.js:2:var api = require('ls-api');
+doc/css/_content.scss:5:	text-align: center;
+doc/css/_content.scss:6:	margin-bottom: 50px;
+doc/css/_content.scss:9:.doc-row {
+doc/css/_content.scss:17:	text-align: justify;
+doc/css/_content.scss:47:	border-bottom: 2px solid $gray-2;
+doc/css/_content.scss:50:tr:nth-child(even) {
+doc/css/_content.scss:51:	background-color: $gray-3;
+doc/rst/keyboard_shortcut_cheatsheet.rst:2:----------------------------
+doc/rst/input_validator.rst:12:------------------------
+doc/rst/input_validator.rst:37:``is-invalid`` class to the elements selected by ``style``. It also
+doc/rst/input_validator.rst:39:``invalid-feedback`` that are children of the elements selected by
+doc/rst/input_validator.rst:40:``style``. The used CSS classes are defined by the Bootstrap front-end
+doc/rst/input_validator.rst:98:  ``invalid-feedback`` that are children of the elements selected by
+doc/rst/input_validator.rst:145:---------------------
+doc/rst/control_panel.rst:10:-----
+doc/rst/limits.rst:10:Hard server limits are server-wide limits for all users including admins.
+doc/rst/index.rst:6:-------
+doc/rst/index.rst:13:-------------
+doc/rst/index.rst:28:-------------
+doc/rst/index.rst:35:-----------
+doc/rst/index.rst:48:--------
+doc/rst/markup.rst:11:----------------------
+doc/rst/markup.rst:41:------------------
+doc/rst/markup.rst:51:--------------
+doc/rst/markup.rst:159:--------
+doc/rst/markup.rst:185:          [h size=12%]Multi-column example[/h]
+doc/rst/markup.rst:202:              [p]Containers [b]outside[/b] a [i]columns[/i] class are normal full-width
+doc/rst/markup.rst:208:.. _`CSS color name`: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#Color_keywords
+doc/rst/about.rst:2:LibreSignage - An Open Source Digital Signage Solution
+doc/rst/about.rst:5:LibreSignage is a free and open source, lightweight and easy-to-use
+doc/rst/about.rst:21:interface are from the Font-Awesome_ project. These libraries and other
+doc/rst/about.rst:26:LibreSignage is licensed under the permissive BSD 3-clause license,
+doc/rst/about.rst:36:.. _Font-Awesome: https://fontawesome.com/
+doc/rst/user_manager.rst:10:-------------
+doc/rst/user_manager.rst:20:(A-Z, a-z, 0-9) and the dash (-) and underscore (_) chacraters. Spaces are also
+doc/rst/user_manager.rst:26:------------------
+doc/rst/display_setup.rst:29:-----
+doc/rst/display_setup.rst:35:the ``-nocursor`` option. This makes the cursor permanently hidden.
+doc/rst/display_setup.rst:47:``unclutter -idle 0.01 -root &``
+doc/rst/display_setup.rst:50:-------
+doc/rst/display_setup.rst:57:-------
+doc/rst/editor.rst:15:------------
+doc/rst/editor.rst:29:---------------------------
+doc/rst/editor.rst:50:**Name** - The *Name* field is used for a display slide name in the
+doc/rst/editor.rst:52:field only accepts alphanumeric characters (A-Z, a-z, 0-9) and the dash
+doc/rst/editor.rst:53:(-) and underscore (_) characters. The maximum length of the name is set
+doc/rst/editor.rst:57:**Owner (read-only)** - The owner of the slide.
+doc/rst/editor.rst:59:**Collaborators** - A list of slide collaborators. This selector can
+doc/rst/editor.rst:63:**Time** - The *Time* selector controls how long the slide is shown in
+doc/rst/editor.rst:66:**Index** - The index value controls the order of the slides in the
+doc/rst/editor.rst:69:0-65536 by default.
+doc/rst/editor.rst:71:**Animation** - Select a transition animation for the slide. If no
+doc/rst/editor.rst:77:**Slide scheduling** - Selecting this checkbox enables a feature
+doc/rst/editor.rst:79:a specific time-frame when the slide should be enabled. The server
+doc/rst/editor.rst:85:**Enabled** - Select whether the slide is enabled or not. The slide
+doc/rst/editor.rst:93:**Markup** - The markup field contains the actual slide content.
+doc/rst/editor.rst:100:------------
+doc/rst/editor.rst:111:------------------
+doc/rst/APIEndpoint.rst:30:``APIEndpoint::MEHOD`` - *Required*
+doc/rst/APIEndpoint.rst:36:``APIEndpoint::RESPONSE_TYPE`` - *Required*
+doc/rst/APIEndpoint.rst:44:``APIEndpoint::FORMAT`` - *Optional* - Default: array()
+doc/rst/APIEndpoint.rst:83:``APIEndpoint::STRICT_FORMAT`` - *Optional* - Default: TRUE
+doc/rst/APIEndpoint.rst:90:``APIEndpoint::REQ_QUOTA`` - *Optional* - Default: TRUE
+doc/rst/APIEndpoint.rst:97:``APIEndpoint::REQ_AUTH`` - *Optional* - Default: TRUE
+doc/rst/APIEndpoint.rst:103:  be passed to successive API endpoints in the 'Auth-Token'
+doc/rst/APIEndpoint.rst:111:--------------
+doc/rst/APIEndpoint.rst:138:the authentication status of the caller. If the 'Auth-Token'
+doc/rst/APIEndpoint.rst:153:------------------------------
+doc/rst/APIEndpoint.rst:176:-------------------------------------
+doc/rst/LICENSES_EXT.rst:7:---------
+doc/rst/LICENSES_EXT.rst:11:Copyright (c) 2011-2016 Twitter, Inc.
+doc/rst/LICENSES_EXT.rst:33:------
+doc/rst/LICENSES_EXT.rst:74:---------
+doc/rst/LICENSES_EXT.rst:101:---
+doc/rst/LICENSES_EXT.rst:130:-------
+doc/rst/LICENSES_EXT.rst:141:-----------------------------------------------------------
+doc/rst/LICENSES_EXT.rst:142:SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+doc/rst/LICENSES_EXT.rst:143:-----------------------------------------------------------
+doc/rst/LICENSES_EXT.rst:173:or substituting -- in part or in whole -- any of the components of the
+doc/rst/LICENSES_EXT.rst:192:included either as stand-alone text files, human-readable headers or
+doc/rst/LICENSES_EXT.rst:193:in the appropriate machine-readable metadata fields within text or
+doc/rst/LICENSES_EXT.rst:230:----------
+doc/rst/LICENSES_EXT.rst:239:-----------------------------------------------------------
+doc/rst/LICENSES_EXT.rst:240:SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+doc/rst/LICENSES_EXT.rst:241:-----------------------------------------------------------
+doc/rst/LICENSES_EXT.rst:271:or substituting -- in part or in whole -- any of the components of the
+doc/rst/LICENSES_EXT.rst:290:included either as stand-alone text files, human-readable headers or
+doc/rst/LICENSES_EXT.rst:291:in the appropriate machine-readable metadata fields within text or
+doc/rst/LICENSES_EXT.rst:328:-----------
+doc/rst/LICENSES_EXT.rst:337:-----------------------------------------------------------
+doc/rst/LICENSES_EXT.rst:338:SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+doc/rst/LICENSES_EXT.rst:339:-----------------------------------------------------------
+doc/rst/LICENSES_EXT.rst:369:or substituting -- in part or in whole -- any of the components of the
+doc/rst/LICENSES_EXT.rst:388:included either as stand-alone text files, human-readable headers or
+doc/rst/LICENSES_EXT.rst:389:in the appropriate machine-readable metadata fields within text or
+doc/rst/LICENSES_EXT.rst:426:-------------------------
+doc/rst/LICENSES_EXT.rst:441:In the Font Awesome Free download, the MIT license applies to all non-font and
+doc/rst/LICENSES_EXT.rst:442:non-icon files.
+doc/index.php:49:		<meta charset="utf-8">
+doc/index.php:50:		<meta name="viewport" content="width=device-width, initial-scale=1">
+doc/index.php:55:		<main class="container-fluid h-100">
+doc/index.php:56:			<div class="row doc-row">
+doc/index.php:63:			<div class="row doc-row">
+control/usermgr/js/main.js:2:var api = require('ls-api');
+control/usermgr/js/main.js:3:var user = require('ls-user');
+control/usermgr/js/main.js:4:var uic = require('ls-uicontrol');
+control/usermgr/js/main.js:5:var dialog = require('ls-dialog');
+control/usermgr/js/main.js:6:var multiselect = require('ls-multiselect');
+control/usermgr/js/main.js:7:var val = require('ls-validator');
+control/usermgr/js/main.js:13:const USER_NAME_QUERY = (name) => `#usr-name-input-${name}`;
+control/usermgr/js/main.js:14:const USER_GROUPS_QUERY = (name) => `#usr-groups-input-${name}`;
+control/usermgr/js/main.js:15:const USER_SAVE_QUERY = (name) => `#btn-user-${name}-save`;
+control/usermgr/js/main.js:16:const USER_REMOVE_QUERY = (name) => `#btn-user-${name}-remove`;
+control/usermgr/js/main.js:18:const USER_CREATE = $('#btn-create-user');
+control/usermgr/js/main.js:19:const USERS_TABLE = $('#users-table');
+control/usermgr/js/main.js:60:	<div class="row usr-table-row" id="usr-row-${name}">
+control/usermgr/js/main.js:61:		<div id="usr-name-col-${name}" class="usr-table-col col">
+control/usermgr/js/main.js:64:		<div id="usr-groups-col-${name}" class="usr-table-col col">
+control/usermgr/js/main.js:67:		<div id="usr-comment-col-${name}" class="usr-table-col col">
+control/usermgr/js/main.js:70:		<div class="usr-table-col col-auto">
+control/usermgr/js/main.js:73:				class="btn btn-success small-btn usr-edit-btn"
+control/usermgr/js/main.js:74:				id="btn-user-${name}-save">
+control/usermgr/js/main.js:75:				<i class="fas fa-save"></i>
+control/usermgr/js/main.js:79:				class="btn btn-danger small-btn usr-edit-btn"
+control/usermgr/js/main.js:80:				id="btn-user-${name}-remove">
+control/usermgr/js/main.js:81:				<i class="fas fa-trash-alt"></i>
+control/usermgr/js/main.js:85:				class="btn btn-primary small-btn usr-edit-btn"
+control/usermgr/js/main.js:86:				data-toggle="collapse"
+control/usermgr/js/main.js:87:				data-target="#usr-edit-${name}"
+control/usermgr/js/main.js:88:				aria-expanded="false"
+control/usermgr/js/main.js:89:				aria-controls="usr-collapse-${name}">
+control/usermgr/js/main.js:90:				<i class="fas fa-edit"></i>
+control/usermgr/js/main.js:94:	<div class="collapse usr-edit-row" id="usr-edit-${name}">
+control/usermgr/js/main.js:95:		<div class="usr-edit-row-container">
+control/usermgr/js/main.js:96:			<div class="row usr-edit-input-row">
+control/usermgr/js/main.js:97:				<label class="usr-data-label col-auto col-form-label""
+control/usermgr/js/main.js:98:					for="usr-name-input-${name}">
+control/usermgr/js/main.js:101:				<div class="col px-1">
+control/usermgr/js/main.js:102:					<input id="usr-name-input-${name}"
+control/usermgr/js/main.js:104:						class="form-control"
+control/usermgr/js/main.js:109:			<div class="row usr-edit-input-row">
+control/usermgr/js/main.js:110:				<label class="usr-data-label col-auto col-form-label""
+control/usermgr/js/main.js:111:						for="usr-groups-input-${name}">
+control/usermgr/js/main.js:114:				<div id="usr-groups-input-${name}-cont"
+control/usermgr/js/main.js:115:						class="col px-1">
+control/usermgr/js/main.js:118:			<div class="row usr-edit-input-row">
+control/usermgr/js/main.js:119:				<label class="usr-data-label col-auto col-form-label"
+control/usermgr/js/main.js:120:						for="usr-comment-label-${name}">
+control/usermgr/js/main.js:123:				<div id="usr-comment-label-${name}"
+control/usermgr/js/main.js:124:					class="col px-1 text-left my-auto">
+control/usermgr/js/main.js:247:			regex: /^[A-Za-z0-9_]*$/
+control/usermgr/js/main.js:310:					`usr-groups-input-${name}-cont`,
+control/usermgr/js/main.js:311:					`usr-groups-input-${name}`,
+control/usermgr/js/main.js:320:						regex: /^[A-Za-z0-9_]*$/
+control/usermgr/css/usermgr.scss:7:$table-line-height: 50px;
+control/usermgr/css/usermgr.scss:8:$data-label-mw: 90px;
+control/usermgr/css/usermgr.scss:10:#user-manager-heading {
+control/usermgr/css/usermgr.scss:17:.usr-table-row {
+control/usermgr/css/usermgr.scss:21:	background-color: $white;
+control/usermgr/css/usermgr.scss:22:	border-bottom: 1px solid $gray-1;
+control/usermgr/css/usermgr.scss:25:.usr-table-col {
+control/usermgr/css/usermgr.scss:27:	height: $table-line-height;
+control/usermgr/css/usermgr.scss:28:	line-height: $table-line-height;
+control/usermgr/css/usermgr.scss:30:	white-space: nowrap;
+control/usermgr/css/usermgr.scss:31:	text-overflow: ellipsis;
+control/usermgr/css/usermgr.scss:34:.usr-data-label {
+control/usermgr/css/usermgr.scss:35:	min-width: $data-label-mw;
+control/usermgr/css/usermgr.scss:40:	text-align: right;
+control/usermgr/css/usermgr.scss:43:.usr-edit-row-container {
+control/usermgr/css/usermgr.scss:45:	@include media-breakpoint-down(md) { width: 85%; }
+control/usermgr/css/usermgr.scss:54:.usr-edit-input-row {
+control/usermgr/css/usermgr.scss:61:.usr-edit-btn {
+control/usermgr/css/usermgr.scss:73:@include media-breakpoint-down(md) {
+control/usermgr/css/usermgr.scss:74:	div[id^="usr-comment-col-"], #heading-usr-comment {
+control/usermgr/css/usermgr.scss:79:@include media-breakpoint-down(sm) {
+control/usermgr/css/usermgr.scss:80:	div[id^="usr-groups-col-"], #heading-usr-groups {
+control/usermgr/index.php:10:		<meta charset="utf-8">
+control/usermgr/index.php:11:		<meta name="viewport" content="width=device-width, initial-scale=1">
+control/usermgr/index.php:13:			require_css(['font-awesome']);
+control/usermgr/index.php:22:		<main class="container-fluid">
+control/usermgr/index.php:23:			<div class="container text-center">
+control/usermgr/index.php:24:				<div class="container-fluid">
+control/usermgr/index.php:25:					<div class="row usr-table-row">
+control/usermgr/index.php:26:						<div class="usr-table-col col">
+control/usermgr/index.php:29:						<div class="usr-table-col col"
+control/usermgr/index.php:30:							id="heading-usr-groups">
+control/usermgr/index.php:33:						<div id="heading-usr-comment"
+control/usermgr/index.php:34:							class="usr-table-col col">
+control/usermgr/index.php:38:						<!-- Adjust table spacing. -->
+control/usermgr/index.php:39:						<div class="usr-table-col col-auto invisible">
+control/usermgr/index.php:40:							<div class="btn btn-primary usr-edit-btn small-btn">
+control/usermgr/index.php:41:								<i class="fas fa-save"></i>
+control/usermgr/index.php:43:							<div class="btn btn-primary usr-edit-btn small-btn">
+control/usermgr/index.php:44:								<i class="fas fa-trash-alt"></i>
+control/usermgr/index.php:46:							<div class="btn btn-primary usr-edit-btn small-btn">
+control/usermgr/index.php:47:								<i class="fas fa-edit"></i>
+control/usermgr/index.php:52:				<div id="users-table" class="container-fluid">
+control/usermgr/index.php:54:				<div class="container-fluid">
+control/usermgr/index.php:55:					<div class="usr-table-row">
+control/usermgr/index.php:56:						<div class="usr-table-col">
+control/usermgr/index.php:58:								id="btn-create-user"
+control/usermgr/index.php:60:								class="btn btn-primary"
+control/js/main.js:2:var api = require('ls-api');
+control/js/main.js:5:const QUOTA_CONTAINER = $("#user-quota-cont");
+control/js/main.js:10:	<div class="row quota-bar">
+control/js/main.js:11:		<div class="p-0 pr-2 m-0 col-2 text-right">
+control/js/main.js:14:		<div class="col-10 progress quota-bar">
+control/js/main.js:15:			<div class="progress-bar bg-success
+control/js/main.js:16:					progress-bar-striped"
+control/js/main.js:18:				aria-valuenow="${val}"
+control/js/main.js:20:				aria-valuemin="${min}"
+control/js/main.js:21:				aria-valuemax="${max}">
+control/editor/js/preview.js:6:var markup = require('ls-markup');
+control/editor/js/preview.js:7:var util = require('ls-util');
+control/editor/js/preview.js:10:	{ charset: 'utf-8' },
+control/editor/js/preview.js:11:	{ name: 'viewport', content: 'width=device-width, initial-scale=1' }
+control/editor/js/preview.js:97:			'preview-16x9 preview-4x3 preview-16x9-fit preview-4x3-fit'
+control/editor/js/preview.js:100:			this.container.addClass('preview-4x3');
+control/editor/js/preview.js:103:			this.container.addClass('preview-16x9');
+control/editor/js/preview.js:105:		} else if (r == '4x3-fit') {
+control/editor/js/preview.js:106:			this.container.addClass('preview-4x3-fit');
+control/editor/js/preview.js:108:		} else if (r == '16x9-fit') {
+control/editor/js/preview.js:109:			this.container.addClass('preview-16x9-fit');
+control/editor/js/dialogs.js:5:var dialog = require('ls-dialog');
+control/editor/js/main.js:9:var util = require('ls-util');
+control/editor/js/main.js:10:var val = require('ls-validator');
+control/editor/js/main.js:11:var dialog = require('ls-dialog');
+control/editor/js/main.js:12:var api = require('ls-api');
+control/editor/js/main.js:13:var multiselect = require('ls-multiselect');
+control/editor/js/main.js:14:var uic = require('ls-uicontrol');
+control/editor/js/main.js:15:var slide = require('ls-slide');
+control/editor/js/main.js:16:var queue = require('ls-queue');
+control/editor/js/main.js:17:var sc = require('ls-shortcut');
+control/editor/js/main.js:51:const QUEUE_SELECT				= $("#queue-select");
+control/editor/js/main.js:52:const QUEUE_CREATE				= $("#queue-create");
+control/editor/js/main.js:53:const QUEUE_VIEW				= $("#queue-view");
+control/editor/js/main.js:54:const QUEUE_REMOVE				= $("#queue-remove");
+control/editor/js/main.js:56:const SLIDE_NEW					= $("#btn-slide-new")
+control/editor/js/main.js:57:const SLIDE_PREVIEW				= $("#btn-slide-preview");
+control/editor/js/main.js:58:const SLIDE_SAVE				= $("#btn-slide-save");
+control/editor/js/main.js:59:const SLIDE_REMOVE				= $("#btn-slide-remove");
+control/editor/js/main.js:60:const SLIDE_CH_QUEUE			= $("#btn-slide-ch-queue");
+control/editor/js/main.js:61:const SLIDE_DUP					= $("#btn-slide-dup");
+control/editor/js/main.js:62:const SLIDE_CANT_EDIT			= $("#slide-cant-edit");
+control/editor/js/main.js:63:const SLIDE_READONLY			= $("#slide-readonly");
+control/editor/js/main.js:64:const SLIDE_EDIT_AS_COLLAB		= $("#slide-edit-as-collab");
+control/editor/js/main.js:65:const SLIDE_NAME				= $("#slide-name");
+control/editor/js/main.js:66:const SLIDE_NAME_GRP			= $("#slide-name-group");
+control/editor/js/main.js:67:const SLIDE_OWNER				= $("#slide-owner");
+control/editor/js/main.js:68:const SLIDE_TIME				= $("#slide-time");
+control/editor/js/main.js:69:const SLIDE_TIME_GRP			= $("#slide-time-group");
+control/editor/js/main.js:70:const SLIDE_INDEX				= $("#slide-index");
+control/editor/js/main.js:71:const SLIDE_INDEX_GRP			= $("#slide-index-group");
+control/editor/js/main.js:72:const SLIDE_EN					= $("#slide-enabled");
+control/editor/js/main.js:73:const SLIDE_SCHED				= $("#slide-sched");
+control/editor/js/main.js:74:const SLIDE_SCHED_DATE_S		= $("#slide-sched-date-s");
+control/editor/js/main.js:75:const SLIDE_SCHED_TIME_S		= $("#slide-sched-time-s");
+control/editor/js/main.js:76:const SLIDE_SCHED_DATE_E		= $("#slide-sched-date-e");
+control/editor/js/main.js:77:const SLIDE_SCHED_TIME_E		= $("#slide-sched-time-e");
+control/editor/js/main.js:78:const SLIDE_ANIMATION			= $("#slide-animation")
+control/editor/js/main.js:79:const PREVIEW_R_16x9			= $("#btn-preview-ratio-16x9");
+control/editor/js/main.js:80:const PREVIEW_R_4x3				= $("#btn-preview-ratio-4x3");
+control/editor/js/main.js:81:const MARKUP_ERR_DISPLAY		= $("#markup-err-display");
+control/editor/js/main.js:82:const LINK_QUICK_HELP			= $("#link-quick-help");
+control/editor/js/main.js:83:const CONT_QUICK_HELP			= $("#cont-quick-help");
+control/editor/js/main.js:84:const CLOSE_QUICK_HELP			= $("#close-quick-help");
+control/editor/js/main.js:684:	*  is not locked and is loaded read-only.
+control/editor/js/main.js:767:				$(`#slide-btn-${sel_slide.get('id')}`).remove();
+control/editor/js/main.js:781:	*  the slide server-side. The user must manually save the
+control/editor/js/main.js:918:	*  lines from-to. Returns the marker ID.
+control/editor/js/main.js:923:		'syntax-error-highlight',
+control/editor/js/main.js:994:					regex: /^[A-Za-z0-9_-]*$/
+control/editor/js/main.js:1121:			regex: /^[A-Za-z0-9_-]*$/
+control/editor/js/main.js:1158:	SLIDE_INPUT = ace.edit('slide-input');
+control/editor/js/main.js:1166:			'slide-collab-group',
+control/editor/js/main.js:1167:			'slide-collab',
+control/editor/js/main.js:1218:		'#slide-live-preview',
+control/editor/js/main.js:1219:		'#slide-input',
+control/editor/js/timeline.js:2:var ls_queue = require('ls-queue');
+control/editor/js/timeline.js:3:var uic = require('ls-uicontrol');
+control/editor/js/timeline.js:9:	<div class="btn tl-slide-cont ${!enabled ? 'tl-slide-cont-dis' : ''}"
+control/editor/js/timeline.js:10:		id="slide-btn-${id}">
+control/editor/js/timeline.js:11:		<div class="row m-0 p-0 h-100">
+control/editor/js/timeline.js:12:			<div class="col-2 tl-slide-index-cont">
+control/editor/js/timeline.js:15:			<div id="tl-slide-thumb-cont-${id}"
+control/editor/js/timeline.js:16:				class="col-10 tl-slide-thumb-cont">
+control/editor/js/timeline.js:52:		let index = -1;
+control/editor/js/timeline.js:75:				elem = $(`#slide-btn-${id_scoped}`),
+control/editor/js/timeline.js:79:						elem.removeClass('tl-slide-cont-dis');
+control/editor/js/timeline.js:81:						elem.addClass('tl-slide-cont-dis');
+control/editor/js/timeline.js:95:					`#tl-slide-thumb-cont-${id_scoped}`,
+control/editor/js/timeline.js:100:							$(`#slide-btn-${id_scoped}`).addClass(
+control/editor/js/timeline.js:101:								'tl-slide-error'
+control/editor/js/timeline.js:104:							$(`#slide-btn-${id_scoped}`).removeClass(
+control/editor/js/timeline.js:105:								'tl-slide-error'
+control/editor/js/timeline.js:119:				'16x9-fit'
+control/editor/js/timeline.js:156:			$(`#slide-btn-${this.selected}`).removeClass('tl-selected');
+control/editor/js/timeline.js:159:			$(`#slide-btn-${id}`).addClass('tl-selected');
+control/editor/css/_timeline.scss:5:$tl-pad: 4px;                // Timeline slide default padding.
+control/editor/css/_timeline.scss:6:$tl-slide-cont-width: 200px; // Timeline slide "box" width.
+control/editor/css/_timeline.scss:22:.tl-slide-cont {
+control/editor/css/_timeline.scss:26:		width: $tl-slide-cont-width;
+control/editor/css/_timeline.scss:27:		height: 9/16*10/12*($tl-slide-cont-width + 2*$tl-pad);
+control/editor/css/_timeline.scss:30:		width: $tl-slide-cont-width;
+control/editor/css/_timeline.scss:31:		height: 9/16*10/12*($tl-slide-cont-width + 2*$tl-pad);
+control/editor/css/_timeline.scss:33:	background-color: $white;
+control/editor/css/_timeline.scss:35:	border: 1px solid $gray-1;
+control/editor/css/_timeline.scss:38:.tl-slide-cont-dis {
+control/editor/css/_timeline.scss:39:	background-color: $gray-1;
+control/editor/css/_timeline.scss:42:.tl-slide-cont:hover {
+control/editor/css/_timeline.scss:43:	background-color: $secondary;
+control/editor/css/_timeline.scss:47:.tl-slide-index-cont {
+control/editor/css/_timeline.scss:49:	padding: $tl-pad;
+control/editor/css/_timeline.scss:50:	padding-right: 0;
+control/editor/css/_timeline.scss:51:	text-align: center;
+control/editor/css/_timeline.scss:54:.tl-slide-thumb-cont {
+control/editor/css/_timeline.scss:58:		*  Overwrite .preview-16x9-fit alignment padding.
+control/editor/css/_timeline.scss:60:		top: calc(0.5625*10/12*(100% + 2*#{$tl-pad})) !important;
+control/editor/css/_timeline.scss:66:.tl-slide-thumb-cont > iframe {
+control/editor/css/_timeline.scss:67:	pointer-events: none;
+control/editor/css/_timeline.scss:68:	border: 1px solid $gray-1;
+control/editor/css/_timeline.scss:74:	width: calc(100% - 8px) !important;
+control/editor/css/_timeline.scss:75:	height: calc(100% - 8px) !important;
+control/editor/css/_timeline.scss:78:.tl-selected {
+control/editor/css/_timeline.scss:79:	background-color: $teal;
+control/editor/css/_timeline.scss:83:.tl-slide-error {
+control/editor/css/_timeline.scss:84:	background-color: $red;
+control/editor/css/editor.scss:10:$main-col-minw: 250px;        // Main column min width.
+control/editor/css/editor.scss:11:$slide-input-minh: 45;        // Minimum height of editor in lines.
+control/editor/css/editor.scss:12:$syntax-error-color: #ff6565; // Syntax error highlight color in editor.
+control/editor/css/editor.scss:16:	min-height: 100%;
+control/editor/css/editor.scss:19:#editor-col-l, #editor-col-r {
+control/editor/css/editor.scss:20:	min-width: $main-col-minw;
+control/editor/css/editor.scss:24:#queue-select-cont {
+control/editor/css/editor.scss:26:	white-space: nowrap;
+control/editor/css/editor.scss:27:	overflow-x: auto;
+control/editor/css/editor.scss:28:	overflow-y: hidden;
+control/editor/css/editor.scss:31:#queue-select {
+control/editor/css/editor.scss:35:.btn-slide-ctrl {
+control/editor/css/editor.scss:40:#slide-readonly, #slide-cant-edit {
+control/editor/css/editor.scss:43:	text-align: center;
+control/editor/css/editor.scss:47:#slide-edit-as-collab {
+control/editor/css/editor.scss:50:	text-align: center;
+control/editor/css/editor.scss:54:#slide-sched-group {
+control/editor/css/editor.scss:60:	border-left: 1px solid $gray-1;
+control/editor/css/editor.scss:63:#slide-input {
+control/editor/css/editor.scss:64:	min-height: $slide-input-minh*1em;
+control/editor/css/editor.scss:65:	border: 1px solid $gray-1;
+control/editor/css/editor.scss:66:	margin-bottom: $s3;
+control/editor/css/editor.scss:69:#markup-err-display {
+control/editor/css/editor.scss:70:	font-family: Inconsolata, monospace;
+control/editor/css/editor.scss:74:.syntax-error-highlight {
+control/editor/css/editor.scss:76:	background-color: $syntax-error-color;
+control/editor/css/_preview.scss:4:* The preview-[16x9/4x3](-fit) classes are meant to be applied to to
+control/editor/css/_preview.scss:5:* the div element with the class preview-cont to select the aspect
+control/editor/css/_preview.scss:6:* ratio of the preview. The classes without the -fit suffix have
+control/editor/css/_preview.scss:7:* width: 100% when viewport width < $preview-breakpoint. When viewport
+control/editor/css/_preview.scss:8:* width > $preview-breakpoint, the minimum width of the preview container
+control/editor/css/_preview.scss:9:* is $preview-mw. The *-fit classes always have width: 100%.
+control/editor/css/_preview.scss:15:$ratio-16x9-p: 9/16*100%;     // 16:9 aspect ratio multiplier.
+control/editor/css/_preview.scss:16:$ratio-4x3-p: 3/4*100%;       // 4:3 aspect ratio multiplier.
+control/editor/css/_preview.scss:17:$preview-mw: 600px;           // Preview min-width (vw > breakpoint).
+control/editor/css/_preview.scss:18:$preview-breakpoint: 1000px;  // Preview sizing breakpoint.
+control/editor/css/_preview.scss:20:.preview-cont {
+control/editor/css/_preview.scss:35:	border: 1px solid $gray-1;
+control/editor/css/_preview.scss:38:.preview-16x9-fit {
+control/editor/css/_preview.scss:40:	padding-top: $ratio-16x9-p;
+control/editor/css/_preview.scss:42:		margin-top: -1*$ratio-16x9-p;
+control/editor/css/_preview.scss:46:.preview-4x3-fit {
+control/editor/css/_preview.scss:48:	padding-top: $ratio-4x3-p;
+control/editor/css/_preview.scss:50:		margin-top: -1*$ratio-4x3-p;
+control/editor/css/_preview.scss:54:.preview-16x9 {
+control/editor/css/_preview.scss:55:	padding-top: $ratio-16x9-p;
+control/editor/css/_preview.scss:57:		margin-top: -1*$ratio-16x9-p;
+control/editor/css/_preview.scss:61:.preview-4x3 {
+control/editor/css/_preview.scss:62:	padding-top: $ratio-4x3-p;
+control/editor/css/_preview.scss:64:		margin-top: -1*$ratio-4x3-p;
+control/editor/css/_preview.scss:68:@media screen and (min-width: $preview-breakpoint) {
+control/editor/css/_preview.scss:69:	.preview-16x9 {
+control/editor/css/_preview.scss:70:		padding-top: 0;
+control/editor/css/_preview.scss:71:		height: 9/16*$preview-mw;
+control/editor/css/_preview.scss:78:			width: $preview-mw;
+control/editor/css/_preview.scss:79:			height: 9/16*$preview-mw;
+control/editor/css/_preview.scss:83:	.preview-4x3 {
+control/editor/css/_preview.scss:84:		padding-top: 0;
+control/editor/css/_preview.scss:85:		height: 3/4*$preview-mw;
+control/editor/css/_preview.scss:92:			width: $preview-mw;
+control/editor/css/_preview.scss:93:			height: 3/4*$preview-mw;
+control/editor/css/_quick_help.scss:3:$qh-height: 80vh;					// Quick help height.
+control/editor/css/_quick_help.scss:4:$qh-width: 80%;						// Quick help width.
+control/editor/css/_quick_help.scss:5:$qh-top: (100vh - $qh-height)/2;	// Quick help top space.
+control/editor/css/_quick_help.scss:6:$qh-left: (100% - $qh-width)/2;		// Quick help left space.
+control/editor/css/_quick_help.scss:8:#link-quick-help {
+control/editor/css/_quick_help.scss:9:	text-decoration: none;
+control/editor/css/_quick_help.scss:12:#cont-quick-help {
+control/editor/css/_quick_help.scss:15:	z-index: 1000;
+control/editor/css/_quick_help.scss:17:	width: $qh-width;
+control/editor/css/_quick_help.scss:18:	height: $qh-height;
+control/editor/css/_quick_help.scss:19:	top: $qh-top;
+control/editor/css/_quick_help.scss:20:	left: $qh-left;
+control/editor/css/_quick_help.scss:27:	background-color: $white;
+control/editor/css/_quick_help.scss:28:	border: 1px solid $gray-2;
+control/editor/css/_quick_help.scss:29:	border-radius: 3px;
+control/editor/css/_quick_help.scss:32:#cont-quick-help-content {
+control/editor/css/_quick_help.scss:35:	overflow-y: auto;
+control/editor/css/_quick_help.scss:36:	height: calc(#{$qh-height} - #{4*$s2} - 1rem);
+control/editor/index.php:10:		<meta charset="utf-8">
+control/editor/index.php:11:		<meta name="viewport" content="width=device-width, initial-scale=1">
+control/editor/index.php:13:			require_css(['font-awesome']);
+control/editor/index.php:22:		<main class="container-fluid">
+control/editor/index.php:23:			<div class="container-main container-fluid w-100 h-100">
+control/editor/index.php:24:				<div class="container-fluid row mx-0 my-1">
+control/editor/index.php:25:					<div class="col-12">
+control/editor/index.php:26:						<div id="queue-select-cont">
+control/editor/index.php:27:							<label for="queue-select">Queue:</label>
+control/editor/index.php:28:							<select class="d-inline-block custom-select small-select mx-2"
+control/editor/index.php:29:								id="queue-select">
+control/editor/index.php:31:							<button class="btn btn-primary small-btn mx-1"
+control/editor/index.php:33:								id="queue-create"
+control/editor/index.php:34:								data-toggle="tooltip"
+control/editor/index.php:36:								<i class="fas fa-plus-circle"></i>
+control/editor/index.php:38:							<button class="btn btn-primary small-btn mx-1"
+control/editor/index.php:40:								id="queue-view"
+control/editor/index.php:41:								data-toggle="tooltip"
+control/editor/index.php:43:								<i class="fas fa-eye"></i>
+control/editor/index.php:45:							<button class="btn btn-danger small-btn mx-1"
+control/editor/index.php:47:								id="queue-remove"
+control/editor/index.php:48:								data-toggle="tooltip"
+control/editor/index.php:50:								<i class="fas fa-trash-alt"></i>
+control/editor/index.php:55:				<div class="container-fluid row mx-0 my-1">
+control/editor/index.php:56:					<div class="col-12">
+control/editor/index.php:57:						<div id="timeline" class="d-flex flex-row flex-nowrap">
+control/editor/index.php:61:				<div class="container-fluid row mx-0 my-1">
+control/editor/index.php:62:					<div class="col-md-3 container-fluid pt-2" id="editor-col-l">
+control/editor/index.php:63:						<div id="slide-cant-edit">
+control/editor/index.php:66:						<div id="slide-readonly">
+control/editor/index.php:70:						<div id="slide-edit-as-collab">
+control/editor/index.php:73:						<!-- Slide name input -->
+control/editor/index.php:74:						<div class="form-group" id="slide-name-group">
+control/editor/index.php:75:							<label for="slide-name">Name</label>
+control/editor/index.php:77:								class="form-control w-100"
+control/editor/index.php:78:								id="slide-name"
+control/editor/index.php:79:								data-toggle="tooltip"
+control/editor/index.php:81:							<div class="invalid-feedback"></div>
+control/editor/index.php:84:						<!-- Slide owner label -->
+control/editor/index.php:85:						<div class="form-group" id="slide-owner-group">
+control/editor/index.php:86:							<label for="slide-owner">Owner</label>
+control/editor/index.php:88:								class="form-control w-100"
+control/editor/index.php:89:								id="slide-owner"
+control/editor/index.php:90:								data-toggle="tooltip"
+control/editor/index.php:95:						<!-- Slide collaborators multiselect -->
+control/editor/index.php:96:						<div class="form-group" id="slide-collab-group">
+control/editor/index.php:97:							<label for="slide-collab">
+control/editor/index.php:102:						<!-- Slide time selector -->
+control/editor/index.php:103:						<div class="form-group" id="slide-time-group">
+control/editor/index.php:104:							<label for="slide-time">Time (seconds)</label>
+control/editor/index.php:105:							<select class="custom-select w-100"
+control/editor/index.php:106:								id="slide-time"
+control/editor/index.php:107:								data-toggle="tooltip"
+control/editor/index.php:123:						<!-- Slide index input -->
+control/editor/index.php:124:						<div class="form-group" id="slide-index-group">
+control/editor/index.php:125:							<label for="slide-index">Index</label>
+control/editor/index.php:128:								class="form-control w-100"
+control/editor/index.php:129:								id="slide-index"
+control/editor/index.php:130:								data-toggle="tooltip"
+control/editor/index.php:132:							<div class="invalid-feedback"></div>
+control/editor/index.php:135:						<!-- Slide animation selector -->
+control/editor/index.php:136:						<div class="form-group" id="slide-animation-group">
+control/editor/index.php:137:							<label for="slide-animation">Animation</label>
+control/editor/index.php:138:							<select class="custom-select w-100"
+control/editor/index.php:139:								id="slide-animation"
+control/editor/index.php:140:								data-toggle="tooltip"
+control/editor/index.php:150:						<!-- Schedule enable -->
+control/editor/index.php:151:						<div class="form-group mb-0">
+control/editor/index.php:152:							<a class="link-nostyle"
+control/editor/index.php:153:								data-toggle="collapse"
+control/editor/index.php:154:								href="#slide-sched-group"
+control/editor/index.php:155:								aria-expanded="false"
+control/editor/index.php:156:								aria-controls="slide-sched-group">
+control/editor/index.php:157:								<i class="fas fa-angle-right"></i> Slide scheduling
+control/editor/index.php:161:						<!-- Schedule date/time selector -->
+control/editor/index.php:162:						<div class="row form-group collapse" id="slide-sched-group">
+control/editor/index.php:163:							<div class="col-12 py-1">
+control/editor/index.php:165:									id="slide-sched"
+control/editor/index.php:166:									data-toggle="tooltip"
+control/editor/index.php:168:								<label class="form-check-label" for="slide-sched">
+control/editor/index.php:172:							<div class="col-12 py-1">
+control/editor/index.php:173:								<label for="slide-sched-date-s">
+control/editor/index.php:177:									id="slide-sched-date-s"
+control/editor/index.php:178:									class="form-control d-inline"
+control/editor/index.php:179:									data-toggle="tooltip"
+control/editor/index.php:182:							<div class="col-12 py-1">
+control/editor/index.php:184:									id="slide-sched-time-s"
+control/editor/index.php:185:									class="form-control d-inline"
+control/editor/index.php:186:									data-toggle="tooltip"
+control/editor/index.php:190:							<div class="col-12 py-1">
+control/editor/index.php:191:								<label for="slide-sched-date-e">
+control/editor/index.php:195:									id="slide-sched-date-e"
+control/editor/index.php:196:									class="form-control d-inline"
+control/editor/index.php:197:									data-toggle="tooltip"
+control/editor/index.php:200:							<div class="col-12 py-1">
+control/editor/index.php:202:									id="slide-sched-time-e"
+control/editor/index.php:203:									class="form-control d-inline"
+control/editor/index.php:204:									data-toggle="tooltip"
+control/editor/index.php:210:						<!-- Slide enabled checkbox -->
+control/editor/index.php:211:						<div class="form-group mt-3" id="slide-enabled-group">
+control/editor/index.php:213:								id="slide-enabled"
+control/editor/index.php:214:								data-toggle="tooltip"
+control/editor/index.php:216:							<label class="form-check-label"
+control/editor/index.php:217:								for="slide-enabled">
+control/editor/index.php:222:						<!-- Control buttons -->
+control/editor/index.php:223:						<div class="row form-group container-fluid d-flex justify-content-center mx-0 px-0">
+control/editor/index.php:224:							<button id="btn-slide-new"
+control/editor/index.php:226:								class="btn btn-success btn-slide-ctrl"
+control/editor/index.php:227:								data-toggle="tooltip"
+control/editor/index.php:229:								<i class="fas fa-plus-circle"></i>
+control/editor/index.php:231:							<button id="btn-slide-save"
+control/editor/index.php:233:								class="btn btn-success btn-slide-ctrl"
+control/editor/index.php:234:								data-toggle="tooltip"
+control/editor/index.php:236:								<i class="fas fa-save"></i>
+control/editor/index.php:238:							<button id="btn-slide-dup"
+control/editor/index.php:240:								class="btn btn-success btn-slide-ctrl"
+control/editor/index.php:241:								data-toggle="tooltip"
+control/editor/index.php:243:								<i class="fas fa-copy"></i>
+control/editor/index.php:245:							<button id="btn-slide-preview"
+control/editor/index.php:247:								class="btn btn-success btn-slide-ctrl"
+control/editor/index.php:248:								data-toggle="tooltip"
+control/editor/index.php:250:								<i class="fas fa-eye"></i>
+control/editor/index.php:252:							<button id="btn-slide-ch-queue"
+control/editor/index.php:254:								class="btn btn-success btn-slide-ctrl"
+control/editor/index.php:255:								data-toggle="tooltip"
+control/editor/index.php:257:								<i class="fas fa-arrow-circle-right"></i>
+control/editor/index.php:259:							<button id="btn-slide-remove"
+control/editor/index.php:261:								class="btn btn-danger btn-slide-ctrl"
+control/editor/index.php:262:								data-toggle="tooltip"
+control/editor/index.php:264:								<i class="fas fa-trash-alt"></i>
+control/editor/index.php:268:					<div class="col-md container-fluid pt-2" id="editor-col-r">
+control/editor/index.php:270:							<div class="col-12 container-fluid">
+control/editor/index.php:271:								<a class="link-nostyle"
+control/editor/index.php:272:									data-toggle="collapse"
+control/editor/index.php:273:									href="#slide-live-preview-collapse"
+control/editor/index.php:274:									aria-expanded="false"
+control/editor/index.php:275:									aria-controls="slide-live-preview-collapse">
+control/editor/index.php:276:									<i class="fas fa-angle-right"></i> Live preview
+control/editor/index.php:278:								<div id="slide-live-preview-collapse" class="row collapse">
+control/editor/index.php:279:									<div class="col-12 text-center">
+control/editor/index.php:280:										<button id="btn-preview-ratio-16x9"
+control/editor/index.php:281:												class="btn btn-light btn-border small-btn"
+control/editor/index.php:285:										<button id="btn-preview-ratio-4x3"
+control/editor/index.php:286:												class="btn btn-light btn-border small-btn"
+control/editor/index.php:291:									<div class="col-12">
+control/editor/index.php:292:										<div id="slide-live-preview"
+control/editor/index.php:293:											class="preview-cont">
+control/editor/index.php:300:							<div class="col-md container-fluid">
+control/editor/index.php:302:									<div class="col-6 text-left">
+control/editor/index.php:303:										<label for="slide-input">Markup</label>
+control/editor/index.php:305:									<div class="col-6 text-right">
+control/editor/index.php:306:										<a href="#" id="link-quick-help">Quick help</a>
+control/editor/index.php:309:								<div id="slide-input" class="rounded">
+control/editor/index.php:311:								<div class="container-fluid">
+control/editor/index.php:312:									<p id="markup-err-display"></p>
+control/editor/index.php:318:				<div id="cont-quick-help" class="container">
+control/editor/index.php:320:						<div class="col-12 container text-right">
+control/editor/index.php:321:							<i id="close-quick-help" class="fas fa-times-circle link-nostyle"></i>
+control/editor/index.php:325:						<div id="cont-quick-help-content" class="col-12 container">
+control/editor/index.php:336:		<script src="/libs/ace-builds/src/ace.js"></script>
+control/css/control.scss:6:$quota-bar-height: 1.5rem;
+control/css/control.scss:8:.header-col {
+control/css/control.scss:9:	text-align: center;
+control/css/control.scss:10:	margin-bottom: 1rem;
+control/css/control.scss:13:.ctrl-panel-row {
+control/css/control.scss:14:	margin-left: auto;
+control/css/control.scss:15:	margin-right: auto;
+control/css/control.scss:19:.ctrl-panel-col {
+control/css/control.scss:20:	padding-top: 1rem;
+control/css/control.scss:21:	padding-left: 25px;
+control/css/control.scss:22:	padding-right: 25px;
+control/css/control.scss:23:	margin-bottom: 1rem;
+control/css/control.scss:26:.quota-bar {
+control/css/control.scss:28:	margin-bottom: 1rem;
+control/css/control.scss:30:	height: $quota-bar-height;
+control/css/control.scss:31:	font-size: $quota-bar-height*0.5;
+control/css/control.scss:32:	text-align: center;
+control/css/control.scss:33:	line-height: $quota-bar-height;
+control/user/js/main.js:6:var api = require('ls-api');
+control/user/js/main.js:7:var val = require('ls-validator');
+control/user/js/main.js:8:var user = require('ls-user');
+control/user/js/main.js:9:var dialog = require('ls-dialog');
+control/user/js/main.js:10:var util = require('ls-util');
+control/user/js/main.js:11:var uic = require('ls-uicontrol');
+control/user/js/main.js:17:	<table class="user-session-row">
+control/user/js/main.js:19:			<th class="text-right">Name:</th>
+control/user/js/main.js:25:			<th class="text-right">IP:</th>
+control/user/js/main.js:31:			<th class="text-right">Renewed:</th>
+control/user/js/main.js:37:			<th class="text-right">Your session:</th>
+control/user/js/main.js:50:var USER_NAME = $("#user-name");
+control/user/js/main.js:51:var USER_GROUPS = $("#user-groups");
+control/user/js/main.js:52:var USER_PASS = $("#user-pass");
+control/user/js/main.js:53:var USER_PASS_GRP = $("#user-pass-group");
+control/user/js/main.js:54:var USER_PASS_CONFIRM = $("#user-pass-confirm");
+control/user/js/main.js:55:var USER_PASS_CONFIRM_GRP = $("#user-pass-confirm-group");
+control/user/js/main.js:56:var USER_SAVE = $("#user-save");
+control/user/js/main.js:58:var USER_SESSIONS = $("#user-sessions");
+control/user/js/main.js:59:var BTN_LOGOUT_OTHER = $("#btn-logout-other");
+control/user/css/user.scss:6:.user-settings-cont {
+control/user/css/user.scss:7:	max-width: 750px;
+control/user/css/user.scss:15:.user-session-row {
+control/user/css/user.scss:22:#user-sessions {
+control/user/css/user.scss:23:	border-collapse: collapse;
+control/user/css/user.scss:26:#user-sessions tr {
+control/user/css/user.scss:28:		top: 1px solid $gray-1;
+control/user/css/user.scss:29:		bottom: 1px solid $gray-1;
+control/user/index.php:10:		<meta charset="utf-8">
+control/user/index.php:11:		<meta name="viewport" content="width=device-width, initial-scale=1">
+control/user/index.php:19:		<main class="container-fluid">
+control/user/index.php:20:			<div class="user-settings-cont container mx-auto">
+control/user/index.php:22:				<!-- Username -->
+control/user/index.php:23:				<div class="form-group w-100">
+control/user/index.php:24:					<label class="col-form-label"
+control/user/index.php:25:						for="user-name">
+control/user/index.php:28:					<input id="user-name"
+control/user/index.php:30:						class="form-control"
+control/user/index.php:35:				<!-- User groups -->
+control/user/index.php:36:				<div class="form-group w-100">
+control/user/index.php:37:					<label class="col-form-label"
+control/user/index.php:38:						for="user-groups">
+control/user/index.php:41:					<input id="user-groups"
+control/user/index.php:43:						class="form-control"
+control/user/index.php:48:				<!-- Password input -->
+control/user/index.php:49:				<div id="user-pass-group>
+control/user/index.php:50:					class="form-group w-100">
+control/user/index.php:51:					<label class="col-form-label"
+control/user/index.php:52:						for="user-pass">
+control/user/index.php:55:					<input id="user-pass"
+control/user/index.php:57:						class="form-control">
+control/user/index.php:61:				<!-- Password confirm input -->
+control/user/index.php:62:				<div class="form-group w-100">
+control/user/index.php:63:					<label class="col-form-label"
+control/user/index.php:64:						for="user-pass-confirm">
+control/user/index.php:67:					<div id="user-pass-confirm-group"
+control/user/index.php:68:						class="p-0">
+control/user/index.php:69:					<input id="user-pass-confirm"
+control/user/index.php:71:							class="form-control">
+control/user/index.php:73:						<div class="invalid-feedback"></div>
+control/user/index.php:77:				<!-- Save button -->
+control/user/index.php:78:				<div class="form-group w-100">
+control/user/index.php:79:					<input id="user-save"
+control/user/index.php:80:						class="btn btn-primary w-100"
+control/user/index.php:87:				<div class="form-group w-100 text-center">
+control/user/index.php:88:					<table class="mx-auto text-left"
+control/user/index.php:89:						id="user-sessions">
+control/user/index.php:92:				<div class="form-group w-100">
+control/user/index.php:94:						class="btn btn-danger"
+control/user/index.php:96:						id="btn-logout-other"
+control/index.php:10:		<meta charset="utf-8">
+control/index.php:11:		<meta name="viewport" content="width=device-width, initial-scale=1">
+control/index.php:19:		<main class="container-fluid">
+control/index.php:20:			<div class="row container-fluid mx-auto">
+control/index.php:21:				<div class="col-md-12 header-col">
+control/index.php:25:			<div class="row ctrl-panel-row container-fluid">
+control/index.php:26:				<div class="col-md-6 ctrl-panel-col">
+control/index.php:28:					<div id="user-quota-cont">
+control/index.php:31:				<div class="col-md-6 ctrl-panel-col cont-info-primary">
+login/js/main.js:2:var api = require('ls-api');
+login/js/main.js:3:var uic = require('ls-uicontrol');
+login/js/main.js:4:var val = require('ls-validator');
+login/js/main.js:8:const INPUT_USERNAME = $("#input-user");
+login/js/main.js:9:const INPUT_PASSWORD = $("#input-pass");
+login/js/main.js:10:const BTN_LOGIN = $("#btn-login");
+login/js/main.js:11:const CHECK_PERM = $("#checkbox-perm-session");
+login/css/login.scss:5:$form-login-minw: 200px;
+login/css/login.scss:6:$form-login-maxw: 350px;
+login/css/login.scss:7:$form-label-width: 90px;
+login/css/login.scss:11:	min-height: 100%;
+login/css/login.scss:12:	max-height: 100%;
+login/css/login.scss:15:.form-login-container {
+login/css/login.scss:19:	transform: translate(-50%, -50%);
+login/css/login.scss:20:	text-align: center;
+login/css/login.scss:23:.form-login-header {
+login/css/login.scss:24:	margin-bottom: 20px;
+login/css/login.scss:27:.form-login {
+login/css/login.scss:29:		flex-grow: 0;
+login/css/login.scss:30:		flex-basis: $form-label-width;
+login/css/login.scss:31:		padding-left: 0;
+login/css/login.scss:35:	min-width: $form-login-minw;
+login/css/login.scss:36:	max-width: $form-login-maxw;
+login/index.php:14:		<meta charset="utf-8">
+login/index.php:15:		<meta name="viewport" content="width=device-width, initial-scale=1">
+login/index.php:17:			require_css(['font-awesome']);
+login/index.php:23:		<main class="container-fluid h-100">
+login/index.php:24:			<div class="form-login-container">
+login/index.php:25:				<h4 class="display-4 form-login-header">LibreSignage</br>Login</h4>
+login/index.php:26:				<div class="alert alert-warning" <?php
+login/index.php:32:				<div class="container form-login">
+login/index.php:33:					<div class="form-group form-row">
+login/index.php:34:						<label for="input-user"
+login/index.php:35:							class="col col-form-label">
+login/index.php:39:							<input class="form-control"
+login/index.php:40:								id="input-user"
+login/index.php:46:					<div class="form-group form-row">
+login/index.php:47:						<label for="input-pass"
+login/index.php:48:							class="col col-form-label">
+login/index.php:52:							<input class="form-control"
+login/index.php:53:								id="input-pass"
+login/index.php:59:					<div class="form-group form-row">
+login/index.php:61:							<input class="btn btn-primary w-100"
+login/index.php:62:								id="btn-login"
+login/index.php:68:					<div class="form-group form-row m-0">
+login/index.php:69:						<div class="col text-left">
+login/index.php:70:							<a class="link-nostyle"
+login/index.php:71:								data-toggle="collapse"
+login/index.php:72:								href="#collapse-adv"
+login/index.php:73:								aria-expanded="false"
+login/index.php:74:								aria-controls="collapse-adv">
+login/index.php:75:								<i class="fas fa-angle-right"></i> Advanced
+login/index.php:79:					<div class="form-group form-row">
+login/index.php:80:						<div id="collapse-adv" class="col collapse">
+login/index.php:81:							<input class="form-check-input"
+login/index.php:83:								id="checkbox-perm-session">
+login/index.php:84:							<label class="form-check-label"
+login/index.php:85:								for="checkbox-perm-session">
+common/css/_footer.scss:1:$footer-height: 100px;
+common/css/_footer.scss:5:	min-height: 100%;
+common/css/_footer.scss:9:	padding-bottom: $footer-height;
+common/css/_footer.scss:15:	height: $footer-height;
+common/css/_footer.scss:16:	text-align: center;
+common/css/_dialog.scss:1:$dialog-minw: 300px;
+common/css/_dialog.scss:2:$dialog-maxw: 500px;
+common/css/_dialog.scss:4:#dialog-overlay {
+common/css/_dialog.scss:8:	min-width: 100%;
+common/css/_dialog.scss:9:	max-width: 100%;
+common/css/_dialog.scss:11:	min-height: 100%;
+common/css/_dialog.scss:12:	max-height: 100%;
+common/css/_dialog.scss:19:	z-index: 10000;
+common/css/_dialog.scss:26:	min-width: $dialog-minw;
+common/css/_dialog.scss:27:	max-width: $dialog-maxw;
+common/css/_dialog.scss:31:	transform: translate(-50%, -50%);
+common/css/_dialog.scss:37:#dialog-input {
+common/css/_dialog.scss:38:	margin-bottom: 20px;
+common/css/_dialog.scss:41:.btn-dialog {
+common/css/_nav.scss:15:.nav-logout-cont {
+common/css/_multiselect.scss:5:	flex-wrap: wrap;
+common/css/_multiselect.scss:6:	flex-direction: row;
+common/css/_multiselect.scss:7:	text-align: left;
+common/css/_multiselect.scss:12:.ms-controls {
+common/css/_multiselect.scss:15:	margin-bottom: 8px;
+common/css/_multiselect.scss:19:.ms-input {
+common/css/_multiselect.scss:23:	width: calc(100% - 2.5em - 8px);
+common/css/_multiselect.scss:24:	vertical-align: top;
+common/css/_multiselect.scss:27:.ms-add {
+common/css/_multiselect.scss:28:	display: inline-block;
+common/css/_multiselect.scss:32:	vertical-align: top;
+common/css/_multiselect.scss:35:.ms-values {
+common/css/_multiselect.scss:38:	border: 1px solid $gray-2;
+common/css/_multiselect.scss:39:	border-radius: 4px;
+common/css/_multiselect.scss:40:	background-color: white;
+common/css/_multiselect.scss:41:	min-height: 2.5em;
+common/css/_multiselect.scss:44:.ms-val {
+common/css/_multiselect.scss:45:	display: inline-block;
+common/css/_multiselect.scss:46:	background-color: $gray-2;
+common/css/_multiselect.scss:47:	border-radius: 2px;
+common/css/_multiselect.scss:50:	white-space: nowrap;
+common/css/_multiselect.scss:53:.ms-rm {
+common/css/_multiselect.scss:54:	padding-left: 3px;
+common/css/_multiselect.scss:58:.ms-rm:hover {
+common/css/_markup.scss:6:	text-align: justify;
+common/css/_markup.scss:14:	font-size: 3vh;
+common/css/_markup.scss:15:	margin-bottom: $s3;
+common/css/_markup.scss:19:	margin-bottom: $s1;
+common/css/_markup.scss:23:	font-size: 4vh;
+common/css/_default.scss:22:	background-color: $light;
+common/css/_default.scss:27:	font-family: 'Raleway', sans-serif !important;
+common/css/_default.scss:31:	font-family: 'Montserrat', sans-serif !important;
+common/css/_default.scss:35:	font-family: 'Montserrat', sans-serif !important;
+common/css/_default.scss:36:	margin-bottom: 1rem;
+common/css/_default.scss:40:@media screen and (min-width: 700px) {
+common/css/_default.scss:41:	.display-1 {
+common/css/_default.scss:42:		font-size: 8vw !important;
+common/css/_default.scss:44:	.display-2 {
+common/css/_default.scss:45:		font-size: 7vw !important;
+common/css/_default.scss:47:	.display-3 {
+common/css/_default.scss:48:		font-size: 6vw !important;
+common/css/_default.scss:50:	.display-4 {
+common/css/_default.scss:51:		font-size: 5vw !important;
+common/css/_default.scss:54:@media screen and (max-width: 700px) {
+common/css/_default.scss:55:	.display-1 {
+common/css/_default.scss:56:		font-size: 12vw !important;
+common/css/_default.scss:58:	.display-2 {
+common/css/_default.scss:59:		font-size: 11vw !important;
+common/css/_default.scss:61:	.display-3 {
+common/css/_default.scss:62:		font-size: 10vw !important;
+common/css/_default.scss:64:	.display-4 {
+common/css/_default.scss:65:		font-size: 9vw !important;
+common/css/_default.scss:70:.cont-info-primary {
+common/css/_default.scss:71:	border-left: 3px solid $primary;
+common/css/_default.scss:72:	background-color: rgba(0, 123, 255, 0.08);
+common/css/_default.scss:75:.cont-info-info {
+common/css/_default.scss:76:	border-left: 3px solid $info;
+common/css/_default.scss:77:	background-color: rgba(23, 162, 184, 0.08);
+common/css/_default.scss:80:.cont-info-success {
+common/css/_default.scss:81:	border-left: 3px solid $success;
+common/css/_default.scss:82:	background-color: rgba(40, 167, 69, 0.08);
+common/css/_default.scss:85:.cont-info-warning {
+common/css/_default.scss:86:	border-left: 3px solid $warning;
+common/css/_default.scss:87:	background-color: rgba(255, 193, 7, 0.08);
+common/css/_default.scss:90:.cont-info-danger {
+common/css/_default.scss:91:	border-left: 3px solid $danger;
+common/css/_default.scss:92:	background-color: rgba(220, 53, 69, 0.08);
+common/css/_default.scss:95:.link-nostyle {
+common/css/_default.scss:97:	text-decoration: none;
+common/css/_default.scss:100:.link-nostyle:hover {
+common/css/_default.scss:102:	text-decoration: none;
+common/css/_default.scss:105:.small-select {
+common/css/_default.scss:115:.small-btn {
+common/css/_default.scss:125:.btn-border {
+common/css/_default.scss:126:	border: 1px solid $gray-1;
+common/css/_fonts.scss:5:@font-face {
+common/css/_fonts.scss:6:	font-family: Montserrat;
+common/css/_fonts.scss:8:			url('/assets/fonts/Montserrat/Montserrat-Light.ttf');
+common/css/_fonts.scss:9:	font-style: normal;
+common/css/_fonts.scss:10:	font-weight: 300;
+common/css/_fonts.scss:13:@font-face {
+common/css/_fonts.scss:14:	font-family: Inconsolata;
+common/css/_fonts.scss:16:			url('/assets/fonts/Inconsolata/Inconsolata-Regular.ttf');
+common/css/_fonts.scss:17:	font-style: normal;
+common/css/_fonts.scss:18:	font-weight: 400;
+common/css/_fonts.scss:21:@font-face {
+common/css/_fonts.scss:22:	font-family: Raleway;
+common/css/_fonts.scss:24:			url('/assets/fonts/Raleway/Raleway-Regular.ttf');
+common/css/_fonts.scss:25:	font-style: normal;
+common/css/_fonts.scss:26:	font-weight: 400;
+common/css/_globals.scss:2:$gray-1: rgb(210, 210, 210);
+common/css/_globals.scss:3:$gray-2: rgb(220, 220, 220);
+common/css/_globals.scss:4:$gray-3: rgb(230, 230, 230);
+common/css/_globals.scss:5:$gray-4: rgb(240, 240, 240);
+common/css/_globals.scss:6:$gray-5: rgb(250, 250, 250);
+common/css/_root.scss:2:	--gray-1: $gray-1;
+common/css/_root.scss:3:	--gray-2: $gray-2;
+common/css/_root.scss:4:	--gray-3: $gray-3;
+common/css/_root.scss:5:	--gray-4: $gray-4;
+common/css/_root.scss:6:	--gray-5: $gray-5;
+common/php/auth/userquota.php:29:		if (file_exists($this->_quota_path($user))) {
+common/php/auth/userquota.php:31:			$this->_load($user);
+common/php/auth/userquota.php:34:			$this->data = array(
+common/php/auth/userquota.php:40:					$this->set_limit($k, $l);
+common/php/auth/userquota.php:44:					$this->set_limit($k,
+common/php/auth/userquota.php:46:					$this->set_disp($k,
+common/php/auth/userquota.php:50:			$this->user = $user;
+common/php/auth/userquota.php:51:			$this->ready = TRUE;
+common/php/auth/userquota.php:54:			$this->flush();
+common/php/auth/userquota.php:60:		if (!$this->ready) {
+common/php/auth/userquota.php:66:		return $user->get_data_dir().'/quota.json';
+common/php/auth/userquota.php:73:		$q_path = $this->_quota_path($user);
+common/php/auth/userquota.php:79:		$this->data = json_decode(
+common/php/auth/userquota.php:84:		if ($this->data === NULL &&
+common/php/auth/userquota.php:90:		$this->user = $user;
+common/php/auth/userquota.php:91:		$this->ready = TRUE;
+common/php/auth/userquota.php:99:		$this->_error_on_not_ready();
+common/php/auth/userquota.php:100:		$data_enc = json_encode($this->data);
+common/php/auth/userquota.php:107:			$this->_quota_path($this->user),
+common/php/auth/userquota.php:114:		if (isset($this->data[self::K_QUOTA][$key])) {
+common/php/auth/userquota.php:115:			return $this->data[self::K_QUOTA][$key][self::Q_LIMIT];
+common/php/auth/userquota.php:125:		if ($this->get_limit($key) != NULL) {
+common/php/auth/userquota.php:126:			$tmp = $this->get_limit($key);
+common/php/auth/userquota.php:128:		$this->data[self::K_QUOTA][$key] = array(
+common/php/auth/userquota.php:138:		$this->data[self::K_QUOTA][$key][self::Q_DISP] = $disp;
+common/php/auth/userquota.php:145:		if ($this->get_limit($key) == NULL) {
+common/php/auth/userquota.php:148:		if ($this->get_quota($key) + $amount <=
+common/php/auth/userquota.php:149:				$this->get_limit($key)) {
+common/php/auth/userquota.php:160:		if ($this->has_quota($key, $amount)) {
+common/php/auth/userquota.php:161:			$this->set_quota($key,
+common/php/auth/userquota.php:162:				$this->get_quota($key) + $amount);
+common/php/auth/userquota.php:173:		if ($this->get_quota($key) - $amount >= 0) {
+common/php/auth/userquota.php:174:			$this->set_quota($key,
+common/php/auth/userquota.php:175:				$this->get_quota($key) - $amount);
+common/php/auth/userquota.php:183:		if ($this->get_limit($key) == NULL) {
+common/php/auth/userquota.php:186:		$this->data[self::K_QUOTA][$key][self::Q_USED] = $amount;
+common/php/auth/userquota.php:190:		if ($this->get_limit($key) == NULL) {
+common/php/auth/userquota.php:193:		return $this->data[self::K_QUOTA][$key][self::Q_USED];
+common/php/auth/userquota.php:198:		return isset($this->data[self::K_STATE][$key]);
+common/php/auth/userquota.php:202:		$this->data[self::K_STATE][$key] = $val;
+common/php/auth/userquota.php:206:		if (!$this->has_state_var($key)) {
+common/php/auth/userquota.php:209:		return $this->data[self::K_STATE][$key];
+common/php/auth/userquota.php:213:		return $this->data[self::K_QUOTA];
+common/php/auth/auth.php:12:// -- General authentication functions. --
+common/php/auth/auth.php:26:		if ($u->verify_password($pass)) {
+common/php/auth/auth.php:47:			$session = $u->session_token_verify($tok);
+common/php/auth/auth.php:59:// -- Web interface authentication functions. --
+common/php/auth/auth.php:124:	return array_search($u->get_name(), $wl, TRUE);
+common/php/auth/auth.php:132:	return count(array_intersect($u->get_groups(), $wl)) > 0;
+common/php/auth/user.php:33:		$this->load($name);
+common/php/auth/user.php:37:		$this->{$name} = $value;
+common/php/auth/user.php:41:		return $this->{$name};
+common/php/auth/user.php:55:		$dir = $this->get_data_dir($user);
+common/php/auth/user.php:70:		$this->import($data);
+common/php/auth/user.php:77:		$dir = $this->get_data_dir();
+common/php/auth/user.php:92:		$dir = $this->get_data_dir();
+common/php/auth/user.php:93:		$json = json_encode($this->export(TRUE, TRUE));
+common/php/auth/user.php:112:		if ($tmp == NULL) { $tmp = $this->user; }
+common/php/auth/user.php:128:		$token = $session->new($this, $who, $from, $permanent);
+common/php/auth/user.php:129:		$this->sessions[] = $session;
+common/php/auth/user.php:140:		foreach ($this->sessions as $i => $s) {
+common/php/auth/user.php:141:			if ($s->get_id() === $id) {
+common/php/auth/user.php:142:				array_splice($this->sessions, $i, 1);
+common/php/auth/user.php:143:				$this->sessions = array_values($this->sessions);
+common/php/auth/user.php:155:		$s_new = $this->sessions;
+common/php/auth/user.php:157:			if ($s->get_id() !== $id) { $s_new[$i] = NULL; }
+common/php/auth/user.php:159:		$this->sessions = array_values(array_filter($s_new));
+common/php/auth/user.php:170:		$s_new = $this->sessions;
+common/php/auth/user.php:172:		foreach ($this->sessions as $k => $s) {
+common/php/auth/user.php:173:			if ($s->is_expired()) {
+common/php/auth/user.php:177:			if ($ret === NULL && $s->verify($token)) { $ret = $s; }
+common/php/auth/user.php:179:		$this->sessions = array_values(array_filter($s_new));
+common/php/auth/user.php:180:		$this->write();
+common/php/auth/user.php:189:		foreach ($this->sessions as $i => $s) {
+common/php/auth/user.php:190:			if ($s->get('id') === $id) { return $s; }
+common/php/auth/user.php:199:		$this->sessions = array_values($sessions);
+common/php/auth/user.php:206:		return $this->sessions;
+common/php/auth/user.php:210:		return $this->groups;
+common/php/auth/user.php:214:		return in_array($group, $this->groups, TRUE);
+common/php/auth/user.php:219:			$this->groups = [];
+common/php/auth/user.php:224:			$this->groups = $groups;
+common/php/auth/user.php:231:		return password_verify($pass, $this->hash);
+common/php/auth/user.php:244:		$this->hash = $tmp_hash;
+common/php/auth/user.php:251:		$this->hash = $hash;
+common/php/auth/user.php:255:		return $this->hash;
+common/php/auth/user.php:265:		$this->user = $name;
+common/php/auth/user.php:269:		return $this->user;
+common/php/auth/util.php:23:			return $u->is_in_group($p[1]);
+common/php/auth/util.php:25:			return $u->get_name() == $p[1];
+common/php/auth/session.php:34:	public function get_id() { return $this->id; }
+common/php/auth/session.php:35:	public function get_who() { return $this->who; }
+common/php/auth/session.php:36:	public function get_from() { return $this->from; }
+common/php/auth/session.php:37:	public function get_created() { return $this->created; }
+common/php/auth/session.php:38:	public function get_max_age() { return $this->max_age; }
+common/php/auth/session.php:39:	public function is_permanent() { return $this->permanent; }
+common/php/auth/session.php:40:	public function get_token_hash() { return $this->token_hash; }
+common/php/auth/session.php:43:		$this->{$name} = $value;
+common/php/auth/session.php:47:		return $this->{$name};
+common/php/auth/session.php:70:		$this->id = $user->get_name().'_'.$t;
+common/php/auth/session.php:71:		$this->who = substr($who, 0, 45);
+common/php/auth/session.php:72:		$this->from = substr($from, 0, 45);
+common/php/auth/session.php:73:		$this->created = $t;
+common/php/auth/session.php:74:		$this->max_age = SESSION_MAX_AGE;
+common/php/auth/session.php:75:		$this->permanent = $permanent;
+common/php/auth/session.php:76:		return $this->generate_token();
+common/php/auth/session.php:83:		$this->created = time();
+common/php/auth/session.php:84:		$this->generate_token();
+common/php/auth/session.php:91:		*  $this->token_hash.
+common/php/auth/session.php:94:		$this->token_hash = password_hash($token, PASSWORD_DEFAULT);
+common/php/auth/session.php:95:		if ($this->token_hash === FALSE) {
+common/php/auth/session.php:104:		return time() > $this->created + $this->max_age;
+common/php/auth/session.php:114:			password_verify($token, $this->token_hash)
+common/php/auth/session.php:116:				$this->permanent
+common/php/auth/session.php:117:				|| !$this->is_expired()
+common/php/nav/nav.php:77:			// 'groups' == NULL -> All groups have access.
+common/php/nav/nav.php:81:			if ($d['user']->is_in_group($g)) {
+common/php/nav/nav.php:89:<nav class="nav nav-pills">
+common/php/nav/nav.php:90:	<div class="row container-fluid mx-auto">
+common/php/nav/nav.php:91:		<div class="col-lg-2 my-auto m-0 p-0">
+common/php/nav/nav.php:92:			<p class="lead my-auto">
+common/php/nav/nav.php:96:		<div class="col-lg-10 p-0 m-0">
+common/php/nav/nav.php:97:			<div class="row container-fluid d-flex justify-content-end m-0 p-0">
+common/php/nav/nav.php:103:					echo '<div class="col-lg-auto m-0 p-0 pt-2 pb-2">';
+common/php/nav/nav.php:104:					echo '<a class="nav-item nav-link';
+common/php/nav/nav.php:114:				<div class="col-lg-auto nav-item my-auto nav-logout-cont">
+common/php/nav/nav.php:115:					<a class="d-inline nav-link my-auto p-0 pr-1" href="/control/user">[
+common/php/nav/nav.php:117:							echo $d['user']->get_name();
+common/php/nav/nav.php:120:					<a class="d-inline text-danger nav-link p-0 pl-1" href="/logout">
+common/php/argarray.php:79:		$this->proto = $proto;
+common/php/argarray.php:80:		$this->def = $def;
+common/php/argarray.php:101:		$def = $this->def;
+common/php/argarray.php:102:		$proto = $this->proto;
+common/php/argarray.php:117:			if ($this->_chk_val($args[$k], $v)) {
+common/php/config.php:56:	*  (Tuesday, 19-Jan-2038 03:14:07 UTC)
+common/php/config.php:107:	if ($max_slides > gtlim('SLIDE_MAX_INDEX') - 1) {
+common/php/error.php:90:			header('Content-Type: text/plain');
+common/php/error.php:93:			echo $e->__toString();
+common/php/error.php:97:			error_log($e->__toString());
+common/php/error.php:109:			header('Content-Type: text/plain');
+common/php/error.php:112:			echo $e->__toString();
+common/php/slide/slide.php:32:		$tmp->load($id);
+common/php/slide/slide.php:83:		$this->dir_path = LIBRESIGNAGE_ROOT.SLIDES_DIR.'/'.$id;
+common/php/slide/slide.php:84:		$this->conf_path = $this->dir_path.'/conf.json';
+common/php/slide/slide.php:85:		$this->markup_path = $this->dir_path.'/markup.dat';
+common/php/slide/slide.php:93:		if (!is_dir($this->dir_path) ||
+common/php/slide/slide.php:94:			!is_file($this->conf_path) ||
+common/php/slide/slide.php:95:			!is_file($this->markup_path)) {
+common/php/slide/slide.php:110:		$this->_mk_paths($id);
+common/php/slide/slide.php:111:		if (!$this->_paths_exist()) {
+common/php/slide/slide.php:118:		$cstr = file_lock_and_get($this->conf_path);
+common/php/slide/slide.php:141:		$mu = file_lock_and_get($this->markup_path);
+common/php/slide/slide.php:149:		$this->set_id($id);
+common/php/slide/slide.php:150:		$this->set_markup($mu);
+common/php/slide/slide.php:151:		$this->set_name($conf['name']);
+common/php/slide/slide.php:152:		$this->set_index($conf['index']);
+common/php/slide/slide.php:153:		$this->set_time($conf['time']);
+common/php/slide/slide.php:154:		$this->set_owner($conf['owner']);
+common/php/slide/slide.php:155:		$this->set_enabled($conf['enabled']);
+common/php/slide/slide.php:156:		$this->set_sched($conf['sched']);
+common/php/slide/slide.php:157:		$this->set_sched_t_s($conf['sched_t_s']);
+common/php/slide/slide.php:158:		$this->set_sched_t_e($conf['sched_t_e']);
+common/php/slide/slide.php:159:		$this->set_animation($conf['animation']);
+common/php/slide/slide.php:160:		$this->set_queue_name($conf['queue_name']);
+common/php/slide/slide.php:161:		$this->set_collaborators($conf['collaborators']);
+common/php/slide/slide.php:164:			$sl->load($conf['lock']);
+common/php/slide/slide.php:165:			$this->set_lock($sl);
+common/php/slide/slide.php:168:		$this->check_sched_enabled();
+common/php/slide/slide.php:176:		$slide->gen_id();
+common/php/slide/slide.php:177:		$slide->set_index($slide->get_index() + 1);
+common/php/slide/slide.php:178:		$slide->write();
+common/php/slide/slide.php:180:		$queue = $slide->get_queue();
+common/php/slide/slide.php:181:		$queue->add($slide);
+common/php/slide/slide.php:182:		$queue->write();
+common/php/slide/slide.php:191:		$this->id = get_uid();
+common/php/slide/slide.php:192:		$this->_mk_paths($this->id);
+common/php/slide/slide.php:208:		$this->id = $id;
+common/php/slide/slide.php:209:		$this->_mk_paths($id);
+common/php/slide/slide.php:219:		$this->markup = $markup;
+common/php/slide/slide.php:224:		$tmp = preg_match('/[^a-zA-Z0-9_-]/', $name);
+common/php/slide/slide.php:241:		$this->name = $name;
+common/php/slide/slide.php:251:		$this->index = $index;
+common/php/slide/slide.php:262:		$this->time = $time;
+common/php/slide/slide.php:271:		$this->owner = $owner;
+common/php/slide/slide.php:275:		$this->enabled = $enabled;
+common/php/slide/slide.php:279:		$this->sched = $sched;
+common/php/slide/slide.php:289:		$this->sched_t_s = $tstamp;
+common/php/slide/slide.php:299:		$this->sched_t_e = $tstamp;
+common/php/slide/slide.php:308:		$this->animation = $anim;
+common/php/slide/slide.php:312:		if ($this->queue_name != $name) {
+common/php/slide/slide.php:313:			if ($this->queue_name) {
+common/php/slide/slide.php:315:				$o = $this->get_queue();
+common/php/slide/slide.php:316:				$o->remove_slide($this);
+common/php/slide/slide.php:317:				$o->write();
+common/php/slide/slide.php:321:			$this->queue_name = $name;
+common/php/slide/slide.php:323:			$n->load();
+common/php/slide/slide.php:324:			$n->add($this);
+common/php/slide/slide.php:325:			$n->write();
+common/php/slide/slide.php:330:		$this->queue_name = $name;
+common/php/slide/slide.php:339:		if (empty($this->get_owner())) {
+common/php/slide/slide.php:346:			if ($c == $this->get_owner()) {
+common/php/slide/slide.php:358:		$this->collaborators = $collaborators;
+common/php/slide/slide.php:362:		$this->lock = $lock;
+common/php/slide/slide.php:370:			$this->lock !== NULL
+common/php/slide/slide.php:371:			&& $this->lock->is_expired()
+common/php/slide/slide.php:373:			$this->lock = NULL;
+common/php/slide/slide.php:382:		$this->lock_cleanup();
+common/php/slide/slide.php:384:			$this->lock !== NULL
+common/php/slide/slide.php:385:			&& !$this->lock->is_owned_by($session)
+common/php/slide/slide.php:389:		$this->lock = new SlideLock($session);
+common/php/slide/slide.php:397:		$this->lock_cleanup();
+common/php/slide/slide.php:399:			$this->lock !== NULL
+common/php/slide/slide.php:400:			&& !$this->lock->is_owned_by($session)
+common/php/slide/slide.php:406:		$this->lock = NULL;
+common/php/slide/slide.php:409:	function get_id() { return $this->id; }
+common/php/slide/slide.php:410:	function get_markup() { return $this->markup; }
+common/php/slide/slide.php:411:	function get_name() { return $this->name; }
+common/php/slide/slide.php:412:	function get_index() { return $this->index; }
+common/php/slide/slide.php:413:	function get_time() { return $this->time; }
+common/php/slide/slide.php:414:	function get_owner() { return $this->owner; }
+common/php/slide/slide.php:415:	function get_enabled() { return $this->enabled; }
+common/php/slide/slide.php:416:	function get_sched() { return $this->sched; }
+common/php/slide/slide.php:417:	function get_sched_t_s() { return $this->sched_t_s; }
+common/php/slide/slide.php:418:	function get_sched_t_e() { return $this->sched_t_e; }
+common/php/slide/slide.php:419:	function get_animation() { return $this->animation; }
+common/php/slide/slide.php:420:	function get_queue_name() { return $this->queue_name; }
+common/php/slide/slide.php:421:	function get_collaborators() { return $this->collaborators; }
+common/php/slide/slide.php:422:	function get_lock() { return $this->lock; }
+common/php/slide/slide.php:425:		$queue = new Queue($this->queue_name);
+common/php/slide/slide.php:426:		$queue->load();
+common/php/slide/slide.php:432:		*  Get all the public-to-world data of this slide.
+common/php/slide/slide.php:436:			'id' => $this->id,
+common/php/slide/slide.php:437:			'markup' => $this->markup,
+common/php/slide/slide.php:438:			'name' => $this->name,
+common/php/slide/slide.php:439:			'index' => $this->index,
+common/php/slide/slide.php:440:			'time' => $this->time,
+common/php/slide/slide.php:441:			'owner' => $this->owner,
+common/php/slide/slide.php:442:			'enabled' => $this->enabled,
+common/php/slide/slide.php:443:			'sched' => $this->sched,
+common/php/slide/slide.php:444:			'sched_t_s' => $this->sched_t_s,
+common/php/slide/slide.php:445:			'sched_t_e' => $this->sched_t_e,
+common/php/slide/slide.php:446:			'animation' => $this->animation,
+common/php/slide/slide.php:447:			'queue_name' => $this->queue_name,
+common/php/slide/slide.php:448:			'collaborators' => $this->collaborators,
+common/php/slide/slide.php:449:			'lock' => $this->lock === NULL ? NULL : $this->lock->export()
+common/php/slide/slide.php:460:		if ($this->get_sched() &&
+common/php/slide/slide.php:461:			$t >= $this->get_sched_t_s() &&
+common/php/slide/slide.php:462:			$t <= $this->get_sched_t_e()) {
+common/php/slide/slide.php:464:			// Scheduling active -> enable.
+common/php/slide/slide.php:465:			$this->set_enabled(TRUE);
+common/php/slide/slide.php:466:			$this->write();
+common/php/slide/slide.php:467:		} else if ($this->get_sched()){
+common/php/slide/slide.php:468:			// Scheduling inactive -> disable.
+common/php/slide/slide.php:469:			$this->set_enabled(FALSE);
+common/php/slide/slide.php:470:			$this->write();
+common/php/slide/slide.php:481:		$conf = $this->get_public_data_array();
+common/php/slide/slide.php:493:			$this->conf_path,
+common/php/slide/slide.php:497:			$this->markup_path,
+common/php/slide/slide.php:498:			$this->get_markup()
+common/php/slide/slide.php:508:		$queue = $this->get_queue();
+common/php/slide/slide.php:509:		$queue->remove_slide($this);
+common/php/slide/slide.php:510:		$queue->write();
+common/php/slide/slide.php:513:		if (!empty($this->dir_path)) {
+common/php/slide/slide.php:514:			rmdir_recursive($this->dir_path);
+common/php/slide/slidelock.php:19:			$this->session_id = $session->get_id();
+common/php/slide/slidelock.php:20:			$this->expire = time() + SLIDE_LOCK_MAX_AGE;
+common/php/slide/slidelock.php:29:		foreach ($this->EXPORTED as $k) {
+common/php/slide/slidelock.php:33:			$this->{$k} = $data[$k];
+common/php/slide/slidelock.php:42:		foreach ($this->EXPORTED as $k) { $ret[$k] = $this->{$k}; }
+common/php/slide/slidelock.php:47:		return empty($this->session_id) || time() > $this->expire;
+common/php/slide/slidelock.php:51:		return $this->session_id === $session->get_id();
+common/php/slide/slidelock.php:54:	public function get_session_id() { return $this->session_id; }
+common/php/slide/slidelock.php:55:	public function get_expire() { return $this->expire; }
+common/php/exportable/test.php:26:		$this->var3 = new Test2();
+common/php/exportable/test.php:30:		$this->{$name} = $value;
+common/php/exportable/test.php:34:		return $this->{$name};
+common/php/exportable/test.php:51:		$this->{$name} = $value;
+common/php/exportable/test.php:55:		return $this->{$name};
+common/php/exportable/exportable.php:27:			if (gettype($this->__exportable_get($k)) === 'object') {
+common/php/exportable/exportable.php:30:						$this->__exportable_get($k),
+common/php/exportable/exportable.php:34:					$ret[$k] = $this->__exportable_get($k)->export(
+common/php/exportable/exportable.php:40:						"Can't export non-Exportable object."
+common/php/exportable/exportable.php:44:				$ret[$k] = $this->__exportable_get($k);
+common/php/exportable/exportable.php:57:				$tmp->load($v);
+common/php/exportable/exportable.php:58:				$this->__exportable_set($k, $tmp);
+common/php/exportable/exportable.php:60:				$this->__exportable_set($k, $v);
+common/php/footer/footer.php:5:<footer class="container-fluid footer d-flex align-items-center">
+common/php/footer/footer.php:6:	<div class="container-fluid">
+common/php/footer/footer.php:10:			<?php if (date('Y') != '2018') { echo '-'.date('Y'); } ?>
+common/php/util.php:127:		'0123456789-_';
+common/php/util.php:131:				strlen($chr) - 1), 1);
+common/php/css.php:11:	'font-awesome' => [
+common/php/css.php:13:		'href' => '/libs/@fortawesome/fontawesome-free/css/all.css'
+common/php/css.php:21:				"Attempted to include non-existent CSS library '$l'."
+common/php/queue.php:24:				substr($val, -5) == '.json') {
+common/php/queue.php:25:				return substr($val, 0, strlen($val) - 5);
+common/php/queue.php:52:		$this->queue = $queue;
+common/php/queue.php:53:		$this->slides = array();
+common/php/queue.php:54:		$this->path = LIBRESIGNAGE_ROOT.QUEUES_DIR.
+common/php/queue.php:59:		if (!file_exists($this->path)) {
+common/php/queue.php:64:		$json = file_lock_and_get($this->path);
+common/php/queue.php:74:		$this->set_owner($data['owner']);
+common/php/queue.php:76:		$this->slides = array();
+common/php/queue.php:79:			$tmp->load($n);
+common/php/queue.php:80:			$this->slides[] = $tmp;
+common/php/queue.php:82:		$this->loaded = TRUE;
+common/php/queue.php:86:		if (!$this->owner) {
+common/php/queue.php:92:				'owner' => $this->owner,
+common/php/queue.php:95:						return $s->get_id();
+common/php/queue.php:97:					$this->slides
+common/php/queue.php:108:		file_lock_and_put($this->path, $json);
+common/php/queue.php:115:		usort($this->slides, function(Slide $a, Slide $b) {
+common/php/queue.php:116:			if ($a->get_index() > $b->get_index()) {
+common/php/queue.php:118:			} else if ($a->get_index() < $b->get_index()) {
+common/php/queue.php:119:				return -1;
+common/php/queue.php:124:		for ($i = 0; $i < count($this->slides); $i++) {
+common/php/queue.php:125:			$this->slides[$i]->set_index($i);
+common/php/queue.php:126:			$this->slides[$i]->write();
+common/php/queue.php:141:		foreach ($this->slides as $k => $s) {
+common/php/queue.php:142:			if ($s->get_id() == $keep_id) {
+common/php/queue.php:144:				unset($this->slides[$k]);
+common/php/queue.php:145:				$this->slides = array_values(
+common/php/queue.php:146:					$this->slides
+common/php/queue.php:158:		$this->normalize();
+common/php/queue.php:164:		$keep_i = $keep->get_index();
+common/php/queue.php:165:		foreach ($this->slides as $k => $s) {
+common/php/queue.php:166:			$s_i = $s->get_index();
+common/php/queue.php:169:				$s->set_index($s_i + 1);
+common/php/queue.php:170:				$s->write();
+common/php/queue.php:177:			*  -> make it the last one.
+common/php/queue.php:179:			$keep->set_index(count($this->slides));
+common/php/queue.php:180:			$keep->write();
+common/php/queue.php:183:		// Add $keep back to $this->slides at the correct index.
+common/php/queue.php:184:		$this->slides[] = $keep;
+common/php/queue.php:185:		$this->normalize();
+common/php/queue.php:189:		if (!$this->loaded) {
+common/php/queue.php:194:		if (!file_exists($this->path)) {
+common/php/queue.php:201:		foreach ($this->slides() as $s) {
+common/php/queue.php:202:			$s->remove();
+common/php/queue.php:206:		if (!unlink($this->path)) {
+common/php/queue.php:214:		$this->owner = $owner;
+common/php/queue.php:218:		$this->slides[] = $slide;
+common/php/queue.php:222:		$this->slides = array_filter(
+common/php/queue.php:223:			$this->slides,
+common/php/queue.php:225:				return $s->get_id() != $slide->get_id();
+common/php/queue.php:231:		return $this->slides;
+common/php/queue.php:235:		return $this->owner;
+common/php/queue.php:240:		foreach ($this->slides as $s) {
+common/php/queue.php:241:			$sret[$s->get_id()] = $s->get_public_data_array();
+common/php/queue.php:244:			'owner' => $this->owner,
+logout/js/main.js:2:var api = require('ls-api');
+logout/css/logout.scss:6:	min-height: 100%;
+logout/css/logout.scss:7:	max-height: 100%;
+logout/css/logout.scss:10:.logout-container {
+logout/css/logout.scss:13:	transform: translate(0, -50%);
+logout/css/logout.scss:14:	text-align: center;
+logout/css/logout.scss:15:	animation: logout-text-animation 0.4s forwards;
+logout/css/logout.scss:18:@keyframes logout-text-animation {
+logout/css/logout.scss:20:		top: -20%;
+logout/index.php:10:		<meta charset="utf-8">
+logout/index.php:11:		<meta name="viewport" content="width=device-width, initial-scale=1">
+logout/index.php:16:		<main class="container-fluid h-100">
+logout/index.php:17:			<div class="container-fluid logout-container">
+logout/index.php:18:				<h4 class="display-4">Logged out!</h4>
+Binary file assets/fonts/Inconsolata/Inconsolata-Regular.ttf matches
+assets/fonts/Inconsolata/OFL.txt:8:-----------------------------------------------------------
+assets/fonts/Inconsolata/OFL.txt:9:SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+assets/fonts/Inconsolata/OFL.txt:10:-----------------------------------------------------------
+assets/fonts/Inconsolata/OFL.txt:40:or substituting -- in part or in whole -- any of the components of the
+assets/fonts/Inconsolata/OFL.txt:59:included either as stand-alone text files, human-readable headers or
+assets/fonts/Inconsolata/OFL.txt:60:in the appropriate machine-readable metadata fields within text or
+Binary file assets/fonts/Inconsolata/Inconsolata-Bold.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-BlackItalic.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-ExtraLight.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-ExtraBoldItalic.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-Black.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-BoldItalic.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-ThinItalic.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-Thin.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-SemiBoldItalic.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-ExtraBold.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-Bold.ttf matches
+assets/fonts/Montserrat/OFL.txt:8:-----------------------------------------------------------
+assets/fonts/Montserrat/OFL.txt:9:SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+assets/fonts/Montserrat/OFL.txt:10:-----------------------------------------------------------
+assets/fonts/Montserrat/OFL.txt:40:or substituting -- in part or in whole -- any of the components of the
+assets/fonts/Montserrat/OFL.txt:59:included either as stand-alone text files, human-readable headers or
+assets/fonts/Montserrat/OFL.txt:60:in the appropriate machine-readable metadata fields within text or
+Binary file assets/fonts/Montserrat/Montserrat-SemiBold.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-MediumItalic.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-Italic.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-Light.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-Regular.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-LightItalic.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-ExtraLightItalic.ttf matches
+Binary file assets/fonts/Montserrat/Montserrat-Medium.ttf matches
+Binary file assets/fonts/Raleway/Raleway-Thin.ttf matches
+Binary file assets/fonts/Raleway/Raleway-BlackItalic.ttf matches
+Binary file assets/fonts/Raleway/Raleway-Regular.ttf matches
+Binary file assets/fonts/Raleway/Raleway-ExtraLightItalic.ttf matches
+Binary file assets/fonts/Raleway/Raleway-Medium.ttf matches
+Binary file assets/fonts/Raleway/Raleway-LightItalic.ttf matches
+Binary file assets/fonts/Raleway/Raleway-Italic.ttf matches
+Binary file assets/fonts/Raleway/Raleway-MediumItalic.ttf matches
+Binary file assets/fonts/Raleway/Raleway-ExtraBoldItalic.ttf matches
+Binary file assets/fonts/Raleway/Raleway-Light.ttf matches
+Binary file assets/fonts/Raleway/Raleway-SemiBold.ttf matches
+assets/fonts/Raleway/OFL.txt:10:-----------------------------------------------------------
+assets/fonts/Raleway/OFL.txt:11:SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+assets/fonts/Raleway/OFL.txt:12:-----------------------------------------------------------
+assets/fonts/Raleway/OFL.txt:42:or substituting -- in part or in whole -- any of the components of the
+assets/fonts/Raleway/OFL.txt:61:included either as stand-alone text files, human-readable headers or
+assets/fonts/Raleway/OFL.txt:62:in the appropriate machine-readable metadata fields within text or
+Binary file assets/fonts/Raleway/Raleway-BoldItalic.ttf matches
+Binary file assets/fonts/Raleway/Raleway-ExtraBold.ttf matches
+Binary file assets/fonts/Raleway/Raleway-ExtraLight.ttf matches
+Binary file assets/fonts/Raleway/Raleway-Bold.ttf matches
+Binary file assets/fonts/Raleway/Raleway-Black.ttf matches
+Binary file assets/fonts/Raleway/Raleway-SemiBoldItalic.ttf matches
+Binary file assets/fonts/Raleway/Raleway-ThinItalic.ttf matches
+app/js/main.js:2:var api = require('ls-api');
+app/js/main.js:3:var slide = require('ls-slide');
+app/js/main.js:4:var queue = require('ls-queue');
+app/js/main.js:5:var slidelist = require('ls-slidelist');
+app/js/main.js:6:var markup = require('ls-markup');
+app/js/main.js:7:var util = require('ls-util');
+app/js/main.js:8:var dialog = require('ls-dialog');
+app/js/main.js:16:var c_slide_i = -1;
+app/js/main.js:48:		c_slide_i = -1;
+app/css/_animations.scss:11:.swipe-left {
+app/css/_animations.scss:12:	animation: swipe-left-k 0.25s forwards !important;
+app/css/_animations.scss:15:.swipe-from-right {
+app/css/_animations.scss:16:	animation: swipe-from-right-k 0.25s forwards !important;
+app/css/_animations.scss:19:@keyframes swipe-left-k {
+app/css/_animations.scss:24:@keyframes swipe-from-right-k {
+app/css/_animations.scss:25:	from { right: -100%; }
+app/css/_animations.scss:31:.swipe-right {
+app/css/_animations.scss:32:	animation: swipe-right-k 0.25s forwards !important;
+app/css/_animations.scss:35:.swipe-from-left {
+app/css/_animations.scss:36:	animation: swipe-from-left-k 0.25s forwards !important;
+app/css/_animations.scss:39:@keyframes swipe-right-k {
+app/css/_animations.scss:41:	to { right: -100%; }
+app/css/_animations.scss:44:@keyframes swipe-from-left-k {
+app/css/_animations.scss:51:.swipe-up {
+app/css/_animations.scss:52:	animation: swipe-up-k 0.25s forwards !important;
+app/css/_animations.scss:55:.swipe-from-below {
+app/css/_animations.scss:56:	animation: swipe-from-below-k 0.25s forwards !important;
+app/css/_animations.scss:59:@keyframes swipe-up-k {
+app/css/_animations.scss:61:	to { top: -100%; }
+app/css/_animations.scss:64:@keyframes swipe-from-below-k {
+app/css/_animations.scss:71:.swipe-down {
+app/css/_animations.scss:72:	animation: swipe-down-k 0.25s forwards !important;
+app/css/_animations.scss:75:.swipe-from-above {
+app/css/_animations.scss:76:	animation: swipe-from-above-k 0.25s forwards !important;
+app/css/_animations.scss:79:@keyframes swipe-down-k {
+app/css/_animations.scss:84:@keyframes swipe-from-above-k {
+app/css/_animations.scss:85:	from { top: -100%; }
+app/css/display.scss:9:	overflow-x: hidden;
+app/css/display.scss:10:	overflow-y: hidden;
+app/css/display.scss:16:	min-width: 100%;
+app/css/display.scss:17:	max-width: 100%;
+app/css/display.scss:20:	min-height: 100%;
+app/css/display.scss:21:	max-height: 100%;
+app/index.php:23:		<meta charset="utf-8">
+app/index.php:24:		<meta name="viewport" content="width=device-width, initial-scale=1">
+app/index.php:29:		<main role="main" class="container-fluid">
+data/slides/0x3/markup.dat:3:		[h size=12%]Multi-column example[/h]
+data/slides/0x3/markup.dat:20:		[p]Containers [b]outside[/b] a [i]columns[/i] class are normal full-width
+errors/css/error.scss:4:#container-error {
+errors/css/error.scss:8:	transform: translate(-50%, -50%);
+errors/error.php:8:		<meta charset="utf-8">
+errors/error.php:9:		<meta name="viewport" content="width=device-width, initial-scale=1">
+errors/error.php:14:		<main role="main" class="container-fluid">
+errors/error.php:15:			<div id="container-error" class="container">
+errors/error.php:16:				<h1 class="display-3 text-center"><?php echo $ERROR_PAGE_HEADING?></h1>
+errors/error.php:17:				<p class="lead text-center"><?php echo $ERROR_PAGE_TEXT?></p>
+api/api_error.php:98:		$this->api_err = $api_err;
+api/api_error.php:103:		return $this->api_err;
+api/api_error.php:118:			$err['thrown_at'] = $e->getFile().' @ ln: '.
+api/api_error.php:119:						$e->getLine();
+api/api_error.php:120:			$err['e_msg'] = $e->getMessage();
+api/api_error.php:121:			$err['e_trace'] = $e->getTraceAsString();
+api/api_error.php:143:					$e->get_api_err(), $e
+api/api_error.php:159:				$e->getLine().'."}';
+api/api.php:98:		$ret = $args->chk($config);
+api/api.php:100:			$this->$k = $v;
+api/api.php:126:		$this->_verify($data);
+api/api.php:127:		$this->data = $data;
+api/api.php:128:		$this->inited = TRUE;
+api/api.php:136:		$this->_verify($_GET);
+api/api.php:137:		$this->data = $_GET;
+api/api.php:138:		$this->inited = TRUE;
+api/api.php:147:		switch($this->method) {
+api/api.php:149:				$this->_load_data_post();
+api/api.php:152:				$this->_load_data_get();
+api/api.php:193:						&& $this->_chk_arr_types($d, 'string')
+api/api.php:196:						&& $this->_chk_arr_types($d, 'integer')
+api/api.php:199:						&& $this->_chk_arr_types($d, 'boolean')
+api/api.php:202:						&& $this->_chk_arr_types($d, 'double')
+api/api.php:248:		*  or $this->format if $format is empty. If $format
+api/api.php:249:		*  and $this->format are both empty, this function returns
+api/api.php:251:		*  $this->strict_format is TRUE, extra keys in $data that
+api/api.php:255:			if (!count($this->format)) {
+api/api.php:258:			$format = $this->format;
+api/api.php:264:				if ($this->_is_param_opt($format[$k])) {
+api/api.php:274:				$this->_verify($data[$k], $format[$k]);
+api/api.php:276:				$this->_chk_type($data, $format, $k);
+api/api.php:277:				$this->_chk_data($data, $format, $k);
+api/api.php:283:		*  $this->strict_format is TRUE.
+api/api.php:285:		if ($this->strict_format) {
+api/api.php:297:			return $this->data;
+api/api.php:299:			return $this->data[$key];
+api/api.php:304:		if (in_array($key, array_keys($this->data))) {
+api/api.php:305:			if ($null_check && $this->data[$key] == NULL) {
+api/api.php:315:		switch($this->response_type) {
+api/api.php:325:	public function is_inited() { return $this->inited; }
+api/api.php:326:	public function get_method() { return $this->method; }
+api/api.php:327:	public function requires_quota() { return $this->req_quota; }
+api/api.php:328:	public function requires_auth() { return $this->req_auth; }
+api/api.php:330:	public function set_caller($caller) { $this->caller = $caller; }
+api/api.php:331:	public function get_caller() { return $this->caller; }
+api/api.php:333:	public function set_session($session) { $this->session = $session; }
+api/api.php:334:	public function get_session() { return $this->session; }
+api/api.php:340:		$this->response = $resp;
+api/api.php:347:		if ($this->response_type == API_RESPONSE['TEXT']) {
+api/api.php:348:			if ($this->response) {
+api/api.php:349:				echo $this->response;
+api/api.php:352:		} elseif ($this->response_type == API_RESPONSE['JSON']) {
+api/api.php:353:			if (!$this->response) {
+api/api.php:354:				$this->response = array();
+api/api.php:356:			if (!isset($this->response['error'])) {
+api/api.php:358:				$this->response['error'] = API_E_OK;
+api/api.php:360:			$resp_str = json_encode($this->response);
+api/api.php:378:	header('Access-Control-Allow-Origin: *');
+api/api.php:379:	header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+api/api.php:380:	header('Access-Control-Allow-Headers: Content-Type, Auth-Token');
+api/api.php:381:	header('Access-Control-Max-Age: 600');
+api/api.php:390:	header('Content-Type: '.$endpoint->get_content_type());
+api/api.php:391:	header('Access-Control-Allow-Origin: *');
+api/api.php:395:		array_search($endpoint->get_method(), API_METHOD)) {
+api/api.php:401:				$endpoint->get_method(),
+api/api.php:409:		$endpoint->load_data();
+api/api.php:412:			API_E_INVALID_REQUEST, $e->getMessage(), 0, $e
+api/api.php:416:			API_E_INTERNAL, $e->getMessage(), 0, $e
+api/api.php:421:	if (!$endpoint->requires_auth()) { return; }
+api/api.php:423:	if (!array_key_exists("Auth-Token", getallheaders())) {
+api/api.php:426:			"No Auth-Token header even though required."
+api/api.php:430:	$auth_token = getallheaders()["Auth-Token"];
+api/api.php:440:	$endpoint->set_caller($auth_data['user']);
+api/api.php:441:	$endpoint->set_session($auth_data['session']);
+api/api.php:444:	if (!$endpoint->requires_quota()) { return; }
+api/api.php:447:	if ($quota->has_state_var('api_t_start')) {
+api/api.php:448:		$t = $quota->get_state_var('api_t_start');
+api/api.php:449:		if (time() - $t >= gtlim('API_RATE_T')) {
+api/api.php:454:			$quota->set_state_var('api_t_start', time());
+api/api.php:455:			$quota->set_quota('api_rate', 0);
+api/api.php:459:		$quota->set_state_var('api_t_start', time());
+api/api.php:462:	if (!$quota->use_quota('api_rate')) {
+api/api.php:468:	$quota->flush();
+api/api.php:494:				'Content-Type: '.
+api/api.php:495:				$endpoint->get_content_type()
+api/endpoint/auth/auth_session_renew.php:32:$session = $AUTH_SESSION_RENEW->get_caller()->session_renew(
+api/endpoint/auth/auth_session_renew.php:33:	$AUTH_SESSION_RENEW->get_session()->get_id()
+api/endpoint/auth/auth_session_renew.php:35:$AUTH_SESSION_RENEW->get_caller()->write();
+api/endpoint/auth/auth_session_renew.php:77:$AUTH_SESSION_RENEW->resp_set(array(
+api/endpoint/auth/auth_session_renew.php:81:$AUTH_SESSION_RENEW->send();
+api/endpoint/auth/auth_logout_other.php:30:$u = $AUTH_LOGOUT_OTHER->get_caller();
+api/endpoint/auth/auth_logout_other.php:31:$u->session_n_rm($AUTH_LOGOUT_OTHER->get_session()->get_id());
+api/endpoint/auth/auth_logout_other.php:32:$u->write();
+api/endpoint/auth/auth_logout_other.php:34:$AUTH_LOGOUT_OTHER->resp_set(array('error' => API_E_OK));
+api/endpoint/auth/auth_logout_other.php:35:$AUTH_LOGOUT_OTHER->send();
+api/endpoint/auth/auth_logout.php:29:$AUTH_LOGOUT->get_caller()->session_rm($AUTH_LOGOUT->get_session()->get_id());
+api/endpoint/auth/auth_logout.php:30:$AUTH_LOGOUT->get_caller()->write();
+api/endpoint/auth/auth_logout.php:32:$AUTH_LOGOUT->resp_set(array('error' => API_E_OK));
+api/endpoint/auth/auth_logout.php:33:$AUTH_LOGOUT->send();
+api/endpoint/auth/auth_get_data.php:32:$AUTH_GET_DATA->resp_set([
+api/endpoint/auth/auth_get_data.php:33:	'user' => $AUTH_GET_DATA->get_caller()->get_export_public(),
+api/endpoint/auth/auth_get_data.php:34:	'session' => $AUTH_GET_DATA->get_session()->export_public()
+api/endpoint/auth/auth_get_data.php:36:$AUTH_GET_DATA->send();
+api/endpoint/auth/auth_get_sessions.php:32:$current_session = $AUTH_GET_SESSIONS->get_session();
+api/endpoint/auth/auth_get_sessions.php:33:$sessions = $AUTH_GET_SESSIONS->get_caller()->get_sessions();
+api/endpoint/auth/auth_get_sessions.php:36:	$tmp = $s->export_public();
+api/endpoint/auth/auth_get_sessions.php:37:	$tmp['current'] = ($current_session->get_id() === $s->get_id());
+api/endpoint/auth/auth_get_sessions.php:40:$AUTH_GET_SESSIONS->resp_set($resp);
+api/endpoint/auth/auth_get_sessions.php:41:$AUTH_GET_SESSIONS->send();
+api/endpoint/auth/auth_login.php:42:	$AUTH_LOGIN->get('username'),
+api/endpoint/auth/auth_login.php:43:	$AUTH_LOGIN->get('password')
+api/endpoint/auth/auth_login.php:48:	$tmp = preg_match('/[^a-zA-Z0-9_-]/', $AUTH_LOGIN->get('who'));
+api/endpoint/auth/auth_login.php:61:	if ($AUTH_LOGIN->has('permanent')) {
+api/endpoint/auth/auth_login.php:62:		$perm = $AUTH_LOGIN->get('permanent');
+api/endpoint/auth/auth_login.php:66:	$auth_data = $user->session_new(
+api/endpoint/auth/auth_login.php:67:		$AUTH_LOGIN->get('who'),
+api/endpoint/auth/auth_login.php:71:	$user->write();
+api/endpoint/auth/auth_login.php:81:	if ($auth_data['session']->is_permanent()) {
+api/endpoint/auth/auth_login.php:85:		$exp = $auth_data['session']->get_created()
+api/endpoint/auth/auth_login.php:86:			+ $auth_data['session']->get_max_age();
+api/endpoint/auth/auth_login.php:97:		$value = $auth_data['session']->get_created(),
+api/endpoint/auth/auth_login.php:103:		$value = $auth_data['session']->get_max_age(),
+api/endpoint/auth/auth_login.php:109:		$value = $auth_data['session']->is_permanent() ? '1' : '0',
+api/endpoint/auth/auth_login.php:114:	$AUTH_LOGIN->resp_set(array(
+api/endpoint/auth/auth_login.php:115:		'session' => $auth_data['session']->export_public(),
+api/endpoint/auth/auth_login.php:119:	$AUTH_LOGIN->resp_set([ 'error' => API_E_INCORRECT_CREDS ]);
+api/endpoint/auth/auth_login.php:121:$AUTH_LOGIN->send();
+api/endpoint/queue/queue_create.php:36:if (!check_perm('grp:admin|grp:editor;', $QUEUE_CREATE->get_caller())) {
+api/endpoint/queue/queue_create.php:43:$tmp = preg_match('/[^a-zA-Z0-9_-]/', $QUEUE_CREATE->get('name'));
+api/endpoint/queue/queue_create.php:56:if (queue_exists($QUEUE_CREATE->get('name'))) {
+api/endpoint/queue/queue_create.php:63:$queue = new Queue($QUEUE_CREATE->get('name'));
+api/endpoint/queue/queue_create.php:64:$queue->set_owner($QUEUE_CREATE->get_caller()->get_name());
+api/endpoint/queue/queue_create.php:65:$queue->write();
+api/endpoint/queue/queue_create.php:67:$QUEUE_CREATE->send();
+api/endpoint/queue/queue_get.php:38:$tmp = preg_match('/[^a-zA-Z0-9_-]/', $QUEUE_GET->get('name'));
+api/endpoint/queue/queue_get.php:51:$queue = new Queue($QUEUE_GET->get('name'));
+api/endpoint/queue/queue_get.php:52:$queue->load();
+api/endpoint/queue/queue_get.php:54:$QUEUE_GET->resp_set($queue->get_data_array());
+api/endpoint/queue/queue_get.php:55:$QUEUE_GET->send();
+api/endpoint/queue/queue_remove.php:36:$tmp = preg_match('/[^a-zA-Z0-9_-]/', $QUEUE_REMOVE->get('name'));
+api/endpoint/queue/queue_remove.php:49:$queue = new Queue($QUEUE_REMOVE->get('name'));
+api/endpoint/queue/queue_remove.php:50:$queue->load();
+api/endpoint/queue/queue_remove.php:52:$owner = $queue->get_owner();
+api/endpoint/queue/queue_remove.php:53:$caller = $QUEUE_REMOVE->get_caller();
+api/endpoint/queue/queue_remove.php:66:		array_check($queue->slides(), function($s) use($caller) {
+api/endpoint/queue/queue_remove.php:67:			return $s->get_owner() == $caller->get_name();
+api/endpoint/queue/queue_remove.php:78:$queue->remove();
+api/endpoint/queue/queue_remove.php:79:$QUEUE_REMOVE->send();
+api/endpoint/queue/queue_list.php:32:$QUEUE_LIST->resp_set(array('queues' => queue_list()));
+api/endpoint/queue/queue_list.php:33:$QUEUE_LIST->send();
+api/endpoint/slide/slide_save.php:87:$user = $SLIDE_SAVE->get_caller();
+api/endpoint/slide/slide_save.php:91:if ($SLIDE_SAVE->has('id', TRUE)) {
+api/endpoint/slide/slide_save.php:92:	$slide->load($SLIDE_SAVE->get('id'));
+api/endpoint/slide/slide_save.php:98:if ($SLIDE_SAVE->has('id', TRUE)) {
+api/endpoint/slide/slide_save.php:102:		$SLIDE_SAVE->get_caller()
+api/endpoint/slide/slide_save.php:105:		'grp:editor&usr:'.$slide->get_owner().';',
+api/endpoint/slide/slide_save.php:106:		$SLIDE_SAVE->get_caller()
+api/endpoint/slide/slide_save.php:113:		$SLIDE_SAVE->get_caller()
+api/endpoint/slide/slide_save.php:121:		check_perm('grp:editor;', $SLIDE_SAVE->get_caller())
+api/endpoint/slide/slide_save.php:123:			$SLIDE_SAVE->get_caller()->get_name(),
+api/endpoint/slide/slide_save.php:124:			$slide->get_collaborators()
+api/endpoint/slide/slide_save.php:141:	$lock = $slide->get_lock();
+api/endpoint/slide/slide_save.php:148:		!$lock->is_expired()
+api/endpoint/slide/slide_save.php:149:		&& !$lock->is_owned_by($SLIDE_SAVE->get_session())
+api/endpoint/slide/slide_save.php:166:	$slide->gen_id();
+api/endpoint/slide/slide_save.php:167:	$slide->set_owner($user->get_name());
+api/endpoint/slide/slide_save.php:175:	$slide->set_queue($SLIDE_SAVE->get('queue_name'));
+api/endpoint/slide/slide_save.php:176:	$slide->set_collaborators($SLIDE_SAVE->get('collaborators'));
+api/endpoint/slide/slide_save.php:179:$slide->set_name($SLIDE_SAVE->get('name'));
+api/endpoint/slide/slide_save.php:180:$slide->set_index($SLIDE_SAVE->get('index'));
+api/endpoint/slide/slide_save.php:181:$slide->set_time($SLIDE_SAVE->get('time'));
+api/endpoint/slide/slide_save.php:182:$slide->set_markup($SLIDE_SAVE->get('markup'));
+api/endpoint/slide/slide_save.php:183:$slide->set_enabled($SLIDE_SAVE->get('enabled'));
+api/endpoint/slide/slide_save.php:184:$slide->set_sched($SLIDE_SAVE->get('sched'));
+api/endpoint/slide/slide_save.php:185:$slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
+api/endpoint/slide/slide_save.php:186:$slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
+api/endpoint/slide/slide_save.php:187:$slide->set_animation($SLIDE_SAVE->get('animation'));
+api/endpoint/slide/slide_save.php:191:	if (!$quota->use_quota('slides')) {
+api/endpoint/slide/slide_save.php:197:	$quota->flush();
+api/endpoint/slide/slide_save.php:200:$slide->write();
+api/endpoint/slide/slide_save.php:203:$queue = new Queue($slide->get_queue_name());
+api/endpoint/slide/slide_save.php:204:$queue->load();
+api/endpoint/slide/slide_save.php:205:$queue->juggle($slide->get_id());
+api/endpoint/slide/slide_save.php:207:$SLIDE_SAVE->resp_set($slide->get_public_data_array());
+api/endpoint/slide/slide_save.php:208:$SLIDE_SAVE->send();
+api/endpoint/slide/slide_dup.php:47:if (!check_perm('grp:admin|grp:editor;', $SLIDE_DUP->get_caller())) {
+api/endpoint/slide/slide_dup.php:55:$slide->load($SLIDE_DUP->get('id'));
+api/endpoint/slide/slide_dup.php:58:$new_slide = $slide->dup();
+api/endpoint/slide/slide_dup.php:59:$new_slide->set_owner($SLIDE_DUP->get_caller()->get_name());
+api/endpoint/slide/slide_dup.php:60:$new_slide->write();
+api/endpoint/slide/slide_dup.php:63:$queue = $new_slide->get_queue();
+api/endpoint/slide/slide_dup.php:64:$queue->juggle($new_slide->get_id());
+api/endpoint/slide/slide_dup.php:65:$queue->write();
+api/endpoint/slide/slide_dup.php:67:$SLIDE_DUP->resp_set(['slide' => $new_slide->get_public_data_array()]);
+api/endpoint/slide/slide_dup.php:68:$SLIDE_DUP->send();
+api/endpoint/slide/slide_lock_acquire.php:48:		$SLIDE_LOCK_ACQUIRE->get_caller()
+api/endpoint/slide/slide_lock_acquire.php:58:$slide->load($SLIDE_LOCK_ACQUIRE->get('id'));
+api/endpoint/slide/slide_lock_acquire.php:60:	$slide->lock_acquire($SLIDE_LOCK_ACQUIRE->get_session());
+api/endpoint/slide/slide_lock_acquire.php:69:$slide->write();
+api/endpoint/slide/slide_lock_acquire.php:71:$SLIDE_LOCK_ACQUIRE->resp_set([
+api/endpoint/slide/slide_lock_acquire.php:72:	'expire' => $slide->get_lock()->get_expire(),
+api/endpoint/slide/slide_lock_acquire.php:75:$SLIDE_LOCK_ACQUIRE->send();
+api/endpoint/slide/slide_get.php:51:$slide->load($SLIDE_GET->get('id'));
+api/endpoint/slide/slide_get.php:52:$SLIDE_GET->resp_set(['slide' => $slide->get_public_data_array()]);
+api/endpoint/slide/slide_get.php:53:$SLIDE_GET->send();
+api/endpoint/slide/slide_data_query.php:59:	$tmp->load($s);
+api/endpoint/slide/slide_data_query.php:62:	foreach($SLIDE_DATA_QUERY->get() as $k => $v) {
+api/endpoint/slide/slide_data_query.php:63:		$ret['data'][$s][$k] = $tmp->get_public_data_array()[$k];
+api/endpoint/slide/slide_data_query.php:66:$SLIDE_DATA_QUERY->resp_set($ret);
+api/endpoint/slide/slide_data_query.php:67:$SLIDE_DATA_QUERY->send();
+api/endpoint/slide/slide_rm.php:36:$slide->load($SLIDE_RM->get('id'));
+api/endpoint/slide/slide_rm.php:39:$owner = new User($slide->get_owner());
+api/endpoint/slide/slide_rm.php:46:	$SLIDE_RM->get_caller()
+api/endpoint/slide/slide_rm.php:49:	'grp:editor&usr:'.$slide->get_owner().';',
+api/endpoint/slide/slide_rm.php:50:	$SLIDE_RM->get_caller()
+api/endpoint/slide/slide_rm.php:59:$slide->remove();
+api/endpoint/slide/slide_rm.php:62:$queue = new Queue($slide->get_queue_name());
+api/endpoint/slide/slide_rm.php:63:$queue->load();
+api/endpoint/slide/slide_rm.php:64:$queue->normalize();
+api/endpoint/slide/slide_rm.php:66:$owner_quota->free_quota('slides');
+api/endpoint/slide/slide_rm.php:67:$owner_quota->flush();
+api/endpoint/slide/slide_rm.php:69:$SLIDE_RM->send();
+api/endpoint/slide/slide_list.php:30:$SLIDE_LIST->resp_set(array(
+api/endpoint/slide/slide_list.php:33:$SLIDE_LIST->send();
+api/endpoint/slide/slide_lock_release.php:46:		$SLIDE_LOCK_RELEASE->get_caller()
+api/endpoint/slide/slide_lock_release.php:56:$slide->load($SLIDE_LOCK_RELEASE->get('id'));
+api/endpoint/slide/slide_lock_release.php:58:	$slide->lock_release($SLIDE_LOCK_RELEASE->get_session());
+api/endpoint/slide/slide_lock_release.php:67:$slide->write();
+api/endpoint/slide/slide_lock_release.php:69:$SLIDE_LOCK_RELEASE->resp_set([]);
+api/endpoint/slide/slide_lock_release.php:70:$SLIDE_LOCK_RELEASE->send();
+api/endpoint/user/users_list.php:32:	$ret['users'][] = $u->get_name();
+api/endpoint/user/users_list.php:34:$USERS_GET_ALL->resp_set($ret);
+api/endpoint/user/users_list.php:35:$USERS_GET_ALL->send();
+api/endpoint/user/user_create.php:31:define('GROUPS_REGEX', '/[^A-Za-z0-9_]/');
+api/endpoint/user/user_create.php:46:if (!$USER_CREATE->get_caller()->is_in_group('admin')) {
+api/endpoint/user/user_create.php:53:if (user_exists($USER_CREATE->get('user'))) {
+api/endpoint/user/user_create.php:64:if (preg_match(USER_REGEX, $USER_CREATE->get('user'))) {
+api/endpoint/user/user_create.php:71:	$user->set_name($USER_CREATE->get('user'));
+api/endpoint/user/user_create.php:80:if ($USER_CREATE->has('groups', TRUE)) {
+api/endpoint/user/user_create.php:82:		$USER_CREATE->get('groups')))) {
+api/endpoint/user/user_create.php:90:		$user->set_groups($USER_CREATE->get('groups'));
+api/endpoint/user/user_create.php:107:$user->set_password($tmp_pass);
+api/endpoint/user/user_create.php:108:$user->set_ready(TRUE);
+api/endpoint/user/user_create.php:110:if ($user->write() === FALSE) {
+api/endpoint/user/user_create.php:119:		'name' => $user->get_name(),
+api/endpoint/user/user_create.php:120:		'groups' => $user->get_groups(),
+api/endpoint/user/user_create.php:125:$USER_CREATE->resp_set($ret);
+api/endpoint/user/user_create.php:126:$USER_CREATE->send();
+api/endpoint/user/user_remove.php:34:if (!$USER_REMOVE->get_caller()->is_in_group('admin')) {
+api/endpoint/user/user_remove.php:42:	$u = new User($USER_REMOVE->get('user'));
+api/endpoint/user/user_remove.php:51:	$u->remove();
+api/endpoint/user/user_remove.php:59:$USER_REMOVE->send();
+api/endpoint/user/user_get_current.php:34:$u = $USER_GET->get_caller();
+api/endpoint/user/user_get_current.php:37:		'user' => $u->get_name(),
+api/endpoint/user/user_get_current.php:38:		'groups' => $u->get_groups()
+api/endpoint/user/user_get_current.php:41:$USER_GET->resp_set($ret_data);
+api/endpoint/user/user_get_current.php:42:$USER_GET->send();
+api/endpoint/user/user_get.php:40:if (!$USER_GET->get_caller()->is_in_group('admin')) {
+api/endpoint/user/user_get.php:48:	$u = new User($USER_GET->get('user'));
+api/endpoint/user/user_get.php:58:		'user' => $u->get_name(),
+api/endpoint/user/user_get.php:59:		'groups' => $u->get_groups()
+api/endpoint/user/user_get.php:63:$USER_GET->resp_set($ret_data);
+api/endpoint/user/user_get.php:64:$USER_GET->send();
+api/endpoint/user/users_get_all.php:36:if (!$USERS_GET_ALL->get_caller()->is_in_group('admin')) {
+api/endpoint/user/users_get_all.php:49:	$ret_data['users'][$u->get_name()] = array(
+api/endpoint/user/users_get_all.php:50:		'user' => $u->get_name(),
+api/endpoint/user/users_get_all.php:51:		'groups' => $u->get_groups()
+api/endpoint/user/users_get_all.php:55:$USERS_GET_ALL->resp_set($ret_data);
+api/endpoint/user/users_get_all.php:56:$USERS_GET_ALL->send();
+api/endpoint/user/user_save.php:39:define('GROUP_NAME_COMP_REGEX', '/[^A-Za-z0-9_]/');
+api/endpoint/user/user_save.php:56:$auth_admin = $USER_SAVE->get_caller()->is_in_group('admin');
+api/endpoint/user/user_save.php:59:$auth_usr = ($USER_SAVE->get_caller()->get_name()
+api/endpoint/user/user_save.php:60:		=== $USER_SAVE->get('user'));
+api/endpoint/user/user_save.php:71:if ($USER_SAVE->has('pass', TRUE) && !$auth_usr) {
+api/endpoint/user/user_save.php:79:if ($USER_SAVE->has('groups', TRUE) && !$auth_admin) {
+api/endpoint/user/user_save.php:83:		"Non-admin users can't set groups."
+api/endpoint/user/user_save.php:88:	$u = new User($USER_SAVE->get('user'));
+api/endpoint/user/user_save.php:96:if ($USER_SAVE->has('pass', TRUE)) {
+api/endpoint/user/user_save.php:97:	$u->set_password($USER_SAVE->get('pass'));
+api/endpoint/user/user_save.php:99:if ($USER_SAVE->has('groups', TRUE)) {
+api/endpoint/user/user_save.php:101:			$USER_SAVE->get('groups')))) {
+api/endpoint/user/user_save.php:108:		$u->set_groups($USER_SAVE->get('groups'));
+api/endpoint/user/user_save.php:117:if ($u->write() === FALSE) {
+api/endpoint/user/user_save.php:126:		'name' => $u->get_name(),
+api/endpoint/user/user_save.php:127:		'groups' => $u->get_groups()
+api/endpoint/user/user_save.php:131:$USER_SAVE->resp_set($ret);
+api/endpoint/user/user_save.php:132:$USER_SAVE->send();
+api/endpoint/user/user_get_quota.php:38:if ($USER_GET_QUOTA->has('user', TRUE)) {
+api/endpoint/user/user_get_quota.php:40:	$user_name = $USER_GET_QUOTA->get('user');
+api/endpoint/user/user_get_quota.php:43:	$user_name = $USER_GET_QUOTA->get_caller()->get_name();
+api/endpoint/user/user_get_quota.php:47:if (!$USER_GET_QUOTA->get_caller()->is_in_group('admin')
+api/endpoint/user/user_get_quota.php:48:	&& $USER_GET_QUOTA->get_caller()->get_name() != $user_name) {
+api/endpoint/user/user_get_quota.php:65:$USER_GET_QUOTA->resp_set(array(
+api/endpoint/user/user_get_quota.php:66:	'quota' => $user_quota->get_quota_data()
+api/endpoint/user/user_get_quota.php:68:$USER_GET_QUOTA->send();
+api/endpoint/general/ver_info.php:30:$VER_INFO->resp_set([
+api/endpoint/general/ver_info.php:34:$VER_INFO->send();
+api/endpoint/general/server_limits.php:30:$SERVER_LIMITS->resp_set(array('limits' => LS_LIM));
+api/endpoint/general/server_limits.php:31:$SERVER_LIMITS->send();
+api/endpoint/general/api_err_msgs.php:30:$API_ERR_MSGS->resp_set(array('messages' => API_E_MSG));
+api/endpoint/general/api_err_msgs.php:31:$API_ERR_MSGS->send();
+api/endpoint/general/library_licenses.php:25:$LIBRARY_LICENSES->resp_set(file_get_contents(
+api/endpoint/general/library_licenses.php:28:$LIBRARY_LICENSES->send();
+api/endpoint/general/libresignage_license.php:26:$LIBRESIGNAGE_LICENSE->resp_set(file_get_contents(
+api/endpoint/general/libresignage_license.php:29:$LIBRESIGNAGE_LICENSE->send();
+api/endpoint/general/api_err_codes.php:30:$API_ERR_CODES->resp_set(array('codes' => API_E));
+api/endpoint/general/api_err_codes.php:31:$API_ERR_CODES->send();

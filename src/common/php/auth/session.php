@@ -1,9 +1,10 @@
 <?php
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
 
-class Session {
-	private $EXPORTED_PUBLIC = [
+class Session extends Exportable{
+	static $PUBLIC = [
 		'id',
 		'who',
 		'from',
@@ -12,7 +13,7 @@ class Session {
 		'permanent'
 	];
 
-	private $EXPORTED = [
+	static $PRIVATE = [
 		'id',
 		'who',
 		'from',
@@ -37,6 +38,14 @@ class Session {
 	public function get_max_age() { return $this->max_age; }
 	public function is_permanent() { return $this->permanent; }
 	public function get_token_hash() { return $this->token_hash; }
+
+	public function __exportable_set(string $name, $value) {
+		$this->{$name} = $value;
+	}
+
+	public function __exportable_get(string $name) {
+		return $this->{$name};
+	}
 
 	public function new(
 		User $user,
@@ -73,42 +82,6 @@ class Session {
 		*/
 		$this->created = time();
 		$this->generate_token();
-	}
-
-	public function load(array $data) {
-		/*
-		*  Load data originally exported by Session::export().
-		*/
-		foreach ($this->EXPORTED as $val) {
-			if (!array_key_exists($val, $data)) {
-				throw new ArgException('Invalid session data.');
-			}
-			$this->{$val} = $data[$val];
-		}
-	}
-
-	public function export() {
-		/*
-		*  Export session data as "simple" values for JSON
-		*  encoding & storing in a file.
-		*/
-		$ret = [];
-		foreach ($this->EXPORTED as $val) {
-			$ret[$val] = $this->{$val};
-		}
-		return $ret;
-	}
-
-	public function export_public() {
-		/*
-		*  Export public session data as "simple" values for
-		*  returning via the API.
-		*/
-		$ret = [];
-		foreach ($this->EXPORTED_PUBLIC as $val) {
-			$ret[$val] = $this->{$val};
-		}
-		return $ret;
 	}
 
 	private function generate_token() {
