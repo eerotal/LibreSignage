@@ -25,3 +25,10 @@ v0.1.0
   - [bugfix]   Confirm before changing the queue if an unsaved slide
                is being edited in the editor (#17).
   - [bugfix]   Prevent creating duplicate queues in the editor.
+  - [bugfix]   Don't show unstyled slide previews to users in the editor
+               by making sure the necessary CSS is loaded before showing
+               content.
+  - [bugfix]   Fix a bug resulting in spurious slide changes on the
+               display page.
+  - [improve]  Make the login and user manager pages more mobile friendly.
+  - [feature]  Implement a Quick Help view in the editor.
