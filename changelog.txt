@@ -32,3 +32,11 @@ v0.1.0
                display page.
   - [improve]  Make the login and user manager pages more mobile friendly.
   - [feature]  Implement a Quick Help view in the editor.
+  - [Internal] Implement a new way of exporting PHP object data by using
+               a class called Exportable.
+  - [feature]  Implement slide locking to prevent simultaneous editing
+               of slides (issue #18).
+  - [internal] Rewrite most of the PHP session handling code. Implement
+               a new class called Session for handling & storing session
+               data.
+  - [internal] Implement a simple assertion system in JavaScript.
