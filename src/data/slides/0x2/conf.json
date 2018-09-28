@@ -1,14 +1,1 @@
-{
-	"name": "LibreSignage",
-	"index": 1,
-	"time": 8000,
-	"owner": "admin",
-	"enabled": true,
-	"sched": false,
-	"sched_t_s": 0,
-	"sched_t_e": 0,
-	"animation": 1,
-	"queue_name": "default",
-	"collaborators": [],
-	"lock": null
-}
+{"__classname":"Slide","__visibility":"private","id":"0x2","name":"LibreSignage","index":1,"time":8000,"markup":"[container top=10% right=10% bottom=10% left=10%]\n\t[xcenter]\n\t\t[h size=12%]LibreSignage[\/h]\n\t\t[lead]An Open Source digital signage solution[\/lead]\n\t[\/xcenter]\n\n\t[p]This screen is one of the default screens supplied with LibreSignage. If you see this\n        screen and you are the admin of this instance, the server installation is now\n        finished. Now it's time to add some real content to the system and start using it.[\/p]\n\n\t[p]If you are not the admin of this LibreSignage instance and you see this screen,\n        you should probably contact the server admin. Either the server setup is still in\n        progress or something has gone wrong with the LibreSignage instance.[\/p]\n[\/container]","owner":"admin","enabled":true,"sched":false,"sched_t_s":0,"sched_t_e":0,"animation":1,"queue_name":"default","collaborators":[],"lock":null}

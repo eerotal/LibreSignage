@@ -12,6 +12,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/uid.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/queue.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
 
 function slides_id_list() {
 	$ids = scandir(LIBRESIGNAGE_ROOT.SLIDES_DIR);
@@ -37,12 +38,13 @@ function slides_list() {
 
 class SlideLockException extends Exception {};
 
-class Slide {
-	// Required keys in a slide config file.
-	const CONF_KEYS = array(
+class Slide extends Exportable{
+	static $PUBLIC = [
+		'id',
 		'name',
 		'index',
 		'time',
+		'markup',
 		'owner',
 		'enabled',
 		'sched',
@@ -52,11 +54,27 @@ class Slide {
 		'queue_name',
 		'collaborators',
 		'lock'
-	);
+	];
+
+	static $PRIVATE = [
+		'id',
+		'name',
+		'index',
+		'time',
+		'markup',
+		'owner',
+		'enabled',
+		'sched',
+		'sched_t_s',
+		'sched_t_e',
+		'animation',
+		'queue_name',
+		'collaborators',
+		'lock'
+	];
 
 	// Slide file paths.
 	private $conf_path = NULL;
-	private $markup_path = NULL;
 	private $dir_path = NULL;
 
 	// Slide data variables.
@@ -75,6 +93,14 @@ class Slide {
 	private $collaborators = NULL;
 	private $lock = NULL;
 
+	public function __exportable_set(string $name, $value) {
+		$this->{$name} = $value;
+	}
+
+	public function __exportable_get(string $name) {
+		return $this->{$name};
+	}
+
 	private function _mk_paths(string $id) {
 		/*
 		*  Create the file path strings needed for
@@ -82,7 +108,6 @@ class Slide {
 		*/
 		$this->dir_path = LIBRESIGNAGE_ROOT.SLIDES_DIR.'/'.$id;
 		$this->conf_path = $this->dir_path.'/conf.json';
-		$this->markup_path = $this->dir_path.'/markup.dat';
 	}
 
 	private function _paths_exist() {
@@ -90,9 +115,10 @@ class Slide {
 		*  Check that all the required files and
 		*  directories exist.
 		*/
-		if (!is_dir($this->dir_path) ||
-			!is_file($this->conf_path) ||
-			!is_file($this->markup_path)) {
+		if (
+			!is_dir($this->dir_path)
+			|| !is_file($this->conf_path)
+		) {
 			return FALSE;
 		}
 		return TRUE;
@@ -109,62 +135,21 @@ class Slide {
 
 		$this->_mk_paths($id);
 		if (!$this->_paths_exist()) {
-			throw new ArgException(
-				"Slide $id doesn't exist."
-			);
+			throw new ArgException("Slide $id doesn't exist.");
 		}
 
 		// Read config.
 		$cstr = file_lock_and_get($this->conf_path);
 		if ($cstr === FALSE) {
-			throw new IntException(
-				"Slide config read error!"
-			);
+			throw new IntException("Slide config read error!");
 		}
 		$conf = json_decode($cstr, $assoc=TRUE);
-		if ($conf === NULL &&
-			json_last_error() != JSON_ERROR_NONE) {
-			throw new IntException(
-				"Slide config decode error!"
-			);
-		}
+		if (
+			$conf === NULL
+			&& json_last_error() != JSON_ERROR_NONE
+		) { throw new IntException("Slide config decode error!"); }
 
-		// Check config validity.
-		if (!array_is_equal(array_keys($conf),
-					self::CONF_KEYS)) {
-			throw new IntException(
-				"Invalid slide config."
-			);
-		}
-
-		// Read markup.
-		$mu = file_lock_and_get($this->markup_path);
-		if ($mu === FALSE) {
-			throw new IntException(
-				"Slide markup read error!"
-			);
-		}
-
-		// Copy all loaded data to this object.
-		$this->set_id($id);
-		$this->set_markup($mu);
-		$this->set_name($conf['name']);
-		$this->set_index($conf['index']);
-		$this->set_time($conf['time']);
-		$this->set_owner($conf['owner']);
-		$this->set_enabled($conf['enabled']);
-		$this->set_sched($conf['sched']);
-		$this->set_sched_t_s($conf['sched_t_s']);
-		$this->set_sched_t_e($conf['sched_t_e']);
-		$this->set_animation($conf['animation']);
-		$this->set_queue_name($conf['queue_name']);
-		$this->set_collaborators($conf['collaborators']);
-		if ($conf['lock'] !== NULL) {
-			$sl = new SlideLock(null);
-			$sl->load($conf['lock']);
-			$this->set_lock($sl);
-		}
-
+		$this->import($conf, TRUE);
 		$this->check_sched_enabled();
 	}
 
@@ -201,9 +186,7 @@ class Slide {
 		*  generated.
 		*/
 		if (!in_array($id, slides_id_list())) {
-			throw new ArgException(
-				"Slide $id doesn't exist."
-			);
+			throw new ArgException("Slide $id doesn't exist.");
 		}
 		$this->id = $id;
 		$this->_mk_paths($id);
@@ -212,9 +195,7 @@ class Slide {
 	function set_markup(string $markup) {
 		// Check markup length.
 		if (strlen($markup) > gtlim('SLIDE_MARKUP_MAX_LEN')) {
-			throw new ArgException(
-				"Slide markup too long."
-			);
+			throw new ArgException("Slide markup too long.");
 		}
 		$this->markup = $markup;
 	}
@@ -223,20 +204,14 @@ class Slide {
 		// Check name for invalid chars.
 		$tmp = preg_match('/[^a-zA-Z0-9_-]/', $name);
 		if ($tmp) {
-			throw new ArgException(
-				"Invalid chars in slide name."
-			);
+			throw new ArgException("Invalid chars in slide name.");
 		} else if ($tmp === NULL) {
-			throw new IntException(
-				"Regex match failed."
-			);
+			throw new IntException("Regex match failed.");
 		}
 
 		// Check name length.
 		if (strlen($name) > gtlim('SLIDE_NAME_MAX_LEN')) {
-			throw new ArgException(
-				"Slide name too long."
-			);
+			throw new ArgException("Slide name too long.");
 		}
 		$this->name = $name;
 	}
@@ -244,29 +219,25 @@ class Slide {
 	function set_index(int $index) {
 		// Check index bounds.
 		if ($index < 0 || $index > gtlim('SLIDE_MAX_INDEX')) {
-			throw new ArgException(
-				"Slide index $index out of bounds."
-			);
+			throw new ArgException("Slide index $index out of bounds.");
 		}
 		$this->index = $index;
 	}
 
 	function set_time(int $time) {
 		// Check time bounds.
-		if ($time < gtlim('SLIDE_MIN_TIME') ||
-			$time > gtlim('SLIDE_MAX_TIME')) {
-			throw new ArgException(
-				"Slide time $time out of bounds."
-			);
+		if (
+			$time < gtlim('SLIDE_MIN_TIME')
+			|| $time > gtlim('SLIDE_MAX_TIME')
+		) {
+			throw new ArgException("Slide time $time out of bounds.");
 		}
 		$this->time = $time;
 	}
 
 	function set_owner(string $owner) {
 		if (!user_exists($owner)) {
-			throw new ArgException(
-				"User $owner doesn't exist."
-			);
+			throw new ArgException("User $owner doesn't exist.");
 		}
 		$this->owner = $owner;
 	}
@@ -301,9 +272,7 @@ class Slide {
 
 	function set_animation(int $anim) {
 		if ($anim < 0) {
-			throw new ArgException(
-				"Invalid negative animation."
-			);
+			throw new ArgException("Invalid negative animation.");
 		}
 		$this->animation = $anim;
 	}
@@ -332,9 +301,7 @@ class Slide {
 
 	function set_collaborators(array $collaborators) {
 		if (count($collaborators) > gtlim('SLIDE_MAX_COLLAB')) {
-			throw new ArgException(
-				"Too many collaborators."
-			);
+			throw new ArgException( "Too many collaborators.");
 		}
 		if (empty($this->get_owner())) {
 			throw new ArgException(
@@ -350,9 +317,7 @@ class Slide {
 				);
 			}
 			if (!user_exists($c)) {
-				throw new ArgException(
-					"User $c doesn't exist."
-				);
+				throw new ArgException("User $c doesn't exist.");
 			}
 		}
 		$this->collaborators = $collaborators;
@@ -427,29 +392,6 @@ class Slide {
 		return $queue;
 	}
 
-	function get_public_data_array() {
-		/*
-		*  Get all the public-to-world data of this slide.
-		*  This is mainly used by API endpoints.
-		*/
-		return [
-			'id' => $this->id,
-			'markup' => $this->markup,
-			'name' => $this->name,
-			'index' => $this->index,
-			'time' => $this->time,
-			'owner' => $this->owner,
-			'enabled' => $this->enabled,
-			'sched' => $this->sched,
-			'sched_t_s' => $this->sched_t_s,
-			'sched_t_e' => $this->sched_t_e,
-			'animation' => $this->animation,
-			'queue_name' => $this->queue_name,
-			'collaborators' => $this->collaborators,
-			'lock' => $this->lock === NULL ? NULL : $this->lock->export()
-		];
-	}
-
 	function check_sched_enabled() {
 		/*
 		*  Check whether the slide is enabled based on
@@ -473,30 +415,16 @@ class Slide {
 
 	function write() {
 		/*
-		*  Write the currently stored data into the
-		*  correct storage files. This function
-		*  automatically overwrites files if they
-		*  already exist.
+		*  Write the currently stored data into the correct
+		*  storage files. This function  overwrites files if
+		*  they already exist.
 		*/
-		$conf = $this->get_public_data_array();
-		unset($conf['id']);
-		unset($conf['markup']);
-
-		$cstr = json_encode($conf);
-		if ($cstr === FALSE &&
-			json_last_error() != JSON_ERROR_NONE) {
-			throw new IntException(
-				"Slide config encoding failed."
-			);
-		}
-		file_lock_and_put(
-			$this->conf_path,
-			$cstr
-		);
-		file_lock_and_put(
-			$this->markup_path,
-			$this->get_markup()
-		);
+		$cstr = json_encode($this->export(TRUE, TRUE));
+		if (
+			$cstr === FALSE &&
+			json_last_error() != JSON_ERROR_NONE
+		) { throw new IntException("Slide config encoding failed."); }
+		file_lock_and_put($this->conf_path, $cstr);
 	}
 
 	function remove() {

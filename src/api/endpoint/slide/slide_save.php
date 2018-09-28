@@ -204,5 +204,5 @@ $queue = new Queue($slide->get_queue_name());
 $queue->load();
 $queue->juggle($slide->get_id());
 
-$SLIDE_SAVE->resp_set($slide->get_public_data_array());
+$SLIDE_SAVE->resp_set($slide->export(FALSE, FALSE));
 $SLIDE_SAVE->send();

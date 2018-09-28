@@ -60,7 +60,7 @@ foreach($s_ids as $s) {
 	$ret['data'][$s] = [];
 
 	foreach($SLIDE_DATA_QUERY->get() as $k => $v) {
-		$ret['data'][$s][$k] = $tmp->get_public_data_array()[$k];
+		$ret['data'][$s][$k] = $tmp->export(FALSE, FALSE)[$k];
 	}
 }
 $SLIDE_DATA_QUERY->resp_set($ret);
