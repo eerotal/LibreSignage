@@ -16,11 +16,12 @@ class Test extends Exportable {
 	];
 
 	private $var1 = 1;
-	private $var2 = 2;
+	private $var2 = NULL;
 	private $var3 = NULL;
 	private $var4 = NULL;
 
 	public function __construct() {
+		$this->var2 = new Test2();
 		$this->var3 = [
 			new Test2(),
 			new Test2()
@@ -56,4 +57,10 @@ class Test2 extends Exportable {
 	public function __exportable_get(string $name) {
 		return $this->{$name};
 	}
+}
+
+function test() {
+	$asd = new Test();
+	$a = $asd->export(TRUE, TRUE);
+	$asd->import($a, TRUE);
 }

@@ -56,12 +56,11 @@ abstract class Exportable {
 
 		if (!empty(array_intersect(EXP_RESERVED, $keys))) {
 			throw new ExportableException(
-				"Reserved key '".EXP_CLASSNAME."' in used in object."
+				"Reserved key '".EXP_CLASSNAME."' used in object."
 			);
 		}
 
-		if ($meta) {
-			// Add metadata.
+		if ($meta) { // Add metadata.
 			$ret[EXP_CLASSNAME] = get_class($this);
 			$ret[EXP_VISIBILITY] = $private ? 'private' : 'public';
 		}
@@ -138,33 +137,32 @@ abstract class Exportable {
 		bool $root,
 		bool $check_keys
 	) {
-		if ($check_keys) {
+		if (
+			$check_keys
+			&& array_key_exists(EXP_VISIBILITY, $arr)
+			&& array_key_exists(EXP_CLASSNAME, $arr)
+		) {
 			// Check that the keys in $arr match the expected ones.
 			$keys = [];
-			if (
-				array_key_exists(EXP_VISIBILITY, $arr)
-				&& array_key_exists(EXP_CLASSNAME, $arr)
-			) {
-				switch ($arr[EXP_VISIBILITY]) {
-					case 'public':
-						if ($root) {
-							$keys = static::$PUBLIC;
-						} else {
-							$keys = $arr[EXP_CLASSNAME]::$PUBLIC;
-						}
-						break;
-					case 'private':
-						if ($root) {
-							$keys = static::$PRIVATE;
-						} else {
-							$keys = $arr[EXP_CLASSNAME]::$PRIVATE;
-						}
-						break;
-					default:
-						throw new ExportableException(
-							"Unknown visibility value."
-						);
-				}
+			switch ($arr[EXP_VISIBILITY]) {
+				case 'public':
+					if ($root) {
+						$keys = static::$PUBLIC;
+					} else {
+						$keys = $arr[EXP_CLASSNAME]::$PUBLIC;
+					}
+					break;
+				case 'private':
+					if ($root) {
+						$keys = static::$PRIVATE;
+					} else {
+						$keys = $arr[EXP_CLASSNAME]::$PRIVATE;
+					}
+					break;
+				default:
+					throw new ExportableException(
+						"Unknown visibility value."
+					);
 			}
 
 			$diff = arraydiff(
