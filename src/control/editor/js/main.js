@@ -622,13 +622,12 @@ function disable_controls() {
 function enable_controls() {
 	var o = (
 		!sel_slide.get('owner') // New slide.
-		|| sel_slide.get('owner') == API.CONFIG.user.user
+		|| sel_slide.get('owner') === API.CONFIG.user.user
 	);
 	var c = (
 		sel_slide.get('collaborators').includes(API.CONFIG.user.user)
 	);
 	var l = sel_slide.is_locked_from_here();
-	console.log('locked: ' + l);
 
 	UI_DEFS.all(
 		function(d) {
@@ -713,29 +712,52 @@ function slide_show(s, no_popup) {
 			flag_slide_loading = false;
 		}
 
-		console.log(`LibreSignage: Show slide '${s}'.`);
-
-		flag_slide_loading = true;
-		if (sel_slide) { sel_slide.lock_release(null); }
-
-		// Load the new slide w/ lock
-		sel_slide = new slide.Slide(API);
-		sel_slide.load(s, true, true, err_1 => {
-			if (err_1 == API.ERR.API_E_LOCK) {
-				// or w/o lock
-				sel_slide.load(s, false, false, err_2 => {
-					if (err_2) {
-						error()
+		if (sel_slide !== null && s == sel_slide.get('id')) {
+			/*
+			*  Don't fully reload the slide if it's the same one
+			*  that's already loaded. Just fetch the new data,
+			*  acquire a lock if not already locked and update the
+			*  UI.
+			*/
+			console.log(`LibreSignage: Update slide '${s}'.`);
+			if (!sel_slide.is_locked_from_here()) {
+				sel_slide.lock_acquire(true, err => {
+					if (err) {
+						error();
 					} else {
-						success();
-					}
+						sel_slide.fetch(err => err ? error() : success());
+					}		
 				});
-			} else if (err_1){
-				error();
 			} else {
-				success();
+				sel_slide.fetch(err => err ? error() : success());
 			}
-		});
+		} else {
+			console.log(`LibreSignage: Show slide '${s}'.`);
+			flag_slide_loading = true;
+			if (sel_slide) { sel_slide.lock_release(null); }
+
+			// Load the new slide w/ a lock.
+			sel_slide = new slide.Slide(API);
+			sel_slide.load(s, true, true, err_1 => {
+				switch (err_1) {
+					case API.ERR.API_E_OK:
+						success();
+						break;
+					case API.ERR.API_E_LOCK:
+						// or w/o a lock
+						sel_slide.load(
+							s,
+							false,
+							false,
+							err_2 => err_2 ? error() : success()
+						);
+						break;
+					default:
+						error();
+						break;
+				}
+			});
+		}
 	}
 
 	if (flag_slide_loading) { return; }
@@ -821,8 +843,6 @@ function slide_save() {
 	/*
 	*  Save the currently selected slide.
 	*/
-	console.log("LibreSignage: Save slide");
-
 	if (
 		UI_DEFS.get('SLIDE_INPUT').get().length >
 		API.SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN
@@ -854,9 +874,7 @@ function slide_save() {
 	});
 
 	sel_slide.save((stat) => {
-		if (API.handle_disp_error(stat)) {
-			return;
-		}
+		if (API.handle_disp_error(stat)) { return; }
 		console.log(
 			`LibreSignage: Saved slide '${sel_slide.get("id")}'.`
 		);
