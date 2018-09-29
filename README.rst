@@ -400,10 +400,10 @@ distribution.
 Build system dependencies
 -------------------------
 
-  * SASS (https://sass-lang.com/)
-  * Browserify (http://browserify.org/)
-  * PostCSS (https://postcss.org/)
-  * Autoprefixer (https://github.com/postcss/autoprefixer)
+* SASS (https://sass-lang.com/)
+* Browserify (http://browserify.org/)
+* PostCSS (https://postcss.org/)
+* Autoprefixer (https://github.com/postcss/autoprefixer)
 
 License
 -------
