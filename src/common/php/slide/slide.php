@@ -160,6 +160,7 @@ class Slide extends Exportable{
 		$slide = clone $this;
 		$slide->gen_id();
 		$slide->set_index($slide->get_index() + 1);
+		$slide->set_lock(NULL);
 		$slide->write();
 
 		$queue = $slide->get_queue();
@@ -323,7 +324,7 @@ class Slide extends Exportable{
 		$this->collaborators = $collaborators;
 	}
 
-	private function set_lock(SlideLock $lock) {
+	public function set_lock($lock) {
 		$this->lock = $lock;
 	}
 

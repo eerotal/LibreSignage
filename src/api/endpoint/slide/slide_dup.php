@@ -8,7 +8,8 @@
 *  ====>
 *
 *  *Duplicate a slide. The owner of the new slide is the caller
-*   of this API endpoint.*
+*   of this API endpoint. The new slide is also automatically
+*   locked for the caller.*
 *
 *  POST JSON parameters
 *    * id = The ID of the slide to duplicate.
@@ -54,10 +55,12 @@ if (!check_perm('grp:admin|grp:editor;', $SLIDE_DUP->get_caller())) {
 $slide = new Slide();
 $slide->load($SLIDE_DUP->get('id'));
 
-// Duplicate and set the caller as the owner of the new slide.
 $new_slide = $slide->dup();
 $new_slide->set_owner($SLIDE_DUP->get_caller()->get_name());
+$new_slide->lock_acquire($SLIDE_DUP->get_session());
+
 $new_slide->write();
+
 
 // Juggle slide indices to make sure they are correct.
 $queue = $new_slide->get_queue();
