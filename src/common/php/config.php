@@ -3,25 +3,20 @@
 	*  LibreSignage config code and constants.
 	*/
 
-	/*
-	*  Build time flags
-	*    !!BUILD_VERIFY_NOCONFIG!!
-	*/
-
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/error.php');
 
 	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT']);
 
 	// Version information.
-	const LS_VER = "!!BCONST_LS_VER!!";
-	const API_VER = "!!BCONST_API_VER!!";
+	const LS_VER = "#pre(LS_VER)";
+	const API_VER = "#pre(API_VER)";
 
 	// Setup debugging. Don't touch, set by mkdist.sh.
-	const LIBRESIGNAGE_DEBUG = !!BCONST_DEBUG!!;
+	const LIBRESIGNAGE_DEBUG = #pre(ICONF_DEBUG);
 
 	// Instance owner config. Don't touch, set by mkdist.sh.
-	const ADMIN_EMAIL = "!!BCONST_ADMIN_EMAIL!!";
-	const ADMIN_NAME = "!!BCONST_ADMIN_NAME!!";
+	const ADMIN_EMAIL = "#pre(ICONF_ADMIN_EMAIL)";
+	const ADMIN_NAME = "#pre(ICONF_ADMIN_NAME)";
 
 	/*
 	*  Paths relative to document root. DO NOT make these absolute

@@ -39,8 +39,7 @@ SRC_NO_COMPILE := $(shell find src \
 		-a -type f ! -name '*~' \
 		-a -type f ! -name '*.js' \
 		-a -type f ! -name '*.scss' \
-		-a -type f ! -name '*.rst' \
-		-a -type f ! -name 'config.php' -print \
+		-a -type f ! -name '*.rst' -print \
 	\) \
 )
 
@@ -84,12 +83,11 @@ endif
 		clean realclean LOC
 .ONESHELL:
 
-all:: server docs htmldocs js css api config libs; @:
+all:: server docs htmldocs js css api libs; @:
 
 server:: initchk $(subst src,dist,$(SRC_NO_COMPILE)); @:
 js:: initchk $(subst src,dist,$(SRC_JS)); @:
 api:: initchk $(subst src,dist,$(SRC_ENDPOINT)); @:
-config:: initchk dist/common/php/config.php; @:
 libs:: initchk dist/libs; @:
 docs:: initchk $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_index.rst; @:
 htmldocs:: initchk $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
@@ -99,21 +97,26 @@ libs:: initchk $(subst $(ROOT)node_modules/,dist/libs/,$(LIBS)); @:
 # Copy over non-compiled, non-PHP sources.
 $(filter-out %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
 	@:
+	set -e
 	$(call status,cp,$<,$@)
 	$(call makedir,$@)
 	cp -p $< $@
 
-# Copy over normal PHP files and check the PHP syntax.
+# Copy and prepare PHP files and check the syntax.
 $(filter %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
 	@:
-	php -l $< > /dev/null
+	set -e
 	$(call status,cp,$<,$@)
 	$(call makedir,$@)
 	cp -p $< $@
+	$(call status,prep.sh,<inplace>,$@)
+	./build/scripts/prep.sh $(INST) $@
+	php -l $@ > /dev/null
 
 # Copy API endpoint PHP files and generate corresponding docs.
 $(subst src,dist,$(SRC_ENDPOINT)):: dist%: src%
 	@:
+	set -e
 	php -l $< > /dev/null
 
 	$(call status,cp,$<,$@)
@@ -145,10 +148,11 @@ $(subst src,dist,$(SRC_ENDPOINT)):: dist%: src%
 # Generate the API endpoint documentation index.
 dist/doc/rst/api_index.rst:: $(SRC_ENDPOINT)
 	@:
+	set -e
 	$(call status,makefile,<generated>,$@)
 	$(call makedir,$@)
 
-	@. build/scripts/conf.sh
+	. build/scripts/conf.sh
 	echo "LibreSignage API documentation (Ver: $$ICONF_API_VER)" > $@
 	echo '########################################################' >> $@
 	echo '' >> $@
@@ -167,19 +171,10 @@ dist/doc/rst/api_index.rst:: $(SRC_ENDPOINT)
 		pandoc -f rst -t html -o $(subst /rst/,/html/,$(@:.rst=.html)) $@
 	fi
 
-# Copy and prepare 'config.php'.
-dist/common/php/config.php:: src/common/php/config.php
-	@:
-	$(call status,cp,$<,$@)
-	$(call makedir,$@)
-	cp -p $< $@
-	$(call status,prep.sh,<inplace>,$@)
-	./build/scripts/prep.sh $(INST) $@
-	php -l $@ > /dev/null
-
 # Copy over README.rst.
 dist/doc/rst/README.rst:: README.rst
 	@:
+	set -e
 	$(call status,cp,$<,$@)
 	$(call makedir,$@)
 	cp -p $< $@
@@ -187,6 +182,7 @@ dist/doc/rst/README.rst:: README.rst
 # Copy over RST sources.
 dist/doc/rst/%.rst:: src/doc/rst/%.rst
 	@:
+	set -e
 	$(call status,cp,$<,$@)
 	$(call makedir,$@)
 	cp -p $< $@
@@ -194,6 +190,7 @@ dist/doc/rst/%.rst:: src/doc/rst/%.rst
 # Compile RST sources into HTML.
 dist/doc/html/%.html:: src/doc/rst/%.rst
 	@:
+	set -e
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
 		$(call status,pandoc,$<,$@)
 		$(call makedir,$@)
@@ -203,6 +200,7 @@ dist/doc/html/%.html:: src/doc/rst/%.rst
 # Compile README.rst
 dist/doc/html/README.html:: README.rst
 	@:
+	set -e
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
 		$(call status,pandoc,$<,$@)
 		$(call makedir,$@)
@@ -212,6 +210,7 @@ dist/doc/html/README.html:: README.rst
 # Generate JavaScript deps.
 dep/%/main.js.dep: src/%/main.js
 	@:
+	set -e
 	$(call status,deps-js,$<,$@)
 	$(call makedir,$@)
 	echo "$(subst src,dist,$<):: `$(NPMBIN)/browserify --list $<|\
@@ -236,6 +235,7 @@ dep/%/main.js.dep: src/%/main.js
 # Generate SCSS deps.
 dep/%.scss.dep: src/%.scss
 	@:
+	set -e
 	# Don't create deps for partials.
 	if [ ! "`basename '$(<)' | cut -c 1`" = "_" ]; then
 		$(call status,deps-scss,$<,$@)
@@ -274,16 +274,24 @@ dep/%.scss.dep: src/%.scss
 # Copy production node modules to 'dist/libs/'.
 dist/libs/%:: node_modules/%
 	@:
+	set -e
 	mkdir -p $@
 	$(call status,cp,$<,$@)
 	cp -Rp $</* $@
 
-install:; @./build/scripts/install.sh $(INST)
+install:
+	@:
+	set -e
+	./build/scripts/install.sh $(INST)
 
-utest:; @./utests/api/main.py
+utest:
+	@:
+	set -e
+	./utests/api/main.py
 
 clean:
 	@:
+	set -e
 	$(call status,rm,dist,none)
 	rm -rf dist
 	$(call status,rm,dep,none)
@@ -301,7 +309,7 @@ clean:
 
 realclean:
 	@:
-
+	set -e
 	$(call status,rm,build/*.iconf,none);
 	rm -f build/*.iconf
 	$(call status,rm,build/link,none);
@@ -339,6 +347,7 @@ realclean:
 # Count the lines of code in LibreSignage.
 LOC:
 	@:
+	set -e
 	echo 'Lines Of Code: '
 	wc -l `find . \
 		\( \
@@ -359,16 +368,19 @@ LOC:
 
 LOD:
 	@:
+	set -e
 	echo '[INFO] Make sure your 'dist/' is up to date!'
 	echo '[INFO] Lines Of Documentation: '
 	wc -l `find dist -type f -name '*.rst'`
 
 configure:
 	@:
+	set -e
 	./build/scripts/configure.sh
 
 initchk:
 	@:
+	set -e
 	./build/scripts/ldiconf.sh $(INST)
 
 	# Check that the require dependencies are installed.
@@ -381,6 +393,7 @@ initchk:
 
 %:
 	@:
+	set -e
 	echo "[INFO]: Ignore $@"
 
 ifeq (,$(filter LOC LOD clean realclean configure initchk,$(MAKECMDGOALS)))

@@ -1,10 +1,6 @@
 <?php
 
 /*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
-/*
 *  ====>
 *
 *  *Get the Markdown version of the third party licenses file.

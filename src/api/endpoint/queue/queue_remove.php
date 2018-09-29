@@ -1,9 +1,4 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
