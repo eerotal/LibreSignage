@@ -6,18 +6,16 @@ var preview = require('./preview.js');
 const TL_UPDATE_INTERVAL = 60000;
 
 const timeline_btn = (id, index, name, enabled) => `
-	<div class="btn tl-slide-cont ${!enabled ? 'tl-slide-cont-dis' : ''}"
-		id="slide-btn-${id}">
-		<div class="row m-0 p-0 h-100">
-			<div class="col-2 tl-slide-index-cont">
-				${index}
-			</div>
-			<div id="tl-slide-thumb-cont-${id}"
-				class="col-10 tl-slide-thumb-cont">
-			</div>
+<div class="btn tl-slide-cont ${!enabled ? 'tl-slide-cont-dis' : ''}"
+	id="slide-btn-${id}">
+	<div class="m-0 p-0 h-100">
+		<div class="tl-slide-index-cont">${index}</div>
+		<div id="tl-slide-thumb-cont-${id}" 
+			class="tl-slide-thumb-cont preview-cont">
 		</div>
 	</div>
-`;
+</div>
+`.replace(/\t*\n\t*/g, '');
 
 exports.Timeline = class Timeline {
 	/*

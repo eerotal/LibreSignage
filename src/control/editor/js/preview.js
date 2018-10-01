@@ -25,40 +25,59 @@ exports.Preview = class Preview {
 		this.preview = $('<iframe class="preview rounded"></frame>');
 		this.container.append(this.preview);
 
-		// Add meta tags.
-		let phead = this.preview.contents().find('head');
-		for (let m of META) { phead.append($('<meta>').attr(m)); }
-
-		// Add stylesheets.
-		let tmp = null;
-		let promises = [];
-		for (let s of STYLESHEETS) {
-			tmp = $('<link></link>').attr(
-				{
-					'rel': 'stylesheet',
-					'href': s
-				}
-			);
-			promises.push(new Promise(
-				(resolve, reject) => {
-					tmp.on('load', resolve);
-				}
-			));
-			phead.append(tmp);
-		}
-		this.set_ratio('16x9');
-
 		/*
-		*  Run the rest of the setup code once the stylesheets have
-		*  loaded. This prevents the user from seeing a preview with
-		*  no styling.
+		*  NOTE!
+		*
+		*  Firefox doesn't allow adding content to iframes before a load
+		*  event is fired on them, which is why the code below is wrapped
+		*  in an event listener. Other browsers, however, don't even fire
+		*  the load event so the event is fired manually after creating
+		*  the event listener.
 		*/
-		Promise.all(promises).then(() => {
-			if (!this.noevent) {
-				this.editor.on('keyup', () => { this.update(); })
+		this.preview.on('load', () => {
+			// Add meta tags.
+			let phead = this.preview.contents().find('head');
+			for (let m of META) { phead.append($('<meta>').attr(m)); }
+
+			// Add stylesheets.
+			let tmp = null;
+			let promises = [];
+			for (let s of STYLESHEETS) {
+				tmp = $('<link></link>').attr(
+					{
+						'rel': 'stylesheet',
+						'href': s
+					}
+				);
+				promises.push(new Promise(
+					(resolve, reject) => {
+						tmp.on('load', resolve);
+					}
+				));
+				phead.append(tmp);
 			}
-			this.update();
+			this.set_ratio('16x9');
+
+			/*
+			*  Run the rest of the setup code once the stylesheets have
+			*  loaded. This prevents the user from seeing a preview with
+			*  no styling.
+			*/
+			Promise.all(promises).then(() => {
+				if (!this.noevent) {
+					this.editor.on('keyup', () => { this.update(); })
+				}
+				this.update();
+			});
 		});
+
+		if (
+			window.navigator === null
+			|| window.navigator.userAgent === null
+			|| !window.navigator.userAgent.match('/mozilla/i')
+		) {
+			this.preview.trigger('load');
+		}
 	}
 
 	update() {

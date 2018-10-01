@@ -3,10 +3,12 @@
 *
 * The preview-[16x9/4x3](-fit) classes are meant to be applied to to
 * the div element with the class preview-cont to select the aspect
-* ratio of the preview. The classes without the -fit suffix have
-* width: 100% when viewport width < $preview-breakpoint. When viewport
-* width > $preview-breakpoint, the minimum width of the preview container
-* is $preview-mw. The *-fit classes always have width: 100%.
+* ratio of the preview. The preview-limit class can be used together with
+* the preview-[16x9/4x3] classes to limit the maximum width of the
+* preview so that width: 100% when viewport width < $preview-breakpoint.
+* When viewport width > $preview-breakpoint, the minimum width of the
+* preview container is $preview-mw. The *-fit classes always have
+* width: 100% and can't be used together with preview-limit.
 *  
 */
 
@@ -66,7 +68,7 @@ $preview-breakpoint: 1000px;  // Preview sizing breakpoint.
 }
 
 @media screen and (min-width: $preview-breakpoint) {
-	.preview-16x9 {
+	.preview-16x9.preview-limit {
 		padding-top: 0;
 		height: 9/16*$preview-mw;
 		.preview {
@@ -80,7 +82,7 @@ $preview-breakpoint: 1000px;  // Preview sizing breakpoint.
 		}
 	}
 
-	.preview-4x3 {
+	.preview-4x3.preview-limit {
 		padding-top: 0;
 		height: 3/4*$preview-mw;
 		.preview {
