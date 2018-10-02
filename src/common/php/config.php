@@ -51,11 +51,9 @@
 	*  (Tuesday, 19-Jan-2038 03:14:07 UTC)
 	*/
 	const PERMACOOKIE_EXPIRE		= 2147483647;
-
-	const SESSION_MAX_AGE			= 600;
+	const SESSION_MAX_AGE			= 60;
 	const AUTH_TOKEN_LEN			= 15;
-
-	const SLIDE_LOCK_MAX_AGE		= 60;
+	const SLIDE_LOCK_MAX_AGE		= 600;
 
 	// LibreSignage instance limits.
 	const LS_LIM = array(
@@ -79,17 +77,16 @@
 	}
 
 	// User quota limits.
-	const DEFAULT_QUOTA = array(
-		'slides' => array(
+	const DEFAULT_QUOTA = [
+		'slides' => [
 			'limit' => 10,
 			'disp' => 'Slides'
-		),
-		'api_rate' => array(
+		],
+		'api_rate' => [
 			'limit' => 200,
-			'disp' => 'API quota (calls/'.
-					LS_LIM['API_RATE_T'].'s)'
-		)
-	);
+			'disp' => 'API quota (calls/'.LS_LIM['API_RATE_T'].'s)'
+		]
+	];
 
 	/*
 	*  Setup error handling and reporting.
@@ -100,9 +97,10 @@
 	// Do some checks on the configured values.
 	$max_slides = DEFAULT_QUOTA['slides']['limit']*gtlim('MAX_USERS');
 	if ($max_slides > gtlim('SLIDE_MAX_INDEX') - 1) {
-		throw new Exception('The configured slide quota '.
-				'conflicts with the configured maximum '.
-				'slide index value.');
+		throw new Exception(
+			'The configured slide quota conflicts with the '.
+			'configured maximum slide index value.'
+		);
 	}
 	// Prevent namespace pollution.
 	unset($max_slides);

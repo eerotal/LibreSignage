@@ -78,10 +78,11 @@ class Session extends Exportable{
 
 	public function renew() {
 		/*
-		*  Renew this session.
+		*  Renew this session. Returns the newly generated
+		*  session token.
 		*/
 		$this->created = time();
-		$this->generate_token();
+		return $this->generate_token();
 	}
 
 	private function generate_token() {
