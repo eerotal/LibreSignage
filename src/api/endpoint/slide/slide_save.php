@@ -1,9 +1,4 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
@@ -22,6 +17,11 @@
 *     queue_name and collaborators parameters of the API
 *     call are silently discarded.
 *
+*  This endpoint only allows slide modification if the caller
+*  has locked the slide by calling slide_lock_acquire.php first.
+*  If the slide is not locked or is locked by someone else, the
+*  API_E_LOCK error is returned in the 'error' value.
+*
 *  POST JSON parameters
 *    * id            = The ID of the slide to modify or either
 *      undefined or null for new slide.
@@ -36,6 +36,8 @@
 *    * animation     = The slide animation identifier.
 *    * queue_name    = The name of the slide queue of this slide.
 *    * collaborators = A list of slide collaborators.
+*    * owner         = Unused
+*    * lock          = Unused
 *
 *  Return value
 *    This endpoint returns all the parameters above as well as
@@ -48,7 +50,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_SAVE = new APIEndpoint([
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
@@ -66,7 +68,8 @@ $SLIDE_SAVE = new APIEndpoint([
 		'sched_t_e' => API_P_INT,
 		'animation' => API_P_INT,
 		'queue_name' => API_P_STR,
-		'collaborators' => API_P_ARR_STR
+		'collaborators' => API_P_ARR_STR,
+		'lock' => API_P_UNUSED
 	],
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
@@ -126,6 +129,27 @@ if (!$ALLOW) {
 	}
 }
 
+/*
+*  Check slide lock.
+*/
+if ($OP === 'modify' || $OP === 'modify_collab') {
+	$lock = $slide->get_lock();
+	if ($lock === NULL) {
+		throw new APIException(
+			API_E_LOCK,
+			"Slide not locked."
+		);
+	} else if (
+		!$lock->is_expired()
+		&& !$lock->is_owned_by($SLIDE_SAVE->get_session())
+	) {
+		throw new APIException(
+			API_E_LOCK,
+			"Slide locked by another user."
+		);
+	}
+}
+
 if ($OP === 'create') {
 	/*
 	*  Set the current user as the owner and
@@ -175,5 +199,5 @@ $queue = new Queue($slide->get_queue_name());
 $queue->load();
 $queue->juggle($slide->get_id());
 
-$SLIDE_SAVE->resp_set($slide->get_data_array());
+$SLIDE_SAVE->resp_set($slide->export(FALSE, FALSE));
 $SLIDE_SAVE->send();

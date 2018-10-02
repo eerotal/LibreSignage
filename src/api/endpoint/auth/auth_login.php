@@ -1,9 +1,4 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
@@ -16,7 +11,8 @@
 *    * permanent   = Create permanent session. False by default.
 *
 *  Return value
-*    * session = A session data array.
+*    * user = Current user data.
+*    * session = Current session data.
 *    * error = An error code or API_E_OK on success.
 *
 *  <====
@@ -63,7 +59,7 @@ if ($user) {
 	} else {
 		$perm = FALSE;
 	}
-	$session = $user->session_new(
+	$auth_data = $user->session_new(
 		$AUTH_LOGIN->get('who'),
 		$_SERVER['REMOTE_ADDR'],
 		$perm
@@ -78,45 +74,48 @@ if ($user) {
 	*  if so desired.
 	*/
 	$exp = 0;
-	if ($session['permanent'] == 1) {
+	if ($auth_data['session']->is_permanent()) {
 		// Create a "permanent" cookie.
 		$exp = PERMACOOKIE_EXPIRE;
 	} else {
-		$exp = $session['created'] + $session['max_age'];
+		$exp = $auth_data['session']->get_created()
+			+ $auth_data['session']->get_max_age();
 	}
 
 	setcookie(
 		$name = 'session_token',
-		$value = $session['token'],
+		$value = $auth_data['token'],
 		$expire = $exp,
 		$path = '/'
 	);
 	setcookie(
 		$name = 'session_created',
-		$value = $session['created'],
+		$value = $auth_data['session']->get_created(),
 		$expire = $exp,
 		$path = '/'
 	);
 	setcookie(
 		$name = 'session_max_age',
-		$value = $session['max_age'],
+		$value = $auth_data['session']->get_max_age(),
 		$expire = $exp,
 		$path = '/'
 	);
 	setcookie(
 		$name = 'session_permanent',
-		$value = $session['permanent'] ? '1' : '0',
+		$value = $auth_data['session']->is_permanent() ? '1' : '0',
 		$expire = $exp,
 		$path = '/'
 	);
 
 	$AUTH_LOGIN->resp_set(array(
-		'session' => $session,
+		'user' => $user->export(FALSE, FALSE),
+		'session' => array_merge(
+			$auth_data['session']->export(FALSE, FALSE),
+			[ 'token' => $auth_data['token'] ]
+		),
 		'error' => API_E_OK
 	));
 } else {
-	$AUTH_LOGIN->resp_set(array(
-		'error' => API_E_INCORRECT_CREDS
-	));
+	$AUTH_LOGIN->resp_set([ 'error' => API_E_INCORRECT_CREDS ]);
 }
 $AUTH_LOGIN->send();

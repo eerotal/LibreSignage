@@ -10,8 +10,8 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
-	$u = web_auth(NULL, NULL, FALSE);
-	if (!$u) {
+	$d = web_auth(NULL, NULL, FALSE);
+	if (!$d) {
 		throw new Exception("Can't display navigation ".
 			"bar when not logged in. You should check ".
 			"for authorization before including ".
@@ -72,13 +72,13 @@
 	}
 
 	function _can_access_page(string $name) {
-		global $NAV_PAGE_LINKS, $u;
+		global $NAV_PAGE_LINKS, $d;
 		if ($NAV_PAGE_LINKS[$name]['groups'] == NULL ) {
 			// 'groups' == NULL -> All groups have access.
 			return TRUE;
 		}
 		foreach ($NAV_PAGE_LINKS[$name]['groups'] as $g) {
-			if ($u->is_in_group($g)) {
+			if ($d['user']->is_in_group($g)) {
 				return TRUE;
 			}
 		}
@@ -114,7 +114,7 @@
 				<div class="col-lg-auto nav-item my-auto nav-logout-cont">
 					<a class="d-inline nav-link my-auto p-0 pr-1" href="/control/user">[
 						<?php
-							echo $u->get_name();
+							echo $d['user']->get_name();
 						?>
 					]</a>
 					<a class="d-inline text-danger nav-link p-0 pl-1" href="/logout">

@@ -16,8 +16,8 @@ API_ENDPOINTS_DIR="$DIST_DIR/api/endpoint";
 LS_README="README.rst";
 
 # LibreSignage version information. Used by prep.sh.
-ICONF_LS_VER=`git describe --always --tags --dirty`;
-ICONF_API_VER=1;
+LS_VER=`git describe --always --tags --dirty`;
+API_VER=2;
 
 if [ -z "$SUDO_USER" ]; then
 	OWNER=$USER;

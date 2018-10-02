@@ -3,25 +3,20 @@
 	*  LibreSignage config code and constants.
 	*/
 
-	/*
-	*  Build time flags
-	*    !!BUILD_VERIFY_NOCONFIG!!
-	*/
-
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/error.php');
 
 	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT']);
 
 	// Version information.
-	const LS_VER = "!!BCONST_LS_VER!!";
-	const API_VER = "!!BCONST_API_VER!!";
+	const LS_VER = "#pre(LS_VER)";
+	const API_VER = "#pre(API_VER)";
 
 	// Setup debugging. Don't touch, set by mkdist.sh.
-	const LIBRESIGNAGE_DEBUG = !!BCONST_DEBUG!!;
+	const LIBRESIGNAGE_DEBUG = #pre(ICONF_DEBUG);
 
 	// Instance owner config. Don't touch, set by mkdist.sh.
-	const ADMIN_EMAIL = "!!BCONST_ADMIN_EMAIL!!";
-	const ADMIN_NAME = "!!BCONST_ADMIN_NAME!!";
+	const ADMIN_EMAIL = "#pre(ICONF_ADMIN_EMAIL)";
+	const ADMIN_NAME = "#pre(ICONF_ADMIN_NAME)";
 
 	/*
 	*  Paths relative to document root. DO NOT make these absolute
@@ -56,9 +51,9 @@
 	*  (Tuesday, 19-Jan-2038 03:14:07 UTC)
 	*/
 	const PERMACOOKIE_EXPIRE		= 2147483647;
-
 	const SESSION_MAX_AGE			= 600;
 	const AUTH_TOKEN_LEN			= 15;
+	const SLIDE_LOCK_MAX_AGE		= 600;
 
 	// LibreSignage instance limits.
 	const LS_LIM = array(
@@ -82,17 +77,16 @@
 	}
 
 	// User quota limits.
-	const DEFAULT_QUOTA = array(
-		'slides' => array(
+	const DEFAULT_QUOTA = [
+		'slides' => [
 			'limit' => 10,
 			'disp' => 'Slides'
-		),
-		'api_rate' => array(
+		],
+		'api_rate' => [
 			'limit' => 200,
-			'disp' => 'API quota (calls/'.
-					LS_LIM['API_RATE_T'].'s)'
-		)
-	);
+			'disp' => 'API quota (calls/'.LS_LIM['API_RATE_T'].'s)'
+		]
+	];
 
 	/*
 	*  Setup error handling and reporting.
@@ -103,9 +97,10 @@
 	// Do some checks on the configured values.
 	$max_slides = DEFAULT_QUOTA['slides']['limit']*gtlim('MAX_USERS');
 	if ($max_slides > gtlim('SLIDE_MAX_INDEX') - 1) {
-		throw new Exception('The configured slide quota '.
-				'conflicts with the configured maximum '.
-				'slide index value.');
+		throw new Exception(
+			'The configured slide quota conflicts with the '.
+			'configured maximum slide index value.'
+		);
 	}
 	// Prevent namespace pollution.
 	unset($max_slides);

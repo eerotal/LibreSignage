@@ -42,6 +42,7 @@ echo "# Generated on `date` by configure.sh."     >> $ICONF_F;
 
 echo "ICONF_DOCROOT=\"$ICONF_DOCROOT\";"          >> $ICONF_F;
 echo "ICONF_NAME=\"$ICONF_NAME\";"                >> $ICONF_F;
+echo "ICONF_ALIAS=\"$ICONF_ALIAS\";"              >> $ICONF_F;
 echo "ICONF_ADMIN_NAME=\"$ICONF_ADMIN_NAME\";"    >> $ICONF_F;
 echo "ICONF_ADMIN_EMAIL=\"$ICONF_ADMIN_EMAIL\";"  >> $ICONF_F;
 echo "ICONF_DEBUG=\"$ICONF_DEBUG\";"              >> $ICONF_F;

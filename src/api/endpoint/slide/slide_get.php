@@ -1,9 +1,4 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
@@ -34,7 +29,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_GET = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
@@ -49,7 +44,5 @@ api_endpoint_init($SLIDE_GET);
 
 $slide = new Slide();
 $slide->load($SLIDE_GET->get('id'));
-$SLIDE_GET->resp_set(
-	['slide' => $slide->get_data_array()]
-);
+$SLIDE_GET->resp_set(['slide' => $slide->export(FALSE, FALSE)]);
 $SLIDE_GET->send();

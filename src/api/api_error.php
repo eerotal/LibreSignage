@@ -16,15 +16,16 @@ const API_ERROR_TRACE = LIBRESIGNAGE_DEBUG;
 *  api_err_codes.php API endpoint.
 */
 const API_E = array(
-	"API_E_OK"		=> 0,
-	"API_E_INTERNAL"	=> 1,
-	"API_E_INVALID_REQUEST"	=> 2,
-	"API_E_NOT_AUTHORIZED"	=> 3,
-	"API_E_QUOTA_EXCEEDED"	=> 4,
-	"API_E_LIMITED"		=> 5,
-	"API_E_CLIENT"		=> 6, // Only for client side use!
-	"API_E_RATE"		=> 7,
-	"API_E_INCORRECT_CREDS" => 8
+	"API_E_OK"              => 0,
+	"API_E_INTERNAL"        => 1,
+	"API_E_INVALID_REQUEST" => 2,
+	"API_E_NOT_AUTHORIZED"  => 3,
+	"API_E_QUOTA_EXCEEDED"  => 4,
+	"API_E_LIMITED"         => 5,
+	"API_E_CLIENT"          => 6, // Only for client side use!
+	"API_E_RATE"            => 7,
+	"API_E_INCORRECT_CREDS" => 8,
+	"API_E_LOCK"            => 9
 );
 
 // Define the error codes in the global namespace too.
@@ -80,6 +81,10 @@ const API_E_MSG = array(
 		"short" => "Incorrect credentials received",
 		"long" => "The authentication system received ".
 			"incorrect credentials."
+	),
+	API_E_LOCK => array(
+		"short" => "Slide lock error",
+		"long" => "A slide locking error occured."
 	)
 );
 
@@ -117,8 +122,10 @@ class APIException extends Exception {
 		}
 
 		$err_str = json_encode($err);
-		if ($err_str == FALSE &&
-			json_last_error() != JSON_ERROR_NONE) {
+		if (
+			$err_str == FALSE
+			&& json_last_error() != JSON_ERROR_NONE
+		) {
 			return '{"error": '.API_E_INTERNAL.'}';
 		}
 		return $err_str;
@@ -133,7 +140,7 @@ function api_error_setup() {
 		try {
 			if (get_class($e) == 'APIException') {
 				echo APIException::_to_api_string(
-						$e->get_api_err(), $e
+					$e->get_api_err(), $e
 				);
 			} else {
 				echo APIException::_to_api_string(

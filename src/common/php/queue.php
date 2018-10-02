@@ -6,7 +6,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
 function queue_exists(string $name) {
@@ -238,7 +238,7 @@ class Queue {
 	function get_data_array() {
 		$sret = [];
 		foreach ($this->slides as $s) {
-			$sret[$s->get_id()] = $s->get_data_array();
+			$sret[$s->get_id()] = $s->export(FALSE, FALSE);
 		}
 		return [
 			'owner' => $this->owner,

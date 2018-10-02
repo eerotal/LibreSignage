@@ -72,7 +72,7 @@ function display_setup() {
 		console.log(`LibreSignage: Preview slide ${params['preview']}.`);
 
 		var s = new slide.Slide(API);
-		s.load(params['preview'], (err) => {
+		s.load(params['preview'], false, false, (err) => {
 			if (API.handle_disp_error(err)) {
 				console.log("LibreSignage: Failed to preview slide!");
 				return;

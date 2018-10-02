@@ -1,10 +1,6 @@
 <?php
 
 /*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
-/*
 *  ====>
 *
 *  *Get the Markdown version of the LibreSignage license file.

@@ -37,7 +37,7 @@ html, body {
 }
 
 /* Editor styling */
-#slide-cant-edit {
+#slide-readonly, #slide-cant-edit {
 	color: orange;
 	width: 100%;
 	text-align: center;

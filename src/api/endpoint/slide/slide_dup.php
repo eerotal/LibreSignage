@@ -1,14 +1,10 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
 *  *Duplicate a slide. The owner of the new slide is the caller
-*   of this API endpoint.*
+*   of this API endpoint. The new slide is also automatically
+*   locked for the caller.*
 *
 *  POST JSON parameters
 *    * id = The ID of the slide to duplicate.
@@ -31,7 +27,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_DUP = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
@@ -54,15 +50,17 @@ if (!check_perm('grp:admin|grp:editor;', $SLIDE_DUP->get_caller())) {
 $slide = new Slide();
 $slide->load($SLIDE_DUP->get('id'));
 
-// Duplicate and set the caller as the owner of the new slide.
 $new_slide = $slide->dup();
 $new_slide->set_owner($SLIDE_DUP->get_caller()->get_name());
+$new_slide->lock_acquire($SLIDE_DUP->get_session());
+
 $new_slide->write();
+
 
 // Juggle slide indices to make sure they are correct.
 $queue = $new_slide->get_queue();
 $queue->juggle($new_slide->get_id());
 $queue->write();
 
-$SLIDE_DUP->resp_set(['slide' => $new_slide->get_data_array()]);
+$SLIDE_DUP->resp_set(['slide' => $new_slide->export(FALSE, FALSE)]);
 $SLIDE_DUP->send();

@@ -101,20 +101,29 @@ are listed below.
    following configuration values.
 
    * Document root (default: /var/www)
+
      * The document root to use.
+
    * Server name (domain)
+
      * The domain name to use for configuring apache2. If you
        don't have a domain and you are just testing the system,
        you can either use 'localhost', your machines LAN IP or
        a testing domain you don't actually own. If you use a testing
        domain, you can add that domain to your */etc/hosts* file.
        See the end of this section for more info.
+
    * Server name aliases
    * Admin name
+
      * Shown to users on the main page.
+
    * Admin email
+
      * Shown to users on the main page.
+
    * Enable debugging (y/N)
+
      *  Whether to enable debugging. N is default.
 
    This command generates an instance configuration file needed
@@ -391,10 +400,10 @@ distribution.
 Build system dependencies
 -------------------------
 
-  - SASS (https://sass-lang.com/)
-  - Browserify (http://browserify.org/)
-  - PostCSS (https://postcss.org/)
-  - Autoprefixer (https://github.com/postcss/autoprefixer)
+* SASS (https://sass-lang.com/)
+* Browserify (http://browserify.org/)
+* PostCSS (https://postcss.org/)
+* Autoprefixer (https://github.com/postcss/autoprefixer)
 
 License
 -------
