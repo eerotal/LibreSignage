@@ -65,7 +65,10 @@ setcookie(
 );
 
 $AUTH_SESSION_RENEW->resp_set(array(
-	'session' => $AUTH_SESSION_RENEW->get_session()->export(FALSE, FALSE),
+	'session' => array_merge(
+		$AUTH_SESSION_RENEW->get_session()->export(FALSE, FALSE),
+		[ 'token' => $new_token ]
+	),
 	'error' => API_E_OK
 ));
 $AUTH_SESSION_RENEW->send();

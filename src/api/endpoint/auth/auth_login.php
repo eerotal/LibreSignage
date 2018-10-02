@@ -109,7 +109,10 @@ if ($user) {
 
 	$AUTH_LOGIN->resp_set(array(
 		'user' => $user->export(FALSE, FALSE),
-		'session' => $auth_data['session']->export(FALSE, FALSE),
+		'session' => array_merge(
+			$auth_data['session']->export(FALSE, FALSE),
+			[ 'token' => $auth_data['token'] ]
+		),
 		'error' => API_E_OK
 	));
 } else {
