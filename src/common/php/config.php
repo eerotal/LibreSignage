@@ -51,7 +51,7 @@
 	*  (Tuesday, 19-Jan-2038 03:14:07 UTC)
 	*/
 	const PERMACOOKIE_EXPIRE		= 2147483647;
-	const SESSION_MAX_AGE			= 60;
+	const SESSION_MAX_AGE			= 600;
 	const AUTH_TOKEN_LEN			= 15;
 	const SLIDE_LOCK_MAX_AGE		= 600;
 
