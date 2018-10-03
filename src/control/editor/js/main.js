@@ -676,11 +676,13 @@ function update_controls() {
 	*  the following values.
 	*
 	*  n = Is the current slide object null?
-	*  o = Is the current user the owner of this slide?
+	*  o = Is the current user the owner of this slide or an admin?
 	*  c = Is the current user a collaborator of this slide?
 	*  l = Is the current slide locked by the current user?
 	*  s = Is the current slide saved?
 	*/
+
+	let user = API.CONFIG.user;
 
 	UI_DEFS.all(
 		function(d) { this.state(d); },
@@ -690,14 +692,13 @@ function update_controls() {
 				sel_slide !== null
 				&& (
 					!sel_slide.has('owner')
-					|| sel_slide.get('owner') === API.CONFIG.user.user
+					|| sel_slide.get('owner') === user.user
+					|| user.groups.includes('admin')
 				)
 			),
 			'c': (
 				sel_slide !== null &&
-				sel_slide.get('collaborators').includes(
-					API.CONFIG.user.user
-				)
+				sel_slide.get('collaborators').includes(user.user)
 			),
 			'l': (
 				sel_slide !== null

@@ -200,7 +200,7 @@ abstract class Exportable {
 						);
 						break;
 					default:
-						if (!in_array($k, EXP_RESERVED)) {
+						if (!in_array($k, EXP_RESERVED, TRUE)) {
 							$ret[$k] = $v;
 						}
 						break;

@@ -306,15 +306,13 @@ class Slide extends Exportable{
 		}
 		if (empty($this->get_owner())) {
 			throw new ArgException(
-				"Can't set collaborators ".
-				"before owner."
+				"Can't set collaborators before owner."
 			);
 		}
 		foreach ($collaborators as $k => $c) {
 			if ($c == $this->get_owner()) {
 				throw new ArgException(
-					"Can't set owner ".
-					"as collaborator."
+					"Can't set owner as collaborator."
 				);
 			}
 			if (!user_exists($c)) {
