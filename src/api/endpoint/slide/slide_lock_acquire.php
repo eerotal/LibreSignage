@@ -37,11 +37,15 @@ $SLIDE_LOCK_ACQUIRE = new APIEndpoint(array(
 ));
 api_endpoint_init($SLIDE_LOCK_ACQUIRE);
 
+$slide = new Slide();
+$slide->load($SLIDE_LOCK_ACQUIRE->get('id'));
+
 if (
 	!check_perm(
 		'grp:admin|grp:editor;',
 		$SLIDE_LOCK_ACQUIRE->get_caller()
 	)
+	|| !$slide->can_modify($SLIDE_LOCK_ACQUIRE->get_caller())
 ) {
 	throw new APIException(
 		API_E_NOT_AUTHORIZED,
@@ -49,8 +53,6 @@ if (
 	);
 }
 
-$slide = new Slide();
-$slide->load($SLIDE_LOCK_ACQUIRE->get('id'));
 try {
 	$slide->lock_acquire($SLIDE_LOCK_ACQUIRE->get_session());
 } catch (SlideLockException $e) {

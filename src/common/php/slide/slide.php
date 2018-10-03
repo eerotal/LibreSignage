@@ -412,6 +412,18 @@ class Slide extends Exportable{
 		}
 	}
 
+	function can_modify(User $user) {
+		return (
+			$user->is_in_group('admin')
+			|| $this->get_owner() === $user->get_name()
+			|| in_array(
+				$user->get_name(),
+				$this->get_collaborators(),
+				TRUE
+			)
+		);
+	}
+
 	function write() {
 		/*
 		*  Write the currently stored data into the correct

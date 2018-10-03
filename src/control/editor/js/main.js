@@ -795,11 +795,11 @@ function slide_show(s, no_popup) {
 			console.log(`LibreSignage: Update slide '${s}'.`);
 			if (!sel_slide.is_locked_from_here()) {
 				sel_slide.lock_acquire(true, err => {
-					if (err) {
-						error();
-					} else {
-						sel_slide.fetch(err => err ? error() : success());
-					}		
+					/*
+					*  Doesn't matter whether locking succeeded or not.
+					*  Fetch the new slide data anyway.
+					*/
+					sel_slide.fetch(err => err ? error() : success());
 				});
 			} else {
 				sel_slide.fetch(err => err ? error() : success());
@@ -818,6 +818,7 @@ function slide_show(s, no_popup) {
 					case API.ERR.API_E_OK:
 						success();
 						break;
+					case API.ERR.API_E_NOT_AUTHORIZED:
 					case API.ERR.API_E_LOCK:
 						// or w/o a lock
 						sel_slide.load(
@@ -955,9 +956,7 @@ function slide_save() {
 
 	sel_slide.save((stat) => {
 		if (API.handle_disp_error(stat)) { return; }
-		console.log(
-			`LibreSignage: Saved slide '${sel_slide.get("id")}'.`
-		);
+		console.log(`LibreSignage: Saved '${sel_slide.get("id")}'.`);
 		update_controls();
 		TL.update();
 		slide_show(sel_slide.get('id'), true);
