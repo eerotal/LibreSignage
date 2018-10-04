@@ -60,23 +60,23 @@ const API_P_UNUSED  = API_P_ANY
 
 class APIEndpoint {
 	// Config options.
-	const METHOD		= 'method';
-	const RESPONSE_TYPE	= 'response_type';
-	const FORMAT		= 'format';
-	const STRICT_FORMAT	= 'strict_format';
-	const REQ_QUOTA		= 'req_quota';
-	const REQ_AUTH		= 'req_auth';
+	const METHOD           = 'method';
+	const RESPONSE_TYPE    = 'response_type';
+	const FORMAT           = 'format';
+	const STRICT_FORMAT    = 'strict_format';
+	const REQ_QUOTA        = 'req_quota';
+	const REQ_AUTH         = 'req_auth';
 
-	private $method		= 0;
-	private $response_type	= 0;
-	private $response	= NULL;
-	private $format		= NULL;
-	private $strict_format	= TRUE;
-	private $req_quota	= TRUE;
-	private $req_auth	= TRUE;
-	private $data		= NULL;
-	private $inited		= FALSE;
-	private $caller		= NULL;
+	private $method        = 0;
+	private $response_type = 0;
+	private $response      = NULL;
+	private $format        = NULL;
+	private $strict_format = TRUE;
+	private $req_quota     = TRUE;
+	private $req_auth      = TRUE;
+	private $data          = NULL;
+	private $inited        = FALSE;
+	private $caller        = NULL;
 
 	public function __construct(array $config) {
 		$args = new ArgumentArray(
@@ -96,44 +96,36 @@ class APIEndpoint {
 			)
 		);
 		$ret = $args->chk($config);
-		foreach ($ret as $k => $v) {
-			$this->$k = $v;
-		}
+		foreach ($ret as $k => $v) { $this->$k = $v; }
 	}
 
-	private function _load_data_post() {
-		/*
-		*  Load POST data. Throws exception and sets the
-		*  error flag on error.
-		*/
-		$str = @file_get_contents('php://input');
+	private function load_data_post() {
+		// Load POST request data.
+		$str = file_get_contents('php://input');
 		if ($str === FALSE) {
-			throw new IntException(
-				"Failed to read request data!"
-			);
+			throw new IntException("Failed to read request data!");
 		}
 		if (!strlen($str)) {
-			$data = array();
+			$data = [];
 		} else {
 			$data = json_decode($str, $assoc=TRUE);
-			if ($data === NULL &&
-				json_last_error() != JSON_ERROR_NONE) {
+			if (
+				$data === NULL &&
+				json_last_error() != JSON_ERROR_NONE
+			) {
 				throw new IntException(
 					"Request data parsing failed!"
 				);
 			}
 		}
-		$this->_verify($data);
+		$this->verify($data);
 		$this->data = $data;
 		$this->inited = TRUE;
 	}
 
-	private function _load_data_get() {
-		/*
-		*  Load GET data. Throws exception and sets the
-		*  error flag on error.
-		*/
-		$this->_verify($_GET);
+	private function load_data_get() {
+		// Load GET request data.
+		$this->verify($_GET);
 		$this->data = $_GET;
 		$this->inited = TRUE;
 	}
@@ -141,24 +133,22 @@ class APIEndpoint {
 	public function load_data() {
 		/*
 		*  Wrapper function for loading data into
-		*  this APIEndpoint object. _load_data_post()
-		*  and _load_data_get() do the actual work.
+		*  this APIEndpoint object. load_data_post()
+		*  and load_data_get() do the actual work.
 		*/
 		switch($this->method) {
 			case API_METHOD['POST']:
-				$this->_load_data_post();
+				$this->load_data_post();
 				break;
 			case API_METHOD['GET']:
-				$this->_load_data_get();
+				$this->load_data_get();
 				break;
 			default:
-				throw new ArgException(
-					"Unexpected API method."
-				);
+				throw new ArgException("Unexpected API method.");
 		}
 	}
 
-	private function _chk_arr_types(array $vals, string $type) {
+	private function chk_arr_types(array $vals, string $type) {
 		foreach ($vals as $k => $v) {
 			if (gettype($v) != $type) {
 				return FALSE;
@@ -167,7 +157,7 @@ class APIEndpoint {
 		return TRUE;
 	}
 
-	private function _chk_type(array $data, array $format, $i) {
+	private function chk_type(array $data, array $format, $i) {
 		/*
 		*  Check the value at $i in $data against the
 		*  configured type flags in $format and throw an
@@ -190,16 +180,16 @@ class APIEndpoint {
 						(API_P_ARR_MIXED & $bm) !== 0
 					) || (
 						(API_P_ARR_STR & $bm) !== 0
-						&& $this->_chk_arr_types($d, 'string')
+						&& $this->chk_arr_types($d, 'string')
 					) || (
 						(API_P_ARR_INT & $bm) !== 0
-						&& $this->_chk_arr_types($d, 'integer')
+						&& $this->chk_arr_types($d, 'integer')
 					) || (
 						(API_P_ARR_BOOL & $bm) !== 0
-						&& $this->_chk_arr_types($d, 'boolean')
+						&& $this->chk_arr_types($d, 'boolean')
 					) || (
 						(API_P_ARR_FLOAT & $bm) !== 0
-						&& $this->_chk_arr_types($d, 'double')
+						&& $this->chk_arr_types($d, 'double')
 					)
 				)
 			)
@@ -219,7 +209,7 @@ class APIEndpoint {
 		}
 	}
 
-	function _chk_data(array $data, array $format, $i) {
+	function chk_data(array $data, array $format, $i) {
 		/*
 		*  Check the value at $i in $data against the
 		*  configured data flags in $format and throw an
@@ -228,21 +218,21 @@ class APIEndpoint {
 		$bitmask = $format[$i];
 		$value =  $data[$i];
 
-		if (!(API_P_EMPTY_STR_OK & $bitmask)
+		if (
+			!(API_P_EMPTY_STR_OK & $bitmask)
 			&& gettype($data[$i]) == 'string'
-			&& empty($value)) {
-			throw new ArgException(
-				"Invalid empty data for '$i'."
-			);
+			&& empty($value)
+		) {
+			throw new ArgException("Invalid empty data for '$i'.");
 		}
 
 	}
 
-	private function _is_param_opt(int $bitmask) {
+	private function is_param_opt(int $bitmask) {
 		return (API_P_OPT & $bitmask) != 0;
 	}
 
-	private function _verify($data, array $format=array()) {
+	private function verify($data, array $format=array()) {
 		/*
 		*  Verify request data using the format filter $format
 		*  or $this->format if $format is empty. If $format
@@ -261,20 +251,19 @@ class APIEndpoint {
 		// Check that each key in $format also exists in $data.
 		foreach (array_keys($format) as $k) {
 			if (!in_array($k, array_keys($data))) {
-				if ($this->_is_param_opt($format[$k])) {
+				if ($this->is_param_opt($format[$k])) {
 					continue;
 				}
 				throw new ArgException(
-					"API request parameter ".
-					"'$k' missing."
+					"API request parameter '$k' missing."
 				);
 			}
 			if (gettype($format[$k]) == 'array') {
 				// Verify nested formats.
-				$this->_verify($data[$k], $format[$k]);
+				$this->verify($data[$k], $format[$k]);
 			} else {
-				$this->_chk_type($data, $format, $k);
-				$this->_chk_data($data, $format, $k);
+				$this->chk_type($data, $format, $k);
+				$this->chk_data($data, $format, $k);
 			}
 		}
 
@@ -283,11 +272,13 @@ class APIEndpoint {
 		*  $this->strict_format is TRUE.
 		*/
 		if ($this->strict_format) {
-			if (!array_is_subset(array_keys($data),
-					array_keys($format))) {
-				throw new ArgException(
-					"Extra keys in API request."
-				);
+			if (
+				!array_is_subset(
+					array_keys($data),
+					array_keys($format)
+				)
+			) {
+				throw new ArgException("Extra keys in API request.");
 			}
 		}
 	}
@@ -351,15 +342,17 @@ class APIEndpoint {
 			exit(0);
 		} elseif ($this->response_type == API_RESPONSE['JSON']) {
 			if (!$this->response) {
-				$this->response = array();
+				$this->response = [];
 			}
 			if (!isset($this->response['error'])) {
 				// Make sure the error value exists.
 				$this->response['error'] = API_E_OK;
 			}
 			$resp_str = json_encode($this->response);
-			if ($resp_str === FALSE &&
-				json_last_error() != JSON_ERROR_NONE) {
+			if (
+				$resp_str === FALSE &&
+				json_last_error() != JSON_ERROR_NONE
+			) {
 				throw new APIException(
 					API_E_INTERNAL,
 					"Failed to encode response JSON."
@@ -391,8 +384,12 @@ function api_handle_request(APIEndpoint $endpoint) {
 	header('Access-Control-Allow-Origin: *');
 
 	// Check the request method.
-	if ($_SERVER['REQUEST_METHOD'] !=
-		array_search($endpoint->get_method(), API_METHOD)) {
+	if (
+		$_SERVER['REQUEST_METHOD'] != array_search(
+			$endpoint->get_method(),
+			API_METHOD
+		)
+	) {
 		throw new ArgException(
 			"Invalid request method '".
 			$_SERVER['REQUEST_METHOD'].
@@ -490,12 +487,8 @@ function api_endpoint_init(APIEndpoint $endpoint) {
 			api_handle_preflight();
 			break;
 		default:
-			header(
-				'Content-Type: '.
-				$endpoint->get_content_type()
-			);
-			throw new ArgAxception("Invalid request method.");
-			break;
+			header('Content-Type: '.$endpoint->get_content_type());
+			throw new ArgException("Invalid request method.");
 	}
 
 }
