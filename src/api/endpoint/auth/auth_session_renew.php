@@ -17,7 +17,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 $AUTH_SESSION_RENEW = new APIEndpoint([
 	APIEndpoint::METHOD         => API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE  => API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT         => [],
+	APIEndpoint::FORMAT_BODY    => [],
 	APIEndpoint::REQ_QUOTA      => TRUE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ]);

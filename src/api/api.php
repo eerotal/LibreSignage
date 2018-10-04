@@ -69,7 +69,8 @@ class APIEndpoint {
 	const METHOD           = 'method';
 	const REQUEST_TYPE     = 'request_type';
 	const RESPONSE_TYPE    = 'response_type';
-	const FORMAT           = 'format';
+	const FORMAT_BODY      = 'format_body';
+	const FORMAT_URL       = 'format_url';
 	const STRICT_FORMAT    = 'strict_format';
 	const REQ_QUOTA        = 'req_quota';
 	const REQ_AUTH         = 'req_auth';
@@ -78,12 +79,13 @@ class APIEndpoint {
 	private $request_type  = 0;
 	private $response_type = 0;
 	private $response      = NULL;
-	private $format        = NULL;
+	private $format_body   = NULL;
+	private $format_url    = NULL;
 	private $strict_format = TRUE;
 	private $req_quota     = TRUE;
 	private $req_auth      = TRUE;
 	private $data          = NULL;
-	private $inited        = FALSE;
+	private $raw           = NULL;
 	private $caller        = NULL;
 
 	public function __construct(array $config) {
@@ -92,14 +94,16 @@ class APIEndpoint {
 				self::METHOD        => API_METHOD,
 				self::REQUEST_TYPE  => API_REQUEST,
 				self::RESPONSE_TYPE => API_RESPONSE,
-				self::FORMAT        => 'array',
+				self::FORMAT_BODY   => 'array',
+				self::FORMAT_URL    => 'array',
 				self::STRICT_FORMAT => 'boolean',
 				self::REQ_QUOTA     => 'boolean',
 				self::REQ_AUTH      => 'boolean'
 			),
 			array(
 				self::REQUEST_TYPE  => API_REQUEST['JSON'],
-				self::FORMAT        => array(),
+				self::FORMAT_BODY   => [],
+				self::FORMAT_URL    => [],
 				self::STRICT_FORMAT => TRUE,
 				self::REQ_QUOTA     => TRUE,
 				self::REQ_AUTH      => TRUE
@@ -109,13 +113,13 @@ class APIEndpoint {
 		foreach ($ret as $k => $v) { $this->$k = $v; }
 	}
 
-	private function load_data_post() {
-		// Load POST request data.
+	private function load_data_body_json() {
+		// Load JSON body request data.
 		$str = file_get_contents('php://input');
 		if ($str === FALSE) {
 			throw new IntException("Failed to read request data!");
 		}
-		if (!strlen($str)) {
+		if (strlen($str) === 0) {
 			$data = [];
 		} else {
 			$data = json_decode($str, $assoc=TRUE);
@@ -128,30 +132,50 @@ class APIEndpoint {
 				);
 			}
 		}
-		$this->verify($data);
-		$this->data = $data;
-		$this->inited = TRUE;
+
+		if ($data === NULL || gettype($data) !== 'array') {
+			throw new ArgException('Invalid request data.');
+		}
+
+		$this->verify($data, $this->format_body);
+		return $data;
 	}
 
-	private function load_data_get() {
-		// Load GET request data.
-		$this->verify($_GET);
-		$this->data = $_GET;
-		$this->inited = TRUE;
+	private function load_data_body_raw() {
+		// Load raw body request data.
+		return file_get_contents('php://input');
+	}
+
+	private function load_data_url() {
+		// Load URL request data.
+		$this->verify($_GET, $this->format_url);
+		return $_GET;
 	}
 
 	public function load_data() {
 		/*
 		*  Wrapper function for loading data into
-		*  this APIEndpoint object. load_data_post()
-		*  and load_data_get() do the actual work.
+		*  this APIEndpoint object. JSON and URL data
+		*  is loaded into $this->data, other types
+		*  are loaded into $this->raw.
 		*/
 		switch($this->method) {
 			case API_METHOD['POST']:
-				$this->load_data_post();
+				switch ($this->request_type) {
+					case API_REQUEST['JSON']:
+						$this->data = array_merge(
+							$this->load_data_body_json(),
+							$this->load_data_url()
+						);
+						break;
+					default:
+						$this->raw = $this->load_data_body_raw();
+						$this->data = $this->load_data_url();
+						break;
+				}
 				break;
 			case API_METHOD['GET']:
-				$this->load_data_get();
+				$this->data = $this->load_data_url();
 				break;
 			default:
 				throw new ArgException("Unexpected API method.");
@@ -242,20 +266,18 @@ class APIEndpoint {
 		return (API_P_OPT & $bitmask) != 0;
 	}
 
-	private function verify($data, array $format=array()) {
+	private function verify($data, array $format) {
 		/*
-		*  Verify request data using the format filter $format
-		*  or $this->format if $format is empty. If $format
-		*  and $this->format are both empty, this function returns
-		*  TRUE without doing any verification. If the flag
-		*  $this->strict_format is TRUE, extra keys in $data that
-		*  don't exist in format are considered invalid.
+		*  Verify request data using the format filter $format.
+		*  If the flag $this->strict_format is TRUE, extra keys
+		*  in $data that don't exist in $format are considered invalid.
 		*/
-		if (!count($format)) {
-			if (!count($this->format)) {
+		if (count($format) === 0) {
+			if ($this->strict_format) {
+				return count($data) === 0;
+			} else {
 				return TRUE;
 			}
-			$format = $this->format;
 		}
 
 		// Check that each key in $format also exists in $data.
@@ -292,6 +314,8 @@ class APIEndpoint {
 			}
 		}
 	}
+
+	public function get_raw() { return $this->raw; }
 
 	public function get($key = NULL) {
 		if ($key === NULL) {
@@ -337,7 +361,6 @@ class APIEndpoint {
 		}
 	}
 
-	public function is_inited() { return $this->inited; }
 	public function get_method() { return $this->method; }
 	public function requires_quota() { return $this->req_quota; }
 	public function requires_auth() { return $this->req_auth; }

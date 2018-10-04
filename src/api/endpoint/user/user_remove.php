@@ -18,7 +18,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 $USER_REMOVE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
+	APIEndpoint::FORMAT_BODY => array(
 		'user' => API_P_STR,
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,

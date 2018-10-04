@@ -18,7 +18,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/queue.php');
 $QUEUE_LIST = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(),
+	APIEndpoint::FORMAT_URL => array(),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));

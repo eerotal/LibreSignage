@@ -19,7 +19,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 $USER_GET_QUOTA = new APIEndpoint(array(
 	APIEndpoint::METHOD           => API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE    => API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => [
+	APIEndpoint::FORMAT_URL => [
 		'user' => API_P_STR|API_P_OPT|API_P_NULL
 	],
 	APIEndpoint::REQ_QUOTA        => TRUE,

@@ -29,7 +29,7 @@ define('USER_REGEX', GROUPS_REGEX);
 $USER_CREATE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
+	APIEndpoint::FORMAT_BODY => array(
 		'user' => API_P_STR,
 		'groups' => API_P_ARR_STR|API_P_OPT|API_P_NULL
 	),

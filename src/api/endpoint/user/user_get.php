@@ -24,7 +24,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 $USER_GET = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
+	APIEndpoint::FORMAT_URL => array(
 		'user' => API_P_STR
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,

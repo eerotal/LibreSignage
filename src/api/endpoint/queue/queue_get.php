@@ -22,7 +22,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/queue.php');
 $QUEUE_GET = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
+	APIEndpoint::FORMAT_URL => array(
 		'name' => API_P_STR
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,

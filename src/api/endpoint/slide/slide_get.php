@@ -34,7 +34,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 $SLIDE_GET = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
+	APIEndpoint::FORMAT_URL => array(
 		'id' => API_P_STR
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
