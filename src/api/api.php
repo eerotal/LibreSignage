@@ -10,16 +10,22 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/argarray.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
 // API Endpoint request methods.
-const API_METHOD = array(
+const API_METHOD = [
 	"GET" => 0,
 	"POST" => 1
-);
+];
+
+// API Endpoint request types.
+const API_REQUEST = [
+	"JSON" => 0,
+	"MEDIA" => 1
+];
 
 // API Endpoint response types.
-const API_RESPONSE = array(
+const API_RESPONSE = [
 	"JSON" => 0,
 	"TEXT" => 1
-);
+];
 
 // API type flags.
 const API_P_STR          = 0x1;
@@ -61,6 +67,7 @@ const API_P_UNUSED  = API_P_ANY
 class APIEndpoint {
 	// Config options.
 	const METHOD           = 'method';
+	const REQUEST_TYPE     = 'request_type';
 	const RESPONSE_TYPE    = 'response_type';
 	const FORMAT           = 'format';
 	const STRICT_FORMAT    = 'strict_format';
@@ -68,6 +75,7 @@ class APIEndpoint {
 	const REQ_AUTH         = 'req_auth';
 
 	private $method        = 0;
+	private $request_type  = 0;
 	private $response_type = 0;
 	private $response      = NULL;
 	private $format        = NULL;
@@ -82,6 +90,7 @@ class APIEndpoint {
 		$args = new ArgumentArray(
 			array(
 				self::METHOD        => API_METHOD,
+				self::REQUEST_TYPE  => API_REQUEST,
 				self::RESPONSE_TYPE => API_RESPONSE,
 				self::FORMAT        => 'array',
 				self::STRICT_FORMAT => 'boolean',
@@ -89,6 +98,7 @@ class APIEndpoint {
 				self::REQ_AUTH      => 'boolean'
 			),
 			array(
+				self::REQUEST_TYPE  => API_REQUEST['JSON'],
 				self::FORMAT        => array(),
 				self::STRICT_FORMAT => TRUE,
 				self::REQ_QUOTA     => TRUE,
@@ -303,13 +313,27 @@ class APIEndpoint {
 	}
 
 	public function get_content_type() {
-		switch($this->response_type) {
+		switch ($this->response_type) {
 			case API_RESPONSE['JSON']:
 				return 'application/json';
 			case API_RESPONSE['TEXT']:
-				return 'text/plain';
 			default:
 				return 'text/plain';
+		}
+	}
+
+	public function get_request_mime_regex() {
+		switch ($this->request_type) {
+			case API_REQUEST['MEDIA']:
+				return [
+					'/image\/.*/',
+					'/video\/.*/'
+				];
+			case API_REQUEST['JSON']:
+			default:
+				return [
+					'/application\/json/'
+				];
 		}
 	}
 
@@ -399,6 +423,20 @@ function api_handle_request(APIEndpoint $endpoint) {
 				API_METHOD
 			)."'."
 		);
+	}
+
+	// Check the request MIME type for POST requests.
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		$match = FALSE;
+		foreach ($endpoint->get_request_mime_regex() as $t) {
+			if (preg_match($t, $_SERVER['CONTENT_TYPE'])) {
+				$match = TRUE;
+				break;
+			}
+		}
+		if (!$match) {
+			throw new ArgException("Invalid request MIME type");
+		}
 	}
 
 	// Initialize the endpoint.
