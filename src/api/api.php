@@ -127,11 +127,14 @@ class APIEndpoint {
 				throw new IntException('JSON parsing failed!');
 			}
 		}
-
-		if ($data === NULL || gettype($data) !== 'array') {
-			throw new ArgException('Invalid request data.');
+		if ($data === NULL) {
+			$data = [];
+ 		} else if (gettype($data) !== 'array') {
+			throw new ArgException(
+				'Invalid request data. Expected an  '.
+				'array as the root element.'
+			);
 		}
-
 		$this->verify($data, $this->format_body);
 		return $data;
 	}
@@ -182,8 +185,7 @@ class APIEndpoint {
 								$this->parse_json_request($_POST['body'])
 							);
 						} else if (count($this->format_body) !== 0) {
-							throw new APIException(
-								API_E_INVALID_REQUEST,
+							throw new ArgException(
 								"Invalid multipart request data. ".
 								"Missing 'body' or extra data."
 							);
@@ -191,20 +193,14 @@ class APIEndpoint {
 						$this->files = $_FILES;
 						break;
 					default:
-						throw new APIException(
-							API_E_INVALID_REQUEST,
-							"Unknown request type."
-						);
+						throw new ArgException("Unknown request type.");
 				}
 				break;
 			case API_METHOD['GET']:
 				$this->data = $this->parse_url_request();
 				break;
 			default:
-				throw new APIException(
-					API_E_INVALID_REQUEST,
-					"Unexpected API method."
-				);
+				throw new ArgException("Unexpected API method.");
 		}
 	}
 
