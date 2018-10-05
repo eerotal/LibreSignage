@@ -16,7 +16,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $API_ERR_MSGS = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
 	APIEndpoint::REQ_QUOTA		=> FALSE,
 	APIEndpoint::REQ_AUTH		=> FALSE
 ));

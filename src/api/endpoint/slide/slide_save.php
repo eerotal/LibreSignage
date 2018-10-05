@@ -54,7 +54,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_SAVE = new APIEndpoint([
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
 	APIEndpoint::FORMAT_BODY => [
 		'id' => API_P_STR|API_P_NULL,
 		'name' => API_P_STR,

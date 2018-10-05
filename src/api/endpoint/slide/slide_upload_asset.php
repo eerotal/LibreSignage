@@ -2,7 +2,7 @@
 /*
 *  ====>
 *
-*
+*  TODO
 *
 *  Return value
 *    * error        = An error code or API_E_OK on success.
@@ -15,9 +15,9 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_UPLOAD_ASSET = new APIEndpoint([
 	APIEndpoint::METHOD         => API_METHOD['POST'],
-	APIEndpoint::REQUEST_TYPE   => API_REQUEST['MEDIA'],
-	APIEndpoint::RESPONSE_TYPE  => API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT_URL => [
+	APIEndpoint::REQUEST_TYPE   => API_MIME['multipart/form-data'],
+	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
+	APIEndpoint::FORMAT_BODY    => [
 		'id' => API_P_STR
 	],
 	APIEndpoint::REQ_QUOTA      => TRUE,

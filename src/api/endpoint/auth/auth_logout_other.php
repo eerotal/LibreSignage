@@ -15,7 +15,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $AUTH_LOGOUT_OTHER = new APIEndpoint(array(
 	APIEndpoint::METHOD         => API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE  => API_RESPONSE['JSON'],
+	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
 	APIEndpoint::FORMAT_BODY    => array(),
 	APIEndpoint::REQ_QUOTA      => FALSE,
 	APIEndpoint::REQ_AUTH       => TRUE

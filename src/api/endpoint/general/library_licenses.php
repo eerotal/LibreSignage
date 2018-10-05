@@ -12,7 +12,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $LIBRARY_LICENSES = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['TEXT'],
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['text/plain'],
 	APIEndpoint::REQ_QUOTA		=> FALSE,
 	APIEndpoint::REQ_AUTH		=> FALSE
 ));

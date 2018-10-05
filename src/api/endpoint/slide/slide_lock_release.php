@@ -26,7 +26,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_LOCK_RELEASE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
 	APIEndpoint::FORMAT_BODY => array(
 		'id' => API_P_STR
 	),

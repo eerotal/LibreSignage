@@ -16,7 +16,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $AUTH_GET_DATA = new APIEndpoint(array(
 	APIEndpoint::METHOD         => API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE  => API_RESPONSE['JSON'],
+	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
 	APIEndpoint::FORMAT_URL     => array(),
 	APIEndpoint::REQ_QUOTA      => TRUE,
 	APIEndpoint::REQ_AUTH       => TRUE

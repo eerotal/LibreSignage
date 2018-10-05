@@ -15,16 +15,17 @@ const API_METHOD = [
 	"POST" => 1
 ];
 
-// API Endpoint request types.
-const API_REQUEST = [
-	"JSON" => 0,
-	"MEDIA" => 1
+// API Endpoint MIME types.
+const API_MIME = [
+	"application/json" => 0,
+	"multipart/form-data" => 1,
+	"text/plain" => 2
 ];
 
-// API Endpoint response types.
-const API_RESPONSE = [
-	"JSON" => 0,
-	"TEXT" => 1
+const API_MIME_REGEX_MAP = [
+	0 => "/application\/json.*/",
+	1 => "/multipart\/form-data.*/",
+	2 => "/text\/plain.*/"
 ];
 
 // API type flags.
@@ -85,15 +86,14 @@ class APIEndpoint {
 	private $req_quota     = TRUE;
 	private $req_auth      = TRUE;
 	private $data          = NULL;
-	private $raw           = NULL;
 	private $caller        = NULL;
 
 	public function __construct(array $config) {
 		$args = new ArgumentArray(
 			array(
 				self::METHOD        => API_METHOD,
-				self::REQUEST_TYPE  => API_REQUEST,
-				self::RESPONSE_TYPE => API_RESPONSE,
+				self::REQUEST_TYPE  => API_MIME,
+				self::RESPONSE_TYPE => API_MIME,
 				self::FORMAT_BODY   => 'array',
 				self::FORMAT_URL    => 'array',
 				self::STRICT_FORMAT => 'boolean',
@@ -101,7 +101,8 @@ class APIEndpoint {
 				self::REQ_AUTH      => 'boolean'
 			),
 			array(
-				self::REQUEST_TYPE  => API_REQUEST['JSON'],
+				self::REQUEST_TYPE  => API_MIME['application/json'],
+				self::RESPONSE_TYPE => API_MIME['application/json'],
 				self::FORMAT_BODY   => [],
 				self::FORMAT_URL    => [],
 				self::STRICT_FORMAT => TRUE,
@@ -113,12 +114,8 @@ class APIEndpoint {
 		foreach ($ret as $k => $v) { $this->$k = $v; }
 	}
 
-	private function load_data_body_json() {
-		// Load JSON body request data.
-		$str = file_get_contents('php://input');
-		if ($str === FALSE) {
-			throw new IntException("Failed to read request data!");
-		}
+	private function parse_json_request(string $str) {
+		// Parse JSON request data.
 		if (strlen($str) === 0) {
 			$data = [];
 		} else {
@@ -127,9 +124,7 @@ class APIEndpoint {
 				$data === NULL &&
 				json_last_error() != JSON_ERROR_NONE
 			) {
-				throw new IntException(
-					"Request data parsing failed!"
-				);
+				throw new IntException('JSON parsing failed!');
 			}
 		}
 
@@ -141,44 +136,75 @@ class APIEndpoint {
 		return $data;
 	}
 
-	private function load_data_body_raw() {
-		// Load raw body request data.
-		return file_get_contents('php://input');
-	}
-
-	private function load_data_url() {
-		// Load URL request data.
+	private function parse_url_request() {
+		// Parse URL request data.
 		$this->verify($_GET, $this->format_url);
 		return $_GET;
 	}
 
 	public function load_data() {
 		/*
-		*  Wrapper function for loading data into
-		*  this APIEndpoint object. JSON and URL data
-		*  is loaded into $this->data, other types
-		*  are loaded into $this->raw.
+		*  Load request data. What data is loaded depends on the
+		*  API endpoint request method and MIME type.
+		*  
+		*  POST
+		*    application/json
+		*      * Load URL and body data into $this->data.
+		*    multipart/form-data
+		*      * Load URL and body data into $this->data.
+		*      * Load file data into $this->files.
+		*    other:
+		*      * Throw an error.
+		*  GET
+		*    * Load URL data into $this->data.
+		*  OTHER
+		*    * Throw an error.
 		*/
 		switch($this->method) {
 			case API_METHOD['POST']:
 				switch ($this->request_type) {
-					case API_REQUEST['JSON']:
+					case API_MIME['application/json']:
+						$body_raw = file_get_contents('php://input');
 						$this->data = array_merge(
-							$this->load_data_body_json(),
-							$this->load_data_url()
+							$this->parse_json_request($body_raw),
+							$this->parse_url_request($_GET)
 						);
 						break;
-					default:
-						$this->raw = $this->load_data_body_raw();
-						$this->data = $this->load_data_url();
+					case API_MIME['multipart/form-data']:
+						$this->data = $this->parse_url_request($_GET);
+						if (
+							count($this->format_body) !== 0
+							&& count($_POST) === 1
+							&& array_key_exists('body', $_POST)
+						) {
+							$this->data = array_merge(
+								$this->data,
+								$this->parse_json_request($_POST['body'])
+							);
+						} else if (count($this->format_body) !== 0) {
+							throw new APIException(
+								API_E_INVALID_REQUEST,
+								"Invalid multipart request data. ".
+								"Missing 'body' or extra data."
+							);
+						}
+						$this->files = $_FILES;
 						break;
+					default:
+						throw new APIException(
+							API_E_INVALID_REQUEST,
+							"Unknown request type."
+						);
 				}
 				break;
 			case API_METHOD['GET']:
-				$this->data = $this->load_data_url();
+				$this->data = $this->parse_url_request();
 				break;
 			default:
-				throw new ArgException("Unexpected API method.");
+				throw new APIException(
+					API_E_INVALID_REQUEST,
+					"Unexpected API method."
+				);
 		}
 	}
 
@@ -315,7 +341,7 @@ class APIEndpoint {
 		}
 	}
 
-	public function get_raw() { return $this->raw; }
+	public function get_files() { return $this->files; }
 
 	public function get($key = NULL) {
 		if ($key === NULL) {
@@ -336,32 +362,10 @@ class APIEndpoint {
 		}
 	}
 
-	public function get_content_type() {
-		switch ($this->response_type) {
-			case API_RESPONSE['JSON']:
-				return 'application/json';
-			case API_RESPONSE['TEXT']:
-			default:
-				return 'text/plain';
-		}
-	}
-
-	public function get_request_mime_regex() {
-		switch ($this->request_type) {
-			case API_REQUEST['MEDIA']:
-				return [
-					'/image\/.*/',
-					'/video\/.*/'
-				];
-			case API_REQUEST['JSON']:
-			default:
-				return [
-					'/application\/json/'
-				];
-		}
-	}
-
+	public function get_response_type() { return $this->response_type; }
+	public function get_request_type() { return $this->request_type; }
 	public function get_method() { return $this->method; }
+
 	public function requires_quota() { return $this->req_quota; }
 	public function requires_auth() { return $this->req_auth; }
 
@@ -382,15 +386,8 @@ class APIEndpoint {
 		/*
 		*  Send the current API response.
 		*/
-		if ($this->response_type == API_RESPONSE['TEXT']) {
-			if ($this->response) {
-				echo $this->response;
-			}
-			exit(0);
-		} elseif ($this->response_type == API_RESPONSE['JSON']) {
-			if (!$this->response) {
-				$this->response = [];
-			}
+		if ($this->response_type === API_MIME['application/json']) {
+			if (!$this->response) { $this->response = []; }
 			if (!isset($this->response['error'])) {
 				// Make sure the error value exists.
 				$this->response['error'] = API_E_OK;
@@ -406,6 +403,9 @@ class APIEndpoint {
 				);
 			}
 			echo $resp_str;
+			exit(0);
+		} else {
+			if ($this->response) { echo $this->response; }
 			exit(0);
 		}
 	}
@@ -427,7 +427,10 @@ function api_handle_request(APIEndpoint $endpoint) {
 	*/
 
 	// Send required headers.
-	header('Content-Type: '.$endpoint->get_content_type());
+	header(
+		'Content-Type: '.
+		array_search($endpoint->get_response_type(), API_MIME)
+	);
 	header('Access-Control-Allow-Origin: *');
 
 	// Check the request method.
@@ -450,15 +453,13 @@ function api_handle_request(APIEndpoint $endpoint) {
 
 	// Check the request MIME type for POST requests.
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-		$match = FALSE;
-		foreach ($endpoint->get_request_mime_regex() as $t) {
-			if (preg_match($t, $_SERVER['CONTENT_TYPE'])) {
-				$match = TRUE;
-				break;
-			}
-		}
-		if (!$match) {
-			throw new ArgException("Invalid request MIME type");
+		if (
+			!preg_match(
+				API_MIME_REGEX_MAP[$endpoint->get_request_type()],
+				$_SERVER['CONTENT_TYPE']
+			)
+		) {
+			throw new ArgException("Invalid request MIME type.");
 		}
 	}
 
@@ -477,7 +478,6 @@ function api_handle_request(APIEndpoint $endpoint) {
 
 	// Check authentication.
 	if (!$endpoint->requires_auth()) { return; }
-
 	if (!array_key_exists("Auth-Token", getallheaders())) {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,
@@ -548,7 +548,10 @@ function api_endpoint_init(APIEndpoint $endpoint) {
 			api_handle_preflight();
 			break;
 		default:
-			header('Content-Type: '.$endpoint->get_content_type());
+			header(
+				'Content-Type: '.
+				array_search($endpoint->get_response_type(), API_MIME)
+			);
 			throw new ArgException("Invalid request method.");
 	}
 
