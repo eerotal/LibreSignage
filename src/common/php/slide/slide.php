@@ -7,21 +7,13 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slidelock.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slideasset.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/uid.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/queue.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
-
-const ASSET_MIMES = [
-	'image/png',
-	'image/jpeg',
-	'image/gif',
-	'video/mp4',
-	'video/webm',
-	'video/ogg'
-];
 
 function slides_id_list() {
 	$ids = scandir(LIBRESIGNAGE_ROOT.SLIDES_DIR);
@@ -395,19 +387,9 @@ class Slide extends Exportable{
 		*/
 		$this->readychk();
 		if (!is_dir($this->asset_path)) { mkdir($this->asset_path); }
-		$mime = mime_content_type($file['tmp_name']);
-		if (!in_array($mime, ASSET_MIMES, TRUE)) {
-			throw new ArgException("Invalid asset MIME type.");
-		}
-		if (
-			!move_uploaded_file(
-				$file['tmp_name'],
-				$this->asset_path.'/'.$file['name']
-			)
-		) {
-			throw new IntException("Failed to store uploaded asset.");
-		}
-		$this->assets[] = $file['name'];
+		$asset = new SlideAsset();
+		$asset->new($file, $this->asset_path);
+		$this->assets[] = $asset;
 	}
 
 	function remove_uploaded_asset(string $name) {
@@ -416,12 +398,14 @@ class Slide extends Exportable{
 		*  directory of this slide.
 		*/
 		$this->readychk();
-		if (in_array($this->assets, $name)) {
-			throw new ArgException("Asset '$name' doesn't exist.");
+		for ($i = 0; $i < count($this->assets); $i++) {
+			if ($this->assets[$i]->get_filename() === $name) {
+				$this->assets[$i]->remove();
+				unset($this->assets[$i]);
+				$this->assets = array_values($this->assets);
+			}
 		}
-		echo $this->asset_path.'/'.$name;
-		unset($this->assets[array_search($name, $this->assets)]);
-		$this->assets = array_values($this->assets);
+		throw new ArgException("Asset '$name' doesn't exist.");
 	}
 
 	function get_queue() {

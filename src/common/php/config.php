@@ -57,19 +57,20 @@
 
 	// LibreSignage instance limits.
 	const LS_LIM = array(
-		"SLIDE_MIN_TIME" 		=> 1*1000,
-		"SLIDE_MAX_TIME" 		=> 20*1000,
-		"SLIDE_MAX_INDEX"		=> 65536,
-		"SLIDE_NAME_MAX_LEN"	=> 32,
-		"SLIDE_MARKUP_MAX_LEN"	=> 2048,
-		"SLIDE_MAX_COLLAB"		=> 64,
-		"QUEUE_NAME_MAX_LEN"	=> 32,
+		"SLIDE_MIN_TIME"           => 1*1000,
+		"SLIDE_MAX_TIME"           => 20*1000,
+		"SLIDE_MAX_INDEX"          => 65536,
+		"SLIDE_NAME_MAX_LEN"       => 32,
+		"SLIDE_MARKUP_MAX_LEN"     => 2048,
+		"SLIDE_MAX_COLLAB"         => 64,
+		"SLIDE_ASSET_NAME_MAX_LEN" => 64,
+		"QUEUE_NAME_MAX_LEN"       => 32,
 
-		"MAX_USERS" 			=> 64,
-		"MAX_USER_GROUPS" 		=> 32,
-		"USERNAME_MAX_LEN"		=> 64,
-		"PASSWORD_MAX_LEN"		=> 256,
-		"API_RATE_T"			=> 60
+		"MAX_USERS"                => 64,
+		"MAX_USER_GROUPS"          => 32,
+		"USERNAME_MAX_LEN"         => 64,
+		"PASSWORD_MAX_LEN"         => 256,
+		"API_RATE_T"               => 60
 	);
 
 	function gtlim(string $lim) {

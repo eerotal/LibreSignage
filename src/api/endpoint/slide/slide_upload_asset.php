@@ -76,6 +76,7 @@ foreach($SLIDE_UPLOAD_ASSET->get_files() as $f) {
 		$errors[$f['name']] = -2;
 	}
 }
+$slide->write();
 
 $resp = [
 	'failed' => count($errors),
