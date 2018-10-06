@@ -90,7 +90,7 @@ class APIEndpoint {
 
 	public function __construct(array $config) {
 		$args = new ArgumentArray(
-			array(
+			[
 				self::METHOD        => API_METHOD,
 				self::REQUEST_TYPE  => API_MIME,
 				self::RESPONSE_TYPE => API_MIME,
@@ -99,8 +99,8 @@ class APIEndpoint {
 				self::STRICT_FORMAT => 'boolean',
 				self::REQ_QUOTA     => 'boolean',
 				self::REQ_AUTH      => 'boolean'
-			),
-			array(
+			],
+			[
 				self::REQUEST_TYPE  => API_MIME['application/json'],
 				self::RESPONSE_TYPE => API_MIME['application/json'],
 				self::FORMAT_BODY   => [],
@@ -108,7 +108,7 @@ class APIEndpoint {
 				self::STRICT_FORMAT => TRUE,
 				self::REQ_QUOTA     => TRUE,
 				self::REQ_AUTH      => TRUE
-			)
+			]
 		);
 		$ret = $args->chk($config);
 		foreach ($ret as $k => $v) { $this->$k = $v; }
@@ -206,9 +206,7 @@ class APIEndpoint {
 
 	private function chk_arr_types(array $vals, string $type) {
 		foreach ($vals as $k => $v) {
-			if (gettype($v) != $type) {
-				return FALSE;
-			}
+			if (gettype($v) != $type) { return FALSE; }
 		}
 		return TRUE;
 	}
@@ -273,7 +271,6 @@ class APIEndpoint {
 		*/
 		$bitmask = $format[$i];
 		$value =  $data[$i];
-
 		if (
 			!(API_P_EMPTY_STR_OK & $bitmask)
 			&& gettype($data[$i]) == 'string'
@@ -281,7 +278,6 @@ class APIEndpoint {
 		) {
 			throw new ArgException("Invalid empty data for '$i'.");
 		}
-
 	}
 
 	private function is_param_opt(int $bitmask) {
@@ -337,8 +333,6 @@ class APIEndpoint {
 		}
 	}
 
-	public function get_files() { return $this->files; }
-
 	public function get($key = NULL) {
 		if ($key === NULL) {
 			return $this->data;
@@ -371,6 +365,8 @@ class APIEndpoint {
 	public function set_session($session) { $this->session = $session; }
 	public function get_session() { return $this->session; }
 
+	public function get_files() { return $this->files; }
+
 	public function resp_set($resp) {
 		/*
 		*  Set the API response data.
@@ -391,7 +387,7 @@ class APIEndpoint {
 			$resp_str = json_encode($this->response);
 			if (
 				$resp_str === FALSE &&
-				json_last_error() != JSON_ERROR_NONE
+				json_last_error() !== JSON_ERROR_NONE
 			) {
 				throw new APIException(
 					API_E_INTERNAL,
@@ -501,10 +497,7 @@ function api_handle_request(APIEndpoint $endpoint) {
 	if ($quota->has_state_var('api_t_start')) {
 		$t = $quota->get_state_var('api_t_start');
 		if (time() - $t >= gtlim('API_RATE_T')) {
-			/*
-			*  Reset rate quota and time
-			*  after the cutoff.
-			*/
+			// Reset rate quota and time after the cutoff.
 			$quota->set_state_var('api_t_start', time());
 			$quota->set_quota('api_rate', 0);
 		}
@@ -535,8 +528,6 @@ function api_endpoint_init(APIEndpoint $endpoint) {
 
 	switch ($_SERVER['REQUEST_METHOD']) {
 		case "POST":
-			api_handle_request($endpoint);
-			break;
 		case "GET":
 			api_handle_request($endpoint);
 			break;
