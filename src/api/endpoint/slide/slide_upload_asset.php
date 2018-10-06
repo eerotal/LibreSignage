@@ -2,10 +2,23 @@
 /*
 *  ====>
 *
-*  TODO
+*  Upload a slide asset. The *upload_errors* field of the return data
+*  contains an error code for all failed uploads. Positive integers
+*  are PHP upload error codes and negative integers are LibreSignage
+*  specific errors. Below is a list of the negative error codes.
+*
+*  * -1 = move_uploaded_file() failed.
+*  * -2 = Invalid file type. 
+*
+*  Request: POST, multipart/form-data
+*
+*  JSON parameters
+*    * id = The slide ID to use.
 *
 *  Return value
-*    * error        = An error code or API_E_OK on success.
+*    * failed        = The number of failed uploads.
+*    * upload_errors = Error codes for failed uploads.
+*    * error         = An error code or API_E_OK on success.
 *
 *  <====
 */
@@ -17,12 +30,58 @@ $SLIDE_UPLOAD_ASSET = new APIEndpoint([
 	APIEndpoint::METHOD         => API_METHOD['POST'],
 	APIEndpoint::REQUEST_TYPE   => API_MIME['multipart/form-data'],
 	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
-	APIEndpoint::FORMAT_BODY    => [
-		'id' => API_P_STR
-	],
+	APIEndpoint::FORMAT_BODY    => [ 'id' => API_P_STR ],
 	APIEndpoint::REQ_QUOTA      => TRUE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ]);
 api_endpoint_init($SLIDE_UPLOAD_ASSET);
 
+$slide = new Slide();
+$slide->load($SLIDE_UPLOAD_ASSET->get('id'));
+
+// Allow admins, slide owners or slide collaborators.
+if (!(
+	check_perm(
+		'grp:admin;',
+		$SLIDE_UPLOAD_ASSET->get_caller()
+	)
+	|| check_perm(
+		'grp:editor&usr:'.$slide->get_owner().';',
+		$SLIDE_UPLOAD_ASSET->get_caller())
+	|| (
+		check_perm('grp:editor;', $SLIDE_UPLOAD_ASSET->get_caller())
+		&& in_array(
+			$SLIDE_UPLOAD_ASSET->get_caller()->get_name(),
+			$slide->get_owner()
+		)
+	)
+)) {
+	throw new APIException(
+		API_E_NOT_AUTHORIZED,
+		'Not authorized.'
+	);
+}
+
+$errors = [];
+foreach($SLIDE_UPLOAD_ASSET->get_files() as $f) {
+	if ($f['error'] !== UPLOAD_ERR_OK) {
+		$errors[$f['name']] = $f['error'];
+		continue;
+	}
+	try {
+		$slide->store_uploaded_asset($f);
+	} catch (IntException $e) {
+		$errors[$f['name']] = -1;		
+	} catch (ArgException $e) {
+		$errors[$f['name']] = -2;
+	}
+}
+
+$resp = [
+	'failed' => count($errors),
+	'error' => count($errors) !== 0 ? API_E_UPLOAD : API_E_OK
+];
+if (API_ERROR_TRACE) { $resp['upload_errors'] = $errors; }
+
+$SLIDE_UPLOAD_ASSET->resp_set($resp);
 $SLIDE_UPLOAD_ASSET->send();

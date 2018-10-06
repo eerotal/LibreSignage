@@ -4,6 +4,8 @@
 *
 *  *Get the data of a slide.*
 *
+*  Request: GET
+*
 *  GET parameters
 *    * id = The id of the slide to get.
 *

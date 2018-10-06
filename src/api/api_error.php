@@ -25,7 +25,8 @@ const API_E = array(
 	"API_E_CLIENT"          => 6, // Only for client side use!
 	"API_E_RATE"            => 7,
 	"API_E_INCORRECT_CREDS" => 8,
-	"API_E_LOCK"            => 9
+	"API_E_LOCK"            => 9,
+	"API_E_UPLOAD"          => 10
 );
 
 // Define the error codes in the global namespace too.
@@ -85,6 +86,10 @@ const API_E_MSG = array(
 	API_E_LOCK => array(
 		"short" => "Slide lock error",
 		"long" => "A slide locking error occured."
+	),
+	API_E_UPLOAD => array(
+		"short" >= "Upload error",
+		"long" => "An error occured while uploading a file."
 	)
 );
 

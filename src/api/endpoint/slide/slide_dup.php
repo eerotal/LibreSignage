@@ -6,7 +6,9 @@
 *   of this API endpoint. The new slide is also automatically
 *   locked for the caller.*
 *
-*  POST JSON parameters
+*  Request: POST, application/json
+*
+*  JSON parameters
 *    * id = The ID of the slide to duplicate.
 *
 *  Return value

@@ -5,14 +5,18 @@
 *  Attempt to lock a slide.
 *
 *  This endpoint succeeds if:
+*
 *    * The caller is in the 'admin' or 'editor' groups.
 *    * The slide has previously been locked by the caller.
 *
 *  The 'error' value returned by this endpoint is
+*
 *    * API_E_OK on success.
 *    * API_E_LOCK if the slide is locked by another user.
 *
-*  POST JSON parameters
+*  Request: POST, application/json
+*
+*  JSON parameters
 *    * id = The ID of the slide to lock.
 *
 *  Return value

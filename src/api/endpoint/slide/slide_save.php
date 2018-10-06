@@ -22,7 +22,9 @@
 *  If the slide is not locked or is locked by someone else, the
 *  API_E_LOCK error is returned in the 'error' value.
 *
-*  POST JSON parameters
+*  Request: POST, application/json
+*
+*  JSON parameters
 *    * id            = The ID of the slide to modify or either
 *      undefined or null for new slide.
 *    * name          = The name of the slide.

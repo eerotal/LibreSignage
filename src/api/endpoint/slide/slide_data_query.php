@@ -5,7 +5,9 @@
 *  *Query specific data keys from all of the currently
 *  existing slides.*
 *
-*  GET parameters
+*  Request: GET
+*
+*  parameters
 *    * Data can be requested by assigning 1 to the
 *      requested key. The following keys are accepted:
 *      id, markup, name, index, time, owner, enabled,

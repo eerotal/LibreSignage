@@ -4,6 +4,8 @@
 *
 *  *Get a list of all the existing slides.*
 *
+*  Request: GET
+*
 *  Return value
 *    * An array with all the existing slide IDs.
 *

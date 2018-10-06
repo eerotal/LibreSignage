@@ -4,7 +4,9 @@
 *
 *  *Remove a slide.*
 *
-*  POST parameters
+*  Request: POST, application/json
+*
+*  parameters
 *    * id = The id of the slide to remove.
 *
 *  Return value
