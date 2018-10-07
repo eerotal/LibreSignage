@@ -2,10 +2,12 @@
 /*
 *  ====>
 *
-*  *Get a user's data based on a username. This endpoint
-*  doesn't return any secret information like passwords.*
+*  Get a user's data based on a username. This endpoint
+*  doesn't return any secret information like passwords.
 *
-*  GET parameters
+*  **Request:** GET
+*
+*  Parameters
 *    * user = The username to query.
 *
 *  Return value

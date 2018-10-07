@@ -2,9 +2,11 @@
 /*
 *  ====>
 *
-*  *Get a slide queue.*
+*  Get a slide queue.
 *
-*  GET parameters
+*  **Request:** GET
+*
+*  Parameters
 *    * name = The name of the queue to get.
 *
 *  Return value

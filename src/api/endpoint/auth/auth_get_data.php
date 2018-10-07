@@ -4,6 +4,8 @@
 *
 *  Get the current authentication data.
 *
+*  **Request:** GET
+*
 *  Return value
 *    * user = Current use data.
 *    * session = Current session data.

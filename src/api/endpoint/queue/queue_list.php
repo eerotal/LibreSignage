@@ -2,7 +2,9 @@
 /*
 *  ====>
 *
-*  *Get a list of the existing slide queue names*
+*  Get a list of the existing slide queue names.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * queues = A list containing the slide queue names.

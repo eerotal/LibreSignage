@@ -2,7 +2,9 @@
 /*
 *  ====>
 *
-*  *Get a list of the active sessions for the current user.*
+*  Get a list of the active sessions for the current user.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * sessions = An array of sessions.

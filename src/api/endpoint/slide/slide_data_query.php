@@ -7,7 +7,7 @@
 *
 *  **Request:** GET
 *
-*  parameters
+*  Parameters
 *    * Data can be requested by assigning 1 to the
 *      requested key. The following keys are accepted:
 *      id, markup, name, index, time, owner, enabled,
@@ -40,7 +40,8 @@ $SLIDE_DATA_QUERY = new APIEndpoint(array(
 		'sched_t_e' => API_P_STR|API_P_OPT,
 		'animation' => API_P_STR|API_P_OPT,
 		'collaborators' => API_P_STR|API_P_OPT,
-		'lock' => API_P_STR|API_P_OPT
+		'lock' => API_P_STR|API_P_OPT,
+		'assets' => API_P_STR|API_P_OPT
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE,

@@ -2,9 +2,11 @@
 /*
 *  ====>
 *
-*  *Create a new user.*
+*  Create a new user.
 *
-*  POST parameters
+*  **Request:** POST, application/json
+*
+*  Parameters
 *    * user    = The user to create.
 *    * groups  = New groups (Optionally unset or NULL)
 *

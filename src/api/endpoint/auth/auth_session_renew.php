@@ -2,8 +2,10 @@
 /*
 *  ====>
 *
-*  *Request a session renewal. The previous authentication token
-*  is automatically expired when this endpoint is called.*
+*  Request a session renewal. The previous authentication token
+*  is automatically expired when this endpoint is called.
+*
+*  **Request:** POST, application/json
 *
 *  Return value
 *    * session = An associative array with the latest session data.

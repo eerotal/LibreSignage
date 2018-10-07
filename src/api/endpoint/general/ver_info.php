@@ -2,7 +2,9 @@
 /*
 *  ====>
 *
-*  *Get LibreSignage version information.*
+*  Get LibreSignage version information.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * main    = The LibreSignage version string.

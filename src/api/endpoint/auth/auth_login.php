@@ -2,7 +2,9 @@
 /*
 *  ====>
 *
-*  *Login using the authentication system.*
+*  Login using the authentication system.
+*
+*  **Request:** POST, application/json
 *
 *  POST parameters
 *    * username    = Username

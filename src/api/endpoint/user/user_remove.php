@@ -2,9 +2,11 @@
 /*
 *  ====>
 *
-*  *Remove a user based on a username.*
+*  Remove a user based on a username.
 *
-*  POST parameters
+*  **Request:** POST, application/json
+*
+*  Parameters
 *    * user    = The user to remove.
 *
 *  Return value

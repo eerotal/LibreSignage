@@ -2,8 +2,10 @@
 /*
 *  ====>
 *
-*  *Get the configured server limits. This endpoint doesn't require
-*  or consume the API rate quota.*
+*  Get the configured server limits. This endpoint doesn't require
+*  or consume the API rate quota.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * limits     = A dictionary with the limits.

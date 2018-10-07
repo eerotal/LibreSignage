@@ -2,9 +2,11 @@
 /*
 *  ====>
 *
-*  *Create a slide queue.*
+*  Create a slide queue.
 *
-*  GET parameters
+*  **Request:** POST, application/json
+*
+*  Parameters
 *    * name = Queue name.
 *
 *  Return value

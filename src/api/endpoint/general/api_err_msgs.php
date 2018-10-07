@@ -2,8 +2,10 @@
 /*
 *  ====>
 *
-*  *Get the messages corresponding to different API error codes.
-*  This endpoint doesn't require or consume the API rate quota.*
+*  Get the messages corresponding to different API error codes.
+*  This endpoint doesn't require or consume the API rate quota.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * messages = A dictionary of error messages.

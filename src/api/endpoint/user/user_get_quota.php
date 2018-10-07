@@ -2,9 +2,11 @@
 /*
 *  ====>
 *
-*  *Get a user's quota based on a username.*
+*  Get a user's quota based on a username.
 *
-*  GET parameters
+*  **Request:** GET
+*
+*  Parameters
 *    * user = The username to query.
 *
 *  Return value

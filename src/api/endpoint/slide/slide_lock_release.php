@@ -16,7 +16,7 @@
 *
 *  **Request:** POST, application/json
 *
-*  JSON parameters
+*  Parameters
 *    * id = The ID of the slide to lock.
 *
 *  Return value

@@ -2,9 +2,9 @@
 /*
 *  ====>
 *
-*  *Save a slide. Whether a user is allowed to access this
+*   Save a slide. Whether a user is allowed to access this
 *   API endpoint depends on the parameters passed to the
-*   endpoint.*
+*   endpoint.
 *
 *  Permissions
 *   * id != null => Allow if the caller is in the admin
@@ -24,7 +24,7 @@
 *
 *  **Request:** POST, application/json
 *
-*  JSON parameters
+*  Parameters
 *    * id            = The ID of the slide to modify or either
 *      undefined or null for new slide.
 *    * name          = The name of the slide.

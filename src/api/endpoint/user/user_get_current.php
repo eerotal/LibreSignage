@@ -2,7 +2,9 @@
 /*
 *  ====>
 *
-*  *Get the data of the current user.*
+*  Get the data of the current user.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * user

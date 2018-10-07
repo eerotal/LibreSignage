@@ -2,9 +2,11 @@
 /*
 *  ====>
 *
-*  *Remove a slide queue and all slides in it.*
+*  Remove a slide queue and all slides in it.
 *
-*  GET parameters
+*  **Request:** POST, application/json
+*
+*  Parameters
 *    * name = Queue name.
 *
 *  Return value

@@ -2,7 +2,9 @@
 /*
 *  ====>
 *
-*  *Logout the current session*
+*  Logout the current session.
+*
+*  **Request:** POST, application/json
 *
 *  Return value
 *    * error = An error code or API_E_OK on success.

@@ -2,7 +2,7 @@
 /*
 *  ====>
 *
-*  *Save a user's data.*
+*  Save a user's data.
 *
 *  Access is granted in any of the following cases.
 *
@@ -13,7 +13,9 @@
 *       they are not trying to set user groups. This prevents
 *       privilege escalation.
 *
-*  POST parameters
+*  **Request:** POST, application/json
+*
+*  Parameters
 *    * user    = The user to modify.
 *    * pass    = New password (Optionally unset or NULL)
 *    * groups  = New groups (Optionally unset or NULL)

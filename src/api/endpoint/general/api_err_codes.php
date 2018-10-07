@@ -3,8 +3,10 @@
 /*
 *  ====>
 *
-*  *Get the defined API error codes. This endpoint doesn't require
-*  or consume the API rate quota.*
+*  Get the defined API error codes. This endpoint doesn't require
+*  or consume the API rate quota.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * codes = A dictionary of error codes.

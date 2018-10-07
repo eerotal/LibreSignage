@@ -2,8 +2,10 @@
 /*
 *  ====>
 *
-*  *Get a list of all existing users along with the
-*  available userdata.*
+*  Get a list of all existing users along with the
+*  available userdata.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * users = A dictionary of the users and their data

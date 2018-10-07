@@ -3,8 +3,13 @@
 /*
 *  ====>
 *
-*  *Get the Markdown version of the third party licenses file.
-*  This endpoint doesn't require or consume the API rate quota.*
+*  Get the reStructuredText version of the third party licenses file.
+*  This endpoint doesn't require or consume the API rate quota.
+*
+*  **Request:** GET
+*
+*  Response value
+*    * The raw license text.
 *
 *  <====
 */

@@ -6,7 +6,7 @@
 *
 *  **Request:** POST, application/json
 *
-*  parameters
+*  Parameters
 *    * id = The id of the slide to remove.
 *
 *  Return value

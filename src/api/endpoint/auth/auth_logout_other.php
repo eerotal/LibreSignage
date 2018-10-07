@@ -2,8 +2,10 @@
 /*
 *  ====>
 *
-*  *Logout all sessions of the user corresponding to the supplied
-*  authentication key except the calling session.*
+*  Logout all sessions of the user corresponding to the supplied
+*  authentication key except the calling session.
+*
+*  **Request:** POST, application/json
 *
 *  Return value
 *    * error = An error code or API_E_OK on success.

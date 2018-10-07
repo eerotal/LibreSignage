@@ -6,7 +6,7 @@
 *
 *  **Request:** GET
 *
-*  GET parameters
+*  Parameters
 *    * id = The id of the slide to get.
 *
 *  Return value

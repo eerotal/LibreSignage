@@ -2,7 +2,9 @@
 /*
 *  ====>
 *
-*  *Get a list of the existing usernames.*
+*  Get a list of the existing usernames.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * users = An array of usernames.

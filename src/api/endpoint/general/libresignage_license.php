@@ -3,8 +3,13 @@
 /*
 *  ====>
 *
-*  *Get the Markdown version of the LibreSignage license file.
+*  *Get the reStructuredText version of the LibreSignage license file.
 *  This endpoint doesn't require or consume the API rate quota.*
+*
+*  **Request:** GET
+*
+*  Response value
+*    * The raw license text.
 *
 *  <====
 */

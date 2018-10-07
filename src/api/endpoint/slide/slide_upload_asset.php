@@ -4,11 +4,11 @@
 *
 *  Upload a slide asset.
 *
-*  If debugging is enabled (API_ERROR_TRACE == TRUE), the *upload_errors*
-*  field of the return data contains an error code for all failed
-*  uploads. Positive integers indicate PHP upload `errors`_ and negative
-*  integers are LibreSignage specific errors. Below is a list of the
-*  negative error codes.
+*  If debugging is enabled (``API_ERROR_TRACE === TRUE``), the
+*  *upload_errors* field of the returned data contains an error code
+*  for all failed uploads. Positive integers indicate PHP upload
+*  `errors`_ and negative integers are LibreSignage specific errors.
+*  Below is a list of the negative error codes.
 *
 *  * -1 = move_uploaded_file() failed.
 *  * -2 = Asset filename too long.
