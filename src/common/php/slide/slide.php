@@ -409,6 +409,15 @@ class Slide extends Exportable{
 		throw new ArgException("Asset '$name' doesn't exist.");
 	}
 
+	function get_uploaded_asset(string $name) {
+		foreach ($this->assets as $a) {
+			if ($a->get_filename() === $name) {
+				return $a;
+			}
+		}
+		return NULL;
+	}
+
 	function get_queue() {
 		$queue = new Queue($this->queue_name);
 		$queue->load();

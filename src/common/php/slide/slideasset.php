@@ -85,7 +85,7 @@ class SlideAsset extends Exportable {
 		foreach ($this::$PRIVATE as $n) { $this->{$n} = NULL; }
 	}
 
-	public function get_filename() {
-		return $this->filename;
-	}
+	public function get_filename() { return $this->filename; }
+	public function get_fullpath() { return $this->fullpath; }
+	public function get_mime() { return $this->mime; }
 }

@@ -17,9 +17,9 @@ const API_METHOD = [
 
 // API Endpoint MIME types.
 const API_MIME = [
-	"application/json" => 0,
+	"application/json"    => 0,
 	"multipart/form-data" => 1,
-	"text/plain" => 2
+	"text/plain"          => 2
 ];
 
 const API_MIME_REGEX_MAP = [
@@ -397,7 +397,20 @@ class APIEndpoint {
 			echo $resp_str;
 			exit(0);
 		} else {
-			if ($this->response) { echo $this->response; }
+			if ($this->response) {
+				if (
+					is_resource($this->response)
+					&& get_resource_type($this->response) == 'stream'
+					&& stream_get_meta_data(
+						$this->response
+					)['stream_type'] == 'STDIO'
+				) {
+					fpassthru($this->response);
+					fclose($this->response);
+				} else {
+					echo $this->response;
+				}
+			}
 			exit(0);
 		}
 	}
@@ -419,10 +432,12 @@ function api_handle_request(APIEndpoint $endpoint) {
 	*/
 
 	// Send required headers.
-	header(
-		'Content-Type: '.
-		array_search($endpoint->get_response_type(), API_MIME)
-	);
+	if ($endpoint->get_response_type() !== NULL) {
+		header(
+			'Content-Type: '.
+			array_search($endpoint->get_response_type(), API_MIME)
+		);
+	}
 	header('Access-Control-Allow-Origin: *');
 
 	// Check the request method.
@@ -535,10 +550,15 @@ function api_endpoint_init(APIEndpoint $endpoint) {
 			api_handle_preflight();
 			break;
 		default:
-			header(
-				'Content-Type: '.
-				array_search($endpoint->get_response_type(), API_MIME)
-			);
+			if ($endpoint->get_response_type() !== NULL) {
+				header(
+					'Content-Type: '.
+					array_search($endpoint->get_response_type(), API_MIME)
+				);
+			} else {
+				// Fallback to text/plain if response_type === NULL.
+				header('Content-Type: text/plain');
+			}
 			throw new ArgException("Invalid request method.");
 	}
 
