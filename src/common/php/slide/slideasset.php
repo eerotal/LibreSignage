@@ -1,5 +1,10 @@
 <?php
 
+/*
+*  SlideAsset class declaration used in the Slide class. This class
+*  is used for handling uploaded slide assets.
+*/
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
 
@@ -40,12 +45,17 @@ class SlideAsset extends Exportable {
 	}
 
 	public function new(array $file, string $asset_path) {
+		/*
+		*  Create a new asset instance and move the uploaded
+		*  asset to $asset_path. $file is the upload data for
+		*  a single file from $_FILES.
+		*/
 		assert(!empty($file));
 		assert(!empty($asset_path));
 
 		$mime = mime_content_type($file['tmp_name']);
 		if (!in_array($mime, ASSET_MIMES, TRUE)) {
-			throw new ArgException("Invalid asset MIME type.");
+			throw new FileTypeException("Invalid asset MIME type.");
 		}
 		if (strlen($file['name']) > gtlim('SLIDE_ASSET_NAME_MAX_LEN')) {
 			throw new ArgException("Asset filename too long.");
@@ -59,6 +69,7 @@ class SlideAsset extends Exportable {
 		$this->fullpath = $asset_path.'/'.$this->intname;
 
 		if (!move_uploaded_file($file['tmp_name'], $this->fullpath)) {
+			$this->reset();
 			throw new IntException("Failed to store uploaded asset.");
 		}
 	}
@@ -66,7 +77,12 @@ class SlideAsset extends Exportable {
 	public function remove() {
 		if (!empty($this->fullpath)) {
 			unlink($this->fullpath);
+			$this->reset();
 		}
+	}
+
+	private function reset() {
+		foreach ($this::$PRIVATE as $n) { $this->{$n} = NULL; }
 	}
 
 	public function get_filename() {

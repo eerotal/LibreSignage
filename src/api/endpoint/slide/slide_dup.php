@@ -2,11 +2,11 @@
 /*
 *  ====>
 *
-*  *Duplicate a slide. The owner of the new slide is the caller
+*   Duplicate a slide. The owner of the new slide is the caller
 *   of this API endpoint. The new slide is also automatically
-*   locked for the caller.*
+*   locked for the caller.
 *
-*  Request: POST, application/json
+*  **Request:** POST, application/json
 *
 *  JSON parameters
 *    * id = The ID of the slide to duplicate.

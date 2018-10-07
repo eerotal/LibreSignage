@@ -16,7 +16,6 @@
 		<title>LibreSignage Editor</title>
 	</head>
 	<body>
-		<input type="file" id="filesel">
 		<?php
 			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
 		?>

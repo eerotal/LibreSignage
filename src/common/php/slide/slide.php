@@ -403,6 +403,7 @@ class Slide extends Exportable{
 				$this->assets[$i]->remove();
 				unset($this->assets[$i]);
 				$this->assets = array_values($this->assets);
+				return;
 			}
 		}
 		throw new ArgException("Asset '$name' doesn't exist.");

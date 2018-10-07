@@ -15,7 +15,7 @@
 *    * API_E_OK if the slide locking succeeds.
 *    * API_E_LOCK if the slide is already locked by another user.
 *
-*  Request: POST, application/json
+*  **Request:** POST, application/json
 *
 *  JSON parameters
 *    * id = The ID of the slide to lock.

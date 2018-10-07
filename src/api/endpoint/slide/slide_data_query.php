@@ -2,10 +2,10 @@
 /*
 *  ====>
 *
-*  *Query specific data keys from all of the currently
-*  existing slides.*
+*  Query specific data keys from all of the currently
+*  existing slides.
 *
-*  Request: GET
+*  **Request:** GET
 *
 *  parameters
 *    * Data can be requested by assigning 1 to the

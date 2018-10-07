@@ -2,15 +2,21 @@
 /*
 *  ====>
 *
-*  Upload a slide asset. The *upload_errors* field of the return data
-*  contains an error code for all failed uploads. Positive integers
-*  are PHP upload error codes and negative integers are LibreSignage
-*  specific errors. Below is a list of the negative error codes.
+*  Upload a slide asset.
+*
+*  If debugging is enabled (API_ERROR_TRACE == TRUE), the *upload_errors*
+*  field of the return data contains an error code for all failed
+*  uploads. Positive integers indicate PHP upload `errors`_ and negative
+*  integers are LibreSignage specific errors. Below is a list of the
+*  negative error codes.
 *
 *  * -1 = move_uploaded_file() failed.
-*  * -2 = Invalid file type. 
+*  * -2 = Asset filename too long.
+*  * -3 = Invalid asset file type.
 *
-*  Request: POST, multipart/form-data
+*  .. _errors: http://php.net/manual/en/features.file-upload.errors.php
+*
+*  **Request:** POST, multipart/form-data
 *
 *  JSON parameters
 *    * id = The slide ID to use.
@@ -39,7 +45,7 @@ api_endpoint_init($SLIDE_UPLOAD_ASSET);
 $slide = new Slide();
 $slide->load($SLIDE_UPLOAD_ASSET->get('id'));
 
-// Allow admins, slide owners or slide collaborators.
+// Allow admins, slide owners or slide collaborators to upload assets.
 if (!(
 	check_perm(
 		'grp:admin;',
@@ -74,6 +80,8 @@ foreach($SLIDE_UPLOAD_ASSET->get_files() as $f) {
 		$errors[$f['name']] = -1;		
 	} catch (ArgException $e) {
 		$errors[$f['name']] = -2;
+	} catch (FileTypeException $e) {
+		$errors[$f['name']] = -3;
 	}
 }
 $slide->write();

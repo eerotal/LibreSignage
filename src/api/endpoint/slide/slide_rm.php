@@ -2,9 +2,9 @@
 /*
 *  ====>
 *
-*  *Remove a slide.*
+*  Remove a slide.
 *
-*  Request: POST, application/json
+*  **Request:** POST, application/json
 *
 *  parameters
 *    * id = The id of the slide to remove.
