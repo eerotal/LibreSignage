@@ -22,6 +22,17 @@
 *  If the slide is not locked or is locked by someone else, the
 *  API_E_LOCK error is returned in the 'error' value.
 *
+*  Note!
+*
+*  This endpoint accepts a few unused parameters to simplify
+*  implementing the client interface for this endpoint.
+*  Specifically, clients *must* be able to send all data
+*  received from slide_get.php back to this endpoint, even if
+*  it's not actually used. This makes it possible to implement
+*  a simple Object Oriented interface that just sends all data
+*  fields in the client side Slide object to this endpoint
+*  without filtering what can be sent.
+*
 *  **Request:** POST, application/json
 *
 *  Parameters
@@ -38,8 +49,9 @@
 *    * animation     = The slide animation identifier.
 *    * queue_name    = The name of the slide queue of this slide.
 *    * collaborators = A list of slide collaborators.
-*    * owner         = Unused
-*    * lock          = Unused
+*    * owner         = Unused (see above)
+*    * lock          = Unused (see above)
+*    * assets        = Unused (see above)
 *
 *  Return value
 *    This endpoint returns all the parameters above as well as
@@ -71,7 +83,8 @@ $SLIDE_SAVE = new APIEndpoint([
 		'animation' => API_P_INT,
 		'queue_name' => API_P_STR,
 		'collaborators' => API_P_ARR_STR,
-		'lock' => API_P_UNUSED
+		'lock' => API_P_UNUSED,
+		'assets' => API_P_UNUSED
 	],
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
