@@ -81,6 +81,7 @@ const PREVIEW_R_4x3				= $("#btn-preview-ratio-4x3");
 const MARKUP_ERR_DISPLAY		= $("#markup-err-display");
 const LINK_QUICK_HELP			= $("#link-quick-help");
 const CONT_QUICK_HELP			= $("#cont-quick-help");
+const LINK_ADD_MEDIA			= $("#link-add-media");
 const CLOSE_QUICK_HELP			= $("#close-quick-help");
 var SLIDE_COLLAB				= null;
 var SLIDE_INPUT					= null;
@@ -535,8 +536,20 @@ const UI_DEFS = new uic.UIController({
 		perm = () => { return true; },
 		enabler = null,
 		attach = {
-			'click': () => {
+			'click': (e) => {
+				e.preventDefault(); // Don't scroll up page.
 				QUICK_HELP_UI_DEFS.get('CONT_QUICK_HELP').enabled(true);
+			}
+		},
+		defer = defer_editor_ready
+	),
+	'LINK_ADD_MEDIA': new uic.UIButton(
+		elem = () => { return LINK_ADD_MEDIA; },
+		perm = () => { return true; },
+		enabler = null,
+		attach = {
+			'click': (e) => {
+				e.preventDefault(); // Don't scroll up page.
 			}
 		},
 		defer = defer_editor_ready
