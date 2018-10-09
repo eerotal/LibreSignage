@@ -1,0 +1,39 @@
+/* LibreSignage editor popup styling. */
+
+$pop-height: 80vh;                 // Popup height.
+$pop-width: 80%;                   // Popup width.
+$pop-top: (100vh - $pop-height)/2; // Popup top space.
+$pop-left: (100% - $pop-width)/2;  // Popup left space.
+
+.popup {
+	position: fixed;
+	display: none; /* Initial */
+	z-index: 1000;
+
+	width: $pop-width;
+	height: $pop-height;
+	top: $pop-top;
+	left: $pop-left;
+
+	padding: {
+		top: $s2;
+		bottom: $s2;
+	}
+	margin: 0;
+	background-color: $white;
+	border: 1px solid $gray-2;
+	border-radius: 3px;
+}
+
+.popup-content {
+	overflow: hidden;
+	height: calc(#{$pop-height} - #{4*$s2} - 1rem);
+	margin: {
+		top: $s2;
+		bottom: $s2;
+	}
+	padding: {
+		left: $s5;
+		right: $s5;
+	}
+}

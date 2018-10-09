@@ -24,10 +24,15 @@ echo "	<Directory \"$ICONF_DOCROOT\">";
 echo '		Options -Indexes';
 echo '	</Directory>';
 
-# Send a 404 response when trying to access 'data/'.
+# Send a 404 response when trying to access 'data/' or 'common/'.
 echo "	<DirectoryMatch \"^$ICONF_DOCROOT(/?)$ICONF_NAME(/?)data(.+)\">";
 echo '		RewriteEngine On';
 echo '		RewriteRule .* - [R=404,L]';
 echo '	</DirectoryMatch>';
+echo "	<DirectoryMatch \"^$ICONF_DOCROOT(/?)$ICONF_NAME(/?)common(.+)\">";
+echo '		RewriteEngine On';
+echo '		RewriteRule .* - [R=404,L]';
+echo '	</DirectoryMatch>';
+
 
 echo '</VirtualHost>';

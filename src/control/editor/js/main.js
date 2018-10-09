@@ -15,6 +15,7 @@ var uic = require('ls-uicontrol');
 var slide = require('ls-slide');
 var queue = require('ls-queue');
 var sc = require('ls-shortcut');
+var popup = require('ls-popup');
 
 var ace_range = ace.require('ace/range');
 
@@ -37,7 +38,8 @@ const NEW_SLIDE_DEFAULTS = {
 	'animation': 0,
 	'queue_name': '',
 	'collaborators': [],
-	'lock': null
+	'lock': null,
+	'assets': []
 };
 
 // Editor status constants used by editor_status[_check]().
@@ -86,6 +88,7 @@ const CLOSE_QUICK_HELP			= $("#close-quick-help");
 var SLIDE_COLLAB				= null;
 var SLIDE_INPUT					= null;
 var LIVE_PREVIEW				= null;
+var QUICK_HELP                  = new popup.Popup($('#quick-help').get(0));
 
 var API = null; // API interface object.
 var TL = null;  // Timeline object.
@@ -537,8 +540,8 @@ const UI_DEFS = new uic.UIController({
 		enabler = null,
 		attach = {
 			'click': (e) => {
-				e.preventDefault(); // Don't scroll up page.
-				QUICK_HELP_UI_DEFS.get('CONT_QUICK_HELP').enabled(true);
+				e.preventDefault(); // Don't scroll up.
+				POPUPS.get('QUICK_HELP').enabled(true);
 			}
 		},
 		defer = defer_editor_ready
@@ -549,41 +552,22 @@ const UI_DEFS = new uic.UIController({
 		enabler = null,
 		attach = {
 			'click': (e) => {
-				e.preventDefault(); // Don't scroll up page.
+				e.preventDefault(); // Don't scroll up.
 			}
 		},
 		defer = defer_editor_ready
 	)
 });
 
-// Quick help box UI definitions.
-const QUICK_HELP_UI_DEFS = new uic.UIController({
-	'CONT_QUICK_HELP': new uic.UIStatic(
-		elem = () => { return CONT_QUICK_HELP; },
+const POPUPS = new uic.UIController({
+	'QUICK_HELP': new uic.UIStatic(
+		elem = () => { return QUICK_HELP; },
 		perm = () => { return false; },
-		enabler = (elem, s) => {
-			if (s) {
-				elem.css('display', 'block');
-			} else {
-				elem.css('display', 'none');
-			}
-		},
+		enabler = (elem, s) => { elem.visible(s); },
 		attach = null,
 		defer = null
-	),
-	'CLOSE_QUICK_HELP': new uic.UIButton(
-		elem = () => { return CLOSE_QUICK_HELP; },
-		perm = () => { return true; },
-		enabler = null,
-		attach = {
-			'click': () => {
-				console.log('Clicked');
-				QUICK_HELP_UI_DEFS.get('CONT_QUICK_HELP').enabled(false);
-			}
-		},
-		defer = defer_editor_ready
 	)
-});
+})
 
 // Queue selector UI definitions.
 const QSEL_UI_DEFS = new uic.UIController({

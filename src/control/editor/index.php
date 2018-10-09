@@ -332,19 +332,7 @@
 						</div>
 					</div>
 				</div>
-				<div id="cont-quick-help" class="container">
-					<div class="row">
-						<div class="col-12 container text-right">
-							<i id="close-quick-help" class="fas fa-times-circle link-nostyle"></i>
-						</div>
-					</div>
-					<div class="row">
-						<div id="cont-quick-help-content" class="col-12 container">
-							<?php require_once($_SERVER['DOCUMENT_ROOT'].'/doc/html/keyboard_shortcut_cheatsheet.html') ?>
-							<?php require_once($_SERVER['DOCUMENT_ROOT'].'/doc/html/markup.html') ?>
-						</div>
-					</div>
-				</div>
+				<?php require_once($_SERVER['DOCUMENT_ROOT'].'/control/editor/popups/quick_help.php'); ?>
 			</div>
 		</main>
 		<?php

@@ -5,7 +5,8 @@
 @import 'multiselect';
 @import 'timeline';
 @import 'preview';
-@import 'quick_help';
+@import 'popup';
+@import 'popup_special';
 
 $main-col-minw: 250px;        // Main column min width.
 $slide-input-minh: 45;        // Minimum height of editor in lines.
