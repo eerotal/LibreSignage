@@ -333,6 +333,7 @@
 					</div>
 				</div>
 				<?php require_once($_SERVER['DOCUMENT_ROOT'].'/control/editor/popups/quick_help.php'); ?>
+				<?php require_once($_SERVER['DOCUMENT_ROOT'].'/control/editor/popups/asset_uploader.php'); ?>
 			</div>
 		</main>
 		<?php

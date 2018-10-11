@@ -26,13 +26,19 @@ $pop-left: (100% - $pop-width)/2;  // Popup left space.
 	background-color: $white;
 	border: 1px solid $gray-2;
 	border-radius: 3px;
+
+	.row {
+		margin: 0;
+	}
 }
 
 .popup-content {
+	display: flex;
+	flex-direction: column;
 	overflow: hidden;
 	height: calc(#{$pop-height} - #{4*$s2} - 1rem);
 	margin: {
-		top: $s2;
+		top: $s1;
 		bottom: $s2;
 	}
 	padding: {

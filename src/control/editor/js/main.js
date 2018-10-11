@@ -88,7 +88,9 @@ const CLOSE_QUICK_HELP			= $("#close-quick-help");
 var SLIDE_COLLAB				= null;
 var SLIDE_INPUT					= null;
 var LIVE_PREVIEW				= null;
-var QUICK_HELP                  = new popup.Popup($('#quick-help').get(0));
+
+var QUICK_HELP = new popup.Popup($('#quick-help').get(0));
+var ASSET_UPLOADER = new popup.Popup($('#asset-uploader').get(0));
 
 var API = null; // API interface object.
 var TL = null;  // Timeline object.
@@ -553,16 +555,25 @@ const UI_DEFS = new uic.UIController({
 		attach = {
 			'click': (e) => {
 				e.preventDefault(); // Don't scroll up.
+				POPUPS.get('ASSET_UPLOADER').enabled(true);
 			}
 		},
 		defer = defer_editor_ready
 	)
 });
 
+// Popup UI definitions.
 const POPUPS = new uic.UIController({
 	'QUICK_HELP': new uic.UIStatic(
 		elem = () => { return QUICK_HELP; },
 		perm = () => { return false; },
+		enabler = (elem, s) => { elem.visible(s); },
+		attach = null,
+		defer = null
+	),
+	'ASSET_UPLOADER': new uic.UIStatic(
+		elem = () => { return ASSET_UPLOADER; },
+		perm => () => { return false; },
 		enabler = (elem, s) => { elem.visible(s); },
 		attach = null,
 		defer = null

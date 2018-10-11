@@ -6,11 +6,12 @@
 @import 'timeline';
 @import 'preview';
 @import 'popup';
-@import 'popup_special';
+@import 'quick_help';
+@import 'asset_uploader';
 
 $main-col-minw: 250px;        // Main column min width.
 $slide-input-minh: 45;        // Minimum height of editor in lines.
-$syntax-error-color: #ff6565; // Syntax error highlight color in editor.
+$syntax-error-color: #ff6565; // Editor syntax error highlight color.
 
 html, body {
 	transition: all .5s;
