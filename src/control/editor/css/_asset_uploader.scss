@@ -1,60 +1,60 @@
 $au-margin: $s4;
 
-#asset-uploader-header-row {
-	flex: 0 0 auto;
-	padding: 0;
-	margin: {
-		left: $au-margin;
-		right: $au-margin;
-		bottom: $s1;
-	}
-	h1 {
-		font-size: 1.5em;
-		margin: 0;
-	}
-}
+#asset-uploader-popup-content {
+	display: flex;
+	flex-direction: column;
 
-#asset-uploader-filesel-row {
-	flex: 0 0 auto;
-	margin: {
-		left: $au-margin;
-		right: $au-margin;
-		top: 0;
-		bottom: 0;
-	}
-	div[class^="col"] {
-		button { width: 100%; }
+	#asset-uploader-header-row {
+		flex: 0 0 auto;
 		padding: 0;
 		margin: {
-			top: $s2;
-			right: 0;
+			left: $au-margin;
+			right: $au-margin;
+			bottom: $s2;
 		}
-		height: 100%;
-		@include media-breakpoint-up(sm) {
-			label[for="asset-uploader-filesel"] {
-				margin-right: $s1;
-			}	
-		}
-		@include media-breakpoint-down(xs) {
-			max-width: 100%;
-			width: 100%;
+		h1 {
+			font-size: 1.5em;
+			margin: 0;
 		}
 	}
-	
-}
 
-#asset-uploader-filelist-row {
-	flex: 1 1 100%;
-	padding: 0;
-	height: calc(90% - #{$custom-file-height} - #{$s2} - #{$s4});
-	margin: {
-		left: $au-margin;
-		right: $au-margin;
-		top: $s2;
-		bottom: $s4;
+	#asset-uploader-filesel-row {
+		flex: 0 0 auto;
+		margin: {
+			left: $au-margin;
+			right: $au-margin;
+			top: 0;
+			bottom: $s2;
+		}
+		div[class^="col"] {
+			button { width: 100%; }
+			padding: 0;
+			height: 100%;
+			@include media-breakpoint-up(sm) {
+				label[for="asset-uploader-filesel"] {
+					margin-right: $s1;
+				}	
+			}
+			@include media-breakpoint-down(xs) {
+				max-width: 100%;
+				width: 100%;
+			}
+		}
+
 	}
-	.col {
-		@extend .default-border;
-		height: 100%;
+
+	#asset-uploader-filelist-row {
+		flex: 1 1 100%;
+		padding: 0;
+		margin: {
+			left: $au-margin;
+			right: $au-margin;
+			top: 0;
+			bottom: $s2;
+		}
+		.col {
+			@extend .default-border;
+			height: 100%;
+		}
 	}
 }

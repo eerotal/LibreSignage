@@ -10,7 +10,8 @@ $pop-left: (100% - $pop-width)/2;  // Popup left space.
 
 .popup {
 	position: fixed;
-	display: none; /* Initial */
+	display: none; /* Initial. Set to 'flex' by JS. */
+	flex-direction: column;
 	z-index: 1000;
 
 	width: $pop-width;
@@ -18,10 +19,7 @@ $pop-left: (100% - $pop-width)/2;  // Popup left space.
 	top: $pop-top;
 	left: $pop-left;
 
-	padding: {
-		top: $s2;
-		bottom: $s2;
-	}
+	padding: 0;
 	margin: 0;
 	background-color: $white;
 	border: 1px solid $gray-2;
@@ -32,17 +30,23 @@ $pop-left: (100% - $pop-width)/2;  // Popup left space.
 	}
 }
 
-.popup-content {
+.popup-bar-row {
+	flex: 0 0 auto;
+	.popup-bar {
+		height: 100%;
+		margin-top: $s2;
+	}
+}
+
+.popup-content-row {
 	display: flex;
 	flex-direction: column;
-	overflow: hidden;
-	height: calc(#{$pop-height} - #{4*$s2} - 1rem);
-	margin: {
-		top: $s1;
-		bottom: $s2;
-	}
-	padding: {
-		left: $s5;
-		right: $s5;
+	flex: 1 1 100%;
+	.popup-content {
+		height: 100%;
+		overflow: hidden;
+		padding: $s1 {
+			bottom: $s3;
+		};
 	}
 }
