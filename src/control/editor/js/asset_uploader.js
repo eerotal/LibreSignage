@@ -2,10 +2,12 @@ var $ = require('jquery');
 var uic = require('ls-uicontrol');
 var popup = require('ls-popup');
 var val = require('ls-validator');
+var slide = require('ls-slide');
 
 module.exports.AssetUploader = class AssetUploader {
 	constructor(api) {
 		this.API = api;
+		this.slide = null;
 		this.flag_ready = false;
 		this.defer_ready = () => { return !this.flag_ready; }
 
@@ -69,7 +71,7 @@ module.exports.AssetUploader = class AssetUploader {
 				defer = null
 			),
 			'CANT_UPLOAD_LABEL': new uic.UIStatic(
-				elem = $("#asset-uploader-cant-upload"),
+				elem = $("#asset-uploader-cant-upload-row"),
 				perm = (d) => { return !d['s']; },
 				enabler = (elem, s) => {
 					if (s) {
@@ -108,10 +110,11 @@ module.exports.AssetUploader = class AssetUploader {
 		this.flag_ready = true;
 	}
 
-	upload(for_slide_id, ready) {
+	upload(callback) {
 		/*
-		*  Upload the selected files for the slide 'for_slide_id'.
-		*  Ready is called afterwards with the returned API response.
+		*  Upload the selected files for the slide attached
+		*  to this AssetUploader object. 'callback' is called
+		*  afterwards with the API response data.
 		*/
 		let data = new FormData();
 		let files = this.UI.get('FILESEL').get();
@@ -119,27 +122,59 @@ module.exports.AssetUploader = class AssetUploader {
 			for (let i = 0; i < files.length; i++) {
 				data.append(i, files.item(i));
 			}
-			data.append('body', JSON.stringify({ 'id': for_slide_id }))
-			this.API.call(this.API.ENDP.SLIDE_UPLOAD_ASSET, data, ready);
+			data.append('body', JSON.stringify({
+				'id': this.slide.get('id')
+			}));
+			this.API.call(
+				this.API.ENDP.SLIDE_UPLOAD_ASSET,
+				data,
+				callback
+			);
 		}
 	}
 
-	show(for_slide_id, ready) {
-		if (for_slide_id) {
-			/*
-			*  Attach an event handler to the upload button.
-			*  This is removed by the close_callback of Popup
-			*  when the popup is closed.
-			*/
-			this.UI.get('UPLOAD_BUTTON').get_elem().on(
-				'click',
-				() => { this.upload(for_slide_id, ready); }
-			);
+	show(slide_id, callback) {
+		/*
+		*  Show the asset uploader for the slide 'slide_id'.
+		*  If slide_id === null, the asset uploader is opened
+		*  but all the upload features are disabled. Note that
+		*  you should load the slide before calling this
+		*  function, lock it *and* enable lock renewal. This
+		*  makes sure that a) this function can modify the slide
+		*  and b) this function doesn't have to take care of
+		*  renewing slide locks. An error is thrown if this
+		*  function can't lock the slide.
+		*/
+		if (slide_id) {
+			this.slide = new slide.Slide(this.API);
+			this.slide.load(slide_id, true, false, (err) => {
+				if (err === this.API.ERR.API_E_LOCK) {
+					throw new Error("Slide not locked.");
+				} else if (err) {
+					console.error(
+						"AssetUploader: Slide load failed. " +
+						"Won't open uploader."
+					);
+					if (callback) { callback(err); }
+					return;
+				}
+				this.UI.get('UPLOAD_BUTTON').get_elem().on(
+					'click',
+					() => { this.upload(callback); }
+				);
+				this.UI.all(
+					function(d) { this.state(d); },
+					{ 's': true }
+				);
+				this.UI.get('POPUP').enabled(true);
+			});
+		} else {
+			this.UI.all(
+				function(d) { this.state(d); },
+				{ 's': false }
+			)
+			this.UI.get('POPUP').enabled(true);
+			if (callback) { callback(this.API.ERR.API_E_OK); }
 		}
-		this.UI.all(
-			function(d) { this.state(d); },
-			{ 's': for_slide_id !== null }
-		)
-		this.UI.get('POPUP').enabled(true);
 	}
 }

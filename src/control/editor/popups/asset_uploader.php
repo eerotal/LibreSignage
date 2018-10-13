@@ -31,7 +31,7 @@
 	</div>
 	<div class="row" id="asset-uploader-cant-upload-row">
 		<div class="col">
-			You must select a slide before you can add media.
+			You must save the slide before adding media.
 		</div>
 	</div>
 	<div class="row" id="asset-uploader-filelist-row">

@@ -551,15 +551,25 @@ const UI_DEFS = new uic.UIController({
 	),
 	'LINK_ADD_MEDIA': new uic.UIButton(
 		elem = () => { return LINK_ADD_MEDIA; },
-		perm = () => { return true; },
-		enabler = null,
+		perm = (d) => {
+			return !d['n'] && (d['o'] || d['c']);
+		},
+		enabler = (elem, s) => {
+			if (s) {
+				elem.removeClass('disabled');
+			} else {
+				elem.addClass('disabled');
+			}
+		},
 		attach = {
 			'click': (e) => {
 				e.preventDefault(); // Don't scroll up.
-				if (sel_slide) {
-					ASSET_UPLOADER.show(sel_slide.get('id'));
-				} else {
-					ASSET_UPLOADER.show(null);
+				if (!$(e.target).hasClass('disabled')) {
+					if (sel_slide) {
+						ASSET_UPLOADER.show(sel_slide.get('id'));
+					} else {
+						ASSET_UPLOADER.show(null);
+					}
 				}
 			}
 		},

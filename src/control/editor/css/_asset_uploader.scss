@@ -48,6 +48,7 @@ $au-margin: $s4;
 	}
 
 	#asset-uploader-cant-upload-row {
+		display: none; /* Initial */
 		flex: 0 0 auto;
 		margin: {
 			left: $au-margin;
