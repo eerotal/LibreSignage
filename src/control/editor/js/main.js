@@ -22,6 +22,7 @@ var ace_range = ace.require('ace/range');
 var timeline = require('./timeline.js');
 var preview = require('./preview.js');
 var diags = require('./dialogs.js');
+var asset_uploader = require('./asset_uploader.js');
 
 // Some sane default values for new slides.
 const NEW_SLIDE_DEFAULTS = {
@@ -50,52 +51,52 @@ const ESTATUS = {
 };
 
 // DOM element jQuery selectors.
-const QUEUE_SELECT				= $("#queue-select");
-const QUEUE_CREATE				= $("#queue-create");
-const QUEUE_VIEW				= $("#queue-view");
-const QUEUE_REMOVE				= $("#queue-remove");
+var QUEUE_SELECT          = $("#queue-select");
+var QUEUE_CREATE          = $("#queue-create");
+var QUEUE_VIEW            = $("#queue-view");
+var QUEUE_REMOVE          = $("#queue-remove");
 
-const SLIDE_NEW					= $("#btn-slide-new")
-const SLIDE_PREVIEW				= $("#btn-slide-preview");
-const SLIDE_SAVE				= $("#btn-slide-save");
-const SLIDE_REMOVE				= $("#btn-slide-remove");
-const SLIDE_CH_QUEUE			= $("#btn-slide-ch-queue");
-const SLIDE_DUP					= $("#btn-slide-dup");
-const SLIDE_CANT_EDIT			= $("#slide-cant-edit");
-const SLIDE_READONLY			= $("#slide-readonly");
-const SLIDE_EDIT_AS_COLLAB		= $("#slide-edit-as-collab");
-const SLIDE_NAME				= $("#slide-name");
-const SLIDE_NAME_GRP			= $("#slide-name-group");
-const SLIDE_OWNER				= $("#slide-owner");
-const SLIDE_TIME				= $("#slide-time");
-const SLIDE_TIME_GRP			= $("#slide-time-group");
-const SLIDE_INDEX				= $("#slide-index");
-const SLIDE_INDEX_GRP			= $("#slide-index-group");
-const SLIDE_EN					= $("#slide-enabled");
-const SLIDE_SCHED				= $("#slide-sched");
-const SLIDE_SCHED_DATE_S		= $("#slide-sched-date-s");
-const SLIDE_SCHED_TIME_S		= $("#slide-sched-time-s");
-const SLIDE_SCHED_DATE_E		= $("#slide-sched-date-e");
-const SLIDE_SCHED_TIME_E		= $("#slide-sched-time-e");
-const SLIDE_ANIMATION			= $("#slide-animation")
-const PREVIEW_R_16x9			= $("#btn-preview-ratio-16x9");
-const PREVIEW_R_4x3				= $("#btn-preview-ratio-4x3");
-const MARKUP_ERR_DISPLAY		= $("#markup-err-display");
-const LINK_QUICK_HELP			= $("#link-quick-help");
-const CONT_QUICK_HELP			= $("#cont-quick-help");
-const LINK_ADD_MEDIA			= $("#link-add-media");
-const CLOSE_QUICK_HELP			= $("#close-quick-help");
-var SLIDE_COLLAB				= null;
-var SLIDE_INPUT					= null;
-var LIVE_PREVIEW				= null;
+var SLIDE_NEW             = $("#btn-slide-new")
+var SLIDE_PREVIEW         = $("#btn-slide-preview");
+var SLIDE_SAVE            = $("#btn-slide-save");
+var SLIDE_REMOVE          = $("#btn-slide-remove");
+var SLIDE_CH_QUEUE        = $("#btn-slide-ch-queue");
+var SLIDE_DUP             = $("#btn-slide-dup");
+var SLIDE_CANT_EDIT       = $("#slide-cant-edit");
+var SLIDE_READONLY        = $("#slide-readonly");
+var SLIDE_EDIT_AS_COLLAB  = $("#slide-edit-as-collab");
+var SLIDE_NAME            = $("#slide-name");
+var SLIDE_NAME_GRP        = $("#slide-name-group");
+var SLIDE_OWNER           = $("#slide-owner");
+var SLIDE_TIME            = $("#slide-time");
+var SLIDE_TIME_GRP        = $("#slide-time-group");
+var SLIDE_INDEX           = $("#slide-index");
+var SLIDE_INDEX_GRP       = $("#slide-index-group");
+var SLIDE_EN              = $("#slide-enabled");
+var SLIDE_SCHED           = $("#slide-sched");
+var SLIDE_SCHED_DATE_S    = $("#slide-sched-date-s");
+var SLIDE_SCHED_TIME_S    = $("#slide-sched-time-s");
+var SLIDE_SCHED_DATE_E    = $("#slide-sched-date-e");
+var SLIDE_SCHED_TIME_E    = $("#slide-sched-time-e");
+var SLIDE_ANIMATION       = $("#slide-animation")
+var PREVIEW_R_16x9        = $("#btn-preview-ratio-16x9");
+var PREVIEW_R_4x3         = $("#btn-preview-ratio-4x3");
+var MARKUP_ERR_DISPLAY    = $("#markup-err-display");
+var LINK_QUICK_HELP       = $("#link-quick-help");
+var CONT_QUICK_HELP       = $("#cont-quick-help");
+var LINK_ADD_MEDIA        = $("#link-add-media");
+var CLOSE_QUICK_HELP      = $("#close-quick-help");
+var SLIDE_COLLAB          = null;
+var SLIDE_INPUT           = null;
+var LIVE_PREVIEW          = null;
 
 var QUICK_HELP = new popup.Popup($('#quick-help').get(0));
-var ASSET_UPLOADER = new popup.Popup($('#asset-uploader').get(0));
 
-var API = null; // API interface object.
-var TL = null;  // Timeline object.
+var API = null;            // API interface object.
+var TL = null;             // Timeline object.
+var ASSET_UPLOADER = null; // Asset uploader object.
 
-var qsel_queues = null; // Queue selector queues list.
+var qsel_queues = null;    // Queue selector queues list.
 
 // Input validator selectors.
 var name_sel = null;
@@ -555,7 +556,11 @@ const UI_DEFS = new uic.UIController({
 		attach = {
 			'click': (e) => {
 				e.preventDefault(); // Don't scroll up.
-				POPUPS.get('ASSET_UPLOADER').enabled(true);
+				if (sel_slide) {
+					ASSET_UPLOADER.show(sel_slide.get('id'));
+				} else {
+					ASSET_UPLOADER.show(null);
+				}
 			}
 		},
 		defer = defer_editor_ready
@@ -567,13 +572,6 @@ const POPUPS = new uic.UIController({
 	'QUICK_HELP': new uic.UIStatic(
 		elem = () => { return QUICK_HELP; },
 		perm = () => { return false; },
-		enabler = (elem, s) => { elem.visible(s); },
-		attach = null,
-		defer = null
-	),
-	'ASSET_UPLOADER': new uic.UIStatic(
-		elem = () => { return ASSET_UPLOADER; },
-		perm => () => { return false; },
 		enabler = (elem, s) => { elem.visible(s); },
 		attach = null,
 		defer = null
@@ -1319,6 +1317,8 @@ function setup() {
 	inputs_setup(() => {
 		update_controls();
 		TL = new timeline.Timeline(API, slide_show);
+		ASSET_UPLOADER = new asset_uploader.AssetUploader(API);
+
 		update_qsel(true);
 		flag_editor_ready = true;
 		console.log("LibreSignage: Editor ready.");

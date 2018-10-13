@@ -6,15 +6,17 @@ $au-margin: $s4;
 
 	#asset-uploader-header-row {
 		flex: 0 0 auto;
-		padding: 0;
 		margin: {
 			left: $au-margin;
 			right: $au-margin;
 			bottom: $s2;
 		}
-		h1 {
-			font-size: 1.5em;
-			margin: 0;
+		div[class^="col"] {
+			padding: 0;
+			h1 {
+				font-size: 1.5em;
+				margin: 0;
+			}
 		}
 	}
 
@@ -31,16 +33,32 @@ $au-margin: $s4;
 			padding: 0;
 			height: 100%;
 			@include media-breakpoint-up(sm) {
-				label[for="asset-uploader-filesel"] {
-					margin-right: $s1;
+				label {
+					margin-right: $s2;
 				}	
 			}
 			@include media-breakpoint-down(xs) {
+				button {
+					margin-top: $s2;
+				}
 				max-width: 100%;
 				width: 100%;
 			}
 		}
+	}
 
+	#asset-uploader-cant-upload-row {
+		flex: 0 0 auto;
+		margin: {
+			left: $au-margin;
+			right: $au-margin;
+			top: 0;
+			bottom: $s2;
+		}
+		div[class^="col"] {
+			padding: 0;
+			color: $orange;
+		}
 	}
 
 	#asset-uploader-filelist-row {
