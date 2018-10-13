@@ -178,8 +178,8 @@ class Slide extends Exportable{
 		*  Set the slide id. Note that the requested slide
 		*  ID must already exist. Otherwise an error is
 		*  thrown. This basically means that new slide IDs
-		*  can't be set manually and they are always randomly
-		*  generated.
+		*  can't be set manually and they are always generated
+		*  by the server.
 		*/
 		if (!in_array($id, slides_id_list())) {
 			throw new ArgException("Slide $id doesn't exist.");
@@ -494,7 +494,6 @@ class Slide extends Exportable{
 		*  storage files. This function overwrites files if
 		*  they already exist.
 		*/
-
 		$this->readychk();
 		if (!is_dir($this->dir_path)) { mkdir($this->dir_path); }
 		if (!is_dir($this->asset_path)) { mkdir($this->asset_path); }
