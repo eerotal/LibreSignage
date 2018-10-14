@@ -55,6 +55,9 @@
 	const AUTH_TOKEN_LEN			= 15;
 	const SLIDE_LOCK_MAX_AGE		= 600;
 
+	const ASSET_THUMBNAIL_MAXW      = 320;
+	const ASSET_THUMBNAIL_MAXH      = 180;
+
 	// LibreSignage instance limits.
 	const LS_LIM = array(
 		"SLIDE_MIN_TIME"           => 1*1000,

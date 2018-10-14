@@ -19,7 +19,7 @@ INST ?= ""       # Installation config path.
 
 # LibreSignage build dependencies. Note that apache is excluded
 # since checking whether it's installed usually requires root.
-DEPS := php7.0 pandoc sass npm
+DEPS := php7.2 pandoc sass npm
 
 # Production libraries.
 LIBS := $(filter-out \

@@ -7,6 +7,7 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/thumbnail.php');
 
 const ASSET_MIMES = [
 	'image/png',
@@ -23,7 +24,9 @@ class SlideAsset extends Exportable {
 		'filename',
 		'uid',
 		'intname',
-		'fullpath'
+		'fullpath',
+		'thumbname',
+		'thumbpath'
 	];
 	static $PUBLIC = [
 		'mime',
@@ -33,8 +36,12 @@ class SlideAsset extends Exportable {
 	private $mime = NULL;
 	private $filename = NULL;
 	private $uid = NULL;
+
 	private $intname = NULL;
 	private $fullpath = NULL;
+
+	private $thumbname = NULL;
+	private $thumbpath = NULL;
 
 	public function __exportable_get(string $name) {
 		return $this->{$name};
@@ -65,18 +72,35 @@ class SlideAsset extends Exportable {
 		$this->mime = $mime;
 		$this->uid = get_uid();
 
-		$this->intname = $this->uid.'.'.explode('/', $this->mime)[1];
-		$this->fullpath = $asset_path.'/'.$this->intname;
+		$ext = explode('/', $this->mime)[1];
+
+		$this->intname = "{$this->uid}.{$ext}";
+		$this->fullpath = "{$asset_path}/{$this->intname}";
 
 		if (!move_uploaded_file($file['tmp_name'], $this->fullpath)) {
 			$this->reset();
 			throw new IntException("Failed to store uploaded asset.");
+		}
+
+		// Generate a thumbnail for the asset.
+		$this->thumbname = "{$this->uid}_thumb.{$ext}";
+		$this->thumbpath = "{$asset_path}/{$this->thumbname}";
+
+		if (!generate_thumbnail(
+			$this->fullpath,
+			$this->thumbpath,
+			ASSET_THUMBNAIL_MAXW,
+			ASSET_THUMBNAIL_MAXH
+		)) {
+			$this->thumbname = NULL;
+			$this->thumbpath = NULL;
 		}
 	}
 
 	public function remove() {
 		if (!empty($this->fullpath)) {
 			unlink($this->fullpath);
+			unlink($this->thumbpath);
 			$this->reset();
 		}
 	}

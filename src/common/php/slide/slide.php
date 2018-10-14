@@ -383,7 +383,8 @@ class Slide extends Exportable{
 	function store_uploaded_asset(array $file) {
 		/*
 		*  Store an uploaded asset in the 'assets'
-		*  directory of this slide.
+		*  directory of this slide. This function
+		*  also generates a thumbnail for the asset.
 		*/
 		$this->readychk();
 		if (!is_dir($this->asset_path)) { mkdir($this->asset_path); }
