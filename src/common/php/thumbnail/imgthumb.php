@@ -55,7 +55,10 @@ function gen_img_thumb(
 	*/
 	if (ENABLE_GD_THUMBS !== TRUE) { return FALSE; }
 	if (!extension_loaded('gd')) {
-		throw new ConfigException("Extension 'gd' not loaded.");
+		throw new ConfigException(
+			"Extension 'gd' needed for image thumbnail ".
+			"generation not loaded."
+		);
 	}
 
 	$mime = mime_content_type($src);

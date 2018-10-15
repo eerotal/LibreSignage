@@ -36,6 +36,14 @@ function gen_vid_thumb(
 		);
 	}
 
+	$tmp = preg_replace('/\s/', '', ini_get('disable_functions'));
+	if (in_array('exec', explode(',', $tmp))) {
+		throw new ConfigException(
+			"PHP exec() function needed for video ".
+			"thumbnail generation is disabled."
+		);
+	}
+
 	exec(
 		FFPROBE_PATH." ".
 			"-v quiet ".
