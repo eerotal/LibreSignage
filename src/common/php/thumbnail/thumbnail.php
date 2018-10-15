@@ -2,16 +2,17 @@
 
 /*
 *  Thumbnail generator for LibreSignage. generate_thumbnail() is the
-*  main entry point.
+*  main entry function.
 */
 
+require($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/common.php');
 require($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/imgthumb.php');
+require($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/vidthumb.php');
 
 const MIME_HANDLER_MAP = [
-	'/image\/.*/' => 'ImgThumb\gen_img_thumb'
+	'/image\/.*/' => 'gen_img_thumb',
+	'/video\/.*/' => 'gen_vid_thumb'
 ];
-
-class ThumbnailException extends Exception {};
 
 function generate_thumbnail(
 	string $src,
@@ -26,9 +27,13 @@ function generate_thumbnail(
 	*/
 	foreach(MIME_HANDLER_MAP as $regex => $handler) {
 		if (preg_match($regex, mime_content_type($src))) {
-			if ($handler($src, $dest, $wmax, $hmax)) {
-				return TRUE;
-			}
+			/*
+			*  Handle ThumbnailGeneratorExceptions and IntExceptions
+			*  gracefully but let other exceptions bubble up.
+			*/
+			try {
+				if ($handler($src, $dest, $wmax, $hmax)) { return TRUE; }
+			} catch (ThumbnailGeneratorException | IntException $e) {}
 		}
 	}
 	return FALSE;

@@ -1,6 +1,10 @@
 <?php
+/*
+*  Image thumbnail generator handler.
+*/
 
-namespace ImgThumb;
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/common.php');
 
 function create_img_object(string $src, string $mime) {
 	/*
@@ -14,27 +18,23 @@ function create_img_object(string $src, string $mime) {
 		case 'image/gif':
 			return imagecreatefromgif($src);
 		default:
-			throw new ThumbnailException(
-				"Unknown filetype."
-			);
+			return NULL;
 	}
 }
 
-function put_img_object(string $dest, string $mime) {
+function put_img_object(resource $img, string $dest, string $mime) {
 	/*
 	*  Wrapper for writing and image with GD.
 	*/
 	switch($mime) {
 		case 'image/png':
-			return imagepng($src);
+			return imagepng($img, $dest);
 		case 'image/jpeg':
-			return imagejpeg($src);
+			return imagejpeg($img, $dest);
 		case 'image/gif':
-			return imagegif($src);
+			return imagegif($img, $dest);
 		default:
-			throw new ThumbnailException(
-				"Unknown filetype."
-			);
+			return NULL;
 	}
 }
 
@@ -45,27 +45,36 @@ function gen_img_thumb(
 	int $hmax
 ) {
 	/*
-	*  Generate a thumbnail for the image in $src and put the
-	*  thumbnail in $dest. The image is resized so that it fits
-	*  in a rectangle of size $wmax x $hmax. Returns TRUE on
-	*  success and FALSE on failure. This function requires GD
-	*  and automatically checks whether it's loaded before trying
-	*  to create the thumbnail.
+	*  Generate a thumbnail from $src that fits in a rectangle of
+	*  size $wmax x $hmax. The resulting thumbnail is written into
+	*  $dest. This thumbnail generator function can be enabled with
+	*  the ENABLE_GD_THUMBS constant in config.php. This function
+	*  requires the PHP GD extension and automatically checks whether
+	*  it's loaded before trying to create the thumbnail. Returns TRUE
+	*  on success and FALSE if GD thumbnail generation is disabled.
 	*/
-	if (extension_loaded('gd')) {
-		$img = create_img_object($src, mime_content_type($src));
-		$w = imagesx($img);
-		$h = imagesy($img);
-
-		$ratio = ($wmax/$w < $hmax/$h) ? $wmax/$w : $hmax/$h;
-		$nw = round($w*$ratio);
-		$nh = round($h*$ratio);
-
-		$new = imagecreatetruecolor($nw, $nh);
-		imagecopyresized($new, $img, 0, 0, 0, 0, $nw, $nh, $w, $h);
-		imagepng($new, $dest);
-		return TRUE;
-	} else {
-		return FALSE;		
+	if (ENABLE_GD_THUMBS !== TRUE) { return FALSE; }
+	if (!extension_loaded('gd')) {
+		throw new ConfigException("Extension 'gd' not loaded.");
 	}
+
+	$mime = mime_content_type($src);
+	$img = create_img_object($src, $mime);
+	if (img === NULL) {
+		throw new ThumbnailGeneratorException(
+			"Invalid source image type."
+		);
+	}
+
+	$w = imagesx($img);
+	$h = imagesy($img);
+
+	$dim = get_thumbnail_resolution($w, $h, $wmax, $hmax);		
+	$new = imagecreatetruecolor($dim['width'], $dim['height']);
+	imagecopyresized(
+		$new, $img, 0, 0, 0, 0, $dim['width'], $dim['height'], $w, $h
+	);
+	put_img_object($new, $dest, $mime);
+
+	return TRUE;
 }
