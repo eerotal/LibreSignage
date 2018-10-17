@@ -22,9 +22,9 @@ function create_img_object(string $src, string $mime) {
 	}
 }
 
-function put_img_object(resource $img, string $dest, string $mime) {
+function put_img_object($img, string $dest, string $mime) {
 	/*
-	*  Wrapper for writing and image with GD.
+	*  Wrapper for writing an image with GD.
 	*/
 	switch($mime) {
 		case 'image/png':
@@ -63,7 +63,7 @@ function gen_img_thumb(
 
 	$mime = mime_content_type($src);
 	$img = create_img_object($src, $mime);
-	if (img === NULL) {
+	if ($img === NULL) {
 		throw new ThumbnailGeneratorException(
 			"Invalid source image type."
 		);

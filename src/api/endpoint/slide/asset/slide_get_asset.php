@@ -22,7 +22,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 $SLIDE_GET_ASSET = new APIEndpoint(array(
 	APIEndpoint::METHOD         => API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE  => NULL,
-	APIEndpoint::FORMAT_BODY    => [
+	APIEndpoint::FORMAT_URL    => [
 		'id'   => API_P_STR,
 		'name' => API_P_STR
 	],

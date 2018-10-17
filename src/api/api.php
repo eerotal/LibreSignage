@@ -301,9 +301,7 @@ class APIEndpoint {
 		// Check that each key in $format also exists in $data.
 		foreach (array_keys($format) as $k) {
 			if (!in_array($k, array_keys($data))) {
-				if ($this->is_param_opt($format[$k])) {
-					continue;
-				}
+				if ($this->is_param_opt($format[$k])) { continue; }
 				throw new ArgException(
 					"API request parameter '$k' missing."
 				);
@@ -471,33 +469,21 @@ function api_handle_request(APIEndpoint $endpoint) {
 	}
 
 	// Initialize the endpoint.
-	try {
-		$endpoint->load_data();
-	} catch(ArgException $e) {
-		throw new APIException(
-			API_E_INVALID_REQUEST, $e->getMessage(), 0, $e
-		);
-	} catch(IntException $e) {
-		throw new APIException(
-			API_E_INTERNAL, $e->getMessage(), 0, $e
-		);
-	}
+	$endpoint->load_data();
 
 	// Check authentication.
 	if (!$endpoint->requires_auth()) { return; }
-	if (!array_key_exists("Auth-Token", getallheaders())) {
-		throw new APIException(
-			API_E_NOT_AUTHORIZED,
-			"No Auth-Token header even though required."
-		);
+
+	$atok = NULL;
+	if (array_key_exists('Auth-Token', getallheaders())) {
+		$atok = getallheaders()["Auth-Token"];
 	}
 
-	$auth_token = getallheaders()["Auth-Token"];
-	$auth_data = auth_token_verify($auth_token);
+	$auth_data = web_auth(NULL, NULL, FALSE, $atok);
 	if ($auth_data === NULL) {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,
-			"Invalid authentication token."
+			"Not authenticated."
 		);
 	}
 

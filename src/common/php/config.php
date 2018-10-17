@@ -55,8 +55,14 @@
 	const AUTH_TOKEN_LEN			= 15;
 	const SLIDE_LOCK_MAX_AGE		= 600;
 
-	const ASSET_THUMBNAIL_MAXW      = 320;
-	const ASSET_THUMBNAIL_MAXH      = 180;
+	const ENABLE_FFMPEG_THUMBS      = TRUE;
+	const ENABLE_GD_THUMBS          = TRUE;
+
+	const FFMPEG_PATH               = '/usr/bin/ffmpeg';
+	const FFPROBE_PATH              = '/usr/bin/ffprobe';
+
+	const THUMB_MAXW                = 320;
+	const THUMB_MAXH                = 180;
 
 	// LibreSignage instance limits.
 	const LS_LIM = array(

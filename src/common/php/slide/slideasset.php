@@ -89,8 +89,8 @@ class SlideAsset extends Exportable {
 		if (!generate_thumbnail(
 			$this->fullpath,
 			$this->thumbpath,
-			ASSET_THUMBNAIL_MAXW,
-			ASSET_THUMBNAIL_MAXH
+			THUMB_MAXW,
+			THUMB_MAXH
 		)) {
 			$this->thumbname = NULL;
 			$this->thumbpath = NULL;
@@ -111,5 +111,7 @@ class SlideAsset extends Exportable {
 
 	public function get_filename() { return $this->filename; }
 	public function get_fullpath() { return $this->fullpath; }
+	public function get_thumbname() { return $this->thumbname; }
+	public function get_thumbpath() { return $this->thumbpath; }
 	public function get_mime() { return $this->mime; }
 }
