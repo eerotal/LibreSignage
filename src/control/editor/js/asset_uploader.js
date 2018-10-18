@@ -4,6 +4,28 @@ var popup = require('ls-popup');
 var val = require('ls-validator');
 var slide = require('ls-slide');
 
+const asset_uri_template = (origin, slide_id, name) => `
+${origin}/api/endpoint/slide/asset/slide_get_asset.php
+?${$.param({ 'id': slide_id, 'name': name })}
+`;
+
+const asset_thumb_template = (slide_id, name, index) => `
+<div id="asset-uploader-thumb-${index}" class="asset-uploader-thumb">
+	<div class="asset-uploader-thumb-inner default-border">
+		<div class="asset-uploader-thumb-img-wrapper">
+			<img src="/api/endpoint/slide/asset/slide_get_asset_thumb.php
+					?${$.param({ 'id': slide_id, 'name': name })}">
+			</img>
+		</div>
+		<div class="asset-uploader-thumb-label-wrapper">
+			<div class="asset-uploader-thumb-label">
+				${name}
+			</div>
+		</div>
+	</div>
+</div>
+`;
+
 module.exports.AssetUploader = class AssetUploader {
 	constructor(api) {
 		this.API = api;
@@ -68,7 +90,9 @@ module.exports.AssetUploader = class AssetUploader {
 				perm = (d) => { return d['s']; },
 				enabler = null,
 				attach = null,
-				defer = null
+				defer = null,
+				getter = null,
+				setter = null
 			),
 			'CANT_UPLOAD_LABEL': new uic.UIStatic(
 				elem = $("#asset-uploader-cant-upload-row"),
@@ -81,7 +105,32 @@ module.exports.AssetUploader = class AssetUploader {
 					}
 				},
 				attach = null,
-				defer = null
+				defer = null,
+				getter = null,
+				setter = null
+			),
+			'FILELIST': new uic.UIStatic(
+				elem = $("#asset-uploader-filelist"),
+				perm = (d) => { return true; },
+				enabler = null,
+				attach = null,
+				defer = null,
+				getter = null,
+				setter = (elem, val) => { elem.html(val); }
+			),
+			'FILELINK': new uic.UIInput(
+				elem = $("#asset-uploader-file-link-input"),
+				perm = (d) => { return d['s']; },
+				enabler = (elem, s) => { elem.prop('disabled', !s); },
+				attach = null,
+				defer = null,
+				mod = null,
+				getter = (elem) => { return elem.val(); },
+				setter = (elem, val) => {
+					console.log(val);
+					elem.val(val);
+				},
+				clearer = (elem) => { elem.val(''); }
 			)
 		});
 
@@ -106,6 +155,9 @@ module.exports.AssetUploader = class AssetUploader {
 				this.UI.get('UPLOAD_BUTTON').enabled(false);
 			}
 		);
+
+		this.slide = new slide.Slide(this.API);
+		this.FILELIST_UI = null;
 
 		this.flag_ready = true;
 	}
@@ -133,6 +185,64 @@ module.exports.AssetUploader = class AssetUploader {
 		}
 	}
 
+	populate() {
+		/*
+		*  Populate the existing asset list with data from this.slide.
+		*/
+		let html = '';
+		for (let i = 0; i < this.slide.get('assets').length; i++) {
+			html += asset_thumb_template(
+				this.slide.get('id'),
+				this.slide.get('assets')[i].filename,
+				i
+			);
+		}
+		this.UI.get('FILELIST').set(html);
+
+		let tmp = {};
+		for (let i = 0; i < this.slide.get('assets').length; i++) {
+			let a = this.slide.get('assets')[i];
+			tmp[i] = new uic.UIButton(
+				elem = $(`#asset-uploader-thumb-${i}`),
+				perm = null,
+				enabler = null,
+				attach = {
+					'click': (e) => {
+						console.log(a.filename);
+						console.log(this.UI);
+						this.UI.get('FILELINK').set(asset_uri_template(
+							window.location.origin,
+							this.slide.get('id'),
+							a.filename
+						));
+					}
+				},
+				defer = null
+			);
+		}
+		this.FILELIST_UI = new uic.UIController(tmp);
+	}
+
+	load_slide(slide_id, callback) {
+		/*
+		*  Fetch slide data. 'slide_id' is the slide id to use
+		*  and 'callback' is a callback function that's called
+		*  after the data has been fetched. The returned API error
+		*  code is passed to 'callback'.
+		*/
+		this.slide.load(slide_id, true, false, (err) => {
+			if (callback) { callback(err); }
+		});
+	}
+
+	fetch_slide(callback) {
+		/*
+		*  Fetch new slide data. 'callback' is called afterwards
+		*  with the returned API error code as the first argument.
+		*/
+		this.slide.fetch((err) => { if (callback) { callback(err); } });
+	}
+
 	show(slide_id, callback) {
 		/*
 		*  Show the asset uploader for the slide 'slide_id'.
@@ -143,30 +253,41 @@ module.exports.AssetUploader = class AssetUploader {
 		*  makes sure that a) this function can modify the slide
 		*  and b) this function doesn't have to take care of
 		*  renewing slide locks. An error is thrown if this
-		*  function can't lock the slide.
+		*  function can't lock the slide. 'callback' is called
+		*  after the asset uploader is ready. The resulting API
+		*  error code is passed as the first argument.
 		*/
 		if (slide_id) {
-			this.slide = new slide.Slide(this.API);
-			this.slide.load(slide_id, true, false, (err) => {
-				if (err === this.API.ERR.API_E_LOCK) {
-					throw new Error("Slide not locked.");
-				} else if (err) {
-					console.error(
-						"AssetUploader: Slide load failed. " +
-						"Won't open uploader."
-					);
+			this.load_slide(slide_id, (err) => {
+				if (err) {
 					if (callback) { callback(err); }
 					return;
 				}
+
+				// Enable and setup controls.
 				this.UI.get('UPLOAD_BUTTON').get_elem().on(
 					'click',
-					() => { this.upload(callback); }
+					() => {
+						this.upload((resp) => {
+							if (!resp.error) {
+								// Update list after upload.
+								this.fetch_slide((err) => {
+									if (!err) { this.populate(); }
+								});
+							}
+						});
+					}
 				);
+
 				this.UI.all(
 					function(d) { this.state(d); },
 					{ 's': true }
 				);
+
+				this.populate();
 				this.UI.get('POPUP').enabled(true);
+
+				if (callback) { callback(err); }
 			});
 		} else {
 			this.UI.all(

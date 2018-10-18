@@ -127,6 +127,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .default-border {
-	border: 1px solid $gray-1;
+	border: $default-border-width solid $gray-1;
 	border-radius: $default-border-radius;
 }

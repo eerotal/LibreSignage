@@ -1,5 +1,11 @@
 $au-margin: $s4;
 
+$asset-thumb-w: 120px;
+$asset-thumb-h: 120px;
+$asset-thumb-maxw: 160px;
+$asset-thumb-pad: $s2;
+$asset-thumb-label-h: 2.5em;
+
 #asset-uploader-popup-content {
 	display: flex;
 	flex-direction: column;
@@ -74,6 +80,111 @@ $au-margin: $s4;
 		.col {
 			@extend .default-border;
 			height: 100%;
+		}
+
+		#asset-uploader-filelist {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			align-content: flex-start;
+			overflow-y: auto;
+
+			padding: $s2;
+
+			.asset-uploader-thumb {
+				box-sizing: content-box;
+
+				width: $asset-thumb-w;
+				height: $asset-thumb-h;
+				flex-grow: 1;
+				flex-shrink: 0;
+
+				@include media-breakpoint-up(md) {
+					max-width: $asset-thumb-maxw;
+				}
+				@include media-breakpoint-down(sm) {
+					max-width: none;
+				}
+
+				padding: $s1;
+
+				.asset-uploader-thumb-inner {
+					display: flex;
+					flex-direction: column;
+					height: 100%;
+					width: 100%;
+					.asset-uploader-thumb-img-wrapper {
+						display: flex;
+						flex-direction: column;
+						flex: 1 1 100%;
+						justify-content: center;
+						align-items: center;
+
+						box-sizing: content-box;
+						width: 100%;
+						background-color: $gray-3;
+						img {
+							// Resize to fit but keep aspect ratio.
+							max-width: calc(
+								100% - 2*#{$asset-thumb-pad}
+							);
+							max-height: calc(
+								#{$asset-thumb-h}
+									- #{$asset-thumb-label-h}
+									- 2*#{$asset-thumb-pad}
+							);
+							width: auto;
+							height: auto;
+						}
+					}
+					.asset-uploader-thumb-label-wrapper {
+						flex: 0 0 $asset-thumb-label-h;
+						display: flex;
+						flex-direction: row;
+						padding: {
+							left: $s2;
+							right: $s2;
+						}
+						.asset-uploader-thumb-label {
+							flex: 1 1 100%;
+							line-height: $asset-thumb-label-h;
+							vertical-align: middle;
+							text-align: right;
+							text-overflow: ellipsis;
+							overflow: hidden;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	#asset-uploader-file-link-row {
+		flex: 0 0 auto;
+		margin: {
+			left: $au-margin;
+			right: $au-margin;
+			top: 0;
+			bottom: $s2;
+		}
+		div {
+			display: flex;
+			flex-direction: row;
+			padding: 0;
+			label {
+				flex: 0 0 auto;
+				margin: {
+					top: auto;
+					bottom: auto;
+					left: 0;
+					right: $s2;
+				}
+			}
+			input {
+				flex: 1 1 100%;
+				display: inline-block;
+				width: auto;
+			}
 		}
 	}
 }

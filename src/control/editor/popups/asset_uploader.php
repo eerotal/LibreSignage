@@ -35,8 +35,15 @@
 		</div>
 	</div>
 	<div class="row" id="asset-uploader-filelist-row">
+		<div class="col" id="asset-uploader-filelist">
+		</div>
+	</div>
+	<div class="row" id="asset-uploader-file-link-row">
 		<div class="col">
-
+			<label for="asset-uploader-file-link-input">Link</label>
+			<input type="text"
+					class="form-control"
+					id="asset-uploader-file-link-input">
 		</div>
 	</div>
 </div>
