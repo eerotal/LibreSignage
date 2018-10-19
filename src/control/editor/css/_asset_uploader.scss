@@ -35,28 +35,41 @@ $asset-thumb-label-h: 2.5em;
 			bottom: $s2;
 		}
 		div[class^="col"] {
-			button { width: 100%; }
 			padding: 0;
 			height: 100%;
+
+			button { width: 100%; }
+			label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-oveflow: clip;
+			}
 			@include media-breakpoint-up(sm) {
-				label {
-					margin-right: $s2;
-				}	
+				label { margin-right: $s2; }
 			}
 			@include media-breakpoint-down(xs) {
-				button {
-					margin-top: $s2;
-				}
+				button { margin-top: $s2; }
 				max-width: 100%;
 				width: 100%;
 			}
-			button:not(.uploading) {
-				i, span { display: inline-block; }
-				.on-upload { display: none; }
-			}
-			button.uploading {
-				span, i { display: none; }
-				.on-upload { display: inline-block; }
+			button {
+				/*
+				*  Upload button styling. These enable
+				*  'Upload', 'Uploading' and 'Failed' texts etc.
+				*/
+				width: 100%;
+				i, span { display: none; }
+
+				&:not(.uploading):not(.upload-failed) {
+					.on-active { display: inline-block; }
+				}
+				&.uploading {
+					.on-upload { display: inline-block; }
+				}
+				&.upload-failed {
+					@extend .btn-danger;
+					.on-failed { display: inline-block; }
+				}
 			}
 		}
 	}

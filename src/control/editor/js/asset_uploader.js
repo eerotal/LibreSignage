@@ -87,6 +87,11 @@ module.exports.AssetUploader = class AssetUploader {
 							label += files.item(i).name;
 						}
 						this.UI.get('FILESEL_LABEL').set(label);
+
+						// Remove the failed upload indicator.
+						this.UI.get(
+							'UPLOAD_BUTTON'
+						).get_elem().removeClass('upload-failed');
 					}
 				},
 				defer = this.defer_ready,
@@ -184,7 +189,7 @@ module.exports.AssetUploader = class AssetUploader {
 		);
 		this.fileval_trig = new val.ValidatorTrigger(
 			[ this.fileval_sel ],
-			(valid) => { this.UI.get('UPLOAD_BUTTON').enabled(false); }
+			(valid) => { this.UI.get('UPLOAD_BUTTON').enabled(valid); }
 		);
 		this.flag_ready = true;
 	}
@@ -308,27 +313,34 @@ module.exports.AssetUploader = class AssetUploader {
 				this.UI.get('UPLOAD_BUTTON').get_elem().on(
 					'click',
 					() => {
-						// Add a spinner to the upload button.
 						this.flag_uploading = true;
 						this.update_controls();
 
+						// Add a spinner to the upload button.
+						this.UI.get(
+							'UPLOAD_BUTTON'
+						).get_elem().removeClass('upload-failed');
 						this.UI.get(
 							'UPLOAD_BUTTON'
 						).get_elem().addClass('uploading');
 
 						this.upload((resp) => {
-							if (!resp.error) {
-								// Update asset list after upload.
-								this.update_slide((err) => {
-									if (!err) { this.populate(); }
-								});
-							}
-
 							// Remove the upload button spinner.
 							this.UI.get(
 								'UPLOAD_BUTTON'
 							).get_elem().removeClass('uploading');
 
+							if (!resp.error) {
+								// Update asset list after upload.
+								this.update_slide((err) => {
+									if (!err) { this.populate(); }
+								});
+							} else {
+								// Indicate a failed upload.
+								this.UI.get(
+									'UPLOAD_BUTTON'
+								).get_elem().addClass('upload-failed');
+							}
 							this.flag_uploading = false;
 							this.update_controls();
 						});
