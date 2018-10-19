@@ -50,6 +50,14 @@ $asset-thumb-label-h: 2.5em;
 				max-width: 100%;
 				width: 100%;
 			}
+			button:not(.uploading) {
+				i, span { display: inline-block; }
+				.on-upload { display: none; }
+			}
+			button.uploading {
+				span, i { display: none; }
+				.on-upload { display: inline-block; }
+			}
 		}
 	}
 

@@ -25,7 +25,11 @@
 			<button id="asset-uploader-upload-btn"
 					type="button"
 					class="btn btn-primary">
-				Upload <i class="fas fa-upload"></i>
+				<span>Upload</span>
+				<i class="fas fa-upload"></i>
+
+				<span class="on-upload">Uploading </span>
+				<i class="fas fa-spinner fa-spin on-upload"></i>
 			</button>
 		</div>
 	</div>

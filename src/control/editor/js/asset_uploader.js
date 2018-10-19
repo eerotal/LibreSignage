@@ -43,11 +43,12 @@ const VALID_MIMES = {
 	gif: 'image/gif'
 };
 const FILENAME_MAXLEN = 64;
-const FILENAME_REGEX = /^[A-Za-z0-9+_.-]*$/;
+const FILENAME_REGEX = /^[A-Za-z0-9_.-]*$/;
 
 module.exports.AssetUploader = class AssetUploader {
 	constructor(api) {
 		this.API = api;
+		this.flag_uploading = false;
 		this.flag_ready = false;
 		this.defer_ready = () => { return !this.flag_ready; }
 		this.slide = new slide.Slide(this.API);
@@ -105,12 +106,10 @@ module.exports.AssetUploader = class AssetUploader {
 			),
 			'UPLOAD_BUTTON': new uic.UIButton(
 				elem = $("#asset-uploader-upload-btn"),
-				perm = (d) => { return d['s']; },
+				perm = (d) => { return d['s'] && !d['up']; },
 				enabler = null,
 				attach = null,
 				defer = null,
-				getter = null,
-				setter = null
 			),
 			'CANT_UPLOAD_LABEL': new uic.UIStatic(
 				elem = $("#asset-uploader-cant-upload-row"),
@@ -243,7 +242,7 @@ module.exports.AssetUploader = class AssetUploader {
 				enabler = null,
 				attach = {
 					'click': (e) => {
-						this.UI.get('FILELINK').set(asset_uri_template(
+						this.UI.get('FILELINK').set(asset_url_template(
 							window.location.origin,
 							this.slide.get('id'),
 							a.filename
@@ -277,6 +276,13 @@ module.exports.AssetUploader = class AssetUploader {
 		});
 	}
 
+	update_controls() {
+		this.UI.all(
+			function(d) { this.state(d); },
+			{ 's': this.slide !== null, 'up': this.flag_uploading }
+		);
+	}
+
 	show(slide_id, callback) {
 		/*
 		*  Show the asset uploader for the slide 'slide_id'.
@@ -302,6 +308,14 @@ module.exports.AssetUploader = class AssetUploader {
 				this.UI.get('UPLOAD_BUTTON').get_elem().on(
 					'click',
 					() => {
+						// Add a spinner to the upload button.
+						this.flag_uploading = true;
+						this.update_controls();
+
+						this.UI.get(
+							'UPLOAD_BUTTON'
+						).get_elem().addClass('uploading');
+
 						this.upload((resp) => {
 							if (!resp.error) {
 								// Update asset list after upload.
@@ -309,23 +323,25 @@ module.exports.AssetUploader = class AssetUploader {
 									if (!err) { this.populate(); }
 								});
 							}
+
+							// Remove the upload button spinner.
+							this.UI.get(
+								'UPLOAD_BUTTON'
+							).get_elem().removeClass('uploading');
+
+							this.flag_uploading = false;
+							this.update_controls();
 						});
 					}
 				);
 
-				this.UI.all(
-					function(d) { this.state(d); },
-					{ 's': true }
-				);
 				this.populate();
+				this.update_controls();
 				this.UI.get('POPUP').enabled(true);
 				if (callback) { callback(err); }
 			});
 		} else {
-			this.UI.all(
-				function(d) { this.state(d); },
-				{ 's': false }
-			)
+			this.update_controls();
 			this.UI.get('POPUP').enabled(true);
 			if (callback) { callback(this.API.ERR.API_E_OK); }
 		}
