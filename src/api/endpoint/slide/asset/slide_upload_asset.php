@@ -11,15 +11,22 @@
 *  Below is a list of the negative error codes.
 *
 *  * -1 = move_uploaded_file() failed.
-*  * -2 = Asset filename too long.
+*  * -2 = Asset filename invalid.
 *  * -3 = Invalid asset file type.
+*
+*  This API endpoint only accepts asset filenames that have a length
+*  less than or equal to the server limit SLIDE_ASSET_NAME_MAX_LEN.
+*  The asset names may only contain the characters A-Z, a-z, 0-9,
+*  ., _ and -. These limits result from SlideAsset::new().
 *
 *  .. _errors: http://php.net/manual/en/features.file-upload.errors.php
 *
 *  **Request:** POST, multipart/form-data
 *
-*  JSON parameters
-*    * id = The slide ID to use.
+*  Form-data parameters
+*    * file[name_1 ... name_n] = The file(s) to upload.
+*    * body = JSON encoded body data.
+*      * id = The slide ID to use.
 *
 *  Return value
 *    * failed        = The number of failed uploads.

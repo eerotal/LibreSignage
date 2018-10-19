@@ -4,11 +4,22 @@ var popup = require('ls-popup');
 var val = require('ls-validator');
 var slide = require('ls-slide');
 
-const asset_uri_template = (origin, slide_id, name) => `
+/*
+*  Asset URL template string. 'origin' is the origin URL,
+*  ie. the protocol and hostname. 'slide_id' is the slide id
+*  and 'name' is the original asset name.
+*/
+const asset_url_template = (origin, slide_id, name) => `
 ${origin}/api/endpoint/slide/asset/slide_get_asset.php
 ?${$.param({ 'id': slide_id, 'name': name })}
 `;
 
+/*
+*  Asset uploader thumbnail template literal.
+*  'slide_id' is the slide id to use, 'name' is
+*  the original asset name and 'index' is a unique
+*  index number for each thumbnail.
+*/
 const asset_thumb_template = (slide_id, name, index) => `
 <div id="asset-uploader-thumb-${index}" class="asset-uploader-thumb">
 	<div class="asset-uploader-thumb-inner default-border">
@@ -26,26 +37,33 @@ const asset_thumb_template = (slide_id, name, index) => `
 </div>
 `;
 
+const VALID_MIMES = {
+	jpeg: 'image/jpeg',
+	png: 'image/png',
+	gif: 'image/gif'
+};
+const FILENAME_MAXLEN = 64;
+const FILENAME_REGEX = /^[A-Za-z0-9+_.-]*$/;
+
 module.exports.AssetUploader = class AssetUploader {
 	constructor(api) {
 		this.API = api;
-		this.slide = null;
 		this.flag_ready = false;
 		this.defer_ready = () => { return !this.flag_ready; }
+		this.slide = new slide.Slide(this.API);
 
+		this.FILELIST_UI = null;
 		this.UI = new uic.UIController({
 			'POPUP': new uic.UIStatic(
 				elem = new popup.Popup(
 					$("#asset-uploader").get(0),
 					() => {
-						/*
-						*  Remove upload button event listener and
-						*  reset the file selector label on close.
-						*/
-						this.UI.get(
-							'UPLOAD_BUTTON'
-						).get_elem().off('click');
+						// Reset the asset uploader on close.
+						this.UI.get('UPLOAD_BUTTON').get_elem().off(
+							'click'
+						);
 						this.UI.get('FILESEL_LABEL').set('Choose a file');
+						this.UI.get('FILELINK').clear();
 					}
 				),
 				perm = (d) => { return true; },
@@ -126,10 +144,7 @@ module.exports.AssetUploader = class AssetUploader {
 				defer = null,
 				mod = null,
 				getter = (elem) => { return elem.val(); },
-				setter = (elem, val) => {
-					console.log(val);
-					elem.val(val);
-				},
+				setter = (elem, val) => { elem.val(val); },
 				clearer = (elem) => { elem.val(''); }
 			)
 		});
@@ -140,33 +155,46 @@ module.exports.AssetUploader = class AssetUploader {
 		this.fileval_sel = new val.ValidatorSelector(
 			$("#asset-uploader-filesel"),
 			$("#asset-uploader-filesel-cont"),
-			[new val.FileSelectorValidator({
-				mimes: ['image/png', 'image/jpeg', 'image/gif'],
-				name_len: null
-			}, 'Invalid file type.'),
-			new val.FileSelectorValidator({
-				mimes: null,
-				name_len: 64
-			}, 'Filename too long.')]
+			[new val.FileSelectorValidator(
+				{
+					mimes: Object.values(VALID_MIMES),
+					name_len: null,
+					regex: null
+				},
+				`Invalid file type. The allowed types are: ` +
+				`${Object.keys(VALID_MIMES).join(', ')}.`
+			),
+			new val.FileSelectorValidator(
+				{
+					mimes: null,
+					name_len: FILENAME_MAXLEN,
+					regex: null
+				},
+				`Filename too long. The maximum length ` +
+				`is ${FILENAME_MAXLEN}`
+			),
+			new val.FileSelectorValidator(
+				{
+					mimes: null,
+					name_len: null,
+					regex: FILENAME_REGEX
+				},
+				"Invalid characters in filename. " + 
+				"A-Z, a-z, 0-9, ., _ and - are allowed."
+			)]
 		);
 		this.fileval_trig = new val.ValidatorTrigger(
 			[ this.fileval_sel ],
-			(valid) => {
-				this.UI.get('UPLOAD_BUTTON').enabled(false);
-			}
+			(valid) => { this.UI.get('UPLOAD_BUTTON').enabled(false); }
 		);
-
-		this.slide = new slide.Slide(this.API);
-		this.FILELIST_UI = null;
-
 		this.flag_ready = true;
 	}
 
 	upload(callback) {
 		/*
-		*  Upload the selected files for the slide attached
-		*  to this AssetUploader object. 'callback' is called
-		*  afterwards with the API response data.
+		*  Upload the selected files to the slide that's loaded.
+		*  'callback' is passed straight to the API.call() function
+		*  as the callback argument.
 		*/
 		let data = new FormData();
 		let files = this.UI.get('FILESEL').get();
@@ -190,6 +218,8 @@ module.exports.AssetUploader = class AssetUploader {
 		*  Populate the existing asset list with data from this.slide.
 		*/
 		let html = '';
+
+		// Generate HTML.
 		for (let i = 0; i < this.slide.get('assets').length; i++) {
 			html += asset_thumb_template(
 				this.slide.get('id'),
@@ -199,6 +229,11 @@ module.exports.AssetUploader = class AssetUploader {
 		}
 		this.UI.get('FILELIST').set(html);
 
+		/*
+		*  Create UIElem objects for the asset 'buttons' and attach
+		*  event handlers to them. The UIController is stored in
+		*  this.FILELIST_UI.
+		*/
 		let tmp = {};
 		for (let i = 0; i < this.slide.get('assets').length; i++) {
 			let a = this.slide.get('assets')[i];
@@ -208,8 +243,6 @@ module.exports.AssetUploader = class AssetUploader {
 				enabler = null,
 				attach = {
 					'click': (e) => {
-						console.log(a.filename);
-						console.log(this.UI);
 						this.UI.get('FILELINK').set(asset_uri_template(
 							window.location.origin,
 							this.slide.get('id'),
@@ -217,7 +250,7 @@ module.exports.AssetUploader = class AssetUploader {
 						));
 					}
 				},
-				defer = null
+				defer = this.defer_ready
 			);
 		}
 		this.FILELIST_UI = new uic.UIController(tmp);
@@ -225,22 +258,23 @@ module.exports.AssetUploader = class AssetUploader {
 
 	load_slide(slide_id, callback) {
 		/*
-		*  Fetch slide data. 'slide_id' is the slide id to use
-		*  and 'callback' is a callback function that's called
-		*  after the data has been fetched. The returned API error
-		*  code is passed to 'callback'.
+		*  Load slide data. 'slide_id' is the slide id to use.
+		*  'callback' is called afterwards with the returned
+		*  API error code as the first argument.
 		*/
 		this.slide.load(slide_id, true, false, (err) => {
 			if (callback) { callback(err); }
 		});
 	}
 
-	fetch_slide(callback) {
+	update_slide(callback) {
 		/*
-		*  Fetch new slide data. 'callback' is called afterwards
+		*  Update slide data. 'callback' is called afterwards
 		*  with the returned API error code as the first argument.
 		*/
-		this.slide.fetch((err) => { if (callback) { callback(err); } });
+		this.slide.fetch((err) => {
+			if (callback) { callback(err); }
+		});
 	}
 
 	show(slide_id, callback) {
@@ -270,8 +304,8 @@ module.exports.AssetUploader = class AssetUploader {
 					() => {
 						this.upload((resp) => {
 							if (!resp.error) {
-								// Update list after upload.
-								this.fetch_slide((err) => {
+								// Update asset list after upload.
+								this.update_slide((err) => {
 									if (!err) { this.populate(); }
 								});
 							}
@@ -283,10 +317,8 @@ module.exports.AssetUploader = class AssetUploader {
 					function(d) { this.state(d); },
 					{ 's': true }
 				);
-
 				this.populate();
 				this.UI.get('POPUP').enabled(true);
-
 				if (callback) { callback(err); }
 			});
 		} else {

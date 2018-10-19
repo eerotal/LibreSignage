@@ -18,6 +18,8 @@ const ASSET_MIMES = [
 	'video/ogg'
 ];
 
+const ASSET_FILENAME_REGEX = '/^[A-Za-z0-9_.-]*$/';
+
 class SlideAsset extends Exportable {
 	static $PRIVATE = [
 		'mime',
@@ -60,12 +62,19 @@ class SlideAsset extends Exportable {
 		assert(!empty($file));
 		assert(!empty($asset_path));
 
+		if (strlen($file['name']) > gtlim('SLIDE_ASSET_NAME_MAX_LEN')) {
+			throw new ArgException("Asset filename too long.");
+		}
+
+		if (!preg_match(ASSET_FILENAME_REGEX, $file['name'])) {
+			throw new ArgException(
+				'Asset filename contains invalid characters.'
+			);
+		}
+
 		$mime = mime_content_type($file['tmp_name']);
 		if (!in_array($mime, ASSET_MIMES, TRUE)) {
 			throw new FileTypeException("Invalid asset MIME type.");
-		}
-		if (strlen($file['name']) > gtlim('SLIDE_ASSET_NAME_MAX_LEN')) {
-			throw new ArgException("Asset filename too long.");
 		}
 
 		$this->filename = basename($file['name']);

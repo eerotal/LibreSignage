@@ -64,6 +64,8 @@
 	const THUMB_MAXW                = 320;
 	const THUMB_MAXH                = 180;
 
+	const ASSET_FILENAME_MAXLEN     = 64;
+
 	// LibreSignage instance limits.
 	const LS_LIM = array(
 		"SLIDE_MIN_TIME"           => 1*1000,
