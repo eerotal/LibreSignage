@@ -98,16 +98,18 @@ var ASSET_UPLOADER = null; // Asset uploader object.
 
 var qsel_queues = null;    // Queue selector queues list.
 
-// Input validator selectors.
+// Input validator objects selectors.
 var name_sel = null;
 var index_sel = null;
-var sel_slide = null;
+var val_trigger = null;
 
-var syn_err_id = null;          // Syntax error marker id.
-var flag_slide_loading = false; // Slide loading flag.
-var flag_editor_ready = false;  // Editor ready flag.
+var state = {
+	slide_loading: false,
+	editor_ready: false
+};
 
-var defer_editor_ready = () => { return !flag_editor_ready; };
+var syn_err_id = null;     // Syntax error marker id.
+var sel_slide = null;      // Selected slide.
 
 // Editor UI definitions.
 const UI_DEFS = new uic.UIController({
@@ -163,8 +165,10 @@ const UI_DEFS = new uic.UIController({
 		elem = SLIDE_SAVE,
 		perm = (d) => {
 			return (
-				(!d['n'] && !d['s'])
-				|| (d['l'] && (d['o'] || d['c']))
+				d['v'] && (
+					(!d['n'] && !d['s'])
+					|| (d['l'] && (d['o'] || d['c']))
+				)
 			);
 		},
 		enabler = null,
@@ -352,8 +356,10 @@ const UI_DEFS = new uic.UIController({
 		elem = SLIDE_SCHED,
 		perm = (d) => { return !d['s'] && d['l'] && (d['o'] || d['c']); },
 		enabler = null,
-		attach = null,
-		defer = null,
+		attach = {
+			'change': () => { update_controls(); }
+		},
+		defer = defer_editor_ready,
 		mod = (elem, s) => {
 			return elem.prop('checked') != s.get('sched');
 		},
@@ -594,8 +600,16 @@ const QSEL_UI_DEFS = new uic.UIController({
 		elem = QUEUE_SELECT,
 		perm = () => { return true; },
 		enabler = null,
-		attach = null,
-		defer = null,
+		attach = {
+			'change': () => {
+				queue_select(
+					QSEL_UI_DEFS.get('QUEUE_SELECT').val(),
+					true,
+					null
+				);
+			}
+		},
+		defer = defer_editor_ready,
 		mod = null,
 		getter = (elem) => { return elem.val(); },
 		setter = (elem, value) => { elem.val(value); },
@@ -685,6 +699,10 @@ var EDITOR_SHORTCUTS = new sc.ShortcutController([
 	)
 ]);
 
+function defer_editor_ready() {
+	return !state.editor_ready;
+};
+
 function update_controls() {
 	/*
 	*  Enable editor controls using the UIController system.
@@ -696,6 +714,7 @@ function update_controls() {
 	*  c = Is the current user a collaborator of this slide?
 	*  l = Is the current slide locked by the current user?
 	*  s = Is the current slide saved?
+	*  v = Is the current editor data valid?
 	*/
 
 	let user = API.CONFIG.user;
@@ -723,7 +742,8 @@ function update_controls() {
 			's': (
 				sel_slide !== null
 				&& sel_slide.has('id')
-			)
+			),
+			'v': val_trigger.is_valid()
 		}
 	);
 	if (sel_slide !== null) {
@@ -791,14 +811,14 @@ function slide_show(s, no_popup) {
 		let error = () => {
 			console.error('LibreSignage: API error.');
 			slide_hide();
-			flag_slide_loading = false;
+			state.slide_loading = false;
 		}
 		let success = () => {
 			set_inputs(sel_slide);
 			update_controls();
 			LIVE_PREVIEW.update();
 			TL.select(sel_slide.get('id'));
-			flag_slide_loading = false;
+			state.slide_loading = false;
 		}
 
 		if (sel_slide !== null && s == sel_slide.get('id')) {
@@ -822,7 +842,7 @@ function slide_show(s, no_popup) {
 			}
 		} else {
 			console.log(`LibreSignage: Show slide '${s}'.`);
-			flag_slide_loading = true;
+			state.slide_loading = true;
 			if (sel_slide !== null && sel_slide.is_locked_from_here()) {
 				sel_slide.lock_release(null);
 			}
@@ -852,7 +872,7 @@ function slide_show(s, no_popup) {
 		}
 	}
 
-	if (flag_slide_loading) { return; }
+	if (state.slide_loading) { return; }
 	if (!no_popup && editor_status_check(['UNSAVED'])) {
 		diags.DIALOG_SLIDE_UNSAVED(
 			(status, val) => { if (status) { cb(); } }
@@ -887,7 +907,6 @@ function slide_rm() {
 			if (!status) { return; }
 			sel_slide.remove(null, stat => {
 				if (API.handle_disp_error(stat)) { return; }
-				//$(`#slide-btn-${sel_slide.get('id')}`).remove();
 				console.log(
 					`LibreSignage: Deleted slide ` +
 					`'${sel_slide.get('id')}'.`
@@ -1265,13 +1284,8 @@ function inputs_setup(ready) {
 
 	val_trigger = new val.ValidatorTrigger(
 		[name_sel, index_sel],
-		(valid) => {
-			SLIDE_SAVE.prop('disabled', !valid);
-		}
+		(valid) => { update_controls(); }
 	);
-
-	// Update enabled controls when scheduling is enabled.
-	SLIDE_SCHED.change(update_controls);
 
 	// Setup the ACE editor with the Dawn theme + plaintext mode.
 	SLIDE_INPUT = ace.edit('slide-input');
@@ -1298,12 +1312,11 @@ function inputs_setup(ready) {
 				'maxopts': API.SERVER_LIMITS.SLIDE_MAX_COLLAB
 			}
 		);
-		if (ready) { ready(); }
-	});
 
-	// Setup the queue selector event listener.
-	QUEUE_SELECT.change(() => {
-		queue_select(QUEUE_SELECT.val(), true, null);
+		// Finish by triggering the main validator trigger.
+		val_trigger.trigger();
+
+		if (ready) { ready(); }
 	});
 }
 
@@ -1323,17 +1336,6 @@ function setup() {
 		return e.returnValue;
 	});
 
-	// Setup inputs and other UI elements.
-	inputs_setup(() => {
-		update_controls();
-		TL = new timeline.Timeline(API, slide_show);
-		ASSET_UPLOADER = new asset_uploader.AssetUploader(API);
-
-		update_qsel(true);
-		flag_editor_ready = true;
-		console.log("LibreSignage: Editor ready.");
-	});
-
 	// Setup the live preview.
 	LIVE_PREVIEW = new preview.Preview(
 		'#slide-live-preview',
@@ -1349,6 +1351,17 @@ function setup() {
 			}
 		}
 	);
+
+	TL = new timeline.Timeline(API, slide_show);
+	ASSET_UPLOADER = new asset_uploader.AssetUploader(API);
+
+	// Setup inputs and other UI elements.
+	inputs_setup(() => {
+		update_qsel(true);
+		update_controls();
+		state.editor_ready = true;
+		console.log("LibreSignage: Editor ready.");
+	});
 }
 
 $(document).ready(() => {

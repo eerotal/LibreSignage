@@ -115,12 +115,12 @@ $(document).ready(() => {
 				regex: null
 			}, '')]
 		);
-		val_trigger = new val.ValidatorTrigger(
+		(val_trigger = new val.ValidatorTrigger(
 			[user_sel, pass_sel],
 			(valid) => {
 				LOGIN_UI_DEFS.get('BTN_LOGIN').enabled(valid);
 			}
-		);
+		)).trigger();
 
 		flag_login_ready = true;
 	});

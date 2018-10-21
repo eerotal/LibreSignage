@@ -48,9 +48,12 @@ const FILENAME_REGEX = /^[A-Za-z0-9_.-]*$/;
 module.exports.AssetUploader = class AssetUploader {
 	constructor(api) {
 		this.API = api;
-		this.flag_uploading = false;
-		this.flag_ready = false;
-		this.defer_ready = () => { return !this.flag_ready; }
+
+		this.state = {
+			visible: false,
+			uploading: false,
+			ready: false
+		}
 		this.slide = new slide.Slide(this.API);
 
 		this.FILELIST_UI = null;
@@ -59,7 +62,7 @@ module.exports.AssetUploader = class AssetUploader {
 				elem = new popup.Popup(
 					$("#asset-uploader").get(0),
 					() => {
-						// Reset the asset uploader on close.
+						// Reset the asset uploader data on close.
 						this.UI.get('UPLOAD_BUTTON').get_elem().off(
 							'click'
 						);
@@ -67,7 +70,7 @@ module.exports.AssetUploader = class AssetUploader {
 						this.UI.get('FILELINK').clear();
 					}
 				),
-				perm = (d) => { return true; },
+				perm = (d) => { return d['v']; },
 				enabler = (elem, s) => { elem.visible(s); },
 				attach = null,
 				defer = null,
@@ -94,7 +97,7 @@ module.exports.AssetUploader = class AssetUploader {
 						).get_elem().removeClass('upload-failed');
 					}
 				},
-				defer = this.defer_ready,
+				defer = () => { this.defer_ready(); },
 				mod = null,
 				getter = (elem) => { return elem.prop('files'); },
 				setter = (elem, s) => { elem.prop('files', s); },
@@ -111,7 +114,7 @@ module.exports.AssetUploader = class AssetUploader {
 			),
 			'UPLOAD_BUTTON': new uic.UIButton(
 				elem = $("#asset-uploader-upload-btn"),
-				perm = (d) => { return d['s'] && !d['up']; },
+				perm = (d) => { return d['s'] && !d['u'] && d['f']; },
 				enabler = null,
 				attach = null,
 				defer = null,
@@ -163,7 +166,8 @@ module.exports.AssetUploader = class AssetUploader {
 				{
 					mimes: Object.values(VALID_MIMES),
 					name_len: null,
-					regex: null
+					regex: null,
+					minfiles: null
 				},
 				`Invalid file type. The allowed types are: ` +
 				`${Object.keys(VALID_MIMES).join(', ')}.`
@@ -172,7 +176,8 @@ module.exports.AssetUploader = class AssetUploader {
 				{
 					mimes: null,
 					name_len: FILENAME_MAXLEN,
-					regex: null
+					regex: null,
+					minfiles: null
 				},
 				`Filename too long. The maximum length ` +
 				`is ${FILENAME_MAXLEN}`
@@ -181,17 +186,44 @@ module.exports.AssetUploader = class AssetUploader {
 				{
 					mimes: null,
 					name_len: null,
-					regex: FILENAME_REGEX
+					regex: FILENAME_REGEX,
+					minfiles: null
 				},
 				"Invalid characters in filename. " + 
 				"A-Z, a-z, 0-9, ., _ and - are allowed."
+			),
+			new val.FileSelectorValidator(
+				{
+					mimes: null,
+					name_len: null,
+					regex: null,
+					minfiles: 1
+				}, '', true
 			)]
 		);
-		this.fileval_trig = new val.ValidatorTrigger(
+
+		(this.fileval_trig = new val.ValidatorTrigger(
 			[ this.fileval_sel ],
-			(valid) => { this.UI.get('UPLOAD_BUTTON').enabled(valid); }
+			(valid) => { this.update_controls(); }
+		)).trigger();
+
+		this.state.ready = true;
+	}
+
+	defer_ready() {
+		return !this.state.ready;
+	}
+
+	update_controls() {
+		this.UI.all(
+			function(d) { this.state(d); },
+			{
+				's': this.slide != null,
+				'u': this.state.uploading,
+				'v': this.state.visible,
+				'f': this.fileval_trig.is_valid()
+			}
 		);
-		this.flag_ready = true;
 	}
 
 	upload(callback) {
@@ -254,7 +286,7 @@ module.exports.AssetUploader = class AssetUploader {
 						));
 					}
 				},
-				defer = this.defer_ready
+				defer = () => { this.defer_ready(); }
 			);
 		}
 		this.FILELIST_UI = new uic.UIController(tmp);
@@ -279,13 +311,6 @@ module.exports.AssetUploader = class AssetUploader {
 		this.slide.fetch((err) => {
 			if (callback) { callback(err); }
 		});
-	}
-
-	update_controls() {
-		this.UI.all(
-			function(d) { this.state(d); },
-			{ 's': this.slide !== null, 'up': this.flag_uploading }
-		);
 	}
 
 	show(slide_id, callback) {
@@ -313,7 +338,7 @@ module.exports.AssetUploader = class AssetUploader {
 				this.UI.get('UPLOAD_BUTTON').get_elem().on(
 					'click',
 					() => {
-						this.flag_uploading = true;
+						this.state.uploading = true;
 						this.update_controls();
 
 						// Add a spinner to the upload button.
@@ -341,20 +366,22 @@ module.exports.AssetUploader = class AssetUploader {
 									'UPLOAD_BUTTON'
 								).get_elem().addClass('upload-failed');
 							}
-							this.flag_uploading = false;
+							this.state.uploading = false;
 							this.update_controls();
 						});
 					}
 				);
 
 				this.populate();
+				this.state.visible = true;
 				this.update_controls();
-				this.UI.get('POPUP').enabled(true);
+
 				if (callback) { callback(err); }
 			});
 		} else {
+			this.state.visible = false;
 			this.update_controls();
-			this.UI.get('POPUP').enabled(true);
+
 			if (callback) { callback(this.API.ERR.API_E_OK); }
 		}
 	}
