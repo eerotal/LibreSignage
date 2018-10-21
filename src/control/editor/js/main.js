@@ -1234,10 +1234,27 @@ function update_qsel_ctrls(ready) {
 	if (ready) { ready(); }
 }
 
-function inputs_setup(ready) {
+function ui_setup(ready) {
 	/*
-	*  Setup all editor inputs and input validators etc.
+	*  Setup the editor UI.
 	*/
+
+	LIVE_PREVIEW = new preview.Preview(
+		'#slide-live-preview',
+		'#slide-input',
+		() => { return UI_DEFS.get('SLIDE_INPUT').get(); },
+		(e) => {
+			if (e) {
+				syn_err_id = syn_err_highlight(e.line(), e.line());
+				MARKUP_ERR_DISPLAY.text('>> ' + e.toString(1));
+			} else {
+				syn_err_id = syn_err_clear(syn_err_id);
+				MARKUP_ERR_DISPLAY.text('');
+			}
+		}
+	);
+	TL = new timeline.Timeline(API, slide_show);
+	ASSET_UPLOADER = new asset_uploader.AssetUploader(API);
 
 	// Setup validators for the name and index inputs.
 	name_sel = new val.ValidatorSelector(
@@ -1336,27 +1353,8 @@ function setup() {
 		return e.returnValue;
 	});
 
-	// Setup the live preview.
-	LIVE_PREVIEW = new preview.Preview(
-		'#slide-live-preview',
-		'#slide-input',
-		() => { return UI_DEFS.get('SLIDE_INPUT').get(); },
-		(e) => {
-			if (e) {
-				syn_err_id = syn_err_highlight(e.line(), e.line());
-				MARKUP_ERR_DISPLAY.text('>> ' + e.toString(1));
-			} else {
-				syn_err_id = syn_err_clear(syn_err_id);
-				MARKUP_ERR_DISPLAY.text('');
-			}
-		}
-	);
-
-	TL = new timeline.Timeline(API, slide_show);
-	ASSET_UPLOADER = new asset_uploader.AssetUploader(API);
-
 	// Setup inputs and other UI elements.
-	inputs_setup(() => {
+	ui_setup(() => {
 		update_qsel(true);
 		update_controls();
 		state.editor_ready = true;
