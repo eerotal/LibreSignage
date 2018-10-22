@@ -12,10 +12,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/thumbnail.php');
 const ASSET_MIMES = [
 	'image/png',
 	'image/jpeg',
-	'image/gif',
-	'video/mp4',
-	'video/webm',
-	'video/ogg'
+	'image/gif'
 ];
 
 const ASSET_FILENAME_REGEX = '/^[A-Za-z0-9_.-]*$/';
