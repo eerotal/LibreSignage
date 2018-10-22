@@ -63,11 +63,9 @@ module.exports.AssetUploader = class AssetUploader {
 					$("#asset-uploader").get(0),
 					() => {
 						// Reset the asset uploader data on close.
-						this.UI.get('UPLOAD_BUTTON').get_elem().off(
-							'click'
-						);
 						this.UI.get('FILESEL_LABEL').set('Choose a file');
 						this.UI.get('FILELINK').clear();
+						this.UI.get('FILELIST').set('');
 					}
 				),
 				perm = (d) => { return d['v']; },
@@ -91,10 +89,8 @@ module.exports.AssetUploader = class AssetUploader {
 						}
 						this.UI.get('FILESEL_LABEL').set(label);
 
-						// Remove the failed upload indicator.
-						this.UI.get(
-							'UPLOAD_BUTTON'
-						).get_elem().removeClass('upload-failed');
+						// Remove error styling from the upload button.
+						this.indicate('upload-success');
 					}
 				},
 				defer = () => { this.defer_ready(); },
@@ -116,8 +112,41 @@ module.exports.AssetUploader = class AssetUploader {
 				elem = $("#asset-uploader-upload-btn"),
 				perm = (d) => { return d['s'] && !d['u'] && d['f']; },
 				enabler = null,
-				attach = null,
-				defer = null,
+				attach = {
+					'click': () => {
+						/*
+						*  Handle upload button clicks. This listener
+						*  also applies the necessary styling to the
+						*  upload button and to the filelist on errors
+						*  using this.indicate().
+						*/
+						this.state.uploading = true;
+						this.update_controls();
+
+						this.indicate('upload-success');
+						this.indicate('upload-uploading');
+						this.upload((resp) => {
+							this.indicate('upload-success');
+							if (resp.error) {
+								this.indicate('upload-error');
+							}
+
+							// Update asset list after upload.
+							this.update_slide((err) => {
+								if (!err) {
+									this.indicate('filelist-success');
+									this.populate();
+								} else {
+									this.indicate('filelist-error');
+								}
+							});
+
+							this.state.uploading = false;
+							this.update_controls();
+						});
+					}
+				},
+				defer = () => { this.defer_ready(); },
 			),
 			'CANT_UPLOAD_LABEL': new uic.UIStatic(
 				elem = $("#asset-uploader-cant-upload-row"),
@@ -214,7 +243,56 @@ module.exports.AssetUploader = class AssetUploader {
 		return !this.state.ready;
 	}
 
+	indicate(status) {
+		/*
+		*  Indicate information to the user via CSS styling.
+		*/
+		switch (status) {
+			// Filelist indicators.
+			case 'filelist-error':
+				this.UI.get(
+					'FILELIST'
+				).get_elem().parent().addClass(
+					'error'
+				);
+				break;
+			case 'filelist-success':
+				this.UI.get(
+					'FILELIST'
+				).get_elem().parent().removeClass(
+					'error'
+				);
+				break;
+
+			// Upload button indicators.
+			case 'upload-uploading':
+				this.UI.get('UPLOAD_BUTTON').get_elem().addClass(
+					'uploading'
+				);
+				break;
+			case 'upload-error':
+				this.UI.get('UPLOAD_BUTTON').get_elem().addClass(
+					'error'
+				);
+				break;
+			case 'upload-success':
+				this.UI.get('UPLOAD_BUTTON').get_elem().removeClass(
+					'uploading error'
+				);
+				break;
+			default:
+				break;
+		}
+	}
+
 	update_controls() {
+		/*
+		*  Update the controls state.
+		*    s  = Is this.slide null?
+		*    u  = Is uploading in progress?
+		*    v  = Is the popup visible?
+		*    f  = Is the file validator input validated?
+		*/
 		this.UI.all(
 			function(d) { this.state(d); },
 			{
@@ -229,8 +307,8 @@ module.exports.AssetUploader = class AssetUploader {
 	upload(callback) {
 		/*
 		*  Upload the selected files to the slide that's loaded.
-		*  'callback' is passed straight to the API.call() function
-		*  as the callback argument.
+		*  'callback' is passed straight to API.call() as the
+		*  callback argument.
 		*/
 		let data = new FormData();
 		let files = this.UI.get('FILESEL').get();
@@ -251,9 +329,11 @@ module.exports.AssetUploader = class AssetUploader {
 
 	populate() {
 		/*
-		*  Populate the existing asset list with data from this.slide.
+		*  Populate the existing asset list with data from 'this.slide'.
 		*/
 		let html = '';
+
+		if (!this.slide.get('assets')) { return; }
 
 		// Generate HTML.
 		for (let i = 0; i < this.slide.get('assets').length; i++) {
@@ -316,7 +396,7 @@ module.exports.AssetUploader = class AssetUploader {
 	show(slide_id, callback) {
 		/*
 		*  Show the asset uploader for the slide 'slide_id'.
-		*  If slide_id === null, the asset uploader is opened
+		*  If slide_id == null, the asset uploader is opened
 		*  but all the upload features are disabled. Note that
 		*  you should load the slide before calling this
 		*  function, lock it *and* enable lock renewal. This
@@ -333,55 +413,14 @@ module.exports.AssetUploader = class AssetUploader {
 					if (callback) { callback(err); }
 					return;
 				}
-
-				// Enable and setup controls.
-				this.UI.get('UPLOAD_BUTTON').get_elem().on(
-					'click',
-					() => {
-						this.state.uploading = true;
-						this.update_controls();
-
-						// Add a spinner to the upload button.
-						this.UI.get(
-							'UPLOAD_BUTTON'
-						).get_elem().removeClass('upload-failed');
-						this.UI.get(
-							'UPLOAD_BUTTON'
-						).get_elem().addClass('uploading');
-
-						this.upload((resp) => {
-							// Remove the upload button spinner.
-							this.UI.get(
-								'UPLOAD_BUTTON'
-							).get_elem().removeClass('uploading');
-
-							if (!resp.error) {
-								// Update asset list after upload.
-								this.update_slide((err) => {
-									if (!err) { this.populate(); }
-								});
-							} else {
-								// Indicate a failed upload.
-								this.UI.get(
-									'UPLOAD_BUTTON'
-								).get_elem().addClass('upload-failed');
-							}
-							this.state.uploading = false;
-							this.update_controls();
-						});
-					}
-				);
-
 				this.populate();
 				this.state.visible = true;
 				this.update_controls();
-
 				if (callback) { callback(err); }
 			});
 		} else {
 			this.state.visible = false;
 			this.update_controls();
-
 			if (callback) { callback(this.API.ERR.API_E_OK); }
 		}
 	}

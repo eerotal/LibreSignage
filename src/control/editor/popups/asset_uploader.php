@@ -31,7 +31,7 @@
 				<span class="on-upload">Uploading </span>
 				<i class="fas fa-spinner fa-spin on-upload"></i>
 
-				<span class="on-failed">Upload failed. Retry?</span>
+				<span class="on-error">Upload failed. Retry?</span>
 			</button>
 		</div>
 	</div>
@@ -41,7 +41,10 @@
 		</div>
 	</div>
 	<div class="row" id="asset-uploader-filelist-row">
-		<div class="col" id="asset-uploader-filelist">
+		<div class="col on-error">
+			<h2>There was a problem updating this list :(</h2>
+		</div>
+		<div class="col on-success" id="asset-uploader-filelist">
 		</div>
 	</div>
 	<div class="row" id="asset-uploader-file-link-row">
