@@ -186,6 +186,15 @@ $asset-thumb-label-h: 2.5em;
 							left: $s2;
 							right: $s2;
 						}
+						.asset-uploader-thumb-rm-wrapper {
+							flex: 0 0 auto;
+							margin: {
+								top: auto;
+								bottom: auto;
+								left: 0;
+								right: $s2;
+							}
+						}
 						.asset-uploader-thumb-label {
 							flex: 1 1 100%;
 							line-height: $asset-thumb-label-h;

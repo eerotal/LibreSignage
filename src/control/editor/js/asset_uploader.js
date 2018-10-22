@@ -3,6 +3,16 @@ var uic = require('ls-uicontrol');
 var popup = require('ls-popup');
 var val = require('ls-validator');
 var slide = require('ls-slide');
+var dialog = require('ls-dialog');
+
+var DIALOG_CONFIRM_REMOVE = (name, callback) => {
+	return new dialog.Dialog(
+		dialog.TYPE.CONFIRM,
+		`Remove ${name}?`,
+		`Are you sure you want to remove '${name}'?`,
+		callback
+	);
+}
 
 /*
 *  Asset URL template string. 'origin' is the origin URL,
@@ -29,6 +39,13 @@ const asset_thumb_template = (slide_id, name, index) => `
 			</img>
 		</div>
 		<div class="asset-uploader-thumb-label-wrapper">
+			<div class="asset-uploader-thumb-rm-wrapper">
+				<button id="asset-uploader-thumb-rm-${index}"
+						class="btn btn-danger small-btn"
+						type="button">
+					<i class="fas fa-times"></i>
+				</button>
+			</div>
 			<div class="asset-uploader-thumb-label">
 				${name}
 			</div>
@@ -125,21 +142,14 @@ module.exports.AssetUploader = class AssetUploader {
 
 						this.indicate('upload-success');
 						this.indicate('upload-uploading');
+
 						this.upload((resp) => {
 							this.indicate('upload-success');
 							if (resp.error) {
 								this.indicate('upload-error');
 							}
 
-							// Update asset list after upload.
-							this.update_slide((err) => {
-								if (!err) {
-									this.indicate('filelist-success');
-									this.populate();
-								} else {
-									this.indicate('filelist-error');
-								}
-							});
+							this.update_and_populate();
 
 							this.state.uploading = false;
 							this.update_controls();
@@ -196,7 +206,8 @@ module.exports.AssetUploader = class AssetUploader {
 					mimes: Object.values(VALID_MIMES),
 					name_len: null,
 					regex: null,
-					minfiles: null
+					minfiles: null,
+					bl: null
 				},
 				`Invalid file type. The allowed types are: ` +
 				`${Object.keys(VALID_MIMES).join(', ')}.`
@@ -206,7 +217,8 @@ module.exports.AssetUploader = class AssetUploader {
 					mimes: null,
 					name_len: FILENAME_MAXLEN,
 					regex: null,
-					minfiles: null
+					minfiles: null,
+					bl: null
 				},
 				`Filename too long. The maximum length ` +
 				`is ${FILENAME_MAXLEN}`
@@ -216,7 +228,8 @@ module.exports.AssetUploader = class AssetUploader {
 					mimes: null,
 					name_len: null,
 					regex: FILENAME_REGEX,
-					minfiles: null
+					minfiles: null,
+					bl: null
 				},
 				"Invalid characters in filename. " + 
 				"A-Z, a-z, 0-9, ., _ and - are allowed."
@@ -226,7 +239,25 @@ module.exports.AssetUploader = class AssetUploader {
 					mimes: null,
 					name_len: null,
 					regex: null,
-					minfiles: 1
+					minfiles: null,
+					bl: () => {
+						let tmp = [];
+						if (this.slide && this.slide.get('assets')) {
+							for (let a of this.slide.get('assets')) {
+								tmp.push(a['filename']);
+							}
+						}
+						return tmp;
+					}
+				}, 'At least one of the selected files already exists.'
+			),
+			new val.FileSelectorValidator(
+				{
+					mimes: null,
+					name_len: null,
+					regex: null,
+					minfiles: 1,
+					bl: null
 				}, '', true
 			)]
 		);
@@ -327,6 +358,40 @@ module.exports.AssetUploader = class AssetUploader {
 		}
 	}
 
+	remove(name) {
+		/*
+		*  Remove the slide asset named 'name' from the
+		*  loaded slide. This function handles indicating
+		*  any errors.
+		*/
+		this.API.call(
+			this.API.ENDP.SLIDE_REMOVE_ASSET,
+			{
+				'id': this.slide.get('id'),
+				'name': name
+			},
+			(resp) => {
+				if (this.API.handle_disp_error(resp.error)) { return; }
+				this.update_and_populate();
+			}
+		);
+	}
+
+	update_and_populate() {
+		/*
+		*  Load new slide data and call this.populate(). This
+		*  function also handles indicating any errors.
+		*/
+		this.update_slide((err) => {
+			if (!err) {
+				this.indicate('filelist-success');
+				this.populate();
+			} else {
+				this.indicate('filelist-error');
+			}
+		});
+	}
+
 	populate() {
 		/*
 		*  Populate the existing asset list with data from 'this.slide'.
@@ -353,6 +418,8 @@ module.exports.AssetUploader = class AssetUploader {
 		let tmp = {};
 		for (let i = 0; i < this.slide.get('assets').length; i++) {
 			let a = this.slide.get('assets')[i];
+
+			// Asset select "button" handling.
 			tmp[i] = new uic.UIButton(
 				elem = $(`#asset-uploader-thumb-${i}`),
 				perm = null,
@@ -368,6 +435,25 @@ module.exports.AssetUploader = class AssetUploader {
 				},
 				defer = () => { this.defer_ready(); }
 			);
+
+			// Asset remove button handling.
+			tmp[`${i}_rm`] = new uic.UIButton(
+				elem = $(`#asset-uploader-thumb-rm-${i}`),
+				perm = null,
+				enabler = null,
+				attach = {
+					'click': (e) => {
+						DIALOG_CONFIRM_REMOVE(
+							a.filename,
+							(status, val) => {
+								if (!status) { return; }
+								this.remove(a.filename);
+							}
+						).show();
+						e.stopPropagation();
+					}
+				}
+			)
 		}
 		this.FILELIST_UI = new uic.UIController(tmp);
 	}

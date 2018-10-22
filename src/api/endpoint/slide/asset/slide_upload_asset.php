@@ -13,6 +13,7 @@
 *  * -1 = move_uploaded_file() failed.
 *  * -2 = Asset filename invalid.
 *  * -3 = Invalid asset file type.
+*  * -4 = Asset already exists.
 *
 *  This API endpoint only accepts asset filenames that have a length
 *  less than or equal to the server limit SLIDE_ASSET_NAME_MAX_LEN.
@@ -79,6 +80,10 @@ $errors = [];
 foreach($SLIDE_UPLOAD_ASSET->get_files() as $f) {
 	if ($f['error'] !== UPLOAD_ERR_OK) {
 		$errors[$f['name']] = $f['error'];
+		continue;
+	}
+	if ($slide->has_uploaded_asset($f['name'])) {
+		$errors[$f['name']] = -4;
 		continue;
 	}
 	try {

@@ -419,6 +419,10 @@ class Slide extends Exportable{
 		return NULL;
 	}
 
+	function has_uploaded_asset(string $name) {
+		return $this->get_uploaded_asset($name) !== NULL;
+	}
+
 	function get_queue() {
 		$queue = new Queue($this->queue_name);
 		$queue->load();
