@@ -746,7 +746,8 @@ function update_controls() {
 			'v': val_trigger.is_valid()
 		}
 	);
-	if (sel_slide !== null) {
+
+	if (sel_slide != null) {
 		name_sel.enable();
 		index_sel.enable();
 	} else {
@@ -1253,10 +1254,13 @@ function ui_setup(ready) {
 			}
 		}
 	);
-	TL = new timeline.Timeline(API, slide_show);
+	TL = new timeline.Timeline(
+		API,
+		slide_show
+	);
 	ASSET_UPLOADER = new asset_uploader.AssetUploader(
-		'asset-uploader',
-		API
+		API,
+		'asset-uploader'
 	);
 
 	// Setup validators for the name and index inputs.
@@ -1302,6 +1306,13 @@ function ui_setup(ready) {
 		}, "The index must be an integer value.")]
 	);
 
+	/*
+	*  Initially disable the validators.
+	*  update_controls() enables them.
+	*/
+	name_sel.disable();
+	index_sel.disable();
+
 	val_trigger = new val.ValidatorTrigger(
 		[name_sel, index_sel],
 		(valid) => { update_controls(); }
@@ -1318,7 +1329,11 @@ function ui_setup(ready) {
 		SLIDE_COLLAB = new multiselect.MultiSelect(
 			'slide-collab-group',
 			'slide-collab',
-			[new val.WhitelistValidator(
+			[new val.StrValidator(
+				{ min: 1, max: null, regex: null },
+				'', true
+			),
+			new val.WhitelistValidator(
 				{ wl: data['users'] },
 				"This user doesn't exist."
 			),
@@ -1333,7 +1348,7 @@ function ui_setup(ready) {
 			}
 		);
 
-		// Finish by triggering the main validator trigger.
+		// Finish validator setup.
 		val_trigger.trigger();
 
 		if (ready) { ready(); }

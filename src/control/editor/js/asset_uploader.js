@@ -57,7 +57,7 @@ const asset_thumb_template = (slide_id, name, index) => `
 const FILENAME_REGEX = /^[A-Za-z0-9_.-]*$/;
 
 module.exports.AssetUploader = class AssetUploader {
-	constructor(id, api) {
+	constructor(api, id) {
 		/*
 		*  Initialize the AssetUploader. 'id' is the ID of the main
 		*  container div for the asset uploader HTML. 'api' is an
