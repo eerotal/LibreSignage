@@ -26,7 +26,7 @@
 *  **Request:** POST, multipart/form-data
 *
 *  Form-data parameters
-*    * file[name_1 ... name_n] = The file(s) to upload.
+*    * file_1 ... file_n = The file(s) to upload.
 *    * body = JSON encoded body data.
 *      * id = The slide ID to use.
 *

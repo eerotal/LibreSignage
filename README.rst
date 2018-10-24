@@ -27,6 +27,7 @@ Features
 * Configurable slide duration, transition animations
   and other settings.
 * Special markup syntax for easily formatting slides.
+* Image uploading and embedding support for slides.
 * Possibility to schedule slides for a specific time-frame.
 * Possibility to give slide modification permissions to
   other users to collaborate with them on creating a slide.
