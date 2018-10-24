@@ -63,7 +63,14 @@ const FILENAME_MAXLEN = 64;
 const FILENAME_REGEX = /^[A-Za-z0-9_.-]*$/;
 
 module.exports.AssetUploader = class AssetUploader {
-	constructor(api) {
+	constructor(id, api) {
+		/*
+		*  Initialize the AssetUploader. 'id' is the ID of the main
+		*  container div for the asset uploader HTML. 'api' is an
+		*  initialized API interface object. Call AssetUploader.show()
+		*  to actually display the popup.
+		*/
+		this.div_id = id;
 		this.API = api;
 
 		this.state = {
@@ -77,7 +84,7 @@ module.exports.AssetUploader = class AssetUploader {
 		this.UI = new uic.UIController({
 			'POPUP': new uic.UIStatic(
 				elem = new popup.Popup(
-					$("#asset-uploader").get(0),
+					$(`#${id}`).get(0),
 					() => {
 						// Reset the asset uploader data on close.
 						this.UI.get('FILESEL_LABEL').set('Choose a file');
@@ -93,7 +100,7 @@ module.exports.AssetUploader = class AssetUploader {
 				setter = null
 			),
 			'FILESEL': new uic.UIInput(
-				elem = $("#asset-uploader-filesel"),
+				elem = $(`#${id}-filesel`),
 				perm = (d) => { return d['s']; },
 				enabler = null,
 				attach = {
@@ -117,7 +124,7 @@ module.exports.AssetUploader = class AssetUploader {
 				clearer = (elem) => { elem.prop('files', null); }
 			),
 			'FILESEL_LABEL': new uic.UIStatic(
-				elem = $("#asset-uploader-filesel-label"),
+				elem = $(`#${id}-filesel-label`),
 				perm = (d) => { return true; },
 				enabler = null,
 				attach = null,
@@ -126,7 +133,7 @@ module.exports.AssetUploader = class AssetUploader {
 				setter = (elem, val) => { elem.html(val); }
 			),
 			'UPLOAD_BUTTON': new uic.UIButton(
-				elem = $("#asset-uploader-upload-btn"),
+				elem = $(`#${id}-upload-btn`),
 				perm = (d) => { return d['s'] && !d['u'] && d['f']; },
 				enabler = null,
 				attach = {
@@ -159,7 +166,7 @@ module.exports.AssetUploader = class AssetUploader {
 				defer = () => { this.defer_ready(); },
 			),
 			'CANT_UPLOAD_LABEL': new uic.UIStatic(
-				elem = $("#asset-uploader-cant-upload-row"),
+				elem = $(`#${id}-cant-upload-row`),
 				perm = (d) => { return !d['s']; },
 				enabler = (elem, s) => {
 					if (s) {
@@ -174,7 +181,7 @@ module.exports.AssetUploader = class AssetUploader {
 				setter = null
 			),
 			'FILELIST': new uic.UIStatic(
-				elem = $("#asset-uploader-filelist"),
+				elem = $(`#${id}-filelist`),
 				perm = (d) => { return true; },
 				enabler = null,
 				attach = null,
@@ -183,7 +190,7 @@ module.exports.AssetUploader = class AssetUploader {
 				setter = (elem, val) => { elem.html(val); }
 			),
 			'FILELINK': new uic.UIInput(
-				elem = $("#asset-uploader-file-link-input"),
+				elem = $(`#${id}-file-link-input`),
 				perm = (d) => { return d['s']; },
 				enabler = (elem, s) => { elem.prop('disabled', !s); },
 				attach = null,
@@ -199,8 +206,8 @@ module.exports.AssetUploader = class AssetUploader {
 		*  Create validators and triggers for the file selector.
 		*/
 		this.fileval_sel = new val.ValidatorSelector(
-			$("#asset-uploader-filesel"),
-			$("#asset-uploader-filesel-cont"),
+			$(`#${id}-filesel`),
+			$(`#${id}-filesel-cont`),
 			[new val.FileSelectorValidator(
 				{
 					mimes: Object.values(VALID_MIMES),
@@ -421,7 +428,7 @@ module.exports.AssetUploader = class AssetUploader {
 
 			// Asset select "button" handling.
 			tmp[i] = new uic.UIButton(
-				elem = $(`#asset-uploader-thumb-${i}`),
+				elem = $(`#${this.div_id}-thumb-${i}`),
 				perm = null,
 				enabler = null,
 				attach = {
@@ -438,7 +445,7 @@ module.exports.AssetUploader = class AssetUploader {
 
 			// Asset remove button handling.
 			tmp[`${i}_rm`] = new uic.UIButton(
-				elem = $(`#asset-uploader-thumb-rm-${i}`),
+				elem = $(`#${this.div_id}-thumb-rm-${i}`),
 				perm = null,
 				enabler = null,
 				attach = {

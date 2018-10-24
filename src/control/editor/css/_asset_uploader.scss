@@ -154,6 +154,11 @@ $asset-thumb-label-h: 2.5em;
 					flex-direction: column;
 					height: 100%;
 					width: 100%;
+
+					&:hover {
+						background-color: $gray-4;
+					}
+
 					.asset-uploader-thumb-img-wrapper {
 						display: flex;
 						flex-direction: column;

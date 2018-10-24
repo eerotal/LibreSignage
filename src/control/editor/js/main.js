@@ -1254,7 +1254,10 @@ function ui_setup(ready) {
 		}
 	);
 	TL = new timeline.Timeline(API, slide_show);
-	ASSET_UPLOADER = new asset_uploader.AssetUploader(API);
+	ASSET_UPLOADER = new asset_uploader.AssetUploader(
+		'asset-uploader',
+		API
+	);
 
 	// Setup validators for the name and index inputs.
 	name_sel = new val.ValidatorSelector(
