@@ -20,6 +20,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 // Custom exception classes.
 class ArgException extends Exception {};
 class IntException extends Exception {};
+class FileTypeException extends Exception {};
 
 function error_set_debug(bool $debug) {
 	/*
@@ -97,8 +98,10 @@ function error_handle(int $code, Throwable $e = NULL) {
 			error_log($e->__toString());
 		}
 
-		header($_SERVER['SERVER_PROTOCOL'].ERROR_CODES[$tmp]);
-		header('Location: '.ERROR_PAGES.'/'.$tmp);
+		header($_SERVER['SERVER_PROTOCOL'].' '.ERROR_CODES[$tmp]);
+		include(
+			$_SERVER['DOCUMENT_ROOT'].ERROR_PAGES.'/'.$tmp.'/index.php'
+		);
 		exit(1);
 	} catch (Exception $e){
 		/*

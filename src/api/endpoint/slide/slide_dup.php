@@ -2,11 +2,13 @@
 /*
 *  ====>
 *
-*  *Duplicate a slide. The owner of the new slide is the caller
-*   of this API endpoint. The new slide is also automatically
-*   locked for the caller.*
+*  Duplicate a slide. The owner of the new slide is the caller
+*  of this API endpoint. The new slide is also automatically
+*  locked for the caller.
 *
-*  POST JSON parameters
+*  **Request:** POST, application/json
+*
+*  Parameters
 *    * id = The ID of the slide to duplicate.
 *
 *  Return value
@@ -31,8 +33,8 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_DUP = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
+	APIEndpoint::FORMAT_BODY => array(
 		'id' => API_P_STR
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,

@@ -9,9 +9,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<?php
-			require_css(['font-awesome']);
-		?>
+		<?php require_css(['font-awesome']); ?>
 		<link rel="stylesheet" href="/control/editor/css/editor.css">
 		<title>LibreSignage Editor</title>
 	</head>
@@ -23,6 +21,7 @@
 			<div class="container-main container-fluid w-100 h-100">
 				<div class="container-fluid row mx-0 my-1">
 					<div class="col-12">
+						<!-- Queue selector -->
 						<div id="queue-select-cont">
 							<label for="queue-select">Queue:</label>
 							<select class="d-inline-block custom-select small-select mx-2"
@@ -53,6 +52,7 @@
 					</div>
 				</div>
 				<div class="container-fluid row mx-0 my-1">
+					<!-- Timeline -->
 					<div class="col-12">
 						<div id="timeline" class="d-flex flex-row flex-nowrap">
 						</div>
@@ -60,6 +60,7 @@
 				</div>
 				<div class="container-fluid row mx-0 my-1">
 					<div class="col-md-3 container-fluid pt-2" id="editor-col-l">
+						<!-- Slide editable status labels -->
 						<div id="slide-cant-edit">
 							You can't edit this slide.
 						</div>
@@ -267,6 +268,7 @@
 					</div>
 					<div class="col-md container-fluid pt-2" id="editor-col-r">
 						<div class="row">
+							<!-- Live preview -->
 							<div class="col-12 container-fluid">
 								<a class="link-nostyle"
 									data-toggle="collapse"
@@ -298,12 +300,27 @@
 						</div>
 						<div class="row">
 							<div class="col-md container-fluid">
-								<div class="row">
-									<div class="col-6 text-left">
-										<label for="slide-input">Markup</label>
+								<div class="row py-2">
+									<div class="col-2 m-auto text-left">
+										<label for="slide-input" class="m-0">Markup</label>
 									</div>
-									<div class="col-6 text-right">
-										<a href="#" id="link-quick-help">Quick help</a>
+
+									<!-- Editor toolbar -->
+									<div class="col-10 text-right">
+										<div class="dropdown">
+											<button id="editor-dropdown-menu-btn"
+													class="btn btn-info small-btn dropdown-toggle"
+													type="button"
+													data-toggle="dropdown"
+													aria-haspopup="true"
+													aria-expanded="false">
+												Menu
+											</button>
+											<div class="dropdown-menu" aria-labelledby="editor-dropdown-menu-btn">
+												<a class="dropdown-item" href="#" id="link-add-media">Add media</a>
+												<a class="dropdown-item" href="#" id="link-quick-help">Quick help</a>
+											</div>
+										</div>
 									</div>
 								</div>
 								<div id="slide-input" class="rounded">
@@ -315,19 +332,8 @@
 						</div>
 					</div>
 				</div>
-				<div id="cont-quick-help" class="container">
-					<div class="row">
-						<div class="col-12 container text-right">
-							<i id="close-quick-help" class="fas fa-times-circle link-nostyle"></i>
-						</div>
-					</div>
-					<div class="row">
-						<div id="cont-quick-help-content" class="col-12 container">
-							<?php require_once($_SERVER['DOCUMENT_ROOT'].'/doc/html/keyboard_shortcut_cheatsheet.html') ?>
-							<?php require_once($_SERVER['DOCUMENT_ROOT'].'/doc/html/markup.html') ?>
-						</div>
-					</div>
-				</div>
+				<?php require_once($_SERVER['DOCUMENT_ROOT'].'/control/editor/popups/quick_help.php'); ?>
+				<?php require_once($_SERVER['DOCUMENT_ROOT'].'/control/editor/popups/asset_uploader.php'); ?>
 			</div>
 		</main>
 		<?php

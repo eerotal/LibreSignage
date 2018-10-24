@@ -2,10 +2,12 @@
 /*
 *  ====>
 *
-*  *Get a user's data based on a username. This endpoint
-*  doesn't return any secret information like passwords.*
+*  Get a user's data based on a username. This endpoint
+*  doesn't return any secret information like passwords.
 *
-*  GET parameters
+*  **Request:** GET
+*
+*  Parameters
 *    * user = The username to query.
 *
 *  Return value
@@ -23,8 +25,8 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $USER_GET = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
+	APIEndpoint::FORMAT_URL => array(
 		'user' => API_P_STR
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,

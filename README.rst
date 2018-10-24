@@ -27,6 +27,7 @@ Features
 * Configurable slide duration, transition animations
   and other settings.
 * Special markup syntax for easily formatting slides.
+* Image uploading and embedding support for slides.
 * Possibility to schedule slides for a specific time-frame.
 * Possibility to give slide modification permissions to
   other users to collaborate with them on creating a slide.
@@ -85,9 +86,9 @@ Doing a basic install of LibreSignage is quite simple. The required steps
 are listed below.
 
 1. Install software needed for building LibreSignage. You will need the
-   following packages: ``git, apache2, php7.0, pandoc ruby-sass, npm``.
+   following packages: ``git, apache2, php7.2, pandoc ruby-sass, npm``.
    On Debian Stretch all other packages except *npm* can installed by
-   running ``sudo apt install git apache2 php7.0 pandoc ruby-sass``.
+   running ``sudo apt install git apache2 php7.2 pandoc ruby-sass``.
    Currently *npm* is only available in the Debian Sid repos and even
    there the package is so old it doesn't work correctly. You can,
    however, install npm manually. See `How to install NPM`_ for more info.

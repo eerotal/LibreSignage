@@ -7,6 +7,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slidelock.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slideasset.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/uid.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
@@ -53,7 +54,8 @@ class Slide extends Exportable{
 		'animation',
 		'queue_name',
 		'collaborators',
-		'lock'
+		'lock',
+		'assets'
 	];
 
 	static $PRIVATE = [
@@ -70,12 +72,14 @@ class Slide extends Exportable{
 		'animation',
 		'queue_name',
 		'collaborators',
-		'lock'
+		'lock',
+		'assets'
 	];
 
 	// Slide file paths.
 	private $conf_path = NULL;
 	private $dir_path = NULL;
+	private $asset_path = NULL;
 
 	// Slide data variables.
 	private $id = NULL;
@@ -92,6 +96,8 @@ class Slide extends Exportable{
 	private $queue_name = NULL;
 	private $collaborators = NULL;
 	private $lock = NULL;
+	private $assets = NULL;
+	private $ready = FALSE;
 
 	public function __exportable_set(string $name, $value) {
 		$this->{$name} = $value;
@@ -101,27 +107,14 @@ class Slide extends Exportable{
 		return $this->{$name};
 	}
 
-	private function _mk_paths(string $id) {
+	private function mk_paths(string $id) {
 		/*
 		*  Create the file path strings needed for
 		*  data storage.
 		*/
 		$this->dir_path = LIBRESIGNAGE_ROOT.SLIDES_DIR.'/'.$id;
 		$this->conf_path = $this->dir_path.'/conf.json';
-	}
-
-	private function _paths_exist() {
-		/*
-		*  Check that all the required files and
-		*  directories exist.
-		*/
-		if (
-			!is_dir($this->dir_path)
-			|| !is_file($this->conf_path)
-		) {
-			return FALSE;
-		}
-		return TRUE;
+		$this->asset_path = $this->dir_path.'/assets';
 	}
 
 	function load(string $id) {
@@ -133,8 +126,8 @@ class Slide extends Exportable{
 		$conf = NULL;
 		$mu = NULL;
 
-		$this->_mk_paths($id);
-		if (!$this->_paths_exist()) {
+		$this->mk_paths($id);
+		if (!is_file($this->conf_path)) {
 			throw new ArgException("Slide $id doesn't exist.");
 		}
 
@@ -151,6 +144,8 @@ class Slide extends Exportable{
 
 		$this->import($conf, TRUE);
 		$this->check_sched_enabled();
+
+		$this->set_ready(TRUE);
 	}
 
 	function dup() {
@@ -175,7 +170,7 @@ class Slide extends Exportable{
 		*  Generate a new slide ID.
 		*/
 		$this->id = get_uid();
-		$this->_mk_paths($this->id);
+		$this->mk_paths($this->id);
 	}
 
 	function set_id(string $id) {
@@ -183,14 +178,14 @@ class Slide extends Exportable{
 		*  Set the slide id. Note that the requested slide
 		*  ID must already exist. Otherwise an error is
 		*  thrown. This basically means that new slide IDs
-		*  can't be set manually and they are always randomly
-		*  generated.
+		*  can't be set manually and they are always generated
+		*  by the server.
 		*/
 		if (!in_array($id, slides_id_list())) {
 			throw new ArgException("Slide $id doesn't exist.");
 		}
 		$this->id = $id;
-		$this->_mk_paths($id);
+		$this->mk_paths($id);
 	}
 
 	function set_markup(string $markup) {
@@ -385,6 +380,49 @@ class Slide extends Exportable{
 	function get_collaborators() { return $this->collaborators; }
 	function get_lock() { return $this->lock; }
 
+	function store_uploaded_asset(array $file) {
+		/*
+		*  Store an uploaded asset in the 'assets'
+		*  directory of this slide. This function
+		*  also generates a thumbnail for the asset.
+		*/
+		$this->readychk();
+		if (!is_dir($this->asset_path)) { mkdir($this->asset_path); }
+		$asset = new SlideAsset();
+		$asset->new($file, $this->asset_path);
+		$this->assets[] = $asset;
+	}
+
+	function remove_uploaded_asset(string $name) {
+		/*
+		*  Remove an uploaded asset from the 'assets'
+		*  directory of this slide.
+		*/
+		$this->readychk();
+		for ($i = 0; $i < count($this->assets); $i++) {
+			if ($this->assets[$i]->get_filename() === $name) {
+				$this->assets[$i]->remove();
+				unset($this->assets[$i]);
+				$this->assets = array_values($this->assets);
+				return;
+			}
+		}
+		throw new ArgException("Asset '$name' doesn't exist.");
+	}
+
+	function get_uploaded_asset(string $name) {
+		foreach ($this->assets as $a) {
+			if ($a->get_filename() === $name) {
+				return $a;
+			}
+		}
+		return NULL;
+	}
+
+	function has_uploaded_asset(string $name) {
+		return $this->get_uploaded_asset($name) !== NULL;
+	}
+
 	function get_queue() {
 		$queue = new Queue($this->queue_name);
 		$queue->load();
@@ -424,16 +462,51 @@ class Slide extends Exportable{
 		);
 	}
 
+	function set_ready(bool $value) {
+		if (
+			$value === TRUE
+			&& (
+				empty($this->dir_path)
+				|| empty($this->conf_path)
+				|| empty($this->asset_path)
+			)
+		) {
+			throw new ArgException(
+				"Won't set Slide ready when paths are ".
+				"not set. That would be VERY dangerous."
+			);
+		}
+		$this->ready = $value;
+	}
+
+	function get_ready() { return $this->ready; }
+
+	function readychk() {
+		/*
+		*  Throw an error if the Slide is not ready. This
+		*  should be used at least in functions that access
+		*  files to prevent serious bugs due to the slide path
+		*  variables being empty.
+		*/
+		if ($this->ready !== TRUE) {
+			throw new IntException('Slide not ready.');
+		}
+	}
+
 	function write() {
 		/*
 		*  Write the currently stored data into the correct
-		*  storage files. This function  overwrites files if
+		*  storage files. This function overwrites files if
 		*  they already exist.
 		*/
+		$this->readychk();
+		if (!is_dir($this->dir_path)) { mkdir($this->dir_path); }
+		if (!is_dir($this->asset_path)) { mkdir($this->asset_path); }
+
 		$cstr = json_encode($this->export(TRUE, TRUE));
 		if (
 			$cstr === FALSE &&
-			json_last_error() != JSON_ERROR_NONE
+			json_last_error() !== JSON_ERROR_NONE
 		) { throw new IntException("Slide config encoding failed."); }
 		file_lock_and_put($this->conf_path, $cstr);
 	}
@@ -442,6 +515,8 @@ class Slide extends Exportable{
 		/*
 		*  Remove this slide.
 		*/
+
+		$this->readychk();
 
 		// Remove slide from its queue.
 		$queue = $this->get_queue();

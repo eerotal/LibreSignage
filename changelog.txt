@@ -40,3 +40,5 @@ v0.1.0
                a new class called Session for handling & storing session
                data.
   - [internal] Implement a simple assertion system in JavaScript.
+  - [internal] Implement file uploading via the API system.
+  - [feature]  Implement media storage & uploading in the backend and editor.

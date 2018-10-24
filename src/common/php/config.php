@@ -55,21 +55,39 @@
 	const AUTH_TOKEN_LEN			= 15;
 	const SLIDE_LOCK_MAX_AGE		= 600;
 
+	const ENABLE_FFMPEG_THUMBS      = TRUE;
+	const ENABLE_GD_THUMBS          = TRUE;
+
+	const FFMPEG_PATH               = '/usr/bin/ffmpeg';
+	const FFPROBE_PATH              = '/usr/bin/ffprobe';
+
+	const THUMB_MAXW                = 320;
+	const THUMB_MAXH                = 180;
+
+	const ASSET_FILENAME_MAXLEN     = 64;
+
 	// LibreSignage instance limits.
 	const LS_LIM = array(
-		"SLIDE_MIN_TIME" 		=> 1*1000,
-		"SLIDE_MAX_TIME" 		=> 20*1000,
-		"SLIDE_MAX_INDEX"		=> 65536,
-		"SLIDE_NAME_MAX_LEN"	=> 32,
-		"SLIDE_MARKUP_MAX_LEN"	=> 2048,
-		"SLIDE_MAX_COLLAB"		=> 64,
-		"QUEUE_NAME_MAX_LEN"	=> 32,
+		"SLIDE_MIN_TIME"           => 1*1000,
+		"SLIDE_MAX_TIME"           => 20*1000,
+		"SLIDE_MAX_INDEX"          => 65536,
+		"SLIDE_NAME_MAX_LEN"       => 32,
+		"SLIDE_MARKUP_MAX_LEN"     => 2048,
+		"SLIDE_MAX_COLLAB"         => 64,
+		"SLIDE_ASSET_NAME_MAX_LEN" => 64,
+		"SLIDE_ASSET_VALID_MIMES"  => [
+			'image/jpeg',
+			'image/gif',
+			'image/png'
+		],
 
-		"MAX_USERS" 			=> 64,
-		"MAX_USER_GROUPS" 		=> 32,
-		"USERNAME_MAX_LEN"		=> 64,
-		"PASSWORD_MAX_LEN"		=> 256,
-		"API_RATE_T"			=> 60
+		"QUEUE_NAME_MAX_LEN"       => 32,
+
+		"MAX_USERS"                => 64,
+		"MAX_USER_GROUPS"          => 32,
+		"USERNAME_MAX_LEN"         => 64,
+		"PASSWORD_MAX_LEN"         => 256,
+		"API_RATE_T"               => 60
 	);
 
 	function gtlim(string $lim) {

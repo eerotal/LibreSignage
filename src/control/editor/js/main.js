@@ -15,12 +15,14 @@ var uic = require('ls-uicontrol');
 var slide = require('ls-slide');
 var queue = require('ls-queue');
 var sc = require('ls-shortcut');
+var popup = require('ls-popup');
 
 var ace_range = ace.require('ace/range');
 
 var timeline = require('./timeline.js');
 var preview = require('./preview.js');
 var diags = require('./dialogs.js');
+var asset_uploader = require('./asset_uploader.js');
 
 // Some sane default values for new slides.
 const NEW_SLIDE_DEFAULTS = {
@@ -37,7 +39,8 @@ const NEW_SLIDE_DEFAULTS = {
 	'animation': 0,
 	'queue_name': '',
 	'collaborators': [],
-	'lock': null
+	'lock': null,
+	'assets': []
 };
 
 // Editor status constants used by editor_status[_check]().
@@ -48,59 +51,65 @@ const ESTATUS = {
 };
 
 // DOM element jQuery selectors.
-const QUEUE_SELECT				= $("#queue-select");
-const QUEUE_CREATE				= $("#queue-create");
-const QUEUE_VIEW				= $("#queue-view");
-const QUEUE_REMOVE				= $("#queue-remove");
+var QUEUE_SELECT          = $("#queue-select");
+var QUEUE_CREATE          = $("#queue-create");
+var QUEUE_VIEW            = $("#queue-view");
+var QUEUE_REMOVE          = $("#queue-remove");
 
-const SLIDE_NEW					= $("#btn-slide-new")
-const SLIDE_PREVIEW				= $("#btn-slide-preview");
-const SLIDE_SAVE				= $("#btn-slide-save");
-const SLIDE_REMOVE				= $("#btn-slide-remove");
-const SLIDE_CH_QUEUE			= $("#btn-slide-ch-queue");
-const SLIDE_DUP					= $("#btn-slide-dup");
-const SLIDE_CANT_EDIT			= $("#slide-cant-edit");
-const SLIDE_READONLY			= $("#slide-readonly");
-const SLIDE_EDIT_AS_COLLAB		= $("#slide-edit-as-collab");
-const SLIDE_NAME				= $("#slide-name");
-const SLIDE_NAME_GRP			= $("#slide-name-group");
-const SLIDE_OWNER				= $("#slide-owner");
-const SLIDE_TIME				= $("#slide-time");
-const SLIDE_TIME_GRP			= $("#slide-time-group");
-const SLIDE_INDEX				= $("#slide-index");
-const SLIDE_INDEX_GRP			= $("#slide-index-group");
-const SLIDE_EN					= $("#slide-enabled");
-const SLIDE_SCHED				= $("#slide-sched");
-const SLIDE_SCHED_DATE_S		= $("#slide-sched-date-s");
-const SLIDE_SCHED_TIME_S		= $("#slide-sched-time-s");
-const SLIDE_SCHED_DATE_E		= $("#slide-sched-date-e");
-const SLIDE_SCHED_TIME_E		= $("#slide-sched-time-e");
-const SLIDE_ANIMATION			= $("#slide-animation")
-const PREVIEW_R_16x9			= $("#btn-preview-ratio-16x9");
-const PREVIEW_R_4x3				= $("#btn-preview-ratio-4x3");
-const MARKUP_ERR_DISPLAY		= $("#markup-err-display");
-const LINK_QUICK_HELP			= $("#link-quick-help");
-const CONT_QUICK_HELP			= $("#cont-quick-help");
-const CLOSE_QUICK_HELP			= $("#close-quick-help");
-var SLIDE_COLLAB				= null;
-var SLIDE_INPUT					= null;
-var LIVE_PREVIEW				= null;
+var SLIDE_NEW             = $("#btn-slide-new")
+var SLIDE_PREVIEW         = $("#btn-slide-preview");
+var SLIDE_SAVE            = $("#btn-slide-save");
+var SLIDE_REMOVE          = $("#btn-slide-remove");
+var SLIDE_CH_QUEUE        = $("#btn-slide-ch-queue");
+var SLIDE_DUP             = $("#btn-slide-dup");
+var SLIDE_CANT_EDIT       = $("#slide-cant-edit");
+var SLIDE_READONLY        = $("#slide-readonly");
+var SLIDE_EDIT_AS_COLLAB  = $("#slide-edit-as-collab");
+var SLIDE_NAME            = $("#slide-name");
+var SLIDE_NAME_GRP        = $("#slide-name-group");
+var SLIDE_OWNER           = $("#slide-owner");
+var SLIDE_TIME            = $("#slide-time");
+var SLIDE_TIME_GRP        = $("#slide-time-group");
+var SLIDE_INDEX           = $("#slide-index");
+var SLIDE_INDEX_GRP       = $("#slide-index-group");
+var SLIDE_EN              = $("#slide-enabled");
+var SLIDE_SCHED           = $("#slide-sched");
+var SLIDE_SCHED_DATE_S    = $("#slide-sched-date-s");
+var SLIDE_SCHED_TIME_S    = $("#slide-sched-time-s");
+var SLIDE_SCHED_DATE_E    = $("#slide-sched-date-e");
+var SLIDE_SCHED_TIME_E    = $("#slide-sched-time-e");
+var SLIDE_ANIMATION       = $("#slide-animation")
+var PREVIEW_R_16x9        = $("#btn-preview-ratio-16x9");
+var PREVIEW_R_4x3         = $("#btn-preview-ratio-4x3");
+var MARKUP_ERR_DISPLAY    = $("#markup-err-display");
+var LINK_QUICK_HELP       = $("#link-quick-help");
+var CONT_QUICK_HELP       = $("#cont-quick-help");
+var LINK_ADD_MEDIA        = $("#link-add-media");
+var CLOSE_QUICK_HELP      = $("#close-quick-help");
+var SLIDE_COLLAB          = null;
+var SLIDE_INPUT           = null;
+var LIVE_PREVIEW          = null;
 
-var API = null; // API interface object.
-var TL = null;  // Timeline object.
+var QUICK_HELP = new popup.Popup($('#quick-help').get(0));
 
-var qsel_queues = null; // Queue selector queues list.
+var API = null;            // API interface object.
+var TL = null;             // Timeline object.
+var ASSET_UPLOADER = null; // Asset uploader object.
 
-// Input validator selectors.
+var qsel_queues = null;    // Queue selector queues list.
+
+// Input validator objects selectors.
 var name_sel = null;
 var index_sel = null;
-var sel_slide = null;
+var val_trigger = null;
 
-var syn_err_id = null;          // Syntax error marker id.
-var flag_slide_loading = false; // Slide loading flag.
-var flag_editor_ready = false;  // Editor ready flag.
+var state = {
+	slide_loading: false,
+	editor_ready: false
+};
 
-var defer_editor_ready = () => { return !flag_editor_ready; };
+var syn_err_id = null;     // Syntax error marker id.
+var sel_slide = null;      // Selected slide.
 
 // Editor UI definitions.
 const UI_DEFS = new uic.UIController({
@@ -156,8 +165,10 @@ const UI_DEFS = new uic.UIController({
 		elem = SLIDE_SAVE,
 		perm = (d) => {
 			return (
-				(!d['n'] && !d['s'])
-				|| (d['l'] && (d['o'] || d['c']))
+				d['v'] && (
+					(!d['n'] && !d['s'])
+					|| (d['l'] && (d['o'] || d['c']))
+				)
 			);
 		},
 		enabler = null,
@@ -345,8 +356,10 @@ const UI_DEFS = new uic.UIController({
 		elem = SLIDE_SCHED,
 		perm = (d) => { return !d['s'] && d['l'] && (d['o'] || d['c']); },
 		enabler = null,
-		attach = null,
-		defer = null,
+		attach = {
+			'change': () => { update_controls(); }
+		},
+		defer = defer_editor_ready,
 		mod = (elem, s) => {
 			return elem.prop('checked') != s.get('sched');
 		},
@@ -535,42 +548,51 @@ const UI_DEFS = new uic.UIController({
 		perm = () => { return true; },
 		enabler = null,
 		attach = {
-			'click': () => {
-				QUICK_HELP_UI_DEFS.get('CONT_QUICK_HELP').enabled(true);
+			'click': (e) => {
+				e.preventDefault(); // Don't scroll up.
+				POPUPS.get('QUICK_HELP').enabled(true);
+			}
+		},
+		defer = defer_editor_ready
+	),
+	'LINK_ADD_MEDIA': new uic.UIButton(
+		elem = () => { return LINK_ADD_MEDIA; },
+		perm = (d) => {
+			return !d['n'] && (d['o'] || d['c']);
+		},
+		enabler = (elem, s) => {
+			if (s) {
+				elem.removeClass('disabled');
+			} else {
+				elem.addClass('disabled');
+			}
+		},
+		attach = {
+			'click': (e) => {
+				e.preventDefault(); // Don't scroll up.
+				if (!$(e.target).hasClass('disabled')) {
+					if (sel_slide) {
+						ASSET_UPLOADER.show(sel_slide.get('id'));
+					} else {
+						ASSET_UPLOADER.show(null);
+					}
+				}
 			}
 		},
 		defer = defer_editor_ready
 	)
 });
 
-// Quick help box UI definitions.
-const QUICK_HELP_UI_DEFS = new uic.UIController({
-	'CONT_QUICK_HELP': new uic.UIStatic(
-		elem = () => { return CONT_QUICK_HELP; },
+// Popup UI definitions.
+const POPUPS = new uic.UIController({
+	'QUICK_HELP': new uic.UIStatic(
+		elem = () => { return QUICK_HELP; },
 		perm = () => { return false; },
-		enabler = (elem, s) => {
-			if (s) {
-				elem.css('display', 'block');
-			} else {
-				elem.css('display', 'none');
-			}
-		},
+		enabler = (elem, s) => { elem.visible(s); },
 		attach = null,
 		defer = null
-	),
-	'CLOSE_QUICK_HELP': new uic.UIButton(
-		elem = () => { return CLOSE_QUICK_HELP; },
-		perm = () => { return true; },
-		enabler = null,
-		attach = {
-			'click': () => {
-				console.log('Clicked');
-				QUICK_HELP_UI_DEFS.get('CONT_QUICK_HELP').enabled(false);
-			}
-		},
-		defer = defer_editor_ready
 	)
-});
+})
 
 // Queue selector UI definitions.
 const QSEL_UI_DEFS = new uic.UIController({
@@ -578,8 +600,16 @@ const QSEL_UI_DEFS = new uic.UIController({
 		elem = QUEUE_SELECT,
 		perm = () => { return true; },
 		enabler = null,
-		attach = null,
-		defer = null,
+		attach = {
+			'change': () => {
+				queue_select(
+					QSEL_UI_DEFS.get('QUEUE_SELECT').val(),
+					true,
+					null
+				);
+			}
+		},
+		defer = defer_editor_ready,
 		mod = null,
 		getter = (elem) => { return elem.val(); },
 		setter = (elem, value) => { elem.val(value); },
@@ -669,6 +699,10 @@ var EDITOR_SHORTCUTS = new sc.ShortcutController([
 	)
 ]);
 
+function defer_editor_ready() {
+	return !state.editor_ready;
+};
+
 function update_controls() {
 	/*
 	*  Enable editor controls using the UIController system.
@@ -680,6 +714,7 @@ function update_controls() {
 	*  c = Is the current user a collaborator of this slide?
 	*  l = Is the current slide locked by the current user?
 	*  s = Is the current slide saved?
+	*  v = Is the current editor data valid?
 	*/
 
 	let user = API.CONFIG.user;
@@ -707,7 +742,8 @@ function update_controls() {
 			's': (
 				sel_slide !== null
 				&& sel_slide.has('id')
-			)
+			),
+			'v': val_trigger.is_valid()
 		}
 	);
 	if (sel_slide !== null) {
@@ -775,14 +811,14 @@ function slide_show(s, no_popup) {
 		let error = () => {
 			console.error('LibreSignage: API error.');
 			slide_hide();
-			flag_slide_loading = false;
+			state.slide_loading = false;
 		}
 		let success = () => {
 			set_inputs(sel_slide);
 			update_controls();
 			LIVE_PREVIEW.update();
 			TL.select(sel_slide.get('id'));
-			flag_slide_loading = false;
+			state.slide_loading = false;
 		}
 
 		if (sel_slide !== null && s == sel_slide.get('id')) {
@@ -806,7 +842,7 @@ function slide_show(s, no_popup) {
 			}
 		} else {
 			console.log(`LibreSignage: Show slide '${s}'.`);
-			flag_slide_loading = true;
+			state.slide_loading = true;
 			if (sel_slide !== null && sel_slide.is_locked_from_here()) {
 				sel_slide.lock_release(null);
 			}
@@ -836,7 +872,7 @@ function slide_show(s, no_popup) {
 		}
 	}
 
-	if (flag_slide_loading) { return; }
+	if (state.slide_loading) { return; }
 	if (!no_popup && editor_status_check(['UNSAVED'])) {
 		diags.DIALOG_SLIDE_UNSAVED(
 			(status, val) => { if (status) { cb(); } }
@@ -871,7 +907,6 @@ function slide_rm() {
 			if (!status) { return; }
 			sel_slide.remove(null, stat => {
 				if (API.handle_disp_error(stat)) { return; }
-				//$(`#slide-btn-${sel_slide.get('id')}`).remove();
 				console.log(
 					`LibreSignage: Deleted slide ` +
 					`'${sel_slide.get('id')}'.`
@@ -1199,10 +1234,30 @@ function update_qsel_ctrls(ready) {
 	if (ready) { ready(); }
 }
 
-function inputs_setup(ready) {
+function ui_setup(ready) {
 	/*
-	*  Setup all editor inputs and input validators etc.
+	*  Setup the editor UI.
 	*/
+
+	LIVE_PREVIEW = new preview.Preview(
+		'#slide-live-preview',
+		'#slide-input',
+		() => { return UI_DEFS.get('SLIDE_INPUT').get(); },
+		(e) => {
+			if (e) {
+				syn_err_id = syn_err_highlight(e.line(), e.line());
+				MARKUP_ERR_DISPLAY.text('>> ' + e.toString(1));
+			} else {
+				syn_err_id = syn_err_clear(syn_err_id);
+				MARKUP_ERR_DISPLAY.text('');
+			}
+		}
+	);
+	TL = new timeline.Timeline(API, slide_show);
+	ASSET_UPLOADER = new asset_uploader.AssetUploader(
+		'asset-uploader',
+		API
+	);
 
 	// Setup validators for the name and index inputs.
 	name_sel = new val.ValidatorSelector(
@@ -1249,13 +1304,8 @@ function inputs_setup(ready) {
 
 	val_trigger = new val.ValidatorTrigger(
 		[name_sel, index_sel],
-		(valid) => {
-			SLIDE_SAVE.prop('disabled', !valid);
-		}
+		(valid) => { update_controls(); }
 	);
-
-	// Update enabled controls when scheduling is enabled.
-	SLIDE_SCHED.change(update_controls);
 
 	// Setup the ACE editor with the Dawn theme + plaintext mode.
 	SLIDE_INPUT = ace.edit('slide-input');
@@ -1282,12 +1332,11 @@ function inputs_setup(ready) {
 				'maxopts': API.SERVER_LIMITS.SLIDE_MAX_COLLAB
 			}
 		);
-		if (ready) { ready(); }
-	});
 
-	// Setup the queue selector event listener.
-	QUEUE_SELECT.change(() => {
-		queue_select(QUEUE_SELECT.val(), true, null);
+		// Finish by triggering the main validator trigger.
+		val_trigger.trigger();
+
+		if (ready) { ready(); }
 	});
 }
 
@@ -1308,29 +1357,12 @@ function setup() {
 	});
 
 	// Setup inputs and other UI elements.
-	inputs_setup(() => {
-		update_controls();
-		TL = new timeline.Timeline(API, slide_show);
+	ui_setup(() => {
 		update_qsel(true);
-		flag_editor_ready = true;
+		update_controls();
+		state.editor_ready = true;
 		console.log("LibreSignage: Editor ready.");
 	});
-
-	// Setup the live preview.
-	LIVE_PREVIEW = new preview.Preview(
-		'#slide-live-preview',
-		'#slide-input',
-		() => { return UI_DEFS.get('SLIDE_INPUT').get(); },
-		(e) => {
-			if (e) {
-				syn_err_id = syn_err_highlight(e.line(), e.line());
-				MARKUP_ERR_DISPLAY.text('>> ' + e.toString(1));
-			} else {
-				syn_err_id = syn_err_clear(syn_err_id);
-				MARKUP_ERR_DISPLAY.text('');
-			}
-		}
-	);
 }
 
 $(document).ready(() => {

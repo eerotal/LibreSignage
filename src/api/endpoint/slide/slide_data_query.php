@@ -2,10 +2,12 @@
 /*
 *  ====>
 *
-*  *Query specific data keys from all of the currently
-*  existing slides.*
+*  Query specific data keys from all of the currently
+*  existing slides.
 *
-*  GET parameters
+*  **Request:** GET
+*
+*  Parameters
 *    * Data can be requested by assigning 1 to the
 *      requested key. The following keys are accepted:
 *      id, markup, name, index, time, owner, enabled,
@@ -24,8 +26,8 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_DATA_QUERY = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT		=> array(
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
+	APIEndpoint::FORMAT_URL		=> array(
 		'id' => API_P_STR|API_P_OPT,
 		'markup' => API_P_STR|API_P_OPT,
 		'name' => API_P_STR|API_P_OPT,
@@ -38,7 +40,8 @@ $SLIDE_DATA_QUERY = new APIEndpoint(array(
 		'sched_t_e' => API_P_STR|API_P_OPT,
 		'animation' => API_P_STR|API_P_OPT,
 		'collaborators' => API_P_STR|API_P_OPT,
-		'lock' => API_P_STR|API_P_OPT
+		'lock' => API_P_STR|API_P_OPT,
+		'assets' => API_P_STR|API_P_OPT
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE,

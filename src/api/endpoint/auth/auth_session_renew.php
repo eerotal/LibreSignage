@@ -2,8 +2,10 @@
 /*
 *  ====>
 *
-*  *Request a session renewal. The previous authentication token
-*  is automatically expired when this endpoint is called.*
+*  Request a session renewal. The previous authentication token
+*  is automatically expired when this endpoint is called.
+*
+*  **Request:** POST, application/json
 *
 *  Return value
 *    * session = An associative array with the latest session data.
@@ -16,8 +18,8 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $AUTH_SESSION_RENEW = new APIEndpoint([
 	APIEndpoint::METHOD         => API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE  => API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT         => [],
+	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
+	APIEndpoint::FORMAT_BODY    => [],
 	APIEndpoint::REQ_QUOTA      => TRUE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ]);

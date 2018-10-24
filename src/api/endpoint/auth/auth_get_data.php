@@ -4,6 +4,8 @@
 *
 *  Get the current authentication data.
 *
+*  **Request:** GET
+*
 *  Return value
 *    * user = Current use data.
 *    * session = Current session data.
@@ -16,8 +18,8 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $AUTH_GET_DATA = new APIEndpoint(array(
 	APIEndpoint::METHOD         => API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE  => API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT         => array(),
+	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
+	APIEndpoint::FORMAT_URL     => array(),
 	APIEndpoint::REQ_QUOTA      => TRUE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ));

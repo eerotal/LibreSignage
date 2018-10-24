@@ -11,7 +11,7 @@ function logout_redirect() {
 }
 
 function logout() {
-	if (API.authenticated()) {
+	if (API.CONFIG.session) {
 		API.logout((resp) => {
 			if (API.handle_disp_error(resp.error)) {
 				return;
@@ -20,10 +20,6 @@ function logout() {
 			}
 		});
 	} else {
-		console.log(
-			"Logout: Not logged in, won't " +
-			"attempt to logout."
-		);
 		logout_redirect();
 	}
 }

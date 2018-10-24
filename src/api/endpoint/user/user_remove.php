@@ -2,9 +2,11 @@
 /*
 *  ====>
 *
-*  *Remove a user based on a username.*
+*  Remove a user based on a username.
 *
-*  POST parameters
+*  **Request:** POST, application/json
+*
+*  Parameters
 *    * user    = The user to remove.
 *
 *  Return value
@@ -17,8 +19,8 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $USER_REMOVE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
+	APIEndpoint::FORMAT_BODY => array(
 		'user' => API_P_STR,
 	),
 	APIEndpoint::REQ_QUOTA		=> TRUE,

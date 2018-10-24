@@ -2,7 +2,9 @@
 /*
 *  ====>
 *
-*  *Login using the authentication system.*
+*  Login using the authentication system.
+*
+*  **Request:** POST, application/json
 *
 *  POST parameters
 *    * username    = Username
@@ -21,16 +23,16 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $AUTH_LOGIN = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
+	APIEndpoint::METHOD         => API_METHOD['POST'],
+	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
+	APIEndpoint::FORMAT_BODY => array(
 		'username'  => API_P_STR,
 		'password'  => API_P_STR,
 		'who'       => API_P_STR,
 		'permanent' => API_P_BOOL|API_P_OPT
 	),
-	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_AUTH		=> FALSE
+	APIEndpoint::REQ_QUOTA      => FALSE,
+	APIEndpoint::REQ_AUTH       => FALSE
 ));
 api_endpoint_init($AUTH_LOGIN);
 

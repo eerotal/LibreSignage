@@ -2,7 +2,9 @@
 /*
 *  ====>
 *
-*  *Get a list of the existing usernames.*
+*  Get a list of the existing usernames.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * users = An array of usernames.
@@ -15,8 +17,8 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $USERS_GET_ALL = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT		=> array(),
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
+	APIEndpoint::FORMAT_URL		=> array(),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));

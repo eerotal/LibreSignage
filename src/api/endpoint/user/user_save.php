@@ -2,7 +2,7 @@
 /*
 *  ====>
 *
-*  *Save a user's data.*
+*  Save a user's data.
 *
 *  Access is granted in any of the following cases.
 *
@@ -13,7 +13,9 @@
 *       they are not trying to set user groups. This prevents
 *       privilege escalation.
 *
-*  POST parameters
+*  **Request:** POST, application/json
+*
+*  Parameters
 *    * user    = The user to modify.
 *    * pass    = New password (Optionally unset or NULL)
 *    * groups  = New groups (Optionally unset or NULL)
@@ -36,8 +38,8 @@ define('USER_NAME_COMP_REGEX', GROUP_NAME_COMP_REGEX);
 
 $USER_SAVE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
+	APIEndpoint::FORMAT_BODY => array(
 		'user' => API_P_STR,
 		'pass' => API_P_STR|API_P_OPT|API_P_NULL,
 		'groups' => API_P_ARR_STR|API_P_OPT|API_P_NULL

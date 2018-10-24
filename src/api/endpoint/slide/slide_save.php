@@ -2,9 +2,9 @@
 /*
 *  ====>
 *
-*  *Save a slide. Whether a user is allowed to access this
+*   Save a slide. Whether a user is allowed to access this
 *   API endpoint depends on the parameters passed to the
-*   endpoint.*
+*   endpoint.
 *
 *  Permissions
 *   * id != null => Allow if the caller is in the admin
@@ -22,7 +22,20 @@
 *  If the slide is not locked or is locked by someone else, the
 *  API_E_LOCK error is returned in the 'error' value.
 *
-*  POST JSON parameters
+*  Note!
+*
+*  This endpoint accepts a few unused parameters to simplify
+*  implementing the client interface for this endpoint.
+*  Specifically, clients *must* be able to send all data
+*  received from slide_get.php back to this endpoint, even if
+*  it's not actually used. This makes it possible to implement
+*  a simple Object Oriented interface that just sends all data
+*  fields in the client side Slide object to this endpoint
+*  without filtering what can be sent.
+*
+*  **Request:** POST, application/json
+*
+*  Parameters
 *    * id            = The ID of the slide to modify or either
 *      undefined or null for new slide.
 *    * name          = The name of the slide.
@@ -36,8 +49,9 @@
 *    * animation     = The slide animation identifier.
 *    * queue_name    = The name of the slide queue of this slide.
 *    * collaborators = A list of slide collaborators.
-*    * owner         = Unused
-*    * lock          = Unused
+*    * owner         = Unused (see above)
+*    * lock          = Unused (see above)
+*    * assets        = Unused (see above)
 *
 *  Return value
 *    This endpoint returns all the parameters above as well as
@@ -54,8 +68,8 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_SAVE = new APIEndpoint([
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => [
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
+	APIEndpoint::FORMAT_BODY => [
 		'id' => API_P_STR|API_P_NULL,
 		'name' => API_P_STR,
 		'index' => API_P_INT,
@@ -69,7 +83,8 @@ $SLIDE_SAVE = new APIEndpoint([
 		'animation' => API_P_INT,
 		'queue_name' => API_P_STR,
 		'collaborators' => API_P_ARR_STR,
-		'lock' => API_P_UNUSED
+		'lock' => API_P_UNUSED,
+		'assets' => API_P_UNUSED
 	],
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
@@ -180,6 +195,7 @@ $slide->set_sched($SLIDE_SAVE->get('sched'));
 $slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
 $slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
 $slide->set_animation($SLIDE_SAVE->get('animation'));
+$slide->set_ready(TRUE);
 
 if ($OP === 'create') {
 	// Use quota.

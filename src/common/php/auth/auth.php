@@ -58,10 +58,12 @@ function auth_token_verify(string $tok) {
 
 // -- Web interface authentication functions. --
 
-function web_auth($user_wl = NULL,
-			$group_wl = NULL,
-			bool $redir = FALSE,
-			$token = NULL) {
+function web_auth(
+	$user_wl = NULL,
+	$group_wl = NULL,
+	bool $redir = FALSE,
+	$token = NULL
+) {
 	$d = NULL;
 	if (empty($token)) {
 		// Use authentication token from cookie.
