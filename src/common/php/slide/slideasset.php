@@ -9,12 +9,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/thumbnail.php');
 
-const ASSET_MIMES = [
-	'image/png',
-	'image/jpeg',
-	'image/gif'
-];
-
 const ASSET_FILENAME_REGEX = '/^[A-Za-z0-9_.-]*$/';
 
 class SlideAsset extends Exportable {
@@ -70,7 +64,7 @@ class SlideAsset extends Exportable {
 		}
 
 		$mime = mime_content_type($file['tmp_name']);
-		if (!in_array($mime, ASSET_MIMES, TRUE)) {
+		if (!in_array($mime, gtlim('SLIDE_ASSET_VALID_MIMES'), TRUE)) {
 			throw new FileTypeException("Invalid asset MIME type.");
 		}
 

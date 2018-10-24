@@ -18,7 +18,8 @@
 *  This API endpoint only accepts asset filenames that have a length
 *  less than or equal to the server limit SLIDE_ASSET_NAME_MAX_LEN.
 *  The asset names may only contain the characters A-Z, a-z, 0-9,
-*  ., _ and -. These limits result from SlideAsset::new().
+*  ., _ and -. The accepted filetypes are defined in the server limit
+*  SLIDE_ASSET_VALID_MIMES.
 *
 *  .. _errors: http://php.net/manual/en/features.file-upload.errors.php
 *

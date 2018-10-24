@@ -54,12 +54,6 @@ const asset_thumb_template = (slide_id, name, index) => `
 </div>
 `;
 
-const VALID_MIMES = {
-	jpeg: 'image/jpeg',
-	png: 'image/png',
-	gif: 'image/gif'
-};
-const FILENAME_MAXLEN = 64;
 const FILENAME_REGEX = /^[A-Za-z0-9_.-]*$/;
 
 module.exports.AssetUploader = class AssetUploader {
@@ -79,6 +73,12 @@ module.exports.AssetUploader = class AssetUploader {
 			ready: false
 		}
 		this.slide = new slide.Slide(this.API);
+
+		this.VALID_MIMES = {};
+		for (let v of this.API.SERVER_LIMITS.SLIDE_ASSET_VALID_MIMES) {
+			this.VALID_MIMES[v.split('/')[1]] = v;
+		}
+		this.FILENAME_MAXLEN = this.API.SERVER_LIMITS.SLIDE_ASSET_NAME_MAX_LEN;
 
 		this.FILELIST_UI = null;
 		this.UI = new uic.UIController({
@@ -210,25 +210,25 @@ module.exports.AssetUploader = class AssetUploader {
 			$(`#${id}-filesel-cont`),
 			[new val.FileSelectorValidator(
 				{
-					mimes: Object.values(VALID_MIMES),
+					mimes: Object.values(this.VALID_MIMES),
 					name_len: null,
 					regex: null,
 					minfiles: null,
 					bl: null
 				},
 				`Invalid file type. The allowed types are: ` +
-				`${Object.keys(VALID_MIMES).join(', ')}.`
+				`${Object.keys(this.VALID_MIMES).join(', ')}.`
 			),
 			new val.FileSelectorValidator(
 				{
 					mimes: null,
-					name_len: FILENAME_MAXLEN,
+					name_len: this.FILENAME_MAXLEN,
 					regex: null,
 					minfiles: null,
 					bl: null
 				},
 				`Filename too long. The maximum length ` +
-				`is ${FILENAME_MAXLEN}`
+				`is ${this.FILENAME_MAXLEN} characters.`
 			),
 			new val.FileSelectorValidator(
 				{

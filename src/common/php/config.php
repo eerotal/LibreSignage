@@ -75,6 +75,12 @@
 		"SLIDE_MARKUP_MAX_LEN"     => 2048,
 		"SLIDE_MAX_COLLAB"         => 64,
 		"SLIDE_ASSET_NAME_MAX_LEN" => 64,
+		"SLIDE_ASSET_VALID_MIMES"  => [
+			'image/jpeg',
+			'image/gif',
+			'image/png'
+		],
+
 		"QUEUE_NAME_MAX_LEN"       => 32,
 
 		"MAX_USERS"                => 64,
