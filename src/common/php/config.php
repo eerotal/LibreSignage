@@ -63,6 +63,7 @@
 
 	const THUMB_MAXW                = 320;
 	const THUMB_MAXH                = 180;
+	const THUMB_EXT                 = '.png';
 
 	const ASSET_FILENAME_MAXLEN     = 64;
 
@@ -78,7 +79,10 @@
 		"SLIDE_ASSET_VALID_MIMES"  => [
 			'image/jpeg',
 			'image/gif',
-			'image/png'
+			'image/png',
+			'video/mp4',
+			'video/ogg',
+			'video/webm'
 		],
 
 		"QUEUE_NAME_MAX_LEN"       => 32,

@@ -83,7 +83,7 @@ class SlideAsset extends Exportable {
 		}
 
 		// Generate a thumbnail for the asset.
-		$this->thumbname = "{$this->uid}_thumb.{$ext}";
+		$this->thumbname = "{$this->uid}_thumb.".THUMB_EXT;
 		$this->thumbpath = "{$asset_path}/{$this->thumbname}";
 
 		if (!generate_thumbnail(

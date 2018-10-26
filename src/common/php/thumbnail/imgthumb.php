@@ -29,6 +29,7 @@ function put_img_object($img, string $dest, string $mime) {
 	switch($mime) {
 		case 'image/png':
 			return imagepng($img, $dest);
+		case 'image/jpg':
 		case 'image/jpeg':
 			return imagejpeg($img, $dest);
 		case 'image/gif':
@@ -77,7 +78,10 @@ function gen_img_thumb(
 	imagecopyresized(
 		$new, $img, 0, 0, 0, 0, $dim['width'], $dim['height'], $w, $h
 	);
-	put_img_object($new, $dest, $mime);
 
-	return TRUE;
+	return put_img_object(
+		$new,
+		$dest,
+		'image/'.pathinfo($dest, PATHINFO_EXTENSION)
+	) !== NULL;
 }
