@@ -12,18 +12,8 @@
 *    * id = The ID of the slide to duplicate.
 *
 *  Return value
-*    * slide
-*      * name       = The name of the slide.
-*      * index      = The index of the slide.
-*      * time       = The amount of time the slide is shown.
-*      * owner      = The owner of the slide.
-*      * enabled    = Whether the slide is enabled or not.
-*      * sched      = Whether slide scheduling is enabled or not.
-*      * sched_t_s  = Slide scheduling start timestamp.
-*      * sched_t_e  = Slide scheduling end timestamp.
-*      * animation  = The slide transition animation.
-*      * queue_name = The name of the queue the slide is in.
-*    * error        = An error code or API_E_OK on success.
+*    * slide = Duplicated slide data. See slide_get.php for more info.
+*    * error = An error code or API_E_OK on success.
 *
 *  <====
 */

@@ -40,7 +40,7 @@
 *      undefined or null for new slide.
 *    * name          = The name of the slide.
 *    * index         = The index of the slide.
-*    * time          = The amount of time the slide is shown.
+*    * duration      = The duration of the slide.
 *    * markup        = The markup of the slide.
 *    * enabled       = Whether the slide is enabled or not.
 *    * sched         = Whether the slide is scheduled or not.
@@ -75,7 +75,7 @@ $SLIDE_SAVE = new APIEndpoint([
 		'index' => API_P_INT,
 		'markup' => API_P_STR|API_P_EMPTY_STR_OK,
 		'owner' => API_P_UNUSED,
-		'time' => API_P_INT,
+		'duration' => API_P_INT,
 		'enabled' => API_P_BOOL,
 		'sched' => API_P_BOOL,
 		'sched_t_s' => API_P_INT,
@@ -188,7 +188,7 @@ if ($OP !== 'modify_collab') {
 
 $slide->set_name($SLIDE_SAVE->get('name'));
 $slide->set_index($SLIDE_SAVE->get('index'));
-$slide->set_time($SLIDE_SAVE->get('time'));
+$slide->set_duration($SLIDE_SAVE->get('duration'));
 $slide->set_markup($SLIDE_SAVE->get('markup'));
 $slide->set_enabled($SLIDE_SAVE->get('enabled'));
 $slide->set_sched($SLIDE_SAVE->get('sched'));

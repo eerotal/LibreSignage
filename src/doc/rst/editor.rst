@@ -60,8 +60,8 @@ characters.
 be used to give other users the permission to modify a slide. Slide
 collaborators can't delete or change the queue of the slide.
 
-**Time** - The *Time* selector controls how long the slide is shown in
-the slideshow. The values in the selector are in seconds.
+**Duration** - The *Duration* input is used to specify the duration of
+the slide in seconds.
 
 **Index** - The index value controls the order of the slides in the
 slideshow. The slide with index 0 is the first slide, index 1 is the

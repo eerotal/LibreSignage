@@ -100,25 +100,15 @@
 							</label>
 						</div>
 
-						<!-- Slide time selector -->
-						<div class="form-group" id="slide-time-group">
-							<label for="slide-time">Time (seconds)</label>
-							<select class="custom-select w-100"
-								id="slide-time"
+						<!-- Slide duration selector -->
+						<div class="form-group" id="slide-duration-group">
+							<label for="slide-duration">Duration (seconds)</label>
+							<input type="number" class="form-control w-100"
+								id="slide-duration"
 								data-toggle="tooltip"
-								title="The time the slide is shown in seconds.">
-
-								<option value="1">1</option>
-								<option value="2">2</option>
-								<option value="3">3</option>
-								<option value="4">4</option>
-								<option value="5">5</option>
-								<option value="6">6</option>
-								<option value="7">7</option>
-								<option value="8">8</option>
-								<option value="9">9</option>
-								<option value="10">10</option>
-							</select>
+								title="The duration of the slide in seconds.">
+							</input>
+							<div class="invalid-feedback"></div>
 						</div>
 
 						<!-- Slide index input -->

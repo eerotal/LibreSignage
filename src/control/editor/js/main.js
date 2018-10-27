@@ -29,7 +29,7 @@ const NEW_SLIDE_DEFAULTS = {
 	'id': null,
 	'name': 'NewSlide',
 	'owner': null,
-	'time': 5000,
+	'duration': 5000,
 	'markup': '',
 	'index': 0,
 	'enabled': true,
@@ -68,8 +68,8 @@ var SLIDE_EDIT_AS_COLLAB  = $("#slide-edit-as-collab");
 var SLIDE_NAME            = $("#slide-name");
 var SLIDE_NAME_GRP        = $("#slide-name-group");
 var SLIDE_OWNER           = $("#slide-owner");
-var SLIDE_TIME            = $("#slide-time");
-var SLIDE_TIME_GRP        = $("#slide-time-group");
+var SLIDE_DURATION        = $("#slide-duration");
+var SLIDE_DURATION_GRP    = $("#slide-duration-group");
 var SLIDE_INDEX           = $("#slide-index");
 var SLIDE_INDEX_GRP       = $("#slide-index-group");
 var SLIDE_EN              = $("#slide-enabled");
@@ -98,9 +98,10 @@ var ASSET_UPLOADER = null; // Asset uploader object.
 
 var qsel_queues = null;    // Queue selector queues list.
 
-// Input validator objects selectors.
+// Input validators.
 var name_sel = null;
 var index_sel = null;
+var duration_sel = null;
 var val_trigger = null;
 
 var state = {
@@ -285,8 +286,8 @@ const UI_DEFS = new uic.UIController({
 		},
 		clearer = (elem) => { elem.val(''); }
 	),
-	'SLIDE_TIME': new uic.UIInput(
-		elem = SLIDE_TIME,
+	'SLIDE_DURATION': new uic.UIInput(
+		elem = SLIDE_DURATION,
 		perm = (d) => {
 			return (
 				(!d['n'] && !d['s'])
@@ -297,13 +298,13 @@ const UI_DEFS = new uic.UIController({
 		attach = null,
 		defer = null,
 		mod = (elem, s) => {
-			var time = parseInt(elem.val(), 10);
-			return time != s.get('time')/1000;
+			var dur = parseFloat(elem.val(), 10);
+			return dur != s.get('duration')/1000;
 		},
-		getter = (elem) => { return parseInt(elem.val(), 10); },
+		getter = (elem) => { return parseFloat(elem.val(), 10); },
 		setter = (elem, s) => {
-			var time = parseInt(s.get('time'), 10);
-			elem.val(time/1000);
+			var dur = parseFloat(s.get('duration'), 10);
+			elem.val(dur/1000);
 		},
 		clearer = (elem) => { elem.val(1); }
 	),
@@ -750,9 +751,11 @@ function update_controls() {
 	if (sel_slide != null) {
 		name_sel.enable();
 		index_sel.enable();
+		duration_sel.enable();
 	} else {
 		name_sel.disable();
 		index_sel.disable();
+		duration_sel.disable();
 	}
 }
 
@@ -972,7 +975,7 @@ function slide_save() {
 
 	sel_slide.set({
 		'name': UI_DEFS.get('SLIDE_NAME').get(),
-		'time': UI_DEFS.get('SLIDE_TIME').get()*1000,
+		'duration': UI_DEFS.get('SLIDE_DURATION').get()*1000,
 		'index': UI_DEFS.get('SLIDE_INDEX').get(),
 		'markup': UI_DEFS.get('SLIDE_INPUT').get(),
 		'enabled': UI_DEFS.get('SLIDE_EN').get(),
@@ -1263,7 +1266,7 @@ function ui_setup(ready) {
 		'asset-uploader'
 	);
 
-	// Setup validators for the name and index inputs.
+	// Setup validators for the name, index and duration inputs.
 	name_sel = new val.ValidatorSelector(
 		SLIDE_NAME,
 		SLIDE_NAME_GRP,
@@ -1301,9 +1304,45 @@ function ui_setup(ready) {
 		new val.NumValidator({
 			min: null,
 			max: null,
+			nan: true,
+			float: false
+		}, 'The index must be an integer value.'),
+		new val.NumValidator({
+			min: null,
+			max: null,
 			nan: false,
 			float: false
-		}, "The index must be an integer value.")]
+		}, 'You must specify an index.')]
+	);
+	duration_sel = new val.ValidatorSelector(
+		SLIDE_DURATION,	
+		SLIDE_DURATION_GRP,
+		[new val.NumValidator(
+			{
+				min: API.SERVER_LIMITS.SLIDE_MIN_DURATION/1000,
+				max: null,
+				nan: true,
+				float: true
+			},
+			`The duration is too short. The minimum duration ` +
+			`is ${API.SERVER_LIMITS.SLIDE_MIN_DURATION/1000}s.`
+		),
+		new val.NumValidator(
+			{
+				min: null,
+				max: API.SERVER_LIMITS.SLIDE_MAX_DURATION/1000,
+				nan: true,
+				float: true
+			},
+			`The duration is too long. The maximum duration ` +
+			`is ${API.SERVER_LIMITS.SLIDE_MAX_DURATION/1000}s.`
+		),
+		new val.NumValidator({
+			min: null,
+			max: null,
+			nan: false,
+			float: true
+		}, 'You must specify a duration.')]
 	);
 
 	/*
@@ -1312,9 +1351,10 @@ function ui_setup(ready) {
 	*/
 	name_sel.disable();
 	index_sel.disable();
+	duration_sel.disable();
 
 	val_trigger = new val.ValidatorTrigger(
-		[name_sel, index_sel],
+		[name_sel, index_sel, duration_sel],
 		(valid) => { update_controls(); }
 	);
 

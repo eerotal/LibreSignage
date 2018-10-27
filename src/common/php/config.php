@@ -69,8 +69,8 @@
 
 	// LibreSignage instance limits.
 	const LS_LIM = array(
-		"SLIDE_MIN_TIME"           => 1*1000,
-		"SLIDE_MAX_TIME"           => 20*1000,
+		"SLIDE_MIN_DURATION"       => 1*1000,
+		"SLIDE_MAX_DURATION"       => 40*1000,
 		"SLIDE_MAX_INDEX"          => 65536,
 		"SLIDE_NAME_MAX_LEN"       => 32,
 		"SLIDE_MARKUP_MAX_LEN"     => 2048,

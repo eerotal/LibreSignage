@@ -44,7 +44,7 @@ class Slide extends Exportable{
 		'id',
 		'name',
 		'index',
-		'time',
+		'duration',
 		'markup',
 		'owner',
 		'enabled',
@@ -62,7 +62,7 @@ class Slide extends Exportable{
 		'id',
 		'name',
 		'index',
-		'time',
+		'duration',
 		'markup',
 		'owner',
 		'enabled',
@@ -85,7 +85,7 @@ class Slide extends Exportable{
 	private $id = NULL;
 	private $name = NULL;
 	private $index = NULL;
-	private $time = NULL;
+	private $duration = NULL;
 	private $markup = NULL;
 	private $owner = NULL;
 	private $enabled = FALSE;
@@ -220,15 +220,17 @@ class Slide extends Exportable{
 		$this->index = $index;
 	}
 
-	function set_time(int $time) {
-		// Check time bounds.
+	function set_duration(int $duration) {
+		// Check duration bounds.
 		if (
-			$time < gtlim('SLIDE_MIN_TIME')
-			|| $time > gtlim('SLIDE_MAX_TIME')
+			$duration < gtlim('SLIDE_MIN_DURATION')
+			|| $duration > gtlim('SLIDE_MAX_DURATION')
 		) {
-			throw new ArgException("Slide time $time out of bounds.");
+			throw new ArgException(
+				"Slide duration $duration out of bounds."
+			);
 		}
-		$this->time = $time;
+		$this->duration = $duration;
 	}
 
 	function set_owner(string $owner) {
@@ -369,7 +371,7 @@ class Slide extends Exportable{
 	function get_markup() { return $this->markup; }
 	function get_name() { return $this->name; }
 	function get_index() { return $this->index; }
-	function get_time() { return $this->time; }
+	function get_duration() { return $this->duration; }
 	function get_owner() { return $this->owner; }
 	function get_enabled() { return $this->enabled; }
 	function get_sched() { return $this->sched; }
