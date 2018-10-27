@@ -1,13 +1,10 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
-*  *Login using the authentication system.*
+*  Login using the authentication system.
+*
+*  **Request:** POST, application/json
 *
 *  POST parameters
 *    * username    = Username
@@ -16,7 +13,8 @@
 *    * permanent   = Create permanent session. False by default.
 *
 *  Return value
-*    * session = A session data array.
+*    * user = Current user data.
+*    * session = Current session data.
 *    * error = An error code or API_E_OK on success.
 *
 *  <====
@@ -25,16 +23,16 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $AUTH_LOGIN = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(
+	APIEndpoint::METHOD         => API_METHOD['POST'],
+	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
+	APIEndpoint::FORMAT_BODY => array(
 		'username'  => API_P_STR,
 		'password'  => API_P_STR,
 		'who'       => API_P_STR,
 		'permanent' => API_P_BOOL|API_P_OPT
 	),
-	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_AUTH		=> FALSE
+	APIEndpoint::REQ_QUOTA      => FALSE,
+	APIEndpoint::REQ_AUTH       => FALSE
 ));
 api_endpoint_init($AUTH_LOGIN);
 
@@ -63,7 +61,7 @@ if ($user) {
 	} else {
 		$perm = FALSE;
 	}
-	$session = $user->session_new(
+	$auth_data = $user->session_new(
 		$AUTH_LOGIN->get('who'),
 		$_SERVER['REMOTE_ADDR'],
 		$perm
@@ -78,45 +76,48 @@ if ($user) {
 	*  if so desired.
 	*/
 	$exp = 0;
-	if ($session['permanent'] == 1) {
+	if ($auth_data['session']->is_permanent()) {
 		// Create a "permanent" cookie.
 		$exp = PERMACOOKIE_EXPIRE;
 	} else {
-		$exp = $session['created'] + $session['max_age'];
+		$exp = $auth_data['session']->get_created()
+			+ $auth_data['session']->get_max_age();
 	}
 
 	setcookie(
 		$name = 'session_token',
-		$value = $session['token'],
+		$value = $auth_data['token'],
 		$expire = $exp,
 		$path = '/'
 	);
 	setcookie(
 		$name = 'session_created',
-		$value = $session['created'],
+		$value = $auth_data['session']->get_created(),
 		$expire = $exp,
 		$path = '/'
 	);
 	setcookie(
 		$name = 'session_max_age',
-		$value = $session['max_age'],
+		$value = $auth_data['session']->get_max_age(),
 		$expire = $exp,
 		$path = '/'
 	);
 	setcookie(
 		$name = 'session_permanent',
-		$value = $session['permanent'] ? '1' : '0',
+		$value = $auth_data['session']->is_permanent() ? '1' : '0',
 		$expire = $exp,
 		$path = '/'
 	);
 
 	$AUTH_LOGIN->resp_set(array(
-		'session' => $session,
+		'user' => $user->export(FALSE, FALSE),
+		'session' => array_merge(
+			$auth_data['session']->export(FALSE, FALSE),
+			[ 'token' => $auth_data['token'] ]
+		),
 		'error' => API_E_OK
 	));
 } else {
-	$AUTH_LOGIN->resp_set(array(
-		'error' => API_E_INCORRECT_CREDS
-	));
+	$AUTH_LOGIN->resp_set([ 'error' => API_E_INCORRECT_CREDS ]);
 }
 $AUTH_LOGIN->send();

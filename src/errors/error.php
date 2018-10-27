@@ -7,19 +7,14 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<?php
-			css_include(['bootstrap']);
-		?>
-		<link rel="stylesheet" href="/common/css/footer.css">
-		<link rel="stylesheet" href="/common/css/default.css">
 		<link rel="stylesheet" href="/errors/css/error.css">
-		<title>403 Forbidden</title>
+		<title><?php echo $ERROR_PAGE_HEADING; ?></title>
 	</head>
 	<body>
 		<main role="main" class="container-fluid">
 			<div id="container-error" class="container">
-				<h1 class="display-3 text-center"><?php echo $ERROR_PAGE_HEADING?></h1>
-				<p class="lead text-center"><?php echo $ERROR_PAGE_TEXT?></p>
+				<h1 class="display-3 text-center"><?php echo $ERROR_PAGE_HEADING; ?></h1>
+				<p class="lead text-center"><?php echo $ERROR_PAGE_TEXT; ?></p>
 			</div>
 		</main>
 		<?php

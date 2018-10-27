@@ -32,15 +32,24 @@ function auth_creds_verify(string $user, string $pass) {
 
 function auth_token_verify(string $tok) {
 	/*
-	*  Verify an authentication token and return the
-	*  corresponding User object if the token is valid.
-	*  Otherwise NULL is returned.
+	*  Verify an authentication token. If a matching session is
+	*  found, an array with the keys 'session' and 'user' is
+	*  returned. 'session' contains the matching Session object.
+	*  'user' is the user object of the session. If a matching
+	*  session is not found, NULL is returned.
 	*/
+	$users = NULL;
+	$session = NULL;
+
 	if (!empty($tok)) {
 		$users = user_array();
 		foreach ($users as $k => $u) {
-			if ($u->session_verify($tok)) {
-				return $u;
+			$session = $u->session_token_verify($tok);
+			if ($session !== NULL) {
+				return [
+					'user' => $u,
+					'session' => $session
+				];
 			}
 		}
 	}
@@ -49,18 +58,20 @@ function auth_token_verify(string $tok) {
 
 // -- Web interface authentication functions. --
 
-function web_auth($user_wl = NULL,
-			$group_wl = NULL,
-			bool $redir = FALSE,
-			$token = NULL) {
-	$u = NULL;
+function web_auth(
+	$user_wl = NULL,
+	$group_wl = NULL,
+	bool $redir = FALSE,
+	$token = NULL
+) {
+	$d = NULL;
 	if (empty($token)) {
 		// Use authentication token from cookie.
-		$u = web_auth_cookie_verify($redir);
+		$d = web_auth_cookie_verify($redir);
 	} else {
 		// Use supplied authentication token.
-		$u = auth_token_verify($token);
-		if ($u == NULL) {
+		$d = auth_token_verify($token);
+		if ($d === NULL) {
 			if ($redir) {
 				header('Location: '.LOGIN_PAGE);
 				exit(0);
@@ -70,7 +81,7 @@ function web_auth($user_wl = NULL,
 		}
 	}
 
-	if (!$u) {
+	if ($d === NULL) {
 		if ($redir) {
 			header('Location: '.LOGIN_PAGE);
 			exit(0);
@@ -78,7 +89,7 @@ function web_auth($user_wl = NULL,
 		return NULL;
 	}
 	if ($user_wl) {
-		if (!web_auth_user_whitelist($u, $user_wl)) {
+		if (!web_auth_user_whitelist($d['user'], $user_wl)) {
 			if ($redir) {
 				error_handle(HTTP_ERR_403);
 			}
@@ -86,14 +97,14 @@ function web_auth($user_wl = NULL,
 		}
 	}
 	if ($group_wl) {
-		if (!web_auth_group_whitelist($u, $group_wl)) {
+		if (!web_auth_group_whitelist($d['user'], $group_wl)) {
 			if ($redir) {
 				error_handle(HTTP_ERR_403);
 			}
 			return NULL;
 		}
 	}
-	return $u;
+	return $d;
 }
 
 function web_auth_cookie_verify(bool $redir = FALSE) {

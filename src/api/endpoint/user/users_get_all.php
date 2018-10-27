@@ -1,14 +1,11 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
-*  *Get a list of all existing users along with the
-*  available userdata.*
+*  Get a list of all existing users along with the
+*  available userdata.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * users = A dictionary of the users and their data
@@ -26,8 +23,8 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $USERS_GET_ALL = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT		=> array(),
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
+	APIEndpoint::FORMAT_URL		=> array(),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));

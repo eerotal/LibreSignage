@@ -1,0 +1,9 @@
+#quick-help-popup-content {
+	@import 'src/doc/css/_content.scss';
+	overflow-y: auto;
+	padding: {
+		top: $s2;
+		right: $s5;
+		left: $s5;
+	}
+}

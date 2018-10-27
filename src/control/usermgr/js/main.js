@@ -20,13 +20,13 @@ const USERS_TABLE = $('#users-table');
 
 const USERMGR_UI_DEFS = new uic.UIController({
 	'USER_CREATE': new uic.UIButton(
-		_elem = USER_CREATE,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = USER_CREATE,
+		perm = () => { return true; },
+		enabler = null,
+		attach = {
 			'click': usermgr_create
 		},
-		_defer = defer_usermgr_ready
+		defer = defer_usermgr_ready
 	)
 });
 var USERMGR_LIST_UI_DEFS = new uic.UIController({});
@@ -56,24 +56,33 @@ const DIALOG_USER_REMOVE_FAILED = new dialog.Dialog(
 );
 
 // User table row template.
-const usr_table_row = (index, name, groups, pass) => `
+const usr_table_row = (name, groups, pass) => `
 	<div class="row usr-table-row" id="usr-row-${name}">
-		<div id="usr-index-${name}" class="usr-table-col col-1">
-			${index}
-		</div>
-		<div id="usr-name-${name}" class="usr-table-col col-2">
+		<div id="usr-name-col-${name}" class="usr-table-col col">
 			${name}
 		</div>
-		<div id="usr-groups-${name}" class="usr-table-col col-3">
+		<div id="usr-groups-col-${name}" class="usr-table-col col">
 			${groups}
 		</div>
-		<div id="usr-info-${name}" class="usr-table-col col-3">
+		<div id="usr-comment-col-${name}" class="usr-table-col col">
 			${pass}
 		</div>
-		<div class="usr-table-col col-3">
+		<div class="usr-table-col col-auto">
 			<button type="button"
 				role="button"
-				class="btn btn-primary"
+				class="btn btn-success small-btn usr-edit-btn"
+				id="btn-user-${name}-save">
+				<i class="fas fa-save"></i>
+			</button>
+			<button type="buttton"
+				role="button"
+				class="btn btn-danger small-btn usr-edit-btn"
+				id="btn-user-${name}-remove">
+				<i class="fas fa-trash-alt"></i>
+			</button>
+			<button type="button"
+				role="button"
+				class="btn btn-primary small-btn usr-edit-btn"
 				data-toggle="collapse"
 				data-target="#usr-edit-${name}"
 				aria-expanded="false"
@@ -85,11 +94,11 @@ const usr_table_row = (index, name, groups, pass) => `
 	<div class="collapse usr-edit-row" id="usr-edit-${name}">
 		<div class="usr-edit-row-container">
 			<div class="row usr-edit-input-row">
-				<label class="col-3 col-form-label"
+				<label class="usr-data-label col-auto col-form-label""
 					for="usr-name-input-${name}">
 					User
 				</label>
-				<div class="col-9">
+				<div class="col px-1">
 					<input id="usr-name-input-${name}"
 						type="text"
 						class="form-control"
@@ -98,26 +107,22 @@ const usr_table_row = (index, name, groups, pass) => `
 				</div>
 			</div>
 			<div class="row usr-edit-input-row">
-				<label class="col-3 col-form-label" for="usr-groups-input-${name}">
+				<label class="usr-data-label col-auto col-form-label""
+						for="usr-groups-input-${name}">
 					Groups
 				</label>
-				<div id="usr-groups-input-${name}-cont" class="col-9">
+				<div id="usr-groups-input-${name}-cont"
+						class="col px-1">
 				</div>
 			</div>
 			<div class="row usr-edit-input-row">
-					<div class="col-12 d-flex flex-row justify-content-center">
-					<input
-						id="btn-user-${name}-save"
-						class="btn btn-primary usr-edit-btn"
-						type="submit"
-						value="Save">
-					</input>
-					<input
-						id="btn-user-${name}-remove"
-						class="btn btn-danger usr-edit-btn"
-						type="button"
-						value="Remove">
-					</input>
+				<label class="usr-data-label col-auto col-form-label"
+						for="usr-comment-label-${name}">
+					Comment
+				</label>
+				<div id="usr-comment-label-${name}"
+					class="col px-1 text-left my-auto">
+					${pass}
 				</div>
 			</div>
 		</div>
@@ -187,6 +192,7 @@ function usermgr_remove(name) {
 		`All user data for ${name} will be lost and won't be ` +
 		`recoverable.`,
 		(status, val) => {
+			if (!status) { return; }
 			for (var u in users) {
 				if (users[u].get_name() != name) { continue; }
 				users[u].remove((resp) => {
@@ -261,7 +267,6 @@ function usermgr_make_ui() {
 
 		// Add the HTML DOM elements to the document.
 		USERS_TABLE.append(usr_table_row(
-			i,
 			name,
 			!grps || !grps.length ? '' : grps.join(', '),
 			!info ? '' : info,
@@ -269,39 +274,39 @@ function usermgr_make_ui() {
 
 		// Create the UI element instances for the inputs & buttons.
 		USERMGR_LIST_UI_DEFS.add(`${name}_save`, new uic.UIButton(
-				_elem = $(USER_SAVE_QUERY(name)),
-				_perm = () => { return true; },
-				_enabler = null,
-				_attach = {
+				elem = $(USER_SAVE_QUERY(name)),
+				perm = () => { return true; },
+				enabler = null,
+				attach = {
 					'click': () => { usermgr_save(name); }
 				},
-				_defer = null
+				defer = null
 			)
 		);
 		USERMGR_LIST_UI_DEFS.add(`${name}_remove`, new uic.UIButton(
-				_elem = $(USER_REMOVE_QUERY(name)),
-				_perm = () => { return name != API.CONFIG.user; },
-				_enabler = null,
-				_attach = {
+				elem = $(USER_REMOVE_QUERY(name)),
+				perm = () => { return name != API.CONFIG.user.user; },
+				enabler = null,
+				attach = {
 					'click': () => { usermgr_remove(name); }
 				},
-				_defer = null
+				defer = null
 			)
 		);
 		USERMGR_LIST_UI_DEFS.add(`${name}_name`, new uic.UIInput(
-				_elem = $(USER_NAME_QUERY(name)),
-				_perm = () => { return false; },
-				_enabler = null,
-				_attach = null,
-				_defer = null,
-				_mod = null,
-				_getter = null,
-				_setter = (elem, usr) => { elem.val(usr.get_name()); },
-				_clear = (elem) => { elem.val(''); }
+				elem = $(USER_NAME_QUERY(name)),
+				perm = () => { return false; },
+				enabler = null,
+				attach = null,
+				defer = null,
+				mod = null,
+				getter = null,
+				setter = (elem, usr) => { elem.val(usr.get_name()); },
+				clearer = (elem) => { elem.val(''); }
 			)
 		);
 		USERMGR_LIST_UI_DEFS.add(`${name}_groups`, new uic.UIInput(
-				_elem = new multiselect.MultiSelect(
+				elem = new multiselect.MultiSelect(
 					`usr-groups-input-${name}-cont`,
 					`usr-groups-input-${name}`,
 					[new val.StrValidator({
@@ -319,20 +324,20 @@ function usermgr_make_ui() {
 						'maxopts': API.SERVER_LIMITS.MAX_USER_GROUPS
 					}
 				),
-				_pass = () => { return true; },
-				_enabler = (elem, state) => {
+				pass = () => { return true; },
+				enabler = (elem, state) => {
 					if (state) {
 						elem.enable();
 					} else {
 						elem.disable();
 					}
 				},
-				_attach = null,
-				_defer = null,
-				_mod = null,
-				_getter = (elem) => { return elem.selected; },
-				_setter = (elem, usr) => { elem.set(usr.get_groups()); },
-				_clear = (elem) => { elem.remove_all(); }
+				attach = null,
+				defer = null,
+				mod = null,
+				getter = (elem) => { return elem.selected; },
+				setter = (elem, usr) => { elem.set(usr.get_groups()); },
+				clearer = (elem) => { elem.remove_all(); }
 			)
 		);
 		// Add the existing user data to the inputs.

@@ -1,13 +1,10 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
-*  *Get a list of the existing slide queue names*
+*  Get a list of the existing slide queue names.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * queues = A list containing the slide queue names.
@@ -17,13 +14,13 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/queue.php');
 
 $QUEUE_LIST = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => array(),
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
+	APIEndpoint::FORMAT_URL => array(),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));

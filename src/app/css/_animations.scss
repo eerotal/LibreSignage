@@ -1,0 +1,87 @@
+/* LibreSignage display animations. */
+
+#display {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+// Swipe left
+
+.swipe-left {
+	animation: swipe-left-k 0.25s forwards !important;
+}
+
+.swipe-from-right {
+	animation: swipe-from-right-k 0.25s forwards !important;
+}
+
+@keyframes swipe-left-k {
+	from { right: 0%; }
+	to { right: 100%; }
+}
+
+@keyframes swipe-from-right-k {
+	from { right: -100%; }
+	to { right: 0%; }
+}
+
+/* Swipe right */
+
+.swipe-right {
+	animation: swipe-right-k 0.25s forwards !important;
+}
+
+.swipe-from-left {
+	animation: swipe-from-left-k 0.25s forwards !important;
+}
+
+@keyframes swipe-right-k {
+	from { right: 0%; }
+	to { right: -100%; }
+}
+
+@keyframes swipe-from-left-k {
+	from { right: 100%; }
+	to { right: 0%; }
+}
+
+/* Swipe up */
+
+.swipe-up {
+	animation: swipe-up-k 0.25s forwards !important;
+}
+
+.swipe-from-below {
+	animation: swipe-from-below-k 0.25s forwards !important;
+}
+
+@keyframes swipe-up-k {
+	from { top: 0%; }
+	to { top: -100%; }
+}
+
+@keyframes swipe-from-below-k {
+	from { top: 100%; }
+	to { top: 0%; }
+}
+
+/* Swipe down */
+
+.swipe-down {
+	animation: swipe-down-k 0.25s forwards !important;
+}
+
+.swipe-from-above {
+	animation: swipe-from-above-k 0.25s forwards !important;
+}
+
+@keyframes swipe-down-k {
+	from { top: 0%; }
+	to { top: 100%; }
+}
+
+@keyframes swipe-from-above-k {
+	from { top: -100%; }
+	to { top: 0%; }
+}

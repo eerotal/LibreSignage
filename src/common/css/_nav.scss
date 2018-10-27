@@ -1,0 +1,32 @@
+@import 'globals';
+@import 'bootstrap';
+
+/* LibreSignage navigation bar styling. */
+
+.nav {
+	padding: {
+		top: 20px !important;
+		bottom: 20px !important;
+		left: 25px !important;
+		right: 25px !important;
+	}
+}
+
+.nav-logout-cont {
+	margin: {
+		left: .5rem;
+		right: .5rem;
+		top: .75rem;
+		bottom: .55rem;
+	}
+
+	padding: {
+		top: $s1;
+		bottom: $s1;
+	}
+
+	border: {
+		top: 1px solid $secondary;
+		bottom: 1px solid $secondary;
+	}
+}

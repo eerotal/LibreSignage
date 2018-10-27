@@ -1,0 +1,25 @@
+// Color definitions.
+$gray-1: rgb(210, 210, 210);
+$gray-2: rgb(220, 220, 220);
+$gray-3: rgb(230, 230, 230);
+$gray-4: rgb(240, 240, 240);
+$gray-5: rgb(250, 250, 250);
+$gray-bg: hsl(0, 0%, 99%);
+
+// Bootstrap spacings.
+$spacer: 1em;
+$s0: 0;
+$s1: $spacer*.25;
+$s2: $spacer*.5;
+$s3: $spacer;
+$s4: $spacer*1.5;
+$s5: $spacer*3;
+$sa: auto;
+
+// Default container padding.
+$dhpad: 15px;
+$dvpad: 30px;
+
+// Border constants.
+$default-border-radius: 3px;
+$default-border-width: 1px;

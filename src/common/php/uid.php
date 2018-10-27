@@ -28,8 +28,7 @@
 		*/
 		try {
 			$current_uid = file_lock_and_get(UID_FILE);
-			$current_uid = preg_replace('/\s+/', '',
-						$current_uid);
+			$current_uid = preg_replace('/\s+/', '', $current_uid);
 			if (empty($current_uid)) {
 				$current_uid = '0x0';
 			}

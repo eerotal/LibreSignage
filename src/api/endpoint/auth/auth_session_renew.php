@@ -1,14 +1,11 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
-*  *Request a session renewal. The previous authentication token
-*  is automatically expired when this endpoint is called.*
+*  Request a session renewal. The previous authentication token
+*  is automatically expired when this endpoint is called.
+*
+*  **Request:** POST, application/json
 *
 *  Return value
 *    * session = An associative array with the latest session data.
@@ -19,19 +16,17 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
-$AUTH_SESSION_RENEW = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT		=> array(),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
+$AUTH_SESSION_RENEW = new APIEndpoint([
+	APIEndpoint::METHOD         => API_METHOD['POST'],
+	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
+	APIEndpoint::FORMAT_BODY    => [],
+	APIEndpoint::REQ_QUOTA      => TRUE,
+	APIEndpoint::REQ_AUTH       => TRUE
+]);
 api_endpoint_init($AUTH_SESSION_RENEW);
 
-// Renew the current session.
-$session = $AUTH_SESSION_RENEW->get_caller()->session_renew(
-	$AUTH_SESSION_RENEW->get_auth_token()
-);
+$session = $AUTH_SESSION_RENEW->get_session();
+$new_token = $session->renew();
 $AUTH_SESSION_RENEW->get_caller()->write();
 
 /*
@@ -41,41 +36,41 @@ $AUTH_SESSION_RENEW->get_caller()->write();
 *  clients can ignore these cookies if so desired.
 */
 $exp = 0;
-if ($session['permanent']) {
+if ($session->is_permanent()) {
 	$exp = PERMACOOKIE_EXPIRE;
 } else {
-	$exp = $session['created'] + $session['max_age'];
+	$exp = $session->get_created() + $session->get_max_age();
 }
 setcookie(
 	$name = 'session_token',
-	$value = $session['token'],
+	$value = $new_token,
 	$expire = $exp,
 	$path = '/'
 );
 setcookie(
 	$name = 'session_created',
-	$value = $session['created'],
+	$value = $session->get_created(),
 	$expire = $exp,
 	$path = '/'
 );
 setcookie(
 	$name = 'session_max_age',
-	$value = $session['max_age'],
+	$value = $session->get_max_age(),
 	$expire = $exp,
 	$path = '/'
 );
 setcookie(
 	$name = 'session_permanent',
-	$value = $session['permanent'] ? '1' : '0',
+	$value = $session->is_permanent() ? '1' : '0',
 	$expire = $exp,
 	$path = '/'
 );
 
-// Don't leak authentication token hashes.
-unset($session['token_hash']);
-
 $AUTH_SESSION_RENEW->resp_set(array(
-	'session' => $session,
+	'session' => array_merge(
+		$AUTH_SESSION_RENEW->get_session()->export(FALSE, FALSE),
+		[ 'token' => $new_token ]
+	),
 	'error' => API_E_OK
 ));
 $AUTH_SESSION_RENEW->send();

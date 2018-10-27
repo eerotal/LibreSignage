@@ -9,16 +9,8 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<?php
-			css_include(['font-awesome', 'bootstrap']);
-		?>
-		<link rel="stylesheet" href="/common/css/footer.css">
-		<link rel="stylesheet" href="/common/css/nav.css">
-		<link rel="stylesheet" href="/common/css/default.css">
-		<link rel="stylesheet" href="/common/css/dialog.css">
-		<link rel="stylesheet" href="/common/css/multiselect.css">
+		<?php require_css(['font-awesome']); ?>
 		<link rel="stylesheet" href="/control/editor/css/editor.css">
-		<link rel="stylesheet" href="/control/editor/css/timeline.css">
 		<title>LibreSignage Editor</title>
 	</head>
 	<body>
@@ -29,6 +21,7 @@
 			<div class="container-main container-fluid w-100 h-100">
 				<div class="container-fluid row mx-0 my-1">
 					<div class="col-12">
+						<!-- Queue selector -->
 						<div id="queue-select-cont">
 							<label for="queue-select">Queue:</label>
 							<select class="d-inline-block custom-select small-select mx-2"
@@ -59,6 +52,7 @@
 					</div>
 				</div>
 				<div class="container-fluid row mx-0 my-1">
+					<!-- Timeline -->
 					<div class="col-12">
 						<div id="timeline" class="d-flex flex-row flex-nowrap">
 						</div>
@@ -66,8 +60,13 @@
 				</div>
 				<div class="container-fluid row mx-0 my-1">
 					<div class="col-md-3 container-fluid pt-2" id="editor-col-l">
+						<!-- Slide editable status labels -->
 						<div id="slide-cant-edit">
 							You can't edit this slide.
+						</div>
+						<div id="slide-readonly">
+							You can't edit this slide because someone
+							else is already editing it.
 						</div>
 						<div id="slide-edit-as-collab">
 							You can edit this slide as a collaborator.
@@ -101,25 +100,15 @@
 							</label>
 						</div>
 
-						<!-- Slide time selector -->
-						<div class="form-group" id="slide-time-group">
-							<label for="slide-time">Time (seconds)</label>
-							<select class="custom-select w-100"
-								id="slide-time"
+						<!-- Slide duration selector -->
+						<div class="form-group" id="slide-duration-group">
+							<label for="slide-duration">Duration (seconds)</label>
+							<input type="number" class="form-control w-100"
+								id="slide-duration"
 								data-toggle="tooltip"
-								title="The time the slide is shown in seconds.">
-
-								<option value="1">1</option>
-								<option value="2">2</option>
-								<option value="3">3</option>
-								<option value="4">4</option>
-								<option value="5">5</option>
-								<option value="6">6</option>
-								<option value="7">7</option>
-								<option value="8">8</option>
-								<option value="9">9</option>
-								<option value="10">10</option>
-							</select>
+								title="The duration of the slide in seconds.">
+							</input>
+							<div class="invalid-feedback"></div>
 						</div>
 
 						<!-- Slide index input -->
@@ -150,7 +139,7 @@
 						</div>
 
 						<!-- Schedule enable -->
-						<div class="form-group">
+						<div class="form-group mb-0">
 							<a class="link-nostyle"
 								data-toggle="collapse"
 								href="#slide-sched-group"
@@ -161,14 +150,14 @@
 						</div>
 
 						<!-- Schedule date/time selector -->
-						<div class="row form-group pl-4 collapse" id="slide-sched-group">
+						<div class="row form-group collapse" id="slide-sched-group">
 							<div class="col-12 py-1">
 								<input type="checkbox"
 									id="slide-sched"
 									data-toggle="tooltip"
 									title="Select whether the slide is scheduled.">
 								<label class="form-check-label" for="slide-sched">
-									Scheduling enabled
+									Enable
 								</label>
 							</div>
 							<div class="col-12 py-1">
@@ -210,14 +199,14 @@
 						</div>
 
 						<!-- Slide enabled checkbox -->
-						<div class="form-group" id="slide-enabled-group">
+						<div class="form-group mt-3" id="slide-enabled-group">
 							<input type="checkbox"
 								id="slide-enabled"
 								data-toggle="tooltip"
 								title="Select whether the slide is enabled or not.">
 							<label class="form-check-label"
 								for="slide-enabled">
-								Slide enabled
+								Enable slide
 							</label>
 						</div>
 
@@ -268,10 +257,73 @@
 						</div>
 					</div>
 					<div class="col-md container-fluid pt-2" id="editor-col-r">
-						<label for="slide-input">Markup</label>
-						<div id="slide-input" class="no-font rounded"></div>
+						<div class="row">
+							<!-- Live preview -->
+							<div class="col-12 container-fluid">
+								<a class="link-nostyle"
+									data-toggle="collapse"
+									href="#slide-live-preview-collapse"
+									aria-expanded="false"
+									aria-controls="slide-live-preview-collapse">
+									<i class="fas fa-angle-right"></i> Live preview
+								</a>
+								<div id="slide-live-preview-collapse" class="row collapse">
+									<div class="col-12 text-center">
+										<button id="btn-preview-ratio-16x9"
+												class="btn btn-light btn-border small-btn"
+												type="button">
+												16:9
+										</button>
+										<button id="btn-preview-ratio-4x3"
+												class="btn btn-light btn-border small-btn"
+												type="button">
+												4:3
+										</button>
+									</div>
+									<div class="col-12">
+										<div id="slide-live-preview"
+											class="preview-cont preview-limit">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md container-fluid">
+								<div class="row py-2">
+									<div class="col-2 m-auto text-left">
+										<label for="slide-input" class="m-0">Markup</label>
+									</div>
+
+									<!-- Editor toolbar -->
+									<div class="col-10 text-right">
+										<div class="dropdown">
+											<button id="editor-dropdown-menu-btn"
+													class="btn btn-info small-btn dropdown-toggle"
+													type="button"
+													data-toggle="dropdown"
+													aria-haspopup="true"
+													aria-expanded="false">
+												Menu
+											</button>
+											<div class="dropdown-menu" aria-labelledby="editor-dropdown-menu-btn">
+												<a class="dropdown-item" href="#" id="link-add-media">Add media</a>
+												<a class="dropdown-item" href="#" id="link-quick-help">Quick help</a>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div id="slide-input" class="rounded">
+								</div>
+								<div class="container-fluid">
+									<p id="markup-err-display"></p>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
+				<?php require_once($_SERVER['DOCUMENT_ROOT'].'/control/editor/popups/quick_help.php'); ?>
+				<?php require_once($_SERVER['DOCUMENT_ROOT'].'/control/editor/popups/asset_uploader.php'); ?>
 			</div>
 		</main>
 		<?php

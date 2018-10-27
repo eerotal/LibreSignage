@@ -1,8 +1,18 @@
 # Exclude some generated LibreSignage files and
 # temporary text editor files.
+
+# Nano
 *.swp
 *.save
+
+# Emacs
+.#*
+\#*\#
+*~
+
+# Build
 /dist
+/dep
 /build/link
 *.iconf
 
@@ -11,6 +21,11 @@ __pycache__
 .mypy_cache
 .pyc
 
-# Exclude npm debug logs and external node modules.
+# Exclude various temporary NPM files.
 /node_modules
 npm-debug.log
+package-lock.json
+
+# Exclude temporary sass files.
+.sass-cache
+

@@ -1,15 +1,10 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
-*  *Save a slide. Whether a user is allowed to access this
+*   Save a slide. Whether a user is allowed to access this
 *   API endpoint depends on the parameters passed to the
-*   endpoint.*
+*   endpoint.
 *
 *  Permissions
 *   * id != null => Allow if the caller is in the admin
@@ -22,12 +17,30 @@
 *     queue_name and collaborators parameters of the API
 *     call are silently discarded.
 *
-*  POST JSON parameters
+*  This endpoint only allows slide modification if the caller
+*  has locked the slide by calling slide_lock_acquire.php first.
+*  If the slide is not locked or is locked by someone else, the
+*  API_E_LOCK error is returned in the 'error' value.
+*
+*  Note!
+*
+*  This endpoint accepts a few unused parameters to simplify
+*  implementing the client interface for this endpoint.
+*  Specifically, clients *must* be able to send all data
+*  received from slide_get.php back to this endpoint, even if
+*  it's not actually used. This makes it possible to implement
+*  a simple Object Oriented interface that just sends all data
+*  fields in the client side Slide object to this endpoint
+*  without filtering what can be sent.
+*
+*  **Request:** POST, application/json
+*
+*  Parameters
 *    * id            = The ID of the slide to modify or either
 *      undefined or null for new slide.
 *    * name          = The name of the slide.
 *    * index         = The index of the slide.
-*    * time          = The amount of time the slide is shown.
+*    * duration      = The duration of the slide.
 *    * markup        = The markup of the slide.
 *    * enabled       = Whether the slide is enabled or not.
 *    * sched         = Whether the slide is scheduled or not.
@@ -36,6 +49,9 @@
 *    * animation     = The slide animation identifier.
 *    * queue_name    = The name of the slide queue of this slide.
 *    * collaborators = A list of slide collaborators.
+*    * owner         = Unused (see above)
+*    * lock          = Unused (see above)
+*    * assets        = Unused (see above)
 *
 *  Return value
 *    This endpoint returns all the parameters above as well as
@@ -48,25 +64,27 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_SAVE = new APIEndpoint([
 	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT => [
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
+	APIEndpoint::FORMAT_BODY => [
 		'id' => API_P_STR|API_P_NULL,
 		'name' => API_P_STR,
 		'index' => API_P_INT,
 		'markup' => API_P_STR|API_P_EMPTY_STR_OK,
 		'owner' => API_P_UNUSED,
-		'time' => API_P_INT,
+		'duration' => API_P_INT,
 		'enabled' => API_P_BOOL,
 		'sched' => API_P_BOOL,
 		'sched_t_s' => API_P_INT,
 		'sched_t_e' => API_P_INT,
 		'animation' => API_P_INT,
 		'queue_name' => API_P_STR,
-		'collaborators' => API_P_ARR_STR
+		'collaborators' => API_P_ARR_STR,
+		'lock' => API_P_UNUSED,
+		'assets' => API_P_UNUSED
 	],
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
@@ -126,6 +144,27 @@ if (!$ALLOW) {
 	}
 }
 
+/*
+*  Check slide lock.
+*/
+if ($OP === 'modify' || $OP === 'modify_collab') {
+	$lock = $slide->get_lock();
+	if ($lock === NULL) {
+		throw new APIException(
+			API_E_LOCK,
+			"Slide not locked."
+		);
+	} else if (
+		!$lock->is_expired()
+		&& !$lock->is_owned_by($SLIDE_SAVE->get_session())
+	) {
+		throw new APIException(
+			API_E_LOCK,
+			"Slide locked by another user."
+		);
+	}
+}
+
 if ($OP === 'create') {
 	/*
 	*  Set the current user as the owner and
@@ -149,13 +188,14 @@ if ($OP !== 'modify_collab') {
 
 $slide->set_name($SLIDE_SAVE->get('name'));
 $slide->set_index($SLIDE_SAVE->get('index'));
-$slide->set_time($SLIDE_SAVE->get('time'));
+$slide->set_duration($SLIDE_SAVE->get('duration'));
 $slide->set_markup($SLIDE_SAVE->get('markup'));
 $slide->set_enabled($SLIDE_SAVE->get('enabled'));
 $slide->set_sched($SLIDE_SAVE->get('sched'));
 $slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
 $slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
 $slide->set_animation($SLIDE_SAVE->get('animation'));
+$slide->set_ready(TRUE);
 
 if ($OP === 'create') {
 	// Use quota.
@@ -175,5 +215,5 @@ $queue = new Queue($slide->get_queue_name());
 $queue->load();
 $queue->juggle($slide->get_id());
 
-$SLIDE_SAVE->resp_set($slide->get_data_array());
+$SLIDE_SAVE->resp_set($slide->export(FALSE, FALSE));
 $SLIDE_SAVE->send();

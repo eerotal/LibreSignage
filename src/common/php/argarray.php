@@ -1,9 +1,4 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  A general purpose system for accepting PHP function arguments
 *  as an array.

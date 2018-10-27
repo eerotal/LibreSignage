@@ -1,0 +1,46 @@
+v0.1.0
+  - [feature]  Implement keyboard shortcuts for the editor.
+  - [feature]  Make it possible to preserve instance data when
+               reinstalling.
+  - [feature]  Implement a live slide preview in the editor.
+  - [internal] Self host font files. (I actually don't particularly
+               like including binary files in the GIT tree but I don't
+               know of a better way so the font files are now included
+               in the tree.)
+  - [internal] Use SCSS instead of plain CSS for the stylesheets.
+  - [internal] Import Bootstrap straight into the _default.scss file
+               instead of including it in the HTML <head> tag.
+  - [internal] Process CSS using PostCSS /w Autoprefixer.
+  - [bugfix]   Fix a major security issue where the contents of the
+               'data/' directory were accessible by requesting the
+               different files with eg. a web browser. Even directory
+               listings were enabled.
+  - [feature]  Completely rewrite the markup transpiler system to
+               improve its error detecting and reporting capabilities.
+               The rewrite also introduced many other improvements. The
+               transpiler now uses the familiar lexer-parser-evaluator
+               architecture that most compilers use.
+  - [feature]  Improve markup error reporting in the editor UI. Erroneous
+               code lines are now highlighted in the editor input.
+  - [bugfix]   Confirm before changing the queue if an unsaved slide
+               is being edited in the editor (#17).
+  - [bugfix]   Prevent creating duplicate queues in the editor.
+  - [bugfix]   Don't show unstyled slide previews to users in the editor
+               by making sure the necessary CSS is loaded before showing
+               content.
+  - [bugfix]   Fix a bug resulting in spurious slide changes on the
+               display page.
+  - [improve]  Make the login and user manager pages more mobile friendly.
+  - [feature]  Implement a Quick Help view in the editor.
+  - [Internal] Implement a new way of exporting PHP object data by using
+               a class called Exportable.
+  - [feature]  Implement slide locking to prevent simultaneous editing
+               of slides (issue #18).
+  - [internal] Rewrite most of the PHP session handling code. Implement
+               a new class called Session for handling & storing session
+               data.
+  - [internal] Implement a simple assertion system in JavaScript.
+  - [internal] Implement file uploading via the API system.
+  - [feature]  Implement media storage & uploading in the backend and
+               editor.
+  - [feature]  Implement embedding video in slides using [video] tags.

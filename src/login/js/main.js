@@ -20,10 +20,10 @@ var defer_login_ready = () => { return !flag_login_ready; }
 
 const LOGIN_UI_DEFS = new uic.UIController({
 	'INPUT_USERNAME': new uic.UIInput(
-		_elem = INPUT_USERNAME,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = INPUT_USERNAME,
+		perm = () => { return true; },
+		enabler = null,
+		attach = {
 			'keyup': (event) => {
 				if (
 					event.key == 'Enter'
@@ -34,17 +34,17 @@ const LOGIN_UI_DEFS = new uic.UIController({
 				}
 			}
 		},
-		_defer = defer_login_ready,
-		_mod = null,
-		_getter = (elem) => { return elem.val(); },
-		_setter = null,
-		_clear = null
+		defer = defer_login_ready,
+		mod = null,
+		getter = (elem) => { return elem.val(); },
+		setter = null,
+		clearer = null
 	),
 	'INPUT_PASSWORD': new uic.UIInput(
-		_elem = INPUT_PASSWORD,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = {
+		elem = INPUT_PASSWORD,
+		perm = () => { return true; },
+		enabler = null,
+		attach = {
 			'keyup': (event) => {
 				if (
 					event.key == 'Enter'
@@ -55,18 +55,18 @@ const LOGIN_UI_DEFS = new uic.UIController({
 				}
 			}
 		},
-		_defer = defer_login_ready,
-		_mod = null,
-		_getter = (elem) => { return elem.val(); },
-		_setter = null,
-		_clear = null
+		defer = defer_login_ready,
+		mod = null,
+		getter = (elem) => { return elem.val(); },
+		setter = null,
+		clearer = null
 	),
 	'BTN_LOGIN': new uic.UIButton(
-		_elem = BTN_LOGIN,
-		_perm = () => { return true; },
-		_enabler = null,
-		_attach = { 'click': login },
-		_defer = defer_login_ready
+		elem = BTN_LOGIN,
+		perm = () => { return true; },
+		enabler = null,
+		attach = { 'click': login },
+		defer = defer_login_ready
 	)
 });
 
@@ -115,12 +115,12 @@ $(document).ready(() => {
 				regex: null
 			}, '')]
 		);
-		val_trigger = new val.ValidatorTrigger(
+		(val_trigger = new val.ValidatorTrigger(
 			[user_sel, pass_sel],
 			(valid) => {
 				LOGIN_UI_DEFS.get('BTN_LOGIN').enabled(valid);
 			}
-		);
+		)).trigger();
 
 		flag_login_ready = true;
 	});

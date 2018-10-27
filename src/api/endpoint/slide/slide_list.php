@@ -1,13 +1,10 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
-*  *Get a list of all the existing slides.*
+*  Get a list of all the existing slides.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * An array with all the existing slide IDs.
@@ -16,12 +13,12 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_LIST = new APIEndpoint(array(
 	APIEndpoint::METHOD 		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE 	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT		=> array(),
+	APIEndpoint::RESPONSE_TYPE 	=> API_MIME['application/json'],
+	APIEndpoint::FORMAT_URL		=> array(),
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));

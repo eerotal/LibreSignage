@@ -1,0 +1,83 @@
+@import 'default';
+@import 'footer';
+@import 'nav';
+@import 'dialog';
+@import 'multiselect';
+
+$table-line-height: 50px;
+$data-label-mw: 90px;
+
+#user-manager-heading {
+	margin: {
+		top: 30px;
+		bottom: 30px;
+	}
+}
+
+.usr-table-row {
+	margin: 0;
+	padding: 0;
+	color: $black;
+	background-color: $gray-bg;
+	border-bottom: 1px solid $gray-1;
+}
+
+.usr-table-col {
+	padding: 0;
+	height: $table-line-height;
+	line-height: $table-line-height;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.usr-data-label {
+	min-width: $data-label-mw;
+	padding: {
+		left: $s2;
+		right: $s2;
+	}
+	text-align: right;
+}
+
+.usr-edit-row-container {
+	width: 75%;
+	@include media-breakpoint-down(md) { width: 85%; }
+
+	margin: {
+		left: auto;
+		right: auto;
+	}
+}
+
+
+.usr-edit-input-row {
+	padding: {
+		top: 8px;
+		bottom: 8px;
+	}
+}
+
+.usr-edit-btn {
+	margin: {
+		left: 2px;
+		right: 2px;
+	}
+}
+
+/*
+*  Hide certain user info when the screen is
+*  too small to fit all of it. The info is
+*  shown in the extended column anyway.
+*/
+@include media-breakpoint-down(md) {
+	div[id^="usr-comment-col-"], #heading-usr-comment {
+		display: none;	
+	}
+}
+
+@include media-breakpoint-down(sm) {
+	div[id^="usr-groups-col-"], #heading-usr-groups {
+		display: none;	
+	}
+}

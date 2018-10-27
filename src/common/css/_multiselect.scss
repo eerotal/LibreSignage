@@ -1,0 +1,60 @@
+@import 'globals';
+
+.multiselect {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+	text-align: left;
+	padding: 0;
+	margin: 0;
+}
+
+.ms-controls {
+	display: block;
+	margin: 0;
+	margin-bottom: 8px;
+	padding: 0;
+}
+
+.ms-input {
+	display: block;
+	float: left;
+	margin: 0;
+	width: calc(100% - 2.5em - 8px);
+	vertical-align: top;
+}
+
+.ms-add {
+	display: inline-block;
+	float: right;
+	margin: 0;
+	width: 2.5em;
+	vertical-align: top;
+}
+
+.ms-values {
+	padding: 4px;
+	margin: 0;
+	border: 1px solid $gray-2;
+	border-radius: 4px;
+	background-color: white;
+	min-height: 2.5em;
+}
+
+.ms-val {
+	display: inline-block;
+	background-color: $gray-2;
+	border-radius: 2px;
+	padding: 2px 8px;
+	margin: 4px;
+	white-space: nowrap;
+}
+
+.ms-rm {
+	padding-left: 3px;
+	color: gray;
+}
+
+.ms-rm:hover {
+	color: black;
+}

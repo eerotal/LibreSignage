@@ -1,0 +1,27 @@
+@import 'default';
+@import 'footer';
+
+html {
+	height: 100%;
+	min-height: 100%;
+	max-height: 100%;
+}
+
+.logout-container {
+	position: absolute;
+	left: 0;
+	transform: translate(0, -50%);
+	text-align: center;
+	animation: logout-text-animation 0.4s forwards;
+}
+
+@keyframes logout-text-animation {
+	from {
+		top: -20%;
+		opacity: 0;
+	}
+	to {
+		top: 50%;
+		opacity: 1;
+	}
+}

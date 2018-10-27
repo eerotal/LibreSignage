@@ -1,13 +1,10 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
-*  *Get the data of the current user.*
+*  Get the data of the current user.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * user
@@ -23,21 +20,16 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $USER_GET = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT		=> array(),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
+	APIEndpoint::METHOD         => API_METHOD['GET'],
+	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
+	APIEndpoint::FORMAT_URL     => array(),
+	APIEndpoint::REQ_QUOTA      => TRUE,
+	APIEndpoint::REQ_AUTH       => TRUE
 ));
 api_endpoint_init($USER_GET);
 
-$u = $USER_GET->get_caller();
-$ret_data = array(
-	'user' => array(
-		'user' => $u->get_name(),
-		'groups' => $u->get_groups()
-	)
-);
-$USER_GET->resp_set($ret_data);
+$USER_GET->resp_set([
+	'user' => $USER_GET->get_caller()->export(FALSE, FALSE)
+]);
 $USER_GET->send();
 

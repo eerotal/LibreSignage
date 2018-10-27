@@ -1,14 +1,15 @@
 <?php
 
 /*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
-/*
 *  ====>
 *
-*  *Get the Markdown version of the LibreSignage license file.
+*  *Get the reStructuredText version of the LibreSignage license file.
 *  This endpoint doesn't require or consume the API rate quota.*
+*
+*  **Request:** GET
+*
+*  Response value
+*    * The raw license text.
 *
 *  <====
 */
@@ -16,10 +17,10 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $LIBRESIGNAGE_LICENSE = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['TEXT'],
-	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_AUTH		=> FALSE
+	APIEndpoint::METHOD         => API_METHOD['GET'],
+	APIEndpoint::RESPONSE_TYPE  => API_MIME['text/plain'],
+	APIEndpoint::REQ_QUOTA      => FALSE,
+	APIEndpoint::REQ_AUTH       => FALSE
 ));
 api_endpoint_init($LIBRESIGNAGE_LICENSE);
 

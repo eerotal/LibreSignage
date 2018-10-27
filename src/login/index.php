@@ -14,11 +14,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<?php
-			css_include(['bootstrap', 'font-awesome']);
+			require_css(['font-awesome']);
 		?>
-		<link rel="stylesheet" href="/common/css/footer.css">
-		<link rel="stylesheet" href="/common/css/default.css">
-		<link rel="stylesheet" href="/common/css/dialog.css">
 		<link rel="stylesheet" href="/login/css/login.css">
 		<title>LibreSignage Login</title>
 	</head>
@@ -35,7 +32,7 @@
 				<div class="container form-login">
 					<div class="form-group form-row">
 						<label for="input-user"
-							class="col-3 col-form-label">
+							class="col col-form-label">
 							Username
 						</label>
 						<div class="col">
@@ -48,7 +45,7 @@
 					</div>
 					<div class="form-group form-row">
 						<label for="input-pass"
-							class="col-3 col-form-label">
+							class="col col-form-label">
 							Password
 						</label>
 						<div class="col">
@@ -68,7 +65,7 @@
 						</div>
 					</div>
 					<hr/>
-					<div class="form-group form-row">
+					<div class="form-group form-row m-0">
 						<div class="col text-left">
 							<a class="link-nostyle"
 								data-toggle="collapse"

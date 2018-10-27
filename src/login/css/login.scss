@@ -1,0 +1,42 @@
+@import 'default';
+@import 'footer';
+@import 'dialog';
+
+$form-login-minw: 200px;
+$form-login-maxw: 350px;
+$form-label-width: 90px;
+
+html {
+	height: 100%;
+	min-height: 100%;
+	max-height: 100%;
+}
+
+.form-login-container {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	text-align: center;
+}
+
+.form-login-header {
+	margin-bottom: 20px;
+}
+
+.form-login {
+	label {
+		flex-grow: 0;
+		flex-basis: $form-label-width;
+		padding-left: 0;
+	}
+
+	width: 80vw;
+	min-width: $form-login-minw;
+	max-width: $form-login-maxw;
+	margin: {
+		left: auto;
+		right: auto;
+		top: 20px;
+	}
+}

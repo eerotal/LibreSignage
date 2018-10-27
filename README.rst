@@ -2,49 +2,118 @@
 LibreSignage - An open source digital signage solution
 ######################################################
 
-LibreSignage is a free and open source, lightweight and easy-to-use
-digital signage solution. LibreSignage runs on a HTTP web server serving
-content to normal web browsers. This makes it possible to use basically
-any device with the ability to display web pages from the internet as a
-client for a LibreSignage instance.
+Table Of Contents
+-----------------
 
-Features
---------
+`1. General`_
+
+`2. Features`_
+
+`3. Project goals`_
+
+`4. Installation`_
+
+`5. Default users`_
+
+`6. How to install npm`_
+
+`7. LibreSignage in GIT`_
+
+`8. LibreSignage versioning`_
+
+`9. FAQ`_
+
+`10. Screenshots`_
+
+`11. Make rules`_
+
+`12. Documentation`_
+
+`13. Third-party dependencies`_
+
+`14. Build system dependencies`_
+
+`15. License`_
+
+1. General
+----------
+
+LibreSignage is a free and open source, lightweight and easy-to-use
+digital signage solution. LibreSignage can be used to control a network
+of digital signage clients that display content from 'Slide queues'.
+The slides in these queues can be edited from the LibreSignage web
+interface.
+
+LibreSignage includes multi-user support and the permissions of
+different users are determined based on the groups they belong to
+ie. users of the group 'editor' can access the LibreSignage slide
+editor. The groups are also used to grant or deny access to different
+API endpoints.
+
+LibreSignage runs on a HTTP web server serving content to normal web
+browsers. This makes it possible to use basically any device with the
+ability to display web pages from the internet as a client for a
+LibreSignage instance.
+
+2. Features
+-----------
 
 * Web interface for editing slides and managing the
   LibreSignage instance.
 * Configurable slide duration, transition animations
-  and other parameters.
+  and other settings.
 * Special markup syntax for easily formatting slides.
+* Live preview of the slide markup in the slide editor.
+* Support for uploading image and video files.
+* Support for embedding remote or uploaded image and video
+  files using specific markup tags.
 * Possibility to schedule slides for a specific time-frame.
 * Possibility to give slide modification permissions to
-  other users.
+  other users to collaborate with them on creating a slide.
 * Separate slide queues for different digital signage
-  screens.
+  clients.
 * Multiple user accounts with permissions based on
   user groups.
 * User settings view for changing passwords and viewing
-  logged insessions.
-* User management/creation/deletion via the web intarface
+  logged in sessions.
+* User management/creation/deletion via the web interface
   for admin users.
 * Configurable quotas for actions such as creating slides.
 * Rate limited API for reducing server load.
-* Extensive documentation of all features.
-* Modular design of the codebase.
+* Extensive documentation of features including docs for
+  developers.
+* Documentation written in reStructuredText, making it
+  possible to read it even outside the web interface. This
+  is especially useful when reading the developer docs.
+* Extensive configuration possibilities.
+* Modular design.
 
-Installation
-------------
+3. Project goals
+----------------
+
+* Create a lightweight alternative to other digital signage solutions.
+* Create a system that's both easy to set up and easy to use.
+* Write a well documented and modular API so that implementing new
+  user interfaces is simple.
+* Avoid scope creep.
+* Document all features.
+* Keep it simple.
+
+4. Installation
+---------------
 
 LibreSignage has currently only been tested on Linux based systems,
 however it should be possible to run it on other systems aswell. Running
-LibreSignage on other systems will require some manual configuration though,
-since the build and installation systems won't work out of the box. The only
-requirement for running a LibreSignage server instance is the Apache web
-server with PHP support, which should be available on most systems. Building
-LibreSignage on the other hand requires some additional software.
+LibreSignage on other systems will require some manual configuration
+though, since the build and installation systems won't work out of the
+box. The only requirement for running a LibreSignage server instance is
+the Apache web server with PHP support, which should be available on most
+systems. Building LibreSignage on the other hand requires some additional
+software.
 
-LibreSignage is designed to be used with Apache 2.0 and the default install
-system is programmed to use Apache's Virtual Host configuration features.
+LibreSignage is designed to be used with Apache 2.0 and the default
+install system is programmed to use Apache's Virtual Host configuration
+features.
 
 In a nutshell, Virtual Hosts are a way of hosting multiple websites on
 one server, which is ideal in the case of LibreSignage. Using Virtual
@@ -56,29 +125,59 @@ can look up more information about Virtual Hosts on the
 Doing a basic install of LibreSignage is quite simple. The required steps
 are listed below.
 
-1. Install software needed for building LibreSignage. On Debian Stretch
-   this can be accomplished by running ``sudo apt install git npm
-   apache2 php7.0 pandoc``. *pandoc* is needed for compiling the
-   reStructuredText documentation files to HTML.
-2. Install the required JavaScript dependencies by running ``npm install``.
-   If this command fails to install Browserify because of a permission
-   error, you need to fix your npm installation. Check `the npm documentation
-   page <https://docs.npmjs.com/getting-started/fixing-npm-permissions>`_
-   for instructions. Both of the options on that page should work but
-   at least *Option 2* has been tested.
+1. Install software needed for building LibreSignage. You will need the
+   following packages: ``git, apache2, php7.2, pandoc ruby-sass, npm``.
+   On Debian Stretch all other packages except *npm* can installed by
+   running ``sudo apt install git apache2 php7.2 pandoc ruby-sass``.
+   Currently *npm* is only available in the Debian Sid repos and even
+   there the package is so old it doesn't work correctly. You can,
+   however, install npm manually. See `6. How to install NPM`_ for
+   more info.
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
    The repository will be cloned into the directory *LibreSignage/*.
 4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
-5. Run ``make``, read the instructions and answer the questions.
-   This command saves the config values it asks to a file in the *build/*
-   directory with the name *<DOMAIN>.iconf* where *<DOMAIN>* is the
-   domain name you entered. On subsequent invocations of ``make`` you
-   can add ``INST=<DOMAIN>.iconf`` to the command to use the same config
-   values that you specified earlier. For more advanced usage of ``make``,
-   see the section *Make rules*
-6. Finally, to install LibreSignage, run ``sudo make install`` and answer
+5. Install dependencies from NPM by running ``npm install``.
+6. Run ``make configure``. This script asks you to enter the
+   following configuration values.
+
+   * Document root (default: /var/www)
+
+     * The document root to use.
+
+   * Server name (domain)
+
+     * The domain name to use for configuring apache2. If you
+       don't have a domain and you are just testing the system,
+       you can either use 'localhost', your machines LAN IP or
+       a testing domain you don't actually own. If you use a testing
+       domain, you can add that domain to your */etc/hosts* file.
+       See the end of this section for more info.
+
+   * Server name aliases
+   * Admin name
+
+     * Shown to users on the main page.
+
+   * Admin email
+
+     * Shown to users on the main page.
+
+   * Enable debugging (y/N)
+
+     *  Whether to enable debugging. N is default.
+
+   This command generates an instance configuration file needed
+   for building LibreSignage. The file is saved in ``build/`` as
+   ``<DOMAIN>.iconf`` where ``<DOMAIN>`` is the domain name you
+   specified.
+7. Run ``make`` to build LibreSignage. You can use the ``-j<MAXJOBS>``
+   CLI option to specify a maximum number of parallel jobs to speed up
+   the building process. The usual recommended value for the max number
+   of jobs is one per CPU core, meaning that for eg. a quad core CPU you
+   should use -j4. See `11. Make rules`_ for more advanced options.
+8. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
 
 After this the LibreSignage instance is fully installed and ready to be
@@ -91,11 +190,12 @@ line to your */etc/hosts* file.
 
 ``example.com    127.0.0.1``
 
-This will redirect all requests for *example.com* to *localhost*,
-making it possible to access the site by connecting to *example.com*.
+This will redirect all requests for *example.com* to *127.0.0.1*
+(loopback), making it possible to access the site by connecting
+to *example.com*.
 
-Default users
--------------
+5. Default users
+----------------
 
 The initial configured users and their groups and passwords are listed
 below. It goes without saying that you should create new users and
@@ -110,8 +210,106 @@ user         editor, display          user
 display      display                  display
 =========== ======================== ==========
 
-Screenshots
------------
+6. How to install npm
+---------------------
+
+If npm doesn't exist in the repos of your Linux distribution of choice,
+is very outdated (like in the case of Debian) or you are not using a
+Linux based distribution at all, you must install it manually. You can
+follow the installation instructions for your OS on the
+`node.js website <https://nodejs.org/en/download/package-manager/>`_.
+
+There are other ways to install npm too. One alternative way to install
+npm is described below. *Note that if you use this method to install
+npm, you shouldn't update npm via it's own update mechanism
+(running npm install npm) since that will install the new version into
+a different directory. To update npm when it's installed this way,
+you should just follow steps 1-3 again.*
+
+1. Download the *node.js* binaries for your system from
+   https://nodejs.org/en/download/.
+2. Extract the tarball with ``tar -xvf <name of tarball>``.
+3. Create a new directory ``/opt/npm`` and copy the extracted
+   files into it.
+4. Run ``ln -s /opt/npm/bin/npm /usr/local/bin/npm`` and
+   ``ln -s /opt/npm/bin/npx /usr/local/bin/npx``. You need to
+   be root when running these commands so prefix them with ``sudo``
+   or log in as root first.
+5. Run ``cd ~/`` to go back to your home directory and verify the
+   installation by running ``npm -v``. This should now print the
+   installed npm version.
+
+7. LibreSignage in GIT
+----------------------
+
+LibreSignage uses the GIT version control system. The LibreSignage
+repository contains multiple branches that all have some differences.
+
+master
+  The master branch always contains the latest stable version of
+  LibreSignage with all the latest backported fixes. If you just
+  wan't to use a fully functioning version of LibreSignage, clone
+  this branch. The actual LibreSignage release points are also marked
+  in the GIT tree as annotated tags. You can clone a release tag too
+  but note that the latest patch release doesn't necessarily contain
+  the latest backports if new fixes have just been backported to master.
+
+v<MAJOR>.<MINOR>.<PATCH>
+  These branches are release branches. Development for a specific
+  LibreSignage version happens in the release branch for that specific
+  version. A new release branch is created every time either the major
+  or the minor version number changes. New eelease branches aren't created
+  for patch releases. Release branches are often quite stable and they
+  generally already work, but they might still contain serious bugs from
+  time to time.
+
+feature/*, bugfix/*, ...
+  Branches that start with a category and have the branch name after
+  a forward slash are development branches. You normally shouldn't
+  clone these because they are actively being worked on and even
+  commit history might be rewritten from time to time. These branches
+  aren't meant to be used by anyone else other than the developers
+  working on the branch.
+
+8. LibreSignage versioning
+--------------------------
+
+Each LibreSignage release has a designated version number of the
+form MAJOR.MINOR.PATCH.
+
+* The PATCH version is incremented for each patch release. Patch
+  releases only contain fixes and never contain new features.
+* The MINOR version is incremented for every release where
+  incrementing the MAJOR number is not justified. Minor releases
+  can contain new features and bugfixes etc.
+* The MAJOR version number is only incremented for very big and
+  major releases.
+
+The LibreSignage API also has its own version number that's just
+an integer which is incremented every time a backwards incompatible
+API change is made.
+
+9. FAQ
+------
+
+Why doesn't LibreSignage use framework/library X?
+  To avoid bloat; LibreSignage is designed to be minimal and lightweight
+  and it only uses external libraries where they are actually needed. 
+  Most UI frameworks for example are huge. LibreSignage does use
+  Bootstrap though, since it's a rather clean and simple framework.
+
+Why doesn't LibreSignage have feature X?
+  You can suggest new features in the bug tracker. If you know a bit
+  about programming in PHP, JS, HTML and CSS, you can also implement
+  the feature yourself and create a pull request.
+
+Is LibreSignage really free?
+  YES! In fact LibreSignage is not only free, it's also open source.
+  You can find information about the LibreSignage license in the
+  `15. License`_ section.
+
+10. Screenshots
+---------------
 
 Open these images in a new tab to view the full resolution versions.
 *Note that these screenshots are always the latest ones no matter what
@@ -119,76 +317,112 @@ branch or commit you are viewing.*
 
 **LibreSignage Login**
 
-.. image:: http://etal.mbnet.fi/libresignage/login.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/login.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Control Panel**
 
-.. image:: http://etal.mbnet.fi/libresignage/control.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/control.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Editor**
 
-.. image:: http://etal.mbnet.fi/libresignage/editor.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/editor.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage User Manager**
 
-.. image:: http://etal.mbnet.fi/libresignage/user_manager.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/user_manager.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage User Settings**
 
-.. image:: http://etal.mbnet.fi/libresignage/settings.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/user_settings.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Display**
 
-.. image:: http://etal.mbnet.fi/libresignage/display.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/display.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Documentation**
 
-.. image:: http://etal.mbnet.fi/libresignage/docs.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/docs.png
    :width: 320 px
    :height: 180 px
 
-Make rules
-----------
+**LibreSignage Media Uploader**
+
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/media_uploader.png
+   :width: 320 px
+   :height: 180 px
+
+11. Make rules
+--------------
 
 The following ``make`` rules are implemented in the makefile.
 
 all
-  The default rule that builds LibreSignage.
+  The default rule that builds the LibreSignage distribution.
 
 install
-  Install LibreSignage. This copies the LibreSignage disribution files
-  into a virtual host directory in */var/www*.
+  Install LibreSignage. This copies the LibreSignage distribution files
+  into a virtual host directory in the configured document root.
 
 utest
   Run the LibreSignage unit testing scripts. Note that you must install
-  LibreSignage before this rule works correctly.
+  LibreSignage before running this rule.
 
 clean
   Clean files generated by building LibreSignage.
 
 realclean
-  Same as *clean* but also remove generated config files from *build/*.
+  Same as *clean* but removes all generated files too. This rule
+  effectively resets the LibreSignage directory to how it was right
+  after cloning the repo.
 
 LOC
   Count the lines of code in LibreSignage.
 
-You can also pass ``INST=[CONFIG FILE]`` with all the build/installation rules
-to specify an existing install config to use. 
+LOD
+  Count the lines of documentation in LibreSignage. This target will
+  only work after building LibreSignage since the documentation lines
+  are counted from the docs in the dist/ directory. This way the
+  generated API endpoint docs can be taken into account too.
 
-Used third-party libraries and resources
-----------------------------------------
+You can also pass some other arguments to the LibreSignage makefile.
+
+INST=<config file> - (default: Last generated config.)
+  Manually specify a config file to use.
+
+VERBOSE=<y/n> - (default: y)
+  Print verbose log output.
+
+NOHTMLDOCS=<y/n> - (default: n)
+  Don't generate HTML documentation from the reStructuredText docs
+  or the API endpoint files. This setting can be used with make rules
+  that build files. Using it with eg. ``make install`` has no effect.
+  
+12. Documentation
+-----------------
+
+LibreSignage documentation is written in reStructuredText, which is
+a plaintext format often used for writing technical documentation.
+The reStructuredText syntax is also human-readable as-is, so you can
+read the documentation files straight from the source tree. The docs
+are located in the directory *src/doc/rst/*.
+
+The reStructuredText files are also compiled into HTML when LibreSignage
+is built and they can be accessed from the *Help* page of LibreSignage.
+
+13. Third-party dependencies
+----------------------------
 
 Bootstrap (Library, MIT License)
   Copyright (c) 2011-2016 Twitter, Inc.
@@ -213,18 +447,31 @@ Raleway (Font, SIL Open Font License 1.1)
 Montserrat (Font, SIL Open Font License 1.1)
   Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)  
 
+Inconsolata (Font, SIL Open Font License 1.1)
+  Copyright 2006 The Inconsolata Project Authors (https://github.com/cyrealtype/Inconsolata)
+
 Font-Awesome (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
   Font Awesome Free 5.1.0 by @fontawesome - https://fontawesome.com
 
-The full licenses for these third party libraries and resources can be found
-in the file *src/doc/rst/LICENSES_EXT.rst* in the source distribution.
+The full licenses for these third party libraries and resources can be
+found in the file *src/doc/rst/LICENSES_EXT.rst* in the source
+distribution.
 
-License
--------
+14. Build system dependencies
+-----------------------------
 
-LibreSignage is licensed under the BSD 3-clause license, which can be found
-in the file *src/doc/rst/LICENSE.rst* in the source distribution. Third party
-libraries and resources are licensed under their respective licenses. See the
-section *Used third party libraries and resources* for more information.
+* SASS (https://sass-lang.com/)
+* Browserify (http://browserify.org/)
+* PostCSS (https://postcss.org/)
+* Autoprefixer (https://github.com/postcss/autoprefixer)
+
+15. License
+-----------
+
+LibreSignage is licensed under the BSD 3-clause license, which can be
+found in the files *LICENSE.rst* and *src/doc/rst/LICENSE.rst* in the
+source distribution. Third party libraries and resources are licensed
+under their respective licenses. See `13. Third-party dependencies`_ for
+more information.
 
 Copyright Eero Talus 2018

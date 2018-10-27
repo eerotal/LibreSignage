@@ -1,14 +1,11 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
-*  *Get the configured server limits. This endpoint doesn't require
-*  or consume the API rate quota.*
+*  Get the configured server limits. This endpoint doesn't require
+*  or consume the API rate quota.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * limits     = A dictionary with the limits.
@@ -21,7 +18,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $SERVER_LIMITS = new APIEndpoint(array(
 	APIEndpoint::METHOD 		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
+	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
 	APIEndpoint::REQ_QUOTA		=> FALSE,
 	APIEndpoint::REQ_AUTH		=> FALSE
 ));

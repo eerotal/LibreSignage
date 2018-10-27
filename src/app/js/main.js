@@ -58,32 +58,49 @@ function display_update() {
 				)
 			)
 		);
+
 		display_animate(DISPLAY, slide.anim_show(), () => {
-			setTimeout(display_update, slide.get('time'));
+			setTimeout(display_update, slide.get('duration'));
 		});
 	});
 }
 
 function display_setup() {
-	var params = util.get_GET_parameters();
+	let params = util.get_GET_parameters();
 
 	if ('preview' in params) {
 		// Preview a slide without starting the display.
 		console.log(`LibreSignage: Preview slide ${params['preview']}.`);
 
-		var s = new slide.Slide(API);
-		s.load(params['preview'], (err) => {
+		let s = new slide.Slide(API);
+		s.load(params['preview'], false, false, (err) => {
 			if (API.handle_disp_error(err)) {
 				console.log("LibreSignage: Failed to preview slide!");
 				return;
 			}
-			DISPLAY.html(
-				markup.parse(
-					util.sanitize_html(
-						s.get('markup')
+			try {
+				let content = $(
+					markup.parse(
+						util.sanitize_html(
+							s.get('markup')
+						)
 					)
-				)
-			);
+				);
+
+				if ('static' in params) {
+					if (content.is('video')) {
+						content.removeAttr('autoplay');
+					}
+					content.find('video').removeAttr('autoplay');
+				}
+
+				DISPLAY.html(content);
+			} catch (e) {
+				if (e instanceof markup.err.MarkupSyntaxError) {
+					console.error(`LibreSignage: ${e.message}`);
+					DISPLAY.html('');
+				}
+			}
 		});
 	} else if ('q' in params){
 		console.log("LibreSignage: Start the display loop.");

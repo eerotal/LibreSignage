@@ -196,4 +196,4 @@ the response. The functions are defined as follows.
   this function automatically sets it to zero if it isn't already set.
   It is, however, possible to set the error value in the API endpoint
   code if needed. This function also exits the API endpoint meaning
-  that no code is executed after this function is finisehd.
+  that no code is executed after this function is finished.

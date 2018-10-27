@@ -141,3 +141,30 @@ function array_check(array $arr, Callable $func) {
 	}
 	return TRUE;
 }
+
+function htmltag(string $type, string $content, array $params) {
+	$ret = "<$type";
+	foreach ($params as $k => $v) { $ret .= ' '.$k.'="'.$v.'"'; }
+	$ret .= ">$content</$type>";
+	return $ret;
+}
+
+function arraydiff(array $arr1, array $arr2) {
+	$missing = [];
+	$extra = [];
+
+	foreach ($arr1 as $v) {
+		if (!in_array($v, $arr2)) {
+			$missing[] = $v;
+		}
+	}
+	foreach ($arr2 as $v) {
+		if (!in_array($v, $arr1)) {
+			$extra[] = $v;
+		}
+	}
+	return [
+		'missing' => $missing,
+		'extra' => $extra
+	];
+}

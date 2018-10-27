@@ -1,13 +1,10 @@
 <?php
-
-/*
-*  !!BUILD_VERIFY_NOCONFIG!!
-*/
-
 /*
 *  ====>
 *
-*  *Get a list of the active sessions for the current user.*
+*  Get a list of the active sessions for the current user.
+*
+*  **Request:** GET
 *
 *  Return value
 *    * sessions = An array of sessions.
@@ -19,25 +16,23 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
 $AUTH_GET_SESSIONS = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_RESPONSE['JSON'],
-	APIEndpoint::FORMAT		=> array(),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
+	APIEndpoint::METHOD         => API_METHOD['GET'],
+	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
+	APIEndpoint::FORMAT_URL     => array(),
+	APIEndpoint::REQ_QUOTA      => TRUE,
+	APIEndpoint::REQ_AUTH       => TRUE
 ));
 api_endpoint_init($AUTH_GET_SESSIONS);
 
-$resp = array();
-$tok = $AUTH_GET_SESSIONS->get_auth_token();
-$sd = $AUTH_GET_SESSIONS->get_caller()->get_session_data();
-foreach ($sd as $k => $d) {
-	$resp['sessions'][] = array(
-		'who' => $d['who'],
-		'from' => $d['from'],
-		'created' => $d['created'],
-		'max_age' => $d['max_age'],
-		'current' => password_verify($tok, $d['token_hash'])
-	);
+$resp = [];
+$tmp = [];
+$current_session = $AUTH_GET_SESSIONS->get_session();
+$sessions = $AUTH_GET_SESSIONS->get_caller()->get_sessions();
+
+foreach ($sessions as $k => $s) {
+	$tmp = $s->export(FALSE, FALSE);
+	$tmp['current'] = ($current_session->get_id() === $s->get_id());
+	$resp['sessions'][] = $tmp;
 }
 $AUTH_GET_SESSIONS->resp_set($resp);
 $AUTH_GET_SESSIONS->send();
