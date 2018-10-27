@@ -23,8 +23,8 @@ __pycache__
 
 # Exclude various temporary NPM files.
 /node_modules
+/package-lock.json
 npm-debug.log
-package-lock.json
 
 # Exclude temporary sass files.
 .sass-cache
