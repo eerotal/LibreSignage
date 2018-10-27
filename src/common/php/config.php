@@ -84,6 +84,7 @@
 			'video/ogg',
 			'video/webm'
 		],
+		"SLIDE_MAX_ASSETS"         => 2,
 
 		"QUEUE_NAME_MAX_LEN"       => 32,
 

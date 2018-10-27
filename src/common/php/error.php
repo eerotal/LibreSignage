@@ -21,6 +21,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 class ArgException extends Exception {};
 class IntException extends Exception {};
 class FileTypeException extends Exception {};
+class LimitException extends Exception {};
 
 function error_set_debug(bool $debug) {
 	/*

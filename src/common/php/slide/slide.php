@@ -387,6 +387,13 @@ class Slide extends Exportable{
 		*  also generates a thumbnail for the asset.
 		*/
 		$this->readychk();
+
+		if (
+			!empty($this->assets)
+			&& count($this->assets) >= gtlim('SLIDE_MAX_ASSETS')
+		) {
+			throw new LimitException('Too many slide assets.');
+		}
 		if (!is_dir($this->asset_path)) { mkdir($this->asset_path); }
 		$asset = new SlideAsset();
 		$asset->new($file, $this->asset_path);
@@ -411,6 +418,7 @@ class Slide extends Exportable{
 	}
 
 	function get_uploaded_asset(string $name) {
+		if (empty($this->assets)) { return NULL; }
 		foreach ($this->assets as $a) {
 			if ($a->get_filename() === $name) {
 				return $a;
