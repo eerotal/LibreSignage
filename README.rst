@@ -2,6 +2,42 @@
 LibreSignage - An open source digital signage solution
 ######################################################
 
+Table Of Contents
+-----------------
+
+`1. General`_
+
+`2. Features`_
+
+`3. Project goals`_
+
+`4. Installation`_
+
+`5. Default users`_
+
+`6. How to install npm`_
+
+`7. LibreSignage in GIT`_
+
+`8. LibreSignage versioning`_
+
+`9. FAQ`_
+
+`10. Screenshots`_
+
+`11. Make rules`_
+
+`12. Documentation`_
+
+`13. Third-party dependencies`_
+
+`14. Build system dependencies`_
+
+`15. License`_
+
+1. General
+----------
+
 LibreSignage is a free and open source, lightweight and easy-to-use
 digital signage solution. LibreSignage can be used to control a network
 of digital signage clients that display content from 'Slide queues'.
@@ -19,8 +55,8 @@ browsers. This makes it possible to use basically any device with the
 ability to display web pages from the internet as a client for a
 LibreSignage instance.
 
-Features
---------
+2. Features
+-----------
 
 * Web interface for editing slides and managing the
   LibreSignage instance.
@@ -52,18 +88,19 @@ Features
 * Extensive configuration possibilities.
 * Modular design.
 
-Goals
------
+3. Project goals
+----------------
 
 * Create a lightweight alternative to other digital signage solutions.
 * Create a system that's both easy to set up and easy to use.
 * Write a well documented and modular API so that implementing new
   user interfaces is simple.
+* Avoid scope creep.
 * Document all features.
 * Keep it simple.
 
-Installation
-------------
+4. Installation
+---------------
 
 LibreSignage has currently only been tested on Linux based systems,
 however it should be possible to run it on other systems aswell. Running
@@ -94,7 +131,8 @@ are listed below.
    running ``sudo apt install git apache2 php7.2 pandoc ruby-sass``.
    Currently *npm* is only available in the Debian Sid repos and even
    there the package is so old it doesn't work correctly. You can,
-   however, install npm manually. See `How to install NPM`_ for more info.
+   however, install npm manually. See `6. How to install NPM`_ for
+   more info.
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
@@ -138,7 +176,7 @@ are listed below.
    CLI option to specify a maximum number of parallel jobs to speed up
    the building process. The usual recommended value for the max number
    of jobs is one per CPU core, meaning that for eg. a quad core CPU you
-   should use -j4. See `Make rules`_ for more advanced options.
+   should use -j4. See `11. Make rules`_ for more advanced options.
 8. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
 
@@ -156,8 +194,8 @@ This will redirect all requests for *example.com* to *127.0.0.1*
 (loopback), making it possible to access the site by connecting
 to *example.com*.
 
-Default users
--------------
+5. Default users
+----------------
 
 The initial configured users and their groups and passwords are listed
 below. It goes without saying that you should create new users and
@@ -172,8 +210,8 @@ user         editor, display          user
 display      display                  display
 =========== ======================== ==========
 
-How to install npm
-------------------
+6. How to install npm
+---------------------
 
 If npm doesn't exist in the repos of your Linux distribution of choice,
 is very outdated (like in the case of Debian) or you are not using a
@@ -201,8 +239,8 @@ you should just follow steps 1-3 again.*
    installation by running ``npm -v``. This should now print the
    installed npm version.
 
-LibreSignage in GIT
--------------------
+7. LibreSignage in GIT
+----------------------
 
 LibreSignage uses the GIT version control system. The LibreSignage
 repository contains multiple branches that all have some differences.
@@ -233,8 +271,8 @@ feature/*, bugfix/*, ...
   aren't meant to be used by anyone else other than the developers
   working on the branch.
 
-LibreSignage versioning
------------------------
+8. LibreSignage versioning
+--------------------------
 
 Each LibreSignage release has a designated version number of the
 form MAJOR.MINOR.PATCH.
@@ -251,8 +289,8 @@ The LibreSignage API also has its own version number that's just
 an integer which is incremented every time a backwards incompatible
 API change is made.
 
-FAQ
----
+9. FAQ
+------
 
 Why doesn't LibreSignage use framework/library X?
   To avoid bloat; LibreSignage is designed to be minimal and lightweight
@@ -266,12 +304,12 @@ Why doesn't LibreSignage have feature X?
   the feature yourself and create a pull request.
 
 Is LibreSignage really free?
-  YES! In fact LibreSignage is not only free, it's also open source. You
-  can find information about the LibreSignage license in the License_
-  section.
+  YES! In fact LibreSignage is not only free, it's also open source.
+  You can find information about the LibreSignage license in the
+  `15. License`_ section.
 
-Screenshots
------------
+10. Screenshots
+---------------
 
 Open these images in a new tab to view the full resolution versions.
 *Note that these screenshots are always the latest ones no matter what
@@ -319,8 +357,8 @@ branch or commit you are viewing.*
    :width: 320 px
    :height: 180 px
 
-Make rules
-----------
+11. Make rules
+--------------
 
 The following ``make`` rules are implemented in the makefile.
 
@@ -365,8 +403,20 @@ NOHTMLDOCS=<y/n> - (default: n)
   or the API endpoint files. This setting can be used with make rules
   that build files. Using it with eg. ``make install`` has no effect.
   
-Third-party dependencies
-------------------------
+12. Documentation
+-----------------
+
+LibreSignage documentation is written in reStructuredText, which is
+a plaintext format often used for writing technical documentation.
+The reStructuredText syntax is also human-readable as-is, so you can
+read the documentation files straight from the source tree. The docs
+are located in the directory *src/doc/rst/*.
+
+The reStructuredText files are also compiled into HTML when LibreSignage
+is built and they can be accessed from the *Help* page of LibreSignage.
+
+13. Third-party dependencies
+----------------------------
 
 Bootstrap (Library, MIT License)
   Copyright (c) 2011-2016 Twitter, Inc.
@@ -401,21 +451,21 @@ The full licenses for these third party libraries and resources can be
 found in the file *src/doc/rst/LICENSES_EXT.rst* in the source
 distribution.
 
-Build system dependencies
--------------------------
+14. Build system dependencies
+-----------------------------
 
 * SASS (https://sass-lang.com/)
 * Browserify (http://browserify.org/)
 * PostCSS (https://postcss.org/)
 * Autoprefixer (https://github.com/postcss/autoprefixer)
 
-License
--------
+15. License
+-----------
 
 LibreSignage is licensed under the BSD 3-clause license, which can be
 found in the files *LICENSE.rst* and *src/doc/rst/LICENSE.rst* in the
 source distribution. Third party libraries and resources are licensed
-under their respective licenses. See `Third-party dependencies`_ for
+under their respective licenses. See `13. Third-party dependencies`_ for
 more information.
 
 Copyright Eero Talus 2018
