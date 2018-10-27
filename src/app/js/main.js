@@ -60,7 +60,7 @@ function display_update() {
 		);
 
 		display_animate(DISPLAY, slide.anim_show(), () => {
-			setTimeout(display_update, slide.get('time'));
+			setTimeout(display_update, slide.get('duration'));
 		});
 	});
 }

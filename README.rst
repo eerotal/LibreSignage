@@ -27,6 +27,7 @@ Features
 * Configurable slide duration, transition animations
   and other settings.
 * Special markup syntax for easily formatting slides.
+* Live preview of the slide markup in the slide editor.
 * Support for uploading image and video files.
 * Support for embedding remote or uploaded image and video
   files using specific markup tags.

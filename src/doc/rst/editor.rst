@@ -107,6 +107,16 @@ set to 2048 characters.
     clicking the red *X* symbol under the file in the media list.
   * **Quick help** - This button opens a popup with some help documents.
 
+Live preview
+------------
+
+The editor includes a live preview of the slide markup. The preview
+can be opened by clicking the *> Live preview* text above the markup
+input. The live preview is updated every time a change occurs in the
+markup input. The *4:3* and *16:9* buttons above the preview can be
+used to select different aspect ratios for the preview. This makes it
+possible to check what the slide will look like on different displays.
+
 Slide quotas
 ------------
 
