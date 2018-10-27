@@ -41,4 +41,6 @@ v0.1.0
                data.
   - [internal] Implement a simple assertion system in JavaScript.
   - [internal] Implement file uploading via the API system.
-  - [feature]  Implement media storage & uploading in the backend and editor.
+  - [feature]  Implement media storage & uploading in the backend and
+               editor.
+  - [feature]  Implement embedding video in slides using [video] tags.

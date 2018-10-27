@@ -30,8 +30,7 @@ Integer *(int)*
 
 String *(str)*
   A value of the form ``'<string>'`` or ``"<string>"`` where ``<string>``
-  is a string of letters, numbers and other characters. Strings can
-  contain all characters except =, [ and ].
+  is a string of letters, numbers and other characters.
 
 Raw string *(rstr)*
   The same thing as a normal string but raw strings don't have quotes
@@ -79,7 +78,7 @@ Display *italic* text.
 
 
 Image
-  | Syntax: ``[img url=<URL> width=<height> height=<height>]``
+  | Syntax: ``[img url=<URL> width=<width> height=<height>][/img]``
   | ``url: str``
   | ``width: percent``
   | ``height: percent``
@@ -92,6 +91,23 @@ Eg. ``width=50%`` would set the image width to 50% of the viewport
 **width** and ``height=50%`` would set the image height to 50% of
 the viewport **height**.
 
+
+Video
+  | Syntax: ``[video url=<URL> width=<width> height=<height>][/video]``
+  | ``url: str``
+  | ``width: percent``
+  | ``height: percent``
+
+The video class can be used to embed video. ``<URL>`` is the URL
+address of the video file, ``<width>`` is the width of the video
+element and ``<height>`` is the height of the video element. The
+width and height are defined as percentages of the viewport width
+and height respectively. Eg. ``width=50%`` would set the video
+width to 50% of the viewport **width** and ``height=50%`` would set
+the image height to 50% of the viewport **height**. Note that these
+sizes are only the size of the video element and the actual video
+scales so that the aspect ratio is always kept correct, ie. the actual
+video may not always fill the whole space that's allocated for it.
 
 Paragraph
   | Syntax: ``[p][/p]``
