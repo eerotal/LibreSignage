@@ -63,13 +63,14 @@
 
 	const THUMB_MAXW                = 320;
 	const THUMB_MAXH                = 180;
+	const THUMB_EXT                 = '.png';
 
 	const ASSET_FILENAME_MAXLEN     = 64;
 
 	// LibreSignage instance limits.
 	const LS_LIM = array(
-		"SLIDE_MIN_TIME"           => 1*1000,
-		"SLIDE_MAX_TIME"           => 20*1000,
+		"SLIDE_MIN_DURATION"       => 1*1000,
+		"SLIDE_MAX_DURATION"       => 40*1000,
 		"SLIDE_MAX_INDEX"          => 65536,
 		"SLIDE_NAME_MAX_LEN"       => 32,
 		"SLIDE_MARKUP_MAX_LEN"     => 2048,
@@ -78,8 +79,12 @@
 		"SLIDE_ASSET_VALID_MIMES"  => [
 			'image/jpeg',
 			'image/gif',
-			'image/png'
+			'image/png',
+			'video/mp4',
+			'video/ogg',
+			'video/webm'
 		],
+		"SLIDE_MAX_ASSETS"         => 2,
 
 		"QUEUE_NAME_MAX_LEN"       => 32,
 

@@ -74,7 +74,7 @@ $asset-thumb-label-h: 2.5em;
 		}
 	}
 
-	#asset-uploader-cant-upload-row {
+	.limit-indicator-row {
 		display: none; /* Initial */
 		flex: 0 0 auto;
 		margin: {

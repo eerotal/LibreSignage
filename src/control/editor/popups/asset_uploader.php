@@ -35,9 +35,17 @@
 			</button>
 		</div>
 	</div>
-	<div class="row" id="asset-uploader-cant-upload-row">
+	<div class="row limit-indicator-row"
+		id="asset-uploader-cant-upload-row">
 		<div class="col">
 			You must save the slide before adding media.
+		</div>
+	</div>
+	<div class="row limit-indicator-row"
+		id="asset-uploader-no-more-assets-row">
+		<div class="col">
+			The maximum number of files for this slide has been
+			reached. You can't upload more files.
 		</div>
 	</div>
 	<div class="row" id="asset-uploader-filelist-row">

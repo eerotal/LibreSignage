@@ -14,6 +14,7 @@
 *  * -2 = Asset filename invalid.
 *  * -3 = Invalid asset file type.
 *  * -4 = Asset already exists.
+*  * -5 = Too many slide assets.
 *
 *  This API endpoint only accepts asset filenames that have a length
 *  less than or equal to the server limit SLIDE_ASSET_NAME_MAX_LEN.
@@ -95,6 +96,8 @@ foreach($SLIDE_UPLOAD_ASSET->get_files() as $f) {
 		$errors[$f['name']] = -2;
 	} catch (FileTypeException $e) {
 		$errors[$f['name']] = -3;
+	} catch (LimitException $e) {
+		$errors[$f['name']] = -5;
 	}
 }
 $slide->write();

@@ -62,7 +62,11 @@ module.exports.AssetUploader = class AssetUploader {
 		*  Initialize the AssetUploader. 'id' is the ID of the main
 		*  container div for the asset uploader HTML. 'api' is an
 		*  initialized API interface object. Call AssetUploader.show()
-		*  to actually display the popup.
+		*  to actually display the popup. Note that you can call
+		*  AssetUploader.show() multiple times but you shouldn't
+		*  construct new AssetUploader objects for the same container
+		*  ID since that causes the popup HTML to be wrapped with extra
+		*  HTML multiple times.
 		*/
 		this.div_id = id;
 		this.API = api;
@@ -78,7 +82,8 @@ module.exports.AssetUploader = class AssetUploader {
 		for (let v of this.API.SERVER_LIMITS.SLIDE_ASSET_VALID_MIMES) {
 			this.VALID_MIMES[v.split('/')[1]] = v;
 		}
-		this.FILENAME_MAXLEN = this.API.SERVER_LIMITS.SLIDE_ASSET_NAME_MAX_LEN;
+		this.FILENAME_MAXLEN
+			= this.API.SERVER_LIMITS.SLIDE_ASSET_NAME_MAX_LEN;
 
 		this.FILELIST_UI = null;
 		this.UI = new uic.UIController({
@@ -87,7 +92,7 @@ module.exports.AssetUploader = class AssetUploader {
 					$(`#${id}`).get(0),
 					() => {
 						// Reset the asset uploader data on close.
-						this.UI.get('FILESEL_LABEL').set('Choose a file');
+						this.UI.get('FILESEL').clear();
 						this.UI.get('FILELINK').clear();
 						this.UI.get('FILELIST').set('');
 					}
@@ -101,27 +106,48 @@ module.exports.AssetUploader = class AssetUploader {
 			),
 			'FILESEL': new uic.UIInput(
 				elem = $(`#${id}-filesel`),
-				perm = (d) => { return d['s']; },
-				enabler = null,
+				perm = (d) => { return d['s'] && d['c']; },
+				enabler = (elem, s) => {
+					elem.prop('disabled', !s);
+				},
 				attach = {
-					'change': (e) => {
+					'input': (e) => {
+						/*
+						*  Update the file selector label when
+						*  the selection is changed.
+						*/
 						var label = '';
 						var files = e.target.files;
-						for (let i = 0; i < files.length; i++) {
-							if (label.length !== 0) { label += ', '; }
-							label += files.item(i).name;
+						if (files.length !== 0) {
+							for (let i = 0; i < files.length; i++) {
+								if (label.length !== 0) { label += ', '; }
+								label += files.item(i).name;
+							}
+						} else {
+							label = 'Choose a file';
 						}
 						this.UI.get('FILESEL_LABEL').set(label);
 
-						// Remove error styling from the upload button.
+						/*
+						*  Remove possible error styling from the
+						*  upload button.
+						*/
 						this.indicate('upload-success');
 					}
 				},
 				defer = () => { this.defer_ready(); },
 				mod = null,
 				getter = (elem) => { return elem.prop('files'); },
-				setter = (elem, s) => { elem.prop('files', s); },
-				clearer = (elem) => { elem.prop('files', null); }
+				setter = null,
+				clearer = (elem) => {
+					/*
+					*  Clear the file selector. This function also fires
+					*  the 'input' events to execute the attached event
+					*  handlers and to update any validators.
+					*/
+					elem.val('');
+					elem.trigger('input');
+				}
 			),
 			'FILESEL_LABEL': new uic.UIStatic(
 				elem = $(`#${id}-filesel-label`),
@@ -134,30 +160,27 @@ module.exports.AssetUploader = class AssetUploader {
 			),
 			'UPLOAD_BUTTON': new uic.UIButton(
 				elem = $(`#${id}-upload-btn`),
-				perm = (d) => { return d['s'] && !d['u'] && d['f']; },
+				perm = (d) => {
+					return d['s'] && !d['u'] && d['f'] && d['c'];
+				},
 				enabler = null,
 				attach = {
 					'click': () => {
 						/*
-						*  Handle upload button clicks. This listener
-						*  also applies the necessary styling to the
-						*  upload button and to the filelist on errors
-						*  using this.indicate().
+						*  Handle upload button clicks.
 						*/
 						this.state.uploading = true;
 						this.update_controls();
 
-						this.indicate('upload-success');
 						this.indicate('upload-uploading');
-
 						this.upload((resp) => {
-							this.indicate('upload-success');
 							if (resp.error) {
 								this.indicate('upload-error');
+							} else {
+								this.indicate('upload-success');
+								this.UI.get('FILESEL').clear();
 							}
-
 							this.update_and_populate();
-
 							this.state.uploading = false;
 							this.update_controls();
 						});
@@ -169,11 +192,18 @@ module.exports.AssetUploader = class AssetUploader {
 				elem = $(`#${id}-cant-upload-row`),
 				perm = (d) => { return !d['s']; },
 				enabler = (elem, s) => {
-					if (s) {
-						elem.show();
-					} else {
-						elem.hide();
-					}
+					s ? elem.show() : elem.hide();
+				},
+				attach = null,
+				defer = null,
+				getter = null,
+				setter = null
+			),
+			'NO_MORE_ASSETS_LABEL': new uic.UIStatic(
+				elem = $(`#${id}-no-more-assets-row`),
+				perm = (d) => { return d['s'] && !d['c']; },
+				enabler = (elem, s) => {
+					s ? elem.show() : elem.hide();
 				},
 				attach = null,
 				defer = null,
@@ -283,7 +313,8 @@ module.exports.AssetUploader = class AssetUploader {
 
 	indicate(status) {
 		/*
-		*  Indicate information to the user via CSS styling.
+		*  Indicate information by setting or removing CSS
+		*  classes.
 		*/
 		switch (status) {
 			// Filelist indicators.
@@ -304,11 +335,17 @@ module.exports.AssetUploader = class AssetUploader {
 
 			// Upload button indicators.
 			case 'upload-uploading':
+				this.UI.get('UPLOAD_BUTTON').get_elem().removeClass(
+					'error'
+				);
 				this.UI.get('UPLOAD_BUTTON').get_elem().addClass(
 					'uploading'
 				);
 				break;
 			case 'upload-error':
+				this.UI.get('UPLOAD_BUTTON').get_elem().removeClass(
+					'uploading'
+				);
 				this.UI.get('UPLOAD_BUTTON').get_elem().addClass(
 					'error'
 				);
@@ -329,7 +366,8 @@ module.exports.AssetUploader = class AssetUploader {
 		*    s  = Is this.slide null?
 		*    u  = Is uploading in progress?
 		*    v  = Is the popup visible?
-		*    f  = Is the file validator input validated?
+		*    f  = Is the file selector input validated?
+		*    c  = Is uploading more assets allowed?
 		*/
 		this.UI.all(
 			function(d) { this.state(d); },
@@ -337,16 +375,22 @@ module.exports.AssetUploader = class AssetUploader {
 				's': this.slide != null,
 				'u': this.state.uploading,
 				'v': this.state.visible,
-				'f': this.fileval_trig.is_valid()
+				'f': this.fileval_trig.is_valid(),
+				'c': (
+					this.slide != null
+					&& this.slide.get('assets') != null
+					&& this.slide.get('assets').length
+						< this.API.SERVER_LIMITS.SLIDE_MAX_ASSETS
+				)
 			}
 		);
 	}
 
 	upload(callback) {
 		/*
-		*  Upload the selected files to the slide that's loaded.
-		*  'callback' is passed straight to API.call() as the
-		*  callback argument.
+		*  Upload the selected files to the loaded slide.
+		*  'callback' is passed straight to API.call() as
+		*  the callback argument.
 		*/
 		let data = new FormData();
 		let files = this.UI.get('FILESEL').get();
@@ -365,11 +409,11 @@ module.exports.AssetUploader = class AssetUploader {
 		}
 	}
 
-	remove(name) {
+	remove(name, callback) {
 		/*
 		*  Remove the slide asset named 'name' from the
-		*  loaded slide. This function handles indicating
-		*  any errors.
+		*  loaded slide. 'callback' is passed straight
+		*  to API.call().
 		*/
 		this.API.call(
 			this.API.ENDP.SLIDE_REMOVE_ASSET,
@@ -377,17 +421,14 @@ module.exports.AssetUploader = class AssetUploader {
 				'id': this.slide.get('id'),
 				'name': name
 			},
-			(resp) => {
-				if (this.API.handle_disp_error(resp.error)) { return; }
-				this.update_and_populate();
-			}
+			callback
 		);
 	}
 
 	update_and_populate() {
 		/*
 		*  Load new slide data and call this.populate(). This
-		*  function also handles indicating any errors.
+		*  function handles all errors.
 		*/
 		this.update_slide((err) => {
 			if (!err) {
@@ -396,6 +437,7 @@ module.exports.AssetUploader = class AssetUploader {
 			} else {
 				this.indicate('filelist-error');
 			}
+			this.update_controls();
 		});
 	}
 
@@ -454,7 +496,16 @@ module.exports.AssetUploader = class AssetUploader {
 							a.filename,
 							(status, val) => {
 								if (!status) { return; }
-								this.remove(a.filename);
+								this.remove(
+									a.filename,
+									(resp) => {
+										this.API.handle_disp_error(
+											resp.error
+										);
+										this.UI.get('FILELINK').set('');
+										this.update_and_populate();
+									}
+								);
 							}
 						).show();
 						e.stopPropagation();

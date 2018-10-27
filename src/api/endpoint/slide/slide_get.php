@@ -15,7 +15,7 @@
 *      * id            = The ID of the slide.
 *      * name          = The name of the slide.
 *      * index         = The index of the slide.
-*      * time          = The time the slide is shown.
+*      * duration      = The duration of the slide.
 *      * markup        = The markup of the slide.
 *      * owner         = The owner of the slide.
 *      * enabled       = Whether the slide is enabled or not.
@@ -24,6 +24,8 @@
 *      * sched_t_e     = The slide schedule ending timestamp.
 *      * animation     = The slide animation identifier.
 *      * collaborators = The collaborators of the slide.
+*      * lock          = Slide lock data object.
+*      * assets        = Slide assets data object.
 *
 *    * error   = An error code or API_E_OK on success.
 *

@@ -44,8 +44,8 @@ Editing an existing slide
 Existing slides can be edited by selecting them in the timeline,
 editing the values and saving them using the save button.
 
-Data fields
-+++++++++++
+Configuration fields
+++++++++++++++++++++
 
 **Name** - The *Name* field is used for a display slide name in the
 LibreSignage editor. This name is only visible in the editor. The *Name*
@@ -60,8 +60,8 @@ characters.
 be used to give other users the permission to modify a slide. Slide
 collaborators can't delete or change the queue of the slide.
 
-**Time** - The *Time* selector controls how long the slide is shown in
-the slideshow. The values in the selector are in seconds.
+**Duration** - The *Duration* input is used to specify the duration of
+the slide in seconds.
 
 **Index** - The index value controls the order of the slides in the
 slideshow. The slide with index 0 is the first slide, index 1 is the
@@ -82,7 +82,7 @@ then automatically enables the slide when needed. Note that the manual
 and end dates for the scheduling feature can be entered in the inputs
 below this checkbox.
 
-**Enabled** - Select whether the slide is enabled or not. The slide
+**Enable slide** - Select whether the slide is enabled or not. The slide
 will only be shown on the display page if this checkbox is selected.
 The enabled/disabled state is additionally indicated in the slide
 list at the top of the page: Grey slides are disabled and white slides
@@ -95,6 +95,17 @@ The markup field accepts a special markup sytax described in
 `LibreSignage Markup </doc?doc=markup>`_. The maximum length of the
 markup is set in the LibreSignage instance config and by default it's
 set to 2048 characters.
+
+**Menu** - The menu dropdown contains some additional editor controls.
+
+  * **Add media** - This button opens a media uploader popup that
+    can be used to upload images and videos to embed them in slides.
+    After uploading a file, you can click the respective thumbnail
+    in the media list and the URL of that file will be shown next to
+    the *Link* label. Copy this URL and use in the *url* argument of a
+    markup tag to embed the file. An uploaded file can be deleted by
+    clicking the red *X* symbol under the file in the media list.
+  * **Quick help** - This button opens a popup with some help documents.
 
 Slide quotas
 ------------

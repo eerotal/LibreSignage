@@ -10,7 +10,7 @@
 *  Parameters
 *    * Data can be requested by assigning 1 to the
 *      requested key. The following keys are accepted:
-*      id, markup, name, index, time, owner, enabled,
+*      id, markup, name, index, duration, owner, enabled,
 *      sched, sched_t_s, sched_t_e, animation, collaborators,
 *      lock
 *
@@ -32,7 +32,7 @@ $SLIDE_DATA_QUERY = new APIEndpoint(array(
 		'markup' => API_P_STR|API_P_OPT,
 		'name' => API_P_STR|API_P_OPT,
 		'index' => API_P_STR|API_P_OPT,
-		'time' => API_P_STR|API_P_OPT,
+		'duration' => API_P_STR|API_P_OPT,
 		'owner' => API_P_STR|API_P_OPT,
 		'enabled' => API_P_STR|API_P_OPT,
 		'sched' => API_P_STR|API_P_OPT,

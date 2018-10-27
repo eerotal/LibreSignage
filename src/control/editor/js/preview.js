@@ -103,7 +103,17 @@ exports.Preview = class Preview {
 		}
 
 		if (html != null) {
-			this.preview.contents().find('body').html(html);
+			let content = $(html);
+
+			/* 
+			*  Disable autoplaying video for previews.
+			*/
+			if (content.is('video')) {
+				content.removeAttr('autoplay');
+			}
+			content.find('video').removeAttr('autoplay');
+
+			this.preview.contents().find('body').html(content);
 		}
 	}
 
