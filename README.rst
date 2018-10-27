@@ -317,43 +317,49 @@ branch or commit you are viewing.*
 
 **LibreSignage Login**
 
-.. image:: http://etal.mbnet.fi/libresignage/login.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/login.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Control Panel**
 
-.. image:: http://etal.mbnet.fi/libresignage/control.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/control.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Editor**
 
-.. image:: http://etal.mbnet.fi/libresignage/editor.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/editor.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage User Manager**
 
-.. image:: http://etal.mbnet.fi/libresignage/user_manager.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/user_manager.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage User Settings**
 
-.. image:: http://etal.mbnet.fi/libresignage/settings.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/user_settings.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Display**
 
-.. image:: http://etal.mbnet.fi/libresignage/display.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/display.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Documentation**
 
-.. image:: http://etal.mbnet.fi/libresignage/docs.png
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/docs.png
+   :width: 320 px
+   :height: 180 px
+
+**LibreSignage Media Uploader**
+
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/media_uploader.png
    :width: 320 px
    :height: 180 px
 

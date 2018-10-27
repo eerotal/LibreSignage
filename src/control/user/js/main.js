@@ -150,7 +150,7 @@ function user_settings_setup() {
 				regex: null
 			}, "The password is too long."),
 			new val.EqValidator(
-				null,
+				{},
 				"The passwords don't match."
 			)
 		],
