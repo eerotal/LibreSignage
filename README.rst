@@ -38,55 +38,64 @@ Table Of Contents
 1. General
 ----------
 
+Digital Signage is everything from large-scale commercial billboards
+to smaller advertisement displays, notice boards or digital restaurant
+menus. The possibilities of digital signage are endless. If you need
+to display periodically changing content to users on a wall-mounted
+TV for example, digital signage is probably what you are looking for.
+
 LibreSignage is a free and open source, lightweight and easy-to-use
-digital signage solution. LibreSignage can be used to control a network
-of digital signage clients that display content from 'Slide queues'.
-The slides in these queues can be edited from the LibreSignage web
-interface.
+digital signage solution for use in schools, cafés, restaurants and
+shops among others. LibreSignage can be used to manage a network of
+digital signage displays. Don't let the word network fool you though;
+a network can be as small as one display on an office wall or as big
+as 50+ displays spread throughout a larger building.
 
-LibreSignage includes multi-user support and the permissions of
-different users are determined based on the groups they belong to
-ie. users of the group 'editor' can access the LibreSignage slide
-editor. The groups are also used to grant or deny access to different
-API endpoints.
+LibreSignage also includes multi-user support with password authentication
+and configurable access control to specific features. If a school wants
+to setup a digital notice board system for example, they might give
+every teacher an account with slide editing permissions so that teachers
+could manage the content on the internal digital signage network. This
+way the teachers could inform students about important things such as
+upcoming tests for example.
 
-LibreSignage runs on a HTTP web server serving content to normal web
-browsers. This makes it possible to use basically any device with the
-ability to display web pages from the internet as a client for a
-LibreSignage instance.
+LibreSignage uses a HTTP web server to serve content to the individual
+signage displays. This means that he displays only need to run a web
+browser pointed to the central LibreSignage server to actually display
+content. This approach has a few advantages.
+
+  1. It's simple - No specific hardware/software platform is required.
+     Any system with a fairly recent web browser works.
+  2. It's cheap - You don't necessarily need to buy lots of expensive
+     equipment to get started. Just dust off the old PC in the closet,
+     install an up-to-date OS like Linux on it, install a web browser,
+     hide the mouse pointer by default and connect the system to a
+     display. That's it. The only other thing you need is the server,
+     which in fact can run on the same system if needed.
+  3. It's reliable - The web infrastructure is already implemented and
+     well tested so why not use it.
+  4. It makes editing easy - Displaying content in a browser has the
+     advantage of making slide previewing very simple. You can either
+     use the 'Live Preview' in the editor or check the exact results
+     from the actual 'Display' page that's displayed on the clients too.
 
 2. Features
 -----------
 
-* Web interface for editing slides and managing the
-  LibreSignage instance.
-* Configurable slide duration, transition animations
-  and other settings.
+* Web interface for editing slides and managing the LibreSignage instance.
+* Many per slide settings like durations, transitions, etc.
 * Special markup syntax for easily formatting slides.
 * Live preview of the slide markup in the slide editor.
-* Support for uploading image and video files.
-* Support for embedding remote or uploaded image and video
-  files using specific markup tags.
-* Possibility to schedule slides for a specific time-frame.
-* Possibility to give slide modification permissions to
-  other users to collaborate with them on creating a slide.
-* Separate slide queues for different digital signage
-  clients.
-* Multiple user accounts with permissions based on
-  user groups.
-* User settings view for changing passwords and viewing
-  logged in sessions.
-* User management/creation/deletion via the web interface
-  for admin users.
-* Configurable quotas for actions such as creating slides.
+* Support for embedding remote or uploaded image and video files.
+* Support for scheduling specific slides for a specific time-frame.
+* Collaboration features with other users on the network.
+* Separate slide queues for different sets of signage clients.
+* Multi user support with configurable access control.
+* User management features for admin users in the web interface.
+* Configurable quota for the amount of slides a user can create.
 * Rate limited API for reducing server load.
-* Extensive documentation of features including docs for
-  developers.
-* Documentation written in reStructuredText, making it
-  possible to read it even outside the web interface. This
-  is especially useful when reading the developer docs.
+* Extensive documentation of features including docs for developers.
 * Extensive configuration possibilities.
-* Modular design.
 
 3. Project goals
 ----------------
