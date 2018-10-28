@@ -64,20 +64,20 @@ signage displays. This means that he displays only need to run a web
 browser pointed to the central LibreSignage server to actually display
 content. This approach has a few advantages.
 
-  1. It's simple - No specific hardware/software platform is required.
-     Any system with a fairly recent web browser works.
-  2. It's cheap - You don't necessarily need to buy lots of expensive
-     equipment to get started. Just dust off the old PC in the closet,
-     install an up-to-date OS like Linux on it, install a web browser,
-     hide the mouse pointer by default and connect the system to a
-     display. That's it. The only other thing you need is the server,
-     which in fact can run on the same system if needed.
-  3. It's reliable - The web infrastructure is already implemented and
-     well tested so why not use it.
-  4. It makes editing easy - Displaying content in a browser has the
-     advantage of making slide previewing very simple. You can either
-     use the 'Live Preview' in the editor or check the exact results
-     from the actual 'Display' page that's displayed on the clients too.
+1. It's simple - No specific hardware/software platform is required.
+   Any system with a fairly recent web browser works.
+2. It's cheap - You don't necessarily need to buy lots of expensive
+   equipment to get started. Just dust off the old PC in the closet,
+   install an up-to-date OS like Linux on it, install a web browser,
+   hide the mouse pointer by default and connect the system to a
+   display. That's it. The only other thing you need is the server,
+   which in fact can run on the same system if needed.
+3. It's reliable - The web infrastructure is already implemented and
+   well tested so why not use it.
+4. It makes editing easy - Displaying content in a browser has the
+   advantage of making slide previewing very simple. You can either
+   use the 'Live Preview' in the editor or check the exact results
+   from the actual 'Display' page that's displayed on the clients too.
 
 2. Features
 -----------
