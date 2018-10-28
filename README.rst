@@ -342,6 +342,12 @@ branch or commit you are viewing.*
    :width: 320 px
    :height: 180 px
 
+**LibreSignage Media Uploader**
+
+.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/media_uploader.png
+   :width: 320 px
+   :height: 180 px
+
 **LibreSignage User Manager**
 
 .. image:: http://etal.mbnet.fi/libresignage/v0.2.0/user_manager.png
@@ -363,12 +369,6 @@ branch or commit you are viewing.*
 **LibreSignage Documentation**
 
 .. image:: http://etal.mbnet.fi/libresignage/v0.2.0/docs.png
-   :width: 320 px
-   :height: 180 px
-
-**LibreSignage Media Uploader**
-
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/media_uploader.png
    :width: 320 px
    :height: 180 px
 
