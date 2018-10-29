@@ -8,6 +8,11 @@
 set -e
 . build/scripts/conf.sh
 
+read -p 'Server environment (DEF: apache2-debian): ' ICONF_SERVER_ENV;
+if [ -z "$ICONF_SERVER_ENV" ]; then
+	ICONF_SERVER_ENV='apache2-debian';
+fi
+
 read -p 'Document root (DEF: /var/www): ' ICONF_DOCROOT;
 if [ -z "$ICONF_DOCROOT" ]; then
 	ICONF_DOCROOT='/var/www';
@@ -40,6 +45,7 @@ echo "Write config to '$ICONF_F'.";
 echo '#!/bin/sh'                                  >  $ICONF_F;
 echo "# Generated on `date` by configure.sh."     >> $ICONF_F;
 
+echo "ICONF_SERVER_ENV=\"$ICONF_SERVER_ENV\";"    >> $ICONF_F;
 echo "ICONF_DOCROOT=\"$ICONF_DOCROOT\";"          >> $ICONF_F;
 echo "ICONF_NAME=\"$ICONF_NAME\";"                >> $ICONF_F;
 echo "ICONF_ALIAS=\"$ICONF_ALIAS\";"              >> $ICONF_F;

@@ -1,8 +1,8 @@
 #!/bin/sh
 
 ##
-## A script for building LibreSignage and installing an
-## apache2 virtual host for hosting a LibreSignage instance.
+## A LibreSignage environment specific install handler for
+## apache2 on Debian.
 ##
 
 set -e
@@ -11,14 +11,15 @@ set -e
 
 FLAG_PRESERVE_DATA=0;
 
-# Check that the APACHE_SITES directory exists.
-if [ ! -d "$APACHE_SITES" ]; then
-	echo "[ERROR] '$APACHE_SITES' doesn't exist.";
-	echo "[ERROR] Is apache2 installed?";
-	exit 1;
-fi
-
+# Environment specific path constants.
+SITES_DIR='/etc/apache2/sites-available';
 VHOST_DIR=`echo "$ICONF_DOCROOT/$ICONF_NAME" | sed "s/\/\+/\//g"`;
+
+# Check that the SITES_DIR directory exists.
+if [ ! -d "$SITES_DIR" ]; then
+	echo "[ERROR] '$SITES_DIR' doesn't exist. Is apache2 installed?"
+	exit 1
+fi
 
 # Check whether VHOST_DIR already has files.
 if [ -d "$VHOST_DIR" ]; then
@@ -80,34 +81,32 @@ find "$VHOST_DIR/data" -type d -exec chmod 775 "{}" ";";
 find "$VHOST_DIR/data" -type f -exec chmod 664 "{}" ";";
 
 ##
-##  Create config and setup Apache.
+## Final apache2 setup.
 ##
 
-echo "[INFO] Creating VHost config in '$APACHE_SITES/$ICONF_NAME.conf'";
-if [ -f "$APACHE_SITES/$ICONF_NAME.conf" ]; then
-	read -p 'Replace existing VHost config? (y/N): ' create_vhost_conf
-else
-	read -p 'Create VHost config? (y/N): ' create_vhost_conf	
+if [ -f "$SITES_DIR/$ICONF_NAME.conf" ]; then
+	echo "[INFO] Apache2 server config already exists."
+	read -p "Replace? (y/N) " tmp
+	case "$tmp" in
+		[Yy]* )
+			;;
+		*)
+			exit 0;
+			;;
+	esac
 fi
+cp "$CONF_DIR/sites-available/$ICONF_NAME.conf"	"$SITES_DIR/."
 
-case "$create_vhost_conf" in
+echo "[INFO] Enable virtual host."
+a2ensite --quiet "$ICONF_NAME.conf"
+echo "[INFO] Enable mod_rewrite."
+a2enmod	--quiet	rewrite
+
+read -p	"Restart apache2? (y/N) " tmp
+case "$tmp" in  
 	[Yy]* )
-		. 'build/scripts/templates/vhost.sh' \
-			> $APACHE_SITES/$ICONF_NAME.conf;
-		echo "[INFO] Enabling site '$ICONF_NAME.conf'...";
-		a2ensite --quiet "$ICONF_NAME.conf";;
-	*) ;;
-esac
-
-echo '[INFO] Enabling apache2 mod_rewrite...';
-a2enmod --quiet rewrite;
-
-read -p 'Restart apache2? (y/N): ' EN_VHOST;
-case "$EN_VHOST" in
-	[Yy]* )
-		echo '[INFO] Restarting apache2...';
+		echo "[INFO] Restart apache2."
 		apache2ctl restart
-		echo '[INFO] Done!';
 		;;
 	*)
 		;;

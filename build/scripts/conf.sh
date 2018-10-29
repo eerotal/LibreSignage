@@ -5,8 +5,8 @@
 # Source and distribution paths for the build system.
 SRC_DIR='src';
 DIST_DIR='dist';
-APACHE_SITES='/etc/apache2/sites-available';
-APACHE_CONFIGS='/etc/apache2/conf-available';
+CONF_DIR='server';
+
 ICONF_FILE_EXT='.iconf';
 RST_DIR="$DIST_DIR/doc/rst";
 HTML_DIR="$DIST_DIR/doc/html";

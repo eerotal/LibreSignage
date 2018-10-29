@@ -13,9 +13,17 @@ ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SASS_IPATHS := $(ROOT) $(ROOT)src/common/css
 SASSFLAGS := --sourcemap=none --no-cache
 
-VERBOSE ?= Y     # Verobose log output.
-NOHTMLDOCS ?= N  # Don't generate HTML docs.
-INST ?= ""       # Installation config path.
+# Verbose log output.
+VERBOSE ?= Y
+
+# Don't generate HTML docs.
+NOHTMLDOCS ?= N
+
+# Installation config path.
+INST ?= ""
+
+# Use apache2 by default.
+SERVER_ENV ?= apache2
 
 # LibreSignage build dependencies. Note that apache is excluded
 # since checking whether it's installed usually requires root.
@@ -300,7 +308,20 @@ dist/libs/%:: node_modules/%
 install:
 	@:
 	set -e
-	./build/scripts/install.sh $(INST)
+	. build/scripts/ldiconf.sh
+	./build/scripts/env_install_handlers/"$$ICONF_SERVER_ENV".sh $(INST)
+
+configure:
+	@:
+	set -e
+
+	./build/scripts/configure.sh
+
+	. build/scripts/conf.sh
+	. build/scripts/ldiconf.sh
+	echo "[INFO] Generate server configuration for '$$ICONF_SERVER_ENV'."
+	mkdir -p "$$CONF_DIR";
+	./build/scripts/env_config_generators/"$$ICONF_SERVER_ENV".sh
 
 utest:
 	@:
@@ -334,6 +355,8 @@ realclean:
 	rm -rf build/link
 	$(call status,rm,node_modules,none);
 	rm -rf node_modules
+	$(call status,rm,server,none)
+	rm -rf server
 	$(call status,rm,package-lock.json,none);
 	rm -f package-lock.json
 
@@ -390,11 +413,6 @@ LOD:
 	echo '[INFO] Make sure your 'dist/' is up to date!'
 	echo '[INFO] Lines Of Documentation: '
 	wc -l `find dist -type f -name '*.rst'`
-
-configure:
-	@:
-	set -e
-	./build/scripts/configure.sh
 
 initchk:
 	@:

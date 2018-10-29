@@ -1,6 +1,14 @@
-# LibreSignage Virtual Host configuration template.
-# This file is sourced in install.sh.
+#
+#  LibreSignage environment config generator for Apache 2 on Debian.
+#
 
+set -e
+. build/scripts/conf.sh
+. build/scripts/ldiconf.sh
+
+mkdir -p "$CONF_DIR/sites-available";
+
+{
 echo '<VirtualHost *:80>';
 if [ -n "$ICONF_ADMIN_EMAIL" ]; then
 	echo "	ServerAdmin $ICONF_ADMIN_EMAIL";
@@ -37,3 +45,4 @@ echo '		RewriteRule .* - [R=404,L]';
 echo '	</DirectoryMatch>';
 
 echo '</VirtualHost>';
+} > "$CONF_DIR/sites-available/$ICONF_NAME.conf"
