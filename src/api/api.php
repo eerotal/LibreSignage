@@ -4,145 +4,75 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/defs.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/argarray.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
-// API Endpoint request methods.
-const API_METHOD = [
-	"GET" => 0,
-	"POST" => 1
-];
-
-// API Endpoint MIME types.
-const API_MIME = [
-	"application/json"    => 0,
-	"multipart/form-data" => 1,
-	"text/plain"          => 2
-];
-
-const API_MIME_REGEX_MAP = [
-	0 => "/application\/json.*/",
-	1 => "/multipart\/form-data.*/",
-	2 => "/text\/plain.*/"
-];
-
-// API type flags.
-const API_P_STR          = 0x1;
-const API_P_INT          = 0x2;
-const API_P_FLOAT        = 0x4;
-const API_P_OPT          = 0x8;
-const API_P_NULL         = 0x10;
-const API_P_BOOL         = 0x20;
-
-// API array type flags.
-const API_P_ARR_INT      = 0x40;
-const API_P_ARR_STR      = 0x80;
-const API_P_ARR_FLOAT    = 0x100;
-const API_P_ARR_BOOL     = 0x200;
-const API_P_ARR_MIXED    = 0x400;
-
-// API data flags.
-const API_P_EMPTY_STR_OK = 0x800;
-
-// API convenience flags.
-const API_P_ARR_ANY	= API_P_ARR_STR
-                     |API_P_ARR_INT
-                     |API_P_ARR_FLOAT
-                     |API_P_ARR_BOOL
-                     |API_P_ARR_MIXED;
-
-const API_P_ANY     = API_P_STR
-                     |API_P_INT
-                     |API_P_FLOAT
-                     |API_P_OPT
-                     |API_P_NULL
-                     |API_P_BOOL
-                     |API_P_ARR_ANY;
-
-const API_P_UNUSED  = API_P_ANY
-                     |API_P_EMPTY_STR_OK
-                     |API_P_OPT;
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/filters/configfilter.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/filters/requestfilter.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/filters/authfilter.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/filters/ratefilter.php');
 
 class APIEndpoint {
 	// Config options.
-	const METHOD           = 'method';
-	const REQUEST_TYPE     = 'request_type';
-	const RESPONSE_TYPE    = 'response_type';
-	const FORMAT_BODY      = 'format_body';
-	const FORMAT_URL       = 'format_url';
-	const STRICT_FORMAT    = 'strict_format';
-	const REQ_QUOTA        = 'req_quota';
-	const REQ_AUTH         = 'req_auth';
+	const METHOD               = 'method';
+	const REQUEST_TYPE         = 'request_type';
+	const RESPONSE_TYPE        = 'response_type';
+	const FORMAT_BODY          = 'format_body';
+	const FORMAT_URL           = 'format_url';
+	const STRICT_FORMAT        = 'strict_format';
+	const REQ_QUOTA            = 'req_quota';
+	const REQ_AUTH             = 'req_auth';
+	const ALLOW_COOKIE_AUTH    = 'allow_cookie_auth';
 
-	private $method        = 0;
-	private $request_type  = 0;
-	private $response_type = 0;
-	private $response      = NULL;
-	private $format_body   = NULL;
-	private $format_url    = NULL;
-	private $strict_format = TRUE;
-	private $req_quota     = TRUE;
-	private $req_auth      = TRUE;
-	private $data          = NULL;
-	private $caller        = NULL;
+	private $method            = 0;
+	private $request_type      = 0;
+	private $response_type     = 0;
+	private $response          = NULL;
+	private $format_body       = NULL;
+	private $format_url        = NULL;
+	private $strict_format     = TRUE;
+	private $req_quota         = TRUE;
+	private $req_auth          = TRUE;
+	private $data              = NULL;
+	private $headers           = NULL;
+	private $caller            = NULL;
+	private $allow_cookie_auth = FALSE;
 
 	public function __construct(array $config) {
 		$args = new ArgumentArray(
 			[
-				self::METHOD        => API_METHOD,
-				self::REQUEST_TYPE  => API_MIME,
-				self::RESPONSE_TYPE => API_MIME,
-				self::FORMAT_BODY   => 'array',
-				self::FORMAT_URL    => 'array',
-				self::STRICT_FORMAT => 'boolean',
-				self::REQ_QUOTA     => 'boolean',
-				self::REQ_AUTH      => 'boolean'
+				self::METHOD            => API_METHOD,
+				self::REQUEST_TYPE      => API_MIME,
+				self::RESPONSE_TYPE     => API_MIME,
+				self::FORMAT_BODY       => 'array',
+				self::FORMAT_URL        => 'array',
+				self::STRICT_FORMAT     => 'boolean',
+				self::REQ_QUOTA         => 'boolean',
+				self::REQ_AUTH          => 'boolean',
+				self::ALLOW_COOKIE_AUTH => 'boolean'
 			],
 			[
-				self::REQUEST_TYPE  => API_MIME['application/json'],
-				self::RESPONSE_TYPE => API_MIME['application/json'],
-				self::FORMAT_BODY   => [],
-				self::FORMAT_URL    => [],
-				self::STRICT_FORMAT => TRUE,
-				self::REQ_QUOTA     => TRUE,
-				self::REQ_AUTH      => TRUE
+				self::REQUEST_TYPE      => API_MIME['application/json'],
+				self::RESPONSE_TYPE     => API_MIME['application/json'],
+				self::FORMAT_BODY       => [],
+				self::FORMAT_URL        => [],
+				self::STRICT_FORMAT     => TRUE,
+				self::REQ_QUOTA         => TRUE,
+				self::REQ_AUTH          => TRUE,
+				self::ALLOW_COOKIE_AUTH => FALSE
 			]
 		);
 		$ret = $args->chk($config);
 		foreach ($ret as $k => $v) { $this->$k = $v; }
 	}
 
-	private function parse_json_request(string $str) {
-		// Parse JSON request data.
-		if (strlen($str) === 0) {
-			$data = [];
-		} else {
-			$data = json_decode($str, $assoc=TRUE);
-			if (
-				$data === NULL &&
-				json_last_error() != JSON_ERROR_NONE
-			) {
-				throw new IntException('JSON parsing failed!');
-			}
-		}
-		if ($data === NULL) {
-			$data = [];
- 		} else if (gettype($data) !== 'array') {
-			throw new ArgException(
-				'Invalid request data. Expected an  '.
-				'array as the root element.'
-			);
-		}
-		$this->verify($data, $this->format_body);
-		return $data;
-	}
-
-	private function parse_url_request() {
-		// Parse URL request data.
-		$this->verify($_GET, $this->format_url);
-		return $_GET;
+	public function load_headers() {
+		/*
+		*  Load supplied request headers;
+		*/
+		$this->headers = getallheaders();
 	}
 
 	public function load_data() {
@@ -202,6 +132,37 @@ class APIEndpoint {
 			default:
 				throw new ArgException("Unexpected API method.");
 		}
+	}
+
+	private function parse_json_request(string $str) {
+		// Parse JSON request data.
+		if (strlen($str) === 0) {
+			$data = [];
+		} else {
+			$data = json_decode($str, $assoc=TRUE);
+			if (
+				$data === NULL &&
+				json_last_error() != JSON_ERROR_NONE
+			) {
+				throw new IntException('JSON parsing failed!');
+			}
+		}
+		if ($data === NULL) {
+			$data = [];
+ 		} else if (gettype($data) !== 'array') {
+			throw new ArgException(
+				'Invalid request data. Expected an  '.
+				'array as the root element.'
+			);
+		}
+		$this->verify($data, $this->format_body);
+		return $data;
+	}
+
+	private function parse_url_request() {
+		// Parse URL request data.
+		$this->verify($_GET, $this->format_url);
+		return $_GET;
 	}
 
 	private function chk_arr_types(array $vals, string $type) {
@@ -340,7 +301,7 @@ class APIEndpoint {
 	}
 
 	public function has(string $key, bool $null_check = FALSE) {
-		if (in_array($key, array_keys($this->data))) {
+		if (array_key_exists($key, $this->data)) {
 			if ($null_check && $this->data[$key] == NULL) {
 				return FALSE;
 			}
@@ -350,12 +311,22 @@ class APIEndpoint {
 		}
 	}
 
+	public function get_header(string $key) {
+		return $this->headers[$key];
+	}
+
+	public function has_header(string $key) {
+		if (empty($key)) { return FALSE; }
+		return array_key_exists($key, $this->headers);
+	}
+
 	public function get_response_type() { return $this->response_type; }
 	public function get_request_type() { return $this->request_type; }
 	public function get_method() { return $this->method; }
 
 	public function requires_quota() { return $this->req_quota; }
 	public function requires_auth() { return $this->req_auth; }
+	public function allows_cookie_auth() { return $this->allow_cookie_auth; }
 
 	public function set_caller($caller) { $this->caller = $caller; }
 	public function get_caller() { return $this->caller; }
@@ -414,138 +385,18 @@ class APIEndpoint {
 	}
 }
 
-function api_handle_preflight() {
-	/*
-	*  Handle preflight requests.
-	*/
-	header('Access-Control-Allow-Origin: *');
-	header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-	header('Access-Control-Allow-Headers: Content-Type, Auth-Token');
-	header('Access-Control-Max-Age: 600');
-}
-
-function api_handle_request(APIEndpoint $endpoint) {
-	/*
-	*  Handle reqular API calls using POST or GET.
-	*/
-
-	// Send required headers.
-	if ($endpoint->get_response_type() !== NULL) {
-		header(
-			'Content-Type: '.
-			array_search($endpoint->get_response_type(), API_MIME)
-		);
-	}
-	header('Access-Control-Allow-Origin: *');
-
-	// Check the request method.
-	if (
-		$_SERVER['REQUEST_METHOD'] != array_search(
-			$endpoint->get_method(),
-			API_METHOD
-		)
-	) {
-		throw new ArgException(
-			"Invalid request method '".
-			$_SERVER['REQUEST_METHOD'].
-			"'. Expected '".
-			array_search(
-				$endpoint->get_method(),
-				API_METHOD
-			)."'."
-		);
-	}
-
-	// Check the request MIME type for POST requests.
-	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-		if (
-			!preg_match(
-				API_MIME_REGEX_MAP[$endpoint->get_request_type()],
-				$_SERVER['CONTENT_TYPE']
-			)
-		) {
-			throw new ArgException("Invalid request MIME type.");
-		}
-	}
-
-	// Initialize the endpoint.
-	$endpoint->load_data();
-
-	// Check authentication.
-	if (!$endpoint->requires_auth()) { return; }
-
-	$atok = NULL;
-	if (array_key_exists('Auth-Token', getallheaders())) {
-		$atok = getallheaders()["Auth-Token"];
-	}
-
-	$auth_data = web_auth(NULL, NULL, FALSE, $atok);
-	if ($auth_data === NULL) {
-		throw new APIException(
-			API_E_NOT_AUTHORIZED,
-			"Not authenticated."
-		);
-	}
-
-	// Store caller & session data in endpoint.
-	$endpoint->set_caller($auth_data['user']);
-	$endpoint->set_session($auth_data['session']);
-
-	// Use the API rate quota of the caller if required.
-	if (!$endpoint->requires_quota()) { return; }
-
-	$quota = new UserQuota($auth_data['user']);
-	if ($quota->has_state_var('api_t_start')) {
-		$t = $quota->get_state_var('api_t_start');
-		if (time() - $t >= gtlim('API_RATE_T')) {
-			// Reset rate quota and time after the cutoff.
-			$quota->set_state_var('api_t_start', time());
-			$quota->set_quota('api_rate', 0);
-		}
-	} else {
-		// Start counting time.
-		$quota->set_state_var('api_t_start', time());
-	}
-
-	if (!$quota->use_quota('api_rate')) {
-		throw new APIException(
-			API_E_RATE,
-			"API rate limited."
-		);
-	}
-	$quota->flush();
-}
-
 function api_endpoint_init(APIEndpoint $endpoint) {
 	/*
-	*  Handle endpoint initialization and API calls.
-	*  This function and the api_handle_* functions
-	*  also take care of all the smaller protocol details
-	*  like handling preflight requests and sending the
-	*  proper HTTP headers.
+	*  Initialize the API endpoint $endpoint.
 	*/
-
 	api_error_setup();
-
-	switch ($_SERVER['REQUEST_METHOD']) {
-		case "POST":
-		case "GET":
-			api_handle_request($endpoint);
-			break;
-		case "OPTIONS":
-			api_handle_preflight();
-			break;
-		default:
-			if ($endpoint->get_response_type() !== NULL) {
-				header(
-					'Content-Type: '.
-					array_search($endpoint->get_response_type(), API_MIME)
-				);
-			} else {
-				// Fallback to text/plain if response_type === NULL.
-				header('Content-Type: text/plain');
-			}
-			throw new ArgException("Invalid request method.");
-	}
-
+	$endpoint->load_headers(); // Headers are needed by APIAuthFilter.
+	$filters = [
+		'config' => new APIConfigFilter(),
+		'req' => new APIRequestFilter(),
+		'auth' => new APIAuthFilter(),
+		'quota' => new APIRateFilter()
+	];
+	foreach ($filters as $k => $f) { $f->filter($endpoint); }
+	$endpoint->load_data();
 }
