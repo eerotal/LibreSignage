@@ -26,7 +26,6 @@ $USER_REMOVE = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($USER_REMOVE);
 
 if (!$USER_REMOVE->get_caller()->is_in_group('admin')) {
 	throw new APIException(

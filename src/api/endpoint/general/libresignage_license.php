@@ -22,7 +22,6 @@ $LIBRESIGNAGE_LICENSE = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA      => FALSE,
 	APIEndpoint::REQ_AUTH       => FALSE
 ));
-api_endpoint_init($LIBRESIGNAGE_LICENSE);
 
 $LIBRESIGNAGE_LICENSE->resp_set(file_get_contents(
 	realpath(LIBRESIGNAGE_ROOT.LICENSE_LS_RST)

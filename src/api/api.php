@@ -9,10 +9,13 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/argarray.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/filters/configfilter.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/filters/requestfilter.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/filters/authfilter.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/filters/ratefilter.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_auth.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_configchecker.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_dataloader.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_validator.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_ratelimit.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_requestvalidator.php');
+
 
 class APIEndpoint {
 	// Config options.
@@ -26,21 +29,29 @@ class APIEndpoint {
 	const REQ_AUTH             = 'req_auth';
 	const ALLOW_COOKIE_AUTH    = 'allow_cookie_auth';
 
+	private $modules           = NULL;
+
+	private $url_data          = [];
+	private $body_data         = [];
+	private $file_data         = [];
+	private $header_data       = [];
+
+	private $caller            = NULL;
+	private $response          = NULL;
+
 	private $method            = 0;
 	private $request_type      = 0;
 	private $response_type     = 0;
-	private $response          = NULL;
 	private $format_body       = NULL;
 	private $format_url        = NULL;
 	private $strict_format     = TRUE;
 	private $req_quota         = TRUE;
 	private $req_auth          = TRUE;
-	private $data              = NULL;
-	private $headers           = NULL;
-	private $caller            = NULL;
 	private $allow_cookie_auth = FALSE;
 
 	public function __construct(array $config) {
+		api_error_setup();
+
 		$args = new ArgumentArray(
 			[
 				self::METHOD            => API_METHOD,
@@ -66,258 +77,77 @@ class APIEndpoint {
 		);
 		$ret = $args->chk($config);
 		foreach ($ret as $k => $v) { $this->$k = $v; }
-	}
 
-	public function load_headers() {
-		/*
-		*  Load supplied request headers;
-		*/
-		$this->headers = getallheaders();
-	}
-
-	public function load_data() {
-		/*
-		*  Load request data. What data is loaded depends on the
-		*  API endpoint request method and MIME type.
-		*  
-		*  POST
-		*    application/json
-		*      * Load URL and body data into $this->data.
-		*    multipart/form-data
-		*      * Load URL and body data into $this->data.
-		*      * Load file data into $this->files.
-		*    other:
-		*      * Throw an error.
-		*  GET
-		*    * Load URL data into $this->data.
-		*  OTHER
-		*    * Throw an error.
-		*/
-		switch($this->method) {
-			case API_METHOD['POST']:
-				switch ($this->request_type) {
-					case API_MIME['application/json']:
-						$body_raw = file_get_contents('php://input');
-						$this->data = array_merge(
-							$this->parse_json_request($body_raw),
-							$this->parse_url_request($_GET)
-						);
-						break;
-					case API_MIME['multipart/form-data']:
-						$this->data = $this->parse_url_request($_GET);
-						if (
-							count($this->format_body) !== 0
-							&& count($_POST) === 1
-							&& array_key_exists('body', $_POST)
-						) {
-							$this->data = array_merge(
-								$this->data,
-								$this->parse_json_request($_POST['body'])
-							);
-						} else if (count($this->format_body) !== 0) {
-							throw new ArgException(
-								"Invalid multipart request data. ".
-								"Missing 'body' or extra data."
-							);
-						}
-						$this->files = $_FILES;
-						break;
-					default:
-						throw new ArgException("Unknown request type.");
-				}
-				break;
-			case API_METHOD['GET']:
-				$this->data = $this->parse_url_request();
-				break;
-			default:
-				throw new ArgException("Unexpected API method.");
-		}
-	}
-
-	private function parse_json_request(string $str) {
-		// Parse JSON request data.
-		if (strlen($str) === 0) {
-			$data = [];
-		} else {
-			$data = json_decode($str, $assoc=TRUE);
-			if (
-				$data === NULL &&
-				json_last_error() != JSON_ERROR_NONE
-			) {
-				throw new IntException('JSON parsing failed!');
-			}
-		}
-		if ($data === NULL) {
-			$data = [];
- 		} else if (gettype($data) !== 'array') {
-			throw new ArgException(
-				'Invalid request data. Expected an  '.
-				'array as the root element.'
-			);
-		}
-		$this->verify($data, $this->format_body);
-		return $data;
-	}
-
-	private function parse_url_request() {
-		// Parse URL request data.
-		$this->verify($_GET, $this->format_url);
-		return $_GET;
-	}
-
-	private function chk_arr_types(array $vals, string $type) {
-		foreach ($vals as $k => $v) {
-			if (gettype($v) != $type) { return FALSE; }
-		}
-		return TRUE;
-	}
-
-	private function chk_type(array $data, array $format, $i) {
-		/*
-		*  Check the value at $i in $data against the
-		*  configured type flags in $format and throw an
-		*  ArgException if the types don't match.
-		*/
-		$ok = FALSE;
-		$bm = $format[$i];
-		$d = $data[$i];
-		$t = gettype($d);
-
-		$ok = (
-			((API_P_NULL & $bm) !== 0 && $t == 'NULL')
-			|| ((API_P_STR & $bm) !== 0 && $t == 'string')
-			|| ((API_P_INT & $bm) !== 0 && $t == 'integer')
-			|| ((API_P_BOOL & $bm) !== 0 && $t == 'boolean')
-			|| ((API_P_FLOAT & $bm) !== 0 && $t == 'double')
-			|| ($t == 'array' &&
-				(
-					(
-						(API_P_ARR_MIXED & $bm) !== 0
-					) || (
-						(API_P_ARR_STR & $bm) !== 0
-						&& $this->chk_arr_types($d, 'string')
-					) || (
-						(API_P_ARR_INT & $bm) !== 0
-						&& $this->chk_arr_types($d, 'integer')
-					) || (
-						(API_P_ARR_BOOL & $bm) !== 0
-						&& $this->chk_arr_types($d, 'boolean')
-					) || (
-						(API_P_ARR_FLOAT & $bm) !== 0
-						&& $this->chk_arr_types($d, 'double')
-					)
-				)
+		$this->modules = [
+			'config'   => new APIConfigCheckerModule(),
+			'request'  => new APIRequestValidatorModule(),
+			'data'     => new APIDataLoaderModule(),
+			'auth'     => new APIAuthModule(),
+			'rate'     => new APIRateLimitModule(),
+			'val_url'  => new APIValidatorModule(
+				$this->format_url,
+				'get_url_data',
+				$this->strict_format
+			),
+			'val_body'  => new APIValidatorModule(
+				$this->format_body,
+				'get_body_data',
+				$this->strict_format
 			)
-		);
-
-		if (!$ok) {
-			if ($t == 'array') {
-				throw new ArgException(
-					"Invalid type 'array' for '$i' ".
-					"or invalid array value types."
-				);
-			} else {
-				throw new ArgException(
-					"Invalid type '$t' for '$i'."
-				);
-			}
-		}
+		];
+		foreach ($this->modules as $k => $m) { $m->run($this); }
 	}
 
-	function chk_data(array $data, array $format, $i) {
-		/*
-		*  Check the value at $i in $data against the
-		*  configured data flags in $format and throw an
-		*  ArgException id the data doesn't match the flags.
-		*/
-		$bitmask = $format[$i];
-		$value =  $data[$i];
-		if (
-			!(API_P_EMPTY_STR_OK & $bitmask)
-			&& gettype($data[$i]) == 'string'
-			&& empty($value)
-		) {
-			throw new ArgException("Invalid empty data for '$i'.");
-		}
+	public function set_url_data(array $data) {
+		$this->url_data = $data;
+	}
+	public function set_body_data(array $data) {
+		$this->body_data = $data;
+	}
+	public function set_file_data(array $data) {
+		$this->file_data = $data;
+	}
+	public function set_header_data(array $data) {
+		$this->header_data = $data;
 	}
 
-	private function is_param_opt(int $bitmask) {
-		return (API_P_OPT & $bitmask) != 0;
-	}
+	public function get_url_data() { return $this->url_data; }
+	public function get_body_data() { return $this->body_data; }
+	public function get_file_data() { return $this->file_data; }
+	public function get_header_data() { return $this->header_data; }
 
-	private function verify($data, array $format) {
-		/*
-		*  Verify request data using the format filter $format.
-		*  If the flag $this->strict_format is TRUE, extra keys
-		*  in $data that don't exist in $format are considered invalid.
-		*/
-		if (count($format) === 0) {
-			if ($this->strict_format) {
-				return count($data) === 0;
-			} else {
-				return TRUE;
-			}
-		}
-
-		// Check that each key in $format also exists in $data.
-		foreach (array_keys($format) as $k) {
-			if (!in_array($k, array_keys($data))) {
-				if ($this->is_param_opt($format[$k])) { continue; }
-				throw new ArgException(
-					"API request parameter '$k' missing."
-				);
-			}
-			if (gettype($format[$k]) == 'array') {
-				// Verify nested formats.
-				$this->verify($data[$k], $format[$k]);
-			} else {
-				$this->chk_type($data, $format, $k);
-				$this->chk_data($data, $format, $k);
-			}
-		}
-
-		/*
-		*  Consider extra keys in $data invalid if
-		*  $this->strict_format is TRUE.
-		*/
-		if ($this->strict_format) {
-			if (
-				!array_is_subset(
-					array_keys($data),
-					array_keys($format)
-				)
-			) {
-				throw new ArgException("Extra keys in API request.");
-			}
-		}
-	}
-
-	public function get($key = NULL) {
-		if ($key === NULL) {
-			return $this->data;
+	public function get($key) {
+		if (array_key_exists($key, $this->url_data)) {
+			return $this->url_data[$key];
+		} else if (array_key_exists($key, $this->body_data)) {
+			return $this->body_data[$key];
 		} else {
-			return $this->data[$key];
+			throw new ArgException('No such key.');
 		}
 	}
 
 	public function has(string $key, bool $null_check = FALSE) {
-		if (array_key_exists($key, $this->data)) {
-			if ($null_check && $this->data[$key] == NULL) {
-				return FALSE;
-			}
-			return TRUE;
-		} else {
-			return FALSE;
-		}
+		return (
+			array_key_exists($key, $this->url_data)
+			&& (
+				$null_check === FALSE
+				|| $this->url_data[$key] !== NULL
+			)
+		) || (
+			array_key_exists($key, $this->body_data)
+			&& (
+				$null_check === FALSE
+				|| $this->body_data[$key] !== NULL
+			)
+		);
 	}
 
 	public function get_header(string $key) {
-		return $this->headers[$key];
+		return $this->header_data[$key];
 	}
 
 	public function has_header(string $key) {
-		if (empty($key)) { return FALSE; }
-		return array_key_exists($key, $this->headers);
+		return array_key_exists($key, $this->header_data);
 	}
 
 	public function get_response_type() { return $this->response_type; }
@@ -333,8 +163,6 @@ class APIEndpoint {
 
 	public function set_session($session) { $this->session = $session; }
 	public function get_session() { return $this->session; }
-
-	public function get_files() { return $this->files; }
 
 	public function resp_set($resp) {
 		/*
@@ -383,20 +211,4 @@ class APIEndpoint {
 			exit(0);
 		}
 	}
-}
-
-function api_endpoint_init(APIEndpoint $endpoint) {
-	/*
-	*  Initialize the API endpoint $endpoint.
-	*/
-	api_error_setup();
-	$endpoint->load_headers(); // Headers are needed by APIAuthFilter.
-	$filters = [
-		'config' => new APIConfigFilter(),
-		'req' => new APIRequestFilter(),
-		'auth' => new APIAuthFilter(),
-		'quota' => new APIRateFilter()
-	];
-	foreach ($filters as $k => $f) { $f->filter($endpoint); }
-	$endpoint->load_data();
 }

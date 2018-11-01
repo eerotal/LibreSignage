@@ -23,7 +23,6 @@ $AUTH_SESSION_RENEW = new APIEndpoint([
 	APIEndpoint::REQ_QUOTA      => TRUE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ]);
-api_endpoint_init($AUTH_SESSION_RENEW);
 
 $session = $AUTH_SESSION_RENEW->get_session();
 $new_token = $session->renew();

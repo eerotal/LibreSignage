@@ -26,7 +26,6 @@ $USER_GET = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA      => TRUE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ));
-api_endpoint_init($USER_GET);
 
 $USER_GET->resp_set([
 	'user' => $USER_GET->get_caller()->export(FALSE, FALSE)

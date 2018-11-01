@@ -1,10 +1,10 @@
 <?php
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/filters/filter.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
-class APIAuthFilter extends APIFilter {
+class APIAuthModule extends APIModule {
 	/*
 	*  Check authentication and assign the user and session
 	*  data into $endpoint.
@@ -13,9 +13,9 @@ class APIAuthFilter extends APIFilter {
 		parent::__construct();
 	}
 
-	public function filter(APIEndpoint $endpoint) {
+	public function run(APIEndpoint $endpoint) {
 		$token = NULL;
-		$adata = NULL; // Don't change.
+		$adata = NULL; // This must be initially NULL. Don't change.
 
 		if (!$endpoint->requires_auth()) { return; }
 

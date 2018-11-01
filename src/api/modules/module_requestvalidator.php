@@ -1,9 +1,9 @@
 <?php
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/defs.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/filters/filter.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module.php');
 
-class APIRequestFilter extends APIFilter {
+class APIRequestValidatorModule extends APIModule {
 	/*
 	*  Check that the request is correctly formed.
 	*/
@@ -11,7 +11,7 @@ class APIRequestFilter extends APIFilter {
 		parent::__construct();
 	}
 
-	public function filter(APIEndpoint $endpoint) {
+	public function run(APIEndpoint $endpoint) {
 		// Check the request method.
 		$method = array_search($endpoint->get_method(), API_METHOD);
 		if ($_SERVER['REQUEST_METHOD'] != $method) {

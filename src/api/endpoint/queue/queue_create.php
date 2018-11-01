@@ -28,7 +28,6 @@ $QUEUE_CREATE = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($QUEUE_CREATE);
 
 if (!check_perm('grp:admin|grp:editor;', $QUEUE_CREATE->get_caller())) {
 	throw new APIException(

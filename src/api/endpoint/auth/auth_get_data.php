@@ -23,7 +23,6 @@ $AUTH_GET_DATA = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA      => TRUE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ));
-api_endpoint_init($AUTH_GET_DATA);
 
 
 $AUTH_GET_DATA->resp_set([

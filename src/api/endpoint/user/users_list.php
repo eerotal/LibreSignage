@@ -22,7 +22,6 @@ $USERS_GET_ALL = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($USERS_GET_ALL);
 
 $ret = ['users' => []];
 foreach (user_array() as $u) {

@@ -32,7 +32,6 @@ $USER_GET = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($USER_GET);
 
 if (!$USER_GET->get_caller()->is_in_group('admin')) {
 	throw new APIException(

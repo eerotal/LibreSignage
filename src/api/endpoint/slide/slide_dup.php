@@ -30,7 +30,6 @@ $SLIDE_DUP = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($SLIDE_DUP);
 
 if (!check_perm('grp:admin|grp:editor;', $SLIDE_DUP->get_caller())) {
 	throw new APIException(

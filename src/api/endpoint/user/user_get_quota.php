@@ -27,7 +27,6 @@ $USER_GET_QUOTA = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA        => TRUE,
 	APIEndpoint::REQ_AUTH         => TRUE
 ));
-api_endpoint_init($USER_GET_QUOTA);
 
 $flag_auth = FALSE;
 $user_name = NULL;

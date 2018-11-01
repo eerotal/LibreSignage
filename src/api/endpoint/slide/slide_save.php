@@ -89,7 +89,6 @@ $SLIDE_SAVE = new APIEndpoint([
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ]);
-api_endpoint_init($SLIDE_SAVE);
 
 $OP = '';
 $ALLOW = FALSE;

@@ -150,6 +150,7 @@ function api_error_setup() {
 				case 'APIException':
 					$code = $e->get_api_err();
 					break;
+				case 'APIValidatorException':
 				case 'ArgException':
 					$code = API_E_INVALID_REQUEST;
 					break;

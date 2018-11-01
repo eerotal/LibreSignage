@@ -1,19 +1,19 @@
 <?php
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/filters/filter.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module.php');
 
-class APIConfigFilter extends APIFilter {
+class APIConfigCheckerModule extends APIModule {
 	/*
 	*  Check the API endpoint config for invalid configuration
-	*  or dangerous config combinations. This filter also
-	*  sends the required Content-Type header.
+	*  or dangerous config combinations. This module also sends
+	*  the required Content-Type header.
 	*/
 	public function __construct() {
 		parent::__construct();
 	}
 
-	public function filter(APIEndpoint $endpoint) {
+	public function run(APIEndpoint $endpoint) {
 		// Send the proper Content-Type header.
 		$mime = array_search($endpoint->get_response_type(), API_MIME);
 		header("Content-Type: {$mime}");
