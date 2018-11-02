@@ -1,3 +1,9 @@
+v0.2.1
+  - [bugfix]   Fix a bug where the timeline didn't update after the
+               selected queue was changed.
+  - [bugfix]   Fix a server-side bug that prevented user creation from
+               the user manager.
+
 v0.2.0
   - [feature]  Implement keyboard shortcuts for the editor.
   - [feature]  Make it possible to preserve instance data when

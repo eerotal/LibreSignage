@@ -102,7 +102,6 @@ try {
 	);
 }
 $user->set_password($tmp_pass);
-$user->set_ready(TRUE);
 
 if ($user->write() === FALSE) {
 	throw new APIException(
