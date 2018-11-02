@@ -1,9 +1,5 @@
 <?php
 
-/*
-*  API request data validator module.
-*/
-
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module.php');
 
 // API type flags.
@@ -43,20 +39,23 @@ const API_P_UNUSED  = API_P_ANY
                      |API_P_EMPTY_STR_OK
                      |API_P_OPT;
 
-class APIValidatorException extends Exception {};
-class APIValidatorKeyException extends APIValidatorException {};
-class APIValidatorTypeException extends APIValidatorException {};
-class APIValidatorValueException extends APIValidatorException {};
-class APIValidatorFormatException extends APIValidatorException {};
+class APIValidatorKeyException extends ArgException {};
+class APIValidatorTypeException extends ArgException {};
+class APIValidatorValueException extends ArgException {};
 
 class APIValidatorModule extends APIModule {
-	private $format           = NULL;
-	private $strict           = NULL;
-	private $data_getter_name = NULL;
+	/*
+	*  Validate API request data and assign it into the
+	*  supplied endpoint.
+	*/
+
+	private $format      = NULL;
+	private $strict      = NULL;
+	private $data_getter = NULL;
 	
 	public function __construct(
 		array $format,
-		$data_getter_name,
+		$data_getter,
 		bool $strict
 	) {
 		/*
@@ -83,27 +82,24 @@ class APIValidatorModule extends APIModule {
 		*  array are of the same configured type, eg. 'string' if
 		*  API_P_ARR_STR is used.
 		*
-		*  $data_getter_name is the name of a function that's called
-		*  on the APIEndpoint object supplied to APIValidatorModule::run()
-		*  This function must return the data to be validated when called.
-		*  $data_getter_name can be left null if APIValidatorModule::run()
-		*  is not used.
+		*  $data_getter is a callback used to get the data to validate
+		*  when run() is called. $data_getter must return the data as
+		*  an array. If run() is not used, $data_getter can be left NULL.
 		*
 		*  When $strict === TRUE, keys that exist in the validated
 		*  data but not in the configured format are considered
 		*  invalid.
 		*/
-		assert(gettype($data) === 'array' || gettype($data) === 'NULL');
-
 		parent::__construct();
+
 		$this->format = $format;
 		$this->strict = $strict;
-		$this->data_getter_name = $data_getter_name;
+		$this->data_getter = $data_getter;
 	}
 
 	public function run(APIEndpoint $endpoint) {
-		assert($this->data_getter_name !== NULL);
-		$this->validate($endpoint->{$this->data_getter_name}());
+		assert($this->data_getter !== NULL);
+		$this->validate(call_user_func($this->data_getter));
 	}
 
 	public function validate(array $data) {
@@ -211,7 +207,7 @@ class APIValidatorModule extends APIModule {
 		}
 	}
 
-	private function check_array_types(array $data, string $type) {
+	private function check_array_types(array $data, string $type): bool {
 		foreach ($data as $k => $v) {
 			if (gettype($v) != $type) { return FALSE; }
 		}

@@ -1,13 +1,12 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
 
 class APIAuthModule extends APIModule {
 	/*
 	*  Check authentication and assign the user and session
-	*  data into $endpoint.
+	*  data into the supplied endpoint.
 	*/
 	public function __construct() {
 		parent::__construct();

@@ -100,11 +100,12 @@ const API_E_MSG = [
 
 class APIException extends Exception {
 	private $api_err = 0;
-	public function __construct(int $api_err,
-				string $message = "",
-				int $code = 0,
-				Throwable $previous = NULL) {
-
+	public function __construct(
+		int $api_err,
+		string $message = "",
+		int $code = 0,
+		Throwable $previous = NULL
+	) {
 		$this->api_err = $api_err;
 		parent::__construct($message, $code, $previous);
 	}
@@ -113,12 +114,16 @@ class APIException extends Exception {
 		return $this->api_err;
 	}
 
-	public static function _to_api_string(int $api_err,
-					Throwable $e) {
+	public static function make_json_string(
+		int $api_err,
+		Throwable $e
+	): string {
 		/*
 		*  Get the JSON string representation of an
 		*  Exception object. $api_err is an API error code
-		*  and $e is the exception object.
+		*  and $e is the exception object. Note that $e
+		*  doesn't necessarily have to be an APIException
+		*  object; any exception will do.
 		*/
 		$err = ['error' => $api_err];
 
@@ -137,6 +142,30 @@ class APIException extends Exception {
 		}
 		return $err_str;
 	}
+
+	public static function map_to_code(Throwable $e): int {
+		/*
+		*  Map a LibreSignage exception to an API error
+		*  code. Using a try ... catch statement instead of
+		*  eg. switch(get_class($e)) provides a nicer way of
+		*  handling extended exceptions.
+		*/
+		try {
+			throw $e;
+		} catch (APIException $e) {
+			return $e->get_api_err();
+		} catch (ArgException $e) {
+			return API_E_INVALID_REQUEST;			
+		} catch (IntException $e) {
+			return API_E_INTERNAL;
+		} catch (LimitException $e) {
+			return API_E_LIMITED;
+		} catch (FileTypeException $e) {
+			return API_E_INVALID_FILETYPE;
+		} catch (Exception $e) {
+			return API_E_INTERNAL;
+		}
+	}
 }
 
 function api_error_setup() {
@@ -145,26 +174,10 @@ function api_error_setup() {
 	*/
 	set_exception_handler(function(Throwable $e) {
 		try {
-			$code = API_E_OK;
-			switch (get_class($e)) {
-				case 'APIException':
-					$code = $e->get_api_err();
-					break;
-				case 'APIValidatorException':
-				case 'ArgException':
-					$code = API_E_INVALID_REQUEST;
-					break;
-				case 'LimitException': 
-					$code = API_E_LIMITED;
-					break;
-				case 'FileTypeException':
-					$code = API_E_INVALID_FILETYPE;
-					break;
-				default:
-					$code = API_E_INTERNAL;
-					break;
-			}
-			echo APIException::_to_api_string($code, $e);
+			echo APIException::make_json_string(
+				APIException::map_to_code($e),
+				$e
+			);
 			exit(1);
 		} catch (Exception $e) {
 			/*

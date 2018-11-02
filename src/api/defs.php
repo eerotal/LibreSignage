@@ -12,9 +12,10 @@ const API_METHOD = [
 
 // API Endpoint MIME types.
 const API_MIME = [
-	"application/json"    => 0,
-	"multipart/form-data" => 1,
-	"text/plain"          => 2
+	"application/json"         => 0,
+	"multipart/form-data"      => 1,
+	"text/plain"               => 2,
+	"libresignage/passthrough" => 3
 ];
 
 const API_MIME_REGEX_MAP = [

@@ -1,9 +1,12 @@
 <?php
 /*
 *  APIEndpoint object definition and interface functions.
+*  This class file contains little actual heavy lifting.
+*  Most of the work is done by individual API modules in
+*  the modules/ directory.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/error.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/defs.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/argarray.php');
@@ -15,7 +18,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_dataloader.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_validator.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_ratelimit.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_requestvalidator.php');
-
 
 class APIEndpoint {
 	// Config options.
@@ -78,6 +80,10 @@ class APIEndpoint {
 		$ret = $args->chk($config);
 		foreach ($ret as $k => $v) { $this->$k = $v; }
 
+		/*
+		*  Initialize the API endpoint by executing the following
+		*  modules in the following order.
+		*/
 		$this->modules = [
 			'config'   => new APIConfigCheckerModule(),
 			'request'  => new APIRequestValidatorModule(),
@@ -86,37 +92,22 @@ class APIEndpoint {
 			'rate'     => new APIRateLimitModule(),
 			'val_url'  => new APIValidatorModule(
 				$this->format_url,
-				'get_url_data',
+				[$this, 'get_url_data'],
 				$this->strict_format
 			),
 			'val_body'  => new APIValidatorModule(
 				$this->format_body,
-				'get_body_data',
+				[$this, 'get_body_data'],
 				$this->strict_format
 			)
 		];
 		foreach ($this->modules as $k => $m) { $m->run($this); }
 	}
 
-	public function set_url_data(array $data) {
-		$this->url_data = $data;
-	}
-	public function set_body_data(array $data) {
-		$this->body_data = $data;
-	}
-	public function set_file_data(array $data) {
-		$this->file_data = $data;
-	}
-	public function set_header_data(array $data) {
-		$this->header_data = $data;
-	}
-
-	public function get_url_data() { return $this->url_data; }
-	public function get_body_data() { return $this->body_data; }
-	public function get_file_data() { return $this->file_data; }
-	public function get_header_data() { return $this->header_data; }
-
 	public function get($key) {
+		/*
+		*  Get the request value $key.
+		*/
 		if (array_key_exists($key, $this->url_data)) {
 			return $this->url_data[$key];
 		} else if (array_key_exists($key, $this->body_data)) {
@@ -126,7 +117,12 @@ class APIEndpoint {
 		}
 	}
 
-	public function has(string $key, bool $null_check = FALSE) {
+	public function has(string $key, bool $null_check = FALSE): bool {
+		/*
+		*  Check whether the request value $key exists.
+		*  If $null_check === TRUE, this function returns
+		*  FALSE for any NULL values.
+		*/
 		return (
 			array_key_exists($key, $this->url_data)
 			&& (
@@ -143,26 +139,82 @@ class APIEndpoint {
 	}
 
 	public function get_header(string $key) {
+		/*
+		*  Get the header $key.
+		*/
 		return $this->header_data[$key];
 	}
 
-	public function has_header(string $key) {
+	public function has_header(string $key): bool {
+		/*
+		*  Check whether the request header $key exists.
+		*/
 		return array_key_exists($key, $this->header_data);
 	}
 
-	public function get_response_type() { return $this->response_type; }
-	public function get_request_type() { return $this->request_type; }
-	public function get_method() { return $this->method; }
+	// Data array setters.
+	public function set_url_data(array $data) {
+		$this->url_data = $data;
+	}
+	public function set_body_data(array $data) {
+		$this->body_data = $data;
+	}
+	public function set_file_data(array $data) {
+		$this->file_data = $data;
+	}
+	public function set_header_data(array $data) {
+		$this->header_data = $data;
+	}
 
-	public function requires_quota() { return $this->req_quota; }
-	public function requires_auth() { return $this->req_auth; }
-	public function allows_cookie_auth() { return $this->allow_cookie_auth; }
+	// Data array getters.
+	public function get_url_data(): array {
+		return $this->url_data;
+	}
+	public function get_body_data(): array {
+		return $this->body_data;
+	}
+	public function get_file_data(): array {
+		return $this->file_data;
+	}
+	public function get_header_data(): array {
+		return $this->header_data;
+	}
 
-	public function set_caller($caller) { $this->caller = $caller; }
-	public function get_caller() { return $this->caller; }
+	// Config getters.
+	public function get_response_type(): int {
+		return $this->response_type;
+	}
+	public function get_request_type(): int {
+		return $this->request_type;
+	}
+	public function get_method(): int {
+		return $this->method;
+	}
 
-	public function set_session($session) { $this->session = $session; }
-	public function get_session() { return $this->session; }
+	public function requires_quota(): bool {
+		return $this->req_quota;
+	}
+	public function requires_auth(): bool {
+		return $this->req_auth;
+	}
+	public function allows_cookie_auth(): bool {
+		return $this->allow_cookie_auth;
+	}
+
+	// Caller identification data setters/getters.
+	public function set_caller($caller) {
+		$this->caller = $caller;
+	}
+	public function get_caller() {
+		return $this->caller;
+	}
+
+	public function set_session($session) {
+		$this->session = $session;
+	}
+	public function get_session() {
+		return $this->session;
+	}
 
 	public function resp_set($resp) {
 		/*
@@ -173,30 +225,43 @@ class APIEndpoint {
 
 	public function send() {
 		/*
-		*  Send the current API response.
+		*  Send the current API response. The way the response is sent
+		*  depends on the configured response type.
+		*
+		*  application/json
+		*     - JSON encode the response and send it.
+		*  libresignage/passthrough
+		*     - If the response is an open file handle, read the whole
+		*       file starting from the current position and send the
+		*       raw data to the client. Note that you must set any
+		*       headers yourself (Content-Type, Content-Length etc.).
+		*  text/plain
+		*     - If the response is not NULL, send it response as
+		*       plaintext.
 		*/
-		if ($this->response_type === API_MIME['application/json']) {
-			if (!$this->response) { $this->response = []; }
-			if (!isset($this->response['error'])) {
-				// Make sure the error value exists.
-				$this->response['error'] = API_E_OK;
-			}
-			$resp_str = json_encode($this->response);
-			if (
-				$resp_str === FALSE &&
-				json_last_error() !== JSON_ERROR_NONE
-			) {
-				throw new APIException(
-					API_E_INTERNAL,
-					"Failed to encode response JSON."
-				);
-			}
-			echo $resp_str;
-			exit(0);
-		} else {
-			if ($this->response) {
+		switch($this->response_type) {
+			case API_MIME['application/json']:
+				if (!$this->response) { $this->response = []; }
+				if (!isset($this->response['error'])) {
+					// Make sure the error value exists.
+					$this->response['error'] = API_E_OK;
+				}
+				$resp_str = json_encode($this->response);
 				if (
-					is_resource($this->response)
+					$resp_str === FALSE &&
+					json_last_error() !== JSON_ERROR_NONE
+				) {
+					throw new APIException(
+						API_E_INTERNAL,
+						"Failed to encode response JSON."
+					);
+				}
+				echo $resp_str;
+				exit(0);
+			case API_MIME['libresignage/passthrough']:
+				if (
+					$this->response !== NULL
+					&& is_resource($this->response)
 					&& get_resource_type($this->response) == 'stream'
 					&& stream_get_meta_data(
 						$this->response
@@ -204,11 +269,15 @@ class APIEndpoint {
 				) {
 					fpassthru($this->response);
 					fclose($this->response);
-				} else {
+				}
+				exit(0);
+			case API_MIME['text/plain']:
+				if ($this->response !== NULL) {
 					echo $this->response;
 				}
-			}
-			exit(0);
+				exit(0);
+			default:
+				exit(1);
 		}
 	}
 }

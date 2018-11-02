@@ -1,6 +1,5 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/userquota.php');
 
@@ -8,7 +7,7 @@ class APIRateLimitModule extends APIModule {
 	/*
 	*  Make sure the caller has rate quota left and use it
 	*  if needed. This module must be called after the user
-	*  data has been assigned into $endpoint (ie. after
+	*  data has been assigned into the endpoint (ie. after
 	*  APIAuthModule).
 	*/
 	public function __construct() {

@@ -1,6 +1,5 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api_error.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module.php');
 
 class APIConfigCheckerModule extends APIModule {
