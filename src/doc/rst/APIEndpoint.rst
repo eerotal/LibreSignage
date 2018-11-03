@@ -5,12 +5,11 @@ The APIEndpoint class is the class used to define LibreSignage
 API endpoints. Using APIEnpoint objects makes it easy to handle
 getting API parameters, setting the correct HTTP headers and
 sending the correctly formatted API response. The APIEndpoint
-system automatically supports normal GET and POST requests as
-well as CORS requests from any domain.
+system supports GET and POST requests.
 
 This document is a detailed explanation of how the APIEndpoint
 class works and how it is used. However, only a small subset of
-the APIEndpoint functions is described. The best way to check out
+the APIEndpoint functions are described. The best way to check out
 the other ones is to just read the source code. Most functions
 contain comments describing what they do and how they can be used.
 
@@ -21,133 +20,136 @@ The APIEndpoint constructor function is defined as follows.
 
 ``public function __construct(array $config)``
 
-The only argument ``$config`` is an associative array of config
-options for the APIEndpoint object. Some of the config options
-are optional and some are required. The following keys can be
-used to configure the APIEndpoint. Optional and required options
-are marked respectively
+You should construct the API endpoint at the very beginning of
+each endpoint file. That initializes the endpoint object and
+sets up some global configuration. The only argument ``$config``
+is an associative array of config options for the APIEndpoint object.
+Some of the config options are optional and some are required.
+The following keys can be used to configure the APIEndpoint.
+Optional and required options are marked respectively
 
-``APIEndpoint::MEHOD`` - *Required*
+``APIEndpoint::METHOD`` - *Required*
 
-* One of the values in ``API_METHOD``. The possible values are
-  ``API_METHOD['GET']`` and ``API_METHOD['POST']``. This value
-  sets the HTTP method the endpoint uses.
+* Default: ``<None>``
+* One of the values in the ``API_METHOD`` array that's defined in
+  *src/api/defs.php*. This value sets the HTTP request method the
+  endpoint uses. The available values are ``API_METHOD['GET']``
+  and ``API_METHOD['POST']``.
+
+``APIEndpoint::REQUEST_TYPE`` - *Optional*
+
+* Default: ``API_MIME['application/json']``
+* This config option sets the expected request type of the endpoint.
+  The value should be one of the values in the ``API_MIME`` array
+  defined in *src/api/defs.php*. Some of the valid values are
+  ``API_MIME['application/json']`` and ``API_MIME['text/plain']``.
+  If a user calls an endpoint with a different Content-Type header
+  than what's configured using this option, the server automatically
+  returns an invalid request error. This option only has an effect
+  if the endpoint expects POST requests.
 
 ``APIEndpoint::RESPONSE_TYPE`` - *Required*
 
-* One of the values in ``API_RESPONSE``. The possible values
-  are ``API_RESPONSE['JSON']`` and ``API_RESPONSE['TEXT']``.
-  This sets the response type of the endpoint. The response
-  data is automatically converted to the proper response type
-  when APIEndpoint::send() is called.
+* Default: ``API_MIME['application/json']``
+* This config option sets the response type of the endpoint. The
+  value should be one of the values in the ``API_MIME`` array defined
+  in *src/api/defs.php*. Some of the available values are
+  ``API_MIME['application/json']`` and ``API_MIME['text/plain']``.
+  The API system automatically converts the response data according
+  to this config option. For example, if the response type is set to
+  *application/json*, the server automatically converts the response
+  data set with ``APIEndpoint::resp_set()`` to JSON before sending it.
 
-``APIEndpoint::FORMAT`` - *Optional* - Default: array()
+``APIEndpoint::FORMAT_[URL/BODY]`` - *Optional*
 
-* This config option sets the format of the required HTTP
-  GET or POST parameters. The value must be an array of the
-  following form.
+* Default: ``[]``
+* This option is used to configure the expected HTTP request data.
+  *FORMAT_URL* controls the URL parameters and *FORMAT_BODY* controls
+  the HTTP body parameters. An array of the following form should
+  be passed to these config options.
 
   ::
 
-    array(
+    [
         'P1' => FLAGS1,
                .
                .
                .
         'PN' => FLAGSN
-    );
+    ];
 
   where *P1, ..., PN* are the parameter names and
   *FLAGS1, ..., FLAGSN* are the defined API parameter flags.
   The API parameter flags are constructed by OR'ing together
   a subset of the following constants.
 
-    | ``API_P_STR``:          String type.
-    | ``API_P_INT``:          Integer type.
-    | ``API_P_FLOAT``:        Floating point type.
-    | ``API_P_ARR``:          Array type.
-    | ``API_P_NULL``:         NULL type.
-    | ``API_P_OPT``:          Optional parameter.
-    | ``API_P_EMPTY_STR_OK``: Allow empty strings when
-                              ``API_P_STR`` is also set.
-    | ``API_P_ANY``:          Accept any type.
-    | ``API_P_UNUSED``:       Indicates an unused parameter. Defined as
-                              ``API_P_ANY|API_P_EMPTY_STR_OK|API_P_OPT``.
+  Normal type flags:
+
+    | ``API_P_STR``:            String type.
+    | ``API_P_INT``:            Integer type.
+    | ``API_P_FLOAT``:          Floating point type.
+    | ``API_P_OPT``:            Optional parameter.
+    | ``API_P_NULL``:           NULL type.
+    | ``API_P_BOOL``:           Boolean type.
+    | ``API_P_ANY``:            Any of the types above.
+
+  Array flags:
+
+    | ``API_P_ARR_INT``:        Array with all integer values.
+    | ``API_P_ARR_STR``:        Array with all string values.
+    | ``API_P_ARR_FLOAT``:      Array with all float values.
+    | ``API_P_ARR_BOOL``:       Array with all boolean values.
+    | ``API_P_ARR_MIXED``:      Array with mixed type values.
+    | ``API_P_ARR_ANY``:        Any of the array types above.
+
+  Special flags.
+
+    | ``API_P_EMPTY_STR_OK``:   Allow empty strings.
+    | ``API_P_UNUSED``:         Specify an unused parameter.
+
+
+  The format can also contain nested arrays if needed.
 
   The format specified using this config option is used to
-  automatically validate the received GET or POST parameters
-  and an error is automatically sent as a response if the
-  received arguments are invalid. If the FORMAT array is empty
-  no validation is done.
+  automatically validate the received HTTP data and an error
+  is automatically sent as a response if the received arguments
+  are invalid.
 
-``APIEndpoint::STRICT_FORMAT`` - *Optional* - Default: TRUE
+``APIEndpoint::STRICT_FORMAT`` - *Optional*
 
-* Select whether to consider HTTP parameters not in the
-  ``APIEndpoint::FORMAT``` array invalid or not. If this config
-  option is ``TRUE``, extra parameters are considered invalid.
-  Otherwise extra parameters are accepted.
+* Default: ``TRUE``
+* Select whether to consider extra HTTP parameters that aren't
+  included in the ``APIEndpoint::FORMAT_[URL/BODY]`` arrays
+  invalid or not. If this config option is ``TRUE``, extra
+  parameters are considered invalid. Otherwise extra parameters
+  are accepted.
 
-``APIEndpoint::REQ_QUOTA`` - *Optional* - Default: TRUE
+``APIEndpoint::REQ_QUOTA`` - *Optional*
 
-* Check the calling user's API rate quota before proceeding
-  with the API call. If the user has quota, accept the API call.
-  Otherwise reject it. This also selects whether the API rate
-  quota is used when the API endpoint is called.
+* Default: ``TRUE``
+* This options selects whether to enable API rate limiting.
 
-``APIEndpoint::REQ_AUTH`` - *Optional* - Default: TRUE
+``APIEndpoint::REQ_AUTH`` - *Optional*
 
-* Make sure the caller is authenticated before granting access
-  to the API endpoint. If this configuration option is TRUE,
-  the user needs to authenticate using the auth_login.php
-  endpoint. This endpoint returns a session token that should
-  be passed to successive API endpoints in the 'Auth-Token'
-  HTTP header. An error is thrown if the header doesn't exist
-  or the token is invalid.
+* Default: ``TRUE``
+* Require authentication for this API endpoint. The caller may
+  either authenticate using the *Auth-Token* HTTP header or by
+  sending a *session_token* cookie. These should contain a valid
+  server generated session token for authentication to succeed.
+  Note that cookie authentication is only allowed if the
+  ``APIEndpoint::ALLOW_COOKIE_AUTH`` config option is TRUE.
+
+``APIEndpoint::ALLOW_COOKIE_AUTH`` - *Optional*
+
+* Default: ``FALSE``
+* Select whether to allow authentication via the *session_token*
+  cookie that contains a session token. **You should only set this
+  option to TRUE when actually needed. NEVER set this option to TRUE
+  on endpoints that alter data on the server. That would basically
+  enable CSRF attacks on those endpoints.**
 
 Using the APIEndpoint object
 ++++++++++++++++++++++++++++
-
-Initialization
---------------
-
-Before any APIEndpoint functionality can be used, the API
-endpoint must be initialized by calling the function
-``api_endpoint_init()``. The function is defined as follows.
-
-``function api_endpoint_init(APIEndpoint $endpoint)``
-
-The ``$endpoint`` argument is the APIEndpoint object created
-earlier.
-
-The first thing the initialization function does is setup
-a special API exception handler function that reports all
-uncaught exceptions back to the caller via the API.
-
-After this the API system handles the call based on whether
-it is a GET, POST or OPTIONS request. The OPTIONS method is
-used by CORS preflight requests and is not normally used
-manually. If any other request methods are used or if the
-request method doesn't match the one required by the endpoint,
-an exception is thrown.
-
-The first thing the API does for all responses is to set
-the proper HTTP response headers depending on how the
-endpoint is configured.
-
-In case the request is a GET or POST request, the system checks
-the authentication status of the caller. If the 'Auth-Token'
-HTTP header exists and contains a valid session token, the
-caller is granted access. Otherwise an error is thrown.
-
-After this the endpoint request data is loaded and parsed
-into the APIEndpoint object.
-
-Next the API rate quota is checked. If there is no quota left
-and the APIEndpoint config requires quota, the function throws
-an error.
-
-If all the steps above succeed, the function returns and the
-APIEndpoint object is ready to be used.
 
 Getting POST or GET parameters
 ------------------------------
@@ -169,8 +171,8 @@ as follows.
 
 * The ``APIEndpoint::get()`` function can be used to get the
   value of an API request parameter. If the parameter is optional,
-  the caller should check whether it exists first with
-  ``APIEndpoint::has()``.
+  the caller should check whether it exists with ``APIEndpoint::has()``
+  first.
 
 Creating and sending the API response
 -------------------------------------
@@ -182,18 +184,18 @@ the response. The functions are defined as follows.
 ``public function resp_set($resp)``
 
 * Set the response data of the APIEndpoint object. ``$resp`` is the
-  object with the data. Note that ``$resp`` should be the proper
+  object with the data. Note that ``$resp`` should be of the proper
   type corresponding to the selected ``APIEndpoint::RESPONSE_TYPE``.
-  Ie. API endpoints with a ``TEXT`` response should set a string
-  as the response data. ``JSON`` endpoints can use all the standard
-  data types like arrays, integers, strings etc. These are automatically
-  JSON encoded when sending the response.
+
+    * A *string* for ``text/plain``.
+    * An *array* for ``application/json``.
+    * An *open file handle* for ``libresignage/passthrough``.
+
+* The ``libresignage/passthrough`` mimetype is a special one. If it's
+  used, the server reads the contents of the open file handle starting
+  from the current position and sends them to the caller. This is useful
+  for sending binary assets to the caller.
 
 ``public function send()``
 
-* Send the response data set with ``APIEndpoint::resp_set()``. Since
-  all API responses are *guaranteed* to have the ``error`` value set,
-  this function automatically sets it to zero if it isn't already set.
-  It is, however, possible to set the error value in the API endpoint
-  code if needed. This function also exits the API endpoint meaning
-  that no code is executed after this function is finished.
+* Convert the response data to the configured format and send it.
