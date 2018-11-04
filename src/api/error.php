@@ -100,6 +100,7 @@ const API_E_MSG = [
 
 class APIException extends Exception {
 	private $api_err = 0;
+
 	public function __construct(
 		int $api_err,
 		string $message = "",
@@ -136,7 +137,7 @@ class APIException extends Exception {
 		$err_str = json_encode($err);
 		if (
 			$err_str == FALSE
-			&& json_last_error() != JSON_ERROR_NONE
+			&& json_last_error() !== JSON_ERROR_NONE
 		) {
 			return '{"error": '.API_E_INTERNAL.'}';
 		}

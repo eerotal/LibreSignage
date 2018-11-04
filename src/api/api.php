@@ -31,8 +31,6 @@ class APIEndpoint {
 	const REQ_AUTH             = 'req_auth';
 	const ALLOW_COOKIE_AUTH    = 'allow_cookie_auth';
 
-	private $modules           = NULL;
-
 	private $url_data          = [];
 	private $body_data         = [];
 	private $file_data         = [];
@@ -81,10 +79,9 @@ class APIEndpoint {
 		foreach ($ret as $k => $v) { $this->$k = $v; }
 
 		/*
-		*  Initialize the API endpoint by executing the following
-		*  modules in the following order.
+		*  Initialize the API endpoint by executing API modules.
 		*/
-		$this->modules = [
+		$modules = [
 			'config'   => new APIConfigCheckerModule(),
 			'request'  => new APIRequestValidatorModule(),
 			'data'     => new APIDataLoaderModule(),
@@ -101,7 +98,7 @@ class APIEndpoint {
 				$this->strict_format
 			)
 		];
-		foreach ($this->modules as $k => $m) { $m->run($this); }
+		foreach ($modules as $k => $m) { $m->run($this); }
 	}
 
 	public function get($key) {
@@ -241,15 +238,17 @@ class APIEndpoint {
 		*/
 		switch($this->response_type) {
 			case API_MIME['application/json']:
-				if (!$this->response) { $this->response = []; }
+				if ($this->response === NULL) {
+					$this->response = [];
+				}
 				if (!isset($this->response['error'])) {
 					// Make sure the error value exists.
 					$this->response['error'] = API_E_OK;
 				}
 				$resp_str = json_encode($this->response);
 				if (
-					$resp_str === FALSE &&
-					json_last_error() !== JSON_ERROR_NONE
+					$resp_str === FALSE
+					&& json_last_error() !== JSON_ERROR_NONE
 				) {
 					throw new APIException(
 						API_E_INTERNAL,
