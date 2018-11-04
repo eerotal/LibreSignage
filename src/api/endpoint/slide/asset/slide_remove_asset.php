@@ -30,7 +30,6 @@ $SLIDE_REMOVE_ASSET = new APIEndpoint([
 	APIEndpoint::REQ_QUOTA      => TRUE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ]);
-api_endpoint_init($SLIDE_REMOVE_ASSET);
 
 $slide = new Slide();
 $slide->load($SLIDE_REMOVE_ASSET->get('id'));

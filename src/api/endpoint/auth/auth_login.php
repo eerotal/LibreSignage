@@ -34,7 +34,6 @@ $AUTH_LOGIN = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA      => FALSE,
 	APIEndpoint::REQ_AUTH       => FALSE
 ));
-api_endpoint_init($AUTH_LOGIN);
 
 $user = auth_creds_verify(
 	$AUTH_LOGIN->get('username'),

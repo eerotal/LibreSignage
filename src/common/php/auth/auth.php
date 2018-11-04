@@ -6,10 +6,7 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/util.php');
-
-const COOKIE_AUTH_TOKEN = 'session_token';
-
-// -- General authentication functions. --
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/constants.php');
 
 function auth_creds_verify(string $user, string $pass) {
 	/*
@@ -38,12 +35,9 @@ function auth_token_verify(string $tok) {
 	*  'user' is the user object of the session. If a matching
 	*  session is not found, NULL is returned.
 	*/
-	$users = NULL;
 	$session = NULL;
-
 	if (!empty($tok)) {
-		$users = user_array();
-		foreach ($users as $k => $u) {
+		foreach (user_array() as $k => $u) {
 			$session = $u->session_token_verify($tok);
 			if ($session !== NULL) {
 				return [
@@ -56,7 +50,19 @@ function auth_token_verify(string $tok) {
 	return NULL;
 }
 
-// -- Web interface authentication functions. --
+function auth_cookie_verify() {
+	/*
+	*  Verify an authentication token supplied in an
+	*  authentication token cookie. See auth_token_verify()
+	*  for the return values. Additionally NULL is returned
+'	*  if no auth cookie is found.
+	*/
+	if (empty($_COOKIE[AUTH_TOKEN_COOKIE])) {
+		return NULL;
+	} else {
+		return auth_token_verify($_COOKIE[AUTH_TOKEN_COOKIE]);
+	}
+}
 
 function web_auth(
 	$user_wl = NULL,
@@ -66,21 +72,10 @@ function web_auth(
 ) {
 	$d = NULL;
 	if (empty($token)) {
-		// Use authentication token from cookie.
-		$d = web_auth_cookie_verify($redir);
+		$d = auth_cookie_verify(); // Auth w/ cookie.
 	} else {
-		// Use supplied authentication token.
-		$d = auth_token_verify($token);
-		if ($d === NULL) {
-			if ($redir) {
-				header('Location: '.LOGIN_PAGE);
-				exit(0);
-			} else {
-				return NULL;
-			}
-		}
+		$d = auth_token_verify($token); // Auth w/ token.
 	}
-
 	if ($d === NULL) {
 		if ($redir) {
 			header('Location: '.LOGIN_PAGE);
@@ -89,36 +84,21 @@ function web_auth(
 		return NULL;
 	}
 	if ($user_wl) {
-		if (!web_auth_user_whitelist($d['user'], $user_wl)) {
-			if ($redir) {
-				error_handle(HTTP_ERR_403);
-			}
+		if (!auth_user_whitelist($d['user'], $user_wl)) {
+			if ($redir) { error_handle(HTTP_ERR_403); }
 			return NULL;
 		}
 	}
 	if ($group_wl) {
-		if (!web_auth_group_whitelist($d['user'], $group_wl)) {
-			if ($redir) {
-				error_handle(HTTP_ERR_403);
-			}
+		if (!auth_group_whitelist($d['user'], $group_wl)) {
+			if ($redir) { error_handle(HTTP_ERR_403); }
 			return NULL;
 		}
 	}
 	return $d;
 }
 
-function web_auth_cookie_verify(bool $redir = FALSE) {
-	/*
-	*  Verify the auth token in the token cookie. This function
-	*  can be used to grant access to web pages.
-	*/
-	if (!empty($_COOKIE[COOKIE_AUTH_TOKEN])) {
-		return auth_token_verify($_COOKIE[COOKIE_AUTH_TOKEN]);
-	}
-	return NULL;
-}
-
-function web_auth_user_whitelist(User $u, array $wl) {
+function auth_user_whitelist(User $u, array $wl) {
 	/*
 	*  Return TRUE if the user $u is in the whitelist $wl.
 	*  FALSE is returned otherwise.
@@ -126,7 +106,7 @@ function web_auth_user_whitelist(User $u, array $wl) {
 	return array_search($u->get_name(), $wl, TRUE);
 }
 
-function web_auth_group_whitelist(User $u, array $wl) {
+function auth_group_whitelist(User $u, array $wl) {
 	/*
 	*  Return TRUE if the user $u is in one of the groups in $wl.
 	*  FALSE is returned otherwise.

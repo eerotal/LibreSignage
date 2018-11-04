@@ -47,7 +47,6 @@ $USER_SAVE = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($USER_SAVE);
 
 // Is authorized as an admin?
 $auth_admin = $USER_SAVE->get_caller()->is_in_group('admin');

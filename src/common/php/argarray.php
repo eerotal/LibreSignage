@@ -20,13 +20,13 @@ class ArgumentArray {
 		*  valid arguments and default values. $proto is
 		*  an associative array of the form
 		*
-		*  $proto = array(
-		*  	'ARG1' => 'TYPE1',
+		*  $proto = [
+		*      'ARG1' => 'TYPE1',
 		*              .
 		*              .
 		*              .
-		*       'ARGN' => 'TYPEN'
-		*  );
+		*      'ARGN' => 'TYPEN'
+		*  ];
 		*
 		*  where ARG1, ..., ARGN are the argument names and
 		*  TYPE1, ..., TYPEN are the corresponding argument
@@ -38,13 +38,13 @@ class ArgumentArray {
 		*  $def is an associative array of default values for
 		*  the arguments and is of the form
 		*
-		*  $def = array(
-		*  	'ARG1' => VALUE1,
+		*  $def = [
+		*      'ARG1' => VALUE1,
 		*              .
 		*              .
 		*              .
-		*       'ARGN' => VALUEN
-		*  );
+		*      'ARGN' => VALUEN
+		*  ];
 		*
 		*  where ARG1, ..., ARGN are the argument names and
 		*  VALUE1, ..., VALUEN are the default values. If a

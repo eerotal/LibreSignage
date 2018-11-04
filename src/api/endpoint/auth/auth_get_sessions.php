@@ -22,7 +22,6 @@ $AUTH_GET_SESSIONS = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA      => TRUE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ));
-api_endpoint_init($AUTH_GET_SESSIONS);
 
 $resp = [];
 $tmp = [];

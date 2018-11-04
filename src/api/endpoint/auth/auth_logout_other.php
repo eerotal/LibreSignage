@@ -22,7 +22,6 @@ $AUTH_LOGOUT_OTHER = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA      => FALSE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ));
-api_endpoint_init($AUTH_LOGOUT_OTHER);
 
 $u = $AUTH_LOGOUT_OTHER->get_caller();
 $u->session_n_rm($AUTH_LOGOUT_OTHER->get_session()->get_id());

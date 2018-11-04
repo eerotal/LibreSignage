@@ -24,7 +24,6 @@ $QUEUE_LIST = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($QUEUE_LIST);
 
 $QUEUE_LIST->resp_set(array('queues' => queue_list()));
 $QUEUE_LIST->send();

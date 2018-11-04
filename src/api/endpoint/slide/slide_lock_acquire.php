@@ -39,7 +39,6 @@ $SLIDE_LOCK_ACQUIRE = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($SLIDE_LOCK_ACQUIRE);
 
 $slide = new Slide();
 $slide->load($SLIDE_LOCK_ACQUIRE->get('id'));

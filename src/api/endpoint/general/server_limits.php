@@ -16,13 +16,12 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
-$SERVER_LIMITS = new APIEndpoint(array(
+$SERVER_LIMITS = new APIEndpoint([
 	APIEndpoint::METHOD 		=> API_METHOD['GET'],
 	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
 	APIEndpoint::REQ_QUOTA		=> FALSE,
 	APIEndpoint::REQ_AUTH		=> FALSE
-));
-api_endpoint_init($SERVER_LIMITS);
+]);
 
 $SERVER_LIMITS->resp_set(array('limits' => LS_LIM));
 $SERVER_LIMITS->send();

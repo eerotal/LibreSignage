@@ -23,7 +23,6 @@ $API_ERR_CODES = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA      => FALSE,
 	APIEndpoint::REQ_AUTH       => FALSE
 ));
-api_endpoint_init($API_ERR_CODES);
 
 $API_ERR_CODES->resp_set(array('codes' => API_E));
 $API_ERR_CODES->send();

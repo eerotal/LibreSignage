@@ -37,7 +37,6 @@ $SLIDE_LOCK_RELEASE = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($SLIDE_LOCK_RELEASE);
 
 if (
 	!check_perm(

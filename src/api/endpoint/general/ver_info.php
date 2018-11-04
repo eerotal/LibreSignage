@@ -22,7 +22,6 @@ $VER_INFO = new APIEndpoint([
 	APIEndpoint::REQ_QUOTA		=> FALSE,
 	APIEndpoint::REQ_AUTH		=> FALSE
 ]);
-api_endpoint_init($VER_INFO);
 
 $VER_INFO->resp_set([
 	'ls' => LS_VER,

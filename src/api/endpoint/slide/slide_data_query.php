@@ -47,7 +47,6 @@ $SLIDE_DATA_QUERY = new APIEndpoint(array(
 	APIEndpoint::REQ_AUTH		=> TRUE,
 	APIEndpoint::STRICT_FORMAT	=> TRUE
 ));
-api_endpoint_init($SLIDE_DATA_QUERY);
 
 $ret = ['data' => []];
 $tmp = new Slide();

@@ -38,7 +38,6 @@ $USER_CREATE = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($USER_CREATE);
 
 if (!$USER_CREATE->get_caller()->is_in_group('admin')) {
 	throw new APIException(

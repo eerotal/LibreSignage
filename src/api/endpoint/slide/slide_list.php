@@ -22,7 +22,6 @@ $SLIDE_LIST = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($SLIDE_LIST);
 
 $SLIDE_LIST->resp_set(array(
 	'slides' => slides_id_list()

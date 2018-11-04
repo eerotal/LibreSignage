@@ -21,7 +21,6 @@ $LIBRARY_LICENSES = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> FALSE,
 	APIEndpoint::REQ_AUTH		=> FALSE
 ));
-api_endpoint_init($LIBRARY_LICENSES);
 
 $LIBRARY_LICENSES->resp_set(file_get_contents(
 	realpath(LIBRESIGNAGE_ROOT.LICENSES_EXT_RST)
