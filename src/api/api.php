@@ -44,6 +44,7 @@ class APIEndpoint {
 	private $response_type     = 0;
 	private $format_body       = NULL;
 	private $format_url        = NULL;
+
 	private $strict_format     = TRUE;
 	private $req_quota         = TRUE;
 	private $req_auth          = TRUE;
