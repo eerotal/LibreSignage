@@ -17,23 +17,19 @@ Table Of Contents
 
 `6. How to install npm`_
 
-`7. LibreSignage in GIT`_
+`7. FAQ`_
 
-`8. LibreSignage versioning`_
+`8. Screenshots`_
 
-`9. FAQ`_
+`9. Make rules`_
 
-`10. Screenshots`_
+`10. Documentation`_
 
-`11. Make rules`_
+`11. Third-party dependencies`_
 
-`12. Documentation`_
+`12. Build system dependencies`_
 
-`13. Third-party dependencies`_
-
-`14. Build system dependencies`_
-
-`15. License`_
+`13. License`_
 
 1. General
 ----------
@@ -185,7 +181,7 @@ are listed below.
    CLI option to specify a maximum number of parallel jobs to speed up
    the building process. The usual recommended value for the max number
    of jobs is one per CPU core, meaning that for eg. a quad core CPU you
-   should use -j4. See `11. Make rules`_ for more advanced options.
+   should use -j4. See `9. Make rules`_ for more advanced options.
 8. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
 
@@ -248,57 +244,7 @@ you should just follow steps 1-3 again.*
    installation by running ``npm -v``. This should now print the
    installed npm version.
 
-7. LibreSignage in GIT
-----------------------
-
-LibreSignage uses the GIT version control system. The LibreSignage
-repository contains multiple branches that all have some differences.
-
-master
-  The master branch always contains the latest stable version of
-  LibreSignage with all the latest backported fixes. If you just
-  wan't to use a fully functioning version of LibreSignage, clone
-  this branch. The actual LibreSignage release points are also marked
-  in the GIT tree as annotated tags. You can clone a release tag too
-  but note that the latest patch release doesn't necessarily contain
-  the latest backports if new fixes have just been backported to master.
-
-v<MAJOR>.<MINOR>.<PATCH>
-  These branches are release branches. Development for a specific
-  LibreSignage version happens in the release branch for that specific
-  version. A new release branch is created every time either the major
-  or the minor version number changes. New eelease branches aren't created
-  for patch releases. Release branches are often quite stable and they
-  generally already work, but they might still contain serious bugs from
-  time to time.
-
-feature/*, bugfix/*, ...
-  Branches that start with a category and have the branch name after
-  a forward slash are development branches. You normally shouldn't
-  clone these because they are actively being worked on and even
-  commit history might be rewritten from time to time. These branches
-  aren't meant to be used by anyone else other than the developers
-  working on the branch.
-
-8. LibreSignage versioning
---------------------------
-
-Each LibreSignage release has a designated version number of the
-form MAJOR.MINOR.PATCH.
-
-* The PATCH version is incremented for each patch release. Patch
-  releases only contain fixes and never contain new features.
-* The MINOR version is incremented for every release where
-  incrementing the MAJOR number is not justified. Minor releases
-  can contain new features and bugfixes etc.
-* The MAJOR version number is only incremented for very big and
-  major releases.
-
-The LibreSignage API also has its own version number that's just
-an integer which is incremented every time a backwards incompatible
-API change is made.
-
-9. FAQ
+7. FAQ
 ------
 
 Why doesn't LibreSignage use framework/library X?
@@ -315,9 +261,9 @@ Why doesn't LibreSignage have feature X?
 Is LibreSignage really free?
   YES! In fact LibreSignage is not only free, it's also open source.
   You can find information about the LibreSignage license in the
-  `15. License`_ section.
+  `13. License`_ section.
 
-10. Screenshots
+8. Screenshots
 ---------------
 
 Open these images in a new tab to view the full resolution versions.
@@ -372,7 +318,7 @@ branch or commit you are viewing.*
    :width: 320 px
    :height: 180 px
 
-11. Make rules
+9. Make rules
 --------------
 
 The following ``make`` rules are implemented in the makefile.
@@ -418,7 +364,7 @@ NOHTMLDOCS=<y/n> - (default: n)
   or the API endpoint files. This setting can be used with make rules
   that build files. Using it with eg. ``make install`` has no effect.
   
-12. Documentation
+10. Documentation
 -----------------
 
 LibreSignage documentation is written in reStructuredText, which is
@@ -430,7 +376,7 @@ are located in the directory *src/doc/rst/*.
 The reStructuredText files are also compiled into HTML when LibreSignage
 is built and they can be accessed from the *Help* page of LibreSignage.
 
-13. Third-party dependencies
+11. Third-party dependencies
 ----------------------------
 
 Bootstrap (Library, MIT License)
@@ -466,7 +412,7 @@ The full licenses for these third party libraries and resources can be
 found in the file *src/doc/rst/LICENSES_EXT.rst* in the source
 distribution.
 
-14. Build system dependencies
+12. Build system dependencies
 -----------------------------
 
 * SASS (https://sass-lang.com/)
@@ -474,13 +420,13 @@ distribution.
 * PostCSS (https://postcss.org/)
 * Autoprefixer (https://github.com/postcss/autoprefixer)
 
-15. License
+13. License
 -----------
 
 LibreSignage is licensed under the BSD 3-clause license, which can be
 found in the files *LICENSE.rst* and *src/doc/rst/LICENSE.rst* in the
 source distribution. Third party libraries and resources are licensed
-under their respective licenses. See `13. Third-party dependencies`_ for
+under their respective licenses. See `11. Third-party dependencies`_ for
 more information.
 
 Copyright Eero Talus 2018

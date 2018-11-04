@@ -9,6 +9,8 @@ General
 
 `Readme </doc?doc=README>`_
 
+`Contributing </doc?doc=CONTRIBUTING>`_
+
 Web Interface
 -------------
 

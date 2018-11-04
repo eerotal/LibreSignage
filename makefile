@@ -47,7 +47,7 @@ SRC_NO_COMPILE := $(shell find src \
 SRC_RST := $(shell find src \
 	\( -type f -path 'src/node_modules/*' -prune \) \
 	-o -type f -name '*.rst' -print \
-) README.rst
+) README.rst CONTRIBUTING.rst
 
 # SCSS sources.
 SRC_SCSS := $(shell find src \
@@ -179,6 +179,14 @@ dist/doc/rst/README.rst:: README.rst
 	$(call makedir,$@)
 	cp -p $< $@
 
+# Copy over CONTRIBUTING.rst.
+dist/doc/rst/CONTRIBUTING.rst:: CONTRIBUTING.rst
+	@:
+	set -e
+	$(call status,cp,$<,$@)
+	$(call makedir,$@)
+	cp -p $< $@
+
 # Copy over RST sources.
 dist/doc/rst/%.rst:: src/doc/rst/%.rst
 	@:
@@ -199,6 +207,16 @@ dist/doc/html/%.html:: src/doc/rst/%.rst
 
 # Compile README.rst
 dist/doc/html/README.html:: README.rst
+	@:
+	set -e
+	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
+		$(call status,pandoc,$<,$@)
+		$(call makedir,$@)
+		pandoc -o $@ -f rst -t html $<
+	fi
+
+# Compile CONTRIBUTING.rst
+dist/doc/html/CONTRIBUTING.html:: CONTRIBUTING.rst
 	@:
 	set -e
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
