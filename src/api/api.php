@@ -67,47 +67,51 @@ const API_P_UNUSED  = API_P_ANY
 
 class APIEndpoint {
 	// Config options.
-	const METHOD           = 'method';
-	const REQUEST_TYPE     = 'request_type';
-	const RESPONSE_TYPE    = 'response_type';
-	const FORMAT_BODY      = 'format_body';
-	const FORMAT_URL       = 'format_url';
-	const STRICT_FORMAT    = 'strict_format';
-	const REQ_QUOTA        = 'req_quota';
-	const REQ_AUTH         = 'req_auth';
+	const METHOD               = 'method';
+	const REQUEST_TYPE         = 'request_type';
+	const RESPONSE_TYPE        = 'response_type';
+	const FORMAT_BODY          = 'format_body';
+	const FORMAT_URL           = 'format_url';
+	const STRICT_FORMAT        = 'strict_format';
+	const REQ_QUOTA            = 'req_quota';
+	const REQ_AUTH             = 'req_auth';
+	const ALLOW_COOKIE_AUTH    = 'allow_cookie_auth';
 
-	private $method        = 0;
-	private $request_type  = 0;
-	private $response_type = 0;
-	private $response      = NULL;
-	private $format_body   = NULL;
-	private $format_url    = NULL;
-	private $strict_format = TRUE;
-	private $req_quota     = TRUE;
-	private $req_auth      = TRUE;
-	private $data          = NULL;
-	private $caller        = NULL;
+	private $method            = 0;
+	private $request_type      = 0;
+	private $response_type     = 0;
+	private $response          = NULL;
+	private $format_body       = NULL;
+	private $format_url        = NULL;
+	private $strict_format     = TRUE;
+	private $req_quota         = TRUE;
+	private $req_auth          = TRUE;
+	private $data              = NULL;
+	private $caller            = NULL;
+	private $allow_cookie_auth = FALSE;
 
 	public function __construct(array $config) {
 		$args = new ArgumentArray(
 			[
-				self::METHOD        => API_METHOD,
-				self::REQUEST_TYPE  => API_MIME,
-				self::RESPONSE_TYPE => API_MIME,
-				self::FORMAT_BODY   => 'array',
-				self::FORMAT_URL    => 'array',
-				self::STRICT_FORMAT => 'boolean',
-				self::REQ_QUOTA     => 'boolean',
-				self::REQ_AUTH      => 'boolean'
+				self::METHOD            => API_METHOD,
+				self::REQUEST_TYPE      => API_MIME,
+				self::RESPONSE_TYPE     => API_MIME,
+				self::FORMAT_BODY       => 'array',
+				self::FORMAT_URL        => 'array',
+				self::STRICT_FORMAT     => 'boolean',
+				self::REQ_QUOTA         => 'boolean',
+				self::REQ_AUTH          => 'boolean',
+				self::ALLOW_COOKIE_AUTH => 'boolean'
 			],
 			[
-				self::REQUEST_TYPE  => API_MIME['application/json'],
-				self::RESPONSE_TYPE => API_MIME['application/json'],
-				self::FORMAT_BODY   => [],
-				self::FORMAT_URL    => [],
-				self::STRICT_FORMAT => TRUE,
-				self::REQ_QUOTA     => TRUE,
-				self::REQ_AUTH      => TRUE
+				self::REQUEST_TYPE      => API_MIME['application/json'],
+				self::RESPONSE_TYPE     => API_MIME['application/json'],
+				self::FORMAT_BODY       => [],
+				self::FORMAT_URL        => [],
+				self::STRICT_FORMAT     => TRUE,
+				self::REQ_QUOTA         => TRUE,
+				self::REQ_AUTH          => TRUE,
+				self::ALLOW_COOKIE_AUTH => FALSE
 			]
 		);
 		$ret = $args->chk($config);
@@ -356,6 +360,7 @@ class APIEndpoint {
 
 	public function requires_quota() { return $this->req_quota; }
 	public function requires_auth() { return $this->req_auth; }
+	public function allows_cookie_auth() { return $this->allow_cookie_auth; }
 
 	public function set_caller($caller) { $this->caller = $caller; }
 	public function get_caller() { return $this->caller; }
@@ -474,12 +479,22 @@ function api_handle_request(APIEndpoint $endpoint) {
 	// Check authentication.
 	if (!$endpoint->requires_auth()) { return; }
 
-	$atok = NULL;
-	if (array_key_exists('Auth-Token', getallheaders())) {
-		$atok = getallheaders()["Auth-Token"];
-	}
 
-	$auth_data = web_auth(NULL, NULL, FALSE, $atok);
+	$auth_data = NULL;
+	if (array_key_exists('Auth-Token', getallheaders())) {
+		// Token authentication.
+		$atok = getallheaders()['Auth-Token'];
+		$auth_data = auth_token_verify($atok);
+	} else if ($endpoint->allows_cookie_auth()) {
+		// Cookie authentication.
+		if ($endpoint->get_method() === API_METHOD['POST']) {
+			// Prevent CSRF on POST endpoints.
+			throw new IntException(
+				"Won't allow cookie auth for POST endpoints."
+			);
+		}
+		$auth_data = web_auth_cookie_verify();
+	}
 	if ($auth_data === NULL) {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,

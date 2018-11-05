@@ -604,7 +604,7 @@ const QSEL_UI_DEFS = new uic.UIController({
 		attach = {
 			'change': () => {
 				queue_select(
-					QSEL_UI_DEFS.get('QUEUE_SELECT').val(),
+					QSEL_UI_DEFS.get('QUEUE_SELECT').get(),
 					true,
 					null
 				);

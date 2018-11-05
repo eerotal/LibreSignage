@@ -26,11 +26,10 @@ class User extends Exportable{
 
 	public function __construct($name = NULL) {
 		/*
-		*  If $name != NULL, load the userdata for the
+		*  If $name is supplied, load the userdata for the
 		*  user. Otherwise do nothing.
 		*/
-		assert(!empty($name));
-		$this->load($name);
+		if (!empty($name)) { $this->load($name); }
 	}
 
 	public function __exportable_set(string $name, $value) {
