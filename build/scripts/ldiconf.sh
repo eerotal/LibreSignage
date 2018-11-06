@@ -8,30 +8,17 @@
 
 set -e
 
-check_config() {
-	# Check the required values are set.
-	if [ -z "$ICONF_DOCROOT" ]; then
-		echo '[ERROR] No document root in config.';
-		exit 1;
-	elif [ -z "$ICONF_NAME" ]; then
-		echo '[ERROR] No server name in config.';
-		exit 1;
-	fi
-}
-
 if [ -n "$1" ]; then
-	echo "[INFO] Load config from '$1'.";
-	. "$1";
-	check_config;
+	echo "[INFO] Load config from '$1'."
+	. "$1"
 else
 	if [ -f "build/link/last.sh" ]; then
 		echo "[INFO] Load config from"\
-			"'`readlink -f "build/link/last.sh"`'";
-		. "build/link/last.sh";
-		check_config;
+			"'`readlink -f "build/link/last.sh"`'"
+		. "build/link/last.sh"
 	else
 		echo "[ERROR] Instance config doesn't exist." \
-			"Have you run 'make configure'?";
-		exit 1;
+			"Did you run 'make configure'?"
+		exit 1
 	fi
 fi

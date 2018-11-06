@@ -14,9 +14,9 @@
 	// Setup debugging. Don't touch, set by mkdist.sh.
 	const LIBRESIGNAGE_DEBUG = #pre(ICONF_DEBUG);
 
-	// Instance owner config. Don't touch, set by mkdist.sh.
-	const ADMIN_EMAIL = "#pre(ICONF_ADMIN_EMAIL)";
-	const ADMIN_NAME = "#pre(ICONF_ADMIN_NAME)";
+	// Instance admin config.
+	const ADMIN_EMAIL = "admin@example.com";
+	const ADMIN_NAME = "admin";
 
 	/*
 	*  Paths relative to document root. DO NOT make these absolute

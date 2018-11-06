@@ -1,17 +1,12 @@
 #!/bin/sh
 
 ##
-##  Prompt the user for a build system configuration. The
-##  config is automatically saved to a file in 'build/'.
+## LibreSignage build configurator script for the apache2-debian
+## environment. This script is interactive.
 ##
 
 set -e
 . build/scripts/conf.sh
-
-read -p 'Server environment (DEF: apache2-debian): ' ICONF_SERVER_ENV;
-if [ -z "$ICONF_SERVER_ENV" ]; then
-	ICONF_SERVER_ENV='apache2-debian';
-fi
 
 read -p 'Document root (DEF: /var/www): ' ICONF_DOCROOT;
 if [ -z "$ICONF_DOCROOT" ]; then

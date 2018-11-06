@@ -315,7 +315,7 @@ configure:
 	@:
 	set -e
 
-	./build/scripts/configure.sh
+	./build/scripts/bootstrap_config.sh
 
 	. build/scripts/conf.sh
 	. build/scripts/ldiconf.sh
