@@ -50,18 +50,17 @@
 		return LS_LIM[$lim];
 	}
 
-
-	// Load LibreSignage configuration.
+	// Load LibreSignage configuration files.
 	define_array_values(load_config_array(
 		LIBRESIGNAGE_ROOT.'/'.CONFIG_DIR
 	));
-	define(DEFAULT_QUOTA, load_config_array(
-		LIBRESIGNAGE_ROOT.'/'.QUOTA_DIR
-	));
-	define(LS_LIM, load_config_array(
+	define('LS_LIM', load_config_array(
 		LIBRESIGNAGE_ROOT.'/'.LIMITS_DIR
 	));
-	
+	define('DEFAULT_QUOTA', load_config_array(
+		LIBRESIGNAGE_ROOT.'/'.QUOTA_DIR
+	));
+
 	// Setup error handling and reporting.
 	error_setup();
 	error_set_debug(LIBRESIGNAGE_DEBUG);

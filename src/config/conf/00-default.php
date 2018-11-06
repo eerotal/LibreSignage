@@ -42,8 +42,8 @@ return [
 	'USER_MGR_PAGE'         => "/control/usermgr",
 	'USER_SETTINGS_PAGE'    => "/control/user",
 	'ERROR_PAGES'           => "/errors",
-	'LOGIN_LANDING'         => CONTROL_PANEL_PAGE,
-	'LOGOUT_LANDING'        => LOGOUT_PAGE,
+	'LOGIN_LANDING'         => "/control",
+	'LOGOUT_LANDING'        => "/logout",
 
 	// Permanent cookie expiration on Tuesday, 19-Jan-2038 03:14:07 UTC
 	'PERMACOOKIE_EXPIRE'    => 2147483647,
@@ -61,5 +61,5 @@ return [
 	'THUMB_MAXH'            => 180,
 	'THUMB_EXT'             => '.png',
 
-	'ASSET_FILENAME_MAXLEN' => 64,
+	'ASSET_FILENAME_MAXLEN' => 64
 ];
