@@ -25,6 +25,12 @@ INST ?= ""
 # Use apache2 by default.
 SERVER_ENV ?= apache2
 
+# Enable no features by default.
+FEATURES ?= 
+
+# Select no environment by default.
+ENVIRONMENT ?=
+
 # LibreSignage build dependencies. Note that apache is excluded
 # since checking whether it's installed usually requires root.
 DEPS := php7.2 pandoc sass npm
@@ -315,13 +321,13 @@ configure:
 	@:
 	set -e
 
-	./build/scripts/bootstrap_config.sh
+	./build/scripts/bootstrap_config.sh $(ENVIRONMENT) $(FEATURES)
 
 	. build/scripts/conf.sh
 	. build/scripts/ldiconf.sh
 	echo "[INFO] Generate server configuration for '$$ICONF_SERVER_ENV'."
 	mkdir -p "$$CONF_DIR";
-	./build/scripts/env_config_generators/"$$ICONF_SERVER_ENV".sh
+	./build/scripts/env_config_generators/"$$ICONF_SERVER_ENV".sh $(INST)
 
 utest:
 	@:
@@ -404,6 +410,8 @@ LOC:
 		-o -name "*.css" -print \
 		-o -name "*.scss" -print \
 		-o -name "*.sh" -print \
+		-o -name "Dockerfile" -print \
+		-o -name "makefile" -print \
 		-o ! -name 'package-lock.json' -name "*.json" -print \
 		-o -name "*.py" -print`
 
