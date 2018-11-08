@@ -7,7 +7,6 @@ SRC_DIR='src';
 DIST_DIR='dist';
 CONF_DIR='server';
 
-ICONF_FILE_EXT='.iconf';
 RST_DIR="$DIST_DIR/doc/rst";
 HTML_DIR="$DIST_DIR/doc/html";
 CLIENT_DIR="$DIST_DIR/client";

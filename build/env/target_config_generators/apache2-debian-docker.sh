@@ -1,14 +1,14 @@
 ##
-##  LibreSignage server config generator for the
+##  LibreSignage target config generator for the
 ##  apache2-debian-docker target environment used for
 ##  building LibreSignage Docker images. This script
-##  loads the build configuration using the ldiconf.sh
+##  loads the build configuration using the ldconf.sh
 ##  script.
 ##
 
 set -e
 . build/scripts/conf.sh
-. build/scripts/ldiconf.sh
+. build/scripts/ldconf.sh
 
 mkdir -p "$CONF_DIR"
 
@@ -52,10 +52,12 @@ echo '</DirectoryMatch>'
 # PHP configuration.
 mkdir -p "$CONF_DIR/php"
 {
+
 echo "[PHP]"
 echo "file_uploads = On"
 echo "upload_max_filesize = 200M"
 echo "max_file_uploads = 20"
 echo "post_max_size = 210M"
 echo "memory_limit = 300M"
+
 } > "$CONF_DIR/php/ls-docker.ini"

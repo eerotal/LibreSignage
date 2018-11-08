@@ -3,11 +3,11 @@ set -e
 ##
 ##  Install handler for the apache2-debian-docker target
 ##  environment. This script loads the build configuration
-##  using the ldiconf.sh script.
+##  using the ldconf.sh script.
 ##
 
 . build/scripts/conf.sh
-. build/scripts/ldiconf.sh
+. build/scripts/ldconf.sh
 
 args=""
 

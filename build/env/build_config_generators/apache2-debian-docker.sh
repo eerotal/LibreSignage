@@ -57,7 +57,7 @@ done
 ##  Write to the build config file.
 ##
 
-CONF_FILE="build/docker_`date +%F_%T`$ICONF_FILE_EXT"
+CONF_FILE="build/docker_`date +%F_%T`.conf"
 echo "Write config to '$CONF_FILE'."
 
 {
@@ -89,10 +89,4 @@ else
 fi
 } > $CONF_FILE
 
-##
-## Create the config file symlink in build/link/last.sh.
-##
-mkdir -p "build/link"
-rm -f "build/link/last.sh"
-ln -s "`pwd`/$CONF_FILE" "build/link/last.sh"
-
+./build/scripts/mkconfiglink.sh "$CONF_FILE"

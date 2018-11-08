@@ -1,13 +1,13 @@
 #!/bin/sh
 
 ##
-##  Execute the server config generator script for the
-##  configured build environment.
+##  Execute the target config generator script for the
+##  configured environment.
 ##
 
 set -e
 
 . build/scripts/conf.sh
-. build/scripts/ldiconf.sh
+. build/scripts/ldconf.sh
 
-./build/env/server_config_generators/"$CONF_TARGET_ENV".sh $@
+./build/env/target_config_generators/"$CONF_TARGET_ENV".sh $@
