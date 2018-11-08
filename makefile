@@ -22,14 +22,11 @@ NOHTMLDOCS ?= N
 # Installation config path.
 INST ?= ""
 
-# Use apache2 by default.
-SERVER_ENV ?= apache2
-
 # Enable no features by default.
 FEATURES ?= 
 
 # Select no environment by default.
-ENVIRONMENT ?=
+TARGET_ENV ?=
 
 # LibreSignage build dependencies. Note that apache is excluded
 # since checking whether it's installed usually requires root.
@@ -314,20 +311,18 @@ dist/libs/%:: node_modules/%
 install:
 	@:
 	set -e
-	. build/scripts/ldiconf.sh
-	./build/scripts/env_install_handlers/"$$ICONF_SERVER_ENV".sh $(INST)
+	./build/scripts/install.sh
 
 configure:
 	@:
 	set -e
+	args="--env $(TARGET_ENV)"
+	if [ ! -z "$(FEATURES)" ]; then
+		args="$$args --features '$(FEATURES)'"
+	fi
 
-	./build/scripts/bootstrap_config.sh $(ENVIRONMENT) $(FEATURES)
-
-	. build/scripts/conf.sh
-	. build/scripts/ldiconf.sh
-	echo "[INFO] Generate server configuration for '$$ICONF_SERVER_ENV'."
-	mkdir -p "$$CONF_DIR";
-	./build/scripts/env_config_generators/"$$ICONF_SERVER_ENV".sh $(INST)
+	./build/scripts/configure_build.sh $$args
+	./build/scripts/configure_server.sh
 
 utest:
 	@:

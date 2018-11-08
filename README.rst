@@ -137,7 +137,14 @@ are listed below.
    Currently *npm* is only available in the Debian Sid repos and even
    there the package is so old it doesn't work correctly. You can,
    however, install npm manually. See `6. How to install NPM`_ for
-   more info.
+   more info. There are also some optional dependencies:
+
+     * If you want to run or build LibreSignage Docker images,
+       you'll also need to install `Docker <https://www.docker.com/>`_.
+     * If you want to enable video thumbnail generation, you'll
+       need to install ``ffmpeg``. On Debian you can install it by
+       running ``sudo apt install ffmpeg``.
+
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.

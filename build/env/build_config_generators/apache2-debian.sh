@@ -40,7 +40,7 @@ echo "Write config to '$ICONF_F'.";
 echo '#!/bin/sh'                                  >  $ICONF_F;
 echo "# Generated on `date` by configure.sh."     >> $ICONF_F;
 
-echo "ICONF_SERVER_ENV=\"$ICONF_SERVER_ENV\";"    >> $ICONF_F;
+echo "ICONF_TARGET_ENV=\"$ICONF_SERVER_ENV\";"    >> $ICONF_F;
 echo "ICONF_DOCROOT=\"$ICONF_DOCROOT\";"          >> $ICONF_F;
 echo "ICONF_NAME=\"$ICONF_NAME\";"                >> $ICONF_F;
 echo "ICONF_ALIAS=\"$ICONF_ALIAS\";"              >> $ICONF_F;

@@ -1,5 +1,5 @@
 #
-#  LibreSignage environment config generator for Apache 2 on Debian.
+#  LibreSignage environment config handler for Apache 2 on Debian.
 #
 
 set -e

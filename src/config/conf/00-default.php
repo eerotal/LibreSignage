@@ -11,7 +11,7 @@ return [
 	'API_VER'               => "#pre(API_VER)",
 
 	// Control debugging.
-	'LIBRESIGNAGE_DEBUG'    => #pre(ICONF_DEBUG),
+	'LIBRESIGNAGE_DEBUG'    => #pre(CONF_DEBUG),
 
 	// Default admin contact info.
 	'ADMIN_EMAIL'           => "admin@example.com",
@@ -51,8 +51,8 @@ return [
 	'AUTH_TOKEN_LEN'        => 15,
 	'SLIDE_LOCK_MAX_AGE'    => 600,
 
-	'ENABLE_FFMPEG_THUMBS'  => #pre(ICONF_FEATURE_VIDTHUMBS),
-	'ENABLE_GD_THUMBS'      => #pre(ICONF_FEATURE_IMGTHUMBS),
+	'ENABLE_FFMPEG_THUMBS'  => #pre(CONF_FEATURE_VIDTHUMBS),
+	'ENABLE_GD_THUMBS'      => #pre(CONF_FEATURE_IMGTHUMBS),
 
 	'FFMPEG_PATH'           => '/usr/bin/ffmpeg',
 	'FFPROBE_PATH'          => '/usr/bin/ffprobe',

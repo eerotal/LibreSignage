@@ -1,15 +1,16 @@
-#
-#  LibreSignage environment config generator for the
-#  apache2-debian-docker environment that's used for building
-#  LibreSignage Docker images. The apache2 configuration
-#  in the Docker image doesn't use Virtual Hosts as that makes
-#  the configuration code simpler and VHosts have no use in
-#  containers.
-#
+##
+##  LibreSignage server config generator for the
+##  apache2-debian-docker target environment used for
+##  building LibreSignage Docker images. This script
+##  loads the build configuration using the ldiconf.sh
+##  script.
+##
 
 set -e
 . build/scripts/conf.sh
 . build/scripts/ldiconf.sh
+
+mkdir -p "$CONF_DIR"
 
 # Apache2 configuration.
 mkdir -p "$CONF_DIR/apache2"
