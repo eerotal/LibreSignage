@@ -420,7 +420,7 @@ LOD:
 initchk:
 	@:
 	set -e
-	./build/scripts/ldiconf.sh $(INST)
+	./build/scripts/ldconf.sh $(INST)
 
 	# Check that the require dependencies are installed.
 	for d in $(DEPS); do

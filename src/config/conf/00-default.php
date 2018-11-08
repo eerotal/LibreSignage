@@ -14,8 +14,8 @@ return [
 	'LIBRESIGNAGE_DEBUG'    => #pre(CONF_DEBUG),
 
 	// Default admin contact info.
-	'ADMIN_EMAIL'           => "admin@example.com",
-	'ADMIN_NAME'            => "admin",
+	'ADMIN_EMAIL'           => "#pre(CONF_ADMIN_EMAIL)",
+	'ADMIN_NAME'            => "#pre(CONF_ADMIN_NAME)",
 
 	/*
 	*  Paths relative to document root. DO NOT make these absolute

@@ -38,13 +38,18 @@ echo '		Options -Indexes';
 echo '	</Directory>';
 
 
-# Send a 404 response when trying to access 'data/' or 'common/'.
+# Prevent access to 'data/', 'common/' and '/config'.
 echo "	<DirectoryMatch \"^$CONF_INSTALL_DIR(/?)$CONF_NAME(/?)data(.+)\">";
 echo '		RewriteEngine On';
 echo '		RewriteRule .* - [R=404,L]';
 echo '	</DirectoryMatch>';
 
 echo "	<DirectoryMatch \"^$CONF_INSTALL_DIR(/?)$CONF_NAME(/?)common(.+)\">";
+echo '		RewriteEngine On';
+echo '		RewriteRule .* - [R=404,L]';
+echo '	</DirectoryMatch>';
+
+echo "	<DirectoryMatch \"^$CONF_INSTALL_DIR(/?)$CONF_NAME(/?)config(.+)\">";
 echo '		RewriteEngine On';
 echo '		RewriteRule .* - [R=404,L]';
 echo '	</DirectoryMatch>';
@@ -59,3 +64,16 @@ echo "	php_admin_value memory_limit 300M"
 echo '</VirtualHost>';
 
 } > "$CONF_DIR/apache2/$CONF_NAME.conf"
+
+# LibreSignage instance configuration.
+
+mkdir -p "$CONF_DIR/libresignage/conf"
+{
+
+echo "<?php"
+echo "return ["
+echo "	'ADMIN_NAME' => '$CONF_ADMIN_NAME',"
+echo "	'ADMIN_EMAIL' => '$CONF_ADMIN_EMAIL'"
+echo "];"
+
+} > "$CONF_DIR/libresignage/conf/01-admin-info.php"

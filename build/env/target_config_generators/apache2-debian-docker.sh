@@ -36,13 +36,18 @@ echo '	Options -Indexes'
 echo '</Directory>'
 
 
-# Send a 404 response when trying to access 'data/' or 'common/'.
+# Prevent access to 'data/', 'common/' and 'config/'.
 echo "<DirectoryMatch \"^/var/www/html(/?)data(.+)\">"
 echo '  RewriteEngine On'
 echo '  RewriteRule .* - [R=404,L]'
 echo '</DirectoryMatch>'
 
 echo "<DirectoryMatch \"^/var/www/html(/?)common(.+)\">"
+echo '  RewriteEngine On'
+echo '  RewriteRule .* - [R=404,L]'
+echo '</DirectoryMatch>'
+
+echo "<DirectoryMatch \"^/var/www/html(/?)config(.+)\">"
 echo '  RewriteEngine On'
 echo '  RewriteRule .* - [R=404,L]'
 echo '</DirectoryMatch>'

@@ -21,6 +21,26 @@ read -p 'Server name aliases (space separated): ' CONF_ALIAS
 read -p 'Admin name: ' CONF_ADMIN_NAME
 read -p 'Admin email: ' CONF_ADMIN_EMAIL
 
+read -p 'Enable image thumbnail generation? (y/N): ' CONF_FEATURE_IMGTHUMBS
+case "$CONF_FEATURE_IMGTHUMBS" in
+	[Yy])
+		CONF_FEATURE_IMGTHUMBS="TRUE"
+		;;
+	*)
+		CONF_FEATURE_IMGTHUMBS="FALSE"
+		;;
+esac
+
+read -p 'Enable video thumbnail generation? (y/N): ' CONF_FEATURE_VIDTHUMBS
+case "$CONF_FEATURE_VIDTHUMBS" in
+	[Yy])
+		CONF_FEATURE_VIDTHUMBS="TRUE"
+		;;
+	*)
+		CONF_FEATURE_VIDTHUMBS="FALSE"
+		;;
+esac
+
 read -p 'Enable debugging? (y/N): ' TMP_IN
 case "$TMP_IN" in
 	[Yy])
@@ -49,6 +69,8 @@ echo "CONF_NAME=\"$CONF_NAME\""
 echo "CONF_ALIAS=\"$CONF_ALIAS\""
 echo "CONF_ADMIN_NAME=\"$CONF_ADMIN_NAME\""
 echo "CONF_ADMIN_EMAIL=\"$CONF_ADMIN_EMAIL\""
+echo "CONF_FEATURE_IMGTHUMBS=\"$CONF_FEATURE_IMGTHUMBS\""
+echo "CONF_FEATURE_VIDTHUMBS=\"$CONF_FEATURE_VIDTHUMBS\""
 echo "CONF_DEBUG=\"$CONF_DEBUG\""
 
 } > $CONF_FILE

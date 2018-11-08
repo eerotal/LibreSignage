@@ -65,6 +65,12 @@ if [ "$FLAG_PRESERVE_DATA" = "1" ]; then
 fi
 
 ##
+##  Copy generated LibreSignage config files.
+##
+
+cp server/libresignage/conf/* $VHOST_DIR/config/conf/.
+
+##
 ## Set the correct file permissions.
 ##
 

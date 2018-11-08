@@ -66,6 +66,8 @@ echo "# Generated on `date` by"
 echo "# the LibreSignage build system."
 
 echo "CONF_TARGET_ENV='apache2-debian-docker'"
+echo "CONF_ADMIN_NAME='admin'"
+echo "CONF_ADMIN_EMAIL='admin@example.com'"
 
 echo -n 'CONF_DEBUG='
 if is_feature_enabled "$features" 'debug'; then
