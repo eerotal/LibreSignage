@@ -20,12 +20,12 @@ A LibreSignage docker container can be started by running::
 
 This command does a few things
 
-    1. If the LibreSignage image is not yet downloaded, it is pulled
-       from Docker Hub.
-    2. After pulling the image, a container is started in daemon
-       mode (*-d*). Port 80 on the host machine is mapped to port 80
-       in the container (*-p 80:80*) and a Docker volume is created
-       for storing LibreSignage instance data (*--mount ...*).
+1. If the LibreSignage image is not yet downloaded, it is pulled
+   from Docker Hub.
+2. After pulling the image, a container is started in daemon
+   mode (*-d*). Port 80 on the host machine is mapped to port 80
+   in the container (*-p 80:80*) and a Docker volume is created
+   for storing LibreSignage instance data (*--mount ...*).
 
 The started container is a very basic instance that's useful for testing
 LibreSignage. However, if you intend to deploy LibreSignage onto a
@@ -90,8 +90,8 @@ meaningful. This information is shown to users of the system on the main
 so that users can report any problems to the server admin via email. There
 are two config options that affect the admin contact info:
 
-  * *ADMIN_NAME* - The name of the admin.
-  * *ADMIN_EMAIL* - The email address of the admin.
+* *ADMIN_NAME* - The name of the admin.
+* *ADMIN_EMAIL* - The email address of the admin.
 
 These are the most important things to configure. Now you can read
 through the documentation and start learning the system. Have fun!
