@@ -1,27 +1,26 @@
 #!/bin/sh
 
 ##
-##  Select a build environment and execute the build config
-##  generator for that environment. You must pass the environment
-##  name [ENV] by using --env [ENV] when executing this script. Any
-##  additional arguments are passed to the build config generator
-##  script.
+##  Select a target and execute the build config generator for that
+##  target. You must pass the target name [TARGET] by using
+##  --target [TARGET] when executing this script. Any additional
+##  arguments are passed to the build config generator script.
 ##
 
 set -e
 
 pass=''
-server_env=''
+target=''
 
 while [ $# -gt 0 ]; do
 	case "$1" in
-		'--env')
+		'--target')
 			if [ ! -z "$2" ]; then
 				shift
-				server_env="$1"
+				server_target="$1"
 				shift
 			else
-				echo "Expected build environment name after '--env'."
+				echo "Expected target name after '--target'."
 				exit 1
 			fi
 			;;
@@ -36,12 +35,12 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-if [ -z "$server_env" ]; then
-	echo "[Error] Specify a build environment."
+if [ -z "$server_target" ]; then
+	echo "[Error] Specify a build target using '--target [target]'."
 	exit 1
 fi
 
-echo "[INFO] Configuring for '$server_env'."
+echo "[INFO] Configuring for '$server_target'."
 echo "[INFO] Pass to build config generator: '$pass'"
 
-./"build/env/build_config_generators/$server_env.sh" $pass
+."/build/target/"$server_target"/build_config.sh" $pass

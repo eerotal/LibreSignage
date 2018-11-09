@@ -1,8 +1,8 @@
 #!/bin/sh
 
 ##
-## LibreSignage build configurator script for the apache2-debian
-## target environment. This script is interactive.
+## LibreSignage build config generator for the apache2-debian
+## target. This script is interactive.
 ##
 
 set -e
@@ -63,7 +63,7 @@ echo "Write config to '$CONF_FILE'."
 echo '#!/bin/sh'
 echo "# Generated on `date` by configure.sh."
 
-echo "CONF_TARGET_ENV=\"apache2-debian\""
+echo "CONF_TARGET=\"apache2-debian\""
 echo "CONF_INSTALL_DIR=\"$CONF_INSTALL_DIR\""
 echo "CONF_NAME=\"$CONF_NAME\""
 echo "CONF_ALIAS=\"$CONF_ALIAS\""

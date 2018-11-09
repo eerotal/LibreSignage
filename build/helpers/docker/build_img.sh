@@ -17,6 +17,6 @@ fi
 echo "[INFO] Enabled features: $FEATURES"
 
 make configure \
-	"TARGET_ENV=apache2-debian-docker" \
+	"TARGET=apache2-debian-docker" \
 	"FEATURES=$FEATURES"
 make install

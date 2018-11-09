@@ -25,11 +25,10 @@ INST ?= ""
 # Enable no features by default.
 FEATURES ?= 
 
-# Select no environment by default.
-TARGET_ENV ?=
+# Select no target by default.
+TARGET ?=
 
-# LibreSignage build dependencies. Note that apache is excluded
-# since checking whether it's installed usually requires root.
+# LibreSignage build dependencies.
 DEPS := php7.2 pandoc sass npm
 
 # Production libraries.
@@ -316,13 +315,17 @@ install:
 configure:
 	@:
 	set -e
-	args="--env $(TARGET_ENV)"
+	if [ -z "$(TARGET)" ]; then
+		echo "[Error] Specify a target using 'TARGET=[target]'."
+		exit 1
+	fi
+	args="--target $(TARGET)"
 	if [ ! -z "$(FEATURES)" ]; then
 		args="$$args --features '$(FEATURES)'"
 	fi
 
 	./build/scripts/configure_build.sh $$args
-	./build/scripts/configure_server.sh
+	./build/scripts/configure_system.sh
 
 utest:
 	@:

@@ -2,8 +2,8 @@
 
 ##
 ##  LibreSignage build config generator script for the
-##  apache2-debian-docker targte environment used for
-##  building Docker images. 
+##  apache2-debian-docker target used for building
+##  Docker images. 
 ##  
 ##  You can pass the following CLI options when running
 ##  this script:
@@ -65,7 +65,7 @@ echo '#!/bin/sh'
 echo "# Generated on `date` by"
 echo "# the LibreSignage build system."
 
-echo "CONF_TARGET_ENV='apache2-debian-docker'"
+echo "CONF_TARGET='apache2-debian-docker'"
 echo "CONF_ADMIN_NAME='admin'"
 echo "CONF_ADMIN_EMAIL='admin@example.com'"
 

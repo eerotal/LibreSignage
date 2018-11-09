@@ -1,8 +1,7 @@
 #!/bin/sh
 
 ##
-##  A LibreSignage target environment specific install
-##  handler for apache2 on Debian.
+##  A LibreSignage target specific install handler for apache2 on Debian.
 ##
 
 set -e
@@ -11,7 +10,7 @@ set -e
 
 FLAG_PRESERVE_DATA=0;
 
-# Environment specific path constants.
+# Target specific path constants.
 SITES_DIR='/etc/apache2/sites-available';
 VHOST_DIR=`echo "$CONF_INSTALL_DIR/$CONF_NAME" | sed "s/\/\+/\//g"`;
 
