@@ -7,10 +7,10 @@
 ##
 
 if [ "$1" = "dev" ]; then
-	echo "[INFO] Build a *development* Docker image."
+	echo "[Info] Build a *development* Docker image."
 	FEATURES="imgthumbs,vidthumbs,debug"
 else
-	echo "[INFO] Build a *release* Docker image."
+	echo "[Info] Build a *release* Docker image."
 	FEATURES="imgthumbs"
 fi
 
@@ -19,4 +19,5 @@ echo "[INFO] Enabled features: $FEATURES"
 make configure \
 	"TARGET=apache2-debian-docker" \
 	"FEATURES=$FEATURES"
+make -j`nproc`
 make install

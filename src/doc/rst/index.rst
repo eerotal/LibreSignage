@@ -33,6 +33,8 @@ Miscellaneous
 
 `Display Setup </doc?doc=display_setup>`_
 
+`Docker </doc?doc=docker>`_
+
 Development
 -----------
 
