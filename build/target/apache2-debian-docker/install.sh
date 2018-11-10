@@ -1,15 +1,17 @@
-set -e
+#!/bin/sh
 
 ##
-##  Install handler for the apache2-debian-docker target.
-##  This script loads the build configuration using the
-##  ldconf.sh script.
+##  LibreSignage install handler for the apache2-debian-docker
+##  target. This script invokes 'docker build' to configure and
+##  build the Docker image.
 ##
+
+set -e
 
 . build/scripts/conf.sh
 . build/scripts/ldconf.sh
 
-args=""
+args="--build-arg version=$LS_VER"
 
 if [ "$CONF_DEBUG" = "TRUE" ]; then
 	args="$args --build-arg debug=y"
@@ -23,9 +25,6 @@ if [ "$CONF_FEATURE_VIDTHUMBS" = "TRUE" ]; then
 	args="$args --build-arg vidthumbs=y"
 fi
 
-# Remove the leading space in $args.
-args="`echo "$args" | sed 's:^\s::'`"
-
 echo "[INFO] Args for 'docker build': $args";
 
-docker build -t libresignage $args .
+docker build -t libresignage:"$LS_VER" $args .

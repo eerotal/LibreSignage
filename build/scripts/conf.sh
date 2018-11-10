@@ -1,20 +1,15 @@
 #!/bin/sh
 
-# Configuration values for the LibreSignage build system.
+##
+##  Configuration constants for the LibreSignage build system.
+##
 
-# Source and distribution paths for the build system.
+# Path constants.
 SRC_DIR='src';
 DIST_DIR='dist';
 CONF_DIR='server';
 
-RST_DIR="$DIST_DIR/doc/rst";
-HTML_DIR="$DIST_DIR/doc/html";
-CLIENT_DIR="$DIST_DIR/client";
-API_DOC="$RST_DIR/api.rst";
-API_ENDPOINTS_DIR="$DIST_DIR/api/endpoint";
-LS_README="README.rst";
-
-# LibreSignage version information. Used by prep.sh.
+# LibreSignage version information.
 LS_VER=`git describe --always --tags --dirty`;
 API_VER=2;
 

@@ -1,16 +1,14 @@
+#!/bin/sh
+
 ##
-##  LibreSignage target config generator
-##  for Apache 2 on Debian.
+##  LibreSignage target config generator for Apache 2 on Debian.
 ##
 
 set -e
 . build/scripts/conf.sh
 . build/scripts/ldconf.sh
 
-##
-##  Configure apache2.
-##
-
+# Configure apache2.
 mkdir -p "$CONF_DIR/apache2";
 {
 
@@ -37,7 +35,6 @@ echo "	<Directory \"$CONF_INSTALL_DIR/$CONF_NAME\">";
 echo '		Options -Indexes';
 echo '	</Directory>';
 
-
 # Prevent access to 'data/', 'common/' and '/config'.
 echo "	<DirectoryMatch \"^$CONF_INSTALL_DIR(/?)$CONF_NAME(/?)data(.+)\">";
 echo '		RewriteEngine On';
@@ -54,7 +51,7 @@ echo '		RewriteEngine On';
 echo '		RewriteRule .* - [R=404,L]';
 echo '	</DirectoryMatch>';
 
-# PHP config.
+# Configure PHP.
 echo "	php_admin_flag file_uploads On"
 echo "	php_admin_value upload_max_filesize 200M"
 echo "	php_admin_value max_file_uploads 20"
@@ -65,8 +62,7 @@ echo '</VirtualHost>';
 
 } > "$CONF_DIR/apache2/$CONF_NAME.conf"
 
-# LibreSignage instance configuration.
-
+# Configure LibreSignage.
 mkdir -p "$CONF_DIR/libresignage/conf"
 {
 

@@ -1,8 +1,8 @@
 #!/bin/sh
 
 ##
-## LibreSignage build config generator for the apache2-debian
-## target. This script is interactive.
+##  LibreSignage build config generator for the apache2-debian
+##  target. This script is interactive.
 ##
 
 set -e

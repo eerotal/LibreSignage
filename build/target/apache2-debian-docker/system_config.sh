@@ -1,9 +1,9 @@
+#!/bin/sh
+
 ##
 ##  LibreSignage target config generator for the
 ##  apache2-debian-docker target used for building
-##  LibreSignage Docker images. This script loads
-##  the build configuration using the ldconf.sh
-##  script.
+##  LibreSignage Docker images.
 ##
 
 set -e
