@@ -119,13 +119,14 @@ LibreSignage Docker images from Docker hub. The required steps are
 listed below.
 
 1. Install `Docker <https://www.docker.com/>`_ if it's not installed yet.
-2. Run the following command::
+2. Run the following command, but replace ``[VERSION]`` with the
+   LibreSignage version you want to pull::
 
        docker run \
            -d \
            -p 80:80 \
            --mount source=ls_vol,target=/var/www/html/data \
-           [!TODO!]
+           eerotal/libresignage:[VERSION]
 
    This command pulls the LibreSignage image from Docker Hub, binds port
    80 on the host system to the container's port 80 (*-p*) and
