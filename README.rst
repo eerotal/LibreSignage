@@ -17,6 +17,10 @@ Table Of Contents
 
 * `4.2. Build from source`_
 
+  * `4.2.1. Building a native build`_
+
+  * `4.2.2. Building a Docker image`_
+
 `5. Default users`_
 
 `6. How to install npm`_
@@ -111,8 +115,8 @@ content. This approach has a few advantages.
 4. Installation
 ---------------
 
-4.1. Using the Docker image
-+++++++++++++++++++++++++++
+4.1. Using prebuilt Docker images
++++++++++++++++++++++++++++++++++
 
 You can easily deploy a containerized LibreSignage instance using the
 LibreSignage Docker images from Docker hub. The required steps are
@@ -138,11 +142,15 @@ listed below.
    the web interface from the *Help* page.
 
 4.2. Build from source
-++++++++++++++++++++++
+++++++++++++++++++++++++
 
-Building LibreSignage from source isn't too difficult. The required steps
-are listed below. Note that currently the LibreSignage build system only
-supports Debian.
+4.2.1. Building a native build
+..............................
+
+Building LibreSignage from source isn't too difficult. You can build
+a native LibreSignage build that runs on the host machine (ie. no
+containers) by following the instructions below. Note that currently
+the LibreSignage build system only supports Debian.
 
 1. Install software needed for building LibreSignage. You will need the
    following packages: ``git, apache2, php7.2, pandoc ruby-sass, npm``.
@@ -153,11 +161,9 @@ supports Debian.
    however, install npm manually. See `6. How to install NPM`_ for
    more info. There are also some optional dependencies:
 
-     * If you want to run or build LibreSignage Docker images,
-       you'll also need to install `Docker <https://www.docker.com/>`_.
      * If you want to enable video thumbnail generation, you'll
-       need to install ``ffmpeg``. On Debian you can install it by
-       running ``sudo apt install ffmpeg``.
+       need to install ``ffmpeg`` and ``ffprobe``. On Debian you can 
+       install them running ``sudo apt install ffmpeg``.
 
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
@@ -165,38 +171,69 @@ supports Debian.
    The repository will be cloned into the directory *LibreSignage/*.
 4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
 5. Install dependencies from NPM by running ``npm install``.
-6. Run ``make configure``. This script asks you to enter the
-   following configuration values.
+6. Run ``make configure TARGET=apache2-debian``. This script asks you
+   to enter the following configuration values:
 
    * Install directory (default: /var/www)
 
-     * The directory where LibreSignage is installed.
+     * The directory where LibreSignage is installed. A subdirectory
+       is created in this directory.
 
    * Server name (domain)
 
      * The domain name to use for configuring apache2. If you
        don't have a domain and you are just testing the system,
        you can either use 'localhost', your machines LAN IP or
-       a testing domain you don't actually own. If you use a testing
-       domain, you can add that domain to your */etc/hosts* file.
-       See the end of this section for more info.
+       a test domain you don't actually own. If you use a test
+       domain, you can add it to your */etc/hosts* file to make
+       it work on your machine.
 
    * Server name aliases
+
+      * Domain name aliases for the server. Aliases make it possible
+        to have the server respond from multiple domains. One useful
+        way to use name aliases is to set *localhost* as the main
+        domain and the LAN IP of the server as an alias. This would
+        make it possible to connect to the server either by navigating
+        to *localhost* on the host machine or by connecting to the LAN
+        IP on the local network.
+
    * Admin name
 
-     * Shown to users on the main page.
+     * Shown to users on the main page as contact info in case of
+       any problems.
 
    * Admin email
 
-     * Shown to users on the main page.
+     * Shown to users on the main page as contact info in case of
+       any problems.
 
    * Enable image thumbnail generation (y/N)
+
+     * Enable image thumbnail generation on the server. Currently
+       image thumbnails are only generated for uploaded slide
+       media. This option only works if the PHP GD extension is
+       installed and enabled. You can check whether it's enabled
+       by running ``php -m``. If *gd* is in the printed list, it
+       is enabled. If *gd* doesn't appear in the list but is
+       installed, you can run ``sudo phpenmod gd`` to enable it.
+
    * Enable video thumbnail generation (y/N) *Requires ffmpeg.*
-   * Enable debugging (y/N) *Don't answer Y on production systems.*
 
-     *  Whether to enable debugging. N is default.
+     * Enable video thumbnail generation. Currently video thumbnails
+       are only generated for uploaded slide media. Note that video
+       thumbnail generation requires *ffmpeg* and *ffprobe* to be
+       available on the host system. If you enable this option,
+       you'll also need to configure the binary paths to *ffmpeg*
+       and *ffprobe* in the LibreSignage configuration files. The
+       paths default to */usr/bin/ffmpeg* and */usr/bin/ffprobe*.
 
-   This command generates an instance configuration file needed
+   * Enable debugging (y/N) *Do not enable on production systems.*
+
+     *  Whether to enable debugging. This enables things like
+        verbose error reporting through the API etc.
+
+   This command generates aa build configuration file needed
    for building LibreSignage. The file is saved in ``build/`` as
    ``<DOMAIN>.conf`` where ``<DOMAIN>`` is the domain name you
    specified.
@@ -207,12 +244,36 @@ supports Debian.
 9. Navigate to the domain name you entered and you should see the
    LibreSignage login page.
 
+4.2.2. Building a Docker image
+..............................
+
+You can build LibreSignage Docker images by following the instructions
+below.
+
+1. Follow the steps 1-5 from `4.2.1. Building a native build`_.
+2. Install `Docker <https://www.docker.com/>`_ if it isn't yet installed.
+3. Run ``make configure TARGET=apache2-debian-docker FEATURES=[features]``
+   but replace ``[features]`` with a comma separated list of features
+   to enable. The recognised features are:
+
+   * imgthumbs = Image thumbnail generation using *PHP gd*.
+   * vidthumbs = Video thumbnail generation using *ffmpeg*.
+   * debug     = Debugging.
+
+4. Run ``make`` to build the LibreSignage distribution.
+4. Run ``make install`` to package LibreSignage in a Docker image.
+   This will take some time as Docker needs to download a lot of stuff.
+   After this command has completed the LibreSignage image is saved in
+   your machine's Docker registry as *libresignage:[version]*. You can
+   use it by following the instructions in `4.1. Using prebuilt Docker
+   images`_.
+
 5. Default users
 ----------------
 
-The initial configured users and their groups and passwords are listed
-below. It goes without saying that you should create new users and
-change the passwords if you intend to use LibreSignage on a production
+The default users and their groups and passwords are listed below.
+It goes without saying that you should create new users and change
+the passwords if you intend to use LibreSignage on a production
 system.
 
 =========== ======================== ==========
