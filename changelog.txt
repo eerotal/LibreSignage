@@ -1,3 +1,10 @@
+v0.3.0
+  - [internal] Modularize and improve the build system.
+  - [feature]  Implement an improved configuration file loader that
+               supports loading configuration from multiple files.
+  - [feature]  Implement functionality for building LibreSignage
+               Docker images.
+
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
                selected queue was changed.

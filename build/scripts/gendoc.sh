@@ -6,7 +6,7 @@ set -e
 gen_api_doc() {
 	# Get the documentation text from the filepath in $1.
 	if [ -z "$1" ]; then
-			return '';
+		return '';
 	fi
 
 	echo "`basename $1`";

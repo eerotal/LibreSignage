@@ -13,12 +13,22 @@ ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SASS_IPATHS := $(ROOT) $(ROOT)src/common/css
 SASSFLAGS := --sourcemap=none --no-cache
 
-VERBOSE ?= Y     # Verobose log output.
-NOHTMLDOCS ?= N  # Don't generate HTML docs.
-INST ?= ""       # Installation config path.
+# Verbose log output.
+VERBOSE ?= Y
 
-# LibreSignage build dependencies. Note that apache is excluded
-# since checking whether it's installed usually requires root.
+# Don't generate HTML docs.
+NOHTMLDOCS ?= N
+
+# Installation config path.
+INST ?= ""
+
+# Enable no features by default.
+FEATURES ?= 
+
+# Select no target by default.
+TARGET ?=
+
+# LibreSignage build dependencies.
 DEPS := php7.2 pandoc sass npm
 
 # Production libraries.
@@ -300,7 +310,22 @@ dist/libs/%:: node_modules/%
 install:
 	@:
 	set -e
-	./build/scripts/install.sh $(INST)
+	./build/scripts/install.sh
+
+configure:
+	@:
+	set -e
+	if [ -z "$(TARGET)" ]; then
+		echo "[Error] Specify a target using 'TARGET=[target]'."
+		exit 1
+	fi
+	args="--target $(TARGET)"
+	if [ ! -z "$(FEATURES)" ]; then
+		args="$$args --features '$(FEATURES)'"
+	fi
+
+	./build/scripts/configure_build.sh $$args
+	./build/scripts/configure_system.sh
 
 utest:
 	@:
@@ -334,6 +359,8 @@ realclean:
 	rm -rf build/link
 	$(call status,rm,node_modules,none);
 	rm -rf node_modules
+	$(call status,rm,server,none)
+	rm -rf server
 	$(call status,rm,package-lock.json,none);
 	rm -f package-lock.json
 
@@ -381,6 +408,8 @@ LOC:
 		-o -name "*.css" -print \
 		-o -name "*.scss" -print \
 		-o -name "*.sh" -print \
+		-o -name "Dockerfile" -print \
+		-o -name "makefile" -print \
 		-o ! -name 'package-lock.json' -name "*.json" -print \
 		-o -name "*.py" -print`
 
@@ -391,15 +420,10 @@ LOD:
 	echo '[INFO] Lines Of Documentation: '
 	wc -l `find dist -type f -name '*.rst'`
 
-configure:
-	@:
-	set -e
-	./build/scripts/configure.sh
-
 initchk:
 	@:
 	set -e
-	./build/scripts/ldiconf.sh $(INST)
+	./build/scripts/ldconf.sh $(INST)
 
 	# Check that the require dependencies are installed.
 	for d in $(DEPS); do
