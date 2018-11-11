@@ -237,7 +237,7 @@ the LibreSignage build system only supports Debian.
    for building LibreSignage. The file is saved in ``build/`` as
    ``<DOMAIN>.conf`` where ``<DOMAIN>`` is the domain name you
    specified.
-7. Run ``make -j$(nproc)`` to build LibreSignage. See `11. Make rules`_
+7. Run ``make -j$(nproc)`` to build LibreSignage. See `9. Make rules`_
    for more advanced make usage.
 8. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
