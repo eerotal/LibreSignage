@@ -4,6 +4,9 @@ v0.3.0
                supports loading configuration from multiple files.
   - [feature]  Implement functionality for building LibreSignage
                Docker images.
+v0.2.2
+  - [bugfix]   Fix a bug that prevented removing slide assets that didn't
+               have a thumbnail.
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
