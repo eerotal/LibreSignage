@@ -65,4 +65,8 @@ echo "max_file_uploads = 20"
 echo "post_max_size = 210M"
 echo "memory_limit = 300M"
 
+if [ "$CONF_FEATURE_IMGTHUMBS" = "TRUE" ]; then
+	echo "extension=gd.so"
+fi
+
 } > "$CONF_DIR/php/ls-docker.ini"

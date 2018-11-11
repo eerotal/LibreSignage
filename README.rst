@@ -13,9 +13,9 @@ Table Of Contents
 
 `4. Installation`_
 
-* `4.1. Using the Docker image`_
+* `4.1. Using prebuilt Docker images`_
 
-* `4.2. Build from source`_
+* `4.2. Building from source`_
 
   * `4.2.1. Building a native build`_
 
@@ -141,8 +141,8 @@ listed below.
    LibreSignage Docker image. The documentation can also be accessed in
    the web interface from the *Help* page.
 
-4.2. Build from source
-++++++++++++++++++++++++
+4.2. Building from source
++++++++++++++++++++++++++
 
 4.2.1. Building a native build
 ..............................
