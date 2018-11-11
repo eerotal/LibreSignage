@@ -98,11 +98,19 @@ class SlideAsset extends Exportable {
 	}
 
 	public function remove() {
-		if (!empty($this->fullpath)) {
+		if (
+			!empty($this->fullpath)
+			&& is_file($this->fullpath)
+		) {
 			unlink($this->fullpath);
-			unlink($this->thumbpath);
-			$this->reset();
 		}
+		if (
+			!empty($this->thumbpath)
+			&& is_file($this->thumbpath)
+		) {
+			unlink($this->thumbpath);
+		}
+		$this->reset();
 	}
 
 	private function reset() {
