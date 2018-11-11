@@ -161,9 +161,9 @@ the LibreSignage build system only supports Debian.
    however, install npm manually. See `6. How to install NPM`_ for
    more info. There are also some optional dependencies:
 
-     * If you want to enable video thumbnail generation, you'll
-       need to install ``ffmpeg`` and ``ffprobe``. On Debian you can 
-       install them running ``sudo apt install ffmpeg``.
+   * If you want to enable video thumbnail generation, you'll
+     need to install ``ffmpeg`` and ``ffprobe``. On Debian you can 
+     install them running ``sudo apt install ffmpeg``.
 
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
@@ -190,13 +190,13 @@ the LibreSignage build system only supports Debian.
 
    * Server name aliases
 
-      * Domain name aliases for the server. Aliases make it possible
-        to have the server respond from multiple domains. One useful
-        way to use name aliases is to set *localhost* as the main
-        domain and the LAN IP of the server as an alias. This would
-        make it possible to connect to the server either by navigating
-        to *localhost* on the host machine or by connecting to the LAN
-        IP on the local network.
+     * Domain name aliases for the server. Aliases make it possible
+       to have the server respond from multiple domains. One useful
+       way to use name aliases is to set *localhost* as the main
+       domain and the LAN IP of the server as an alias. This would
+       make it possible to connect to the server either by navigating
+       to *localhost* on the host machine or by connecting to the LAN
+       IP on the local network.
 
    * Admin name
 
@@ -261,7 +261,7 @@ below.
    * debug     = Debugging.
 
 4. Run ``make`` to build the LibreSignage distribution.
-4. Run ``make install`` to package LibreSignage in a Docker image.
+5. Run ``make install`` to package LibreSignage in a Docker image.
    This will take some time as Docker needs to download a lot of stuff.
    After this command has completed the LibreSignage image is saved in
    your machine's Docker registry as *libresignage:[version]*. You can
