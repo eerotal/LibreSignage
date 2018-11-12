@@ -6,6 +6,9 @@ v0.3.0
                Docker images.
   - [bugfix]   Fix a bug that prevented removing slide assets that didn't
                have a thumbnail.
+  - [internal] Improve display animation performance by optimizing
+               CSS and JavaScript. Browsers are now also hinted to use
+               GPU acceleration for rendering the display.
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
