@@ -3,7 +3,7 @@
 @import 'default';
 @import 'dialog';
 @import 'markup';
-@import 'animations';
+@import 'animations/_linear.scss';
 
 html {
 	overflow-x: hidden;
@@ -22,4 +22,14 @@ html, body, main, #display {
 
 	padding: 0;
 	margin: 0;
+}
+
+#display {
+	position: absolute;
+	top: 0;
+	right: 0;
+
+	/* Hint the browser to use GPU acceleration. */
+	will-change: transform;
+	transform: translate3d(0, 0, 0);
 }
