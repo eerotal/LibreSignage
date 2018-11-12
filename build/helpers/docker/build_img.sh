@@ -18,6 +18,6 @@ echo "[INFO] Enabled features: $FEATURES"
 
 make configure \
 	"TARGET=apache2-debian-docker" \
-	"FEATURES=$FEATURES"
+	"PASS=\"--features $FEATURES\""
 make -j`nproc`
 make install

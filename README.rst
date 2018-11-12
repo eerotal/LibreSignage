@@ -252,9 +252,14 @@ below.
 
 1. Follow the steps 1-5 from `4.2.1. Building a native build`_.
 2. Install `Docker <https://www.docker.com/>`_ if it isn't yet installed.
-3. Run ``make configure TARGET=apache2-debian-docker FEATURES=[features]``
-   but replace ``[features]`` with a comma separated list of features
-   to enable. The recognised features are:
+3. Run the following command::
+
+       make configure \
+           TARGET=apache2-debian-docker \
+           PASS="--features [features]"
+
+   Where ``[features]`` is a comma separated list of features to enable.
+   The recognised features are:
 
    * imgthumbs = Image thumbnail generation using *PHP gd*.
    * vidthumbs = Video thumbnail generation using *ffmpeg*.
@@ -267,6 +272,17 @@ below.
    your machine's Docker registry as *libresignage:[version]*. You can
    use it by following the instructions in `4.1. Using prebuilt Docker
    images`_.
+
+Extra
+*****
+
+ You can also build LibreSignage Docker images automatically using the
+ helper script *build/helpers/docker/build_img.sh*. If you want to build
+ a release image just run the script. If you want to build a development
+ image, pass *dev* as the first argument.
+
+ The *build/helpers/docker/* directory also contains the script
+ *run_dev.sh* for starting a development/testing docker container.
 
 5. Default users
 ----------------
@@ -393,7 +409,22 @@ branch or commit you are viewing.*
 The following ``make`` rules are implemented in the makefile.
 
 all
-  The default rule that builds the LibreSignage distribution.
+  The default rule that builds the LibreSignage distribution. You
+  can pass ``NOHTMLDOCS=y`` if you don't want to generate any HTML
+  documentation.
+
+configure
+  Generate a LibreSignage build configuration file. You need to use
+  ``TARGET=[target]`` to select a build target to use. You can also
+  optionally use ``PASS=[pass]`` to pass any target specific arguments
+  to the build configuration script. The recognized targets are:
+
+  * apache2-debian (Build target for a native install on Debian.)
+  * apache2-debian-docker (Build target for building Docker images.)
+    * You can use PASS with ``--features [features]`` where ``[features]``
+      is a comma separated list of features to enable. See the section
+      `4.2.2. Building a Docker image`_ for more info.
+      
 
 install
   Install LibreSignage. This copies the LibreSignage distribution files
@@ -420,19 +451,15 @@ LOD
   are counted from the docs in the dist/ directory. This way the
   generated API endpoint docs can be taken into account too.
 
-You can also pass some other arguments to the LibreSignage makefile.
+You can also pass some other settings to the LibreSignage makefile.
 
-INST=<config file> - (default: Last generated config.)
-  Manually specify a config file to use.
+CONF=<config file> - (default: Last generated config.)
+  Manually specify a config file to use. This setting can be used with
+  the targets *all* and *install*.
 
 VERBOSE=<y/n> - (default: y)
-  Print verbose log output.
+  Print verbose log output. This setting can be used with any target.
 
-NOHTMLDOCS=<y/n> - (default: n)
-  Don't generate HTML documentation from the reStructuredText docs
-  or the API endpoint files. This setting can be used with make rules
-  that build files. Using it with eg. ``make install`` has no effect.
-  
 10. Documentation
 -----------------
 

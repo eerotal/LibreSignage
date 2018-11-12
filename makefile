@@ -13,20 +13,12 @@ ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SASS_IPATHS := $(ROOT) $(ROOT)src/common/css
 SASSFLAGS := --sourcemap=none --no-cache
 
-# Verbose log output.
+# Caller supplied build settings.
 VERBOSE ?= Y
-
-# Don't generate HTML docs.
 NOHTMLDOCS ?= N
-
-# Installation config path.
-INST ?= ""
-
-# Enable no features by default.
-FEATURES ?= 
-
-# Select no target by default.
+CONF ?= ""
 TARGET ?=
+PASS ?=
 
 # LibreSignage build dependencies.
 DEPS := php7.2 pandoc sass npm
@@ -85,7 +77,7 @@ status = \
 makedir = mkdir -p $(dir $(1))
 
 ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
-$(info [INFO] Won't generate HTML documentation.)
+$(info [INFO] Not going to generate HTML documentation.)
 endif
 
 .PHONY: initchk configure dirs server js css api \
@@ -120,7 +112,7 @@ $(filter %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
 	$(call makedir,$@)
 	cp -p $< $@
 	$(call status,prep.sh,<inplace>,$@)
-	./build/scripts/prep.sh $(INST) $@
+	./build/scripts/prep.sh $(CONF) $@
 	php -l $@ > /dev/null
 
 # Copy API endpoint PHP files and generate corresponding docs.
@@ -142,7 +134,7 @@ $(subst src,dist,$(SRC_ENDPOINT)):: dist%: src%
 			<generated>,\
 			dist/doc/rst/$(notdir $(@:.php=.rst))\
 		)
-		./build/scripts/gendoc.sh $(INST) $@ dist/doc/rst/
+		./build/scripts/gendoc.sh $(CONF) $@ dist/doc/rst/
 
 		# Compile rst docs into HTML.
 		$(call status,\
@@ -181,23 +173,8 @@ dist/doc/rst/api_index.rst:: $(SRC_ENDPOINT)
 		pandoc -f rst -t html -o $(subst /rst/,/html/,$(@:.rst=.html)) $@
 	fi
 
-# Copy over README.rst.
-dist/doc/rst/README.rst:: README.rst
-	@:
-	set -e
-	$(call status,cp,$<,$@)
-	$(call makedir,$@)
-	cp -p $< $@
-
-# Copy over CONTRIBUTING.rst.
-dist/doc/rst/CONTRIBUTING.rst:: CONTRIBUTING.rst
-	@:
-	set -e
-	$(call status,cp,$<,$@)
-	$(call makedir,$@)
-	cp -p $< $@
-
-# Copy over RST sources.
+# Copy over RST sources. Try to find prerequisites from
+# 'src/doc/rst/' first and then fall back to './'.
 dist/doc/rst/%.rst:: src/doc/rst/%.rst
 	@:
 	set -e
@@ -205,7 +182,15 @@ dist/doc/rst/%.rst:: src/doc/rst/%.rst
 	$(call makedir,$@)
 	cp -p $< $@
 
-# Compile RST sources into HTML.
+dist/doc/rst/%.rst:: %.rst
+	@:
+	set -e
+	$(call status,cp,$<,$@)
+	$(call makedir,$@)
+	cp -p $< $@
+
+# Compile RST sources into HTML. Try to find prerequisites
+# from 'src/doc/rst/' first and then fall back to './'.
 dist/doc/html/%.html:: src/doc/rst/%.rst
 	@:
 	set -e
@@ -215,18 +200,7 @@ dist/doc/html/%.html:: src/doc/rst/%.rst
 		pandoc -o $@ -f rst -t html $<
 	fi
 
-# Compile README.rst
-dist/doc/html/README.html:: README.rst
-	@:
-	set -e
-	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
-		$(call status,pandoc,$<,$@)
-		$(call makedir,$@)
-		pandoc -o $@ -f rst -t html $<
-	fi
-
-# Compile CONTRIBUTING.rst
-dist/doc/html/CONTRIBUTING.html:: CONTRIBUTING.rst
+dist/doc/html/%.html:: %.rst
 	@:
 	set -e
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
@@ -241,23 +215,18 @@ dep/%/main.js.dep: src/%/main.js
 	set -e
 	$(call status,deps-js,$<,$@)
 	$(call makedir,$@)
+
+	# Echo dependency makefile contents.
 	echo "$(subst src,dist,$<):: `$(NPMBIN)/browserify --list $<|\
 		tr '\n' ' '|\
 		sed 's:$(ROOT)::g'`" > $@
 
-	# Make the target silent.
 	echo "\t@:" >> $@
-
-	# Output log info.
 	echo "\t\$$(call status,"\
 		"compile-js,"\
 		"$<,"\
 		"$(subst src,dist,$<))" >> $@
-
-	# Create directory.
 	echo "\t\$$(call makedir,$(subst src,dist,$<))" >> $@
-
-	# Process with browserify.
 	echo "\t$(NPMBIN)/browserify $< -o $(subst src,dist,$<)" >> $@
 
 # Generate SCSS deps.
@@ -268,30 +237,22 @@ dep/%.scss.dep: src/%.scss
 	if [ ! "`basename '$(<)' | cut -c 1`" = "_" ]; then
 		$(call status,deps-scss,$<,$@)
 		$(call makedir,$@)
+
+		# Echo dependency makefile contents.
 		echo "$(subst src,dist,$(<:.scss=.css)):: $< `\
 			./build/scripts/sassdep.py -l $< $(SASS_IPATHS)|\
 			sed 's:$(ROOT)::g'`" > $@
-
-		# Make the target silent.
 		echo "\t@:" >> $@
-
-		# Output log info.
 		echo "\t\$$(call status,"\
 			"compile-scss,"\
 			"$<,"\
 			"$(subst src,dist,$(<:.scss=.css)))" >> $@
-
-		# Create directory.
 		echo "\t\$$(call makedir,$(subst src,dist,$<))" >> $@
-
-		# Compile with sass.
 		echo "\tsass"\
 			"$(addprefix -I,$(SASS_IPATHS))"\
 			"$(SASSFLAGS)"\
 			"$<"\
 			"$(subst src,dist,$(<:.scss=.css))" >> $@
-
-		# Process with postcss.
 		echo "\t$(NPMBIN)/postcss"\
 			"$(subst src,dist,$(<:.scss=.css))"\
 			"--config postcss.config.js"\
@@ -307,10 +268,14 @@ dist/libs/%:: node_modules/%
 	$(call status,cp,$<,$@)
 	cp -Rp $</* $@
 
+##
+##  PHONY targets
+##
+
 install:
 	@:
 	set -e
-	./build/scripts/install.sh
+	./build/scripts/install.sh $(CONF)
 
 configure:
 	@:
@@ -320,8 +285,8 @@ configure:
 		exit 1
 	fi
 	args="--target $(TARGET)"
-	if [ ! -z "$(FEATURES)" ]; then
-		args="$$args --features '$(FEATURES)'"
+	if [ ! -z "$(PASS)" ]; then
+		args="$$args $(PASS)"
 	fi
 
 	./build/scripts/configure_build.sh $$args
@@ -423,7 +388,7 @@ LOD:
 initchk:
 	@:
 	set -e
-	./build/scripts/ldconf.sh $(INST)
+	./build/scripts/ldconf.sh $(CONF)
 
 	# Check that the require dependencies are installed.
 	for d in $(DEPS); do
