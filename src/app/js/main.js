@@ -10,12 +10,15 @@ var dialog = require('ls-dialog');
 var API = null;
 const DISPLAY_UPDATE_INTERVAL = 5000;
 const QUEUE_UPDATE_INTERVAL = 60000;
+const BUFFER_UPDATE_PERIOD = 50;
 const DISPLAY = $('#display');
 
 var c_queue = null;
-var c_slide_i = -1;
 
-function display_animate(elem, animation, end_callback) {
+var slide_buffer = [null, null];
+var markup_buffer = null;
+
+function animate(elem, animation, end_callback) {
 	/*
 	*  Trigger one of the animations defined in 'css/display.css'
 	*  on 'elem'. If 'end_callback' is not null, it's called when
@@ -28,39 +31,56 @@ function display_animate(elem, animation, end_callback) {
 	elem.addClass(animation);
 	elem.one("animationend", (event) => {
 		event.target.classList.remove(animation);
-		if (end_callback) {
-			end_callback();
-		}
+		if (end_callback) { end_callback(); }
 	});
 }
 
-function display_update() {
+function update_buffers() {
 	/*
-	*  Render the next slide.
+	*  Buffer slide data and markup to improve display performance.
 	*/
-	var slide = c_queue.slides.filter(
+	slide_buffer[0] = slide_buffer[1];
+	slide_buffer[1] = c_queue.slides.filter(
 		{'enabled': true}
-	).next(c_slide_i, true);
-
-	if (slide) {
-		c_slide_i = slide.get('index');
-	} else {
-		c_slide_i = -1;
-		setTimeout(display_update, DISPLAY_UPDATE_INTERVAL);
-		return;
-	}
-
-	display_animate(DISPLAY, slide.anim_hide(), () => {
-		DISPLAY.html(
-			markup.parse(
-				util.sanitize_html(
-					slide.get('markup')
-				)
-			)
+	).next(
+		slide_buffer[0] != null ? slide_buffer[0].get('index') : -1,
+		true
+	);
+	if (slide_buffer[1] != null) {
+		markup_buffer = markup.parse(
+			util.sanitize_html(slide_buffer[1].get('markup'))
 		);
+	}
+}
 
-		display_animate(DISPLAY, slide.anim_show(), () => {
-			setTimeout(display_update, slide.get('duration'));
+function render() {
+	/*
+	*  Render the next slide in the loaded slide queue. Slide
+	*  data and markup loads are buffered to improve performance.
+	*/
+	let hide = null;
+	if (slide_buffer[0] != null) {
+		hide = slide_buffer[0].anim_hide();
+	}
+	if (slide_buffer[1] == null) {
+		update_buffers();
+		if (slide_buffer[1] == null) {
+			setTimeout(render, DISPLAY_UPDATE_INTERVAL);
+			return;
+		}
+	}
+	animate(DISPLAY, hide, () => {
+		DISPLAY.html(markup_buffer);
+		animate(DISPLAY, slide_buffer[1].anim_show(), () => {
+			setTimeout(render, slide_buffer[1].get('duration'));
+
+			/*
+			*  Delay the buffer update for BUFFER_UPDATE_PERIOD ms.
+			*  This is done to prevent animation lag because the
+			*  animationend event seems to be fired when the last
+			*  frame(s?) of the animation are still running.
+			*/
+			setTimeout(update_buffers, BUFFER_UPDATE_PERIOD);
 		});
 	});
 }
@@ -116,7 +136,7 @@ function display_setup() {
 					console.log("LibreSignage: Queue update complete.");
 				});
 			}, QUEUE_UPDATE_INTERVAL);
-			display_update();
+			render();
 		});
 	} else {
 		queue.get_list(API, (qd) => {
