@@ -24,17 +24,19 @@ echo "DocumentRoot /var/www/html"
 echo 'ErrorLog ${APACHE_LOG_DIR}/error.log'
 echo 'CustomLog ${APACHE_LOG_DIR}/access.log combined'
 
-echo 'RewriteEngine on'
-echo 'RewriteRule ^/$ control [L,R=301]'
-
 echo 'ErrorDocument 403 /errors/403/index.php'
 echo 'ErrorDocument 404 /errors/404/index.php'
 echo 'ErrorDocument 500 /errors/500/index.php'
 
 echo "<Directory \"/var/www/html\">"
-echo '	Options -Indexes'
+echo '  Options -Indexes'
 echo '</Directory>'
 
+# Redirect / to control.
+echo "<DirectoryMatch \"^/$\">"
+echo '  RewriteEngine On'
+echo '  RewriteRule .* control [R=301,L]'
+echo '</DirectoryMatch>'
 
 # Prevent access to 'data/', 'common/' and 'config/'.
 echo "<DirectoryMatch \"^/var/www/html(/?)data(.+)\">"

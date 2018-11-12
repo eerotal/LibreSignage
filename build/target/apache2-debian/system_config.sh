@@ -24,9 +24,6 @@ echo "	DocumentRoot $CONF_INSTALL_DIR/$CONF_NAME";
 echo '	ErrorLog ${APACHE_LOG_DIR}/error.log';
 echo '	CustomLog ${APACHE_LOG_DIR}/access.log combined';
 
-echo '	RewriteEngine on';
-echo '	RewriteRule ^/$ control [L,R=301]';
-
 echo '	ErrorDocument 403 /errors/403/index.php';
 echo '	ErrorDocument 404 /errors/404/index.php';
 echo '	ErrorDocument 500 /errors/500/index.php';
@@ -34,6 +31,12 @@ echo '	ErrorDocument 500 /errors/500/index.php';
 echo "	<Directory \"$CONF_INSTALL_DIR/$CONF_NAME\">";
 echo '		Options -Indexes';
 echo '	</Directory>';
+
+# Redirect / to control.
+echo "	<DirectoryMatch \"^/$\">"
+echo '		RewriteEngine On'
+echo '		RewriteRule .* control [R=301,L]'
+echo '	</DirectoryMatch>'
 
 # Prevent access to 'data/', 'common/' and '/config'.
 echo "	<DirectoryMatch \"^$CONF_INSTALL_DIR(/?)$CONF_NAME(/?)data(.+)\">";
