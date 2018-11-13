@@ -284,12 +284,9 @@ configure:
 		echo "[Error] Specify a target using 'TARGET=[target]'."
 		exit 1
 	fi
-	args="--target $(TARGET)"
-	if [ ! -z "$(PASS)" ]; then
-		args="$$args $(PASS)"
-	fi
+	target="--target $(TARGET)"
 
-	./build/scripts/configure_build.sh $$args
+	./build/scripts/configure_build.sh $$target $(PASS)
 	./build/scripts/configure_system.sh
 
 utest:

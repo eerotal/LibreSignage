@@ -6,6 +6,8 @@
 ##  passing 'dev' as the first argument.
 ##
 
+set -e
+
 if [ "$1" = "dev" ]; then
 	echo "[Info] Build a *development* Docker image."
 	FEATURES="imgthumbs,vidthumbs,debug"
