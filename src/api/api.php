@@ -464,6 +464,14 @@ function api_handle_request(APIEndpoint $endpoint) {
 	// Check the request MIME type for POST requests.
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		if (
+			!array_key_exists('CONTENT_TYPE', $_SERVER)
+			|| empty($_SERVER['CONTENT_TYPE'])
+		) {
+			throw new ArgException(
+				"Missing or empty Content-Type header in request."
+			);
+		}
+		if (
 			!preg_match(
 				API_MIME_REGEX_MAP[$endpoint->get_request_type()],
 				$_SERVER['CONTENT_TYPE']
