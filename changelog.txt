@@ -9,6 +9,8 @@ v0.3.0
   - [internal] Improve display animation performance by optimizing
                CSS and JavaScript. Browsers are now also hinted to use
                GPU acceleration for rendering the display.
+  - [bugfix]   Fix dialogs not appearing correctly on the documentation
+               pages.
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
