@@ -100,9 +100,9 @@ when backwards incompatible API changes are made.
 +++++++++++++++++++
 
 1. Development for *patch* releases takes place in patch development
-   branches with the name *<original_version>-patch*.
+   branches with the name *<original_version>-dev*.
 2. Patches are released on the first monday of each month. When a patch
    is released, the patch development branch is merged to the original
    release branch and the patch development branch is removed. If the
-   original release branch is contains the latest release, the release
-   branch is merged back to *master* aswell.
+   release branch contains the latest LibreSignage release, it's merged
+   back to *master* too.
