@@ -5,7 +5,7 @@ LibreSignage - An open source digital signage solution
 Table Of Contents
 -----------------
 
-`1. General`_
+`1. Introduction`_
 
 `2. Features`_
 
@@ -39,8 +39,8 @@ Table Of Contents
 
 `13. License`_
 
-1. General
-----------
+1. Introduction
+---------------
 
 Digital Signage is everything from large-scale commercial billboards
 to smaller advertisement displays, notice boards or digital restaurant

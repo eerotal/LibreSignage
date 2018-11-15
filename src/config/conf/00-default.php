@@ -35,7 +35,7 @@ return [
 	'LOGIN_PAGE'            => "/login",
 	'LOGOUT_PAGE'           => "/logout",
 	'DOCS_PAGE'             => "/doc",
-	'ABOUT_PAGE'            => "/doc?doc=about",
+	'README_PAGE'           => "/doc?doc=README",
 	'EDITOR_PAGE'           => "/control/editor",
 	'CONTROL_PANEL_PAGE'    => "/control",
 	'APP_PAGE'              => "/app",
