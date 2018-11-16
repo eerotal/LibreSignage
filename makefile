@@ -2,8 +2,6 @@
 ##  LibreSignage makefile
 ##
 
-NPMBIN := $(shell ./build/scripts/npmbin.sh)
-
 # Note: This makefile assumes that $(ROOT) always has a trailing
 # slash. (which is the case when using the makefile $(dir ...)
 # function) Do not use the shell dirname command here as that WILL
@@ -11,7 +9,7 @@ NPMBIN := $(shell ./build/scripts/npmbin.sh)
 ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 SASS_IPATHS := $(ROOT) $(ROOT)src/common/css
-SASSFLAGS := --sourcemap=none --no-cache
+SASSFLAGS := --no-source-map
 
 # Caller supplied build settings.
 VERBOSE ?= Y
@@ -19,9 +17,6 @@ NOHTMLDOCS ?= N
 CONF ?= ""
 TARGET ?=
 PASS ?=
-
-# LibreSignage build dependencies.
-DEPS := php7.2 pandoc sass npm
 
 # Production libraries.
 LIBS := $(filter-out \
@@ -217,7 +212,7 @@ dep/%/main.js.dep: src/%/main.js
 	$(call makedir,$@)
 
 	# Echo dependency makefile contents.
-	echo "$(subst src,dist,$<):: `$(NPMBIN)/browserify --list $<|\
+	echo "$(subst src,dist,$<):: `npx browserify --list $<|\
 		tr '\n' ' '|\
 		sed 's:$(ROOT)::g'`" > $@
 
@@ -227,7 +222,7 @@ dep/%/main.js.dep: src/%/main.js
 		"$<,"\
 		"$(subst src,dist,$<))" >> $@
 	echo "\t\$$(call makedir,$(subst src,dist,$<))" >> $@
-	echo "\t$(NPMBIN)/browserify $< -o $(subst src,dist,$<)" >> $@
+	echo "\tnpx browserify $< -o $(subst src,dist,$<)" >> $@
 
 # Generate SCSS deps.
 dep/%.scss.dep: src/%.scss
@@ -248,12 +243,12 @@ dep/%.scss.dep: src/%.scss
 			"$<,"\
 			"$(subst src,dist,$(<:.scss=.css)))" >> $@
 		echo "\t\$$(call makedir,$(subst src,dist,$<))" >> $@
-		echo "\tsass"\
+		echo "\tnpx sass"\
 			"$(addprefix -I,$(SASS_IPATHS))"\
 			"$(SASSFLAGS)"\
 			"$<"\
 			"$(subst src,dist,$(<:.scss=.css))" >> $@
-		echo "\t$(NPMBIN)/postcss"\
+		echo "\tnpx postcss"\
 			"$(subst src,dist,$(<:.scss=.css))"\
 			"--config postcss.config.js"\
 			"--replace"\
@@ -386,14 +381,6 @@ initchk:
 	@:
 	set -e
 	./build/scripts/ldconf.sh $(CONF)
-
-	# Check that the require dependencies are installed.
-	for d in $(DEPS); do
-		if [ -z "`which $$d`" ]; then
-			echo "[ERROR] Missing dependency: $$d."
-			exit 1
-		fi
-	done
 
 %:
 	@:

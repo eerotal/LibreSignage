@@ -1,0 +1,48 @@
+##
+##  Travis CI config for LibreSignage. Currently only
+##  the Docker image is built and packaged in Travis
+##  since automatically configuring the apache2-debian
+##  target is quite tricky.
+##
+
+# Ubuntu Xenial is used mainly to get access to a newer
+# version of GNU Make.
+dist: xenial
+
+language: php
+php:
+    - '7.2'
+
+services:
+    - docker
+
+sudo: required
+
+branches:
+    only:
+        - master
+        - next
+        - /v[0-9]+.[0-9]+.x/
+        - /v[0-9]+.[0-9]+.[0-9]+-dev/
+
+matrix:
+    include:
+        env:
+            - target="apache2-debian-docker"
+
+
+before_install:
+    - sudo apt-get update
+
+install:
+    # Install dependencies
+    - sudo apt-get install pandoc
+    - npm install
+
+before_script:
+    # Configure the build
+    - make configure TARGET=$target
+
+script:
+    # Build and install
+    - make -j$(nproc) && make install

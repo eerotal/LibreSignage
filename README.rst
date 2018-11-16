@@ -2,6 +2,9 @@
 LibreSignage - An open source digital signage solution
 ######################################################
 
+.. image:: https://travis-ci.org/eerotal/LibreSignage.svg?branch=master
+    :target: https://travis-ci.org/eerotal/LibreSignage
+
 Table Of Contents
 -----------------
 
@@ -153,13 +156,19 @@ containers) by following the instructions below. Note that currently
 the LibreSignage build system only supports Debian.
 
 1. Install software needed for building LibreSignage. You will need the
-   following packages: ``git, apache2, php7.2, pandoc ruby-sass, npm``.
-   On Debian Stretch all other packages except *npm* can installed by
-   running ``sudo apt install git apache2 php7.2 pandoc ruby-sass``.
-   Currently *npm* is only available in the Debian Sid repos and even
-   there the package is so old it doesn't work correctly. You can,
-   however, install npm manually. See `6. How to install NPM`_ for
-   more info. There are also some optional dependencies:
+   following packages: ``git, apache2, php7.2, pandoc, npm, make``. On
+   Debian Stretch all other packages except *npm* can installed by running
+   ``sudo apt install git apache2 php7.2 pandoc make``. Note the following:
+
+     * PHP needs to be version 7.2.
+     * GNU Make needs to be version 4.0 or newer.
+     * The recommended *npm* version is 6.4.x. Currently *npm* is only
+       available in the Debian Sid repos and even there the package is
+       so old it doesn't work correctly. You can, however, install npm
+       manually. See `6. How to install NPM`_ for more info.
+
+   More detailed build dependency versions are listed in `12. Build
+   system dependencies`_. There are also some optional dependencies:
 
    * If you want to enable video thumbnail generation, you'll
      need to install ``ffmpeg`` and ``ffprobe``. On Debian you can 
@@ -512,10 +521,18 @@ distribution.
 12. Build system dependencies
 -----------------------------
 
-* SASS (https://sass-lang.com/)
-* Browserify (http://browserify.org/)
-* PostCSS (https://postcss.org/)
-* Autoprefixer (https://github.com/postcss/autoprefixer)
+* Installed manually
+
+  * GNU Make (> 4.0) (https://www.gnu.org/software/make/)
+  * PHP (7.2) (http://www.php.net/)
+  * Pandoc (> 2.2.1) (https://pandoc.org/)
+
+* Installed via npm:
+
+  * SASS (https://sass-lang.com/)
+  * Browserify (http://browserify.org/)
+  * PostCSS (https://postcss.org/)
+  * Autoprefixer (https://github.com/postcss/autoprefixer)
 
 13. License
 -----------
