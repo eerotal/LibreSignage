@@ -18,11 +18,11 @@
   },
   "homepage": "https://github.com/eerotal/LibreSignage#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.2.0",
     "ace-builds": "^1.3.3",
     "bootstrap": "^4.0.0",
     "jquery": "^3.3.1",
-    "popper.js": "^1.14.3",
-    "@fortawesome/fontawesome-free": "^5.2.0"
+    "popper.js": "^1.14.3"
   },
   "devDependencies": {
     "autoprefixer": "^9.1.1",
