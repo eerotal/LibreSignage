@@ -1,8 +1,11 @@
 var $ = require('jquery');
-var api = require('ls-api');
 var uic = require('ls-uicontrol');
 var val = require('ls-validator');
 var bootstrap = require('bootstrap');
+
+var APIInterface = require('ls-api').APIInterface;
+var APIEndpoints = require('ls-api').APIEndpoints;
+var APIUI = require('ls-api-ui');
 
 const LOGIN_LANDING = "/control";
 const INPUT_USERNAME = $("#input-user");
@@ -74,54 +77,60 @@ function login_redirect(uri) {
 	window.location.assign(uri);
 }
 
-function login() {
-	API.login(
-		INPUT_USERNAME.val(),
-		INPUT_PASSWORD.val(),
-		CHECK_PERM.is(":checked"),
-		(resp) => {
-			if (resp.error == API.ERR.API_E_INCORRECT_CREDS) {
-				login_redirect("/login?failed=1");
-			} else if (resp.error == API.ERR.API_E_OK) {
-				if (CHECK_PERM.is(":checked")) {
-					login_redirect('/app');
-					return;
-				}
-				login_redirect(LOGIN_LANDING);
-			} else {
-				API.handle_disp_error(resp.error);
-			}
+async function login() {
+	try {
+		await API.login(
+			INPUT_USERNAME.val(),
+			INPUT_PASSWORD.val(),
+			CHECK_PERM.is(":checked")
+		);
+	} catch (e) {
+		if (e.code === APIError.codes.API_E_INCORRECT_CREDS) {
+			login_redirect("/login?failed=1");
+			return;
+		} else {
+			APIUI.handle_error(e);
+			return;
 		}
-	)
+	}
+	if (CHECK_PERM.is(":checked")) {
+		login_redirect('/app');
+		return;
+	}
+	login_redirect(LOGIN_LANDING);
 }
 
-$(document).ready(() => {
-	API = new api.API(null, () => {
-		user_sel = new val.ValidatorSelector(
-			INPUT_USERNAME,
-			null,
-			[new val.StrValidator({
-				min: 1,
-				max: null,
-				regex: null
-			}, '')]
-		);
-		pass_sel = new val.ValidatorSelector(
-			INPUT_PASSWORD,
-			null,
-			[new val.StrValidator({
-				min: 1,
-				max: null,
-				regex: null
-			}, '')]
-		);
-		(val_trigger = new val.ValidatorTrigger(
-			[user_sel, pass_sel],
-			(valid) => {
-				LOGIN_UI_DEFS.get('BTN_LOGIN').enabled(valid);
-			}
-		)).trigger();
-
-		flag_login_ready = true;
-	});
+$(document).ready(async () => {
+	API = new APIInterface({standalone: false});
+	try {
+		await API.init();
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
+	user_sel = new val.ValidatorSelector(
+		INPUT_USERNAME,
+		null,
+		[new val.StrValidator({
+			min: 1,
+			max: null,
+			regex: null
+		}, '')]
+	);
+	pass_sel = new val.ValidatorSelector(
+		INPUT_PASSWORD,
+		null,
+		[new val.StrValidator({
+			min: 1,
+			max: null,
+			regex: null
+		}, '')]
+	);
+	(val_trigger = new val.ValidatorTrigger(
+		[user_sel, pass_sel],
+		(valid) => {
+			LOGIN_UI_DEFS.get('BTN_LOGIN').enabled(valid);
+		}
+	)).trigger();
+	flag_login_ready = true;	
 });
