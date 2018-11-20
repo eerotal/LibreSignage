@@ -1,5 +1,7 @@
 var $ = require('jquery');
-var api = require('ls-api');
+var APIInterface = require('ls-api').APIInterface;
+var APIEndpoints = require('ls-api').APIEndpoints;
+var APIUI = require('ls-api-ui');
 
 var API = null;
 const QUOTA_CONTAINER = $("#user-quota-cont");
@@ -24,23 +26,34 @@ const quota_bar = (name, val, min, max) => `
 	</div>
 `;
 
-function ctrl_setup() {
-	API.call(API.ENDP.USER_GET_QUOTA, null, (resp) => {
-		if (API.handle_disp_error(resp.error)) {
-			throw new Error("API exception while loading " +
-					"user quota.");
-		}
-		var tmp = "";
-		for (var k in resp.quota) {
-			tmp += quota_bar(resp.quota[k].disp,
-					resp.quota[k].used,
-					0,
-					resp.quota[k].limit);
-		}
-		QUOTA_CONTAINER.html(tmp);
-	});
+async function ctrl_setup() {
+	let reps = null;
+	try {
+		resp = await API.call(APIEndpoints.USER_GET_QUOTA, null);
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
+
+	let tmp = "";
+	for (var k in resp.quota) {
+		tmp += quota_bar(
+			resp.quota[k].disp,
+			resp.quota[k].used,
+			0,
+			resp.quota[k].limit
+		);
+	}
+	QUOTA_CONTAINER.html(tmp);
 }
 
-$(document).ready(() => {
-	API = new api.API(null, ctrl_setup);
+$(document).ready(async () => {
+	API = new APIInterface({standalone: false});
+	try {
+		await API.init();
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
+	await ctrl_setup();
 });

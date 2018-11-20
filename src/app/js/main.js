@@ -204,8 +204,10 @@ $(document).ready(async () => {
 	} catch (e) {
 		if (!('noui' in params)) {
 			APIUI.handle_error(e);
+		} else {
+			console.error(e.toString());
 		}
-		throw e;
+		return;
 	}
 	await display_setup();
 });
