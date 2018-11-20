@@ -1,11 +1,14 @@
 var $ = require('jquery');
-var api = require('ls-api');
-var slide = require('ls-slide');
-var queue = require('ls-queue');
-var slidelist = require('ls-slidelist');
+var Slide = require('ls-slide').Slide;
+var Queue = require('ls-queue').Queue;
+var SlideList = require('ls-slidelist').SlideList;
 var markup = require('ls-markup');
 var util = require('ls-util');
 var dialog = require('ls-dialog');
+
+var APIInterface = require('ls-api').APIInterface;
+var APIEndpoints = require('ls-api').APIEndpoints;
+var APIUI = require('ls-api-ui');
 
 var API = null;
 const DISPLAY_UPDATE_INTERVAL = 5000;
@@ -13,7 +16,7 @@ const QUEUE_UPDATE_INTERVAL = 60000;
 const BUFFER_UPDATE_PERIOD = 50;
 const DISPLAY = $('#display');
 
-var c_queue = null;
+var queue = null;
 
 var slide_buffer = [null, null];
 var markup_buffer = null;
@@ -40,7 +43,7 @@ function update_buffers() {
 	*  Buffer slide data and markup to improve display performance.
 	*/
 	slide_buffer[0] = slide_buffer[1];
-	slide_buffer[1] = c_queue.slides.filter(
+	slide_buffer[1] = queue.slides.filter(
 		{'enabled': true}
 	).next(
 		slide_buffer[0] != null ? slide_buffer[0].get('index') : -1,
@@ -85,79 +88,107 @@ function render() {
 	});
 }
 
-function display_setup() {
+async function display_setup() {
 	let params = util.get_GET_parameters();
-
 	if ('preview' in params) {
 		// Preview a slide without starting the display.
-		console.log(`LibreSignage: Preview slide ${params['preview']}.`);
-
-		let s = new slide.Slide(API);
-		s.load(params['preview'], false, false, (err) => {
-			if (API.handle_disp_error(err)) {
-				console.log("LibreSignage: Failed to preview slide!");
-				return;
+		console.log(`LibreSignage: Preview ${params['preview']}.`);
+		let s = new Slide(API);
+		try {
+			await s.load(params['preview'], false, false);
+		} catch (e) {
+			if (!('noui' in params)) {
+				APIUI.handle_error(e);
 			}
-			try {
-				let content = $(
-					markup.parse(
-						util.sanitize_html(
-							s.get('markup')
-						)
+			console.error(
+				`LibreSignage: Failed to preview slide: ${e.message}.`
+			);
+			return;
+		}
+		try {
+			let content = $(
+				markup.parse(
+					util.sanitize_html(
+						s.get('markup')
 					)
-				);
-
-				if ('static' in params) {
-					if (content.is('video')) {
-						content.removeAttr('autoplay');
-					}
-					content.find('video').removeAttr('autoplay');
+				)
+			);
+			if ('static' in params) {
+				if (content.is('video')) {
+					content.removeAttr('autoplay');
 				}
-
-				DISPLAY.html(content);
-			} catch (e) {
-				if (e instanceof markup.err.MarkupSyntaxError) {
-					console.error(`LibreSignage: ${e.message}`);
-					DISPLAY.html('');
-				}
+				content.find('video').removeAttr('autoplay');
 			}
-		});
+			DISPLAY.html(content);
+		} catch (e) {
+			if (e instanceof markup.err.MarkupSyntaxError) {
+				console.error(`LibreSignage: ${e.message}`);
+				DISPLAY.html('');
+			}
+			return;
+		}
 	} else if ('q' in params){
-		console.log("LibreSignage: Start the display loop.");
-		c_queue = new queue.Queue(API);
-		c_queue.load(params['q'], () => {
-			console.log(
-				`LibreSignage: Queue '${params['q']}' loaded. ` +
-				`(${c_queue.slides.length()} slides)`
+		console.log("LibreSignage: Initialize display.");
+		queue = new Queue(API);
+		try {
+			await queue.load(params['q']);
+		} catch (e) {
+			if (!('noui' in params)) {
+				APIUI.handle_error(e);
+			}
+			console.error(
+				`LibreSignage: Failed to start display: ${e.message}`
 			);
-			setInterval(() => {
-				console.log("LibreSignage: Queue update.");
-				c_queue.update(() => {
-					console.log("LibreSignage: Queue update complete.");
-				});
-			}, QUEUE_UPDATE_INTERVAL);
-			render();
-		});
+			return;
+		}
+		console.log(
+			`LibreSignage: Queue '${params['q']}' loaded. ` +
+			`(${queue.slides.length()} slides)`
+		);
+		setInterval(() => {
+			console.log("LibreSignage: Queue update.");
+			queue.update(() => {
+				console.log("LibreSignage: Queue update complete.");
+			});
+		}, QUEUE_UPDATE_INTERVAL);
+		render();
 	} else {
-		queue.get_list(API, (qd) => {
-			var queues = {};
-			qd.sort();
-			for (let q of qd) { queues[q] = q; }
-			dialog.dialog(
-				dialog.TYPE.SELECT,
-				'Select a queue',
-				'',
-				(status, val) => {
-					if (!status) { return; }
-					window.location.replace(`/app/?q=${val}`);
-				},
-				queues
+		let queues = null;
+		let tmp = {};
+		try {
+			queues = await Queue.get_queues(API);
+		} catch (e) {
+			if (!('noui' in params)) {
+				APIUI.handle_error(e);
+			}
+			console.log(
+				`LibreSignage: Failed to load queue list: ${e.message}.`
 			);
-		});
+			return;
+		}
+		queues.sort();
+
+		/*
+		*  Convert the queues array into an object with the
+		*  structure {<queue_name>: <queue_name>} to make
+		*  it compatible with the Dialog class.
+		*/
+		for (let v in queues) { tmp[queues[v]] = queues[v]; }
+
+		dialog.dialog(
+			dialog.TYPE.SELECT,
+			'Select a queue',
+			'',
+			(status, val) => {
+				if (!status) { return; }
+				window.location.replace(`/app/?q=${val}`);
+			},
+			tmp
+		);
 	}
 }
 
-$(document).ready(() => {
+$(document).ready(async () => {
 	var params = util.get_GET_parameters();
 
 	// Disable logging if silent=1 is passed in the URL.
@@ -167,8 +198,15 @@ $(document).ready(() => {
 		console.error = () => {};
 	}
 
-	API = new api.API(
-		{'noui': 'noui' in params && params['noui'] == '1'},
-		display_setup
-	)
+	API = new APIInterface({standalone: false});
+	try {
+		await API.init();
+	} catch (e) {
+		if (!('noui' in params)) {
+			APIUI.handle_error(e);
+		}
+		throw e;
+	}
+	await display_setup();
 });
+
