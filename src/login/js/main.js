@@ -85,7 +85,7 @@ async function login() {
 			CHECK_PERM.is(":checked")
 		);
 	} catch (e) {
-		if (e.code === APIError.codes.API_E_INCORRECT_CREDS) {
+		if (e.response.code === APIError.codes.API_E_INCORRECT_CREDS) {
 			login_redirect("/login?failed=1");
 			return;
 		} else {

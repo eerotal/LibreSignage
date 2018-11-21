@@ -101,7 +101,8 @@ async function display_setup() {
 				APIUI.handle_error(e);
 			}
 			console.error(
-				`LibreSignage: Failed to preview slide: ${e.message}.`
+				`LibreSignage: Failed to preview ` +
+				`slide: ${e.response.e_msg}.`
 			);
 			return;
 		}
@@ -122,7 +123,7 @@ async function display_setup() {
 			DISPLAY.html(content);
 		} catch (e) {
 			if (e instanceof markup.err.MarkupSyntaxError) {
-				console.error(`LibreSignage: ${e.message}`);
+				console.error(`LibreSignage: ${e.response.e_msg}`);
 				DISPLAY.html('');
 			}
 			return;
@@ -137,7 +138,8 @@ async function display_setup() {
 				APIUI.handle_error(e);
 			}
 			console.error(
-				`LibreSignage: Failed to start display: ${e.message}`
+				`LibreSignage: Failed to start ` +
+				`display: ${e.response.e_msg}`
 			);
 			return;
 		}
@@ -162,7 +164,8 @@ async function display_setup() {
 				APIUI.handle_error(e);
 			}
 			console.log(
-				`LibreSignage: Failed to load queue list: ${e.message}.`
+				`LibreSignage: Failed to load ` +
+				`queue list: ${e.response.e_msg}.`
 			);
 			return;
 		}
@@ -204,10 +207,10 @@ $(document).ready(async () => {
 	} catch (e) {
 		if (!('noui' in params)) {
 			APIUI.handle_error(e);
+			return;
 		} else {
 			console.error(e.toString());
 		}
-		return;
 	}
 	await display_setup();
 });
