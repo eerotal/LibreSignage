@@ -3,12 +3,13 @@
 */
 
 var $ = require('jquery');
-var api = require('ls-api');
+var APIInterface = require('ls-api').APIInterface;
 var val = require('ls-validator');
-var user = require('ls-user');
+var User = require('ls-user').User;
 var dialog = require('ls-dialog');
 var util = require('ls-util');
 var uic = require('ls-uicontrol');
+var assert = require('ls-assert').assert;
 
 var API = null;
 
@@ -71,9 +72,9 @@ const USER_UI_DEFS = new uic.UIController({
 		enabler = null,
 		attach = null,
 		defer = null,
-		mod = (elem, u) => { return elem.val() != u.get_name(); },
+		mod = (elem, u) => { return elem.val() != u.data.user(); },
 		getter = (elem) => { return elem.val(); },
-		setter = (elem, u) => { elem.val(u.get_name()); },
+		setter = (elem, u) => { elem.val(u.data.user); },
 		clearer = (elem) => { elem.val(''); }
 	),
 	'USER_GROUPS': new uic.UIInput(
@@ -84,12 +85,12 @@ const USER_UI_DEFS = new uic.UIController({
 		defer = null,
 		mod = (elem, u) => {
 			let tmp = elem.val().replace(/\s/g, '').split(',');
-			return !sets_eq(tmp, u.get_groups());
+			return !sets_eq(tmp, u.data.groups);
 		},
 		getter = (elem) => {
 			return elem.val().replace(/\s/g, '').split(',');
 		},
-		setter = (elem, u) => { elem.val(u.get_groups().join()); },
+		setter = (elem, u) => { elem.val(u.data.groups.join()); },
 		clearer = (elem) => { elem.val(''); }
 	),
 	'USER_PASS': new uic.UIInput(
@@ -134,7 +135,7 @@ const USER_UI_DEFS = new uic.UIController({
 	)
 });
 
-function user_settings_setup() {
+async function user_settings_setup() {
 	pass_sel = new val.ValidatorSelector(
 		USER_PASS.add(USER_PASS_CONFIRM),
 		USER_PASS_GRP.add(USER_PASS_CONFIRM_GRP),
@@ -164,83 +165,84 @@ function user_settings_setup() {
 		]
 	);
 
-	USER_UI_DEFS.all(function(data) { this.set(data)}, usr, 'input');
+	// Populate user data.
+	usr = new User(API);
+	await user_data_populate();
 
-	// Setup the sessions table.
-	user_sessions_populate();
 	flag_user_ready = true;
 }
 
-function user_sessions_populate() {
-	/*
-	*  Display the active sessions.
-	*/
-	API.call(
-		API.ENDP.AUTH_GET_SESSIONS,
-		null,
-		(resp) => {
-			if (API.handle_disp_error(resp.error)) { return; }
-			USER_SESSIONS.html("");
-			for (let d of resp.sessions) {
-				USER_SESSIONS.append(
-					user_session_row(
-						d.who,
-						d.from,
-						d.created*1000,
-						d.current
-					)
-				);
-			}
-		}
-	);
+async function user_data_populate() {
+	// Populate user data.
+	try {
+		await usr.load(null);
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
+	USER_UI_DEFS.all(function(data) { this.set(data)}, usr, 'input');
+
+	// Populate the active sessions table.
+	USER_SESSIONS.html("");
+	for (let d of usr.data.sessions) {
+		console.log(d.id);
+		console.log(API.config.session.data.id);
+		USER_SESSIONS.append(
+			user_session_row(
+				d.who,
+				d.from,
+				d.created*1000,
+				d.id === API.config.session.data.id
+			)
+		);
+	}
 }
 
-function user_sessions_logout() {
+async function user_sessions_logout() {
 	/*
 	*  Event handler for the 'Logout other sessions' button.
 	*/
-	API.call(
-		API.ENDP.AUTH_LOGOUT_OTHER,
-		null,
-		(resp) => {
-			if (API.handle_disp_error(resp.error)) { return; }
-			user_sessions_populate();
-		}
-	);
+	try {
+		await API.call(APIEndpoints.AUTH_LOGOUT_OTHER, null);
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
+	await user_data_populate();
 }
 
-function user_settings_save() {
+async function user_settings_save() {
 	/*
-	*  Save the modified user settings (password etc).
+	*  Save modified user settings.
 	*/
-	if (!usr) { throw new Error("Current user not loaded."); }
+	assert(usr != null, "Current user not loaded.");
 
-	// Change password using the API.
-	usr.pass = USER_UI_DEFS.get('USER_PASS').get();
-	usr.save((ret) => {
-		if (API.handle_disp_error(ret)) { return; }
+	usr.data.pass = USER_UI_DEFS.get('USER_PASS').get();
+	try {
+		await usr.save();
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
 
-		// Empty input boxes.
-		USER_UI_DEFS.get('USER_PASS').clear();
-		USER_UI_DEFS.get('USER_PASS_CONFIRM').clear();
-
-		dialog.dialog(
-			dialog.TYPE.ALERT,
-			'Changes saved',
-			'Changes to user settings saved.',
-			null,
-			null
-		);
-	});
+	// Empty input boxes.
+	USER_UI_DEFS.get('USER_PASS').clear();
+	USER_UI_DEFS.get('USER_PASS_CONFIRM').clear();
+	dialog.dialog(
+		dialog.TYPE.ALERT,
+		'Changes saved',
+		'Changes to user settings saved.',
+		null,
+		null
+	);
 }
 
-$(document).ready(() => {
-	API = new api.API(
-		null,	// Use default config.
-		() => {
-			// Load the current (logged in) user.
-			usr = new user.User(API);
-			usr.load(null, user_settings_setup);
-		}
-	);
+$(document).ready(async () => {
+	API = new APIInterface({standalone: false});
+	try {
+		await API.init();
+	} catch (e) {
+		APIUI.handle_error(e);
+	}
+	await user_settings_setup();
 });
