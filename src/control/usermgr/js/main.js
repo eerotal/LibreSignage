@@ -1,57 +1,45 @@
 var $ = require('jquery');
-var api = require('ls-api');
-var user = require('ls-user');
+var User = require('ls-user').User;
+var APIInterface = require('ls-api').APIInterface;
+var APIEndpoints = require('ls-api').APIEndpoints;
+var APIUI = require('ls-api-ui');
+
 var uic = require('ls-uicontrol');
 var dialog = require('ls-dialog');
 var multiselect = require('ls-multiselect');
 var val = require('ls-validator');
 var bootstrap = require('bootstrap');
 
-var flag_usermgr_ready = false;
-var defer_usermgr_ready = () => { return !flag_usermgr_ready; }
+var flag_ready = false;
+var defer_ready = () => { return !flag_ready; }
 
-const USER_NAME_QUERY = (name) => `#usr-name-input-${name}`;
+const USER_NAME_QUERY   = (name) => `#usr-name-input-${name}`;
 const USER_GROUPS_QUERY = (name) => `#usr-groups-input-${name}`;
-const USER_SAVE_QUERY = (name) => `#btn-user-${name}-save`;
+const USER_SAVE_QUERY   = (name) => `#btn-user-${name}-save`;
 const USER_REMOVE_QUERY = (name) => `#btn-user-${name}-remove`;
 
 const USER_CREATE = $('#btn-create-user');
 const USERS_TABLE = $('#users-table');
 
-const USERMGR_UI_DEFS = new uic.UIController({
+const MAIN_CONTROLLER = new uic.UIController({
 	'USER_CREATE': new uic.UIButton(
 		elem = USER_CREATE,
 		perm = () => { return true; },
 		enabler = null,
 		attach = {
-			'click': usermgr_create
+			'click': create_user
 		},
-		defer = defer_usermgr_ready
+		defer = defer_ready
 	)
 });
-var USERMGR_LIST_UI_DEFS = new uic.UIController({});
-var USERMGR_MULTISELECTS = {};
+var TABLE_CONTROLLER = new uic.UIController({});
 
 // Dialog messages.
-const DIALOG_USER_SAVED = new dialog.Dialog(
-	dialog.TYPE.ALERT,
-	'User saved',
-	'User information was successfully saved!',
-	null
-);
-
 const DIALOG_TOO_MANY_USERS = new dialog.Dialog(
 	dialog.TYPE.ALERT,
 	'Too many users',
 	`The maximum number of users on the server has been reached.
 	No more users can be created.`,
-	null
-);
-
-const DIALOG_USER_REMOVE_FAILED = new dialog.Dialog(
-	dialog.TYPE.ALERT,
-	'User removal failed',
-	'Failed to remove user.',
 	null
 );
 
@@ -129,107 +117,82 @@ const usr_table_row = (name, groups, pass) => `
 	</div>
 `;
 
-function usermgr_assign_userdata(name) {
-	/*
-	*  Assign the edited user data to 'user' from
-	*  the user manager UI.
-	*/
-	var tmp = '';
-	var users = user.users_get();
-	if (!user.user_exists(name)) {
-		throw new Error("User doesn't exist!");
-	}
-
-	for (var u in users) {
-		if (users[u].get_name() == name) {
-			users[u].groups = USERMGR_LIST_UI_DEFS.get(
-				`${users[u].get_name()}_groups`
-			).get();
-
-			// Check that the number of groups is valid.
-			if (users[u].groups.length >
-				API.SERVER_LIMITS.MAX_GROUPS_PER_USER) {
-				DIALOG_TOO_MANY_GROUPS(
-					API.SERVER_LIMITS.MAX_GROUPS_PER_USER
-				).show();
-				return false;
-			}
-			return true;
-		}
-	}
-}
-
-function usermgr_save(name) {
+async function save_user(name) {
 	/*
 	*  Save a user.
 	*/
-	var users = user.users_get();
-	for (var u in users) {
-		if (users[u].get_name() == name) {
-			if (!usermgr_assign_userdata(name)) {
-				console.error('Failed to save userdata.');
-				return;
-			}
-			users[u].save((err) => {
-				if (API.handle_disp_error(err)) { return; }
-				// Update UI.
-				usermgr_make_ui();
-				DIALOG_USER_SAVED.show();
-			});
-			break;
-		}
+	let user = new User(API);
+	try {
+		await user.load(name);
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
 	}
+
+	user.data.groups = TABLE_CONTROLLER.get(`${name}_groups`).get();
+	if (user.data.groups.length > API.limits.MAX_GROUPS_PER_USER) {
+		DIALOG_TOO_MANY_GROUPS(API.limits.MAX_GROUPS_PER_USER).show();
+		return;
+	}
+
+	try {
+		await user.save();
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
+	await update();
 }
 
-function usermgr_remove(name) {
+async function remove_user(name) {
 	/*
 	*  Remove a user.
 	*/
-	var users = user.users_get();
-	dialog.dialog(dialog.TYPE.CONFIRM,
+	dialog.dialog(
+		dialog.TYPE.CONFIRM,
 		`Remove user ${name}?`,
 		`Are you sure you want to remove the user ${name}? ` +
 		`All user data for ${name} will be lost and won't be ` +
 		`recoverable.`,
-		(status, val) => {
+		async (status, val) => {
 			if (!status) { return; }
-			for (var u in users) {
-				if (users[u].get_name() != name) { continue; }
-				users[u].remove((resp) => {
-					if (API.handle_disp_error(resp)) { return; }
-					user.users_load(API, usermgr_make_ui);
-				});
-				return;
+			let user = new User(API);
+			try {
+				await user.load(name);
+				await user.remove();
+			} catch (e) {
+				APIUI.handle_error(e);
+				return;			
 			}
-			DIALOG_USER_REMOVE_FAILED.show();
+			await update();
 		}
 	);
 }
 
-function usermgr_create() {
+function create_user() {
+	/*
+	*  Create a new user.
+	*/
 	dialog.dialog(
 		dialog.TYPE.PROMPT,
 		'Create a user',
-		'Enter a name for the new user.', (status, val) => {
+		'Enter a name for the new user.',
+		async (status, val) => {
 			if (!status) { return; }
-			API.call(API.ENDP.USER_CREATE, {'user': val}, (resp) => {
-				if (resp.error == API.ERR.LIMITED) {
+			let info = {};
+			let usr = new User(API);
+			try {
+				await usr.create(val);
+			} catch (e) {
+				if (e.response.error == APIError.codes.LIMITED) {
 					DIALOG_TOO_MANY_USERS.show();
-					return;
-				} else if (API.handle_disp_error(resp.error)) {
-					return;
+				} else {
+					APIUI.handle_error(e);
 				}
-
-				var tmp = new user.User(API);
-				tmp.set(
-					resp.user.name,
-					resp.user.groups,
-					null
-				);
-				tmp.set_info('Password: ' + resp.user.pass);
-				user.users_add(tmp);
-				usermgr_make_ui();
-			});
+				return;
+			}
+			info[usr.data.user] = `Password: ${usr.data.pass}`;
+			await update(info);
 		},
 		[new val.StrValidator({
 			min: 1,
@@ -238,7 +201,7 @@ function usermgr_create() {
 		}, "The username is too short."),
 		new val.StrValidator({
 			min: null,
-			max: API.SERVER_LIMITS.USERNAME_MAX_LEN,
+			max: API.limits.USERNAME_MAX_LEN,
 			regex: null
 		}, "The username is too long."),
 		new val.StrValidator({
@@ -249,51 +212,60 @@ function usermgr_create() {
 	);
 }
 
-function usermgr_make_ui() {
+async function update(add_info) {
 	/*
-	*  Render the user manager UI.
+	*  Render the user manager UI. Additional text for the
+	*  'Comments' column can be supplied in the associative
+	*  array 'add_info' as username-info pairs.
 	*/
-	var users = user.users_get();
-	var i = 0;
+	let users = null;
+	try {
+		users = await User.get_all(API);
+	} catch (e) {
+		console.log(e);
+		APIUI.handle_error(e);
+		return;
+	}
 
-	USERMGR_LIST_UI_DEFS.rm_all();
-	USERMGR_MULTISELECTS = {};
+	TABLE_CONTROLLER.rm_all();
 	USERS_TABLE.empty();
 
 	for (let u in users) {
-		let name = users[u].get_name();
-		let grps = users[u].get_groups();
-		let info = users[u].get_info();
+		let name = users[u].data.user;
+		let groups = users[u].data.groups;
+		let info = (add_info != null && u in add_info) ? add_info[u] : '';
 
 		// Add the HTML DOM elements to the document.
 		USERS_TABLE.append(usr_table_row(
 			name,
-			!grps || !grps.length ? '' : grps.join(', '),
-			!info ? '' : info,
+			!groups || !groups.length ? '' : groups.join(', '),
+			info
 		));
 
-		// Create the UI element instances for the inputs & buttons.
-		USERMGR_LIST_UI_DEFS.add(`${name}_save`, new uic.UIButton(
+		// Setup the UIController for the input elements.
+		TABLE_CONTROLLER.add(`${name}_save`, new uic.UIButton(
 				elem = $(USER_SAVE_QUERY(name)),
 				perm = () => { return true; },
 				enabler = null,
 				attach = {
-					'click': () => { usermgr_save(name); }
+					'click': () => { save_user(name); }
 				},
 				defer = null
 			)
 		);
-		USERMGR_LIST_UI_DEFS.add(`${name}_remove`, new uic.UIButton(
+		TABLE_CONTROLLER.add(`${name}_remove`, new uic.UIButton(
 				elem = $(USER_REMOVE_QUERY(name)),
-				perm = () => { return name != API.CONFIG.user.user; },
+				perm = () => {
+					return name != API.config.session.data.user;
+				},
 				enabler = null,
 				attach = {
-					'click': () => { usermgr_remove(name); }
+					'click': () => { remove_user(name); }
 				},
 				defer = null
 			)
 		);
-		USERMGR_LIST_UI_DEFS.add(`${name}_name`, new uic.UIInput(
+		TABLE_CONTROLLER.add(`${name}_name`, new uic.UIInput(
 				elem = $(USER_NAME_QUERY(name)),
 				perm = () => { return false; },
 				enabler = null,
@@ -301,11 +273,11 @@ function usermgr_make_ui() {
 				defer = null,
 				mod = null,
 				getter = null,
-				setter = (elem, usr) => { elem.val(usr.get_name()); },
+				setter = (elem, usr) => { elem.val(usr.data.user); },
 				clearer = (elem) => { elem.val(''); }
 			)
 		);
-		USERMGR_LIST_UI_DEFS.add(`${name}_groups`, new uic.UIInput(
+		TABLE_CONTROLLER.add(`${name}_groups`, new uic.UIInput(
 				elem = new multiselect.MultiSelect(
 					`usr-groups-input-${name}-cont`,
 					`usr-groups-input-${name}`,
@@ -321,10 +293,10 @@ function usermgr_make_ui() {
 					}, "The group name has invalid characters.")],
 					{
 						'nodups': true,
-						'maxopts': API.SERVER_LIMITS.MAX_USER_GROUPS
+						'maxopts': API.limits.MAX_USER_GROUPS
 					}
 				),
-				pass = () => { return true; },
+				perm = () => { return true; },
 				enabler = (elem, state) => {
 					if (state) {
 						elem.enable();
@@ -336,25 +308,26 @@ function usermgr_make_ui() {
 				defer = null,
 				mod = null,
 				getter = (elem) => { return elem.selected; },
-				setter = (elem, usr) => { elem.set(usr.get_groups()); },
+				setter = (elem, usr) => { elem.set(usr.data.groups); },
 				clearer = (elem) => { elem.remove_all(); }
 			)
 		);
 		// Add the existing user data to the inputs.
-		USERMGR_LIST_UI_DEFS.get(`${name}_name`).set(users[u]);
-		USERMGR_LIST_UI_DEFS.get(`${name}_groups`).set(users[u]);
-		i++;
+		TABLE_CONTROLLER.get(`${name}_name`).set(users[u]);
+		TABLE_CONTROLLER.get(`${name}_groups`).set(users[u]);
 	}
 	// Conditionally enable all the inputs.
-	USERMGR_LIST_UI_DEFS.all(function() { this.state(); });
+	TABLE_CONTROLLER.all(function() { this.state(); });
 }
 
-$(document).ready(() => {
-	API = new api.API(
-		null,
-		() => {
-			user.users_load(API, usermgr_make_ui);
-			flag_usermgr_ready = true;
-		}
-	);
+$(document).ready(async () => {
+	API = new APIInterface({standalone: false});
+	try {
+		await API.init();
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
+	flag_ready = true;
+	await update();
 });
