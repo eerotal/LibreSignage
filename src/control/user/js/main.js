@@ -185,8 +185,6 @@ async function user_data_populate() {
 	// Populate the active sessions table.
 	USER_SESSIONS.html("");
 	for (let d of usr.data.sessions) {
-		console.log(d.id);
-		console.log(API.config.session.data.id);
 		USER_SESSIONS.append(
 			user_session_row(
 				d.who,
