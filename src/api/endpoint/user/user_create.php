@@ -109,13 +109,12 @@ if ($user->write() === FALSE) {
 	);
 }
 
-$ret = array(
-	'user' => array(
-		'name' => $user->get_name(),
-		'groups' => $user->get_groups(),
-		'pass' => $tmp_pass
+$ret = [
+	'user' => array_merge(
+		$user->export(FALSE, FALSE),
+		['pass' => $tmp_pass]
 	)
-);
+];
 
 $USER_CREATE->resp_set($ret);
 $USER_CREATE->send();
