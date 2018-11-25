@@ -878,7 +878,7 @@ async function slide_show(s, no_popup) {
 				await slide_load(s);
 			}
 		} catch (e) {
-			console.warn('LibreSignage: Failed to show slide.');
+			APIUI.handle_error(e);
 			slide_hide();
 			state.slide_loading = false;
 			return;
@@ -888,7 +888,7 @@ async function slide_show(s, no_popup) {
 		preview.update();
 		timeline.select(sel_slide.get('id'));
 		state.slide_loading = false;			
-	});
+	}).catch(() => {});
 }
 
 function slide_hide() {
@@ -936,7 +936,7 @@ async function slide_rm() {
 		);
 		slide_hide();
 		await timeline.update();
-	});
+	}).catch(() => {});
 }
 
 async function slide_new() {
@@ -976,7 +976,7 @@ async function slide_new() {
 		sel_slide.set(NEW_SLIDE_DEFAULTS);
 		set_inputs(sel_slide);
 		update_controls();
-	});
+	}).catch(() => {});
 }
 
 async function slide_save() {
@@ -1045,6 +1045,8 @@ async function slide_ch_queue() {
 		return;
 	}
 
+	console.log(qd);
+
 	qd.sort();
 	for (let q of qd) {
 		if (q != sel_slide.get('queue_name')) { queues[q] = q; }
@@ -1086,7 +1088,7 @@ async function slide_ch_queue() {
 			APIUI.handle_error(e);
 			return;
 		}
-	});
+	}).catch(() => {});
 }
 
 async function slide_dup() {
@@ -1150,42 +1152,43 @@ async function queue_select(name, confirm) {
 		await timeline.show(name);
 		slide_hide();
 		update_qsel_ctrls();
-	});
+	}).catch(() => {});
 }
 
-function queue_create() {
+async function queue_create() {
 	/*
 	*  Create a new queue and select it. If the current slide in
 	*  the editor is unsaved, the user is asked for confirmation
 	*  first.
 	*/
-	var callback = () => {
-		dialog.dialog(
-			dialog.TYPE.PROMPT,
-			'Create queue',
-			'Queue name',
-			(status, val) => {
-				if (!status) { return; }
-				API.call(
-					API.ENDP.QUEUE_CREATE,
-					{'name': val},
-					(data) => {
-						if (API.handle_disp_error(data['error'])) {
-							return;
-						}
-						// Select the new queue.
-						update_qsel(false, () => {
-							QUEUE_SELECT.val(val);
-							queue_select(val, false, null);
-						});
-						console.log(
-							`LibreSignage: Created queue '${val}'.`
-						);
+	new Promise((resolve, reject) => {
+		if (editor_status_check(['UNSAVED'])) {
+			diags.DIALOG_SLIDE_UNSAVED(
+				(status, val) => {
+					if (status) {
+						resolve();
+					} else {
+						reject();
 					}
-				);
-			},
-			[
-				new val.StrValidator({
+				}
+			).show();
+		} else {
+			resolve();
+		}
+	}).then(() => {
+		return new Promise((resolve, reject) => {
+			dialog.dialog(
+				dialog.TYPE.PROMPT,
+				'Create queue',
+				'Queue name',
+				(status, val) => {
+					if (status) {
+						resolve(val);
+					} else {
+						reject();
+					}
+				},
+				[new val.StrValidator({
 					min: null,
 					max: null,
 					regex: /^[A-Za-z0-9_-]*$/
@@ -1202,57 +1205,78 @@ function queue_create() {
 				}, "The queue name is too long."),
 				new val.BlacklistValidator({
 					bl: qsel_queues
-				}, "This queue already exists.")
-			]
-		);
-	};
+				}, "This queue already exists.")]
+			);
+		});
+	}).then(async (val) => {
+		let resp = null;
+		try {
+			resp = await API.call(
+				APIEndpoints.QUEUE_CREATE,
+				{'name': val}
+			);
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
+		}
+		console.log(`LibreSignage: Created queue '${val}'.`);
 
-	if (editor_status_check(['UNSAVED'])) {
-		diags.DIALOG_SLIDE_UNSAVED(
-			(status, val) => {
-				if (status) { callback(); }
-			}
-		).show();
-	} else {
-		callback();
-	}
+		// Select the new queue.
+		await update_qsel(false);		
+		QSEL_UI.get('QUEUE_SELECT').set(val);
+		await queue_select(val, false, null);
+	}).catch(() => {});
 }
 
-function queue_remove() {
+async function queue_remove() {
 	/*
 	*  Remove the selected queue. If the current slide in the
 	*  editor is unsaved, the user is asked for confirmation
 	*  first.
 	*/
 	let callback = () => {
-		dialog.dialog(
-			dialog.TYPE.CONFIRM,
-			'Delete queue',
-			'Delete the selected queue and all the slides in it?',
-			(status) => {
-				if (!status) { return; }
-				API.call(
-					API.ENDP.QUEUE_REMOVE,
-					{'name': timeline.get_queue().get_name()},
-					(data) => {
-						if (API.handle_disp_error(data['error'])) {
-							return;
-						}
-						update_qsel(true, null);
-						slide_hide();
-					}
-				);
-			},
-			null
-		);
+
 	};
-	if (editor_status_check(['UNSAVED'])) {
-		diags.DIALOG_SLIDE_UNSAVED(
-			(status, val) => {
-				if (status) { callback(); }
-			}
-		).show();
-	} else { callback(); }
+	new Promise((resolve, reject) => {
+		if (editor_status_check(['UNSAVED'])) {
+			diags.DIALOG_SLIDE_UNSAVED(
+				(status, val) => {
+					if (status) {
+						resolve();
+					} else {
+						reject();
+					}
+				}
+			).show();
+		} else { resolve(); }
+	}).then(() => {
+		return new Promise((resolve, reject) => {
+			dialog.dialog(
+				dialog.TYPE.CONFIRM,
+				'Delete queue',
+				'Delete the selected queue and all the slides in it?',
+				(status) => {
+					if (status) {
+						resolve();
+					} else {
+						reject();
+					}
+				},
+				null
+			);
+		});
+	}).then(async () => {
+		try {
+			await API.call(
+				APIEndpoint.QUEUE_REMOVE,
+				{'name': timeline.get_queue().get_name()}
+			);
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
+		}
+		await update_qsel(true, null);
+	}).catch(() => {});
 }
 
 function queue_view() {

@@ -180,6 +180,7 @@ AssetUploader = class AssetUploader {
 							this.UI.get('FILESEL').clear();
 						} catch (e) {
 							this.indicate('upload-error');
+							throw e;
 						}
 						await this.update_and_populate();
 						this.state.uploading = false;
