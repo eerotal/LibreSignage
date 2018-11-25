@@ -12,14 +12,27 @@ const META = [
 ];
 const STYLESHEETS = [ '/app/css/display.css' ];
 
-exports.Preview = class Preview {
-	constructor(container, editor, getter, err, noevent) {
-		this.container = $(container);
-		this.editor = $(editor);
-		this.getter = getter;
-		this.onevent = noevent;
-		this.err = err;
-		this.ratio = null;
+class Preview {
+	constructor(container, editor, getter, errorhandler, noupdates) {
+		/*
+		*  container    = A JQuery selector string for the preview.
+		*  editor       = A JQuery selector string for the editor.
+		*                 This is used to get keyboard events for
+		*                 automatic updates. You can leave this
+		*                 null if you also set 'noupdates = true'.
+		*  getter       = A function that returns the current markup.
+		*  errorhandler = A function that handles any markup syntax
+		*                 errors. The errors are passed as the only
+		*                 argument.
+		*  noupdates    = If this is true, keyboard events on the editor
+		*                 element don't update the preview.
+		*/
+		this.container    = $(container);
+		this.editor       = $(editor);
+		this.getter       = getter;
+		this.noupdates    = noupdates;
+		this.errorhandler = errorhandler;
+		this.ratio        = null;
 
 		// Add the preview iframe to the container.
 		this.preview = $('<iframe class="preview rounded"></frame>');
@@ -64,7 +77,7 @@ exports.Preview = class Preview {
 			*  no styling.
 			*/
 			Promise.all(promises).then(() => {
-				if (!this.noevent) {
+				if (!this.noupdates) {
 					this.editor.on('keyup', () => { this.update(); })
 				}
 				this.update();
@@ -87,7 +100,7 @@ exports.Preview = class Preview {
 		var html = null;
 
 		// Clear previous errors.
-		if (this.err) { this.err(null); }
+		if (this.errorhandler) { this.errorhandler(null); }
 		try {
 			html = markup.parse(
 				util.sanitize_html(
@@ -96,7 +109,7 @@ exports.Preview = class Preview {
 			);
 		} catch (e) {
 			if (e instanceof markup.err.MarkupError) {
-				if (this.err) { this.err(e); }
+				if (this.errorhandler) { this.errorhandler(e); }
 			} else {
 				throw e;
 			}
@@ -125,20 +138,18 @@ exports.Preview = class Preview {
 		this.container.removeClass(
 			'preview-16x9 preview-4x3 preview-16x9-fit preview-4x3-fit'
 		);
-		if (r == '4x3') {
-			this.container.addClass('preview-4x3');
-			this.ratio = r;
-		} else if (r == '16x9') {
-			this.container.addClass('preview-16x9');
-			this.ratio = r;
-		} else if (r == '4x3-fit') {
-			this.container.addClass('preview-4x3-fit');
-			this.ratio = r;
-		} else if (r == '16x9-fit') {
-			this.container.addClass('preview-16x9-fit');
-			this.ratio = r;
-		} else {
-			throw new Error(`Unknown aspect ratio '${r}'.`);
+		switch(r) {
+			case '4x3':
+			case '16x9':
+			case '4x3-fit':
+			case '16x9-fit':
+				this.container.addClass(`preview-${r}`);
+				this.ratio = r;
+				break;
+			default:
+				throw new Error(`Unknown aspect ratio '${r}'.`);
+				break;
 		}
 	}
 }
+exports.Preview = Preview;

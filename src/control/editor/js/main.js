@@ -6,23 +6,29 @@
 var $ = require('jquery');
 var bootstrap = require('bootstrap');
 
+var APIInterface = require('ls-api').APIInterface;
+var APIError = require('ls-api').APIError;
+var APIEndpoint = require('ls-api').APIEndpoints;
+var APIUI = require('ls-api-ui');
+
+var Slide = require('ls-slide').Slide;
+var Queue = require('ls-queue').Queue;
+var User = require('ls-user').User;
+var Preview = require('./preview.js').Preview;
+var Timeline = require('./timeline.js').Timeline;
+var AssetUploader = require('./asset_uploader.js').AssetUploader;
+
 var util = require('ls-util');
 var val = require('ls-validator');
 var dialog = require('ls-dialog');
-var api = require('ls-api');
 var multiselect = require('ls-multiselect');
 var uic = require('ls-uicontrol');
-var slide = require('ls-slide');
-var queue = require('ls-queue');
 var sc = require('ls-shortcut');
 var popup = require('ls-popup');
 
 var ace_range = ace.require('ace/range');
-
-var timeline = require('./timeline.js');
-var preview = require('./preview.js');
 var diags = require('./dialogs.js');
-var asset_uploader = require('./asset_uploader.js');
+
 
 // Some sane default values for new slides.
 const NEW_SLIDE_DEFAULTS = {
@@ -88,13 +94,13 @@ var LINK_ADD_MEDIA        = $("#link-add-media");
 var CLOSE_QUICK_HELP      = $("#close-quick-help");
 var SLIDE_COLLAB          = null;
 var SLIDE_INPUT           = null;
-var LIVE_PREVIEW          = null;
+var preview          = null;
 
 var QUICK_HELP = new popup.Popup($('#quick-help').get(0));
 
 var API = null;            // API interface object.
-var TL = null;             // Timeline object.
-var ASSET_UPLOADER = null; // Asset uploader object.
+var timeline = null;             // Timeline object.
+var assetuploader = null; // Asset uploader object.
 
 var qsel_queues = null;    // Queue selector queues list.
 
@@ -113,18 +119,18 @@ var syn_err_id = null;     // Syntax error marker id.
 var sel_slide = null;      // Selected slide.
 
 // Editor UI definitions.
-const UI_DEFS = new uic.UIController({
+const UI = new uic.UIController({
 	'PREVIEW_R_16x9': new uic.UIButton(
 		elem = PREVIEW_R_16x9,
 		perm = (d) => {
-			return LIVE_PREVIEW.ratio != '16x9';
+			return preview.ratio != '16x9';
 		},
 		enabler = null,
 		attach = {
 			'click': (e) => {
-				UI_DEFS.get('PREVIEW_R_16x9').enabled(false);
-				UI_DEFS.get('PREVIEW_R_4x3').enabled(true);
-				LIVE_PREVIEW.set_ratio('16x9');
+				UI.get('PREVIEW_R_16x9').enabled(false);
+				UI.get('PREVIEW_R_4x3').enabled(true);
+				preview.set_ratio('16x9');
 			}
 		},
 		defer = defer_editor_ready
@@ -132,14 +138,14 @@ const UI_DEFS = new uic.UIController({
 	'PREVIEW_R_4x3': new uic.UIButton(
 		elem = PREVIEW_R_4x3,
 		perm = (d) => {
-			return LIVE_PREVIEW.ratio != '4x3';
+			return preview.ratio != '4x3';
 		},
 		enabler = null,
 		attach = {
 			'click': () => {
-				UI_DEFS.get('PREVIEW_R_16x9').enabled(true);
-				UI_DEFS.get('PREVIEW_R_4x3').enabled(false);
-				LIVE_PREVIEW.set_ratio('4x3');
+				UI.get('PREVIEW_R_16x9').enabled(true);
+				UI.get('PREVIEW_R_4x3').enabled(false);
+				preview.set_ratio('4x3');
 			}
 		},
 		defer = defer_editor_ready
@@ -332,7 +338,7 @@ const UI_DEFS = new uic.UIController({
 	'SLIDE_EN': new uic.UIInput(
 		elem = SLIDE_EN,
 		perm = (d) => {
-			if (!UI_DEFS.get('SLIDE_SCHED').get()) {
+			if (!UI.get('SLIDE_SCHED').get()) {
 				return (
 					(!d['n'] && !d['s'])
 					|| (d['l'] && (d['o'] || d['c']))
@@ -374,7 +380,7 @@ const UI_DEFS = new uic.UIController({
 		elem = SLIDE_SCHED_DATE_S,
 		perm = (d) => {
 			return (
-				UI_DEFS.get('SLIDE_SCHED').get()
+				UI.get('SLIDE_SCHED').get()
 				&& (
 					(!d['n'] && !d['s'])
 					|| (d['l'] && (d['o'] || d['c']))
@@ -399,7 +405,7 @@ const UI_DEFS = new uic.UIController({
 		elem = SLIDE_SCHED_TIME_S,
 		perm = (d) => {
 			return (
-				UI_DEFS.get('SLIDE_SCHED').get()
+				UI.get('SLIDE_SCHED').get()
 				&& (
 					(!d['n'] && !d['s'])
 					|| (d['l'] && (d['o'] || d['c']))
@@ -424,7 +430,7 @@ const UI_DEFS = new uic.UIController({
 		elem = SLIDE_SCHED_DATE_E,
 		perm = (d) => {
 			return (
-				UI_DEFS.get('SLIDE_SCHED').get()
+				UI.get('SLIDE_SCHED').get()
 				&& (
 					(!d['n'] && !d['s'])
 					|| (d['l'] && (d['o'] || d['c']))
@@ -449,7 +455,7 @@ const UI_DEFS = new uic.UIController({
 		elem = SLIDE_SCHED_TIME_E,
 		perm = (d) => {
 			return (
-				UI_DEFS.get('SLIDE_SCHED').get()
+				UI.get('SLIDE_SCHED').get()
 				&& (
 					(!d['n'] && !d['s'])
 					|| (d['l'] && (d['o'] || d['c']))
@@ -573,9 +579,9 @@ const UI_DEFS = new uic.UIController({
 				e.preventDefault(); // Don't scroll up.
 				if (!$(e.target).hasClass('disabled')) {
 					if (sel_slide) {
-						ASSET_UPLOADER.show(sel_slide.get('id'));
+						assetuploader.show(sel_slide.get('id'));
 					} else {
-						ASSET_UPLOADER.show(null);
+						assetuploader.show(null);
 					}
 				}
 			}
@@ -596,7 +602,7 @@ const POPUPS = new uic.UIController({
 })
 
 // Queue selector UI definitions.
-const QSEL_UI_DEFS = new uic.UIController({
+const QSEL_UI = new uic.UIController({
 	'QUEUE_SELECT': new uic.UIInput(
 		elem = QUEUE_SELECT,
 		perm = () => { return true; },
@@ -604,7 +610,7 @@ const QSEL_UI_DEFS = new uic.UIController({
 		attach = {
 			'change': () => {
 				queue_select(
-					QSEL_UI_DEFS.get('QUEUE_SELECT').get(),
+					QSEL_UI.get('QUEUE_SELECT').get(),
 					true,
 					null
 				);
@@ -637,7 +643,7 @@ const QSEL_UI_DEFS = new uic.UIController({
 	'QUEUE_REMOVE': new uic.UIButton(
 		elem = QUEUE_REMOVE,
 		perm = (d) => {
-			return d['o'] && TL.queue;
+			return d['o'] && timeline.get_queue();
 		},
 		enabler = null,
 		attach = {
@@ -718,9 +724,8 @@ function update_controls() {
 	*  v = Is the current editor data valid?
 	*/
 
-	let user = API.CONFIG.user;
-
-	UI_DEFS.all(
+	let user = API.get_session().get_user();
+	UI.all(
 		function(d) { this.state(d); },
 		{
 			'n': sel_slide === null,
@@ -728,13 +733,13 @@ function update_controls() {
 				sel_slide !== null
 				&& (
 					!sel_slide.has('owner')
-					|| sel_slide.get('owner') === user.user
-					|| user.groups.includes('admin')
+					|| sel_slide.get('owner') === user.get_user()
+					|| user.get_groups().includes('admin')
 				)
 			),
 			'c': (
 				sel_slide !== null &&
-				sel_slide.get('collaborators').includes(user.user)
+				sel_slide.get('collaborators').includes(user.get_user())
 			),
 			'l': (
 				sel_slide !== null
@@ -764,9 +769,9 @@ function set_inputs(s) {
 	*  Display the data of 'slide' on the editor inputs.
 	*/
 	if (!s) {
-		UI_DEFS.all(function() { this.clear(); }, null, 'input');
+		UI.all(function() { this.clear(); }, null, 'input');
 	} else {
-		UI_DEFS.all(function(data) { this.set(data); }, s, 'input');
+		UI.all(function(data) { this.set(data); }, s, 'input');
 	}
 }
 
@@ -775,7 +780,7 @@ function editor_status() {
 	if (!sel_slide) {
 		return ESTATUS.NOSLIDE;
 	} else {
-		UI_DEFS.all(
+		UI.all(
 			function() {
 				if (this.is_mod(sel_slide)) {
 					ret = true;
@@ -801,7 +806,49 @@ function editor_status_check(arr) {
 	return false;
 }
 
-function slide_show(s, no_popup) {
+async function slide_update() {
+	/*
+	*  Only update slide data if the slide is already loaded.
+	*/
+	console.log(`LibreSignage: Update slide.`);
+	if (!sel_slide.is_locked_from_here()) {
+		try {
+			await sel_slide.lock_acquire(true);
+		} catch (e) {} // Continue even with lock errors.
+	}
+	await sel_slide.fetch();
+}
+
+async function slide_load(s) {
+	/*
+	*  Load a new slide.
+	*/
+	console.log(`LibreSignage: Show slide '${s}'.`);
+	if (sel_slide != null && sel_slide.is_locked_from_here()) {
+		try {
+			await sel_slide.lock_release();
+		} catch (e) {} // Continue even with errors.
+	}
+
+	// Load the new slide w/ a lock.
+	sel_slide = new Slide(API);
+	try {
+		await sel_slide.load(s, true, true);
+	} catch (e) {
+		switch (e.response.error) {
+			case APIError.codes.API_E_NOT_AUTHORIZED:
+			case APIError.codes.API_E_LOCK:
+				// or w/o a lock
+				await sel_slide.load(s, false, false);
+				break;
+			default:
+				throw e;
+				break;
+		}
+	}
+}
+
+async function slide_show(s, no_popup) {
 	/*
 	*  Show the slide 's'. If the current slide has unsaved
 	*  changes, this function displays an 'Unsaved changes'
@@ -811,77 +858,37 @@ function slide_show(s, no_popup) {
 	*  writable by the logged in user. Otherwise the slide
 	*  is not locked and is loaded read-only.
 	*/
-	var cb = () => {
-		let error = () => {
-			console.error('LibreSignage: API error.');
+	if (state.slide_loading) { return; }
+	new Promise((resolve, reject) => {
+		if (!no_popup && editor_status_check(['UNSAVED'])){
+			diags.DIALOG_SLIDE_UNSAVED(
+				(status, val) => {
+					if (status) { resolve(); } else { reject(); }
+				}
+			).show();
+		} else {
+			resolve();
+		}
+	}).then(async () => {
+		state.slide_loading = true;
+		try {
+			if (sel_slide != null && s == sel_slide.get('id')) {
+				await slide_update();
+			} else {
+				await slide_load(s);
+			}
+		} catch (e) {
+			console.warn('LibreSignage: Failed to show slide.');
 			slide_hide();
 			state.slide_loading = false;
+			return;
 		}
-		let success = () => {
-			set_inputs(sel_slide);
-			update_controls();
-			LIVE_PREVIEW.update();
-			TL.select(sel_slide.get('id'));
-			state.slide_loading = false;
-		}
-
-		if (sel_slide !== null && s == sel_slide.get('id')) {
-			/*
-			*  Don't fully reload the slide if it's the same one
-			*  that's already loaded. Just fetch the new data,
-			*  acquire a lock if not already locked and update the
-			*  UI.
-			*/
-			console.log(`LibreSignage: Update slide '${s}'.`);
-			if (!sel_slide.is_locked_from_here()) {
-				sel_slide.lock_acquire(true, err => {
-					/*
-					*  Doesn't matter whether locking succeeded or not.
-					*  Fetch the new slide data anyway.
-					*/
-					sel_slide.fetch(err => err ? error() : success());
-				});
-			} else {
-				sel_slide.fetch(err => err ? error() : success());
-			}
-		} else {
-			console.log(`LibreSignage: Show slide '${s}'.`);
-			state.slide_loading = true;
-			if (sel_slide !== null && sel_slide.is_locked_from_here()) {
-				sel_slide.lock_release(null);
-			}
-
-			// Load the new slide w/ a lock.
-			sel_slide = new slide.Slide(API);
-			sel_slide.load(s, true, true, err_1 => {
-				switch (err_1) {
-					case API.ERR.API_E_OK:
-						success();
-						break;
-					case API.ERR.API_E_NOT_AUTHORIZED:
-					case API.ERR.API_E_LOCK:
-						// or w/o a lock
-						sel_slide.load(
-							s,
-							false,
-							false,
-							err_2 => err_2 ? error() : success()
-						);
-						break;
-					default:
-						error();
-						break;
-				}
-			});
-		}
-	}
-
-	if (state.slide_loading) { return; }
-	if (!no_popup && editor_status_check(['UNSAVED'])) {
-		diags.DIALOG_SLIDE_UNSAVED(
-			(status, val) => { if (status) { cb(); } }
-		).show();
-	} else { cb(); }
+		set_inputs(sel_slide);
+		update_controls();
+		preview.update();
+		timeline.select(sel_slide.get('id'));
+		state.slide_loading = false;			
+	});
 }
 
 function slide_hide() {
@@ -891,57 +898,54 @@ function slide_hide() {
 	*/
 	console.log('LibreSignage: Hide slide.');
 	sel_slide = null;
-	TL.select(null);
+	timeline.select(null);
 	set_inputs(null);
 	update_controls();
-	LIVE_PREVIEW.update();
+	preview.update();
 }
 
-function slide_rm() {
+async function slide_rm() {
 	/*
-	*  Remove the selected slide. This function asks for confirmation
-	*  from the user before actually removing the slide.
+	*  Remove the selected slide. This function asks for
+	*  confirmation from the user before actually removing
+	*  the slide.
 	*/
-	dialog.dialog(
-		dialog.TYPE.CONFIRM,
-		"Delete slide?",
-		`Are you sure you want to delete ` +
-		`slide '${sel_slide.get("name")}'.`,
-		(status, val) => {
-			if (!status) { return; }
-			sel_slide.remove(null, stat => {
-				if (API.handle_disp_error(stat)) { return; }
-				console.log(
-					`LibreSignage: Deleted slide ` +
-					`'${sel_slide.get('id')}'.`
-				);
-				slide_hide();
-				TL.update();
-			});
+	new Promise((resolve, reject) => {
+		dialog.dialog(
+			dialog.TYPE.CONFIRM,
+			"Delete slide?",
+			`Are you sure you want to delete ` +
+			`slide '${sel_slide.get("name")}'.`,
+			(status, val) => {
+				if (status) {
+					resolve();
+				} else {
+					reject();
+				}
+			}
+		);
+	}).then(async () => {
+		try {
+			await sel_slide.remove(null);
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
 		}
-	);
+		console.log(
+			`LibreSignage: Deleted slide '${sel_slide.get('id')}'.`
+		);
+		slide_hide();
+		await timeline.update();
+	});
 }
 
-function slide_new() {
+async function slide_new() {
 	/*
 	*  Create a new slide. Note that this function doesn't save
 	*  the slide server-side. The user must manually save the
 	*  slide afterwards.
 	*/
-	var cb = () => {
-		console.log("LibreSignage: Create slide!");
-		if (sel_slide !== null && sel_slide.is_locked_from_here()) {
-			// Release the old slide lock.
-			sel_slide.lock_release(null);
-		}
-		TL.select(null);
-		sel_slide = new slide.Slide(API);
-		sel_slide.set(NEW_SLIDE_DEFAULTS);
-		set_inputs(sel_slide);
-		update_controls();
-	};
-
-	if (!TL.queue) {
+	if (!timeline.get_queue()) {
 		dialog.dialog(
 			dialog.TYPE.ALERT,
 			'Please create a queue',
@@ -952,54 +956,73 @@ function slide_new() {
 		return;
 	}
 
-	if (editor_status_check(['UNSAVED'])) {
-		diags.DIALOG_SLIDE_UNSAVED((status, val) => {
-			if (status) { cb(); }
-		}).show();
-	} else { cb(); }
+	new Promise((resolve, reject) => {
+		if (editor_status_check(['UNSAVED'])) {
+			diags.DIALOG_SLIDE_UNSAVED((status, val) => {
+				if (status) { resolve(); } else { reject(); }
+			}).show();		
+		} else {
+			resolve();
+		}
+	}).then(async () => {
+		console.log("LibreSignage: Create slide!");
+		if (sel_slide != null && sel_slide.is_locked_from_here()) {
+			try {
+				await sel_slide.lock_release(null);
+			} catch (e) {} // Continue even with errors.
+		}
+		timeline.select(null);
+		sel_slide = new Slide(API);
+		sel_slide.set(NEW_SLIDE_DEFAULTS);
+		set_inputs(sel_slide);
+		update_controls();
+	});
 }
 
-function slide_save() {
+async function slide_save() {
 	/*
 	*  Save the currently selected slide.
 	*/
 	if (
-		UI_DEFS.get('SLIDE_INPUT').get().length >
-		API.SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN
+		UI.get('SLIDE_INPUT').get().length >
+		API.limits.SLIDE_MARKUP_MAX_LEN
 	) {
 		diags.DIALOG_MARKUP_TOO_LONG(
-			API.SERVER_LIMITS.SLIDE_MARKUP_MAX_LEN
+			API.limits.SLIDE_MARKUP_MAX_LEN
 		).show();
 		return;
 	}
 
 	sel_slide.set({
-		'name': UI_DEFS.get('SLIDE_NAME').get(),
-		'duration': UI_DEFS.get('SLIDE_DURATION').get()*1000,
-		'index': UI_DEFS.get('SLIDE_INDEX').get(),
-		'markup': UI_DEFS.get('SLIDE_INPUT').get(),
-		'enabled': UI_DEFS.get('SLIDE_EN').get(),
-		'sched': UI_DEFS.get('SLIDE_SCHED').get(),
+		'name':          UI.get('SLIDE_NAME').get(),
+		'duration':      UI.get('SLIDE_DURATION').get()*1000,
+		'index':         UI.get('SLIDE_INDEX').get(),
+		'markup':        UI.get('SLIDE_INPUT').get(),
+		'enabled':       UI.get('SLIDE_EN').get(),
+		'sched':         UI.get('SLIDE_SCHED').get(),
 		'sched_t_s': util.datetime_to_tstamp(
-				UI_DEFS.get('SLIDE_SCHED_DATE_S').get(),
-				UI_DEFS.get('SLIDE_SCHED_TIME_S').get()
-			),
+			UI.get('SLIDE_SCHED_DATE_S').get(),
+			UI.get('SLIDE_SCHED_TIME_S').get()
+		),
 		'sched_t_e': util.datetime_to_tstamp(
-				UI_DEFS.get('SLIDE_SCHED_DATE_E').get(),
-				UI_DEFS.get('SLIDE_SCHED_TIME_E').get()
-			),
-		'animation': UI_DEFS.get('SLIDE_ANIMATION').get(),
-		'queue_name': TL.queue.name,
-		'collaborators': UI_DEFS.get('SLIDE_COLLAB').get()
+			UI.get('SLIDE_SCHED_DATE_E').get(),
+			UI.get('SLIDE_SCHED_TIME_E').get()
+		),
+		'animation':     UI.get('SLIDE_ANIMATION').get(),
+		'queue_name':    timeline.get_queue().get_name(),
+		'collaborators': UI.get('SLIDE_COLLAB').get()
 	});
 
-	sel_slide.save((stat) => {
-		if (API.handle_disp_error(stat)) { return; }
-		console.log(`LibreSignage: Saved '${sel_slide.get("id")}'.`);
-		update_controls();
-		TL.update();
-		slide_show(sel_slide.get('id'), true);
-	});
+	try {
+		await sel_slide.save();
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
+	console.log(`LibreSignage: Saved '${sel_slide.get("id")}'.`);
+	update_controls();
+	await timeline.update();
+	slide_show(sel_slide.get('id'), true);
 }
 
 function slide_preview() {
@@ -1007,51 +1030,77 @@ function slide_preview() {
 	window.open(`/app/?preview=${sel_slide.get('id')}`);
 }
 
-function slide_ch_queue() {
+async function slide_ch_queue() {
 	/*
 	*  Change the queue of the selected slide. This function
 	*  prompts the user for the new queue.
 	*/
-	queue.get_list(API, (qd) => {
-		var queues = {};
-		qd.sort();
-		for (let q of qd) {
-			if (q != sel_slide.get('queue_name')) { queues[q] = q; }
-		}
+	let qd = null;
+	var queues = {};
+
+	try {
+		qd = await Queue.get_queues(API);
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
+
+	qd.sort();
+	for (let q of qd) {
+		if (q != sel_slide.get('queue_name')) { queues[q] = q; }
+	}
+
+	new Promise((resolve, reject) => {
 		dialog.dialog(
 			dialog.TYPE.SELECT,
 			'Select queue',
 			'Please select a queue to move the slide to.',
 			(status, val) => {
-				if (!status) { return; }
-				sel_slide.set({'queue_name': val});
-				var cb = () => {
-					sel_slide.save((err) => {
-						if (API.handle_disp_error(err)) { return; }
-						slide_hide();
-						TL.update();
-					});
+				if (status) {
+					resolve(val);
+				} else {
+					reject();
 				}
-				if (editor_status_check(['UNSAVED'])) {
-					diags.DIALOG_SLIDE_UNSAVED((status, val) => {
-						if (status) { cb(); }
-					}).show();
-				} else { cb(); }
 			},
 			queues
 		);
+	}).then((val) => {
+		sel_slide.set({'queue_name': val});
+		return new Promise((resolve, reject) => {
+			if (editor_status_check(['UNSAVED'])) {
+				diags.DIALOG_SLIDE_UNSAVED((status, val) => {
+					if (status) {
+						resolve();
+					} else {
+						reject();
+					}
+				}).show();
+			} else { resolve(); }
+		});
+	}).then(async () => {
+		try {
+			await sel_slide.save();
+			slide_hide();
+			await timeline.update();
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
+		}
 	});
 }
 
-function slide_dup() {
+async function slide_dup() {
 	/*
 	*  Duplicate the selected slide.
 	*/
-	sel_slide.dup((s) => {
-		sel_slide = s;
-		set_inputs(s);
-		TL.update();
-	});
+	try {
+		sel_slide = await sel_slide.dup();
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
+	set_inputs(sel_slide);
+	await timeline.update();
 }
 
 function syn_err_highlight(from, to) {
@@ -1059,7 +1108,7 @@ function syn_err_highlight(from, to) {
 	*  Create an editor syntax error marker for the
 	*  lines from-to. Returns the marker ID.
 	*/
-	var sess = UI_DEFS.get('SLIDE_INPUT').get_elem().session;
+	var sess = UI.get('SLIDE_INPUT').get_elem().session;
 	return syn_err_id = sess.addMarker(
 		new ace_range.Range(from, 0, to, 10),
 		'syntax-error-highlight',
@@ -1072,30 +1121,36 @@ function syn_err_clear(id) {
 	*  Remove the editor syntax error marker 'id'.
 	*/
 	if (id) {
-		UI_DEFS.get('SLIDE_INPUT').get_elem().session.removeMarker(id);
+		UI.get('SLIDE_INPUT').get_elem().session.removeMarker(id);
 	}
 }
 
-function queue_select(name, confirm, ready) {
+async function queue_select(name, confirm) {
 	/*
 	*  Select the queue 'name'. If 'confirm' == true and an unsaved
 	*  slide is selected, the user will be asked for confirmation
 	*  first.
 	*/
-	var callback = () => {
+	new Promise((resolve, reject) => {
+		if (editor_status_check(['UNSAVED']) && confirm) {
+			diags.DIALOG_SLIDE_UNSAVED(
+				(status, val) => {
+					if (status) {
+						resolve();
+					} else {
+						reject();
+					}
+				}
+			).show();
+		} else {
+			resolve();
+		}
+	}).then(async () => {
 		console.log(`LibreSignage: Select queue '${name}'.`)
-		TL.show(name, () => {
-			slide_hide();
-			update_qsel_ctrls(ready);
-		});
-	};
-	if (editor_status_check(['UNSAVED']) && confirm) {
-		diags.DIALOG_SLIDE_UNSAVED(
-			(status, val) => {
-				if (status) { callback(); }
-			}
-		).show();
-	} else { callback(); }
+		await timeline.show(name);
+		slide_hide();
+		update_qsel_ctrls();
+	});
 }
 
 function queue_create() {
@@ -1142,7 +1197,7 @@ function queue_create() {
 				}, "The queue name is too short."),
 				new val.StrValidator({
 					min: null,
-					max: API.SERVER_LIMITS.QUEUE_NAME_MAX_LEN,
+					max: API.limits.QUEUE_NAME_MAX_LEN,
 					regex: null
 				}, "The queue name is too long."),
 				new val.BlacklistValidator({
@@ -1178,7 +1233,7 @@ function queue_remove() {
 				if (!status) { return; }
 				API.call(
 					API.ENDP.QUEUE_REMOVE,
-					{'name': TL.queue.name},
+					{'name': timeline.get_queue().get_name()},
 					(data) => {
 						if (API.handle_disp_error(data['error'])) {
 							return;
@@ -1201,52 +1256,54 @@ function queue_remove() {
 }
 
 function queue_view() {
-	window.open(`/app/?q=${TL.queue.name}`);
+	window.open(`/app/?q=${timeline.get_queue().get_name()}`);
 }
 
-function update_qsel(show_initial, ready) {
+async function update_qsel(show_initial) {
 	/*
 	*  Update the queue selector options.
 	*/
-	queue.get_list(API, (queues) => {
-		queues.sort();
-		qsel_queues = queues;
+	qsel_queues = await Queue.get_queues(API);
+	qsel_queues.sort();
 
-		QUEUE_SELECT.html('');
-		for (let q of queues) {
-			QUEUE_SELECT.append(`<option value="${q}">${q}</option>`);
-		}
-		if (show_initial && queues.length) {
-			queue_select(queues[0], false, ready);
-		} else {
-			queue_select(null, false, ready);
-		}
-	});
+	QUEUE_SELECT.html('');
+	for (let q of qsel_queues) {
+		QUEUE_SELECT.append(`<option value="${q}">${q}</option>`);
+	}
+	if (show_initial && qsel_queues.length) {
+		await queue_select(qsel_queues[0], false);
+	} else {
+		await queue_select(null, false);
+	}
 }
 
-function update_qsel_ctrls(ready) {
+function update_qsel_ctrls() {
 	// Update queue selector controls.
-	QSEL_UI_DEFS.all(
+	QSEL_UI.all(
 		function() {
 			this.state({
-				'o': TL.queue && (TL.queue.owner == API.CONFIG.user.user)
+				'o': (
+					timeline.get_queue()
+					&& (
+						timeline.get_queue().get_owner()
+						== API.get_session().get_user().get_user()
+					)
+				)
 			});
 		},
 		null,
 		'button'
 	);
-	if (ready) { ready(); }
 }
 
-function ui_setup(ready) {
+async function ui_setup() {
 	/*
 	*  Setup the editor UI.
 	*/
-
-	LIVE_PREVIEW = new preview.Preview(
+	preview = new Preview(
 		'#slide-live-preview',
 		'#slide-input',
-		() => { return UI_DEFS.get('SLIDE_INPUT').get(); },
+		() => { return UI.get('SLIDE_INPUT').get(); },
 		(e) => {
 			if (e) {
 				syn_err_id = syn_err_highlight(e.line(), e.line());
@@ -1255,15 +1312,17 @@ function ui_setup(ready) {
 				syn_err_id = syn_err_clear(syn_err_id);
 				MARKUP_ERR_DISPLAY.text('');
 			}
-		}
+		},
+		false
 	);
-	TL = new timeline.Timeline(
+	timeline = new Timeline(
 		API,
+		'#timeline',
 		slide_show
 	);
-	ASSET_UPLOADER = new asset_uploader.AssetUploader(
+	assetuploader = new AssetUploader(
 		API,
-		'asset-uploader'
+		'#asset-uploader'
 	);
 
 	// Setup validators for the name, index and duration inputs.
@@ -1277,7 +1336,7 @@ function ui_setup(ready) {
 		}, "The name is too short."),
 		new val.StrValidator({
 			min: null,
-			max: API.SERVER_LIMITS.SLIDE_NAME_MAX_LEN,
+			max: API.limits.SLIDE_NAME_MAX_LEN,
 			regex: null
 		}, "The name is too long."),
 		new val.StrValidator({
@@ -1297,7 +1356,7 @@ function ui_setup(ready) {
 		}, "The index is too small."),
 		new val.NumValidator({
 			min: null,
-			max: API.SERVER_LIMITS.SLIDE_MAX_INDEX,
+			max: API.limits.SLIDE_MAX_INDEX,
 			nan: true,
 			float: true
 		}, "The index is too large."),
@@ -1319,23 +1378,23 @@ function ui_setup(ready) {
 		SLIDE_DURATION_GRP,
 		[new val.NumValidator(
 			{
-				min: API.SERVER_LIMITS.SLIDE_MIN_DURATION/1000,
+				min: API.limits.SLIDE_MIN_DURATION/1000,
 				max: null,
 				nan: true,
 				float: true
 			},
 			`The duration is too short. The minimum duration ` +
-			`is ${API.SERVER_LIMITS.SLIDE_MIN_DURATION/1000}s.`
+			`is ${API.limits.SLIDE_MIN_DURATION/1000}s.`
 		),
 		new val.NumValidator(
 			{
 				min: null,
-				max: API.SERVER_LIMITS.SLIDE_MAX_DURATION/1000,
+				max: API.limits.SLIDE_MAX_DURATION/1000,
 				nan: true,
 				float: true
 			},
 			`The duration is too long. The maximum duration ` +
-			`is ${API.SERVER_LIMITS.SLIDE_MAX_DURATION/1000}s.`
+			`is ${API.limits.SLIDE_MAX_DURATION/1000}s.`
 		),
 		new val.NumValidator({
 			min: null,
@@ -1363,39 +1422,41 @@ function ui_setup(ready) {
 	SLIDE_INPUT.setTheme('ace/theme/dawn');
 	SLIDE_INPUT.$blockScrolling = Infinity;
 
-	// Setup the collaborators multiselect w/ validators.
-	API.call(API.ENDP.USERS_LIST, {}, (data) => {
-		if (API.handle_disp_error(data['error'])) { return; }
-		SLIDE_COLLAB = new multiselect.MultiSelect(
-			'slide-collab-group',
-			'slide-collab',
-			[new val.StrValidator(
-				{ min: 1, max: null, regex: null },
-				'', true
-			),
-			new val.WhitelistValidator(
-				{ wl: data['users'] },
-				"This user doesn't exist."
-			),
-			new val.BlacklistValidator(
-				{ bl: [API.CONFIG.user.user] },
-				"You can't add yourself " +
-				"as a collaborator."
-			)],
-			{
-				'nodups': true,
-				'maxopts': API.SERVER_LIMITS.SLIDE_MAX_COLLAB
-			}
-		);
+	let users = null;
+	try {
+		users = User.list_all(API);
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
 
-		// Finish validator setup.
-		val_trigger.trigger();
+	SLIDE_COLLAB = new multiselect.MultiSelect(
+		'slide-collab-group',
+		'slide-collab',
+		[new val.StrValidator(
+			{ min: 1, max: null, regex: null },
+			'', true
+		),
+		new val.WhitelistValidator(
+			{ wl: users },
+			"This user doesn't exist."
+		),
+		new val.BlacklistValidator(
+			{ bl: [API.get_session().get_user().get_user()] },
+			"You can't add yourself " +
+			"as a collaborator."
+		)],
+		{
+			'nodups': true,
+			'maxopts': API.limits.SLIDE_MAX_COLLAB
+		}
+	);
 
-		if (ready) { ready(); }
-	});
+	// Finish validator setup.
+	val_trigger.trigger();
 }
 
-function setup() {
+async function setup() {
 	util.setup_defaults();
 
 	/*
@@ -1420,17 +1481,30 @@ function setup() {
 	});
 
 	// Setup inputs and other UI elements.
-	ui_setup(() => {
-		update_qsel(true);
-		update_controls();
-		state.editor_ready = true;
-		console.log("LibreSignage: Editor ready.");
-	});
+	try {
+		await ui_setup();
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
+
+	try {
+		await update_qsel(true);
+	} catch (e) {
+		APIUI.handle_error(e);
+	}
+	update_controls();
+	state.editor_ready = true;
+	console.log("LibreSignage: Editor ready.");
 }
 
-$(document).ready(() => {
-	API = new api.API(
-		null,	// Use default config.
-		setup
-	);
+$(document).ready(async () => {
+	API = new APIInterface({standalone: false});
+	try {
+		await API.init();
+		await setup();
+	} catch (e) {
+		APIUI.handle_error(e);
+		return;
+	}
 });

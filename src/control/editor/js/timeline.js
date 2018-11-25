@@ -1,5 +1,7 @@
 var $ = require('jquery');
-var ls_queue = require('ls-queue');
+var Queue = require('ls-queue').Queue;
+var APIUI = require('ls-api-ui');
+
 var uic = require('ls-uicontrol');
 var preview = require('./preview.js');
 
@@ -17,89 +19,94 @@ const timeline_btn = (id, index, name, enabled) => `
 </div>
 `.replace(/\t*\n\t*/g, '');
 
-exports.Timeline = class Timeline {
+class Timeline {
 	/*
 	*  LibreSignage Timeline UI element class.
 	*
 	*  api         = An initialized API object.
-	*  f_sel_slide = A function to call when a slide is clicked.
+	*  container   = A JQuery selector string used for selecting the
+	*                timeline HTML container.
+	*  onclick     = A function to call when a slide is clicked.
 	*                The ID of the slide that was clicked is passed
 	*                to this function as the first argument. Note
 	*                that you must call select() on the timeline object
 	*                yourself if you want the selected slide highlighting
 	*                to work.
 	*/
-	constructor(api, f_sel_slide) {
-		this.selected = null;
+	constructor(api, container, onclick) {
 		this.api = api;
-		this.f_sel_slide = f_sel_slide;
+		this.selected = null;
+		this.onclick = onclick;
 		this.queue = null;
 
-		this.TL = $("#timeline");
-		this.TL_UI_DEFS = new uic.UIController({});
+		this.TL = $(container);
+		this.UI = new uic.UIController({});
 
 		this.update_html();
-		setInterval(() => { this.update(); }, TL_UPDATE_INTERVAL);
+		setInterval(async () => {
+			try {
+				await this.update();
+			} catch (e) {
+				APIUI.handle_error(e);
+			}
+		}, TL_UPDATE_INTERVAL);
 	}
 
 	update_html() {
 		/*
 		*  Update the timeline HTML elements.
 		*/
-		let s = null;
+		let tmp = null;
 		let index = -1;
 
 		this.TL.html('');
-		this.TL_UI_DEFS.rm_all();
+		this.UI.rm_all();
 
 		if (!this.queue) { return; }
-		while (s = this.queue.slides.next(index, false)) {
+		while (tmp = this.queue.get_slides().next(index, false)) {
+			let s = tmp; // Handle problems with scopes.
+			let id = s.get('id');
 			index = s.get('index');
-			
-			let id_scoped = s.get('id');
-			let s_scoped = s;
-			
+
 			this.TL.append(
 				timeline_btn(
-					s.get('id'),
-					s.get('index'),
+					id,
+					index,
 					s.get('name'),
 					s.get('enabled')
 				)
 			);
 			
 			// Slide button UI definition.
-			this.TL_UI_DEFS.add(id_scoped, new uic.UIButton(
-				elem = $(`#slide-btn-${id_scoped}`),
-				perm = () => { return s_scoped.get('enabled'); },
+			this.UI.add(id, new uic.UIButton(
+				elem = $(`#slide-btn-${id}`),
+				perm = () => { return s.get('enabled'); },
 				enabler = (elem, s) => {
-					if (s_scoped) {
+					if (s) {
 						elem.removeClass('tl-slide-cont-dis');
 					} else {
 						elem.addClass('tl-slide-cont-dis');
 					}
 				},
 				attach = {
-					'click': () => {
-						this.f_sel_slide(id_scoped);
-					}
+					'click': () => { this.onclick(id); }
 				},
 				defer = null
 			));
 
 			// Thumb UI definition.
-			this.TL_UI_DEFS.add(id_scoped, new uic.UIStatic(
+			this.UI.add(id, new uic.UIStatic(
 				elem = new preview.Preview(
-					`#tl-slide-thumb-cont-${id_scoped}`,
+					`#tl-slide-thumb-cont-${id}`,
 					null,
-					() => { return s_scoped.get('markup'); },
+					() => { return s.get('markup'); },
 					(e) => {
 						if (e) {
-							$(`#slide-btn-${id_scoped}`).addClass(
+							$(`#slide-btn-${id}`).addClass(
 								'tl-slide-error'
 							);
 						} else {
-							$(`#slide-btn-${id_scoped}`).removeClass(
+							$(`#slide-btn-${id}`).removeClass(
 								'tl-slide-error'
 							);
 						}
@@ -113,7 +120,7 @@ exports.Timeline = class Timeline {
 				getter = () => {},
 				setter = () => {}
 			));
-			this.TL_UI_DEFS.get(id_scoped).get_elem().set_ratio(
+			this.UI.get(id).get_elem().set_ratio(
 				'16x9-fit'
 			);
 		}
@@ -124,29 +131,25 @@ exports.Timeline = class Timeline {
 		}
 	}
 
-	update() {
-		// Update timeline information and HTML.
+	async update() {
+		// Update queue and UI.
 		if (this.queue) {
-			this.queue.update(() => { this.update_html(); });
-		} else {
-			this.update_html();
+			await this.queue.update();
 		}
+		this.update_html();
 	}
 
-	show(name, ready) {
+	async show(name) {
+		this.selected = null;
 		if (!name) {
 			this.queue = null;
 			this.update_html();
-			if (ready) { ready(); }
 			return;
 		}
 
-		this.selected = null;
-		this.queue = new ls_queue.Queue(this.api);
-		this.queue.load(name, () => {
-			this.update_html();
-			if (ready) { ready(); }
-		});
+		this.queue = new Queue(this.api);
+		await this.queue.load(name);
+		this.update_html();
 	}
 
 	select(id) {
@@ -158,4 +161,7 @@ exports.Timeline = class Timeline {
 		}
 		this.selected = id;
 	}
+
+	get_queue() { return this.queue; }
 }
+exports.Timeline = Timeline;

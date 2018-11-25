@@ -68,7 +68,7 @@ const LOGIN_UI_DEFS = new uic.UIController({
 		elem = BTN_LOGIN,
 		perm = () => { return true; },
 		enabler = null,
-		attach = { 'click': login },
+		attach = { 'click': async () => { await login(); } },
 		defer = defer_login_ready
 	)
 });
@@ -85,12 +85,16 @@ async function login() {
 			CHECK_PERM.is(":checked")
 		);
 	} catch (e) {
-		if (e.response.code === APIError.codes.API_E_INCORRECT_CREDS) {
-			login_redirect("/login?failed=1");
-			return;
+		if (e instanceof APIError) {
+			if (e.response.error === APIError.codes.API_E_INCORRECT_CREDS) {
+				login_redirect("/login?failed=1");
+				return;
+			} else {
+				APIUI.handle_error(e);
+				return;
+			}
 		} else {
-			APIUI.handle_error(e);
-			return;
+			throw e;
 		}
 	}
 	if (CHECK_PERM.is(":checked")) {
