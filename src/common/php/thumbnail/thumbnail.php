@@ -33,7 +33,8 @@ function generate_thumbnail(
 			*/
 			try {
 				if ($handler($src, $dest, $wmax, $hmax)) { return TRUE; }
-			} catch (ThumbnailGeneratorException | IntException $e) {}
+			} catch (ThumbnailGeneratorException $e) {
+			} catch (IntException $e) {}
 		}
 	}
 	return FALSE;
