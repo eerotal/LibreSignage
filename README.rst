@@ -137,7 +137,7 @@ are listed below.
 1. Install software needed for building LibreSignage. You will need the
    following packages: ``git, apache2, php, pandoc, npm, make``.
    On Debian Stretch all other packages except *npm* can installed by
-   running ``sudo apt install git apache2 php7.2 pandoc``.
+   running ``sudo apt install git apache2 php pandoc``.
    Currently *npm* is only available in the Debian Sid repos and even
    there the package is so old it doesn't work correctly. You can,
    however, install npm manually. See `6. How to install NPM`_ for
