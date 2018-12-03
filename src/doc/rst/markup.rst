@@ -125,6 +125,13 @@ Set the color of text. All text inside this class will have the color
 set by this class if no nested classes change the color. ``<color>`` is
 the `CSS color name`_ or a hexadecimal color code to use.
 
+Font
+  | Syntax: ``[font f=<font>][/font]``
+  | ``f: str``
+
+Set the font of text. All text inside this class will have the font set
+by this class if no nested classes change the font. ``<font>`` must be
+a valid font name that exists on the target system.
 
 Container
   | Syntax: ``[container top=<t> right=<r> bottom=<b> left=<l>][/container]``

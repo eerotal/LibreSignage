@@ -3,6 +3,10 @@ v0.2.2
                have a thumbnail.
   - [bugfix]   Fix dialogs not appearing correctly on the documentation
                pages.
+  - [bugfix]   Fix a bug where adding media to user-created slides didn't
+               work. (#27)
+  - [feature]  Implement a new tag [font] in the markup transpiler for
+               changing fonts in slides. (#28)
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
