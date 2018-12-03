@@ -96,7 +96,7 @@ class Slide extends Exportable{
 	private $queue_name = NULL;
 	private $collaborators = NULL;
 	private $lock = NULL;
-	private $assets = NULL;
+	private $assets = [];
 	private $ready = FALSE;
 
 	public function __exportable_set(string $name, $value) {
