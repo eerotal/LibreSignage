@@ -22,6 +22,7 @@ class ArgException extends Exception {};
 class IntException extends Exception {};
 class FileTypeException extends Exception {};
 class LimitException extends Exception {};
+class ConfigException extends Exception {};
 
 function error_set_debug(bool $debug) {
 	/*

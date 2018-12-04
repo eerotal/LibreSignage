@@ -159,6 +159,7 @@ function api_error_setup() {
 				case 'FileTypeException':
 					$code = API_E_INVALID_FILETYPE;
 					break;
+				case 'ConfigException':
 				default:
 					$code = API_E_INTERNAL;
 					break;
