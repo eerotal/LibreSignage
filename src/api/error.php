@@ -163,6 +163,8 @@ class APIException extends Exception {
 			return API_E_LIMITED;
 		} catch (FileTypeException $e) {
 			return API_E_INVALID_FILETYPE;
+		} catch (ConfigException $e) {
+			return API_E_INTERNAL;
 		} catch (Exception $e) {
 			return API_E_INTERNAL;
 		}

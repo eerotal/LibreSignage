@@ -40,7 +40,7 @@ function gen_vid_thumb(
 	if (in_array('exec', explode(',', $tmp))) {
 		throw new ConfigException(
 			"PHP exec() function needed for video ".
-			"thumbnail generation is disabled."
+			"thumbnail generation but it's disabled."
 		);
 	}
 
