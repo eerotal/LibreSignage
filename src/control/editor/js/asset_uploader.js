@@ -54,7 +54,7 @@ const asset_thumb_template = (slide_id, name, index) => `
 </div>
 `;
 
-const FILENAME_REGEX = /^[A-Za-z0-9_.-]*$/;
+const FILENAME_REGEX = /^[ A-Za-z0-9_.-]*$/;
 
 module.exports.AssetUploader = class AssetUploader {
 	constructor(api, id) {
@@ -268,7 +268,7 @@ module.exports.AssetUploader = class AssetUploader {
 					bl: null
 				},
 				"Invalid characters in filename. " + 
-				"A-Z, a-z, 0-9, ., _ and - are allowed."
+				"A-Z, a-z, 0-9, ., _, - and space are allowed."
 			),
 			new val.FileSelectorValidator(
 				{

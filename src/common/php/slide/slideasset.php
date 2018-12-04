@@ -9,7 +9,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/thumbnail.php');
 
-const ASSET_FILENAME_REGEX = '/^[A-Za-z0-9_.-]*$/';
+const ASSET_FILENAME_REGEX = '/^[ A-Za-z0-9_.-]*$/';
 
 class SlideAsset extends Exportable {
 	static $PRIVATE = [

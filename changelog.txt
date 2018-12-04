@@ -20,6 +20,7 @@ v0.3.0
   - [bugfix]   Fix a bug where the editor media uploader popup didn't
                close when the (X) button was clicked if an uploade had
                previously failed.
+  - [feature]  Allow space characters in upload filenames.
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
