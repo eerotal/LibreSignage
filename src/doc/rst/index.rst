@@ -34,6 +34,8 @@ Miscellaneous
 Server setup
 ------------
 
+`Configuration </doc?doc=configuration>`_
+
 `Docker </doc?doc=docker>`_
 
 Development
