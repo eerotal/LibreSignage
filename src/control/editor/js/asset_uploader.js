@@ -72,7 +72,6 @@ module.exports.AssetUploader = class AssetUploader {
 		this.API = api;
 
 		this.state = {
-			visible: false,
 			uploading: false,
 			ready: false
 		}
@@ -97,8 +96,8 @@ module.exports.AssetUploader = class AssetUploader {
 						this.UI.get('FILELIST').set('');
 					}
 				),
-				perm = (d) => { return d['v']; },
-				enabler = (elem, s) => { elem.visible(s); },
+				perm = () => false,
+				enabler = () => {},
 				attach = null,
 				defer = null,
 				getter = null,
@@ -374,7 +373,6 @@ module.exports.AssetUploader = class AssetUploader {
 			{
 				's': this.slide != null,
 				'u': this.state.uploading,
-				'v': this.state.visible,
 				'f': this.fileval_trig.is_valid(),
 				'c': (
 					this.slide != null
@@ -558,12 +556,13 @@ module.exports.AssetUploader = class AssetUploader {
 					return;
 				}
 				this.populate();
-				this.state.visible = true;
+				this.UI.get('POPUP').get_elem().visible(true);
+
 				this.update_controls();
 				if (callback) { callback(err); }
 			});
 		} else {
-			this.state.visible = false;
+			this.UI.get('POPUP').get_elem().visible(false);
 			this.update_controls();
 			if (callback) { callback(this.API.ERR.API_E_OK); }
 		}
