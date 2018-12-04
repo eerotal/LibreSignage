@@ -55,7 +55,7 @@
 	const AUTH_TOKEN_LEN			= 15;
 	const SLIDE_LOCK_MAX_AGE		= 600;
 
-	const ENABLE_FFMPEG_THUMBS      = TRUE;
+	const ENABLE_FFMPEG_THUMBS      = FALSE;
 	const ENABLE_GD_THUMBS          = TRUE;
 
 	const FFMPEG_PATH               = '/usr/bin/ffmpeg';
