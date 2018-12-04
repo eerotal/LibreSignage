@@ -9,6 +9,9 @@ v0.2.2
                changing fonts in slides. (#28)
   - [bugfix]   Add a missing class definition that caused problems when
                uploading files.
+  - [bugfix]   Fix a bug where the editor media uploader popup didn't
+               close if the (X) button was clicked after an upload had
+               failed.
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
