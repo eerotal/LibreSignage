@@ -21,8 +21,8 @@ class User extends Exportable{
 
 	private $user = '';
 	private $hash = '';
-	private $groups = array();
-	private $sessions = array();
+	private $groups = [];
+	private $sessions = [];
 
 	public function __construct($name = NULL) {
 		/*
@@ -67,6 +67,7 @@ class User extends Exportable{
 			throw new IntException('JSON user data decode error!');
 		}
 		$this->import($data);
+		$this->session_cleanup();
 	}
 
 	public function remove() {
@@ -158,26 +159,29 @@ class User extends Exportable{
 		$this->sessions = array_values(array_filter($s_new));
 	}
 
+	private function session_cleanup() {
+		/*
+		*  Cleanup all expired sessions.
+		*/
+		foreach ($this->sessions as $i => $s) {
+			if ($s->is_expired()) {
+				$this->sessions[$i] = NULL;
+			}
+		}
+		$this->sessions = array_values(array_filter($this->sessions));
+		$this->write();
+	}
+
 	public function session_token_verify(string $token) {
 		/*
 		*  Verify a session token against the sessions of
 		*  this user. If a session matches the token, the
 		*  Session object for the matching session is returned.
-		*  This function also purges all expired sessions and
-		*  writes the changes to disk.
 		*/
-		$s_new = $this->sessions;
-		$ret = NULL;
-		foreach ($this->sessions as $k => $s) {
-			if ($s->is_expired()) {
-				$s_new[$k] = NULL;
-				continue;
-			}
-			if ($ret === NULL && $s->verify($token)) { $ret = $s; }
+		foreach ($this->sessions as $s) {
+			if ($s->verify($token)) { return $s; }
 		}
-		$this->sessions = array_values(array_filter($s_new));
-		$this->write();
-		return $ret;
+		return NULL;
 	}
 
 	public function session_get(string $id) {
@@ -186,7 +190,7 @@ class User extends Exportable{
 		*  a session with the supplied ID doesn't exist.
 		*/
 		foreach ($this->sessions as $i => $s) {
-			if ($s->get('id') === $id) { return $s; }
+			if ($s->get_id() === $id) { return $s; }
 		}
 		return NULL;
 	}
