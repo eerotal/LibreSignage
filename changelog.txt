@@ -21,6 +21,7 @@ v0.3.0
                close when the (X) button was clicked if an uploade had
                previously failed.
   - [feature]  Allow space characters in upload filenames.
+  - [bugfix]   Implement automatic slide lock cleanup on logout.
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
