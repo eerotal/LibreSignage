@@ -22,11 +22,11 @@ var flag_login_ready = false;
 var defer_login_ready = () => { return !flag_login_ready; }
 
 const LOGIN_UI_DEFS = new uic.UIController({
-	'INPUT_USERNAME': new uic.UIInput(
-		elem = INPUT_USERNAME,
-		perm = () => { return true; },
-		enabler = null,
-		attach = {
+	'INPUT_USERNAME': new uic.UIInput({
+		elem: INPUT_USERNAME,
+		cond: () => true,
+		enabler: null,
+		attach: {
 			'keyup': (event) => {
 				if (
 					event.key == 'Enter'
@@ -37,17 +37,17 @@ const LOGIN_UI_DEFS = new uic.UIController({
 				}
 			}
 		},
-		defer = defer_login_ready,
-		mod = null,
-		getter = (elem) => { return elem.val(); },
-		setter = null,
-		clearer = null
-	),
-	'INPUT_PASSWORD': new uic.UIInput(
-		elem = INPUT_PASSWORD,
-		perm = () => { return true; },
-		enabler = null,
-		attach = {
+		defer: defer_login_ready,
+		mod: null,
+		getter: elem => elem.val(),
+		setter: null,
+		clearer: null
+	}),
+	'INPUT_PASSWORD': new uic.UIInput({
+		elem: INPUT_PASSWORD,
+		cond: () => true,
+		enabler:null,
+		attach: {
 			'keyup': (event) => {
 				if (
 					event.key == 'Enter'
@@ -58,19 +58,19 @@ const LOGIN_UI_DEFS = new uic.UIController({
 				}
 			}
 		},
-		defer = defer_login_ready,
-		mod = null,
-		getter = (elem) => { return elem.val(); },
-		setter = null,
-		clearer = null
-	),
-	'BTN_LOGIN': new uic.UIButton(
-		elem = BTN_LOGIN,
-		perm = () => { return true; },
-		enabler = null,
-		attach = { 'click': async () => { await login(); } },
-		defer = defer_login_ready
-	)
+		defer: defer_login_ready,
+		mod: null,
+		getter: elem => elem.val(),
+		setter: null,
+		clearer: null
+	}),
+	'BTN_LOGIN': new uic.UIButton({
+		elem: BTN_LOGIN,
+		cond: () => true,
+		enabler: null,
+		attach: { 'click': async () => { await login(); } },
+		defer: defer_login_ready
+	})
 });
 
 function login_redirect(uri) {
