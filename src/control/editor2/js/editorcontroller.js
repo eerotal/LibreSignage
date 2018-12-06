@@ -2,6 +2,7 @@ var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 var APIInterface = require('ls-api').APIInterface;
 var APIError = require('ls-api').APIError;
 var Slide = require('ls-slide').Slide;
+var assert = require('ls-assert').assert;
 
 class EditorController {
 	constructor(api) {
@@ -75,6 +76,20 @@ class EditorController {
 			owned:       this.slide.is_owned_by_me(),
 			collaborate: this.slide.can_collaborate()
 		});
+	}
+
+	async save_slide() {
+		assert(this.slide != null, "No slide to save.");
+		await this.slide.save();
+	}
+
+	async remove_slide() {
+		assert(this.slide != null, "No slide to remove.");
+		if (this.slide.get_id() === null) {
+			this.slide = null;
+		} else {
+			await this.slide.remove();
+		}
 	}
 
 	get_state() { return this.state; }

@@ -1,4 +1,5 @@
 var $ = require('jquery');
+var bootstrap = require('bootstrap');
 var UIController = require('ls-uicontrol').UIController;
 var UIInput = require('ls-uicontrol').UIInput;
 var UIButton = require('ls-uicontrol').UIButton;
@@ -11,6 +12,8 @@ var BlacklistValidator = require('ls-validator').BlacklistValidator;
 var APIUI = require('ls-api-ui');
 var EditorController = require('./editorcontroller.js').EditorController;
 var User = require('ls-user').User;
+
+var util = require('ls-util');
 
 class EditorView {
 	constructor(api) {
@@ -40,26 +43,26 @@ class EditorView {
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
-					&& d.slide.owned
+					&& (d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
-				attach:  null,
-				defer:   () => this.ready,
-				mod:     null,
-				getter:  e => e.val(),
-				setter:  (e, val) => e.val(val),
+				attach: null,
+				defer: () => !this.ready,
+				mod: null,
+				getter: e => e.val(),
+				setter: (e, val) => e.val(val),
 				clearer: e => e.val('')
 			}),
 			owner: new UIInput({
-				elem:    $('#slide-owner'),
-				cond:    () => false,
+				elem: $('#slide-owner'),
+				cond: () => false,
 				enabler: null,
-				attach:  null,
-				defer:   () => this.ready,
-				mod:     null,
-				getter:  e => e.val(),
-				setter:  (e, val) => e.val(val),
-				clearer:  e => e.val('')
+				attach: null,
+				defer: () => !this.ready,
+				mod: null,
+				getter: e => e.val(),
+				setter: (e, val) => e.val(val),
+				clearer: e => e.val('')
 			}),
 			collaborators: new UIInput({
 				elem: new MultiSelect(
@@ -80,41 +83,235 @@ class EditorView {
 					]
 				),
 				cond: d => (
-					d.loaded
-					&& d.locked
-					&& d.owned
+					d.slide.loaded
+					&& d.slide.locked
+					&& d.slide.owned
 				),
-				enabler: (e, s) => s ? e.enabled() : e.disable(),
-				attach:  null,
-				defer:   () => this.ready,
-				mod:     null,
-				getter:  e => e.selected,
-				setter:  (e, val) => e.set(val),
+				enabler: (e, s) => s ? e.enable() : e.disable(),
+				attach: null,
+				defer: () => !this.ready,
+				mod: null,
+				getter: e => e.selected,
+				setter: (e, val) => e.set(val),
 				clearer: e => e.set([])
+			}),
+			duration: new UIInput({
+				elem: $('#slide-duration'),
+				cond: d => (
+					d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: null,
+				attach: null,
+				defer: () => !this.ready,
+				mod: null,
+				getter: e => parseFloat(e.val(), 10)*1000,
+				setter: (e, val) => e.val(val/1000),
+				clearer: e => e.val('')
+			}),
+			index: new UIInput({
+				elem: $('#slide-index'),
+				cond: d => (
+					d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: null,
+				attach: null,
+				defer: () => !this.ready,	
+				mod: null,
+				getter: e => parseInt(e.val(), 10),
+				setter: (e, val) => e.val(val),
+				clearer: e => e.val('')
+			}),
+			animation: new UIInput({
+				elem: $('#slide-animation'),
+				cond: d => (
+					d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: null,
+				attach: null,
+				defer: () => !this.ready,	
+				mod: null,
+				getter: e => e.val(),
+				setter: (e, val) => e.val(val),
+				clearer: e => e.val('')
+			}),
+			schedule: new UIInput({
+				elem: $('#slide-sched'),
+				cond: d => (
+					d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: null,
+				attach: { change: () => this.update() },
+				defer: () => !this.ready,	
+				mod: null,
+				getter: e => e.prop('checked'),
+				setter: (e, val) => e.prop('checked', val),
+				clearer: e => e.prop('checked', false)
+			}),
+			schedule_date_start: new UIInput({
+				elem: $('#slide-sched-date-s'),
+				cond: d => (
+					this.inputs.get('schedule').get()
+					&& d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: null,
+				attach: null,
+				defer: () => !this.ready,	
+				mod: null,
+				getter: e => e.val(),
+				setter: (e, val) => {
+					e.val(util.tstamp_to_datetime(val)[0]);
+				},
+				clearer: e => e.val('')
+			}),
+			schedule_time_start: new UIInput({
+				elem: $('#slide-sched-time-s'),
+				cond: d => (
+					this.inputs.get('schedule').get()
+					&& d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: null,
+				attach: null,
+				defer: () => !this.ready,	
+				mod: null,
+				getter: e => e.val(),
+				setter: (e, val) => {
+					e.val(util.tstamp_to_datetime(val)[1]);
+				},
+				clearer: e => e.val('')
+			}),
+			schedule_date_end: new UIInput({
+				elem: $('#slide-sched-date-e'),
+				cond: d => (
+					this.inputs.get('schedule').get()
+					&& d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: null,
+				attach: null,
+				defer: () => !this.ready,	
+				mod: null,
+				getter: e => e.val(),
+				setter: (e, val) => {
+					e.val(util.tstamp_to_datetime(val)[0]);
+				},
+				clearer: e => e.val('')
+			}),
+			schedule_time_end: new UIInput({
+				elem: $('#slide-sched-time-e'),
+				cond: d => (
+					this.inputs.get('schedule').get()
+					&& d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: null,
+				attach: null,
+				defer: () => !this.ready,	
+				mod: null,
+				getter: e => e.val(),
+				setter: (e, val) => {
+					e.val(util.tstamp_to_datetime(val)[2]);
+				},
+				clearer: e => e.val('')
+			}),
+			editor: new UIInput({
+				elem: (() => {
+					let ret = ace.edit('slide-input');
+					ret.setTheme('ace/theme/dawn');
+					ret.blockScrolling = Infinity;
+					return ret;
+				})(),
+				cond: d => (
+					d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: (e, s) => e.setReadOnly(!s),
+				attach: null,
+				defer: () => !this.ready,	
+				mod: null,
+				getter: e => e.getValue(),
+				setter: (e, val) => {
+					e.setValue(val);
+					e.clearSelection();
+				},
+				clearer: e => {
+					e.setValue('');
+					e.clearSelection();
+				}
 			})
 		});
 		this.buttons = new UIController({
+			new: new UIButton({
+				elem: $('#btn-slide-new'),
+				cond: d => true,
+				enabler: null,
+				attach: { click: () => this.new_slide() },
+				defer: () => !this.ready
+			}),
 			save: new UIButton({
-				elem: $('#slide-save'),
+				elem: $('#btn-slide-save'),
 				cond: d => (
-					d.loaded
-					&& d.locked
-					&& (d.owned || d.collaborate)
+					d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
-				attach:  { click: () => this.slide_save() },
-				defer:   () => this.ready
+				attach: { click: () => this.save_slide() },
+				defer: () => !this.ready
+			}),
+			duplicate: new UIButton({
+				elem: $('#btn-slide-dup'),
+				cond: d => (
+					d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: null,
+				attach: { click: () => this.duplicate_slide() },
+				defer: () => !this.ready
+			}),
+			preview: new UIButton({
+				elem: $('#btn-slide-preview'),
+				cond: d => d.slide.loaded,
+				enabler: null,
+				attach: { click: () => this.preview_slide() },
+				defer: () => !this.ready
+			}),
+			move: new UIButton({
+				elem: $('#btn-slide-ch-queue'),
+				cond: d => (
+					d.slide.loaded
+					&& d.slide.locked
+					&& d.slide.owned
+				),
+				enabler: null,
+				attach: { click: () => this.move_slide() },
+				defer: () => !this.ready
 			}),
 			remove: new UIButton({
-				elem: $('#slide-remove'),
+				elem: $('#btn-slide-remove'),
 				cond: d => (
-					d.loaded
-					&& d.locked
-					&& d.owned
+					d.slide.loaded
+					&& d.slide.locked
+					&& d.slide.owned
 				),
 				enabler: null,
-				attach:  { click: () => this.slide_remove() },
-				defer:   () => this.ready
+				attach: { click: () => this.remove_slide() },
+				defer: () => !this.ready
 			})
 		});
 		this.ready = true;
@@ -149,6 +346,47 @@ class EditorView {
 		this.inputs.get('name').set(s.get('name'));
 		this.inputs.get('owner').set(s.get('owner'));
 		this.inputs.get('collaborators').set(s.get('collaborators'));
+		this.inputs.get('duration').set(s.get('duration'));
+		this.inputs.get('index').set(s.get('index'));
+		this.inputs.get('animation').set(s.get('animation'))
+		this.inputs.get('schedule').set(s.get('sched'))
+		this.inputs.get('schedule_date_start').set(s.get('sched_t_s'));
+		this.inputs.get('schedule_time_start').set(s.get('sched_t_s'));
+		this.inputs.get('schedule_date_end').set(s.get('sched_t_e'));
+		this.inputs.get('schedule_time_end').set(s.get('sched_t_e'));
+		this.inputs.get('editor').set(s.get('markup'));
+	}
+
+	new_slide() {
+
+	}
+
+	async save_slide() {
+		try {
+			await this.controller.save_slide();
+		} catch (e) {
+			APIUI.handle_error(e);
+		}
+	}
+
+	duplicate_slide() {
+
+	}
+
+	preview_slide() {
+
+	}
+
+	move_slide() {
+
+	}
+
+	async remove_slide() {
+		try {
+			await this.controller.remove_slide();
+		} catch (e) {
+			APIUI.handle_error(e);
+		}
 	}
 
 	async hide_slide() {
