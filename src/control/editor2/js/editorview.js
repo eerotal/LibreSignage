@@ -9,9 +9,10 @@ var StrValidator = require('ls-validator').StrValidator;
 var WhitelistValidator = require('ls-validator').WhitelistValidator;
 var BlacklistValidator = require('ls-validator').BlacklistValidator;
 
-var APIUI = require('ls-api-ui');
 var EditorController = require('./editorcontroller.js').EditorController;
+var APIUI = require('ls-api-ui');
 var User = require('ls-user').User;
+var Queue = require('ls-queue').Queue;
 
 var util = require('ls-util');
 
@@ -292,7 +293,7 @@ class EditorView {
 				defer: () => !this.ready
 			}),
 			move: new UIButton({
-				elem: $('#btn-slide-ch-queue'),
+				elem: $('#btn-slide-move'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -369,16 +370,73 @@ class EditorView {
 		}
 	}
 
-	duplicate_slide() {
+	async duplicate_slide() {
 
 	}
 
 	preview_slide() {
-
+		/*
+		*  Preview the open slide in a new window.
+		*/
+		window.open(
+			`/app/?preview=${this.controller.get_slide().get_id()}`
+		);
 	}
 
-	move_slide() {
+	async move_slide() {
+		/*
+		*  Create the dropdown items for the 'Move slide' dropdown
+		*  and attach event handlers to them.
+		*/
+		let queues = null;
+		let sq = this.controller.get_slide().get('queue_name');
+		try {
+			queues = (
+				await Queue.get_queues(this.api)
+			).filter(q => q !== sq);
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
+		}
 
+		/*
+		*  No other queues than the current one.
+		*    => Add the '< No queues>' item.
+		*/
+		if (queues.length === 0) {
+			$('#dropdown-slide-move').html(
+				$('<button></button>')
+					.text('< No queues >')
+					.attr({
+						class: 'dropdown-item disabled',
+						type: 'button'
+					})
+			);
+			return;
+		}
+
+		// Add queue buttons to the dropdown.
+		$('#dropdown-slide-move').html('');
+		for (let q of queues) {
+			if (q === this.controller.get_slide().get('queue')) {
+				continue;
+			}
+			$('#dropdown-slide-move').append(
+				$('<button></button>')
+					.text(q)
+					.attr({
+						class: 'dropdown-item',
+						type: 'button'
+					})
+					.on('click', async () => {
+						try {
+							await this.controller.move_slide(q);
+						} catch (e) {
+							APIUI.handle_error(e);
+						}
+					})
+			);
+		}
 	}
 
 	async remove_slide() {

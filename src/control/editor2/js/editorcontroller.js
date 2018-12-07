@@ -83,6 +83,12 @@ class EditorController {
 		await this.slide.save();
 	}
 
+	async move_slide(queue) {
+		assert(this.slide != null, "No slide to move.");
+		this.slide.set('queue', queue);
+		await this.save_slide();
+	}
+
 	async remove_slide() {
 		assert(this.slide != null, "No slide to remove.");
 		if (this.slide.get_id() === null) {
