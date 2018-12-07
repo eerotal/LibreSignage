@@ -1,4 +1,3 @@
-var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 var APIInterface = require('ls-api').APIInterface;
 var APIError = require('ls-api').APIError;
 var Slide = require('ls-slide').Slide;
@@ -91,11 +90,20 @@ class EditorController {
 
 	async remove_slide() {
 		assert(this.slide != null, "No slide to remove.");
-		if (this.slide.get_id() === null) {
+
+		if (this.slide.get('id') === null) {
 			this.slide = null;
 		} else {
 			await this.slide.remove();
+			this.slide = null;
 		}
+
+		Object.assign(this.state.slide, {
+			loaded:      false,
+			locked:      false,
+			owned:       false,
+			collaborate: false
+		});
 	}
 
 	get_state() { return this.state; }

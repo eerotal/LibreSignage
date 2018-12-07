@@ -311,6 +311,20 @@ class EditorView {
 					&& d.slide.owned
 				),
 				enabler: null,
+				attach: null,
+				defer: () => !this.ready
+			}),
+			remove_cancel: new UIButton({
+				elem: $('#btn-slide-remove-cancel'),
+				cond: d => true,
+				enabler: null,
+				attach: null,
+				defer: () => !this.ready
+			}),
+			remove_continue: new UIButton({
+				elem: $('#btn-slide-remove-continue'),
+				cond: d => true,
+				enabler: null,
 				attach: { click: () => this.remove_slide() },
 				defer: () => !this.ready
 			})
@@ -358,11 +372,37 @@ class EditorView {
 		this.inputs.get('editor').set(s.get('markup'));
 	}
 
+	async hide_slide() {
+		if (this.controller.get_state().slide.loaded) {
+			try {
+				await this.controller.close_slide();
+			} catch (e) {
+				// Continue even with errors.
+				APIUI.handle_error(e);
+			}
+		}
+		this.inputs.all(function() { this.clear(); });
+	}
+
 	new_slide() {
 
 	}
 
 	async save_slide() {
+		let s = this.controller.get_slide();
+
+		s.set({
+			'name':          this.inputs.get('name').get(),
+			'collaborators': this.inputs.get('collaborators').get(),
+			'duration':      this.inputs.get('duration').get(),
+			'index':         this.inputs.get('index').get(),
+			'animation':     this.inputs.get('animation').get(),
+			'sched':         this.inputs.get('schedule').get(),
+			'markup':        this.inputs.get('editor').get()
+		});
+
+		// TODO: Assing scheduling info to slide.
+
 		try {
 			await this.controller.save_slide();
 		} catch (e) {
@@ -437,23 +477,25 @@ class EditorView {
 					})
 			);
 		}
+
+		try {
+			await this.hide_slide();
+		} catch (e) {
+			// Continue even with errors.
+			APIUI.handle_error(e);
+		}
+
+		this.update();
 	}
 
 	async remove_slide() {
 		try {
 			await this.controller.remove_slide();
+			await this.hide_slide();
 		} catch (e) {
 			APIUI.handle_error(e);
 		}
-	}
-
-	async hide_slide() {
-		try {
-			await this.controller.close_slide();
-		} catch (e) {
-			APIUI.handle_error(e);
-			return;
-		}
+		this.update();
 	}
 
 	update() {
