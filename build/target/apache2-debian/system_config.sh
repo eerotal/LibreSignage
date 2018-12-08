@@ -21,8 +21,8 @@ if [ -n "$CONF_ALIAS" ]; then
 	echo "	ServerAlias $CONF_ALIAS";
 fi
 echo "	DocumentRoot $CONF_INSTALL_DIR/$CONF_NAME";
-echo '	ErrorLog ${APACHE_LOG_DIR}/error.log';
-echo '	CustomLog ${APACHE_LOG_DIR}/access.log combined';
+echo "	ErrorLog \${APACHE_LOG_DIR}/$CONF_NAME-error.log";
+echo "	CustomLog \${APACHE_LOG_DIR}/$CONF_NAME-access.log combined";
 
 echo '	ErrorDocument 403 /errors/403/index.php';
 echo '	ErrorDocument 404 /errors/404/index.php';
