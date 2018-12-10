@@ -446,7 +446,11 @@ class EditorView {
 	}
 
 	async duplicate_slide() {
-		await this.controller.duplicate_slide();
+		try {
+			await this.controller.duplicate_slide();
+		} catch (e) {
+			APIUI.handle_error(e);
+		}
 	}
 
 	preview_slide() {
