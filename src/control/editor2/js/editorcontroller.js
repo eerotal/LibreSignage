@@ -1,6 +1,7 @@
 var APIInterface = require('ls-api').APIInterface;
 var APIError = require('ls-api').APIError;
 var Slide = require('ls-slide').Slide;
+var Queue = require('ls-queue').Queue;
 var assert = require('ls-assert').assert;
 
 class EditorController {
@@ -15,6 +16,7 @@ class EditorController {
 			},
 			slide: {
 				loaded:      false,
+				saved:       false,
 				locked:      false,
 				owned:       false,
 				collaborate: false
@@ -44,6 +46,7 @@ class EditorController {
 		}
 		Object.assign(this.state.slide, {
 			loaded:      false,
+			saved:       false,
 			locked:      false,
 			owned:       false,
 			collaborate: false
@@ -51,11 +54,15 @@ class EditorController {
 	}
 
 	async open_slide(id) {
+		assert(this.queue != null, "No queue loaded.");
+		assert(this.queue.has_slide(id), "No such slide in queue.");
+
 		if (this.slide != null) {
 			try {
 				await this.slide.lock_release();
 			} catch (e) {}
 		}
+
 		this.slide = new Slide(this.api);
 		try {
 			await this.slide.load(id, true, true);
@@ -69,21 +76,66 @@ class EditorController {
 					throw e;
 			}
 		}
+
 		Object.assign(this.state.slide, {
 			loaded:      true,
+			saved:       true,
 			locked:      this.slide.is_locked_from_here(),
 			owned:       this.slide.is_owned_by_me(),
 			collaborate: this.slide.can_collaborate()
 		});
 	}
 
+	async new_slide() {
+		assert(this.queue != null, "No queue loaded.");
+
+		if (this.slide != null) {
+			await this.close_slide();
+		}
+
+		this.slide = new Slide(this.api);
+
+		// Set some default values.
+		this.slide.set({
+			id:            null,
+			name:          'NewSlide',
+			owner:         this.api.get_session().get_user().get_user(),
+			duration:      5000,
+			markup:        '',
+			index:         0,
+			enabled:       true,
+			sched:         false,
+			sched_t_s:     Math.round(Date.now()/1000),
+			sched_t_e:     Math.round(Date.now()/1000),
+			animation:     0,
+			queue_name:    this.queue.get_name(),
+			collaborators: [],
+			lock:          null,
+			assets:        []
+		});
+
+		Object.assign(this.state.slide, {
+			loaded:      true,
+			saved:       false,
+			locked:      false,
+			owned:       true,
+			collaborate: false
+		});
+	}
+
 	async save_slide() {
 		assert(this.slide != null, "No slide to save.");
+
 		await this.slide.save();
+		Object.assign(this.state.slide, {
+			saved: true
+		});
 	}
 
 	async move_slide(queue) {
 		assert(this.slide != null, "No slide to move.");
+		assert(this.state.slide.saved, "Slide not saved.");
+
 		this.slide.set('queue', queue);
 		await this.save_slide();
 	}
@@ -100,6 +152,7 @@ class EditorController {
 
 		Object.assign(this.state.slide, {
 			loaded:      false,
+			saved:       false,
 			locked:      false,
 			owned:       false,
 			collaborate: false

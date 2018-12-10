@@ -91,7 +91,7 @@
 <div class="row form-group collapse" id="slide-sched-group">
 	<div class="col-12 py-1">
 		<input type="checkbox"
-			id="slide-sched"
+			id="slide-schedule-enable"
 			data-toggle="tooltip"
 			title="Select whether the slide is scheduled.">
 		<label class="form-check-label" for="slide-sched">
@@ -139,7 +139,7 @@
 <!-- Slide enabled checkbox -->
 <div class="form-group mt-3" id="slide-enabled-group">
 	<input type="checkbox"
-		id="slide-enabled"
+		id="slide-enable"
 		data-toggle="tooltip"
 		title="Select whether the slide is enabled or not.">
 	<label class="form-check-label"

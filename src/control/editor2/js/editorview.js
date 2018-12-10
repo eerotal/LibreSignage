@@ -71,17 +71,21 @@ class EditorView {
 					'slide-collab',
 					[
 						new StrValidator(
-							{min: 1, max: null, regex: null},
+							{ min: 1, max: null, regex: null },
 							'', true
 						),
 						new WhitelistValidator(
-							{wl: users},
+							{ wl: users },
 							"This user doesn't exist."
 						),
 						new BlacklistValidator(
-							{bl: [user]}
+							{ bl: [user] }
 						)
-					]
+					],
+					{
+						nodups: true,
+						maxopts: this.api.limits.SLIDE_MAX_COLLAB
+					}
 				),
 				cond: d => (
 					d.slide.loaded
@@ -137,12 +141,12 @@ class EditorView {
 				attach: null,
 				defer: () => !this.ready,	
 				mod: null,
-				getter: e => e.val(),
+				getter: e => parseInt(e.val(), 10),
 				setter: (e, val) => e.val(val),
 				clearer: e => e.val('')
 			}),
-			schedule: new UIInput({
-				elem: $('#slide-sched'),
+			schedule_enable: new UIInput({
+				elem: $('#slide-schedule-enable'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -159,7 +163,7 @@ class EditorView {
 			schedule_date_start: new UIInput({
 				elem: $('#slide-sched-date-s'),
 				cond: d => (
-					this.inputs.get('schedule').get()
+					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
 					&& d.slide.locked
 					&& (d.slide.owned || d.slide.collaborate)
@@ -177,7 +181,7 @@ class EditorView {
 			schedule_time_start: new UIInput({
 				elem: $('#slide-sched-time-s'),
 				cond: d => (
-					this.inputs.get('schedule').get()
+					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
 					&& d.slide.locked
 					&& (d.slide.owned || d.slide.collaborate)
@@ -195,7 +199,7 @@ class EditorView {
 			schedule_date_end: new UIInput({
 				elem: $('#slide-sched-date-e'),
 				cond: d => (
-					this.inputs.get('schedule').get()
+					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
 					&& d.slide.locked
 					&& (d.slide.owned || d.slide.collaborate)
@@ -213,7 +217,7 @@ class EditorView {
 			schedule_time_end: new UIInput({
 				elem: $('#slide-sched-time-e'),
 				cond: d => (
-					this.inputs.get('schedule').get()
+					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
 					&& d.slide.locked
 					&& (d.slide.owned || d.slide.collaborate)
@@ -224,7 +228,7 @@ class EditorView {
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
-					e.val(util.tstamp_to_datetime(val)[2]);
+					e.val(util.tstamp_to_datetime(val)[1]);
 				},
 				clearer: e => e.val('')
 			}),
@@ -253,6 +257,22 @@ class EditorView {
 					e.setValue('');
 					e.clearSelection();
 				}
+			}),
+			enable: new UIInput({
+				elem: $('#slide-enable'),
+				cond: d => (
+					!this.inputs.get('schedule_enable').get()
+					&& d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: null,
+				attach: null,
+				defer: () => !this.ready,
+				mod: null,
+				getter: e => e.prop('checked'),
+				setter: (e, val) => e.prop('checked', val),
+				clearer: e => e.prop('checked', false)
 			})
 		});
 		this.buttons = new UIController({
@@ -331,6 +351,7 @@ class EditorView {
 		});
 		this.ready = true;
 
+		await this.show_queue('default');
 		await this.show_slide('0x1');
 		this.update();
 	}
@@ -350,11 +371,13 @@ class EditorView {
 
 	async show_slide(id) {
 		let s = null;
-		try {
-			await this.controller.open_slide(id);
-		} catch (e) {
-			APIUI.handle_error(e);
-			return;
+		if (id != null) {
+			try {
+				await this.controller.open_slide(id);
+			} catch (e) {
+				APIUI.handle_error(e);
+				return;
+			}
 		}
 		s = this.controller.get_slide();
 
@@ -364,50 +387,62 @@ class EditorView {
 		this.inputs.get('duration').set(s.get('duration'));
 		this.inputs.get('index').set(s.get('index'));
 		this.inputs.get('animation').set(s.get('animation'))
-		this.inputs.get('schedule').set(s.get('sched'))
+		this.inputs.get('schedule_enable').set(s.get('sched'))
 		this.inputs.get('schedule_date_start').set(s.get('sched_t_s'));
 		this.inputs.get('schedule_time_start').set(s.get('sched_t_s'));
 		this.inputs.get('schedule_date_end').set(s.get('sched_t_e'));
 		this.inputs.get('schedule_time_end').set(s.get('sched_t_e'));
 		this.inputs.get('editor').set(s.get('markup'));
+		this.inputs.get('enable').set(s.get('enabled'));
 	}
 
 	async hide_slide() {
 		if (this.controller.get_state().slide.loaded) {
-			try {
-				await this.controller.close_slide();
-			} catch (e) {
-				// Continue even with errors.
-				APIUI.handle_error(e);
-			}
+			await this.controller.close_slide();
 		}
 		this.inputs.all(function() { this.clear(); });
 	}
 
-	new_slide() {
-
+	async new_slide() {
+		try {
+			await this.controller.new_slide();
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
+		}
+		this.show_slide(null);
 	}
 
 	async save_slide() {
 		let s = this.controller.get_slide();
-
 		s.set({
 			'name':          this.inputs.get('name').get(),
 			'collaborators': this.inputs.get('collaborators').get(),
 			'duration':      this.inputs.get('duration').get(),
 			'index':         this.inputs.get('index').get(),
 			'animation':     this.inputs.get('animation').get(),
-			'sched':         this.inputs.get('schedule').get(),
-			'markup':        this.inputs.get('editor').get()
+			'sched':         this.inputs.get('schedule_enable').get(),
+			'sched_t_s': util.datetime_to_tstamp(
+				this.inputs.get('schedule_date_start').get(),
+				this.inputs.get('schedule_time_start').get()
+			),
+			'sched_t_e': util.datetime_to_tstamp(
+				this.inputs.get('schedule_date_end').get(),
+				this.inputs.get('schedule_time_end').get()
+			),
+			'markup':        this.inputs.get('editor').get(),
+			'enabled':       this.inputs.get('enable').get()
 		});
-
-		// TODO: Assing scheduling info to slide.
 
 		try {
 			await this.controller.save_slide();
 		} catch (e) {
 			APIUI.handle_error(e);
+			return;
 		}
+
+		// Update slide data in the UI.
+		this.show_slide(null);
 	}
 
 	async duplicate_slide() {
@@ -419,7 +454,7 @@ class EditorView {
 		*  Preview the open slide in a new window.
 		*/
 		window.open(
-			`/app/?preview=${this.controller.get_slide().get_id()}`
+			`/app/?preview=${this.controller.get_slide().get('id')}`
 		);
 	}
 
@@ -481,8 +516,8 @@ class EditorView {
 		try {
 			await this.hide_slide();
 		} catch (e) {
-			// Continue even with errors.
 			APIUI.handle_error(e);
+			return;
 		}
 
 		this.update();

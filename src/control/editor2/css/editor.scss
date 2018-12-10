@@ -38,6 +38,19 @@ html, body {
 	margin: 5px;
 }
 
+#btn-slide-remove::after {
+	/* Remove the dropdown arrow added by Bootstrap. */
+	content: none;
+}
+
+#dropdown-slide-remove {
+	flex-direction: column;
+	text-align: center;
+	padding: $s1;
+	&.show { display: flex !important; }
+	button { flex: 1 1 100%; }
+}
+
 /* Editor styling */
 #slide-readonly, #slide-cant-edit {
 	color: orange;

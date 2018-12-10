@@ -194,6 +194,8 @@ $slide->set_sched($SLIDE_SAVE->get('sched'));
 $slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
 $slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
 $slide->set_animation($SLIDE_SAVE->get('animation'));
+$slide->check_sched_enabled();
+
 $slide->set_ready(TRUE);
 
 if ($OP === 'create') {
