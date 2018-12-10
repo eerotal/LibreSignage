@@ -60,14 +60,16 @@ class EditorController {
 		if (this.slide != null) {
 			try {
 				await this.slide.lock_release();
-			} catch (e) {}
+			} catch (e) {
+				console.warn('EditorController: Lock release failed.');
+			}
 		}
 
 		this.slide = new Slide(this.api);
 		try {
 			await this.slide.load(id, true, true);
 		} catch (e) {
-			switch (e) {
+			switch (e.response.error) {
 				case APIError.codes.API_E_NOT_AUTHORIZED:
 				case APIError.codes.API_E_LOCK:
 					await this.slide.load(id, false, false);
@@ -117,7 +119,7 @@ class EditorController {
 		Object.assign(this.state.slide, {
 			loaded:      true,
 			saved:       false,
-			locked:      false,
+			locked:      true, // Unsaved slides are technically locked.
 			owned:       true,
 			collaborate: false
 		});

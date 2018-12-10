@@ -52,14 +52,14 @@ html, body {
 }
 
 /* Editor styling */
-#slide-readonly, #slide-cant-edit {
+#slide-label-readonly, #slide-label-edited {
 	color: orange;
 	width: 100%;
 	text-align: center;
 	display: none; /* Initial */
 }
 
-#slide-edit-as-collab {
+#slide-label-collaborate {
 	color: darkgreen;
 	width: 100%;
 	text-align: center;

@@ -3,6 +3,7 @@ var bootstrap = require('bootstrap');
 var UIController = require('ls-uicontrol').UIController;
 var UIInput = require('ls-uicontrol').UIInput;
 var UIButton = require('ls-uicontrol').UIButton;
+var UIStatic = require('ls-uicontrol').UIStatic;
 var MultiSelect = require('ls-multiselect').MultiSelect;
 
 var StrValidator = require('ls-validator').StrValidator;
@@ -275,6 +276,48 @@ class EditorView {
 				clearer: e => e.prop('checked', false)
 			})
 		});
+		this.statics = new UIController({
+			label_readonly: new UIStatic({
+				elem: $('#slide-label-readonly'),
+				cond: d => (
+					d.slide.loaded
+					&& !d.slide.locked
+					&& !d.slide.owned
+					&& !d.slide.collaborate
+				),
+				enabler: (e, s) => s ? e.show() : e.hide(),
+				attach: null,
+				defer: () => !this.ready,
+				getter: null,
+				setter: null
+			}),
+			label_edited: new UIStatic({
+				elem: $('#slide-label-edited'),
+				cond: d => (
+					d.slide.loaded
+					&& !d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: (e, s) => s ? e.show() : e.hide(),
+				attach: null,
+				defer: () => !this.ready,
+				getter: null,
+				setter: null
+			}),
+			label_collaborate: new UIStatic({
+				elem: $('#slide-label-collaborate'),
+				cond: d => (
+					d.slide.loaded
+					&& d.slide.locked
+					&& d.slide.collaborate
+				),
+				enabler: (e, s) => s ? e.show() : e.hide(),
+				attach: null,
+				defer: () => !this.ready,
+				getter: null,
+				setter: null
+			})
+		});
 		this.buttons = new UIController({
 			new: new UIButton({
 				elem: $('#btn-slide-new'),
@@ -353,7 +396,6 @@ class EditorView {
 
 		await this.show_queue('default');
 		await this.show_slide('0x1');
-		this.update();
 	}
 
 	async show_queue(name) {
@@ -394,6 +436,8 @@ class EditorView {
 		this.inputs.get('schedule_time_end').set(s.get('sched_t_e'));
 		this.inputs.get('editor').set(s.get('markup'));
 		this.inputs.get('enable').set(s.get('enabled'));
+
+		this.update();
 	}
 
 	async hide_slide() {
@@ -540,6 +584,10 @@ class EditorView {
 	update() {
 		this.inputs.all(
 			function(d) { this.state(d); },
+			this.controller.get_state()
+		);
+		this.statics.all(
+			function (d) { this.state(d); },
 			this.controller.get_state()
 		);
 		this.buttons.all(

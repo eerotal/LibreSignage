@@ -20,7 +20,9 @@
 *  This endpoint only allows slide modification if the caller
 *  has locked the slide by calling slide_lock_acquire.php first.
 *  If the slide is not locked or is locked by someone else, the
-*  API_E_LOCK error is returned in the 'error' value.
+*  API_E_LOCK error is returned in the 'error' value. If a new
+*  slide is created, the slide is automatically locked for the
+*  caller.
 *
 *  Note!
 *
@@ -171,9 +173,12 @@ if ($OP === 'create') {
 	*  that Slide::set_owner() must be called before
 	*  Slide::set_collaborators(), which is why
 	*  this if statement is here. Don't move it.
+	*  The slide is also automatically locked for
+	*  the creator.
 	*/
 	$slide->gen_id();
 	$slide->set_owner($user->get_name());
+	$slide->lock_acquire($SLIDE_SAVE->get_session());
 }
 
 /*
@@ -194,9 +199,9 @@ $slide->set_sched($SLIDE_SAVE->get('sched'));
 $slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
 $slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
 $slide->set_animation($SLIDE_SAVE->get('animation'));
-$slide->check_sched_enabled();
 
 $slide->set_ready(TRUE);
+$slide->check_sched_enabled();
 
 if ($OP === 'create') {
 	// Use quota.

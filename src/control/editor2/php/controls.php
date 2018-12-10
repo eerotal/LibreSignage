@@ -1,14 +1,15 @@
 <!-- Slide editable status labels -->
-<div id="slide-cant-edit">
+<div id="slide-label-readonly">
 	You can't edit this slide.
 </div>
-<div id="slide-readonly">
+<div id="slide-label-edited">
 	You can't edit this slide because someone
 	else is already editing it.
 </div>
-<div id="slide-edit-as-collab">
+<div id="slide-label-collaborate">
 	You can edit this slide as a collaborator.
 </div>
+
 <!-- Slide name input -->
 <div class="form-group" id="slide-name-group">
 	<label for="slide-name">Name</label>
