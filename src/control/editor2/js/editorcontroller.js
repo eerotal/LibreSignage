@@ -140,6 +140,12 @@ class EditorController {
 		await this.save_slide();
 	}
 
+	async duplicate_slide() {
+		assert(this.slide != null, "No slide to duplicate.");
+		await this.slide.dup();
+		await this.queue.update();
+	}
+
 	async remove_slide() {
 		assert(this.slide != null, "No slide to remove.");
 

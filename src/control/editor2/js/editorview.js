@@ -295,7 +295,7 @@ class EditorView {
 				defer: () => !this.ready
 			}),
 			duplicate: new UIButton({
-				elem: $('#btn-slide-dup'),
+				elem: $('#btn-slide-duplicate'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -446,7 +446,7 @@ class EditorView {
 	}
 
 	async duplicate_slide() {
-
+		await this.controller.duplicate_slide();
 	}
 
 	preview_slide() {

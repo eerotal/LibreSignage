@@ -14,7 +14,7 @@
 		title="Save slide.">
 		<i class="fas fa-save"></i>
 	</button>
-	<button id="btn-slide-dup"
+	<button id="btn-slide-duplicate"
 		type="button"
 		class="btn btn-success btn-slide-ctrl"
 		data-toggle="tooltip"
