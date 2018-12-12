@@ -17,6 +17,8 @@ var Queue = require('ls-queue').Queue;
 
 var util = require('ls-util');
 
+var Timeline = require('./components/timeline.js').Timeline;
+
 class EditorView {
 	constructor(api) {
 		this.api        = api;
@@ -392,6 +394,8 @@ class EditorView {
 				defer: () => !this.ready
 			})
 		});
+
+		this.timeline = new Timeline(this.api, 'timeline');
 		this.ready = true;
 
 		await this.show_queue('default');
@@ -405,9 +409,11 @@ class EditorView {
 			APIUI.handle_error(e);
 			return;
 		}
+		this.timeline.show_queue(this.controller.get_queue());
 	}
 
 	hide_queue() {
+		this.timeline.hide_queue();
 		this.controller.close_queue();
 	}
 

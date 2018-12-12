@@ -22,6 +22,9 @@
 						<!-- Slide selector -->
 						<div id="slide-selector"></div>
 					</div>
+					<div class="col-12">
+						<div id="timeline"></div>
+					</div>
 				</div>
 				<div class="container-fluid row mx-0 my-1">
 					<div class="col-md-3 container-fluid pt-2" id="editor-col-l">

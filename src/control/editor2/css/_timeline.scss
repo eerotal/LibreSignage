@@ -8,6 +8,12 @@ $tl-index-cont-width: 0.15;  // Relative slide index container width.
 $tl-thumb-cont-width: 1 - $tl-index-cont-width;
 
 #timeline {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	margin: {
+		top: $s1;
+	}
 	padding: {
 		top: 5px;
 		bottom: 5px;
@@ -39,15 +45,23 @@ $tl-thumb-cont-width: 1 - $tl-index-cont-width;
 	background-color: $white;
 	color: $secondary;
 	border: 1px solid $gray-1;
-}
 
-.tl-slide-cont-dis {
-	background-color: $gray-1;
-}
+	&:hover {
+		background-color: $secondary;
+		color: $white;
+	}
 
-.tl-slide-cont:hover {
-	background-color: $secondary;
-	color: $white;
+	&.disabled {
+		background-color: $gray-1;
+	}
+	&.selected {
+		background-color: $teal;
+		color: $white;
+	}
+	&.error {
+		background-color: $red;
+		color: $white;
+	}
 }
 
 .tl-slide-index-cont {
@@ -76,26 +90,16 @@ $tl-thumb-cont-width: 1 - $tl-index-cont-width;
 			0.5625*#{$tl-thumb-cont-width}*(100% + 2*#{$tl-pad})
 		) !important;
 	}
-}
 
-.tl-slide-thumb-cont > iframe {
-	pointer-events: none;
-	border: 1px solid $gray-1;
+	> iframe {
+		pointer-events: none;
+		border: 1px solid $gray-1;
 
-	/*
-	*  Overwrite .preview padding and sizing.
-	*/
-	left: 4px !important;
-	width: calc(100% - 8px) !important;
-	height: calc(100% - 8px) !important;
-}
-
-.tl-selected {
-	background-color: $teal;
-	color: $white;
-}
-
-.tl-slide-error {
-	background-color: $red;
-	color: $white;
+		/*
+		*  Overwrite .preview padding and sizing.
+		*/
+		left: 4px !important;
+		width: calc(100% - 8px) !important;
+		height: calc(100% - 8px) !important;
+	}
 }
