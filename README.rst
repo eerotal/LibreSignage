@@ -16,17 +16,17 @@ Table Of Contents
 
 `4. Installation`_
 
-* `4.1. Using prebuilt Docker images`_
+* `4.1. Using prebuilt Docker images on any distribution`_
 
 * `4.2. Building from source`_
 
-  * `4.2.1. Building a native build`_
+  * `4.2.1. Building a native build on Debian or Ubuntu`_
 
-  * `4.2.2. Building a Docker image`_
+  * `4.2.2. Building a Docker image on Debian or Ubuntu`_
 
-`5. Default users`_
+`5. Build system dependencies`_
 
-`6. How to install npm`_
+`6. Default users`_
 
 `7. FAQ`_
 
@@ -38,9 +38,7 @@ Table Of Contents
 
 `11. Third-party dependencies`_
 
-`12. Build system dependencies`_
-
-`13. License`_
+`12. License`_
 
 1. Introduction
 ---------------
@@ -118,8 +116,8 @@ content. This approach has a few advantages.
 4. Installation
 ---------------
 
-4.1. Using prebuilt Docker images
-+++++++++++++++++++++++++++++++++
+4.1. Using prebuilt Docker images on any distribution
++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 You can easily deploy a containerized LibreSignage instance using the
 LibreSignage Docker images from Docker hub. The required steps are
@@ -147,39 +145,42 @@ listed below.
 4.2. Building from source
 +++++++++++++++++++++++++
 
-4.2.1. Building a native build
-..............................
+4.2.1. Building a native build on Debian or Ubuntu
+..................................................
 
 Building LibreSignage from source isn't too difficult. You can build
-a native LibreSignage build that runs on the host machine (ie. no
-containers) by following the instructions below. Note that currently
-the LibreSignage build system only supports Debian.
+a native LibreSignage build that runs directly on a Debian or Ubuntu
+host (ie. no containers) by following the instructions below.
 
 1. Install software needed for building LibreSignage. You will need the
-   following packages: ``git, apache2, php7.2, pandoc, npm, make``. On
-   Debian Stretch all other packages except *npm* can installed by running
-   ``sudo apt install git apache2 php7.2 pandoc make``. Note the following:
+   following packages: ``git, apache2, php, php-gd, pandoc, npm, make``.
+   All other packages except *npm* can be installed from the distribution
+   repos by running ``sudo apt update && sudo apt install git apache2
+   php php-gd pandoc make``.
+   Note the following:
 
-     * PHP needs to be version 7.2.
-     * GNU Make needs to be version 4.0 or newer.
-     * The recommended *npm* version is 6.4.x. Currently *npm* is only
-       available in the Debian Sid repos and even there the package is
-       so old it doesn't work correctly. You can, however, install npm
-       manually. See `6. How to install NPM`_ for more info.
+   * PHP must be version 7.x.
+   * GNU Make must be version 4.x or newer.
+   * Pandoc must be version 2.2.x or newer.
+   * NPM must be version 6.4.x or newer. You can install
+     NPM by following the instructions on the `node.js website
+     <https://nodejs.org/en/download/package-manager/>`_.
 
-   More detailed build dependency versions are listed in `12. Build
+   More detailed build dependency versions are listed in `5. Build
    system dependencies`_. There are also some optional dependencies:
 
    * If you want to enable video thumbnail generation, you'll
      need to install ``ffmpeg`` and ``ffprobe``. On Debian you can 
-     install them running ``sudo apt install ffmpeg``.
+     install them by running ``sudo apt install ffmpeg``.
 
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
    The repository will be cloned into the directory *LibreSignage/*.
 4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
-5. Install dependencies from NPM by running ``npm install``.
+5. Install dependencies from NPM by running ``npm install``. *This command
+   will probably print a warning about an incompatible package. That's
+   normal and doesn't affect the build in any way.*
 6. Run ``make configure TARGET=apache2-debian``. This script asks you
    to enter the following configuration values:
 
@@ -236,6 +237,8 @@ the LibreSignage build system only supports Debian.
        you'll also need to configure the binary paths to *ffmpeg*
        and *ffprobe* in the LibreSignage configuration files. The
        paths default to */usr/bin/ffmpeg* and */usr/bin/ffprobe*.
+       See the help page `Libresignage configuration` or the file
+       `src/doc/rst/configuration.rst` for more info.
 
    * Enable debugging (y/N) *Do not enable on production systems.*
 
@@ -250,16 +253,19 @@ the LibreSignage build system only supports Debian.
    for more advanced make usage.
 8. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
-9. Navigate to the domain name you entered and you should see the
-   LibreSignage login page.
+9. Disable the default Apache site by running
+   ``sudo a2dissite 000-default.conf``.
+10. Navigate to the domain name you entered and you should see the
+    LibreSignage login page.
 
-4.2.2. Building a Docker image
-..............................
+4.2.2. Building a Docker image on Debian or Ubuntu
+..................................................
 
 You can build LibreSignage Docker images by following the instructions
 below.
 
-1. Follow the steps 1-5 from `4.2.1. Building a native build`_.
+1. Follow the steps 1-5 from `4.2.1. Building a native build on Debian
+   or Ubuntu`_.
 2. Install `Docker <https://www.docker.com/>`_ if it isn't yet installed.
 3. Run the following command::
 
@@ -280,7 +286,7 @@ below.
    After this command has completed the LibreSignage image is saved in
    your machine's Docker registry as *libresignage:[version]*. You can
    use it by following the instructions in `4.1. Using prebuilt Docker
-   images`_.
+   images on any distribution`_.
 
 Extra
 *****
@@ -293,7 +299,24 @@ Extra
  The *build/helpers/docker/* directory also contains the script
  *run_dev.sh* for starting a development/testing docker container.
 
-5. Default users
+5. Build system dependencies
+-----------------------------
+
+* Installed manually
+
+  * GNU Make (> 4.0) (https://www.gnu.org/software/make/)
+  * PHP (7.2) (http://www.php.net/)
+  * Pandoc (> 2.2.1) (https://pandoc.org/)
+  * npm (> 6.4.x) (https://www.npmjs.com/)
+
+* Installed via npm:
+
+  * SASS (https://sass-lang.com/)
+  * Browserify (http://browserify.org/)
+  * PostCSS (https://postcss.org/)
+  * Autoprefixer (https://github.com/postcss/autoprefixer)
+
+6. Default users
 ----------------
 
 The default users and their groups and passwords are listed below.
@@ -309,34 +332,6 @@ user         editor, display          user
 display      display                  display
 =========== ======================== ==========
 
-6. How to install npm
----------------------
-
-If npm doesn't exist in the repos of your Linux distribution of choice,
-is very outdated (like in the case of Debian) or you are not using a
-Linux based distribution at all, you must install it manually. You can
-follow the installation instructions for your OS on the
-`node.js website <https://nodejs.org/en/download/package-manager/>`_.
-
-There are other ways to install npm too. One alternative way to install
-npm is described below. *Note that if you use this method to install
-npm, you shouldn't update npm via it's own update mechanism
-(running npm install npm) since that will install the new version into
-a different directory. To update npm when it's installed this way,
-you should just follow steps 1-3 again.*
-
-1. Download the *node.js* binaries for your system from
-   https://nodejs.org/en/download/.
-2. Extract the tarball with ``tar -xvf <name of tarball>``.
-3. Create a new directory ``/opt/npm`` and copy the extracted
-   files into it.
-4. Run ``ln -s /opt/npm/bin/npm /usr/local/bin/npm`` and
-   ``ln -s /opt/npm/bin/npx /usr/local/bin/npx``. You need to
-   be root when running these commands so prefix them with ``sudo``
-   or log in as root first.
-5. Run ``cd ~/`` to go back to your home directory and verify the
-   installation by running ``npm -v``. This should now print the
-   installed npm version.
 
 7. FAQ
 ------
@@ -355,7 +350,7 @@ Why doesn't LibreSignage have feature X?
 Is LibreSignage really free?
   YES! In fact LibreSignage is not only free, it's also open source.
   You can find information about the LibreSignage license in the
-  section `13. License`_.
+  section `12. License`_.
 
 8. Screenshots
 ---------------
@@ -431,7 +426,8 @@ configure
 
     * You can use PASS with ``--features [features]`` where ``[features]``
       is a comma separated list of features to enable. See the section
-      `4.2.2. Building a Docker image`_ for more info.      
+      `4.2.2. Building a Docker image on Debian or Ubuntu`_ for more
+      info.
 
 install
   Install the LibreSignage distribution on the machine. Note that
@@ -518,23 +514,7 @@ The full licenses for these third party libraries and resources can be
 found in the file *src/doc/rst/LICENSES_EXT.rst* in the source
 distribution.
 
-12. Build system dependencies
------------------------------
-
-* Installed manually
-
-  * GNU Make (> 4.0) (https://www.gnu.org/software/make/)
-  * PHP (7.2) (http://www.php.net/)
-  * Pandoc (> 2.2.1) (https://pandoc.org/)
-
-* Installed via npm:
-
-  * SASS (https://sass-lang.com/)
-  * Browserify (http://browserify.org/)
-  * PostCSS (https://postcss.org/)
-  * Autoprefixer (https://github.com/postcss/autoprefixer)
-
-13. License
+12. License
 -----------
 
 LibreSignage is licensed under the BSD 3-clause license, which can be
