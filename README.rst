@@ -16,29 +16,29 @@ Table Of Contents
 
 `4. Installation`_
 
-* `4.1. Using prebuilt Docker images on any distribution`_
+* `4.1. Minimum system requirements`_
 
-* `4.2. Building from source`_
+* `4.2. Using prebuilt Docker images on any distribution`_
 
-  * `4.2.1. Building a native build on Debian or Ubuntu`_
+* `4.3. Building from source`_
 
-  * `4.2.2. Building a Docker image on Debian or Ubuntu`_
+  * `4.3.1. Building a native build on Debian or Ubuntu`_
 
-`5. Build system dependencies`_
+  * `4.3.2. Building a Docker image on Debian or Ubuntu`_
 
-`6. Default users`_
+`5. Default users`_
 
-`7. FAQ`_
+`6. FAQ`_
 
-`8. Screenshots`_
+`7. Screenshots`_
 
-`9. Make rules`_
+`8. Make rules`_
 
-`10. Documentation`_
+`9. Documentation`_
 
-`11. Third-party dependencies`_
+`10. Third-party dependencies`_
 
-`12. License`_
+`11. License`_
 
 1. Introduction
 ---------------
@@ -116,7 +116,51 @@ content. This approach has a few advantages.
 4. Installation
 ---------------
 
-4.1. Using prebuilt Docker images on any distribution
+4.1. Minimum system requirements
+++++++++++++++++++++++++++++++++
+
+Disk space
+  > 100MB (Excludes dependencies and uploaded media.)
+
+RAM
+  Depends on the specific use case.
+
+Tested operating systems
+  * Debian 9 (Stretch)
+  * Ubuntu 18.04 LTS (Bionic Beaver)
+
+*Required* runtime dependencies
+  * PHP (Version 7.x.)
+  * Apache2 (Version 2.4.x.)
+
+*Optional* runtime dependencies
+  * PHP gd extension for image thumbnail generation.
+  * ffmpeg (Version 4.0.x) for video thumbnail generation.
+
+Build system dependencies
+  * PHP (Version 7.x.) (http://www.php.net/)
+  * GNU Make (Version 4.x or newer.) (https://www.gnu.org/software/make/)
+  * Pandoc (Version 2.2.x or newer.) (https://pandoc.org/)
+  * npm (Version 6.4.x or newer.) (https://nodejs.org/en/)
+
+Build system dependencies installed automatically by npm
+  * Tools
+
+    * SASS (https://sass-lang.com/)
+    * Browserify (http://browserify.org/)
+    * PostCSS (https://postcss.org/)
+    * Autoprefixer (https://github.com/postcss/autoprefixer)
+
+  * Libraries
+
+    * Ace editor (https://ace.c9.io/)
+    * Bootstrap (https://getbootstrap.com/)
+    * jQuery (https://jquery.com/)
+    * Popper.js (https://popper.js.org/)
+    * Font-Awesome Free (https://fontawesome.com/)
+
+
+4.2. Using prebuilt Docker images on any distribution
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 You can easily deploy a containerized LibreSignage instance using the
@@ -142,11 +186,14 @@ listed below.
    LibreSignage Docker image. The documentation can also be accessed in
    the web interface from the *Help* page.
 
-4.2. Building from source
+4.3. Building from source
 +++++++++++++++++++++++++
 
-4.2.1. Building a native build on Debian or Ubuntu
+4.3.1. Building a native build on Debian or Ubuntu
 ..................................................
+
+*These instructions apply on Debian 9 (Stretch) and Ubuntu 18.04
+(Bionic Beaver)*
 
 Building LibreSignage from source isn't too difficult. You can build
 a native LibreSignage build that runs directly on a Debian or Ubuntu
@@ -156,23 +203,13 @@ host (ie. no containers) by following the instructions below.
    following packages: ``git, apache2, php, php-gd, pandoc, npm, make``.
    All other packages except *npm* can be installed from the distribution
    repos by running ``sudo apt update && sudo apt install git apache2
-   php php-gd pandoc make``.
-   Note the following:
+   php php-gd pandoc make``. You can install NPM by following the
+   instructions on the `node.js website <https://nodejs.org/en/download/package-manager/>`_.
 
-   * PHP must be version 7.x.
-   * GNU Make must be version 4.x or newer.
-   * Pandoc must be version 2.2.x or newer.
-   * NPM must be version 6.4.x or newer. You can install
-     NPM by following the instructions on the `node.js website
-     <https://nodejs.org/en/download/package-manager/>`_.
+   If you want to enable video thumbnail generation, you need to install
+   *ffmpeg* too. You can do that by running ``sudo apt install ffmpeg``.
 
-   More detailed build dependency versions are listed in `5. Build
-   system dependencies`_. There are also some optional dependencies:
-
-   * If you want to enable video thumbnail generation, you'll
-     need to install ``ffmpeg`` and ``ffprobe``. On Debian you can 
-     install them by running ``sudo apt install ffmpeg``.
-
+   See the section `4.1. Minimum system requirements`_ for more info.
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
@@ -249,7 +286,7 @@ host (ie. no containers) by following the instructions below.
    for building LibreSignage. The file is saved in ``build/`` as
    ``<DOMAIN>.conf`` where ``<DOMAIN>`` is the domain name you
    specified.
-7. Run ``make -j$(nproc)`` to build LibreSignage. See `9. Make rules`_
+7. Run ``make -j$(nproc)`` to build LibreSignage. See `8. Make rules`_
    for more advanced make usage.
 8. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
@@ -258,13 +295,16 @@ host (ie. no containers) by following the instructions below.
 10. Navigate to the domain name you entered and you should see the
     LibreSignage login page.
 
-4.2.2. Building a Docker image on Debian or Ubuntu
+4.3.2. Building a Docker image on Debian or Ubuntu
 ..................................................
+
+*These instructions apply on Debian 9 (Stretch) and Ubuntu 18.04
+(Bionic Beaver)*
 
 You can build LibreSignage Docker images by following the instructions
 below.
 
-1. Follow the steps 1-5 from `4.2.1. Building a native build on Debian
+1. Follow the steps 1-5 from `4.3.1. Building a native build on Debian
    or Ubuntu`_.
 2. Install `Docker <https://www.docker.com/>`_ if it isn't yet installed.
 3. Run the following command::
@@ -285,7 +325,7 @@ below.
    This will take some time as Docker needs to download a lot of stuff.
    After this command has completed the LibreSignage image is saved in
    your machine's Docker registry as *libresignage:[version]*. You can
-   use it by following the instructions in `4.1. Using prebuilt Docker
+   use it by following the instructions in `4.2. Using prebuilt Docker
    images on any distribution`_.
 
 Extra
@@ -299,24 +339,7 @@ Extra
  The *build/helpers/docker/* directory also contains the script
  *run_dev.sh* for starting a development/testing docker container.
 
-5. Build system dependencies
------------------------------
-
-* Installed manually
-
-  * GNU Make (> 4.0) (https://www.gnu.org/software/make/)
-  * PHP (7.2) (http://www.php.net/)
-  * Pandoc (> 2.2.1) (https://pandoc.org/)
-  * npm (> 6.4.x) (https://www.npmjs.com/)
-
-* Installed via npm:
-
-  * SASS (https://sass-lang.com/)
-  * Browserify (http://browserify.org/)
-  * PostCSS (https://postcss.org/)
-  * Autoprefixer (https://github.com/postcss/autoprefixer)
-
-6. Default users
+5. Default users
 ----------------
 
 The default users and their groups and passwords are listed below.
@@ -333,7 +356,7 @@ display      display                  display
 =========== ======================== ==========
 
 
-7. FAQ
+6. FAQ
 ------
 
 Why doesn't LibreSignage use framework/library X?
@@ -350,9 +373,9 @@ Why doesn't LibreSignage have feature X?
 Is LibreSignage really free?
   YES! In fact LibreSignage is not only free, it's also open source.
   You can find information about the LibreSignage license in the
-  section `12. License`_.
+  section `11. License`_.
 
-8. Screenshots
+7. Screenshots
 ---------------
 
 Open these images in a new tab to view the full resolution versions.
@@ -405,7 +428,7 @@ Open these images in a new tab to view the full resolution versions.
    :width: 320 px
    :height: 180 px
 
-9. Make rules
+8. Make rules
 --------------
 
 The following ``make`` rules are implemented in the makefile.
@@ -426,7 +449,7 @@ configure
 
     * You can use PASS with ``--features [features]`` where ``[features]``
       is a comma separated list of features to enable. See the section
-      `4.2.2. Building a Docker image on Debian or Ubuntu`_ for more
+      `4.3.2. Building a Docker image on Debian or Ubuntu`_ for more
       info.
 
 install
@@ -466,7 +489,7 @@ CONF=<config file> - (default: Last generated config.)
 VERBOSE=<Y/n>
   Print verbose log output. This setting can be used with any target.
 
-10. Documentation
+9. Documentation
 -----------------
 
 LibreSignage documentation is written in reStructuredText, which is
@@ -478,7 +501,7 @@ are located in the directory *src/doc/rst/*.
 The reStructuredText files are also compiled into HTML when LibreSignage
 is built and they can be accessed from the *Help* page of LibreSignage.
 
-11. Third-party dependencies
+10. Third-party dependencies
 ----------------------------
 
 Bootstrap (Library, MIT License)
@@ -514,13 +537,13 @@ The full licenses for these third party libraries and resources can be
 found in the file *src/doc/rst/LICENSES_EXT.rst* in the source
 distribution.
 
-12. License
+11. License
 -----------
 
 LibreSignage is licensed under the BSD 3-clause license, which can be
 found in the files *LICENSE.rst* and *src/doc/rst/LICENSE.rst* in the
 source distribution. Third party libraries and resources are licensed
-under their respective licenses. See `11. Third-party dependencies`_ for
+under their respective licenses. See `10. Third-party dependencies`_ for
 more information.
 
 Copyright Eero Talus 2018
