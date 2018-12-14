@@ -280,6 +280,19 @@ class EditorView {
 			})
 		});
 		this.statics = new UIController({
+			timeline: new UIStatic({
+				elem: $('#timeline'),
+				cond: () => true,
+				enabler: null,
+				attach: {
+					'component.timeline.click': async (e, data) => {
+						await this.show_slide(data.id);
+					}
+				},
+				defer: () => !this.ready,
+				getter: null,
+				setter: null
+			}),
 			label_readonly: new UIStatic({
 				elem: $('#slide-label-readonly'),
 				cond: d => (
@@ -396,11 +409,10 @@ class EditorView {
 			})
 		});
 
-		this.timeline = new Timeline(this.api, 'timeline');
+		this.timeline = new Timeline('timeline');
 		this.ready = true;
 
 		await this.show_queue('default');
-		await this.show_slide('0x1');
 	}
 
 	async show_queue(name) {

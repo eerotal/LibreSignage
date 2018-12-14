@@ -14,8 +14,7 @@ const slide_template = s => `
 `;
 
 class Timeline {
-	constructor(api, container_id) {
-		this.api = api;
+	constructor(container_id) {
 		this.container = $(`#${container_id}`);
 
 		this.queue = null;
@@ -33,11 +32,9 @@ class Timeline {
 			&& this.slide.get('id') === id
 		) { return; }
 
-		this.container[0].dispatchEvent(
-			new CustomEvent(
-				'timeline.click',
-				{ 'id': id }
-			)
+		this.container.trigger(
+			'component.timeline.click',
+			{ 'id': id }
 		);
 
 		let slides = this.queue.get_slides().get_slides();
