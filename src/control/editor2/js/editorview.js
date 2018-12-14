@@ -18,6 +18,7 @@ var Queue = require('ls-queue').Queue;
 var util = require('ls-util');
 
 var Timeline = require('./components/timeline.js').Timeline;
+var Preview = require('./components/preview.js').Preview;
 
 class EditorView {
 	constructor(api) {

@@ -1,18 +1,14 @@
 var $ = require('jquery');
+var Preview = require('./preview.js').Preview;
+var MarkupError = require('ls-markup').err.MarkupError;
 
 const slide_template = s => `
 <div
 	class="btn tl-slide-cont ${!s.get('enabled') ? 'disabled': ''}"
-	id="slide-btn-${s.get('id')}">
-	<div class="m-0 p-0 h-100">
-		<div
-			class="tl-slide-index-cont">
-			${s.get('index')}
-		</div>
-		<div
-			class="tl-slide-thumb-cont preview-cont"
-			id="tl-slide-thumb-cont-${s.get('id')}">
-		</div>
+	id="tl-slide-btn-${s.get('id')}">
+	<div class="tl-slide-index-cont">${s.get('index')}</div>
+	<div class="tl-slide-thumb-cont preview-cont"
+		id="tl-slide-thumb-cont-${s.get('id')}">
 	</div>
 </div>
 `;
@@ -24,6 +20,8 @@ class Timeline {
 
 		this.queue = null;
 		this.slide = null;
+
+		this.thumbs = null;
 	}
 
 	slide_clicked(id) {
@@ -46,14 +44,14 @@ class Timeline {
 		for (let s of Object.values(slides)) {
 			if (s.get('id') === id) {
 				this.slide = s;
-				$(`#slide-btn-${s.get('id')}`).addClass('selected');
+				$(`#tl-slide-btn-${s.get('id')}`).addClass('selected');
 			} else {
-				$(`#slide-btn-${s.get('id')}`).removeClass('selected');
+				$(`#tl-slide-btn-${s.get('id')}`).removeClass('selected');
 			}
 		}
 	}
 
-	show_queue(queue) {
+	async show_queue(queue) {
 		/*
 		*  Show a queue and setup the necessary event listeners.
 		*/
@@ -62,13 +60,31 @@ class Timeline {
 
 		this.queue = queue;
 		this.container.html('');
+		this.thumbs = {};
 
 		while (s = queue.get_slides().next(i++, false)) {
 			let id = s.get('id');
+			let thumb = null;
+
 			this.container.append(slide_template(s));
-			$(`#slide-btn-${id}`).on('click', () => {
+			$(`#tl-slide-btn-${id}`).on('click', () => {
 				this.slide_clicked(id);
 			});
+
+			thumb = new Preview(`tl-slide-thumb-cont-${id}`);
+			await thumb.init();
+
+			try {
+				thumb.render(s.get('markup'));
+			} catch (e) {
+				if (e instanceof MarkupError) {
+					$(`#tl-slide-btn-${id}`).addClass('error');
+				} else {
+					$(`#tl-slide-btn-${id}`).removeClass('error');
+					throw e;
+				}
+			}
+			this.thumbs[id] = thumb;
 		}
 	}
 
@@ -78,6 +94,7 @@ class Timeline {
 		*/
 		this.queue = null;
 		this.slide = null;
+		this.thumbs = null;
 		this.container.html('');
 	}
 }
