@@ -14,8 +14,10 @@ var EditorController = require('./editorcontroller.js').EditorController;
 var APIUI = require('ls-api-ui');
 var User = require('ls-user').User;
 var Queue = require('ls-queue').Queue;
+var MarkupError = require('ls-markup').err.MarkupError;
 
 var util = require('ls-util');
+var ace_range = ace.require('ace/range');
 
 var Timeline = require('./components/timeline.js').Timeline;
 var Preview = require('./components/preview.js').Preview;
@@ -28,6 +30,13 @@ class EditorView {
 
 		this.buttons    = null;
 		this.inputs     = null;
+		this.statics    = null;
+
+		this.editor     = null;
+		this.timeline   = null;
+		this.preview    = null;
+
+		this.error_id   = null;
 	}
 
 	async init() {
@@ -237,29 +246,24 @@ class EditorView {
 				clearer: e => e.val('')
 			}),
 			editor: new UIInput({
-				elem: (() => {
-					let ret = ace.edit('slide-input');
-					ret.setTheme('ace/theme/dawn');
-					ret.blockScrolling = Infinity;
-					return ret;
-				})(),
+				elem: $('#slide-input'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
 					&& (d.slide.owned || d.slide.collaborate)
 				),
-				enabler: (e, s) => e.setReadOnly(!s),
-				attach: null,
+				enabler: (e, s) => this.editor.setReadOnly(!s),
+				attach: { 'keyup': () => this.render_preview() },
 				defer: () => !this.ready,	
 				mod: null,
-				getter: e => e.getValue(),
+				getter: e => this.editor.getValue(),
 				setter: (e, val) => {
-					e.setValue(val);
-					e.clearSelection();
+					this.editor.setValue(val);
+					this.editor.clearSelection();
 				},
 				clearer: e => {
-					e.setValue('');
-					e.clearSelection();
+					this.editor.setValue('');
+					this.editor.clearSelection();
 				}
 			}),
 			enable: new UIInput({
@@ -327,6 +331,15 @@ class EditorView {
 					&& d.slide.locked
 					&& d.slide.collaborate
 				),
+				enabler: (e, s) => s ? e.show() : e.hide(),
+				attach: null,
+				defer: () => !this.ready,
+				getter: null,
+				setter: null
+			}),
+			label_editor_error: new UIStatic({
+				elem: $('#slide-label-editor-error'),
+				cond: () => true,
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
 				defer: () => !this.ready,
@@ -409,9 +422,16 @@ class EditorView {
 			})
 		});
 
-		this.timeline = new Timeline('timeline');
-		this.ready = true;
+		this.editor = ace.edit('slide-input');
+		this.editor.setTheme('ace/theme/dawn');
+		this.editor.blockScrolling = Infinity;
 
+		this.timeline = new Timeline('timeline');
+
+		this.preview = new Preview('preview');
+		await this.preview.init();
+
+		this.ready = true;
 		await this.show_queue('default');
 	}
 
@@ -456,7 +476,40 @@ class EditorView {
 		this.inputs.get('editor').set(s.get('markup'));
 		this.inputs.get('enable').set(s.get('enabled'));
 
+		this.render_preview();
+
 		this.update();
+	}
+
+	highlight_error(from, to) {
+		return this.editor.session.addMarker(
+			new ace_range.Range(from, 0, to, 10),
+			'syntax-error-highlight',
+			'fullLine'
+		);
+	}
+
+	clear_error(id) {
+		if (id) { this.editor.session.removeMarker(id); }
+	}
+
+	render_preview() {
+		this.statics.get('label_editor_error').set('');
+		this.clear_error(this.error_id);
+		this.error_id = null;
+
+		try {
+			this.preview.render(this.inputs.get('editor').get());
+		} catch (e) {
+			if (e instanceof MarkupError) {
+				this.statics.get('label_editor_error').set(
+					`>> ${e.toString()}`
+				);
+				this.error_id = this.highlight_error(e.line(), e.line());
+			} else {
+				throw e;
+			}
+		}
 	}
 
 	async hide_slide() {

@@ -26,6 +26,6 @@
 	<div id="slide-input" class="rounded"></div>
 
 	<div class="container-fluid">
-		<p id="markup-err-display"></p>
+		<p id="slide-label-editor-error"></p>
 	</div>
 </div>

@@ -21,9 +21,7 @@
 			</button>
 		</div>
 		<div class="col-12">
-			<div id="slide-live-preview"
-				class="preview-cont preview-limit">
-			</div>
+			<div id="preview" class="preview-cont preview-limit"></div>
 		</div>
 	</div>
 </div>
