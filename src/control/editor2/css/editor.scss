@@ -3,6 +3,7 @@
 @import 'nav';
 @import 'dialog';
 @import 'multiselect';
+@import 'ls-dropselect/css/dropselect.scss';
 @import 'timeline';
 @import 'preview';
 @import 'popup';
@@ -30,8 +31,16 @@ html, body {
 	overflow-y: hidden;
 }
 
-#queue-select {
-	width: 150px;
+.q-select {
+	display: inline-block;
+	height: 100%;
+	padding: {
+		right: 0;
+		left: 0;
+	}
+	.dropselect-open {
+		@extend .small-select;
+	}
 }
 
 .btn-slide-ctrl {

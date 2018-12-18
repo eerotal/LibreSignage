@@ -21,6 +21,7 @@ var ace_range = ace.require('ace/range');
 
 var Timeline = require('./components/timeline.js').Timeline;
 var Preview = require('./components/preview.js').Preview;
+var QueueSelector = require('./components/queueselector.js').QueueSelector;
 
 class EditorView {
 	constructor(api) {
@@ -297,6 +298,28 @@ class EditorView {
 				getter: null,
 				setter: null
 			}),
+			queueselector: new UIStatic({
+				elem: $('#queueselector'),
+				cond: () => true,
+				enabler: null,
+				attach: {
+					'component.queueselector.select': async (e, data) => {
+						await this.show_queue(data.queue);
+					},
+					'component.queueselector.create': async (e, data) => {
+						await this.create_queue();
+					},
+					'component.queueselector.view': (e, data) => {
+						this.view_queue();						
+					},
+					'component.queueselector.remove': async (e, data) => {
+						await this.remove_queue();	
+					}
+				},
+				defer: () => !this.ready,
+				getter: null,
+				setter: null
+			}),
 			label_readonly: new UIStatic({
 				elem: $('#slide-label-readonly'),
 				cond: d => (
@@ -426,28 +449,44 @@ class EditorView {
 		this.editor.setTheme('ace/theme/dawn');
 		this.editor.blockScrolling = Infinity;
 
+		this.queueselector = new QueueSelector(
+			'queueselector',
+			this.api
+		);
 		this.timeline = new Timeline('timeline');
-
 		this.preview = new Preview('preview');
 		await this.preview.init();
 
 		this.ready = true;
-		await this.show_queue('default');
 	}
 
 	async show_queue(name) {
 		try {
 			await this.controller.open_queue(name);
 		} catch (e) {
+			this.queueselector.deselect_queue();
 			APIUI.handle_error(e);
-			return;
+			return false;
 		}
 		this.timeline.show_queue(this.controller.get_queue());
+		return true;
 	}
 
 	hide_queue() {
 		this.timeline.hide_queue();
 		this.controller.close_queue();
+	}
+
+	create_queue() {
+
+	}
+
+	view_queue() {
+		window.open(`/app/?q=${this.controller.get_queue().get_name()}`);
+	}
+
+	remove_queue() {
+
 	}
 
 	async show_slide(id) {

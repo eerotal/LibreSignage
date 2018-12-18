@@ -19,8 +19,11 @@
 			<div class="container-main container-fluid w-100 h-100">
 				<div class="container-fluid row mx-0 my-1">
 					<div class="col-12">
-						<!-- Slide selector -->
-						<div id="slide-selector"></div>
+						<div id="queueselector">
+							<?php
+								require_once('./php/queueselector.php');
+							?>
+						</div>
 					</div>
 					<div class="col-12">
 						<div id="timeline"></div>
