@@ -43,7 +43,7 @@ function update_buffers() {
 	*  Buffer slide data and markup to improve display performance.
 	*/
 	slide_buffer[0] = slide_buffer[1];
-	slide_buffer[1] = queue.slides.filter(
+	slide_buffer[1] = queue.get_slides().filter(
 		{'enabled': true}
 	).next(
 		slide_buffer[0] != null ? slide_buffer[0].get('index') : -1,
@@ -129,7 +129,6 @@ async function display_setup() {
 			return;
 		}
 	} else if ('q' in params){
-		console.log("LibreSignage: Initialize display.");
 		queue = new Queue(API);
 		try {
 			await queue.load(params['q']);
@@ -138,20 +137,24 @@ async function display_setup() {
 				APIUI.handle_error(e);
 			}
 			console.error(
-				`LibreSignage: Failed to start ` +
-				`display: ${e.response.e_msg}`
+				`LibreSignage: Failed to show queue: ${e.response.e_msg}`
 			);
 			return;
 		}
 		console.log(
 			`LibreSignage: Queue '${params['q']}' loaded. ` +
-			`(${queue.slides.length()} slides)`
+			`(${queue.get_slides().length()} slides)`
 		);
-		setInterval(() => {
+		setInterval(async () => {
 			console.log("LibreSignage: Queue update.");
-			queue.update(() => {
-				console.log("LibreSignage: Queue update complete.");
-			});
+			try {
+				await queue.update();
+			} catch (e) {
+				if (!('noui' in params)) {
+					APIUI.handle_error(e);
+				}
+				console.error(`LibreSignage: Failed to update queue.`);
+			}
 		}, QUEUE_UPDATE_INTERVAL);
 		render();
 	} else {
