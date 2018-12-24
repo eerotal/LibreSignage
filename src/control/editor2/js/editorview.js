@@ -459,6 +459,7 @@ class EditorView {
 		this.remove.set_button_html('<i class="fas fa-trash-alt"></i>');
 		this.remove.set_content_html('Remove slide?');
 
+		this.update();
 		this.ready = true;
 	}
 
@@ -476,7 +477,7 @@ class EditorView {
 			APIUI.handle_error(e);
 			return;
 		}
-		this.timeline.show_queue(this.controller.get_queue());
+		await this.timeline.show_queue(this.controller.get_queue());
 	}
 
 	async hide_queue() {
@@ -660,7 +661,8 @@ class EditorView {
 			return;
 		}
 
-		// Update slide data in the UI.
+		// Update timeline and editor UI.
+		await this.timeline.show_queue(this.controller.get_queue());
 		this.show_slide(null);
 	}
 
@@ -759,6 +761,7 @@ class EditorView {
 		} catch (e) {
 			APIUI.handle_error(e);
 		}
+		await this.timeline.show_queue(this.controller.get_queue());
 		this.update();
 	}
 

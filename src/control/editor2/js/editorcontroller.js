@@ -32,6 +32,11 @@ class EditorController {
 		});
 	}
 
+	async update_queue() {
+		assert(this.queue != null, "No queue loaded.");
+		await this.queue.update();
+	}
+
 	async create_queue(name) {
 		if (this.queue != null) {
 			this.close_queue();
@@ -150,6 +155,7 @@ class EditorController {
 		assert(this.slide != null, "No slide to save.");
 
 		await this.slide.save();
+		await this.update_queue();
 		Object.assign(this.state.slide, {
 			saved: true
 		});
@@ -161,12 +167,13 @@ class EditorController {
 
 		this.slide.set('queue', queue);
 		await this.save_slide();
+		await this.update_queue();
 	}
 
 	async duplicate_slide() {
 		assert(this.slide != null, "No slide to duplicate.");
 		await this.slide.dup();
-		await this.queue.update();
+		await this.update_queue();
 	}
 
 	async remove_slide() {
@@ -177,6 +184,7 @@ class EditorController {
 		} else {
 			await this.slide.remove();
 			this.slide = null;
+			await this.update_queue();
 		}
 
 		Object.assign(this.state.slide, {

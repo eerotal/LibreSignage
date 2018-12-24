@@ -56,6 +56,7 @@ class Timeline {
 		let s = null;
 
 		this.queue = queue;
+		this.slide = null;
 		this.container.html('');
 		this.thumbs = {};
 
