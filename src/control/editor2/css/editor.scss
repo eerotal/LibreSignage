@@ -4,6 +4,7 @@
 @import 'dialog';
 @import 'multiselect';
 @import 'ls-dropselect/css/dropselect.scss';
+@import 'ls-dropconfirm/css/dropconfirm.scss';
 @import 'timeline';
 @import 'preview';
 @import 'popup';
@@ -32,14 +33,16 @@ html, body {
 }
 
 .q-select {
-	display: inline-block;
-	height: 100%;
-	padding: {
-		right: 0;
-		left: 0;
-	}
 	.dropselect-open {
-		@extend .small-select;
+		@extend .btn-primary;
+		@extend .small-btn;
+	}
+}
+
+.q-remove {
+	.dropconfirm-open {
+		@extend .btn-danger;
+		@extend .small-btn;
 	}
 }
 
@@ -47,17 +50,11 @@ html, body {
 	margin: 5px;
 }
 
-#btn-slide-remove::after {
-	/* Remove the dropdown arrow added by Bootstrap. */
-	content: none;
-}
-
-#dropdown-slide-remove {
-	flex-direction: column;
-	text-align: center;
-	padding: $s1;
-	&.show { display: flex !important; }
-	button { flex: 1 1 100%; }
+#btn-slide-remove {
+	.dropconfirm-open {
+		@extend .btn-danger;
+		@extend .btn-slide-ctrl
+	}
 }
 
 /* Editor styling */

@@ -40,27 +40,5 @@
 		<div class="dropdown-menu" id="dropdown-slide-move" aria-labelledby="btn-slide-move">
 		</div>
 	</div>
-	<div class="dropdown">
-		<button id="btn-slide-remove"
-			type="button"
-			class="btn btn-danger btn-slide-ctrl dropdown-toggle"
-			data-toggle="dropdown"
-			aria-haspopup="true"
-			aria-expanded="false">
-			<i class="fas fa-trash-alt"></i>
-		</button>
-		<div class="dropdown-menu" id="dropdown-slide-remove" aria-labelledby="btn-slide-remove">
-			<span>Remove slide?</span>
-			<button class="btn btn-success btn-slide-ctrl"
-				id="btn-slide-remove-continue"
-				type="button">
-				<i class="fas fa-check"></i>
-			</button>
-			<button class="btn btn-danger btn-slide-ctrl"
-				type="button"
-				id="btn-slide-remove-cancel">
-				<i class="fas fa-times"></i>
-			</button>
-		</div>
-	</div>
+	<div id="btn-slide-remove"></div>
 </div>

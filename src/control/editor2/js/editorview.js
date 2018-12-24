@@ -5,6 +5,7 @@ var UIInput = require('ls-uicontrol').UIInput;
 var UIButton = require('ls-uicontrol').UIButton;
 var UIStatic = require('ls-uicontrol').UIStatic;
 var MultiSelect = require('ls-multiselect').MultiSelect;
+var DropConfirm = require('ls-dropconfirm').DropConfirm;
 
 var StrValidator = require('ls-validator').StrValidator;
 var WhitelistValidator = require('ls-validator').WhitelistValidator;
@@ -425,37 +426,38 @@ class EditorView {
 					&& d.slide.locked
 					&& d.slide.owned
 				),
-				enabler: null,
-				attach: null,
-				defer: () => !this.ready
-			}),
-			remove_cancel: new UIButton({
-				elem: $('#btn-slide-remove-cancel'),
-				cond: d => true,
-				enabler: null,
-				attach: null,
-				defer: () => !this.ready
-			}),
-			remove_continue: new UIButton({
-				elem: $('#btn-slide-remove-continue'),
-				cond: d => true,
-				enabler: null,
-				attach: { click: () => this.remove_slide() },
+				enabler: (elem, s) => {
+					elem.find('.dropconfirm-open').prop('disabled', !s);
+				},
+				attach: {
+					'component.dropconfirm.confirm': () => {
+						this.remove_slide();
+					}
+				},
 				defer: () => !this.ready
 			})
 		});
 
+		// Markup editor.
 		this.editor = ace.edit('slide-input');
 		this.editor.setTheme('ace/theme/dawn');
 		this.editor.blockScrolling = Infinity;
 
+		// Queue selector.
 		this.queueselector = new QueueSelector('queueselector', this.api);
 		await this.queueselector.init();
 
+		// Queue timeline.
 		this.timeline = new Timeline('timeline');
 
+		// Live slide preview.
 		this.preview = new Preview('preview');
 		await this.preview.init();
+
+		// Slide remove DropConfirm.
+		this.remove = new DropConfirm($('#btn-slide-remove')[0]);
+		this.remove.set_button_html('<i class="fas fa-trash-alt"></i>');
+		this.remove.set_content_html('Remove slide?');
 
 		this.ready = true;
 	}

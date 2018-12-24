@@ -5,13 +5,14 @@ var UIInput = require('ls-uicontrol').UIInput;
 var Queue = require('ls-queue').Queue;
 var APIUI = require('ls-api-ui');
 var DropSelect = require('ls-dropselect').DropSelect;
+var DropConfirm = require('ls-dropconfirm').DropConfirm;
 var dialog = require('ls-dialog');
 
 var StrValidator = require('ls-validator').StrValidator;
 var BlacklistValidator = require('ls-validator').BlacklistValidator;
 
 class QueueSelector {
-	constructor (container_id, api) {
+	constructor(container_id, api) {
 		this.container = $(`#${container_id}`);
 		this.api = api;
 		this.state = {
@@ -53,14 +54,28 @@ class QueueSelector {
 			remove: new UIButton({
 				elem: this.container.find('.q-remove'),
 				cond: d => d.queue.selected,
-				enabler: null,
-				attach: { click: () => this.remove_queue() },
+				enabler: (elem, s) => {
+					elem.find('.dropconfirm-open').prop('disabled', !s);
+				},
+				attach: {
+					'component.dropconfirm.confirm': () => {
+						this.remove_queue();
+					}
+				},
 				defer: () => !this.state.ready
-			})
+			}),
 		});
 
-		this.select = new DropSelect(this.container.find('.q-select')[0]);
-		this.select.set_button_text('Queue');
+		this.remove = new DropConfirm(
+			this.container.find('.q-remove')[0]
+		);
+		this.remove.set_button_html('<i class="fas fa-trash-alt"></i>');
+		this.remove.set_content_html('Remove queue?');
+
+		this.select = new DropSelect(
+			this.container.find('.q-select')[0]
+		);
+		this.select.set_button_html('Queue');
 
 		await this.update_queue_list();
 		this.update();
@@ -97,7 +112,7 @@ class QueueSelector {
 		*  queue name is passed as 'queue' in the event data object.
 		*/
 		this.state.queue.selected = true;
-		this.select.set_button_text(queue);
+		this.select.set_button_html(queue);
 		this.select.select(queue, false);
 		this.update();
 
@@ -109,7 +124,7 @@ class QueueSelector {
 		*  Fire the queue deselect event.
 		*/
 		this.state.queue.selected = false;
-		this.select.set_button_text('Queue');
+		this.select.set_button_html('Queue');
 		this.update();
 
 		this.trigger('deselect');
