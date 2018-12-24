@@ -32,6 +32,27 @@ class EditorController {
 		});
 	}
 
+	async create_queue(name) {
+		if (this.queue != null) {
+			this.close_queue();
+		}
+
+		this.queue = new Queue(this.api);
+		await this.queue.create(name);
+		Object.assign(this.state.queue, {
+			loaded: true
+		});
+	}
+
+	async remove_queue() {
+		assert(this.queue != null, "No queue loaded.");
+		await this.queue.remove();
+		this.queue = null;
+		Object.assign(this.state.queue, {
+			loaded: false
+		});
+	}
+
 	close_queue() {
 		this.queue = null;
 		Object.assign(this.state.queue, {

@@ -307,12 +307,12 @@ class EditorView {
 						await this.show_queue(data.queue);
 					},
 					'component.queueselector.create': async (e, data) => {
-						await this.create_queue();
+						await this.create_queue(data.queue);
 					},
-					'component.queueselector.view': (e, data) => {
+					'component.queueselector.view': e => {
 						this.view_queue();						
 					},
-					'component.queueselector.remove': async (e, data) => {
+					'component.queueselector.remove': async e => {
 						await this.remove_queue();	
 					}
 				},
@@ -449,11 +449,11 @@ class EditorView {
 		this.editor.setTheme('ace/theme/dawn');
 		this.editor.blockScrolling = Infinity;
 
-		this.queueselector = new QueueSelector(
-			'queueselector',
-			this.api
-		);
+		this.queueselector = new QueueSelector('queueselector', this.api);
+		await this.queueselector.init();
+
 		this.timeline = new Timeline('timeline');
+
 		this.preview = new Preview('preview');
 		await this.preview.init();
 
@@ -461,35 +461,78 @@ class EditorView {
 	}
 
 	async show_queue(name) {
+		/*
+		*  Show the queue 'name'.
+		*/
+		await this.hide_queue();
 		try {
 			await this.controller.open_queue(name);
 		} catch (e) {
+			// Deselect the queue in QueueSelector on error.		
 			this.queueselector.deselect_queue();
+
 			APIUI.handle_error(e);
-			return false;
+			return;
 		}
 		this.timeline.show_queue(this.controller.get_queue());
-		return true;
 	}
 
-	hide_queue() {
+	async hide_queue() {
+		/*
+		*  Hide the current queue.
+		*/
+		try {
+			await this.hide_slide();
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
+		}
 		this.timeline.hide_queue();
 		this.controller.close_queue();
 	}
 
-	create_queue() {
+	async create_queue(queue) {
+		/*
+		*  Create a new queue.
+		*/
+		try {
+			await this.controller.create_queue(queue);
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
+		}
 
+		/*
+		*  Make the QueueSelector select the new queue. Note
+		*  that these calls also fire the QueueSelector select
+		*  event, which in turn calls EditorView.queue_select().
+		*
+		*  These could technically be called directly in
+		*  QueueSelector.create_queue() but that would make the
+		*  program flow a pain to reason about because the code
+		*  in QueueSelector would need to know whether the event
+		*  handler functions failed or not.
+		*/
+		await this.queueselector.update_queue_list();
+		this.queueselector.select_queue(queue);
 	}
 
 	view_queue() {
 		window.open(`/app/?q=${this.controller.get_queue().get_name()}`);
 	}
 
-	remove_queue() {
-
+	async remove_queue() {
+		/*
+		*  Remove and hide the current queue.
+		*/
+		this.controller.remove_queue();
+		await this.hide_queue();
 	}
 
 	async show_slide(id) {
+		/*
+		*  Show the slide 'id'.
+		*/
 		let s = null;
 		if (id != null) {
 			try {
@@ -521,6 +564,9 @@ class EditorView {
 	}
 
 	highlight_error(from, to) {
+		/*
+		*  Highlight lines from-to in the markup editor.
+		*/
 		return this.editor.session.addMarker(
 			new ace_range.Range(from, 0, to, 10),
 			'syntax-error-highlight',
@@ -529,10 +575,16 @@ class EditorView {
 	}
 
 	clear_error(id) {
+		/*
+		*  Clear editor highlights.
+		*/
 		if (id) { this.editor.session.removeMarker(id); }
 	}
 
 	render_preview() {
+		/*
+		*  Render the live markup preview.
+		*/
 		this.statics.get('label_editor_error').set('');
 		this.clear_error(this.error_id);
 		this.error_id = null;
@@ -552,6 +604,9 @@ class EditorView {
 	}
 
 	async hide_slide() {
+		/*
+		*  Hide the currently visible slide.
+		*/
 		if (this.controller.get_state().slide.loaded) {
 			await this.controller.close_slide();
 		}
@@ -559,6 +614,10 @@ class EditorView {
 	}
 
 	async new_slide() {
+		/*
+		*  Create a new slide. Note that this function
+		*  doesn't save the slide automatically.
+		*/
 		try {
 			await this.controller.new_slide();
 		} catch (e) {
@@ -569,6 +628,9 @@ class EditorView {
 	}
 
 	async save_slide() {
+		/*
+		*  Save the current slide.
+		*/
 		let s = this.controller.get_slide();
 		s.set({
 			'name':          this.inputs.get('name').get(),
@@ -601,6 +663,9 @@ class EditorView {
 	}
 
 	async duplicate_slide() {
+		/*
+		*  Duplicate the current slide.
+		*/
 		try {
 			await this.controller.duplicate_slide();
 		} catch (e) {
@@ -683,6 +748,9 @@ class EditorView {
 	}
 
 	async remove_slide() {
+		/*
+		*  Remove the current slide.
+		*/
 		try {
 			await this.controller.remove_slide();
 			await this.hide_slide();
@@ -693,6 +761,10 @@ class EditorView {
 	}
 
 	update() {
+		/*
+		*  Update controls state, ie. whether buttons and
+		*  inputs are enabled.
+		*/
 		this.inputs.all(
 			function(d) { this.state(d); },
 			this.controller.get_state()
