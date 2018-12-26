@@ -508,6 +508,7 @@ class EditorView {
 		}
 		this.timeline.hide_queue();
 		this.controller.close_queue();
+		this.update();
 	}
 
 	async create_queue(queue) {
