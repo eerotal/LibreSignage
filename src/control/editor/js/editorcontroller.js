@@ -165,7 +165,7 @@ class EditorController {
 		assert(this.slide != null, "No slide to move.");
 		assert(this.state.slide.saved, "Slide not saved.");
 
-		this.slide.set('queue', queue);
+		this.slide.set({ 'queue_name': queue });
 		await this.save_slide();
 		await this.update_queue();
 	}

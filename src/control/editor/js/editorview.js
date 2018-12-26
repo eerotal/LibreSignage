@@ -691,6 +691,7 @@ class EditorView {
 		} catch (e) {
 			APIUI.handle_error(e);
 		}
+		await this.timeline.show_queue(this.controller.get_queue());
 	}
 
 	preview_slide() {
@@ -728,6 +729,8 @@ class EditorView {
 		} catch (e) {
 			APIUI.handle_error(e);
 		}
+		await this.timeline.show_queue(this.controller.get_queue());
+		this.hide_slide();
 	}
 
 	async remove_slide() {

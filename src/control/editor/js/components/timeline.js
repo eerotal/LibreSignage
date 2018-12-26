@@ -52,7 +52,7 @@ class Timeline {
 		/*
 		*  Show a queue and setup the necessary event listeners.
 		*/
-		let i = -1;
+		let index = -1;
 		let s = null;
 
 		this.queue = queue;
@@ -60,7 +60,9 @@ class Timeline {
 		this.container.html('');
 		this.thumbs = {};
 
-		while (s = queue.get_slides().next(i++, false)) {
+		while (s = queue.get_slides().next(index, false)) {
+			index = s.get('index');
+
 			let id = s.get('id');
 			let thumb = null;
 
