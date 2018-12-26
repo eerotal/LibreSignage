@@ -6,6 +6,7 @@ var UIButton = require('ls-uicontrol').UIButton;
 var UIStatic = require('ls-uicontrol').UIStatic;
 var MultiSelect = require('ls-multiselect').MultiSelect;
 var DropConfirm = require('ls-dropconfirm').DropConfirm;
+var DropSelect = require('ls-dropselect').DropSelect;
 
 var StrValidator = require('ls-validator').StrValidator;
 var WhitelistValidator = require('ls-validator').WhitelistValidator;
@@ -415,8 +416,17 @@ class EditorView {
 					&& d.slide.locked
 					&& d.slide.owned
 				),
-				enabler: null,
-				attach: { click: () => this.move_slide() },
+				enabler: (elem, s) => {
+					elem.find('.dropselect-open').prop('disabled', !s);
+				},
+				attach: {
+					'component.dropselect.show': async () => {
+						await this.update_move_slide_options();
+					},
+					'component.dropselect.select': (e, data) => {
+						this.move_slide(data.option);
+					}
+				},
 				defer: () => !this.ready
 			}),
 			remove: new UIButton({
@@ -458,6 +468,12 @@ class EditorView {
 		this.remove = new DropConfirm($('#btn-slide-remove')[0]);
 		this.remove.set_button_html('<i class="fas fa-trash-alt"></i>');
 		this.remove.set_content_html('Remove slide?');
+
+		/* Slide move DropSelect. */
+		this.move = new DropSelect($('#btn-slide-move')[0]);
+		this.move.set_button_html(
+			'<i class="fas fa-arrow-circle-right"></i>'
+		);
 
 		this.update();
 		this.ready = true;
@@ -686,10 +702,9 @@ class EditorView {
 		);
 	}
 
-	async move_slide() {
+	async update_move_slide_options() {
 		/*
-		*  Create the dropdown items for the 'Move slide' dropdown
-		*  and attach event handlers to them.
+		*  Update the queue list in the 'Move slide' DropSelect.
 		*/
 		let queues = null;
 		let sq = this.controller.get_slide().get('queue_name');
@@ -701,54 +716,18 @@ class EditorView {
 			APIUI.handle_error(e);
 			return;
 		}
+		this.move.set_options(queues);
+	}
 
+	async move_slide(queue) {
 		/*
-		*  No other queues than the current one.
-		*    => Add the '< No queues>' item.
+		*  Move the current slide to 'queue'.
 		*/
-		if (queues.length === 0) {
-			$('#dropdown-slide-move').html(
-				$('<button></button>')
-					.text('< No queues >')
-					.attr({
-						class: 'dropdown-item disabled',
-						type: 'button'
-					})
-			);
-			return;
-		}
-
-		// Add queue buttons to the dropdown.
-		$('#dropdown-slide-move').html('');
-		for (let q of queues) {
-			if (q === this.controller.get_slide().get('queue')) {
-				continue;
-			}
-			$('#dropdown-slide-move').append(
-				$('<button></button>')
-					.text(q)
-					.attr({
-						class: 'dropdown-item',
-						type: 'button'
-					})
-					.on('click', async () => {
-						try {
-							await this.controller.move_slide(q);
-						} catch (e) {
-							APIUI.handle_error(e);
-						}
-					})
-			);
-		}
-
 		try {
-			await this.hide_slide();
+			await this.controller.move_slide(queue);
 		} catch (e) {
 			APIUI.handle_error(e);
-			return;
 		}
-
-		this.update();
 	}
 
 	async remove_slide() {

@@ -8,7 +8,7 @@
 # break things since it doesn't add the trailing slash to the path.
 ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-SASS_IPATHS := $(ROOT) $(ROOT)src/common/css
+SASS_IPATHS := $(ROOT) $(ROOT)src/common/css $(ROOT)/src/node_modules
 SASSFLAGS := --no-source-map
 
 # Caller supplied build settings.

@@ -28,17 +28,6 @@
 		title="Preview slide.">
 		<i class="fas fa-eye"></i>
 	</button>
-	<div class="dropdown">
-		<button id="btn-slide-move"
-			type="button"
-			class="btn btn-success btn-slide-ctrl dropdown-toggle"
-			data-toggle="dropdown"
-			aria-haspopup="true"
-			aria-expanded="false">
-			<i class="fas fa-arrow-circle-right"></i>
-		</button>
-		<div class="dropdown-menu" id="dropdown-slide-move" aria-labelledby="btn-slide-move">
-		</div>
-	</div>
+	<div id="btn-slide-move"></div>
 	<div id="btn-slide-remove"></div>
 </div>

@@ -4,6 +4,13 @@
 	margin: 5px;
 }
 
+#btn-slide-move {
+	.dropselect-open {
+		@extend .btn-primary;
+		@extend .btn-slide-ctrl
+	}
+}
+
 #btn-slide-remove {
 	.dropconfirm-open {
 		@extend .btn-danger;
