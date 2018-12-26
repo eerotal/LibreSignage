@@ -221,5 +221,8 @@ $queue = new Queue($slide->get_queue_name());
 $queue->load();
 $queue->juggle($slide->get_id());
 
-$SLIDE_SAVE->resp_set($slide->export(FALSE, FALSE));
+// Get the slide data from $queue since $queue->juggle() modifies it.
+$SLIDE_SAVE->resp_set(
+	$queue->get_slide($slide->get_id())->export(FALSE, FALSE)
+);
 $SLIDE_SAVE->send();

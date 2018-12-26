@@ -231,6 +231,15 @@ class Queue {
 		return $this->slides;
 	}
 
+	function get_slide(string $id) {
+		foreach($this->slides as $s) {
+			if ($s->get_id() === $id) {
+				return $s;
+			}
+		}
+		return NULL;
+	}
+
 	function get_owner() {
 		return $this->owner;
 	}
