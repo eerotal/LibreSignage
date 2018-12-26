@@ -3,8 +3,7 @@
 #queueselector {
 	width: 100%;
 	white-space: nowrap;
-	overflow-x: auto;
-	overflow-y: hidden;
+	overflow: visible;
 }
 
 .q-select {

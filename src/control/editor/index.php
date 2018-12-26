@@ -10,7 +10,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<?php require_css(['font-awesome']); ?>
-		<link rel="stylesheet" href="/control/editor2/css/main.css">
+		<link rel="stylesheet" href="/control/editor/css/main.css">
 		<title>LibreSignage Editor</title>
 	</head>
 	<body>
@@ -53,6 +53,6 @@
 			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
 		?>
 		<script src="/libs/ace-builds/src/ace.js"></script>
-		<script src="/control/editor2/js/main.js"></script>
+		<script src="/control/editor/js/main.js"></script>
 	</body>
 </html>
