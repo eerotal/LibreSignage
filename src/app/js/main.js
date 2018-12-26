@@ -121,9 +121,16 @@ async function display_setup() {
 				content.find('video').removeAttr('autoplay');
 			}
 			DISPLAY.html(content);
+
+			/*
+			*  This DISPLAY.show() call is a workaround for Chrome
+			*  (and possibly other browsers?) where the display won't
+			*  render until a change, eg. a page resize, happens.
+			*/
+			DISPLAY.show();
 		} catch (e) {
 			if (e instanceof markup.err.MarkupSyntaxError) {
-				console.error(`LibreSignage: ${e.response.e_msg}`);
+				console.error(`LibreSignage: ${e.toString}`);
 				DISPLAY.html('');
 			}
 			return;
