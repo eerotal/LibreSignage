@@ -1,4 +1,4 @@
-/* LibreSignage editor timeline styling. */
+/* Editor timeline styling. */
 
 @import 'globals';
 
@@ -50,11 +50,19 @@ $tl-thumb-cont-width: 1 - $tl-index-cont-width;
 	color: $secondary;
 	border: 1px solid $gray-1;
 
+	/* Remove some margins from the first and last slide containers. */
+	&:first-child {
+		margin-left: 0;
+	}
+	&:last-child {
+		margin-right: 0;
+	}
+
+	/* Special style classes. */
 	&:hover {
 		background-color: $secondary;
 		color: $white;
 	}
-
 	&.disabled {
 		background-color: $gray-1;
 	}

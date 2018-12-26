@@ -10,7 +10,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<?php require_css(['font-awesome']); ?>
-		<link rel="stylesheet" href="/control/editor2/css/editor.css">
+		<link rel="stylesheet" href="/control/editor2/css/main.css">
 		<title>LibreSignage Editor</title>
 	</head>
 	<body>

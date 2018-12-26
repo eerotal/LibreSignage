@@ -1,0 +1,31 @@
+/* Main SCSS file where all partials are imported. */
+
+@import 'default';
+@import 'footer';
+@import 'nav';
+@import 'dialog';
+@import 'multiselect';
+@import 'ls-dropselect/css/dropselect.scss';
+@import 'ls-dropconfirm/css/dropconfirm.scss';
+
+@import 'timeline';
+@import 'preview';
+@import 'popup';
+@import 'quick_help';
+@import 'asset_uploader';
+@import 'queueselector';
+@import 'buttons';
+@import 'editor';
+@import 'controls';
+
+$main-col-minw: 250px; // Main column min width.
+
+html, body {
+	transition: all .5s;
+	min-height: 100%;
+}
+
+#editor-col-l, #editor-col-r {
+	min-width: $main-col-minw;
+}
+

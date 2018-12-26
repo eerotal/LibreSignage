@@ -1,0 +1,12 @@
+/* Editor buttons styling */
+
+.btn-slide-ctrl {
+	margin: 5px;
+}
+
+#btn-slide-remove {
+	.dropconfirm-open {
+		@extend .btn-danger;
+		@extend .btn-slide-ctrl
+	}
+}

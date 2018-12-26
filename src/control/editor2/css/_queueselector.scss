@@ -1,0 +1,22 @@
+/* Editor queue selector styling. */
+
+#queueselector {
+	width: 100%;
+	white-space: nowrap;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+.q-select {
+	.dropselect-open {
+		@extend .btn-primary;
+		@extend .small-btn;
+	}
+}
+
+.q-remove {
+	.dropconfirm-open {
+		@extend .btn-danger;
+		@extend .small-btn;
+	}
+}
