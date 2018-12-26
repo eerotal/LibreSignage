@@ -7,6 +7,7 @@ var UIStatic = require('ls-uicontrol').UIStatic;
 var MultiSelect = require('ls-multiselect').MultiSelect;
 var DropConfirm = require('ls-dropconfirm').DropConfirm;
 var DropSelect = require('ls-dropselect').DropSelect;
+var Popup = require('ls-popup').Popup;
 
 var StrValidator = require('ls-validator').StrValidator;
 var WhitelistValidator = require('ls-validator').WhitelistValidator;
@@ -445,6 +446,15 @@ class EditorView {
 					}
 				},
 				defer: () => !this.ready
+			}),
+			quick_help: new UIButton({
+				elem: $('#link-quick-help'),
+				cond: d => true,
+				enabler: null,
+				attach: {
+					click: () => this.quick_help.visible(true)
+				},
+				defer: () => !this.ready
 			})
 		});
 
@@ -474,6 +484,9 @@ class EditorView {
 		this.move.set_button_html(
 			'<i class="fas fa-arrow-circle-right"></i>'
 		);
+
+		/* Quick help popup. */
+		this.quick_help = new Popup($('#quick-help')[0]);
 
 		this.update();
 		this.ready = true;
