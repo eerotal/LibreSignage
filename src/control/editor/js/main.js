@@ -1403,12 +1403,20 @@ function setup() {
 	*  the user doesn't accidentally exit the page and lose changes.
 	*/
 	$(window).on('beforeunload', function(e) {
+		event.preventDefault();
 		if (editor_status_check(['NOSLIDE', 'SAVED'])) { return; }
 		e.returnValue = "The selected slide is not saved. " +
 				"Any changes will be lost if you exit " +
 				"the page. Are you sure you want to " +
 				"continue?";
 		return e.returnValue;
+	});
+
+	// Release slide lock on exit.
+	$(window).on('unload', function(e) {
+		if (sel_slide != null && sel_slide.is_locked_from_here()) {
+			sel_slide.lock_release();
+		}
 	});
 
 	// Setup inputs and other UI elements.

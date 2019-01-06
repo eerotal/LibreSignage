@@ -2,6 +2,7 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
 
 class Session extends Exportable{
 	static $PUBLIC = [
@@ -23,6 +24,9 @@ class Session extends Exportable{
 		'token_hash'
 	];
 
+	const ID_DELIMITER = '_';
+	const TRUNC_LEN    = 45;
+
 	private $id = NULL;
 	private $who = NULL;
 	private $from = NULL;
@@ -31,13 +35,13 @@ class Session extends Exportable{
 	private $permanent = NULL;
 	private $token_hash = NULL;
 
-	public function get_id() { return $this->id; }
-	public function get_who() { return $this->who; }
-	public function get_from() { return $this->from; }
-	public function get_created() { return $this->created; }
-	public function get_max_age() { return $this->max_age; }
-	public function is_permanent() { return $this->permanent; }
-	public function get_token_hash() { return $this->token_hash; }
+	public function get_id(): string { return $this->id; }
+	public function get_who(): string { return $this->who; }
+	public function get_from(): string { return $this->from; }
+	public function get_created(): int { return $this->created; }
+	public function get_max_age(): int { return $this->max_age; }
+	public function is_permanent(): bool { return $this->permanent; }
+	public function get_token_hash(): string { return $this->token_hash; }
 
 	public function __exportable_set(string $name, $value) {
 		$this->{$name} = $value;
@@ -47,12 +51,22 @@ class Session extends Exportable{
 		return $this->{$name};
 	}
 
+	public static function from_id(string $id) {
+		/*
+		*  Load a session based on its ID. Returns the Session
+		*  object on success or NULL on failure.
+		*/
+		$p = explode(Session::ID_DELIMITER, $id);
+		$u = new User($p[0]);
+		return $u->session_get($id);
+	}
+
 	public function new(
 		User $user,
 		string $who,
 		string $from,
 		bool $permanent = FALSE
-	) {
+	): string {
 		/*
 		*  Create a new session and return the generated
 		*  session token. Note that only the session token
@@ -67,16 +81,16 @@ class Session extends Exportable{
 		*  Note that $who and $from are truncated to 45 characters.
 		*/
 		$t = time();
-		$this->id = $user->get_name().'_'.$t;
-		$this->who = substr($who, 0, 45);
-		$this->from = substr($from, 0, 45);
+		$this->id = $user->get_name().Session::ID_DELIMITER.$t;
+		$this->who = substr($who, 0, Session::TRUNC_LEN);
+		$this->from = substr($from, 0, Session::TRUNC_LEN);
 		$this->created = $t;
 		$this->max_age = SESSION_MAX_AGE;
 		$this->permanent = $permanent;
 		return $this->generate_token();
 	}
 
-	public function renew() {
+	public function renew(): string {
 		/*
 		*  Renew this session. Returns the newly generated
 		*  session token.
@@ -85,7 +99,7 @@ class Session extends Exportable{
 		return $this->generate_token();
 	}
 
-	private function generate_token() {
+	private function generate_token(): string {
 		/*
 		*  Generate a new cryptographically secure authentication
 		*  token and return it. The hash of the token is stored in
@@ -101,11 +115,11 @@ class Session extends Exportable{
 		return $token;
 	}
 
-	public function is_expired() {
+	public function is_expired(): bool {
 		return time() > $this->created + $this->max_age;
 	}
 
-	public function verify(string $token) {
+	public function verify(string $token): bool {
 		/*
 		*  Verify the authentication token $token against this
 		*  session object. Returns TRUE if the token matches

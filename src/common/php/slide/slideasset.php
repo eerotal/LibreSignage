@@ -9,7 +9,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/thumbnail.php');
 
-const ASSET_FILENAME_REGEX = '/^[A-Za-z0-9_.-]*$/';
+const ASSET_FILENAME_REGEX = '/^[ A-Za-z0-9_.-]*$/';
 
 class SlideAsset extends Exportable {
 	static $PRIVATE = [
@@ -98,11 +98,19 @@ class SlideAsset extends Exportable {
 	}
 
 	public function remove() {
-		if (!empty($this->fullpath)) {
+		if (
+			!empty($this->fullpath)
+			&& is_file($this->fullpath)
+		) {
 			unlink($this->fullpath);
-			unlink($this->thumbpath);
-			$this->reset();
 		}
+		if (
+			!empty($this->thumbpath)
+			&& is_file($this->thumbpath)
+		) {
+			unlink($this->thumbpath);
+		}
+		$this->reset();
 	}
 
 	private function reset() {

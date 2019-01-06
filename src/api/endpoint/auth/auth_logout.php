@@ -14,17 +14,19 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 
-$AUTH_LOGOUT = new APIEndpoint(array(
+$AUTH_LOGOUT = new APIEndpoint([
 	APIEndpoint::METHOD	        => API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
 	APIEndpoint::FORMAT_BODY    => array(),
 	APIEndpoint::REQ_QUOTA      => FALSE,
 	APIEndpoint::REQ_AUTH       => TRUE
-));
+]);
 api_endpoint_init($AUTH_LOGOUT);
 
-$AUTH_LOGOUT->get_caller()->session_rm($AUTH_LOGOUT->get_session()->get_id());
+$AUTH_LOGOUT->get_caller()->session_rm(
+	$AUTH_LOGOUT->get_session()->get_id()
+);
 $AUTH_LOGOUT->get_caller()->write();
 
-$AUTH_LOGOUT->resp_set(array('error' => API_E_OK));
+$AUTH_LOGOUT->resp_set(['error' => API_E_OK]);
 $AUTH_LOGOUT->send();

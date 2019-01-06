@@ -1,3 +1,20 @@
+v0.2.2
+  - [bugfix]   Fix a bug that prevented removing slide assets that didn't
+               have a thumbnail.
+  - [bugfix]   Fix dialogs not appearing correctly on the documentation
+               pages.
+  - [bugfix]   Fix a bug where adding media to user-created slides didn't
+               work. (#27)
+  - [feature]  Implement a new tag [font] in the markup transpiler for
+               changing fonts in slides. (#28)
+  - [bugfix]   Add a missing class definition that caused problems when
+               uploading files.
+  - [bugfix]   Fix a bug where the editor media uploader popup didn't
+               close if the (X) button was clicked after an upload had
+               failed.
+  - [feature]  Allow space characters in upload filenames.
+  - [bugfix]   Implement automatic slide lock cleanup on logout.
+
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
                selected queue was changed.

@@ -96,7 +96,7 @@ class Slide extends Exportable{
 	private $queue_name = NULL;
 	private $collaborators = NULL;
 	private $lock = NULL;
-	private $assets = NULL;
+	private $assets = [];
 	private $ready = FALSE;
 
 	public function __exportable_set(string $name, $value) {
@@ -146,6 +146,7 @@ class Slide extends Exportable{
 		$this->check_sched_enabled();
 
 		$this->set_ready(TRUE);
+		$this->lock_cleanup();
 	}
 
 	function dup() {
@@ -333,6 +334,7 @@ class Slide extends Exportable{
 		) {
 			$this->lock = NULL;
 		}
+		$this->write();
 	}
 
 	function lock_acquire(Session $session) {
@@ -340,7 +342,6 @@ class Slide extends Exportable{
 		*  Attempt to lock this slide. Throws a SlideLockException
 		*  if the slide is already locked by another user.
 		*/
-		$this->lock_cleanup();
 		if (
 			$this->lock !== NULL
 			&& !$this->lock->is_owned_by($session)
@@ -355,7 +356,6 @@ class Slide extends Exportable{
 		*  Attempt to unlock this slide. Throws a SlideLockException
 		*  if the slide is locked by another user.
 		*/
-		$this->lock_cleanup();
 		if (
 			$this->lock !== NULL
 			&& !$this->lock->is_owned_by($session)
