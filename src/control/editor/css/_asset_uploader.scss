@@ -8,239 +8,237 @@ $asset-thumb-maxw: 160px;
 $asset-thumb-pad: $s2;
 $asset-thumb-label-h: 2.5em;
 
-#asset-uploader-popup-content {
-	display: flex;
-	flex-direction: column;
+#asset-uploader {
+	.popup-content {
+		display: flex;
+		flex-direction: column;
 
-	#asset-uploader-header-row {
-		flex: 0 0 auto;
-		margin: {
-			left: $au-margin;
-			right: $au-margin;
-			bottom: $s2;
-		}
-		div[class^="col"] {
-			padding: 0;
-			h1 {
-				font-size: 1.5em;
-				margin: 0;
+		.header-row {
+			flex: 0 0 auto;
+			margin: {
+				left: $au-margin;
+				right: $au-margin;
+				bottom: $s2;
 			}
-		}
-	}
-
-	#asset-uploader-filesel-row {
-		flex: 0 0 auto;
-		margin: {
-			left: $au-margin;
-			right: $au-margin;
-			top: 0;
-			bottom: $s2;
-		}
-		div[class^="col"] {
-			padding: 0;
-			height: 100%;
-
-			button { width: 100%; }
-			label {
-				white-space: nowrap;
-				overflow: hidden;
-				text-oveflow: clip;
-			}
-			@include media-breakpoint-up(sm) {
-				label { margin-right: $s2; }
-			}
-			@include media-breakpoint-down(xs) {
-				button { margin-top: $s2; }
-				max-width: 100%;
-				width: 100%;
-			}
-			button {
-				/*
-				*  Upload button styling. These enable
-				*  'Upload', 'Uploading' and 'Failed' texts etc.
-				*/
-				width: 100%;
-				i, span { display: none; }
-
-				&:not(.uploading):not(.error) {
-					.on-active { display: inline-block; }
-				}
-				&.uploading {
-					.on-upload { display: inline-block; }
-				}
-				&.error {
-					@extend .btn-danger;
-					.on-error { display: inline-block; }
+			div[class^="col"] {
+				padding: 0;
+				h1 {
+					font-size: 1.5em;
+					margin: 0;
 				}
 			}
 		}
-	}
 
-	.limit-indicator-row {
-		display: none; /* Initial */
-		flex: 0 0 auto;
-		margin: {
-			left: $au-margin;
-			right: $au-margin;
-			top: 0;
-			bottom: $s2;
-		}
-		div[class^="col"] {
-			padding: 0;
-			color: $orange;
-		}
-	}
+		.filesel-row {
+			flex: 0 0 auto;
+			margin: {
+				left: $au-margin;
+				right: $au-margin;
+				top: 0;
+				bottom: $s2;
+			}
+			div[class^="col"] {
+				padding: 0;
+				height: 100%;
 
-	#asset-uploader-filelist-row {
-		flex: 1 1 100%;
-		padding: 0;
-		margin: {
-			left: $au-margin;
-			right: $au-margin;
-			top: 0;
-			bottom: $s2;
-		}
-		.col {
-			@extend .default-border;
-			height: 100%;
-		}
-
-		.on-error {
-			display: flex !important;
-			flex-direction: column;
-			width: 100%;
-			height: 100%;
-
-			justify-content: center;
-			align-items: center;
-			text-align: center;
-		}
-
-		&:not(.error) {
-			.on-success { display: initial; }
-			.on-error { display: none !important; }
-		}
-		&.error {
-			.on-success { display: none !important; }
-			.on-error { display: initial; }
-		}
-
-		#asset-uploader-filelist {
-			display: flex;
-			flex-direction: row;
-			flex-wrap: wrap;
-			align-content: flex-start;
-			overflow-y: auto;
-
-			padding: $s2;
-
-			.asset-uploader-thumb {
-				box-sizing: content-box;
-
-				width: $asset-thumb-w;
-				height: $asset-thumb-h;
-				flex-grow: 1;
-				flex-shrink: 0;
-
-				@include media-breakpoint-up(md) {
-					max-width: $asset-thumb-maxw;
+				button { width: 100%; }
+				label {
+					white-space: nowrap;
+					overflow: hidden;
+					text-oveflow: clip;
 				}
-				@include media-breakpoint-down(sm) {
-					max-width: none;
+				@include media-breakpoint-up(sm) {
+					label { margin-right: $s2; }
 				}
-
-				padding: $s1;
-
-				.asset-uploader-thumb-inner {
-					display: flex;
-					flex-direction: column;
-					height: 100%;
+				@include media-breakpoint-down(xs) {
+					button { margin-top: $s2; }
+					max-width: 100%;
 					width: 100%;
+				}
+				button {
+					/*
+					*  Upload button styling. These enable the
+					*  'Upload' and 'Uploading' texts in the button.
+					*/
+					width: 100%;
+					i, span { display: none; }
 
-					&:hover {
-						background-color: $gray-4;
+					&:not(.uploading) {
+						.on-active { display: inline-block; }
+					}
+					&.uploading {
+						.on-upload { display: inline-block; }
+					}
+				}
+			}
+		}
+
+		.file-limit-label-row {
+			display: none; /* Initial */
+			flex: 0 0 auto;
+			margin: {
+				left: $au-margin;
+				right: $au-margin;
+				top: 0;
+				bottom: $s2;
+			}
+			.file-limit-label-col {
+				padding: 0;
+				color: $orange;
+			}
+		}
+
+		.filelist-row {
+			flex: 1 1 100%;
+			padding: 0;
+			margin: {
+				left: $au-margin;
+				right: $au-margin;
+				top: 0;
+				bottom: $s2;
+			}
+			.col {
+				@extend .default-border;
+				height: 100%;
+			}
+
+			.on-error {
+				display: flex !important;
+				flex-direction: column;
+				width: 100%;
+				height: 100%;
+
+				justify-content: center;
+				align-items: center;
+				text-align: center;
+			}
+
+			&:not(.error) {
+				.on-success { display: initial; }
+				.on-error { display: none !important; }
+			}
+			&.error {
+				.on-success { display: none !important; }
+				.on-error { display: initial; }
+			}
+
+			.filelist {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				align-content: flex-start;
+				overflow-y: auto;
+
+				padding: $s2;
+
+				.thumb {
+					box-sizing: content-box;
+
+					width: $asset-thumb-w;
+					height: $asset-thumb-h;
+					flex-grow: 1;
+					flex-shrink: 0;
+
+					@include media-breakpoint-up(md) {
+						max-width: $asset-thumb-maxw;
+					}
+					@include media-breakpoint-down(sm) {
+						max-width: none;
 					}
 
-					.asset-uploader-thumb-img-wrapper {
+					padding: $s1;
+
+					.thumb-inner {
 						display: flex;
 						flex-direction: column;
-						flex: 1 1 100%;
-						justify-content: center;
-						align-items: center;
-
-						box-sizing: content-box;
+						height: 100%;
 						width: 100%;
-						background-color: $gray-3;
-						img {
-							// Resize to fit but keep aspect ratio.
-							max-width: calc(
-								100% - 2*#{$asset-thumb-pad}
-							);
-							max-height: calc(
-								#{$asset-thumb-h}
-									- #{$asset-thumb-label-h}
-									- 2*#{$asset-thumb-pad}
-							);
-							width: auto;
-							height: auto;
+
+						&:hover {
+							background-color: $gray-4;
 						}
-					}
-					.asset-uploader-thumb-label-wrapper {
-						flex: 0 0 $asset-thumb-label-h;
-						display: flex;
-						flex-direction: row;
-						padding: {
-							left: $s2;
-							right: $s2;
-						}
-						.asset-uploader-thumb-rm-wrapper {
-							flex: 0 0 auto;
-							margin: {
-								top: auto;
-								bottom: auto;
-								left: 0;
-								right: $s2;
+
+						.thumb-img-wrapper {
+							display: flex;
+							flex-direction: column;
+							flex: 1 1 100%;
+							justify-content: center;
+							align-items: center;
+
+							box-sizing: content-box;
+							width: 100%;
+							background-color: $gray-3;
+							img {
+								// Resize to fit but keep aspect ratio.
+								max-width: calc(
+									100% - 2*#{$asset-thumb-pad}
+								);
+								max-height: calc(
+									#{$asset-thumb-h}
+										- #{$asset-thumb-label-h}
+										- 2*#{$asset-thumb-pad}
+								);
+								width: auto;
+								height: auto;
 							}
 						}
-						.asset-uploader-thumb-label {
-							flex: 1 1 100%;
-							line-height: $asset-thumb-label-h;
-							vertical-align: middle;
-							text-align: right;
-							text-overflow: ellipsis;
-							overflow: hidden;
+						.thumb-label-wrapper {
+							flex: 0 0 $asset-thumb-label-h;
+							display: flex;
+							flex-direction: row;
+							padding: {
+								left: $s2;
+								right: $s2;
+							}
+							.thumb-rm-wrapper {
+								flex: 0 0 auto;
+								margin: {
+									top: auto;
+									bottom: auto;
+									left: 0;
+									right: $s2;
+								}
+							}
+							.thumb-label {
+								flex: 1 1 100%;
+								line-height: $asset-thumb-label-h;
+								vertical-align: middle;
+								text-align: right;
+								text-overflow: ellipsis;
+								overflow: hidden;
+							}
 						}
 					}
 				}
 			}
 		}
-	}
 
-	#asset-uploader-file-link-row {
-		flex: 0 0 auto;
-		margin: {
-			left: $au-margin;
-			right: $au-margin;
-			top: 0;
-			bottom: $s2;
-		}
-		div {
-			display: flex;
-			flex-direction: row;
-			padding: 0;
-			label {
-				flex: 0 0 auto;
-				margin: {
-					top: auto;
-					bottom: auto;
-					left: 0;
-					right: $s2;
-				}
+		.file-link-row {
+			flex: 0 0 auto;
+			margin: {
+				left: $au-margin;
+				right: $au-margin;
+				top: 0;
+				bottom: $s2;
 			}
-			input {
-				flex: 1 1 100%;
-				display: inline-block;
-				width: auto;
+			div {
+				display: flex;
+				flex-direction: row;
+				padding: 0;
+				label {
+					flex: 0 0 auto;
+					margin: {
+						top: auto;
+						bottom: auto;
+						left: 0;
+						right: $s2;
+					}
+				}
+				input {
+					flex: 1 1 100%;
+					display: inline-block;
+					width: auto;
+				}
 			}
 		}
 	}

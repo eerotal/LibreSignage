@@ -1,5 +1,5 @@
 var $ = require('jquery');
-var Preview = require('./preview.js').Preview;
+var Preview = require('../preview/preview.js').Preview;
 var MarkupError = require('ls-markup').err.MarkupError;
 
 const slide_template = s => `

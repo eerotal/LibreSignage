@@ -22,9 +22,18 @@ var MarkupError = require('ls-markup').err.MarkupError;
 var util = require('ls-util');
 var ace_range = ace.require('ace/range');
 
-var Timeline = require('./components/timeline.js').Timeline;
-var Preview = require('./components/preview.js').Preview;
-var QueueSelector = require('./components/queueselector.js').QueueSelector;
+var AssetUploader = require(
+	'./components/assetuploader/assetuploader.js'
+).AssetUploader;
+var Timeline = require(
+	'./components/timeline/timeline.js'
+).Timeline;
+var Preview = require(
+	'./components/preview/preview.js'
+).Preview;
+var QueueSelector = require(
+	'./components/queueselector/queueselector.js'
+).QueueSelector;
 
 class EditorView {
 	constructor(api) {
@@ -448,11 +457,28 @@ class EditorView {
 				defer: () => !this.ready
 			}),
 			quick_help: new UIButton({
-				elem: $('#link-quick-help'),
+				elem: $('#btn-quick-help'),
 				cond: d => true,
 				enabler: null,
 				attach: {
 					click: () => this.quick_help.visible(true)
+				},
+				defer: () => !this.ready
+			}),
+			add_media: new UIButton({
+				elem: $('#btn-add-media'),
+				cond: d => (
+					d.slide.loaded
+					&& d.slide.locked
+					&& (d.slide.owned || d.slide.collaborate)
+				),
+				enabler: null,
+				attach: {
+					click: () => {
+						this.asset_uploader.show(
+							this.controller.get_slide()
+						);
+					}
 				},
 				defer: () => !this.ready
 			})
@@ -487,6 +513,12 @@ class EditorView {
 
 		/* Quick help popup. */
 		this.quick_help = new Popup($('#quick-help')[0]);
+
+		/* Asset uploader popup. */
+		this.asset_uploader = new AssetUploader(
+			$('#asset-uploader')[0],
+			this.api
+		);
 
 		this.update();
 		this.ready = true;

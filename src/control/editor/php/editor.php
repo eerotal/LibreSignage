@@ -16,8 +16,16 @@
 					Menu
 				</button>
 				<div class="dropdown-menu" aria-labelledby="editor-dropdown-menu-btn">
-					<a class="dropdown-item" href="#" id="link-add-media">Add media</a>
-					<a class="dropdown-item" href="#" id="link-quick-help">Quick help</a>
+					<button type="button"
+						class="dropdown-item"
+						id="btn-add-media">
+						Add media
+					</button>
+					<button type="button"
+						class="dropdown-item"
+						id="btn-quick-help">
+						Quick help
+					</button>
 				</div>
 			</div>
 		</div>
