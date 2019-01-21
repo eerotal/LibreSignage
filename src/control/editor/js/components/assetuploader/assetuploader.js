@@ -5,37 +5,14 @@ var UIButton = require('ls-uicontrol').UIButton;
 var UIController = require('ls-uicontrol').UIController;
 var Popup = require('ls-popup').Popup;
 var assert = require('ls-assert').assert;
-var AssetUploaderController = require('./assetuploader_controller.js').AssetUploaderController;
 var APIUI = require('ls-api-ui');
+
+var AssetUploaderController = require('./assetuploader_controller.js').AssetUploaderController;
+var AssetList = require('./assetlist.js').AssetList;
 
 var ValidatorSelector = require('ls-validator').ValidatorSelector;
 var ValidatorTrigger = require('ls-validator').ValidatorTrigger;
 var FileSelectorValidator = require('ls-validator').FileSelectorValidator;
-
-/*
-*  Asset uploader thumbnail template. 'slide' is the slide
-*  object to use and 'name' is the asset name.
-*/
-const asset_thumb_template = (slide, name) => `
-<div id="asset-uploader-thumb-${slide.get('index')}"
-	class="asset-uploader-thumb">
-	<div class="asset-uploader-thumb-inner default-border">
-		<div class="asset-uploader-thumb-img-wrapper">
-			<img src="${slide.get_asset_thumb_url(name)}"></img>
-		</div>
-		<div class="asset-uploader-thumb-label-wrapper">
-			<div class="asset-uploader-thumb-rm-wrapper">
-				<button id="asset-uploader-thumb-rm-${slide.get('index')}"
-						class="btn btn-danger small-btn"
-						type="button">
-					<i class="fas fa-times"></i>
-				</button>
-			</div>
-			<div class="asset-uploader-thumb-label">${name}</div>
-		</div>
-	</div>
-</div>
-`;
 
 class AssetUploader {
 	constructor(container, api) {
@@ -43,6 +20,10 @@ class AssetUploader {
 		this.container = container;
 
 		this.popup = new Popup(container);
+
+		this.assetlist = new AssetList(
+			$(this.container).find('.filelist')
+		);
 
 		this.inputs = new UIController({
 			files: new UIInput({
@@ -65,6 +46,36 @@ class AssetUploader {
 					e.val('');
 					e.trigger('input');
 				}
+			}),
+			filelist: new UIInput({
+				elem: $(this.container).find('.filelist'),
+				cond: d => true,
+				enabler: null,
+				attach: {
+					'component.assetlist.select': (e, data) => {
+						this.select_asset(data.name);
+					},
+					'component.assetlist.remove': async (e, data) => {
+						await this.remove_asset(data.name);
+						this.inputs.get('filelink').clear();
+					}
+				},
+				defer: () => !this.ready,
+				mod: null,
+				setter: null,
+				getter: null,
+				clearer: null
+			}),
+			filelink: new UIInput({
+				elem: $(this.container).find('.file-link-input'),
+				cond: d => true,
+				enabler: null,
+				attach: null,
+				defer: () => !this.ready,
+				mod: null,
+				setter: (e, val) => e.val(val),
+				getter: e => e.val(),
+				clearer: e => e.val('')
 			})
 		});
 		this.buttons = new UIController({
@@ -76,13 +87,18 @@ class AssetUploader {
 					&& (d.slide.owned || d.slide.collaborate)
 					&& !d.slide.uploading
 					&& this.inputs.get('files').get().length != 0
-					
 				),
 				enabler: null,
 				attach: {
-					click: () => this.upload_assets(),
-					begin_upload: e => $(e.target).addClass('uploading'),
-					end_upload: e => $(e.target).removeClass('uploading')
+					click: () => {
+						this.upload_assets();
+					},
+					'local.upload.begin': e => {
+						$(e.target).addClass('uploading');
+					},
+					'local.upload.end': e => {
+						$(e.target).removeClass('uploading');
+					}
 				},
 				defer: () => !this.ready
 			})
@@ -210,6 +226,7 @@ class AssetUploader {
 		*/
 		assert(slide != null, "No slide specified.");
 		this.controller.open(slide);
+		this.assetlist.show(slide);
 		this.popup.visible(true);
 		this.update();
 	}
@@ -218,38 +235,65 @@ class AssetUploader {
 		/*
 		*  Hide the asset uploader.
 		*/
-		this.controller.close();
 		this.popup.visible(false);
+		this.assetlist.hide();
+		this.controller.close();
 	}
 
 	async upload_assets() {
 		/*
 		*  Upload the currently selected files. This function
-		*  also handles indicating uploads in progress.
+		*  also handles indicating uploads in progress by firing
+		*  the local.upload.begin and local.upload.end events on
+		*  the upload button.
 		*/
 		let btn = this.buttons.get('upload').get_elem();
 		let selector = this.inputs.get('files');
 
-		btn.trigger('begin_upload');
+		btn.trigger('local.upload.begin');
 		try {
 			let tmp = this.controller.upload_assets(selector.get());
 			this.update(); // Disable the upload button.
 			await tmp;
 		} catch (e) {
-			btn.trigger('end_upload')
+			btn.trigger('local.upload.end')
 			this.update();
 
 			APIUI.handle_error(e);
 			return;
 		}
 		selector.clear();
-		btn.trigger('end_upload');
+		btn.trigger('local.upload.end');
 		this.update();
+	}
+
+	async remove_asset(name) {
+		/*
+		*  Remove the asset 'name' and update the UI.
+		*/
+		try {
+			await this.controller.remove_asset(name);
+		} catch (e) {
+			APIUI.handle_error(e);
+		}
+		this.inputs.get('filelink').clear();
+		this.update();
+	}
+
+	select_asset(name) {
+		/*
+		*  Select the asset 'name'.
+		*/
+		this.inputs.get('filelink').set(
+			window.location.origin
+			+ this.controller.get_slide().get_asset_uri(name)
+		);
 	}
 
 	update_file_selector_label() {
 		/*
-		*  Update the file selector label.
+		*  Update the file selector label with the selected
+		*  filenames.
 		*/
 		let names = [];
 		let elem = this.inputs.get('files').get_elem()[0];
@@ -277,6 +321,7 @@ class AssetUploader {
 			function(d) { this.state(d); },
 			this.controller.get_state()
 		);
+		this.assetlist.update();
 	}
 }
 exports.AssetUploader = AssetUploader;

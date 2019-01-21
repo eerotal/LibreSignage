@@ -37,11 +37,7 @@
 		</div>
 	</div>
 	<div class="row filelist-row">
-		<div class="col on-error">
-			<h2>There was a problem updating this list :(</h2>
-		</div>
-		<div class="col on-success filelist">
-		</div>
+		<div class="col filelist"></div>
 	</div>
 	<div class="row file-link-row">
 		<div class="col">

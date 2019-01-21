@@ -102,26 +102,6 @@ $asset-thumb-label-h: 2.5em;
 				height: 100%;
 			}
 
-			.on-error {
-				display: flex !important;
-				flex-direction: column;
-				width: 100%;
-				height: 100%;
-
-				justify-content: center;
-				align-items: center;
-				text-align: center;
-			}
-
-			&:not(.error) {
-				.on-success { display: initial; }
-				.on-error { display: none !important; }
-			}
-			&.error {
-				.on-success { display: none !important; }
-				.on-error { display: initial; }
-			}
-
 			.filelist {
 				display: flex;
 				flex-direction: row;

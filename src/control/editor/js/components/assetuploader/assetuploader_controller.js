@@ -58,7 +58,6 @@ class AssetUploaderController {
 		*/
 		assert(name != null && name.length != 0, "Empty slide name.");
 		await this.slide.remove_asset(name);
-
 		this.update_file_limit_state();
 	}
 
