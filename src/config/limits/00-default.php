@@ -20,7 +20,7 @@ return [
 		'video/ogg',
 		'video/webm'
 	],
-	"SLIDE_MAX_ASSETS"         => 2,
+	"SLIDE_MAX_ASSETS"         => 20,
 
 	"QUEUE_NAME_MAX_LEN"       => 32,
 
