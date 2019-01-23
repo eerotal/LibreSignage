@@ -83,7 +83,7 @@ class EditorController {
 		assert(this.queue != null, "No queue loaded.");
 		assert(this.queue.has_slide(id), "No such slide in queue.");
 
-		if (this.slide != null) {
+		if (this.slide != null && this.slide.is_locked_from_here()) {
 			try {
 				await this.slide.lock_release();
 			} catch (e) {
