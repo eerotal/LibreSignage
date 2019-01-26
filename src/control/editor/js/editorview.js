@@ -481,6 +481,24 @@ class EditorView {
 					}
 				},
 				defer: () => !this.ready
+			}),
+			preview_16x9: new UIButton({
+				elem: $('#btn-preview-ratio-16x9'),
+				cond: () => this.preview.get_ratio() !== '16x9',
+				enabler: null,
+				attach: {
+					click: () => this.set_preview_ratio('16x9')
+				},
+				defer: () => !this.ready
+			}),
+			preview_4x3: new UIButton({
+				elem: $('#btn-preview-ratio-4x3'),
+				cond: () => this.preview.get_ratio() !== '4x3',
+				enabler: null,
+				attach: {
+					click: () => this.set_preview_ratio('4x3')
+				},
+				defer: () => !this.ready
 			})
 		});
 
@@ -666,6 +684,14 @@ class EditorView {
 				throw e;
 			}
 		}
+	}
+
+	set_preview_ratio(r) {
+		/*
+		*  Set the aspect ratio of the live slide preview.
+		*/
+		this.preview.set_ratio(r);
+		this.update();
 	}
 
 	async hide_slide() {

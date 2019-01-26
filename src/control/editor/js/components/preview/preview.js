@@ -11,6 +11,7 @@ const STYLESHEETS = [ '/app/css/display.css' ];
 class Preview {
 	constructor(container_id) {
 		this.container = $(`#${container_id}`);
+		this.ratio = null;
 	}
 
 	async init() {
@@ -89,6 +90,7 @@ class Preview {
 		/*
 		*  Set the aspect ratio of the preview box.
 		*/
+		this.ratio = r;
 		this.container.removeClass(
 			'preview-16x9 preview-4x3 preview-16x9-fit preview-4x3-fit'
 		);
@@ -103,6 +105,10 @@ class Preview {
 				throw new Error(`Unknown aspect ratio '${r}'.`);
 				break;
 		}
+	}
+
+	get_ratio() {
+		return this.ratio;
 	}
 }
 exports.Preview = Preview;
