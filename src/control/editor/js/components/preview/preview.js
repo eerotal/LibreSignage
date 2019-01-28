@@ -30,7 +30,20 @@ class Preview {
 		*  the event listener.
 		*/
 		ret = new Promise((resolve, reject) => {
-			this.preview.one('load', () => {
+			this.preview.on('load', () => {
+				/*
+				*  Workaround for odd Firefox behaviour where the 'load'
+				*  event is fired twice for the iframe. Once when the
+				*  document readyState == 'uninitialized' and again when
+				*  readyState == 'complete'. This if statement skips the
+				*  uninitialized step to make the modified iframe contents
+				*  actually persist.
+				*/
+				if (this.preview[0].contentDocument.readyState !== 'complete') {
+					return;
+				}
+				this.preview.off('load');
+
 				// Add meta tags.
 				let phead = this.preview.contents().find('head');
 				for (let m of META) { phead.append($('<meta>').attr(m)); }
@@ -41,8 +54,9 @@ class Preview {
 				for (let s of STYLESHEETS) {
 					tmp = $('<link></link>').attr(
 						{
-							'rel': 'stylesheet',
-							'href': s
+							rel: 'stylesheet',
+							type: 'text/css',
+							href: s
 						}
 					);
 					promises.push(new Promise(
