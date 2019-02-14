@@ -104,6 +104,18 @@ class AssetUploader {
 			})
 		});
 		this.statics = new UIController({
+			popup: new UIStatic({
+				elem: $(this.container),
+				cond: d => true,
+				enabler: null,
+				attach: {
+					'component.popup.close': () => this.clear()
+				},
+				defer: () => !this.ready,
+				setter: null,
+				getter: null,
+				clearer: null
+			}),
 			files_label: new UIStatic({
 				elem: $(this.container).find('.filesel-label'),
 				cond: d => true,
@@ -231,11 +243,11 @@ class AssetUploader {
 		this.update();
 	}
 
-	hide() {
+	clear() {
 		/*
-		*  Hide the asset uploader.
+		*  Clear the asset uploader.
 		*/
-		this.popup.visible(false);
+		this.inputs.all(function() { this.clear(); });
 		this.assetlist.hide();
 		this.controller.close();
 	}
