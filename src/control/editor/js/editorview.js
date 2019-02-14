@@ -14,6 +14,8 @@ var WhitelistValidator = require('ls-validator').WhitelistValidator;
 var BlacklistValidator = require('ls-validator').BlacklistValidator;
 
 var EditorController = require('./editorcontroller.js').EditorController;
+var EditorValidators = require('./editorvalidators.js').EditorValidators;
+
 var APIUI = require('ls-api-ui');
 var User = require('ls-user').User;
 var Queue = require('ls-queue').Queue;
@@ -523,20 +525,40 @@ class EditorView {
 		this.remove.set_button_html('<i class="fas fa-trash-alt"></i>');
 		this.remove.set_content_html('Remove slide?');
 
-		/* Slide move DropSelect. */
+		// Slide move DropSelect.
 		this.move = new DropSelect($('#btn-slide-move')[0]);
 		this.move.set_button_html(
 			'<i class="fas fa-arrow-circle-right"></i>'
 		);
 
-		/* Quick help popup. */
+		// Quick help popup.
 		this.quick_help = new Popup($('#quick-help')[0]);
 
-		/* Asset uploader popup. */
+		// Asset uploader popup.
 		this.asset_uploader = new AssetUploader(
 			$('#asset-uploader')[0],
 			this.api
 		);
+
+		/*
+		*  Initialize the input validators. All input validators except
+		*  the validators for the collaborators MultiSelect are defined
+		*  in src/control/editor/js/editorvalidators.js. This is because
+		*  the MultiSelect component has it's own way of handling input
+		*  validators. These validators are defined in the MultiSelect
+		*  constructor call instead.
+		*
+		*  A trigger hook is also added so that the editor state is
+		*  updated every time a change in the validation state occurs.
+		*  Note that this doesn't need to happen for the collaborators
+		*  MultiSelect since it won't allow adding invalid selections
+		*  in the first place.
+		*/
+		this.validators = new EditorValidators(this.api);
+		this.validators.add_trigger_hook(() => this.update())
+
+		// Make the initial state of the editor more predictable.
+		this.hide_queue();
 
 		this.update();
 		this.ready = true;
@@ -643,6 +665,12 @@ class EditorView {
 
 		this.render_preview();
 
+		/*
+		*  Enable all validators now that a slide is open.
+		*  EditorView.hide_slide() disables them.
+		*/
+		this.validators.enable(true);
+
 		this.update();
 	}
 
@@ -698,6 +726,13 @@ class EditorView {
 		/*
 		*  Hide the currently visible slide.
 		*/
+
+		/*
+		*  Disable the input validators so that they don't validate
+		*  the input as invalid when the field is disabled.
+		*/
+		this.validators.enable(false);
+
 		if (this.controller.get_state().slide.loaded) {
 			await this.controller.close_slide();
 		}
@@ -836,6 +871,7 @@ class EditorView {
 			function(d) { this.state(d); },
 			this.controller.get_state()
 		);
+		this.validators.validate_all();
 	}
 }
 exports.EditorView = EditorView;
