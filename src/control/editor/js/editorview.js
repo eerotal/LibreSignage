@@ -395,7 +395,8 @@ class EditorView {
 			save: new UIButton({
 				elem: $('#btn-slide-save'),
 				cond: d => (
-					d.slide.loaded
+					this.validators.get_state()
+					&& d.slide.loaded
 					&& d.slide.locked
 					&& (d.slide.owned || d.slide.collaborate)
 				),

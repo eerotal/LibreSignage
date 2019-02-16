@@ -154,5 +154,16 @@ class EditorValidators {
 			v.enable(state);
 		}
 	}
+
+	get_state() {
+		/*
+		*  Get the combined state of the ValidatorSelectors, ie.
+		*  true if all of them are valid and false otherwise.
+		*/
+		for (let v of Object.values(this.validators)) {
+			if (!v.get_state()) { return false; }
+		}
+		return true;
+	}
 }
 exports.EditorValidators = EditorValidators;
