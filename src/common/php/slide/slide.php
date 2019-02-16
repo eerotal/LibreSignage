@@ -94,7 +94,7 @@ class Slide extends Exportable{
 	private $sched_t_e = 0;
 	private $animation = 0;
 	private $queue_name = NULL;
-	private $collaborators = NULL;
+	private $collaborators = [];
 	private $lock = NULL;
 	private $assets = [];
 	private $ready = FALSE;
