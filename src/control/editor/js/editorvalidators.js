@@ -13,8 +13,8 @@ class EditorValidators {
 		this.triggers = [];
 		this.validators = {
 			name: new ValidatorSelector(
-				$('#slide-name'),
-				$('#slide-name-group'),
+				$('#slide-name')[0],
+				$('#slide-name-group')[0],
 				[
 					new StrValidator(
 						{
@@ -43,8 +43,8 @@ class EditorValidators {
 				]	
 			),
 			duration: new ValidatorSelector(
-				$('#slide-duration'),
-				$('#slide-duration-group'),
+				$('#slide-duration')[0],
+				$('#slide-duration-group')[0],
 				[
 					new NumValidator(
 						{
@@ -79,8 +79,8 @@ class EditorValidators {
 				]
 			),
 			index: new ValidatorSelector(
-				$('#slide-index'),
-				$('#slide-index-group'),
+				$('#slide-index')[0],
+				$('#slide-index-group')[0],
 				[
 					new NumValidator(
 						{
@@ -151,7 +151,7 @@ class EditorValidators {
 		*  Enable/disable all ValidatorSelectors.
 		*/
 		for (let v of Object.values(this.validators)) {
-			state ? v.enable() : v.disable();
+			v.enable(state);
 		}
 	}
 }

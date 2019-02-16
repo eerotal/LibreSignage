@@ -153,8 +153,8 @@ class AssetUploader {
 		*  Create validators for the file selector.
 		*/
 		this.fileval_sel = new ValidatorSelector(
-			$(this.container).find('.filesel'),
-			$(this.container).find('.filesel-cont'),
+			$(this.container).find('.filesel')[0],
+			$(this.container).find('.filesel-cont')[0],
 			[new FileSelectorValidator(
 				{
 					mimes: Object.values(f_mimes),
