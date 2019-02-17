@@ -96,7 +96,6 @@ $OP = '';
 $ALLOW = FALSE;
 
 $user = $SLIDE_SAVE->get_caller();
-$quota = new UserQuota($user);
 
 $slide = new Slide();
 if ($SLIDE_SAVE->has('id', TRUE)) {
@@ -204,14 +203,16 @@ $slide->set_ready(TRUE);
 $slide->check_sched_enabled();
 
 if ($OP === 'create') {
-	// Use quota.
-	if (!$quota->use_quota('slides')) {
+	// Use quota when a new slide is created.
+	if (!$user->get_quota()->has_quota('slides')) {
 		throw new APIException(
 			API_E_QUOTA_EXCEEDED,
 			"Slide quota exceeded."
 		);
+	} else {
+		$user->get_quota()->use_quota('slides');
+		$user->write();
 	}
-	$quota->flush();
 }
 
 $slide->write();
