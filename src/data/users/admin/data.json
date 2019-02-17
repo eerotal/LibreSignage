@@ -1,6 +1,29 @@
 {
-	"user":"admin",
-	"groups":["admin","editor","display"],
-	"hash":"$2y$10$eZjS01R.HyPGQ\/FXkXATP.ITpMcydYPM2\/6n8sa232.2CWDwGlPzK",
-	"sessions": []
+	"__classname": "User",
+	"__visibility": "private",
+	"user": "admin",
+	"hash": "$2y$10$21MD1KxpFZ5fEbu6BViVSOQL57T4a2xbuO3.lAoSkOEXxi2LZE42.",
+	"groups": [
+		"admin",
+		"editor",
+		"display"
+	],
+	"sessions": [],
+	"quota": {
+		"__classname": "UserQuota",
+		"__visibility": "private",
+		"quota": {
+			"slides": {
+				"limit": 10,
+				"description": "Slides",
+				"used": 0
+			},
+			"api_rate": {
+				"limit": 200,
+				"description": "API quota (calls\/60s)",
+				"used": 0
+			}
+		},
+		"state": []
+	}
 }

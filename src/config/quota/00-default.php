@@ -8,10 +8,10 @@
 return [
 	'slides' => [
 		'limit' => 10,
-		'disp' => 'Slides'
+		'description' => 'Slides'
 	],
 	'api_rate' => [
 		'limit' => 200,
-		'disp' => 'API quota (calls/'.gtlim('API_RATE_T').'s)'
+		'description' => 'API quota (calls/'.gtlim('API_RATE_T').'s)'
 	]
 ];

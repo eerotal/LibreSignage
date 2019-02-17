@@ -18,24 +18,27 @@ class APIRateLimitModule extends APIModule {
 		// Use API rate quota  if required.
 		if (!$endpoint->requires_quota()) { return; }
 
-		$quota = new UserQuota($endpoint->get_caller());
-		if ($quota->has_state_var('api_t_start')) {
-			$t = $quota->get_state_var('api_t_start');
+		$quota = $endpoint->get_caller()->get_quota();
+		if ($quota->has_state('api_t_start')) {
+			$t = $quota->get_state('api_t_start');
 			if (time() - $t >= gtlim('API_RATE_T')) {
 				// Reset rate quota and time after the cutoff.
-				$quota->set_state_var('api_t_start', time());
-				$quota->set_quota('api_rate', 0);
+				$quota->set_state('api_t_start', time());
+				$quota->set_used('api_rate', 0);
 			}
 		} else {
 			// Start counting time.
-			$quota->set_state_var('api_t_start', time());
+			$quota->set_state('api_t_start', time());
 		}
-		if (!$quota->use_quota('api_rate')) {
+
+		if (!$quota->has_quota('api_rate')) {
 			throw new APIException(
 				API_E_RATE,
 				"API rate limited."
 			);
+		} else {
+			$quota->use_quota('api_rate');
 		}
-		$quota->flush();
+		$endpoint->get_caller()->write();
 	}
 }
