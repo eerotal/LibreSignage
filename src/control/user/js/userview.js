@@ -62,7 +62,7 @@ class UserView {
 		this.buttons = new UIController({
 			save: new UIButton({
 				elem: $('#user-save'),
-				cond: () => true,
+				cond: () => this.validators.get_state(),
 				enabler: null,
 				attach: {
 					click: async () => await this.save_password()
@@ -81,6 +81,7 @@ class UserView {
 		});
 
 		this.validators = new UserValidators();
+		this.validators.create_trigger(() => this.update());
 
 		this.populate();
 		this.ready = true;
@@ -122,6 +123,10 @@ class UserView {
 			APIUI.handle_error(e);
 			return;
 		}
+	}
+
+	update() {
+		this.buttons.all(function() { this.state(); })
 	}
 }
 exports.UserView = UserView;
