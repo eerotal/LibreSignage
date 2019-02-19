@@ -111,6 +111,9 @@ class UserView {
 			APIUI.handle_error(e);
 			return;
 		}
+
+		this.inputs.get('password').clear();
+		this.inputs.get('password_confirm').clear();
 	}
 
 	async logout_other_sessions() {
