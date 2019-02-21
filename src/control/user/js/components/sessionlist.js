@@ -50,7 +50,7 @@ class SessionList {
 			$(this.where).append(session_row(
 				s.who,
 				s.from,
-				s.created,
+				s.created*1000,
 				s.id === this.api.get_session().get_id()
 			));
 		}
