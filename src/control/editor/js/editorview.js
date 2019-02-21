@@ -13,6 +13,9 @@ var StrValidator = require('ls-validator').StrValidator;
 var WhitelistValidator = require('ls-validator').WhitelistValidator;
 var BlacklistValidator = require('ls-validator').BlacklistValidator;
 
+var ShortcutController = require('ls-shortcut').ShortcutController;
+var Shortcut = require('ls-shortcut').Shortcut;
+
 var EditorController = require('./editorcontroller.js').EditorController;
 var EditorValidators = require('./editorvalidators.js').EditorValidators;
 
@@ -66,6 +69,7 @@ class EditorView {
 		}
 		user = this.api.get_session().get_user().get_user();
 
+		// Define UI element controllers for the editor.
 		this.inputs = new UIController({
 			name: new UIInput({
 				elem: $('#slide-name'),
@@ -387,7 +391,7 @@ class EditorView {
 		this.buttons = new UIController({
 			new: new UIButton({
 				elem: $('#btn-slide-new'),
-				cond: d => true,
+				cond: d => d.queue.loaded,
 				enabler: null,
 				attach: { click: () => this.new_slide() },
 				defer: () => !this.ready
@@ -504,6 +508,50 @@ class EditorView {
 				defer: () => !this.ready
 			})
 		});
+
+		// Define shortcuts for the editor.
+		this.shortcuts = new ShortcutController([
+			new Shortcut({ // Control + Alt + n => New slide
+				keys: ['Control', 'Alt', 'n'],
+				hook: () => {
+					let elem = this.buttons.get('new').get_elem();
+					if (!elem.prop('disabled')) {
+						elem.trigger('click');
+					}
+				},
+				defer: () => !this.ready
+			}),
+			new Shortcut({ // Control + s => Save slide
+				keys: ['Control', 's'],
+				hook: () => {
+					let elem = this.buttons.get('save').get_elem();
+					if (!elem.prop('disabled')) {
+						elem.trigger('click');
+					}
+				},
+				defer: () => !this.ready
+			}),
+			new Shortcut({ // Control + d => Duplicate slide
+				keys: ['Control', 'd'],
+				hook: () => {
+					let elem = this.buttons.get('duplicate').get_elem();
+					if (!elem.prop('disabled')) {
+						elem.trigger('click');
+					}
+				},
+				defer: () => !this.ready
+			}),
+			new Shortcut({ // Control + p => Preview slide
+				keys: ['Control', 'p'],
+				hook: () => {
+					let elem = this.buttons.get('preview').get_elem();
+					if (!elem.prop('disabled')) {
+						elem.trigger('click');
+					}
+				},
+				defer: () => !this.ready
+			})
+		])
 
 		// Markup editor.
 		this.editor = ace.edit('slide-input');
