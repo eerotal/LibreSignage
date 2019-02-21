@@ -6,6 +6,7 @@ var APIUI = require('ls-api-ui');
 
 var UserController = require('./usercontroller.js').UserController;
 var UserValidators = require('./uservalidators.js').UserValidators;
+var SessionList = require('./components/sessionlist.js').SessionList;
 
 class UserView {
 	constructor(api) {
@@ -83,13 +84,23 @@ class UserView {
 		this.validators = new UserValidators();
 		this.validators.create_trigger(() => this.update());
 
-		this.populate();
+		this.sessionlist = new SessionList(
+			api,
+			$('#user-sessions')[0]
+		);
+	}
+
+	async init() {
+		/*
+		*  Initialize the view.
+		*/
+		await this.populate();
 		this.ready = true;
 	}
 
-	populate() {
+	async populate() {
 		/*
-		*  Populate the user settings page UI.
+		*  Populate the UI with userdata.
 		*/
 		this.inputs.get('username').set(
 			this.controller.get_user().get_user()
@@ -97,6 +108,15 @@ class UserView {
 		this.inputs.get('groups').set(
 			this.controller.get_user().get_groups()
 		);
+
+		// Fetch the SessionList data and render it.
+		try {
+			await this.sessionlist.fetch();
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
+		}
+		this.sessionlist.render();
 	}
 
 	async save_password() {
@@ -126,6 +146,7 @@ class UserView {
 			APIUI.handle_error(e);
 			return;
 		}
+		await this.populate();
 	}
 
 	update() {

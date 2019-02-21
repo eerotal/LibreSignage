@@ -13,4 +13,5 @@ $(document).ready(async () => {
 	}
 
 	let view = new UserView(API);
+	await view.init();
 });
