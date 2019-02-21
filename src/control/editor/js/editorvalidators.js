@@ -3,15 +3,15 @@
 */
 
 var $ = require('jquery');
+var ValidatorController = require('ls-validator').ValidatorController;
 var ValidatorSelector = require('ls-validator').ValidatorSelector;
 var ValidatorTrigger = require('ls-validator').ValidatorTrigger;
 var StrValidator = require('ls-validator').StrValidator;
 var NumValidator = require('ls-validator').NumValidator;
 
-class EditorValidators {
+class EditorValidators extends ValidatorController {
 	constructor(api) {
-		this.triggers = [];
-		this.validators = {
+		super({
 			name: new ValidatorSelector(
 				$('#slide-name')[0],
 				$('#slide-name-group')[0],
@@ -121,49 +121,7 @@ class EditorValidators {
 					)
 				]
 			)
-		}
-	}
-
-	add_trigger_hook(hook) {
-		/*
-		*  Create a new ValidatorTrigger for all of the
-		*  ValidatorSelectors in this.validators.
-		*/
-		this.triggers.push(
-			new ValidatorTrigger(
-				Object.values(this.validators),
-				hook
-			)
-		);
-	}
-
-	validate_all() {
-		/*
-		*  Validate all ValidatorSelectors.
-		*/
-		for (let v of Object.values(this.validators)) {
-			v.validate();
-		}
-	}
-
-	enable(state) {
-		/*
-		*  Enable/disable all ValidatorSelectors.
-		*/
-		for (let v of Object.values(this.validators)) {
-			v.enable(state);
-		}
-	}
-
-	get_state() {
-		/*
-		*  Get the combined state of the ValidatorSelectors, ie.
-		*  true if all of them are valid and false otherwise.
-		*/
-		for (let v of Object.values(this.validators)) {
-			if (!v.get_state()) { return false; }
-		}
-		return true;
+		});
 	}
 }
 exports.EditorValidators = EditorValidators;

@@ -556,7 +556,7 @@ class EditorView {
 		*  in the first place.
 		*/
 		this.validators = new EditorValidators(this.api);
-		this.validators.add_trigger_hook(() => this.update())
+		this.validators.create_trigger(() => this.update())
 
 		// Make the initial state of the editor more predictable.
 		this.hide_queue();
@@ -872,7 +872,7 @@ class EditorView {
 			function(d) { this.state(d); },
 			this.controller.get_state()
 		);
-		this.validators.validate_all();
+		this.validators.validate();
 	}
 }
 exports.EditorView = EditorView;
