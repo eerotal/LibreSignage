@@ -229,9 +229,14 @@ class User extends Exportable {
 			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
 				throw new ArgException('Too many user groups.');
 			}
+			foreach ($groups as $g) {
+				if (strlen($g) > gtlim('MAX_USER_GROUP_LEN')) {
+					throw new ArgException('Too long user group name.');
+				}
+			}
 			$this->groups = $groups;
 		} else {
-			throw new ArgException("Invalid type for $groups.");
+			throw new ArgException('Invalid type for groups.');
 		}
 	}
 
