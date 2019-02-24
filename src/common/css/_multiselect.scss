@@ -7,54 +7,64 @@
 	text-align: left;
 	padding: 0;
 	margin: 0;
-}
 
-.ms-controls {
-	display: block;
-	margin: 0;
-	margin-bottom: 8px;
-	padding: 0;
-}
+	.ms-controls {
+		display: block;
+		margin: 0;
+		margin-bottom: 8px;
+		padding: 0;
 
-.ms-input {
-	display: block;
-	float: left;
-	margin: 0;
-	width: calc(100% - 2.5em - 8px);
-	vertical-align: top;
-}
+		.ms-input {
+			display: block;
+			float: left;
+			margin: 0;
+			width: calc(100% - 2.5em - 8px);
+			vertical-align: top;
 
-.ms-add {
-	display: inline-block;
-	float: right;
-	margin: 0;
-	width: 2.5em;
-	vertical-align: top;
-}
+			/*
+			*  Override default Bootstrap .invalid-feedback styling to
+			*  set 'display: inline-block;' when .is-invalid is set on
+			*  the input. This makes sure the invalid feedback <div> is
+			*  properly placed.
+			*/
+			&.is-invalid ~ .invalid-feedback {
+				display: inline-block;
+			}
+		}
 
-.ms-values {
-	padding: 4px;
-	margin: 0;
-	border: 1px solid $gray-2;
-	border-radius: 4px;
-	background-color: white;
-	min-height: 2.5em;
-}
+		.ms-add {
+			display: inline-block;
+			float: right;
+			margin: 0;
+			width: 2.5em;
+			vertical-align: top;
+		}
+	}
 
-.ms-val {
-	display: inline-block;
-	background-color: $gray-2;
-	border-radius: 2px;
-	padding: 2px 8px;
-	margin: 4px;
-	white-space: nowrap;
-}
+	.ms-values {
+		padding: 4px;
+		margin: 0;
+		border: 1px solid $gray-2;
+		border-radius: 4px;
+		background-color: white;
+		min-height: 2.5em;
 
-.ms-rm {
-	padding-left: 3px;
-	color: gray;
-}
+		.ms-val {
+			display: inline-block;
+			background-color: $gray-2;
+			border-radius: 2px;
+			padding: 2px 8px;
+			margin: 4px;
+			white-space: nowrap;
 
-.ms-rm:hover {
-	color: black;
+			.ms-rm {
+				padding-left: 3px;
+				color: gray;
+
+				&:hover {
+					color: black;
+				}
+			}
+		}
+	}
 }
