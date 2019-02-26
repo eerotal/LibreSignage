@@ -89,8 +89,8 @@ class UserManagerView {
 				/*
 				*  Manually add the new user to the UserList to make
 				*  the generated initial password visible in the UI.
-				*  This is done because the API doesn't return the
-				*  password on subsequent calls.
+				*  This is done because the API doesn't return (or
+				*  even know) the password on subsequent calls.
 				*/
 				this.userlist.add_user(user);
 				this.populate();
@@ -100,7 +100,7 @@ class UserManagerView {
 					min: 1,
 					max: null,
 					regex: null
-				}, 'The username is too short.'),
+				}, '', true),
 				new StrValidator({
 					min: null,
 					max: this.api.limits.USERNAME_MAX_LEN,

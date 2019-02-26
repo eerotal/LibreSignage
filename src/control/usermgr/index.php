@@ -25,7 +25,7 @@
 					type="button"
 					id="btn-create-user"
 					class="btn btn-primary">
-					Create user
+					<i class="fas fa-plus-circle"></i> Create user
 				</button>
 			</div>
 		</div>
