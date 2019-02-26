@@ -1,9 +1,11 @@
 var $ = require('jquery');
 var MultiSelect = require('ls-multiselect').MultiSelect;
+var DropConfirm = require('ls-dropconfirm').DropConfirm;
 var StrValidator = require('ls-validator').StrValidator;
 
+// Template for the UserListEntry HTML.
 const user_list_entry = (name, password) => `
-	<div class="card">
+	<div id="user-list-entry-${name}" class="card">
 		<div
 			class="card-header"
 			id="heading-${name}">
@@ -21,7 +23,7 @@ const user_list_entry = (name, password) => `
 			aria-labelledby="heading-${name}"
 			data-parent="#users-table">
 			<div class="card-body">
-				<table>
+				<table class="input-container">
 					<tr>
 						<td>
 							<label
@@ -67,6 +69,18 @@ const user_list_entry = (name, password) => `
 							<div id="${name}-groups-group"></div>
 						</td>
 					</tr>
+					<tr>
+					</tr>
+				</table>
+				<div class="btn-container">
+					<button
+						id="btn-user-save-${name}"
+						class="btn-user-save btn btn-success">
+						<i class="fas fa-save"></i>
+					</button>
+					<div id="btn-user-remove-${name}"
+						class="btn-user-remove">
+					</div>
 				</div>
 			</div>
 		</div>
@@ -74,21 +88,27 @@ const user_list_entry = (name, password) => `
 `;
 
 class UserListEntry {
-	constructor(api, user) {
+	constructor(api, user, container) {
 		this.api = api;
 		this.user = user;
+
+		this.container = container;
 	}
 
-	render(where) {
+	render() {
 		let pass = this.user.get_password();
-		$(where).append(user_list_entry(
-			this.user.get_user(),
+		let name = this.user.get_user();
+
+		// Create the UserListEntry HTML.
+		$(this.container).append(user_list_entry(
+			name,
 			pass != null ? pass : '(Hidden)'
 		));
 
-		this.groups_multiselect = new MultiSelect(
-			`${this.user.get_user()}-groups-group`,
-			`${this.user.get_user()}-groups`,
+		// Initialize the groups MultiSelect.
+		this.groups = new MultiSelect(
+			`${name}-groups-group`,
+			`${name}-groups`,
 			[
 				new StrValidator(
 					{
@@ -117,7 +137,46 @@ class UserListEntry {
 				maxopts: this.api.limits.MAX_USER_GROUPS
 			}
 		)
-		this.groups_multiselect.set(this.user.get_groups());
+		this.groups.set(this.user.get_groups());
+
+		// Initialize the remove button DropConfirm.
+		this.remove = new DropConfirm($(`#btn-user-remove-${name}`)[0]);
+		this.remove.set_button_html('<i class="fas fa-trash-alt"></i>');
+		this.remove.set_content_html('Remove user?');
+
+		// Initialize the remove DropConfirm event handling.
+		$(`#btn-user-remove-${name}`).on(
+			'component.dropconfirm.confirm',
+			() => {
+				this.trigger(
+					'remove',
+					{ username: name }
+				);
+			}
+		);
+
+		// Initialize the save button event handling.
+		$(`#btn-user-save-${name}`).on(
+			'click',
+			() => {
+				this.trigger(
+					'save',
+					{ username: name, groups: this.groups.selected }
+				);
+			}
+		);
+	}
+
+	get_element() {
+		return $(`#user-list-entry-${this.user.get_user()}`)[0];
+	}
+
+	trigger(name, data) {
+		console.log(name, data);
+		$(this.get_element()).trigger(
+			`component.userlistentry.${name}`,
+			data
+		);
 	}
 }
 exports.UserListEntry = UserListEntry;

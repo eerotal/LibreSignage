@@ -3,8 +3,13 @@
 @import 'nav';
 @import 'dialog';
 @import 'multiselect';
+@import 'ls-dropconfirm/css/dropconfirm.scss';
 
 $usermgr-minw: 250px;
+
+$user-inputs-w: 50%;
+$user-inputs-minw: 200px;
+$user-inputs-maxw: 400px;
 
 #users-table {
 	min-width: $usermgr-minw;
@@ -18,10 +23,10 @@ $usermgr-minw: 250px;
 	}
 
 	.card-body {
-		table {
-			width: 50%;
-			min-width: 200px;
-			max-width: 400px;
+		.input-container {
+			width: $user-inputs-w;
+			min-width: $user-inputs-minw;
+			max-width: $user-inputs-maxw;
 			margin: auto;
 
 			border-collapse: separate;
@@ -33,6 +38,28 @@ $usermgr-minw: 250px;
 
 			td:first-of-type {
 				text-align: right;
+			}
+		}
+
+		.btn-container {
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-end;
+
+			width: $user-inputs-w;
+			min-width: $user-inputs-minw;
+			max-width: $user-inputs-maxw;
+			margin: auto;
+
+			.btn-user-save, .btn-user-remove {
+				margin: {
+					left: $s1;
+					right: $s1;
+				}
+
+				.dropconfirm-open {
+					@extend .btn-danger;
+				}
 			}
 		}
 	}

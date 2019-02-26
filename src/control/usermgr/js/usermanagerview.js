@@ -3,6 +3,7 @@ var bootstrap = require('bootstrap');
 
 var UIController = require('ls-uicontrol').UIController;
 var UIButton = require('ls-uicontrol').UIButton;
+var UIInput = require('ls-uicontrol').UIInput;
 
 var StrValidator = require('ls-validator').StrValidator;
 var dialog = require('ls-dialog');
@@ -28,11 +29,41 @@ class UserManagerView {
 			})
 		});
 
-		this.userlist = new UserList(this.api);
+		this.inputs = new UIController({
+			userlist: new UIInput({
+				elem: $('#users-table'),
+				cond: () => true,
+				enabler: null,
+				attach: {
+					'component.userlist.save': async (event, data) => {
+						await this.save_user(
+							data.username,
+							data.groups
+						);
+					},
+					'component.userlist.remove': async (event, data) => {
+						await this.remove_user(
+							data.username
+						);
+					}
+				},
+				defer: () => !this.ready,
+				mod: null,
+				getter: null,
+				setter: null,
+				clearer: null
+			})
+		})
+
+		this.userlist = new UserList(
+			this.api,
+			$('#users-table')[0]
+		);
 	}
 
 	async init() {
-		await this.populate();
+		await this.fetch();
+		this.populate();
 		this.ready = true;
 	}
 
@@ -54,6 +85,15 @@ class UserManagerView {
 					APIUI.handle_error(e);
 					return;
 				}
+
+				/*
+				*  Manually add the new user to the UserList to make
+				*  the generated initial password visible in the UI.
+				*  This is done because the API doesn't return the
+				*  password on subsequent calls.
+				*/
+				this.userlist.add_user(user);
+				this.populate();
 			},
 			[
 				new StrValidator({
@@ -75,8 +115,10 @@ class UserManagerView {
 		)
 	}
 
-	async populate() {
-		// Fetch userdata.
+	async fetch() {
+		/*
+		*  Fetch userdata for the UI.
+		*/
 		try {
 			this.userlist.set_user_data(
 				await this.controller.get_users()
@@ -85,9 +127,39 @@ class UserManagerView {
 			APIUI.handle_error(e);
 			return;
 		}
+	}
 
-		// Populate the UI.
-		this.userlist.render($('#users-table')[0]);
+	populate() {
+		/*
+		*  Populate the UI from the current userdata.
+		*/
+		this.userlist.render();
+	}
+
+	async save_user(username, groups) {
+		/*
+		*  Save the user 'username' with the new groups 'groups'.
+		*/
+		try {
+			await this.controller.save_user(username, groups);
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
+		}
+	}
+
+	async remove_user(username) {
+		/*
+		*  Remove the user 'username'.
+		*/
+		try {
+			await this.controller.remove_user(username);
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
+		}
+		await this.fetch();
+		this.populate()
 	}
 }
 exports.UserManagerView = UserManagerView;
