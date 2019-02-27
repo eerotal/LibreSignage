@@ -152,20 +152,20 @@ class QueueSelector {
 				'Please enter a name for the new queue.',
 				(action, val) => action ? resolve(val) : reject(),
 				[new StrValidator({
-					min: null,
-					max: null,
-					regex: /^[A-Za-z0-9_-]*$/
-				}, "Invalid characters in queue name."),
-				new StrValidator({
 					min: 1,
 					max: null,
 					regex: null,
-				}, "The queue name is too short."),
+				}, "", true),
 				new StrValidator({
 					min: null,
 					max: this.api.limits.QUEUE_NAME_MAX_LEN,
 					regex: null
 				}, "The queue name is too long."),
+				new StrValidator({
+					min: null,
+					max: null,
+					regex: /^[A-Za-z0-9_-]*$/
+				}, "Invalid characters in queue name."),
 				new BlacklistValidator({
 					bl: queues
 				}, "This queue already exists.")]
