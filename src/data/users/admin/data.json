@@ -16,7 +16,7 @@
 			"slides": {
 				"limit": 10,
 				"description": "Slides",
-				"used": 0
+				"used": 3
 			},
 			"api_rate": {
 				"limit": 200,
