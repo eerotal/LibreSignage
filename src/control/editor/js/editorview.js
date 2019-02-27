@@ -628,6 +628,7 @@ class EditorView {
 			return;
 		}
 		await this.timeline.show_queue(this.controller.get_queue());
+		this.update();
 	}
 
 	async hide_queue() {
