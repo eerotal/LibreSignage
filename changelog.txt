@@ -22,6 +22,9 @@ v0.3.0
                previously failed.
   - [feature]  Allow space characters in upload filenames.
   - [bugfix]   Implement automatic slide lock cleanup on logout.
+  - [feature]  Rewrite the web interface to use a Model, View, Controller
+               architecture. Various JavaScript components used in the
+               interface were also rewritten in the process.
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
