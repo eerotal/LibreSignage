@@ -20,12 +20,13 @@ return [
 		'video/ogg',
 		'video/webm'
 	],
-	"SLIDE_MAX_ASSETS"         => 2,
+	"SLIDE_MAX_ASSETS"         => 20,
 
 	"QUEUE_NAME_MAX_LEN"       => 32,
 
 	"MAX_USERS"                => 64,
 	"MAX_USER_GROUPS"          => 32,
+	"MAX_USER_GROUP_LEN"       => 64,
 	"USERNAME_MAX_LEN"         => 64,
 	"PASSWORD_MAX_LEN"         => 256,
 	"API_RATE_T"               => 60

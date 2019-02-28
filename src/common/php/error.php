@@ -22,6 +22,7 @@ class ArgException extends Exception {};
 class IntException extends Exception {};
 class FileTypeException extends Exception {};
 class LimitException extends Exception {};
+class QuotaException extends Exception {};
 class ConfigException extends Exception {};
 
 function error_set_debug(bool $debug) {
@@ -34,7 +35,7 @@ function error_set_debug(bool $debug) {
 	if ($debug) {
 		error_reporting(E_ALL | E_NOTICE | E_STRICT);
 		ini_set('display_errors', "1");
-		ini_set('log_errors', "0");
+		ini_set('log_errors', "1");
 	} else {
 		error_reporting(E_ALL | ~E_NOTICE);
 		ini_set('display_errors', "0");

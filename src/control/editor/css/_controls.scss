@@ -1,0 +1,19 @@
+/* Editor controls styling. */
+
+#slide-label-readonly, #slide-label-edited, #slide-label-collaborate {
+	width: 100%;
+	text-align: center;
+	display: none; /* Initial */
+}
+#slide-label-readonly    { color: orange;   }
+#slide-label-edited      { color: orange;   }
+#slide-label-collaborate { color: darkgreen;}
+
+#slide-sched-group {
+	margin: {
+		top: .5rem;
+		bottom: .5rem;
+		left: 1.5rem;
+	}
+	border-left: 1px solid $gray-1;
+}

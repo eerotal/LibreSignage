@@ -94,7 +94,7 @@ class Slide extends Exportable{
 	private $sched_t_e = 0;
 	private $animation = 0;
 	private $queue_name = NULL;
-	private $collaborators = NULL;
+	private $collaborators = [];
 	private $lock = NULL;
 	private $assets = [];
 	private $ready = FALSE;
@@ -124,7 +124,6 @@ class Slide extends Exportable{
 		*/
 		$cstr = NULL;
 		$conf = NULL;
-		$mu = NULL;
 
 		$this->mk_paths($id);
 		if (!is_file($this->conf_path)) {
@@ -143,10 +142,9 @@ class Slide extends Exportable{
 		) { throw new IntException("Slide config decode error!"); }
 
 		$this->import($conf, TRUE);
-		$this->check_sched_enabled();
-
 		$this->set_ready(TRUE);
 		$this->lock_cleanup();
+		$this->check_sched_enabled();
 	}
 
 	function dup() {
@@ -446,10 +444,11 @@ class Slide extends Exportable{
 		*  overrides the manual 'enabled' control.
 		*/
 		$t = time();
-		if ($this->get_sched() &&
-			$t >= $this->get_sched_t_s() &&
-			$t <= $this->get_sched_t_e()) {
-
+		if (
+			$this->get_sched()
+			&& $t >= $this->get_sched_t_s()
+			&& $t <= $this->get_sched_t_e()
+		) {
 			// Scheduling active -> enable.
 			$this->set_enabled(TRUE);
 			$this->write();

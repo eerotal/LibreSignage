@@ -222,7 +222,7 @@ class APIValidatorModule extends APIModule {
 		*  doesn't do any type validation.
 		*/
 		if (
-			API_P_EMPTY_STR_OK & $format === 0
+			(API_P_EMPTY_STR_OK & $format) === 0
 			&& gettype($data) === 'string'
 			&& empty($data)
 		) {

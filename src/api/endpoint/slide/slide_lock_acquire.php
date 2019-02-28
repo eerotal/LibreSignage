@@ -69,7 +69,7 @@ try {
 $slide->write();
 
 $SLIDE_LOCK_ACQUIRE->resp_set([
-	'expire' => $slide->get_lock()->get_expire(),
+	'lock' => $slide->get_lock()->export(FALSE, FALSE),
 	'error' => API_E_OK
 ]);
 $SLIDE_LOCK_ACQUIRE->send();

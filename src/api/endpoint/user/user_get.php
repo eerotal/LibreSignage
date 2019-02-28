@@ -49,12 +49,12 @@ try {
 	);
 }
 
-$ret_data = array(
-	'user' => array(
+$ret_data = [
+	'user' => [
 		'user' => $u->get_name(),
 		'groups' => $u->get_groups()
-	)
-);
+	]
+];
 
 $USER_GET->resp_set($ret_data);
 $USER_GET->send();

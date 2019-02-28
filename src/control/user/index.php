@@ -46,7 +46,7 @@
 				</div>
 
 				<!-- Password input -->
-				<div id="user-pass-group>
+				<div id="user-pass-group"
 					class="form-group w-100">
 					<label class="col-form-label"
 						for="user-pass">
@@ -54,7 +54,7 @@
 					</label>
 					<input id="user-pass"
 							type="password"
-						class="form-control">
+							class="form-control">
 					</input>
 				</div>
 
@@ -66,9 +66,9 @@
 					</label>
 					<div id="user-pass-confirm-group"
 						class="p-0">
-					<input id="user-pass-confirm"
-							type="password"
-							class="form-control">
+						<input id="user-pass-confirm"
+								type="password"
+								class="form-control">
 						</input>
 						<div class="invalid-feedback"></div>
 					</div>
