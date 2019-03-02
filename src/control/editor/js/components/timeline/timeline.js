@@ -16,10 +16,8 @@ const slide_template = s => `
 class Timeline {
 	constructor(container_id) {
 		this.container = $(`#${container_id}`);
-
 		this.queue = null;
 		this.slide = null;
-
 		this.thumbs = null;
 	}
 
@@ -37,6 +35,13 @@ class Timeline {
 			{ 'id': id }
 		);
 
+		this.set_selected(id);
+	}
+
+	set_selected(id) {
+		/*
+		*  Select a slide from the timeline.
+		*/
 		let slides = this.queue.get_slides().get_slides();
 		for (let s of Object.values(slides)) {
 			if (s.get('id') === id) {
@@ -85,6 +90,19 @@ class Timeline {
 				}
 			}
 			this.thumbs[id] = thumb;
+		}
+	}
+
+	async update(preserve_selected) {
+		/*
+		*  Update the timeline. If preserve_selected === true,
+		*  the current slide selection is preserved.
+		*/
+		let slide = this.slide;
+		await this.show_queue(this.queue);
+
+		if (preserve_selected === true) {
+			this.set_selected(slide.get('id'));
 		}
 	}
 

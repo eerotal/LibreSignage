@@ -835,7 +835,7 @@ class EditorView {
 		}
 
 		// Update timeline and editor UI.
-		await this.timeline.show_queue(this.controller.get_queue());
+		await this.timeline.update(true);
 		this.show_slide(null);
 	}
 
@@ -848,7 +848,7 @@ class EditorView {
 		} catch (e) {
 			APIUI.handle_error(e);
 		}
-		await this.timeline.show_queue(this.controller.get_queue());
+		await this.timeline.update(true);
 	}
 
 	preview_slide() {
@@ -886,7 +886,7 @@ class EditorView {
 		} catch (e) {
 			APIUI.handle_error(e);
 		}
-		await this.timeline.show_queue(this.controller.get_queue());
+		await this.timeline.update(false);
 		this.hide_slide();
 	}
 
@@ -900,7 +900,7 @@ class EditorView {
 		} catch (e) {
 			APIUI.handle_error(e);
 		}
-		await this.timeline.show_queue(this.controller.get_queue());
+		this.timeline.update(false);
 		this.update();
 	}
 
