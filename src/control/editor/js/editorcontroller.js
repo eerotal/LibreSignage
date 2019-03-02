@@ -22,6 +22,21 @@ class EditorController {
 				collaborate: false
 			}
 		};
+
+		window.onbeforeunload = () => {
+			/*
+			*  Release slide locks on exit.
+			*
+			*  'await' is not used here on purpose because
+			*  the browser won't wait for the API call to
+			*  finish anyway. That doesn't really matter since
+			*  as long as the call is sent to the server, any
+			*  locks are released regardless of whether the
+			*  response is received or not.
+			*/
+			console.log('Cleanup');
+			this.close_slide();
+		}
 	}
 
 	async open_queue(name) {
