@@ -28,7 +28,8 @@
     "autoprefixer": "^9.1.1",
     "browserify": "^16.2.2",
     "postcss-cli": "^6.0.0",
-    "sass": "^1.15.0"
+    "sass": "^1.15.0",
+    "xmlhttprequest": "^1.8.0"
   },
   "private": true
 }
