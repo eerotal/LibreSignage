@@ -205,7 +205,9 @@ class Slide extends Exportable{
 		}
 
 		// Check name length.
-		if (strlen($name) > gtlim('SLIDE_NAME_MAX_LEN')) {
+		if (strlen($name) === 0) {
+			throw new ArgException("Invalid empty slide name.");
+		} else if (strlen($name) > gtlim('SLIDE_NAME_MAX_LEN')) {
 			throw new ArgException("Slide name too long.");
 		}
 		$this->name = $name;
