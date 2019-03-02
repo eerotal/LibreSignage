@@ -1,14 +1,16 @@
 var $ = require('jquery');
+var util = require('ls-util');
 
 /*
 *  Asset list thumbnail template. 'slide' is the slide
 *  object to use and 'name' is the asset name.
 */
-const asset_thumb_template = (slide, name) => `
+
+const asset_thumb_template = (name, thumb_uri) => `
 <div class="thumb">
 	<div class="thumb-inner default-border">
 		<div class="thumb-img-wrapper">
-			<img src="${slide.get_asset_thumb_uri(name)}"></img>
+			<img src="${thumb_uri}"></img>
 		</div>
 		<div class="thumb-label-wrapper">
 			<div class="thumb-rm-wrapper">
@@ -53,16 +55,33 @@ class AssetList {
 		if (this.slide == null) { return; }
 
 		for (let a of this.slide.get('assets')) {
-			let tmp = $(asset_thumb_template(this.slide, a.filename));
-			$(this.container).append(tmp);
+			let thumb_uri = null;
+			let html = null;
 
-			tmp.on('click', () => {
+			/*
+			*  Use the asset thumbnail if it exists and a placeholder
+			*  icon otherwise.
+			*/
+			if (this.slide.has_thumb(a.filename)) {
+				thumb_uri = this.slide.get_asset_thumb_uri(a.filename);
+			} else {
+				thumb_uri = util.fa_svg_uri('solid', 'image');
+			}
+
+			html = $(asset_thumb_template(
+				a.filename,
+				thumb_uri
+			));
+			$(this.container).append(html);
+
+			// Attach event listeners for the select and remove actions.
+			html.on('click', () => {
 				this.trigger(
 					'select',
 					{ name: a.filename }
 				);
 			});
-			tmp.find('.btn-remove').on('click', e => {
+			html.find('.btn-remove').on('click', e => {
 				this.trigger(
 					'remove',
 					{ name: a.filename }

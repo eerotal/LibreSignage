@@ -19,11 +19,13 @@ class SlideAsset extends Exportable {
 		'intname',
 		'fullpath',
 		'thumbname',
-		'thumbpath'
+		'thumbpath',
+		'has_thumb'
 	];
 	static $PUBLIC = [
 		'mime',
-		'filename'
+		'filename',
+		'has_thumb'
 	];
 
 	private $mime = NULL;
@@ -35,6 +37,8 @@ class SlideAsset extends Exportable {
 
 	private $thumbname = NULL;
 	private $thumbpath = NULL;
+
+	private $has_thumb = FALSE;
 
 	public function __exportable_get(string $name) {
 		return $this->{$name};
@@ -94,6 +98,9 @@ class SlideAsset extends Exportable {
 		)) {
 			$this->thumbname = NULL;
 			$this->thumbpath = NULL;
+			$this->has_thumb = FALSE;
+		} else {
+			$this->has_thumb = TRUE;
 		}
 	}
 
@@ -117,9 +124,9 @@ class SlideAsset extends Exportable {
 		foreach ($this::$PRIVATE as $n) { $this->{$n} = NULL; }
 	}
 
-	public function get_filename() { return $this->filename; }
-	public function get_fullpath() { return $this->fullpath; }
+	public function get_filename()  { return $this->filename;  }
+	public function get_fullpath()  { return $this->fullpath;  }
 	public function get_thumbname() { return $this->thumbname; }
 	public function get_thumbpath() { return $this->thumbpath; }
-	public function get_mime() { return $this->mime; }
+	public function get_mime()      { return $this->mime;      }
 }
