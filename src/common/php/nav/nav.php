@@ -88,12 +88,13 @@
 
 <nav class="nav nav-pills">
 	<div class="row container-fluid mx-auto">
-		<div class="col-lg-2 my-auto m-0 p-0">
-			<p class="lead my-auto">
-				LibreSignage
-			</p>
+		<div class="col-lg-3 my-auto m-0 p-0">
+			<img
+				class="ls-logo"
+				src="/assets/images/logo/libresignage_text.svg">
+			</img>
 		</div>
-		<div class="col-lg-10 p-0 m-0">
+		<div class="col-lg-9 p-0 m-0">
 			<div class="row container-fluid d-flex justify-content-end m-0 p-0">
 				<?php
 				foreach (array_keys($NAV_PAGE_LINKS) as $k) {
