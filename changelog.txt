@@ -1,4 +1,4 @@
-v0.3.0
+v1.0.0
   - [internal] Modularize and improve the build system.
   - [feature]  Implement an improved configuration file loader that
                supports loading configuration from multiple files.
@@ -25,7 +25,7 @@ v0.3.0
   - [feature]  Rewrite the web interface to use a Model, View, Controller
                architecture. Various JavaScript components used in the
                interface were also rewritten in the process.
-  - [feature]  Create a LibreSignage logo and use throughout the
+  - [feature]  Create a LibreSignage logo and use it throughout the
                web interface.
 
 v0.2.1
