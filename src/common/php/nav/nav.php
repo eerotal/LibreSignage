@@ -87,7 +87,7 @@
 ?>
 
 <nav class="nav nav-pills">
-	<div class="row container-fluid mx-auto">
+	<div class="row container-fluid px-0 mx-auto">
 		<div class="col-lg-3 my-auto m-0 p-0">
 			<img
 				class="ls-logo"
