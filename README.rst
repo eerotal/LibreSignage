@@ -1,9 +1,11 @@
-######################################################
-LibreSignage - An open source digital signage solution
-######################################################
+.. image:: https://raw.githubusercontent.com/eerotal/LibreSignage/next/src/assets/images/logo/libresignage_text_476x100.png
+    :align: center
+
+  An open source digital signage solution
 
 .. image:: https://travis-ci.org/eerotal/LibreSignage.svg?branch=master
     :target: https://travis-ci.org/eerotal/LibreSignage
+    :align: center
 
 Table Of Contents
 -----------------
