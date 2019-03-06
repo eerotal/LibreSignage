@@ -10,4 +10,4 @@ Quota
 -----
 
 The *Control Panel* page includes a *Your quota* box where the current
-`User Quota </doc?doc=quotas>`_ limits and used quotas are shown.
+`User Quota </doc?doc=limits>`_ limits and used quotas are shown.
