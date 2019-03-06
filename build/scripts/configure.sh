@@ -16,7 +16,7 @@ CURRENT_NPM_VERSION=$(npm -v)
 version_check () { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
 if version_check $CURRENT_NPM_VERSION $MINIMUM_NPM_VERSION; then
         echo "[ERROR] NPM version '$CURRENT_NPM_VERSION' is below requirement of '$MINIMUM_NPM_VERSION'"
-        echo "[ERROR] Please install an updated version and run npm install again"
+        echo "[ERROR] Please install an updated version and run 'npm install' again"
 	echo "[ERROR] See the README for details"
         exit 1;
 fi
