@@ -11,18 +11,6 @@ set -e
 
 FLAG_PRESERVE_DATA=0;
 
-# Check if NPM is proper version
-MINIMUM_NPM_VERSION="6.0.0"
-CURRENT_NPM_VERSION=$(npm -v)
-
-
-version_check () { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
-if version_check $CURRENT_NPM_VERSION $MINIMUM_NPM_VERSION; then
-	echo "[ERROR] NPM version '$CURRENT_NPM_VERSION' is below requirement of '$MINIMUM_NPM_VERSION'"
-	echo "[ERROR] Please install an updated version. See the README for details."
-	exit 1;
-fi
-
 # Check that the APACHE_SITES directory exists.
 if [ ! -d "$APACHE_SITES" ]; then
 	echo "[ERROR] '$APACHE_SITES' doesn't exist.";

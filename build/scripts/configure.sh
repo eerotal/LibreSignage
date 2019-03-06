@@ -8,6 +8,21 @@
 set -e
 . build/scripts/conf.sh
 
+# Check if NPM is proper version
+MINIMUM_NPM_VERSION="6.0.0"
+CURRENT_NPM_VERSION=$(npm -v)
+
+
+version_check () { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != $
+if version_check $CURRENT_NPM_VERSION $MINIMUM_NPM_VERSION; then
+        echo "[ERROR] NPM version '$CURRENT_NPM_VERSION' is below requirement of '$MINIMUM_NPM_VERSION'"
+        echo "[ERROR] Please install an updated version and run npm install again"
+	echo "[ERROR] See the README for details"
+        exit 1;
+fi
+
+
+
 read -p 'Document root (DEF: /var/www): ' ICONF_DOCROOT;
 if [ -z "$ICONF_DOCROOT" ]; then
 	ICONF_DOCROOT='/var/www';
