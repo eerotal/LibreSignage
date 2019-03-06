@@ -37,12 +37,19 @@ class SlideLock extends Exportable{
 	}
 
 	public function is_expired() {
+		/*
+		*  Return TRUE if this SlideLock is expired and FALSE otherwise.
+		*/
 		if (empty($this->session_id)) { return TRUE; }
 		$s = Session::from_id($this->session_id);
 		return $s === NULL || time() > $this->expire;
 	}
 
 	public function is_owned_by(Session $session) {
+		/*
+		*  Return TRUE if this SlideLock is owned by $session and
+		*  FALSE otherwise.
+		*/
 		return $this->session_id === $session->get_id();
 	}
 

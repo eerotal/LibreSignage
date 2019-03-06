@@ -55,7 +55,14 @@ class Queue {
 				'/'.$queue.'.json';
 	}
 
-	function load() {
+	function load(bool $fix_errors = FALSE) {
+		/*
+		*  Load a queue from disk. If $fix_errors === TRUE,
+		*  slides that can't be loaded are automatically
+		*  removed from the queue.
+		*/
+		$errors_fixed = FALSE;
+
 		if (!file_exists($this->path)) {
 			throw new ArgException(
 				"Queue doesn't exist."
@@ -76,9 +83,30 @@ class Queue {
 		$this->slides = array();
 		foreach ($data['slides'] as $n) {
 			$tmp = new Slide();
-			$tmp->load($n);
+			try {
+				$tmp->load($n);
+			} catch (Exception $e) {
+				if (
+					!(
+						$e instanceof ArgException
+						|| $e instanceof IntException
+					)
+					|| $fix_errors === FALSE
+				) {
+					throw $e;
+				} else {
+					$errors_fixed = TRUE;
+					continue;
+				}
+			}
 			$this->slides[] = $tmp;
 		}
+
+		// Write changes to disk in case any errors were fixed.
+		if ($errors_fixed === TRUE) {
+			$this->write();
+		}
+
 		$this->loaded = TRUE;
 	}
 
