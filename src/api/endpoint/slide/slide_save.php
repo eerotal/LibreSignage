@@ -140,7 +140,7 @@ if ($SLIDE_SAVE->has('id', TRUE)) {
 function ensure_slide_lock(Slide $slide, Session $caller_session): void {
 	/*
 	*  Ensure that the slide $slide is locked by $session and
-	*  is not expired.
+	*  the lock is not expired.
 	*/
 	$lock = $slide->get_lock();
 	if ($lock === NULL) {
