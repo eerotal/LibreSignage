@@ -86,7 +86,7 @@ endif
 
 .PHONY: initchk configure dirs server js css api \
 		config libs docs htmldocs install utest \
-		clean realclean LOC VERSION_CHECK
+		clean realclean LOC
 .ONESHELL:
 # Targets only defined if requirements met
 ifeq ($(REQUIREMENTS_MET),1)
