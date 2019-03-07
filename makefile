@@ -11,6 +11,15 @@ ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SASS_IPATHS := $(ROOT) $(ROOT)src/common/css $(ROOT)/src/node_modules
 SASSFLAGS := --no-source-map
 
+# Initial Requirement Checks.
+export NPM_REQUIRED_VERSION := 6.4.0
+export GCC_REQUIRED_VERSION := 4.0
+export NPM_VERSION_PASS := $(shell $(ROOT)build/scripts/npm_version.sh $(NPM_REQUIRED_VERSION))
+export GCC_VERSION_PASS := $(shell $(ROOT)build/scripts/gcc_version.sh $(GCC_REQUIRED_VERSION))
+$(info NPM_Version_Pass $(NPM_VERSION_PASS))
+$(info GCC_Version_Pass $(GCC_VERSION_PASS))
+export REQUIREMENTS_MET := $(shell expr $(NPM_VERSION_PASS) \* $(GCC_VERSION_PASS))
+
 # Caller supplied build settings.
 VERBOSE ?= Y
 NOHTMLDOCS ?= N
@@ -77,11 +86,12 @@ endif
 
 .PHONY: initchk configure dirs server js css api \
 		config libs docs htmldocs install utest \
-		clean realclean LOC
+		clean realclean LOC VERSION_CHECK
 .ONESHELL:
+# Targets only defined if requirements met
+ifeq ($(REQUIREMENTS_MET),1)
 
 all:: server docs htmldocs js css api libs; @:
-
 server:: initchk $(subst src,dist,$(SRC_NO_COMPILE)); @:
 js:: initchk $(subst src,dist,$(SRC_JS)); @:
 api:: initchk $(subst src,dist,$(SRC_ENDPOINT)); @:
@@ -90,6 +100,21 @@ docs:: initchk $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_
 htmldocs:: initchk $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
 css:: initchk $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
 libs:: initchk $(subst $(ROOT)node_modules/,dist/libs/,$(LIBS)); @:
+
+else
+#Display NPM Required Version
+ifeq ($(NPM_VERSION_PASS),0)
+$(info [ERROR] NPM version must be at least $(NPM_REQUIRED_VERSION))
+endif
+#Display GCC Required Version
+ifeq ($(GCC_VERSION_PASS),0)
+$(info [ERROR] GCC version must be at least $(GCC_REQUIRED_VERSION))
+endif
+#Halt
+$(error Requirements not met)
+
+endif
+# End of code blocked by requirements
 
 # Copy over non-compiled, non-PHP sources.
 $(filter-out %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
