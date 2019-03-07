@@ -3,6 +3,7 @@ var APIError = require('ls-api').APIError;
 var Slide = require('ls-slide').Slide;
 var Queue = require('ls-queue').Queue;
 var assert = require('ls-assert').assert;
+var User = require('ls-user').User;
 
 class EditorController {
 	constructor(api) {
@@ -20,6 +21,9 @@ class EditorController {
 				locked:      false,
 				owned:       false,
 				collaborate: false
+			},
+			quota: {
+				slides: false
 			}
 		};
 
@@ -37,6 +41,26 @@ class EditorController {
 			console.log('Cleanup');
 			this.close_slide();
 		}
+	}
+
+	async init() {
+		/*
+		*  Initialize the EditorController.
+		*/
+		await this.update_quotas();
+	}
+
+	async update_quotas() {
+		/*
+		*  Fetch current userdata and update the quota
+		*  state booleans in 'this.state.quota'.
+		*/
+		let user = new User(this.api);
+		await user.load(null);
+
+		Object.assign(this.state.quota, {
+			slides: user.get_quota().has_quota('slides')
+		})
 	}
 
 	async open_queue(name) {
@@ -171,6 +195,8 @@ class EditorController {
 
 		await this.slide.save();
 		await this.update_queue();
+		await this.update_quotas();
+
 		Object.assign(this.state.slide, {
 			saved: true
 		});
@@ -201,6 +227,8 @@ class EditorController {
 			this.slide = null;
 			await this.update_queue();
 		}
+
+		await this.update_quotas();
 
 		Object.assign(this.state.slide, {
 			loaded:      false,

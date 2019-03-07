@@ -99,9 +99,10 @@ class Timeline {
 		*  the current slide selection is preserved.
 		*/
 		let slide = this.slide;
+		await this.queue.update();
 		await this.show_queue(this.queue);
 
-		if (preserve_selected === true) {
+		if (slide != null && preserve_selected === true) {
 			this.set_selected(slide.get('id'));
 		}
 	}

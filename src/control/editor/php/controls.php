@@ -1,4 +1,4 @@
-<!-- Slide editable status labels -->
+<!-- Slide status labels -->
 <div id="slide-label-readonly">
 	You can't edit this slide.
 </div>
@@ -8,6 +8,9 @@
 </div>
 <div id="slide-label-collaborate">
 	You can edit this slide as a collaborator.
+</div>
+<div id="slide-label-no-quota">
+	You can't create any more slides.
 </div>
 
 <!-- Slide name input -->

@@ -62,6 +62,13 @@ class EditorView {
 		let user = null;
 
 		try {
+			await this.controller.init();
+		} catch (e) {
+			APIUI.handle_error(e);
+			return;
+		}
+
+		try {
 			users = await User.list_all(this.api);
 		} catch (e) {
 			APIUI.handle_error(e);
@@ -378,6 +385,15 @@ class EditorView {
 				getter: null,
 				setter: null
 			}),
+			label_no_quota: new UIStatic({
+				elem: $('#slide-label-no-quota'),
+				cond: d => !d.quota.slides,
+				enabler: (e, s) => s ? e.show() : e.hide(),
+				attach: null,
+				defer: () => !this.ready,
+				getter: null,
+				setter: null
+			}),
 			label_editor_error: new UIStatic({
 				elem: $('#slide-label-editor-error'),
 				cond: () => true,
@@ -386,12 +402,15 @@ class EditorView {
 				defer: () => !this.ready,
 				getter: null,
 				setter: null
-			})
+			}),
 		});
 		this.buttons = new UIController({
 			new: new UIButton({
 				elem: $('#btn-slide-new'),
-				cond: d => d.queue.loaded,
+				cond: d => (
+					d.quota.slides
+					&& d.queue.loaded
+				),
 				enabler: null,
 				attach: { click: () => this.new_slide() },
 				defer: () => !this.ready
@@ -400,30 +419,45 @@ class EditorView {
 				elem: $('#btn-slide-save'),
 				cond: d => (
 					this.validators.get_state()
-					&& d.slide.loaded
-					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (
+						(
+							d.slide.saved
+							&& d.slide.loaded
+							&& d.slide.locked
+							&& (d.slide.owned || d.slide.collaborate)
+						) || (
+							!d.slide.saved
+							&& d.quota.slides
+						)
+					)
 				),
 				enabler: null,
-				attach: { click: () => this.save_slide() },
+				attach: {
+					click: async () => await this.save_slide()
+				},
 				defer: () => !this.ready
 			}),
 			duplicate: new UIButton({
 				elem: $('#btn-slide-duplicate'),
 				cond: d => (
-					d.slide.loaded
+					d.quota.slides
+					&& d.slide.loaded
 					&& d.slide.locked
 					&& (d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
-				attach: { click: () => this.duplicate_slide() },
+				attach: {
+					click: async () => await this.duplicate_slide()
+				},
 				defer: () => !this.ready
 			}),
 			preview: new UIButton({
 				elem: $('#btn-slide-preview'),
 				cond: d => d.slide.loaded,
 				enabler: null,
-				attach: { click: () => this.preview_slide() },
+				attach: {
+					click: () => this.preview_slide()
+				},
 				defer: () => !this.ready
 			}),
 			move: new UIButton({
@@ -440,8 +474,8 @@ class EditorView {
 					'component.dropselect.show': async () => {
 						await this.update_move_slide_options();
 					},
-					'component.dropselect.select': (e, data) => {
-						this.move_slide(data.option);
+					'component.dropselect.select': async (e, data) => {
+						await this.move_slide(data.option);
 					}
 				},
 				defer: () => !this.ready
@@ -457,8 +491,8 @@ class EditorView {
 					elem.find('.dropconfirm-open').prop('disabled', !s);
 				},
 				attach: {
-					'component.dropconfirm.confirm': () => {
-						this.remove_slide();
+					'component.dropconfirm.confirm': async () => {
+						await this.remove_slide();
 					}
 				},
 				defer: () => !this.ready
@@ -686,7 +720,8 @@ class EditorView {
 
 	async show_slide(id) {
 		/*
-		*  Show the slide 'id'.
+		*  Show the slide 'id'. If id == null, the current
+		*  loaded slide from the EditorController is used.
 		*/
 		let s = null;
 		if (id != null) {
@@ -834,8 +869,12 @@ class EditorView {
 			return;
 		}
 
-		// Update timeline and editor UI.
-		await this.timeline.update(true);
+		/*
+		*  Update the timeline and editor and select the new
+		*  slide in the timeline.
+		*/
+		await this.timeline.update(false);
+		this.timeline.set_selected(s.get('id'));
 		this.show_slide(null);
 	}
 
@@ -900,7 +939,7 @@ class EditorView {
 		} catch (e) {
 			APIUI.handle_error(e);
 		}
-		this.timeline.update(false);
+		await this.timeline.update(false);
 		this.update();
 	}
 
