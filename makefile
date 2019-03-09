@@ -64,6 +64,19 @@ SRC_ENDPOINT := $(shell find src/api/endpoint \
 	-o \( -type f -name '*.php' -print \) \
 )
 
+# Logo SVG sources.
+SRC_LOGO_BARE := \
+	src/assets/images/logo/libresignage.svg
+DIST_LOGO_BARE := \
+	dist/assets/images/logo/libresignage_16x16.png \
+	dist/assets/images/logo/libresignage_32x32.png \
+	dist/assets/images/logo/libresignage_96x96.png
+
+SRC_LOGO_TEXT := \
+	src/assets/images/logo/libresignage_text.svg
+DIST_LOGO_TEXT := \
+	dist/assets/images/logo/libresignage_text_476x100.png
+
 status = \
 	if [ "`echo '$(VERBOSE)'|cut -zc1|\
 		tr '[:upper:]' '[:lower:]'`" = "y" ]; then \
@@ -80,7 +93,7 @@ endif
 		clean realclean LOC
 .ONESHELL:
 
-all:: server docs htmldocs js css api libs; @:
+all:: server docs htmldocs js css api libs logo; @:
 
 server:: initchk $(subst src,dist,$(SRC_NO_COMPILE)); @:
 js:: initchk $(subst src,dist,$(SRC_JS)); @:
@@ -90,6 +103,7 @@ docs:: initchk $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_
 htmldocs:: initchk $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
 css:: initchk $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
 libs:: initchk $(subst $(ROOT)node_modules/,dist/libs/,$(LIBS)); @:
+logo:: initchk $(DIST_LOGO_BARE) $(DIST_LOGO_TEXT); @:
 
 # Copy over non-compiled, non-PHP sources.
 $(filter-out %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
@@ -262,6 +276,27 @@ dist/libs/%:: node_modules/%
 	mkdir -p $@
 	$(call status,cp,$<,$@)
 	cp -Rp $</* $@
+
+# Convert the LibreSignage SVG logos to PNG logos of various sizes.
+$(DIST_LOGO_BARE):: $(SRC_LOGO_BARE)
+	@:
+	set -e
+	. build/scripts/convert_images.sh
+	SRC_DIR=`dirname $(@) | sed 's:dist:src:g'`
+	DEST_DIR=`dirname $(@)`
+	NAME=`basename $(lastword $^)`
+	SIZE=`echo $(@) | rev | cut -f 2 -d '.' | cut -f 1 -d '_' | rev`
+	convert_to_png "$$SRC_DIR" "$$DEST_DIR" "$$NAME" "$$SIZE"
+
+$(DIST_LOGO_TEXT):: $(SRC_LOGO_TEXT)
+	@:
+	set -e
+	. build/scripts/convert_images.sh
+	SRC_DIR=`dirname $(@) | sed 's:dist:src:g'`
+	DEST_DIR=`dirname $(@)`
+	NAME=`basename $(lastword $^)`
+	SIZE=`echo $(@) | rev | cut -f 2 -d '.' | cut -f 1 -d '_' | rev`
+	convert_to_transparent_png "$$SRC_DIR" "$$DEST_DIR" "$$NAME" "$$SIZE"
 
 ##
 ##  PHONY targets
