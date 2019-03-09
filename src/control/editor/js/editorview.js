@@ -310,41 +310,6 @@ class EditorView {
 			})
 		});
 		this.statics = new UIController({
-			timeline: new UIStatic({
-				elem: $('#timeline'),
-				cond: () => true,
-				enabler: null,
-				attach: {
-					'component.timeline.click': async (e, data) => {
-						await this.show_slide(data.id);
-					}
-				},
-				defer: () => !this.ready,
-				getter: null,
-				setter: null
-			}),
-			queueselector: new UIStatic({
-				elem: $('#queueselector'),
-				cond: () => true,
-				enabler: null,
-				attach: {
-					'component.queueselector.select': async (e, data) => {
-						await this.show_queue(data.queue);
-					},
-					'component.queueselector.create': async (e, data) => {
-						await this.create_queue(data.queue);
-					},
-					'component.queueselector.view': e => {
-						this.view_queue();						
-					},
-					'component.queueselector.remove': async e => {
-						await this.remove_queue();	
-					}
-				},
-				defer: () => !this.ready,
-				getter: null,
-				setter: null
-			}),
 			label_readonly: new UIStatic({
 				elem: $('#slide-label-readonly'),
 				cond: d => (
@@ -405,6 +370,41 @@ class EditorView {
 			}),
 		});
 		this.buttons = new UIController({
+			timeline: new UIStatic({
+				elem: $('#timeline'),
+				cond: () => true,
+				enabler: null,
+				attach: {
+					'component.timeline.click': async (e, data) => {
+						await this.show_slide(data.id);
+					}
+				},
+				defer: () => !this.ready,
+				getter: null,
+				setter: null
+			}),
+			queueselector: new UIStatic({
+				elem: $('#queueselector'),
+				cond: () => true,
+				enabler: null,
+				attach: {
+					'component.queueselector.select': async (e, data) => {
+						await this.show_queue(data.queue);
+					},
+					'component.queueselector.create': async (e, data) => {
+						await this.create_queue(data.queue);
+					},
+					'component.queueselector.view': e => {
+						this.view_queue();						
+					},
+					'component.queueselector.remove': async e => {
+						await this.remove_queue();	
+					}
+				},
+				defer: () => !this.ready,
+				getter: null,
+				setter: null
+			}),
 			new: new UIButton({
 				elem: $('#btn-slide-new'),
 				cond: d => (
