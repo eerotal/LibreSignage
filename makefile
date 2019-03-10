@@ -83,8 +83,8 @@ $(info [Info] Not going to generate HTML documentation.)
 endif
 
 .PHONY: initchk configure dirs server js css api \
-		config libs docs htmldocs install utest \
-		clean realclean LOC
+		config libs docs htmldocs install clean \
+		realclean LOC
 .ONESHELL:
 
 all:: server docs htmldocs js css api libs logo; @:
@@ -304,11 +304,6 @@ configure:
 	./build/scripts/configure_build.sh $$target $(PASS)
 	./build/scripts/configure_system.sh
 
-utest:
-	@:
-	set -e
-	./utests/api/main.py
-
 clean:
 	@:
 	set -e
@@ -374,7 +369,6 @@ LOC:
 	wc -l `find . \
 		\( \
 			-path "./dist/*" -o \
-			-path "./utests/api/.mypy_cache/*" -o \
 			-path "./node_modules/*" \
 		\) -prune \
 		-o -name ".#*" \
