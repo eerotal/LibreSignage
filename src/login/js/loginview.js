@@ -13,6 +13,8 @@ var UIButton = require('ls-uicontrol').UIButton;
 
 var LoginController = require('./logincontroller.js').LoginController;
 
+var util = require('ls-util');
+
 class LoginView {
 	constructor(api) {
 		this.ready = false;
@@ -100,6 +102,7 @@ class LoginView {
 		/*
 		*  Login using the credentials in the input fields.
 		*/
+		let query = util.get_GET_parameters();
 		try {
 			await this.controller.login(
 				this.inputs.get('username').get(),
@@ -109,7 +112,10 @@ class LoginView {
 		} catch (e) {
 			if (e instanceof APIError) {
 				if (e.response.error === APIError.codes.API_E_INCORRECT_CREDS) {
-					window.location.assign('/login?failed=1');
+					query.failed = '1';
+					window.location.assign(
+						`/login?${util.querify(query)}`
+					);
 					return;
 				} else {
 					APIUI.handle_error(e);
@@ -119,10 +125,22 @@ class LoginView {
 				throw e;
 			}
 		}
-		if (this.inputs.get('permanent').get()) {
-			window.location.assign('/app');
+
+		/*
+		*  Redirect the user
+		*   * to the originally requested URL if the query parameter
+		*     'redir' is set.
+		*   * to '/app' if a permanent session is made.
+		*   * to '/control' otherwise.
+		*/
+		if ('redir' in query) {
+			window.location.assign(decodeURIComponent(query.redir));
 		} else {
-			window.location.assign('/control');
+			if (this.inputs.get('permanent').get()) {
+				window.location.assign('/app');
+			} else {
+				window.location.assign('/control');
+			}
 		}
 	}
 

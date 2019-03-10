@@ -78,7 +78,10 @@ function web_auth(
 	}
 	if ($d === NULL) {
 		if ($redir) {
-			header('Location: '.LOGIN_PAGE);
+			header(
+				'Location: '.LOGIN_PAGE.
+				'?redir='.urlencode($_SERVER['REQUEST_URI'])
+			);
 			exit(0);
 		}
 		return NULL;
