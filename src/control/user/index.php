@@ -10,12 +10,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="/control/user/css/user.css">
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/favicon.php'); ?>
 		<title>LibreSignage User Settings</title>
 	</head>
 	<body>
-		<?php
-			require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH);
-		?>
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH); ?>
 		<main class="container-fluid">
 			<div class="user-settings-cont container mx-auto">
 				<h2>User settings</h2>
@@ -98,9 +97,7 @@
 				</div>
 			</div>
 		</main>
-		<?php
-			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
-		?>
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH); ?>
 		<script src="/control/user/js/main.js"></script>
 	</body>
 </html>

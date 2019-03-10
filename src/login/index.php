@@ -13,10 +13,9 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<?php
-			require_css(['font-awesome']);
-		?>
+		<?php require_css(['font-awesome']); ?>
 		<link rel="stylesheet" href="/login/css/login.css">
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/favicon.php'); ?>
 		<title>LibreSignage Login</title>
 	</head>
 	<body>
@@ -90,9 +89,7 @@
 				</div>
 			</div>
 		</main>
-		<?php
-			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
-		?>
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH); ?>
 		<script src="/login/js/main.js"></script>
 	</body>
 </html>

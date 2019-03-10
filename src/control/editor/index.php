@@ -11,6 +11,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<?php require_css(['font-awesome']); ?>
 		<link rel="stylesheet" href="/control/editor/css/main.css">
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/favicon.php'); ?>
 		<title>LibreSignage Editor</title>
 	</head>
 	<body>
@@ -49,9 +50,7 @@
 				<?php require_once($_SERVER['DOCUMENT_ROOT'].'/control/editor/popups/asset_uploader.php'); ?>
 			</div>
 		</main>
-		<?php
-			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
-		?>
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH); ?>
 		<script src="/libs/ace-builds/src/ace.js"></script>
 		<script src="/control/editor/js/main.js"></script>
 	</body>

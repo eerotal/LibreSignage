@@ -23,6 +23,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="/app/css/display.css">
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/favicon.php'); ?>
 		<title>LibreSignage Display</title>
 	</head>
 	<body>

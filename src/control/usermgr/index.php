@@ -12,7 +12,7 @@
 
 		<?php require_css(['font-awesome']); ?>
 		<link rel="stylesheet" href="/control/usermgr/css/usermgr.css">
-
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/favicon.php'); ?>
 		<title>LibreSignage User Manager</title>
 	</head>
 	<body>
