@@ -12,8 +12,8 @@ SASS_IPATHS := $(ROOT) $(ROOT)src/common/css $(ROOT)/src/node_modules
 SASSFLAGS := --no-source-map
 
 # Define required versions.
-export NPM_REQUIRED_VERSION := 6.4.0
-export MAKE_REQUIRED_VERSION := 4.0
+NPM_REQUIRED_VERSION := 6.4.0
+MAKE_REQUIRED_VERSION := 4.0
 
 # Caller supplied build settings.
 VERBOSE ?= Y
