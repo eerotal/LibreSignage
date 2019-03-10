@@ -64,18 +64,8 @@ SRC_ENDPOINT := $(shell find src/api/endpoint \
 	-o \( -type f -name '*.php' -print \) \
 )
 
-# Logo SVG sources.
-SRC_LOGO_BARE := \
-	src/assets/images/logo/libresignage.svg
-DIST_LOGO_BARE := \
-	dist/assets/images/logo/libresignage_16x16.png \
-	dist/assets/images/logo/libresignage_32x32.png \
-	dist/assets/images/logo/libresignage_96x96.png
-
-SRC_LOGO_TEXT := \
-	src/assets/images/logo/libresignage_text.svg
-DIST_LOGO_TEXT := \
-	dist/assets/images/logo/libresignage_text_476x100.png
+# Generated PNG logo paths.
+GENERATED_LOGOS := $(addprefix dist/assets/images/logo/libresignage_,16x16.png 32x32.png 96x96.png text_466x100.png)
 
 status = \
 	if [ "`echo '$(VERBOSE)'|cut -zc1|\
@@ -85,7 +75,7 @@ status = \
 makedir = mkdir -p $(dir $(1))
 
 ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
-$(info [INFO] Not going to generate HTML documentation.)
+$(info [Info] Not going to generate HTML documentation.)
 endif
 
 .PHONY: initchk configure dirs server js css api \
@@ -103,7 +93,7 @@ docs:: initchk $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_
 htmldocs:: initchk $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
 css:: initchk $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
 libs:: initchk $(subst $(ROOT)node_modules/,dist/libs/,$(LIBS)); @:
-logo:: initchk $(DIST_LOGO_BARE) $(DIST_LOGO_TEXT); @:
+logo:: initchk $(GENERATED_LOGOS); @:
 
 # Copy over non-compiled, non-PHP sources.
 $(filter-out %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
@@ -278,7 +268,8 @@ dist/libs/%:: node_modules/%
 	cp -Rp $</* $@
 
 # Convert the LibreSignage SVG logos to PNG logos of various sizes.
-$(DIST_LOGO_BARE):: $(SRC_LOGO_BARE)
+.SECONDEXPANSION:
+$(GENERATED_LOGOS): dist/%.png: src/$$(shell echo '$$*' | rev | cut -f 2- -d '_' | rev).svg
 	@:
 	set -e
 	. build/scripts/convert_images.sh
@@ -286,17 +277,7 @@ $(DIST_LOGO_BARE):: $(SRC_LOGO_BARE)
 	DEST_DIR=`dirname $(@)`
 	NAME=`basename $(lastword $^)`
 	SIZE=`echo $(@) | rev | cut -f 2 -d '.' | cut -f 1 -d '_' | rev`
-	convert_to_png "$$SRC_DIR" "$$DEST_DIR" "$$NAME" "$$SIZE"
-
-$(DIST_LOGO_TEXT):: $(SRC_LOGO_TEXT)
-	@:
-	set -e
-	. build/scripts/convert_images.sh
-	SRC_DIR=`dirname $(@) | sed 's:dist:src:g'`
-	DEST_DIR=`dirname $(@)`
-	NAME=`basename $(lastword $^)`
-	SIZE=`echo $(@) | rev | cut -f 2 -d '.' | cut -f 1 -d '_' | rev`
-	convert_to_transparent_png "$$SRC_DIR" "$$DEST_DIR" "$$NAME" "$$SIZE"
+	svg_to_png "$$SRC_DIR" "$$DEST_DIR" "$$NAME" "$$SIZE"
 
 ##
 ##  PHONY targets
@@ -408,8 +389,8 @@ LOC:
 LOD:
 	@:
 	set -e
-	echo '[INFO] Make sure your 'dist/' is up to date!'
-	echo '[INFO] Lines Of Documentation: '
+	echo '[Info] Make sure your 'dist/' is up to date!'
+	echo '[Info] Lines Of Documentation: '
 	wc -l `find dist -type f -name '*.rst'`
 
 initchk:
@@ -420,10 +401,10 @@ initchk:
 %:
 	@:
 	set -e
-	echo "[INFO]: Ignore $@"
+	echo "[Info]: Ignore $@"
 
 ifeq (,$(filter LOC LOD clean realclean configure initchk,$(MAKECMDGOALS)))
-$(info [INFO] Include dependency makefiles.)
+$(info [Info] Include dependency makefiles.)
 -include $(subst src,dep,$(SRC_JS:.js=.js.dep))\
 		$(subst src,dep,$(SRC_SCSS:.scss=.scss.dep))
 endif
