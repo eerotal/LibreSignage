@@ -11,6 +11,10 @@ ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 SASS_IPATHS := $(ROOT) $(ROOT)src/common/css $(ROOT)/src/node_modules
 SASSFLAGS := --no-source-map
 
+# Define required versions.
+export NPM_REQUIRED_VERSION := 6.4.0
+export MAKE_REQUIRED_VERSION := 4.0
+
 # Caller supplied build settings.
 VERBOSE ?= Y
 NOHTMLDOCS ?= N
@@ -84,7 +88,6 @@ endif
 .ONESHELL:
 
 all:: server docs htmldocs js css api libs logo; @:
-
 server:: initchk $(subst src,dist,$(SRC_NO_COMPILE)); @:
 js:: initchk $(subst src,dist,$(SRC_JS)); @:
 api:: initchk $(subst src,dist,$(SRC_ENDPOINT)); @:
@@ -94,6 +97,7 @@ htmldocs:: initchk $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html))); 
 css:: initchk $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
 libs:: initchk $(subst $(ROOT)node_modules/,dist/libs/,$(LIBS)); @:
 logo:: initchk $(GENERATED_LOGOS); @:
+
 
 # Copy over non-compiled, non-PHP sources.
 $(filter-out %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
@@ -397,6 +401,8 @@ initchk:
 	@:
 	set -e
 	./build/scripts/ldconf.sh $(CONF)
+	./build/scripts/npm_version.sh $(NPM_REQUIRED_VERSION)
+	./build/scripts/make_version.sh $(MAKE_REQUIRED_VERSION)
 
 %:
 	@:
