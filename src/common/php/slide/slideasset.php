@@ -48,14 +48,35 @@ class SlideAsset extends Exportable {
 		$this->{$name} = $value;
 	}
 
-	public function new(array $file, string $asset_path) {
+	public function set_paths(
+		string $uid,
+		string $ext,
+		string $asset_path
+	) {
+		$this->intname = "{$uid}.{$ext}";
+		$this->fullpath = "{$asset_path}/{$this->intname}";
+	}
+
+	public function set_thumb_paths(
+		string $uid,
+		string $asset_path
+	) {
+		$this->thumbname = "{$uid}_thumb".THUMB_EXT;
+		$this->thumbpath = "{$asset_path}/{$this->thumbname}";
+	}
+
+	public function gen_uid() {
+		$this->uid = get_uid();
+	}
+
+	public function new(array $file, Slide $slide) {
 		/*
 		*  Create a new asset instance and move the uploaded
-		*  asset to $asset_path. $file is the upload data for
-		*  a single file from $_FILES.
+		*  asset to the asset store of $slide. $file is the
+		*  upload data for a single file from $_FILES.
 		*/
 		assert(!empty($file));
-		assert(!empty($asset_path));
+		assert(!empty($slide->get_asset_path()));
 
 		if (strlen($file['name']) > gtlim('SLIDE_ASSET_NAME_MAX_LEN')) {
 			throw new ArgException("Asset filename too long.");
@@ -74,12 +95,10 @@ class SlideAsset extends Exportable {
 
 		$this->filename = basename($file['name']);
 		$this->mime = $mime;
-		$this->uid = get_uid();
 
+		$this->gen_uid();
 		$ext = explode('/', $this->mime)[1];
-
-		$this->intname = "{$this->uid}.{$ext}";
-		$this->fullpath = "{$asset_path}/{$this->intname}";
+		$this->set_paths($this->uid, $ext, $slide->get_asset_path());
 
 		if (!move_uploaded_file($file['tmp_name'], $this->fullpath)) {
 			$this->reset();
@@ -87,9 +106,7 @@ class SlideAsset extends Exportable {
 		}
 
 		// Generate a thumbnail for the asset.
-		$this->thumbname = "{$this->uid}_thumb".THUMB_EXT;
-		$this->thumbpath = "{$asset_path}/{$this->thumbname}";
-
+		$this->set_thumb_paths($this->uid, $slide->get_asset_path());
 		if (!generate_thumbnail(
 			$this->fullpath,
 			$this->thumbpath,
@@ -129,4 +146,29 @@ class SlideAsset extends Exportable {
 	public function get_thumbname() { return $this->thumbname; }
 	public function get_thumbpath() { return $this->thumbpath; }
 	public function get_mime()      { return $this->mime;      }
+	public function get_uid()       { return $this->uid;       }
+
+	public function clone(Slide $slide): SlideAsset {
+		/*
+		*  Clone this SlideAsset into the slide $slide. This
+		*  function returns the new SlideAsset instance.
+		*/
+		$asset = clone $this;
+
+		$asset->gen_uid();		
+		$asset->set_paths(
+			$asset->get_uid(),
+			explode('/', $asset->get_mime())[1],
+			$slide->get_asset_path()
+		);
+		$asset->set_thumb_paths(
+			$asset->get_uid(),
+			$slide->get_asset_path()
+		);
+
+		copy($this->get_fullpath(), $asset->get_fullpath());
+		copy($this->get_thumbpath(), $asset->get_thumbpath());
+
+		return $asset;
+	}
 }

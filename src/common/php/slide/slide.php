@@ -149,12 +149,23 @@ class Slide extends Exportable{
 
 	function dup() {
 		/*
-		*  Duplicate a slide.
+		*  Duplicate this slide.
 		*/
 		$slide = clone $this;
 		$slide->gen_id();
 		$slide->set_index($slide->get_index() + 1);
 		$slide->set_lock(NULL);
+
+		// Make sure all directories are created.
+		$slide->write();
+
+		$tmp = [];
+		foreach ($this->get_assets() as $a) {
+			$tmp[] = $a->clone($slide);
+		}
+		$slide->set_assets($tmp);
+
+		// Write latest changes.
 		$slide->write();
 
 		$queue = $slide->get_queue();
@@ -381,6 +392,7 @@ class Slide extends Exportable{
 	function get_queue_name() { return $this->queue_name; }
 	function get_collaborators() { return $this->collaborators; }
 	function get_lock() { return $this->lock; }
+	function get_asset_path() { return $this->asset_path; }
 
 	function store_uploaded_asset(array $file) {
 		/*
@@ -398,7 +410,7 @@ class Slide extends Exportable{
 		}
 		if (!is_dir($this->asset_path)) { mkdir($this->asset_path); }
 		$asset = new SlideAsset();
-		$asset->new($file, $this->asset_path);
+		$asset->new($file, $this);
 		$this->assets[] = $asset;
 	}
 
@@ -431,6 +443,14 @@ class Slide extends Exportable{
 
 	function has_uploaded_asset(string $name) {
 		return $this->get_uploaded_asset($name) !== NULL;
+	}
+
+	function set_assets(array $assets) {
+		$this->assets = $assets;
+	}
+
+	function get_assets() {
+		return $this->assets;
 	}
 
 	function get_queue() {
