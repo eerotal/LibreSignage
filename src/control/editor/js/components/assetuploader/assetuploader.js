@@ -92,12 +92,6 @@ class AssetUploader {
 				attach: {
 					click: () => {
 						this.upload_assets();
-					},
-					'local.upload.begin': e => {
-						$(e.target).addClass('uploading');
-					},
-					'local.upload.end': e => {
-						$(e.target).removeClass('uploading');
 					}
 				},
 				defer: () => !this.ready
@@ -224,10 +218,10 @@ class AssetUploader {
 		/*
 		*  Create a validator trigger and manually trigger it once.
 		*/
-		(this.fileval_trig = new ValidatorTrigger(
+		this.fileval_trig = new ValidatorTrigger(
 			[this.fileval_sel],
 			() => this.update()
-		)).trigger();
+		);
 
 		this.ready = true;
 	}
@@ -255,28 +249,36 @@ class AssetUploader {
 	async upload_assets() {
 		/*
 		*  Upload the currently selected files. This function
-		*  also handles indicating uploads in progress by firing
-		*  the local.upload.begin and local.upload.end events on
-		*  the upload button.
+		*  also handles indicating uploads in progress in the UI.
 		*/
-		let btn = this.buttons.get('upload').get_elem();
 		let selector = this.inputs.get('files');
 
-		btn.trigger('local.upload.begin');
+		this.indicate_upload_begin();
 		try {
 			let tmp = this.controller.upload_assets(selector.get());
 			this.update(); // Disable the upload button.
 			await tmp;
 		} catch (e) {
-			btn.trigger('local.upload.end')
+			this.indicate_upload_end();
 			this.update();
-
 			APIUI.handle_error(e);
 			return;
 		}
 		selector.clear();
-		btn.trigger('local.upload.end');
+		this.indicate_upload_end();
 		this.update();
+	}
+
+	indicate_upload_begin() {
+		this.buttons.get('upload')
+			.get_elem()
+			.addClass('uploading');
+	}
+
+	indicate_upload_end() {
+		this.buttons.get('upload')
+			.get_elem()
+			.removeClass('uploading');
 	}
 
 	async remove_asset(name) {
