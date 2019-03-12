@@ -5,7 +5,7 @@
 
 set -e
 CURRENT_NPM_VERSION=$(npm -v)
-version_check () {
+version_check() {
 	test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1 )" != "$1"
 }
 
