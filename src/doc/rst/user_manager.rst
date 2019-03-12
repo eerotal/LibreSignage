@@ -33,5 +33,5 @@ The maximum length is 64 characters by default.
 
 When a new user is created they are given an automatically generated password.
 The initial password is visible to the admin user in the *Password* input box
-in the user editor dropdown _once_ after creating the user. The password is not
+in the user editor dropdown **once** after creating the user. The password is not
 visible (or known by the server) on subsequent reloads of the page.
