@@ -21,9 +21,9 @@ and all slides in it. Alternatively users of the *admin* group can
 remove any queue.
 
 Queues can be selected in the editor using the *Queue* select box.
-Next to the box are the *Create queue*, *Remove queue* and *View queue*
-buttons. The *View queue* button opens the display page showing the
-selected queue.
+Next to the box are the *Create (+)*, *View (Eye icon)* and *Remove
+(Trash icon)* buttons. The *View* button opens the display page showing
+the selected queue.
 
 Editing and creating slides
 ---------------------------
@@ -135,4 +135,3 @@ Keyboard shortcuts
 :Ctrl+S:      Save the selected slide.
 :Ctrl+D:      Duplicate the selected slide.
 :Ctrl+P:      Preview the selected slide.
-:Ctrl+Q:      Change the queue of the selected slide.
