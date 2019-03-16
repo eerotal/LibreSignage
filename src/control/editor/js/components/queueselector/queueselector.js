@@ -7,6 +7,7 @@ var APIUI = require('ls-api-ui');
 var DropSelect = require('ls-dropselect').DropSelect;
 var DropConfirm = require('ls-dropconfirm').DropConfirm;
 var dialog = require('ls-dialog');
+var EventData = require('ls-eventdata').EventData;
 
 var StrValidator = require('ls-validator').StrValidator;
 var BlacklistValidator = require('ls-validator').BlacklistValidator;
@@ -28,11 +29,15 @@ class QueueSelector {
 				cond: () => true,
 				enabler: null,
 				attach: {
-					'component.dropselect.show': async () => {
+					'component.dropselect.show': async (e, data) => {
 						await this.update_queue_list();
 					},
 					'component.dropselect.select': (e, data) => {
-						this.select_queue(data.option);
+						if (this.select_queue(data.get('option'))) {
+							data.then();
+						} else {
+							data.except();
+						}
 					}
 				},
 				defer: () => !this.state.ready
@@ -111,23 +116,37 @@ class QueueSelector {
 		*  Select a queue by firing the queue select event. The
 		*  queue name is passed as 'queue' in the event data object.
 		*/
-		this.state.queue.selected = true;
-		this.select.set_button_html(queue);
-		this.select.select(queue, false);
-		this.update();
-
-		this.trigger('select', { queue: queue });
+		this.trigger(
+			'select',
+			new EventData(
+				{ queue: queue },
+				() => {
+					this.state.queue.selected = true;
+					this.select.set_button_html(queue);
+					this.select.select(queue, false);
+					this.update();
+				},
+				null
+			)
+		);
 	}
 
 	deselect_queue() {
 		/*
 		*  Fire the queue deselect event.
 		*/
-		this.state.queue.selected = false;
-		this.select.set_button_html('Queue');
-		this.update();
-
-		this.trigger('deselect');
+		this.trigger(
+			'deselect',
+			new EventData(
+				null,
+				() => {
+					this.state.queue.selected = false;
+					this.select.set_button_html('Queue');
+					this.update();
+				},
+				null
+			)
+		);
 	}
 
 	async create_queue() {
@@ -171,7 +190,10 @@ class QueueSelector {
 				}, "This queue already exists.")]
 			)
 		}).then((value) => {
-			this.trigger('create', { queue: value });
+			this.trigger(
+				'create',
+				new EventData({ queue: value }, null, null)
+			);
 		}).catch(() => {})
 	}
 
@@ -179,15 +201,21 @@ class QueueSelector {
 		/*
 		*  Fire the queue view event.
 		*/
-		this.trigger('view');
+		this.trigger('view', new EventData());
 	}
 
 	remove_queue() {
 		/*
 		*  Fire the queue remove event.
 		*/
-		this.deselect_queue();
-		this.trigger('remove');
+		this.trigger(
+			'remove',
+			new EventData(
+				null,
+				() => this.deselect_queue(),
+				null
+			)
+		);
 	}
 
 	update() {

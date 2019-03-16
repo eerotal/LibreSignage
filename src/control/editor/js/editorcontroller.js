@@ -27,7 +27,7 @@ class EditorController {
 			}
 		};
 
-		window.onbeforeunload = () => {
+		window.addEventListener('unload', () => {
 			/*
 			*  Release slide locks on exit.
 			*
@@ -38,9 +38,9 @@ class EditorController {
 			*  locks are released regardless of whether the
 			*  response is received or not.
 			*/
-			console.log('Cleanup');
+			console.log('EditorController: Cleanup');
 			this.close_slide();
-		}
+		});
 	}
 
 	async init() {

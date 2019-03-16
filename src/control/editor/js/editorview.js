@@ -24,6 +24,7 @@ var User = require('ls-user').User;
 var Queue = require('ls-queue').Queue;
 var MarkupError = require('ls-markup').err.MarkupError;
 
+var dialog = require('ls-dialog');
 var util = require('ls-util');
 var ace_range = ace.require('ace/range');
 
@@ -376,7 +377,11 @@ class EditorView {
 				enabler: null,
 				attach: {
 					'component.timeline.click': async (e, data) => {
-						await this.show_slide(data.id);
+						if (await this.show_slide(data.get('id'))) {
+							data.then();
+						} else {
+							data.except();
+						}
 					}
 				},
 				defer: () => !this.ready,
@@ -389,16 +394,24 @@ class EditorView {
 				enabler: null,
 				attach: {
 					'component.queueselector.select': async (e, data) => {
-						await this.show_queue(data.queue);
+						if (await this.show_queue(data.get('queue'))) {
+							data.then();
+						} else {
+							data.except();
+						}
+					},
+					'component.queueselector.deselect': (e, data) => {
+						data.then();
 					},
 					'component.queueselector.create': async (e, data) => {
-						await this.create_queue(data.queue);
+						await this.create_queue(data.get('queue'));
 					},
-					'component.queueselector.view': e => {
-						this.view_queue();						
+					'component.queueselector.view': (e, data) => {
+						this.view_queue();
 					},
-					'component.queueselector.remove': async e => {
-						await this.remove_queue();	
+					'component.queueselector.remove': async (e, data) => {
+						await this.remove_queue();
+						data.then();
 					}
 				},
 				defer: () => !this.ready,
@@ -475,7 +488,11 @@ class EditorView {
 						await this.update_move_slide_options();
 					},
 					'component.dropselect.select': async (e, data) => {
-						await this.move_slide(data.option);
+						if (await this.move_slide(data.get('option'))) {
+							data.then();
+					 	} else {
+							data.except();
+						}
 					}
 				},
 				defer: () => !this.ready
@@ -643,14 +660,48 @@ class EditorView {
 		// Make the initial state of the editor more predictable.
 		this.hide_queue();
 
+		window.addEventListener('beforeunload', (e) => {
+			if (
+				this.controller.get_state().slide.loaded
+				&& this.is_slide_modified()
+			) {
+				e.returnValue = "The editor contains unsaved changes. " +
+					"The changes will be lost if you don't save " +
+					"them before leaving. Continue anyway?";
+				return e.returnValue;
+			}
+		});
+
 		this.update();
 		this.ready = true;
 	}
 
+	async confirm_slide_hide() {
+		return new Promise((resolve, reject) => {
+			if (
+				this.controller.get_state().slide.loaded
+				&& this.is_slide_modified()
+			) {
+				dialog.dialog(
+					dialog.TYPE.CONFIRM,
+					"Unsaved changes",
+					"The editor contains unsaved changes. The changes " +
+					"will be lost if you don't save them before " +
+					"continuing. Continue anyway?",
+					(status, val) => resolve(status),
+				);
+			} else { resolve(true); }
+		});
+	}
+
 	async show_queue(name) {
 		/*
-		*  Show the queue 'name'.
+		*  Show the queue 'name'. If a slide is already loaded and it
+		*  has unsaved changes, the user is prompted for confirmation
+		*  before changing the queue.
 		*/
+		if (!(await this.confirm_slide_hide())) { return false; }
+
 		await this.hide_queue();
 		try {
 			await this.controller.open_queue(name);
@@ -659,10 +710,12 @@ class EditorView {
 			this.queueselector.deselect_queue();
 
 			APIUI.handle_error(e);
-			return;
+			return false;
 		}
 		await this.timeline.show_queue(this.controller.get_queue());
 		this.update();
+
+		return true;
 	}
 
 	async hide_queue() {
@@ -722,7 +775,13 @@ class EditorView {
 		/*
 		*  Show the slide 'id'. If id == null, the current
 		*  loaded slide from the EditorController is used.
+		*  If a slide is already loaded and it has unsaved
+		*  changes, the user is prompted for confirmation
+		*  before changing the slide. This function returns
+		*  true if the slide was changed and false otherwise.
 		*/
+		if (!(await this.confirm_slide_hide())) { return false; }
+
 		let s = null;
 		if (id != null) {
 			try {
@@ -755,8 +814,9 @@ class EditorView {
 		*  EditorView.hide_slide() disables them.
 		*/
 		this.validators.enable(true);
-
 		this.update();
+
+		return true;
 	}
 
 	highlight_error(from, to) {
@@ -807,6 +867,38 @@ class EditorView {
 		this.update();
 	}
 
+	get_editor_input_data() {
+		/*
+		*  Return the editor input data as an object compatible
+		*  with Slide.set().
+		*/
+		return {
+			name:          this.inputs.get('name').get(),
+			collaborators: this.inputs.get('collaborators').get(),
+			duration:      this.inputs.get('duration').get(),
+			index:         this.inputs.get('index').get(),
+			animation:     this.inputs.get('animation').get(),
+			sched:         this.inputs.get('schedule_enable').get(),
+			sched_t_s: util.datetime_to_tstamp(
+				this.inputs.get('schedule_date_start').get(),
+				this.inputs.get('schedule_time_start').get()
+			),
+			sched_t_e: util.datetime_to_tstamp(
+				this.inputs.get('schedule_date_end').get(),
+				this.inputs.get('schedule_time_end').get()
+			),
+			markup:        this.inputs.get('editor').get(),
+			enabled:       this.inputs.get('enable').get()
+		}
+	}
+
+	is_slide_modified() {
+		return !util.object_contains(
+			this.get_editor_input_data(),
+			this.controller.get_slide().get_data()
+		);
+	}
+
 	async hide_slide() {
 		/*
 		*  Hide the currently visible slide.
@@ -843,37 +935,15 @@ class EditorView {
 		*  Save the current slide.
 		*/
 		let s = this.controller.get_slide();
-		s.set({
-			'name':          this.inputs.get('name').get(),
-			'collaborators': this.inputs.get('collaborators').get(),
-			'duration':      this.inputs.get('duration').get(),
-			'index':         this.inputs.get('index').get(),
-			'animation':     this.inputs.get('animation').get(),
-			'sched':         this.inputs.get('schedule_enable').get(),
-			'sched_t_s': util.datetime_to_tstamp(
-				this.inputs.get('schedule_date_start').get(),
-				this.inputs.get('schedule_time_start').get()
-			),
-			'sched_t_e': util.datetime_to_tstamp(
-				this.inputs.get('schedule_date_end').get(),
-				this.inputs.get('schedule_time_end').get()
-			),
-			'markup':        this.inputs.get('editor').get(),
-			'enabled':       this.inputs.get('enable').get()
-		});
+		s.set(this.get_editor_input_data());
 
 		try {
 			await this.controller.save_slide();
+			await this.timeline.update(false);
 		} catch (e) {
 			APIUI.handle_error(e);
 			return;
 		}
-
-		/*
-		*  Update the timeline and editor and select the new
-		*  slide in the timeline.
-		*/
-		await this.timeline.update(false);
 		this.timeline.set_selected(s.get('id'));
 		this.show_slide(null);
 	}
@@ -884,10 +954,10 @@ class EditorView {
 		*/
 		try {
 			await this.controller.duplicate_slide();
+			await this.timeline.update(true);
 		} catch (e) {
 			APIUI.handle_error(e);
 		}
-		await this.timeline.update(true);
 	}
 
 	preview_slide() {
@@ -918,15 +988,18 @@ class EditorView {
 
 	async move_slide(queue) {
 		/*
-		*  Move the current slide to 'queue'.
+		*  Move the current slide to 'queue'. Returns true/false
+		*  on success/failure respectively.
 		*/
 		try {
 			await this.controller.move_slide(queue);
+			await this.timeline.update(false);
 		} catch (e) {
 			APIUI.handle_error(e);
+			return false;
 		}
-		await this.timeline.update(false);
 		this.hide_slide();
+		return true;
 	}
 
 	async remove_slide() {
@@ -936,10 +1009,10 @@ class EditorView {
 		try {
 			await this.controller.remove_slide();
 			await this.hide_slide();
+			await this.timeline.update(false);
 		} catch (e) {
 			APIUI.handle_error(e);
 		}
-		await this.timeline.update(false);
 		this.update();
 	}
 

@@ -1,6 +1,7 @@
 var $ = require('jquery');
 var Preview = require('../preview/preview.js').Preview;
 var MarkupError = require('ls-markup').err.MarkupError;
+var EventData = require('ls-eventdata').EventData;
 
 const slide_template = s => `
 <div
@@ -32,10 +33,8 @@ class Timeline {
 
 		this.container.trigger(
 			'component.timeline.click',
-			{ 'id': id }
+			new EventData({ id: id }, () => this.set_selected(id), null)
 		);
-
-		this.set_selected(id);
 	}
 
 	set_selected(id) {
