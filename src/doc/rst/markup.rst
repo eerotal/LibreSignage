@@ -93,10 +93,11 @@ the viewport **height**.
 
 
 Video
-  | Syntax: ``[video url=<URL> width=<width> height=<height>][/video]``
+  | Syntax: ``[video url=<URL> width=<width> height=<height> muted=<muted>][/video]``
   | ``url: str``
   | ``width: percent``
   | ``height: percent``
+  | ``muted: int``
 
 The video class can be used to embed video. ``<URL>`` is the URL
 address of the video file, ``<width>`` is the width of the video
@@ -108,6 +109,8 @@ the image height to 50% of the viewport **height**. Note that these
 sizes are only the size of the video element and the actual video
 scales so that the aspect ratio is always kept correct, ie. the actual
 video may not always fill the whole space that's allocated for it.
+``<muted>`` can be used to control whether the video plays muted or
+unmuted. A value of *1* makes the video muted and *0* makes it unmuted.
 
 Paragraph
   | Syntax: ``[p][/p]``
