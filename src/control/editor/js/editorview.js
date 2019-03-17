@@ -446,7 +446,8 @@ class EditorView {
 							&& d.slide.locked
 							&& (d.slide.owned || d.slide.collaborate)
 						) || (
-							!d.slide.saved
+							d.slide.loaded
+							&& !d.slide.saved
 							&& d.quota.slides
 						)
 					)
@@ -782,10 +783,11 @@ class EditorView {
 		*  before changing the slide. This function returns
 		*  true if the slide was changed and false otherwise.
 		*/
-		if (!(await this.confirm_slide_hide())) { return false; }
-
 		let s = null;
 		if (id != null) {
+			// Only confirm changing the slide if id != null.
+			if (!(await this.confirm_slide_hide())) { return false; }
+
 			try {
 				await this.controller.open_slide(id);
 			} catch (e) {
@@ -928,8 +930,11 @@ class EditorView {
 	async new_slide() {
 		/*
 		*  Create a new slide. Note that this function
-		*  doesn't save the slide automatically.
+		*  doesn't save the slide automatically. Returns
+		*  true if a new slide was created and false
+		*  otherwise.
 		*/
+		if (!(await this.confirm_slide_hide())) { return false; }
 		try {
 			await this.controller.new_slide();
 		} catch (e) {
@@ -937,6 +942,7 @@ class EditorView {
 			return;
 		}
 		await this.show_slide(null);
+		return true;
 	}
 
 	async save_slide() {
