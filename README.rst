@@ -1,4 +1,4 @@
-.. image:: https://raw.githubusercontent.com/eerotal/LibreSignage/next/src/assets/images/logo/libresignage_text_476x100.png
+.. image:: http://etal.mbnet.fi/libresignage/logo/libresignage_text_466x100.png
     
 A free and open source digital signage solution.
 
