@@ -37,13 +37,13 @@ class UserManagerView {
 				attach: {
 					'component.userlist.save': async (event, data) => {
 						await this.save_user(
-							data.username,
-							data.groups
+							data.get('username'),
+							data.get('groups')
 						);
 					},
 					'component.userlist.remove': async (event, data) => {
 						await this.remove_user(
-							data.username
+							data.get('username')
 						);
 					}
 				},

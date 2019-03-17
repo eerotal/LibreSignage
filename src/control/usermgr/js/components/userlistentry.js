@@ -2,6 +2,7 @@ var $ = require('jquery');
 var MultiSelect = require('ls-multiselect').MultiSelect;
 var DropConfirm = require('ls-dropconfirm').DropConfirm;
 var StrValidator = require('ls-validator').StrValidator;
+var EventData = require('ls-eventdata').EventData;
 
 // Template for the UserListEntry HTML.
 const user_list_entry = (name, password) => `
@@ -150,7 +151,11 @@ class UserListEntry {
 			() => {
 				this.trigger(
 					'remove',
-					{ username: name }
+					new EventData(
+						{ username: name },
+						null,
+						null
+					)
 				);
 			}
 		);
@@ -161,7 +166,11 @@ class UserListEntry {
 			() => {
 				this.trigger(
 					'save',
-					{ username: name, groups: this.groups.selected }
+					new EventData(
+						{ username: name, groups: this.groups.selected },
+						null,
+						null
+					)
 				);
 			}
 		);
@@ -172,7 +181,6 @@ class UserListEntry {
 	}
 
 	trigger(name, data) {
-		console.log(name, data);
 		$(this.get_element()).trigger(
 			`component.userlistentry.${name}`,
 			data
