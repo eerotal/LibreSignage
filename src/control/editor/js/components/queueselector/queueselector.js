@@ -111,44 +111,6 @@ class QueueSelector {
 		}
 	}
 
-	select_queue(queue) {
-		/*
-		*  Select a queue by firing the queue select event. The
-		*  queue name is passed as 'queue' in the event data object.
-		*/
-		this.trigger(
-			'select',
-			new EventData(
-				{ queue: queue },
-				() => {
-					this.state.queue.selected = true;
-					this.select.set_button_html(queue);
-					this.select.select(queue, false);
-					this.update();
-				},
-				null
-			)
-		);
-	}
-
-	deselect_queue() {
-		/*
-		*  Fire the queue deselect event.
-		*/
-		this.trigger(
-			'deselect',
-			new EventData(
-				null,
-				() => {
-					this.state.queue.selected = false;
-					this.select.set_button_html('Queue');
-					this.update();
-				},
-				null
-			)
-		);
-	}
-
 	async create_queue() {
 		/*
 		*  Create a new queue. This function prompts for the
@@ -192,9 +154,36 @@ class QueueSelector {
 		}).then((value) => {
 			this.trigger(
 				'create',
-				new EventData({ queue: value }, null, null)
+				new EventData(
+					{ queue: value },
+					async () => {
+						await this.update_queue_list();
+						this.select_queue(value);
+					},
+					null
+				)
 			);
 		}).catch(() => {})
+	}
+
+	select_queue(queue) {
+		/*
+		*  Select a queue by firing the queue select event. The
+		*  queue name is passed as 'queue' in the event data object.
+		*/
+		this.trigger(
+			'select',
+			new EventData(
+				{ queue: queue },
+				() => {
+					this.state.queue.selected = true;
+					this.select.set_button_html(queue);
+					this.select.select(queue, false);
+					this.update();
+				},
+				null
+			)
+		);
 	}
 
 	view_queue() {
@@ -213,6 +202,24 @@ class QueueSelector {
 			new EventData(
 				null,
 				() => this.deselect_queue(),
+				null
+			)
+		);
+	}
+
+	deselect_queue() {
+		/*
+		*  Deselect the current queue.
+		*/
+		this.trigger(
+			'deselect',
+			new EventData(
+				null,
+				() => {
+					this.state.queue.selected = false;
+					this.select.set_button_html('Queue');
+					this.update();
+				},
 				null
 			)
 		);

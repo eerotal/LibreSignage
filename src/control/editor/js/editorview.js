@@ -400,17 +400,24 @@ class EditorView {
 							data.except();
 						}
 					},
-					'component.queueselector.deselect': (e, data) => {
-						data.then();
-					},
 					'component.queueselector.create': async (e, data) => {
-						await this.create_queue(data.get('queue'));
+						if (await this.create_queue(data.get('queue'))) {
+							data.then();
+						} else {
+							data.except();
+						}
 					},
 					'component.queueselector.view': (e, data) => {
 						this.view_queue();
 					},
 					'component.queueselector.remove': async (e, data) => {
-						await this.remove_queue();
+						if (await this.remove_queue()) {
+							data.then();
+						} else {
+							data.except();
+						}
+					},
+					'component.queueselector.deselect': (e, data) => {
 						data.then();
 					}
 				},
@@ -425,7 +432,7 @@ class EditorView {
 					&& d.queue.loaded
 				),
 				enabler: null,
-				attach: { click: () => this.new_slide() },
+				attach: { click: async () => await this.new_slide() },
 				defer: () => !this.ready
 			}),
 			save: new UIButton({
@@ -698,17 +705,15 @@ class EditorView {
 		/*
 		*  Show the queue 'name'. If a slide is already loaded and it
 		*  has unsaved changes, the user is prompted for confirmation
-		*  before changing the queue.
+		*  before changing the queue. Returns true/false on
+		*  success/failure respectively.
 		*/
 		if (!(await this.confirm_slide_hide())) { return false; }
+		if (!(await this.hide_queue())) { return false; }
 
-		await this.hide_queue();
 		try {
 			await this.controller.open_queue(name);
 		} catch (e) {
-			// Deselect the queue in QueueSelector on error.		
-			this.queueselector.deselect_queue();
-
 			APIUI.handle_error(e);
 			return false;
 		}
@@ -720,43 +725,33 @@ class EditorView {
 
 	async hide_queue() {
 		/*
-		*  Hide the current queue.
+		*  Hide the current queue. Returns true/false on success/failure
+		*  respectively.
 		*/
 		try {
 			await this.hide_slide();
 		} catch (e) {
 			APIUI.handle_error(e);
-			return;
+			return false;
 		}
 		this.timeline.hide_queue();
 		this.controller.close_queue();
 		this.update();
+		return true;
 	}
 
 	async create_queue(queue) {
 		/*
-		*  Create a new queue.
+		*  Create a new queue. Returns true/false on success/failure
+		*  respectively.
 		*/
 		try {
 			await this.controller.create_queue(queue);
 		} catch (e) {
 			APIUI.handle_error(e);
-			return;
+			return false;
 		}
-
-		/*
-		*  Make the QueueSelector select the new queue. Note
-		*  that these calls also fire the QueueSelector select
-		*  event, which in turn calls EditorView.queue_select().
-		*
-		*  These could technically be called directly in
-		*  QueueSelector.create_queue() but that would make the
-		*  program flow a pain to reason about because the code
-		*  in QueueSelector would need to know whether the event
-		*  handler functions failed or not.
-		*/
-		await this.queueselector.update_queue_list();
-		this.queueselector.select_queue(queue);
+		return true;
 	}
 
 	view_queue() {
@@ -765,10 +760,17 @@ class EditorView {
 
 	async remove_queue() {
 		/*
-		*  Remove and hide the current queue.
+		*  Remove and hide the current queue. Returns true/false on
+		*  success/failure respectively.
 		*/
-		this.controller.remove_queue();
-		await this.hide_queue();
+		try {
+			await this.controller.remove_queue();
+		} catch (e) {
+			APIUI.handle_error(e);
+			return false;
+		}
+		if (!await this.hide_queue()) { return false; }
+		return true;
 	}
 
 	async show_slide(id) {
@@ -901,7 +903,8 @@ class EditorView {
 
 	async hide_slide() {
 		/*
-		*  Hide the currently visible slide.
+		*  Hide the currently visible slide. Returns true/false on
+		*  success/failure respectively.
 		*/
 
 		/*
@@ -911,9 +914,15 @@ class EditorView {
 		this.validators.enable(false);
 
 		if (this.controller.get_state().slide.loaded) {
-			await this.controller.close_slide();
+			try {
+				await this.controller.close_slide();
+			} catch (e) {
+				APIUI.handle_error(e);
+				return false;
+			}
 		}
 		this.inputs.all(function() { this.clear(); });
+		return true;
 	}
 
 	async new_slide() {
@@ -927,7 +936,7 @@ class EditorView {
 			APIUI.handle_error(e);
 			return;
 		}
-		this.show_slide(null);
+		await this.show_slide(null);
 	}
 
 	async save_slide() {
@@ -945,7 +954,7 @@ class EditorView {
 			return;
 		}
 		this.timeline.set_selected(s.get('id'));
-		this.show_slide(null);
+		await this.show_slide(null);
 	}
 
 	async duplicate_slide() {
@@ -998,22 +1007,26 @@ class EditorView {
 			APIUI.handle_error(e);
 			return false;
 		}
-		this.hide_slide();
+		if (!(await this.hide_slide())) { return false; }
 		return true;
 	}
 
 	async remove_slide() {
 		/*
-		*  Remove the current slide.
+		*  Remove the current slide. Returns true/false on success/failure
+		*  respectively.
 		*/
 		try {
 			await this.controller.remove_slide();
-			await this.hide_slide();
 			await this.timeline.update(false);
 		} catch (e) {
 			APIUI.handle_error(e);
+			return false;
 		}
+		if (!(await this.hide_slide())) { return false; }
 		this.update();
+
+		return true;
 	}
 
 	update() {
