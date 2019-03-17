@@ -165,6 +165,7 @@ class DisplayView {
 				)
 			);
 			if ('static' in this.query_params) {
+				// Don't autoplay video when 'static' is passed in URL.
 				if (content.is('video')) {
 					content.removeAttr('autoplay');
 				}
