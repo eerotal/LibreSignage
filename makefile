@@ -14,6 +14,8 @@ SASSFLAGS := --no-source-map
 # Define required versions.
 NPM_REQUIRED_VERSION := 6.4.0
 MAKE_REQUIRED_VERSION := 4.0
+PANDOC_REQUIRED_VERSION := 2.2.0
+IMAGEMAGICK_REQUIRED_VERSION := 6.0
 
 # Caller supplied build settings.
 VERBOSE ?= Y
@@ -395,8 +397,20 @@ initchk:
 	@:
 	set -e
 	./build/scripts/ldconf.sh $(CONF)
-	./build/scripts/npm_version.sh $(NPM_REQUIRED_VERSION)
-	./build/scripts/make_version.sh $(MAKE_REQUIRED_VERSION)
+
+	echo -n '[Info] Checking dependencies: '
+	./build/scripts/dep_checks/npm_version.sh \
+		$(NPM_REQUIRED_VERSION)
+	echo -n 'NPM OK, '
+	./build/scripts/dep_checks/make_version.sh \
+		$(MAKE_REQUIRED_VERSION)
+	echo -n 'Make OK, '
+	./build/scripts/dep_checks/pandoc_version.sh \
+		$(PANDOC_REQUIRED_VERSION)
+	echo -n 'Pandoc OK, '
+	./build/scripts/dep_checks/imagemagick_version.sh \
+		$(IMAGEMAGICK_REQUIRED_VERSION)
+	echo 'ImageMagick OK '
 
 %:
 	@:
