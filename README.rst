@@ -142,6 +142,7 @@ Build system dependencies
   * GNU Make (Version 4.x or newer.) (https://www.gnu.org/software/make/)
   * Pandoc (Version 2.2.x or newer.) (https://pandoc.org/)
   * npm (Version 6.4.x or newer.) (https://nodejs.org/en/)
+  * ImageMagick (Version 6.x or newer.) (https://www.imagemagick.org/)
 
 Build system dependencies installed automatically by npm
   * Tools
