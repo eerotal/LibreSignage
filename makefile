@@ -89,17 +89,17 @@ endif
 		realclean LOC
 .ONESHELL:
 
-all:: server docs htmldocs js css api libs logo; @:
-server:: initchk $(subst src,dist,$(SRC_NO_COMPILE)); @:
-js:: initchk $(subst src,dist,$(SRC_JS)); @:
-api:: initchk $(subst src,dist,$(SRC_ENDPOINT)); @:
-libs:: initchk dist/libs; @:
-docs:: initchk $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_index.rst; @:
-htmldocs:: initchk $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
-css:: initchk $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
-libs:: initchk $(subst $(ROOT)node_modules/,dist/libs/,$(LIBS)); @:
-logo:: initchk $(GENERATED_LOGOS); @:
-
+all: all_wrapper | initchk
+all_wrapper:: initchk server docs htmldocs js css api libs logo; @:
+server:: $(subst src,dist,$(SRC_NO_COMPILE)); @:
+js:: $(subst src,dist,$(SRC_JS)); @:
+api:: $(subst src,dist,$(SRC_ENDPOINT)); @:
+libs:: dist/libs; @:
+docs:: $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_index.rst; @:
+htmldocs:: $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
+css:: $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
+libs:: $(subst $(ROOT)node_modules/,dist/libs/,$(LIBS)); @:
+logo:: $(GENERATED_LOGOS); @:
 
 # Copy over non-compiled, non-PHP sources.
 $(filter-out %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
