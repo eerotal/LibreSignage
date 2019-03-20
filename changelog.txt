@@ -38,6 +38,7 @@ v1.0.0
   - [feature]  Redirect users to the originally requested URL after login.
                (issue #41)
   - [feature]  Check build dependency versions when building.
+  - [feature]  Implement a startup splash screen for the display page.
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
