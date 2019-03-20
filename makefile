@@ -14,7 +14,7 @@ SASSFLAGS := --no-source-map
 # Define required versions.
 NPM_REQUIRED_VERSION := 6.4.0
 MAKE_REQUIRED_VERSION := 4.0
-PANDOC_REQUIRED_VERSION := 2.2.0
+PANDOC_REQUIRED_VERSION := 1.16
 IMAGEMAGICK_REQUIRED_VERSION := 6.0
 
 # Caller supplied build settings.
@@ -327,8 +327,8 @@ clean:
 realclean:
 	@:
 	set -e
-	$(call status,rm,build/*.iconf,none);
-	rm -f build/*.iconf
+	$(call status,rm,build/*.conf,none);
+	rm -f build/*.conf
 	$(call status,rm,build/link,none);
 	rm -rf build/link
 	$(call status,rm,node_modules,none);
