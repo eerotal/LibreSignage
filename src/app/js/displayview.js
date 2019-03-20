@@ -44,10 +44,27 @@ class DisplayView {
 		}
 	}
 
+	async show_splash() {
+		/*
+		*  Display the LibreSignage splash screen.
+		*/
+		let splash = $('#splash');
+		let ret = new Promise((resolve, reject) => {
+			splash.one('animationend', () => {
+				splash.removeClass('splash-fade');
+				resolve();
+			});
+		});
+		splash.addClass('splash-fade');
+		return ret;
+	}
+
 	async start_render_loop(queue_name) {
 		/*
-		*  Start the main display render loop.
+		*  Display the LibreSignage splash and start the
+		*  main display render loop.
 		*/
+		await this.show_splash();
 		try {
 			await this.controller.init_queue_update_loop(queue_name);
 		} catch (e) {

@@ -1,0 +1,23 @@
+/*
+*  LibreSignage display splash screen styling.
+*/
+
+@keyframes splash-fade {
+	0%   { opacity: 0; }
+	15%  { opacity: 1; }
+	75%  { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+.splash-fade  {
+	display: flex !important;
+	animation: splash-fade 4s;
+}
+
+#splash {
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 60%;
+}

@@ -3,6 +3,7 @@
 @import 'default';
 @import 'dialog';
 @import 'markup';
+@import '_splash.scss';
 @import 'animations/_linear.scss';
 
 html {
@@ -10,7 +11,7 @@ html {
 	overflow-y: hidden;
 }
 
-html, body, main, #display {
+html, body, main, #display, #splash {
 	/* Make sure the display is only the size of the page. */
 	width: 100%;
 	min-width: 100%;

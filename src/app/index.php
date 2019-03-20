@@ -2,6 +2,7 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/css.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/footer/footer_util.php');
 
 	/*
 	*  Try to authenticate using an authentication token
@@ -29,6 +30,11 @@
 	<body>
 		<main role="main" class="container-fluid">
 			<div id="display"></div>
+			<div id="splash">
+				<img
+					src="/assets/images/logo/libresignage_text.svg"
+					alt="LibreSignage logo.">
+			</div>
 		</main>
 		<script src="/app/js/main.js"></script>
 	</body>
