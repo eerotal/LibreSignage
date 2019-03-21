@@ -383,49 +383,49 @@ Open these images in a new tab to view the full resolution versions.
 
 **LibreSignage Login**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/login.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/login.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Control Panel**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/control.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/control.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Editor**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/editor.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/editor.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Media Uploader**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/media_uploader.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/media_uploader.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage User Manager**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/user_manager.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/user_manager.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage User Settings**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/user_settings.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/user_settings.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Display**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/display.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/display.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Documentation**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/docs.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/docs.png
    :width: 320 px
    :height: 180 px
 
