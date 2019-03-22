@@ -77,7 +77,7 @@ SRC_ENDPOINT := $(shell find src/api/endpoint \
 GENERATED_LOGOS := $(addprefix dist/assets/images/logo/libresignage_,16x16.png 32x32.png 96x96.png text_466x100.png)
 
 status = \
-	if [ "`printf '$(VERBOSE)'|cut -zc1|\
+	if [ "`printf '$(VERBOSE)'|cut -c1|sed 's/\n//g'|\
 		tr '[:upper:]' '[:lower:]'`" = "y" ]; then \
 		printf "$(1): $(2) >> $(3)\n"|tr -s ' '|sed 's/^ *$///g'; \
 	fi
