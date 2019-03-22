@@ -2,7 +2,6 @@
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/css.php');
 	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/footer/footer_util.php');
 
 	/*
 	*  Try to authenticate using an authentication token
