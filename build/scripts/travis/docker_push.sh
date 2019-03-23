@@ -1,3 +1,10 @@
+#
+#  Script used to push Docker images to Docker Hub in the CI pipeline.
+#  $1 is the repository to push the image to and $2 is the build type, ie
+#  either 'nightly' or 'release'.
+#
+
+
 #!/bin/sh
 
 set -e
