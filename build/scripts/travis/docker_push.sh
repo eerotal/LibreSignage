@@ -26,7 +26,7 @@ else
 fi
 
 # Login, tag and push to Docker Hub.
-echo "$DOCKER_USER" | docker login --username="$DOCKER_USER" --password-stdin
+echo "$DOCKER_PASS" | docker login --username="$DOCKER_USER" --password-stdin
 docker tag "libresignage:$LS_VER" "$TAG"
 docker push "eerotal/$REPO:$LS_VER"
 
