@@ -46,7 +46,7 @@ deploy:
 
 install:
     # Unshallow the git repo to make 'git describe' work correctly.
-    git fetch --unshallow
+    - git fetch --unshallow
 
     # Install dependencies
     - sudo apt-get update
