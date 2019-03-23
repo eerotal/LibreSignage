@@ -45,6 +45,9 @@ deploy:
           condition: -n $TRAVIS_TAG
 
 install:
+	# Unshallow the git repo to make 'git describe' work correctly.
+	git fetch --unshallow
+
     # Install dependencies
     - sudo apt-get update
     - sudo apt-get install pandoc imagemagick
