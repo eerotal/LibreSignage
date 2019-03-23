@@ -92,12 +92,10 @@ endif
 		realclean LOC
 .ONESHELL:
 
-all: all_wrapper | initchk
-all_wrapper:: initchk server docs htmldocs js css api libs logo; @:
+all:: initchk server docs htmldocs js css api libs logo; @:
 server:: $(subst src,dist,$(SRC_NO_COMPILE)); @:
 js:: $(subst src,dist,$(SRC_JS)); @:
 api:: $(subst src,dist,$(SRC_ENDPOINT)); @:
-libs:: dist/libs; @:
 docs:: $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_index.rst; @:
 htmldocs:: $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
 css:: $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
@@ -388,29 +386,15 @@ LOD:
 initchk:
 	@:
 	set -e
-	./build/scripts/ldconf.sh $(CONF)
+	./build/scripts/check_shell.sh
+	./build/scripts/dep_checks/npm_version.sh $(NPM_REQUIRED_VERSION)
+	./build/scripts/dep_checks/make_version.sh $(MAKE_REQUIRED_VERSION)
+	./build/scripts/dep_checks/pandoc_version.sh $(PANDOC_REQUIRED_VERSION)
+	./build/scripts/dep_checks/imagemagick_version.sh $(IMAGEMAGICK_REQUIRED_VERSION)
 
-	printf '[Info] Checking dependencies: '
-	./build/scripts/dep_checks/npm_version.sh \
-		$(NPM_REQUIRED_VERSION)
-	printf 'NPM OK, '
-	./build/scripts/dep_checks/make_version.sh \
-		$(MAKE_REQUIRED_VERSION)
-	printf 'Make OK, '
-	./build/scripts/dep_checks/pandoc_version.sh \
-		$(PANDOC_REQUIRED_VERSION)
-	printf 'Pandoc OK, '
-	./build/scripts/dep_checks/imagemagick_version.sh \
-		$(IMAGEMAGICK_REQUIRED_VERSION)
-	printf 'ImageMagick OK\n'
-
-%:
-	@:
-	set -e
-	printf "[Info]: Ignore $@\n"
-
+# Include the dependency makefiles from dep/. If the files don't
+# exist, they are built by running the required targets.
 ifeq (,$(filter LOC LOD clean realclean configure initchk,$(MAKECMDGOALS)))
-$(info [Info] Include dependency makefiles.)
--include $(subst src,dep,$(SRC_JS:.js=.js.dep))\
-		$(subst src,dep,$(SRC_SCSS:.scss=.scss.dep))
+include $(subst src,dep,$(SRC_JS:.js=.js.dep))
+include $(subst src,dep,$(SRC_SCSS:.scss=.scss.dep))
 endif

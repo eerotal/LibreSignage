@@ -19,7 +19,7 @@ ensure_dependency_version() {
 	if [ "$(echo "$2 $3" | tr " " "\n" | sort -rV | head -n 1)" != "$2" ]
 	then
 		echo -n "[Error] Version $3 required for '$1'. Version $2 is "
-		echo    "installed. Please update."
+		echo    "installed. Please upgrade."
 		exit 1
 	fi
 }
