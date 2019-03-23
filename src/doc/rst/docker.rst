@@ -1,4 +1,3 @@
-##################################
 Deploying LibreSignage with Docker
 ##################################
 
@@ -35,64 +34,6 @@ production system, you'll want to do some additional configuration.
 2. Configuring a LibreSignage Docker container
 ----------------------------------------------
 
-All LibreSignage config files are located in the directory *config/* in
-the LibreSignage install directory, which is */var/www/html* in Docker
-containers. By default the directory tree in *config/* is as follows::
-
-    config
-        --> conf
-            --> 00-default.php  // Default general config.
-        --> limits
-            --> 00-default.php  // Default server limits.
-        --> quota
-            --> 00-default.php  // Default quota config.
-
-You can access the config directory by bind mounting it onto your host
-machine. You can do this by adding the following switch to your
-``docker run`` command::
-
-    -v [HOSTDIR]:/var/www/html/config
-
-Replace ``[HOSTDIR]`` with a directory path on the host machine. After
-you run the container with this switch, you can access the config files
-in the container by navigating to ``[HOSTDIR]``.
-
-The *00-default.php* files contain the default LibreSignage configuration.
-*You should not edit these files directly.* You should instead create new
-files prefixed with a double-digit number, eg. *01-custom.php* in each
-of the subdirectories. The config files are read in alphabetically
-increasing order, so numbering them makes the order obvious. In this case
-*00-default.php* is read first and *01-custom.php* is read second.
-
-As the config files are actually PHP files, they must be valid PHP. A
-custom config file must start with the PHP tag ``<?php`` and it must
-return an array with the config options to modify like so::
-
-    <?php
-    
-    return [
-        'OPTION_TO_MODIFY' => 'NEW_VALUE'
-    ];
-
-You can read through the default config files to get an idea of the
-available config options and what they do.
-
-3. First steps
---------------
-
-First of all, you **need** to at least change the passwords for the
-default users and/or create new ones. The default usernames/passwords
-are listed in the Readme. You can do this in the web interface from
-the *User Manager* page when you're logged in as an admin user.
-
-You may also want to change the default admin contact info to something
-meaningful. This information is shown to users of the system on the main
-*Control Panel* page. Keeping the contact info up-to-date is recommended
-so that users can report any problems to the server admin via email. There
-are two config options that affect the admin contact info:
-
-* *ADMIN_NAME* - The name of the admin.
-* *ADMIN_EMAIL* - The email address of the admin.
-
-These are the most important things to configure. Now you can read
-through the documentation and start learning the system. Have fun!
+See the help document *Configuration* or the file src/doc/rst/configuration.rst
+in the source tree for information on how to configure a LibreSignage Docker
+container.
