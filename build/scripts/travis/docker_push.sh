@@ -17,9 +17,9 @@ if [ -z "$DOCKER_PASS" ]; then
 fi
 
 if [ "$BUILD" = "nightly" ]; then
-	TAG="$REPO/libresignage:nightly-$LS_VER"
+	DEST="$REPO/libresignage:nightly"
 elif [ "$BUILD" = "release" ]; then
-	TAG="$REPO/libresignage:$LS_VER"
+	DEST="$REPO/libresignage:$LS_VER"
 else
 	echo "[Error] Unknown build type to push."
 	exit 1
@@ -27,7 +27,7 @@ fi
 
 # Login, tag and push to Docker Hub.
 echo "$DOCKER_PASS" | docker login --username="$DOCKER_USER" --password-stdin
-docker tag "libresignage:$LS_VER" "$TAG"
-docker push "eerotal/$REPO:$LS_VER"
+docker tag "libresignage:$LS_VER" "$DEST"
+docker push "$DEST"
 
-echo "[Info] Image '$TAG' pushed to Docker Hub."
+echo "[Info] Image '$DEST' pushed to Docker Hub."
