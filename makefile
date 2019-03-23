@@ -314,7 +314,7 @@ clean:
 		fi
 	done
 
-realclean:
+realclean: clean
 	@:
 	set -e
 	$(call status,rm,build/*.conf,none);
