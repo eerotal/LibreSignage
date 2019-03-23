@@ -7,11 +7,11 @@ REPO="$1"
 BUILD="$2"
 
 # Check that the necessary env vars are set.
-if [ -n "$DOCKER_USER" ]; then
+if [ -z "$DOCKER_USER" ]; then
 	echo "[Error] Docker username not set."
 	exit 1
 fi
-if [ -n "$DOCKER_PASS" ]; then
+if [ -z "$DOCKER_PASS" ]; then
 	echo "[Error] Docker password not set."
 	exit 1
 fi
