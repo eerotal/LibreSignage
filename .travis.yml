@@ -20,6 +20,7 @@ sudo: required
 
 branches:
     only:
+        - feature/auto-deployment
         - master
         - next
         - /v[0-9]+.[0-9]+.x/
@@ -30,13 +31,27 @@ matrix:
         env:
             - target="apache2-debian-docker"
 
-
-before_install:
-    - sudo apt-get update
+deploy:
+    - provider: script
+      script: sh build/scripts/travis/docker_push.sh eerotal nightly
+      on:
+          branch: feature/auto-deployment
+          condition: "$target" = "apache2-debian-docker"
+    - provider: script
+      script: sh build/scripts/travis/docker_push.sh eerotal nightly
+      on:
+          branch: next
+          condition: "$target" = "apache2-debian-docker"
+    - provider: script
+      script: sh build/scripts/travis/docker_push.sh eerotal release
+      on:
+          branch: master
+          condition: "$target" = "apache2-debian-docker"
 
 install:
     # Install dependencies
-    - sudo apt-get install pandoc
+    - sudo apt-get update
+    - sudo apt-get install pandoc imagemagick
     - npm install
 
 before_script:
