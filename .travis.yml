@@ -36,17 +36,17 @@ deploy:
       script: sh build/scripts/travis/docker_push.sh eerotal nightly
       on:
           branch: feature/auto-deployment
-          condition: "$target" = "apache2-debian-docker"
+          condition: $target = 'apache2-debian-docker'
     - provider: script
       script: sh build/scripts/travis/docker_push.sh eerotal nightly
       on:
           branch: next
-          condition: "$target" = "apache2-debian-docker"
+          condition: $target = 'apache2-debian-docker'
     - provider: script
       script: sh build/scripts/travis/docker_push.sh eerotal release
       on:
           branch: master
-          condition: "$target" = "apache2-debian-docker"
+          condition: $target = 'apache2-debian-docker'
 
 install:
     # Install dependencies
