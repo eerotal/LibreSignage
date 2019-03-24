@@ -53,7 +53,7 @@ SRC_NO_COMPILE := $(shell find src \
 SRC_RST := $(shell find src \
 	\( -type f -path 'src/node_modules/*' -prune \) \
 	-o -type f -name '*.rst' -print \
-) README.rst CONTRIBUTING.rst
+) README.rst CONTRIBUTING.rst AUTHORS.rst
 
 # SCSS sources.
 SRC_SCSS := $(shell find src \

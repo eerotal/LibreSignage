@@ -9,6 +9,8 @@ General
 
 `Contributing </doc?doc=CONTRIBUTING>`_
 
+`Authors </doc?doc=AUTHORS>`_
+
 Web Interface
 -------------
 

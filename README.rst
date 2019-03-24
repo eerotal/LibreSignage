@@ -543,4 +543,4 @@ source distribution. Third party libraries and resources are licensed
 under their respective licenses. See `10. Third-party dependencies`_ for
 more information.
 
-Copyright Eero Talus 2018
+Copyright Eero Talus 2018 and contributors
