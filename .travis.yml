@@ -32,6 +32,7 @@ matrix:
     include:
         env:
             - target="apache2-debian-docker"
+              features="imgthumbs"
 
 deploy:
     - provider: script
@@ -55,7 +56,7 @@ install:
 
 before_script:
     # Configure the build
-    - make configure TARGET=$target
+    - make configure TARGET="$target" PASS="--features $features"
 
 script:
     # Build and install
