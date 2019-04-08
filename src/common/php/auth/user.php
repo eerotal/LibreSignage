@@ -130,12 +130,26 @@ class User extends Exportable {
 		*  session token.
 		*/
 		$session = new Session();
-		$token = $session->new($this, $who, $from, $permanent);
+		$session->new($this->get_name(), $who, $from, $permanent);
 		$this->sessions[] = $session;
 		return [
 			'session' => $session,
-			'token' => $token
+			'token' => $session->get_token()
 		];
+	}
+
+	public function session_renew_by_id(string $id) {
+		/*
+		*  Renew a session by ID. Returns the new session and adds it to
+		*  the internal $this->sessions array. Note that the old session
+		*  is marked as orphan by Session::renew() and kept in the sessions
+		*  array for some time.
+		*/
+		$session = $this->session_get($id);
+		if ($session === NULL) { throw new ArgException('No such session.'); }
+		$new = $session->renew();
+		$this->sessions[] = $new;
+		return $new;
 	}
 
 	public function session_rm(string $id) {
