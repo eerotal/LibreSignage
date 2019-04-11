@@ -23,6 +23,11 @@ class APIAuthModule extends APIModule {
 			$adata = auth_token_verify($token);
 		} else if ($endpoint->allows_cookie_auth()) {
 			$adata = auth_cookie_verify();
+		} else {
+			throw new APIException(
+				API_E_INVALID_REQUEST,
+				'No Auth-Token header supplied.'
+			);
 		}
 
 		if ($adata === NULL) {
