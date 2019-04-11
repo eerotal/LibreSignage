@@ -36,7 +36,7 @@ LIBS := $(filter-out \
 # Non-compiled sources.
 SRC_NO_COMPILE := $(shell find src \
 	\( -type f -path 'src/node_modules/*' -prune \) \
-	-o \( -type f -path 'src/api/endpoint/*' -prune \) \
+	-o \( -type f -path 'src/public/api/endpoint/*' -prune \) \
 	-o \( \
 		-type f ! -name '*.swp' \
 		-a -type f ! -name '*.save' \
@@ -68,13 +68,13 @@ SRC_JS := $(shell find src \
 )
 
 # API endpoint sources.
-SRC_ENDPOINT := $(shell find src/api/endpoint \
+SRC_ENDPOINT := $(shell find src/public/api/endpoint \
 	\( -type f -path 'src/node_modules/*' -prune \) \
 	-o \( -type f -name '*.php' -print \) \
 )
 
 # Generated PNG logo paths.
-GENERATED_LOGOS := $(addprefix dist/assets/images/logo/libresignage_,16x16.png 32x32.png 96x96.png text_466x100.png)
+GENERATED_LOGOS := $(addprefix dist/public/assets/images/logo/libresignage_,16x16.png 32x32.png 96x96.png text_466x100.png)
 
 status = \
 	if [ "`printf '$(VERBOSE)'|cut -c1|sed 's/\n//g'|\
@@ -94,11 +94,11 @@ endif
 
 all:: initchk server docs htmldocs js css api libs logo; @:
 server:: $(subst src,dist,$(SRC_NO_COMPILE)); @:
-js:: $(subst src,dist,$(SRC_JS)); @:
+js:: $(subst src,dist/public,$(SRC_JS)); @:
 api:: $(subst src,dist,$(SRC_ENDPOINT)); @:
 docs:: $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_index.rst; @:
-htmldocs:: $(addprefix dist/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
-css:: $(subst src,dist,$(SRC_SCSS:.scss=.css)); @:
+htmldocs:: $(addprefix dist/public/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
+css:: $(subst src,dist/public,$(SRC_SCSS:.scss=.css)); @:
 libs:: $(subst $(ROOT)node_modules/,dist/libs/,$(LIBS)); @:
 logo:: $(GENERATED_LOGOS); @:
 
@@ -134,7 +134,7 @@ $(subst src,dist,$(SRC_ENDPOINT)):: dist%: src%
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
 		# Generate reStructuredText documentation.
 		mkdir -p dist/doc/rst
-		mkdir -p dist/doc/html
+		mkdir -p dist/public/doc/html
 		$(call status,\
 			gendoc.sh,\
 			<generated>,\
@@ -146,10 +146,10 @@ $(subst src,dist,$(SRC_ENDPOINT)):: dist%: src%
 		$(call status,\
 			pandoc,\
 			dist/doc/rst/$(notdir $(@:.php=.rst)),\
-			dist/doc/html/$(notdir $(@:.php=.html))\
+			dist/public/doc/html/$(notdir $(@:.php=.html))\
 		)
 		pandoc -f rst -t html \
-			-o dist/doc/html/$(notdir $(@:.php=.html)) \
+			-o dist/public/doc/html/$(notdir $(@:.php=.html)) \
 			dist/doc/rst/$(notdir $(@:.php=.rst))
 	fi
 
@@ -196,7 +196,7 @@ dist/doc/rst/%.rst:: %.rst
 
 # Compile RST sources into HTML. Try to find prerequisites
 # from 'src/doc/rst/' first and then fall back to './'.
-dist/doc/html/%.html:: src/doc/rst/%.rst
+dist/public/doc/html/%.html:: src/doc/rst/%.rst
 	@:
 	set -e
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
@@ -205,7 +205,7 @@ dist/doc/html/%.html:: src/doc/rst/%.rst
 		pandoc -o $@ -f rst -t html $<
 	fi
 
-dist/doc/html/%.html:: %.rst
+dist/public/doc/html/%.html:: %.rst
 	@:
 	set -e
 	if [ ! "$$NOHTMLDOCS" = "y" ] && [ ! "$$NOHTMLDOCS" = "Y" ]; then
@@ -221,7 +221,7 @@ dep/%/main.js.dep: src/%/main.js
 	$(call status,deps-js,$<,$@)
 	$(call makedir,$@)
 
-	TARGET="$(subst src,dist,$(<))"
+	TARGET="$(subst src,dist/public,$(<))"
 	SRC="$(<)"
 	DEPS=`npx browserify --list $$SRC | tr '\n' ' ' | sed 's:$(ROOT)::g'`
 
@@ -241,7 +241,7 @@ dep/%.scss.dep: src/%.scss
 		$(call status,deps-scss,$<,$@)
 		$(call makedir,$@)
 
-		TARGET="$(subst src,dist,$(<:.scss=.css))"
+		TARGET="$(subst src,dist/public,$(<:.scss=.css))"
 		SRC="$(<)"
 		DEPS=`./$(SASSDEP) -l $$SRC $(SASS_IPATHS)|sed 's:$(ROOT)::g'`
 
