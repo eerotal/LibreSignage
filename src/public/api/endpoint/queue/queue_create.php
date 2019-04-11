@@ -15,9 +15,9 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/queue.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/queue.php');
 
 $QUEUE_CREATE = new APIEndpoint(array(
 	APIEndpoint::METHOD		=> API_METHOD['POST'],

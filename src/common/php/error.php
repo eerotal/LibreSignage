@@ -2,7 +2,7 @@
 /*
 *  LibreSignage error functionality.
 */
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/log.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/log.php');
 
 $ERROR_DEBUG = FALSE;
 
@@ -83,6 +83,9 @@ function error_handle(int $code, Throwable $e = NULL) {
 			include($_SERVER['DOCUMENT_ROOT'].ERROR_PAGES.'/'.$code.'/index.php');
 			ls_log($e->__toString(), LOGERR);
 		}
+		header($_SERVER['SERVER_PROTOCOL'].' '.ERROR_CODES[$tmp]);
+		include(LIBRESIGNAGE_ROOT.ERROR_PAGES.'/'.$tmp.'/index.php');
+		exit(1);
 	} catch (Exception $e){
 		/*
 		*  Exceptions thrown in the exception handler cause

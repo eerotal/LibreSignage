@@ -5,8 +5,8 @@
 *  main entry function.
 */
 
-require($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/imgthumb.php');
-require($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/vidthumb.php');
+require(LIBRESIGNAGE_ROOT.'/common/php/thumbnail/imgthumb.php');
+require(LIBRESIGNAGE_ROOT.'/common/php/thumbnail/vidthumb.php');
 
 const MIME_HANDLER_MAP = [
 	'/image\/.*/' => 'gen_img_thumb',

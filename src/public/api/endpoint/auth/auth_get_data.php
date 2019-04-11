@@ -14,7 +14,7 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
 $AUTH_GET_DATA = new APIEndpoint(array(
 	APIEndpoint::METHOD         => API_METHOD['GET'],

@@ -4,9 +4,9 @@
 *  SlideLock object implementation needed in the Slide class.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/session.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/config.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/exportable/exportable.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/session.php');
 class SlideLock extends Exportable{
 	static $PRIVATE = [
 		'session_id',

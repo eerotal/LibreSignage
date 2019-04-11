@@ -1,9 +1,9 @@
 <?php
 	/*
-	*  LibreSignage config code and constants.
+	*  LibreSignage config runtime.
 	*/
 
-	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT']);
+	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT'].'/..');
 
 	const CONFIG_DIR  = "config/conf";
 	const QUOTA_DIR   = "config/quota";
@@ -69,6 +69,6 @@
 	unset($max_slides);
 
 	// Load error definitions & functions.
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/error.php');
+	require_once(LIBRESIGNAGE_ROOT.'/common/php/error.php');
 	error_setup();
 	error_set_debug(LIBRESIGNAGE_DEBUG);

@@ -3,7 +3,7 @@
 *  Authentication utility functions.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/user.php');
 
 function perm_req_chk(string $buf, User $u) {
 	$p = explode(':', $buf);

@@ -5,9 +5,9 @@
 *  is used for handling uploaded slide assets.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/thumbnail.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/config.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/exportable/exportable.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/thumbnail/thumbnail.php');
 
 const ASSET_FILENAME_REGEX = '/^[ A-Za-z0-9_.-]*$/';
 

@@ -1,7 +1,7 @@
 <?php
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/css.php');
+	require_once(LIBRESIGNAGE_ROOT.'/common/php/config.php');
+	require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/auth.php');
+	require_once(LIBRESIGNAGE_ROOT.'/common/php/css.php');
 
 	if (web_auth()) {
 		header('Location: '.LOGIN_LANDING);
@@ -15,7 +15,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<?php require_css(['font-awesome']); ?>
 		<link rel="stylesheet" href="/login/css/login.css">
-		<?php require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/favicon.php'); ?>
+		<?php require_once(LIBRESIGNAGE_ROOT.'/common/php/favicon.php'); ?>
 		<title>LibreSignage Login</title>
 	</head>
 	<body>
@@ -89,7 +89,7 @@
 				</div>
 			</div>
 		</main>
-		<?php require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH); ?>
+		<?php require_once(LIBRESIGNAGE_ROOT.FOOTER_PATH); ?>
 		<script src="/login/js/main.js"></script>
 	</body>
 </html>

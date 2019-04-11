@@ -6,18 +6,18 @@
 *  the modules/ directory.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/error.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/defs.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/argarray.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/error.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/defs.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/config.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/argarray.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/util.php');
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_auth.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_configchecker.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_dataloader.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_validator.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_ratelimit.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module_requestvalidator.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/modules/module_auth.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/modules/module_configchecker.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/modules/module_dataloader.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/modules/module_validator.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/modules/module_ratelimit.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/modules/module_requestvalidator.php');
 
 class APIEndpoint {
 	// Config options.

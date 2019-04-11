@@ -1,7 +1,7 @@
 <?php
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/css.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
+	require_once(LIBRESIGNAGE_ROOT.'/common/php/config.php');
+	require_once(LIBRESIGNAGE_ROOT.'/common/php/css.php');
+	require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/auth.php');
 	web_auth(NULL, array('admin'), TRUE);
 ?>
 <!DOCTYPE html>
@@ -12,11 +12,11 @@
 
 		<?php require_css(['font-awesome']); ?>
 		<link rel="stylesheet" href="/control/usermgr/css/usermgr.css">
-		<?php require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/favicon.php'); ?>
+		<?php require_once(LIBRESIGNAGE_ROOT.'/common/php/favicon.php'); ?>
 		<title>LibreSignage User Manager</title>
 	</head>
 	<body>
-		<?php require_once($_SERVER['DOCUMENT_ROOT'].NAV_PATH); ?>
+		<?php require_once(LIBRESIGNAGE_ROOT.NAV_PATH); ?>
 
 		<div class="container">
 			<div id="users-table"></div>
@@ -30,7 +30,7 @@
 			</div>
 		</div>
 
-		<?php require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH); ?>
+		<?php require_once(LIBRESIGNAGE_ROOT.FOOTER_PATH); ?>
 		<script src="/control/usermgr/js/main.js"></script>
 	</body>
 </html>

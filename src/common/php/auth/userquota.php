@@ -1,6 +1,6 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/exportable/exportable.php');
 
 class UserQuota extends Exportable {
 	static $PRIVATE = [

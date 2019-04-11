@@ -13,7 +13,7 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
 $AUTH_LOGOUT_OTHER = new APIEndpoint(array(
 	APIEndpoint::METHOD         => API_METHOD['POST'],

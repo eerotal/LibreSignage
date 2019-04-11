@@ -65,8 +65,8 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
 $SLIDE_SAVE = new APIEndpoint([
 	APIEndpoint::METHOD		    => API_METHOD['POST'],

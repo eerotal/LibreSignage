@@ -7,7 +7,7 @@
 *  example.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/util.php');
 
 class ExportableException extends Exception {}
 

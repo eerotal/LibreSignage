@@ -3,7 +3,7 @@
 *  API error definitions.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/config.php');
 
 /*
 *  This controls whether the API exception handler returns
