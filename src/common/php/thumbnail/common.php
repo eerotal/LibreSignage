@@ -1,5 +1,7 @@
 <?php
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
+
 class ThumbnailGeneratorException extends Exception {};
 
 function get_thumbnail_resolution(int $w, int $h, int $wmax, int $hmax) {

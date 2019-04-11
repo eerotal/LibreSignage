@@ -5,7 +5,6 @@
 *  main entry function.
 */
 
-require($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/common.php');
 require($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/imgthumb.php');
 require($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/vidthumb.php');
 
