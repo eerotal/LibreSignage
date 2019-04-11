@@ -31,6 +31,7 @@
 *  <====
 */
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
 define('GROUP_NAME_COMP_REGEX', '/[^A-Za-z0-9_]/');

@@ -21,6 +21,7 @@
 *  <====
 */
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
 $USER_GET = new APIEndpoint(array(

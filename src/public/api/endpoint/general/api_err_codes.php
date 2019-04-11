@@ -15,6 +15,7 @@
 *  <====
 */
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
 $API_ERR_CODES = new APIEndpoint(array(

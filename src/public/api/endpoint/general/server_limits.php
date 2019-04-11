@@ -14,6 +14,7 @@
 *  <====
 */
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
 $SERVER_LIMITS = new APIEndpoint([

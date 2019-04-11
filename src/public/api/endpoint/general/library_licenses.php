@@ -13,6 +13,7 @@
 *
 *  <====
 */
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
 $LIBRARY_LICENSES = new APIEndpoint(array(
