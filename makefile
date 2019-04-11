@@ -99,7 +99,7 @@ api:: $(subst src,dist,$(SRC_ENDPOINT)); @:
 docs:: $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_index.rst; @:
 htmldocs:: $(addprefix dist/public/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
 css:: $(subst src,dist/public,$(SRC_SCSS:.scss=.css)); @:
-libs:: $(subst $(ROOT)node_modules/,dist/libs/,$(LIBS)); @:
+libs:: $(subst $(ROOT)node_modules/,dist/public/libs/,$(LIBS)); @:
 logo:: $(GENERATED_LOGOS); @:
 
 # Copy over non-compiled, non-PHP sources.
@@ -255,8 +255,8 @@ dep/%.scss.dep: src/%.scss
 		printf "\tnpx postcss $$TARGET $(POSTCSS_FLAGS)\n" >> $@
 	fi
 
-# Copy production node modules to 'dist/libs/'.
-dist/libs/%:: node_modules/%
+# Copy production node modules to 'dist/public/libs/'.
+dist/public/libs/%:: node_modules/%
 	@:
 	set -e
 	mkdir -p $@
