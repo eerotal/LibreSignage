@@ -22,7 +22,7 @@
 					<div class="col-12">
 						<div id="queueselector">
 							<?php
-								require_once('./php/queueselector.php');
+								require_once(LIBRESIGNAGE_ROOT.'/control/editor/php/queueselector.php');
 							?>
 						</div>
 					</div>
@@ -33,16 +33,16 @@
 				<div class="container-fluid row mx-0 my-1">
 					<div class="col-md-3 container-fluid pt-2" id="editor-col-l">
 						<?php
-							require_once('./php/controls.php');
-							require_once('./php/buttons.php');
+							require_once(LIBRESIGNAGE_ROOT.'/control/editor/php/controls.php');
+							require_once(LIBRESIGNAGE_ROOT.'/control/editor/php/buttons.php');
 						?>
 					</div>
 					<div class="col-md container-fluid pt-2" id="editor-col-r">
 						<div class="row">
-							<?php require_once('./php/preview.php'); ?>
+							<?php require_once(LIBRESIGNAGE_ROOT.'/control/editor/php/preview.php'); ?>
 						</div>
 						<div class="row">
-							<?php require_once('./php/editor.php'); ?>
+							<?php require_once(LIBRESIGNAGE_ROOT.'/control/editor/php/editor.php'); ?>
 						</div>
 					</div>
 				</div>
