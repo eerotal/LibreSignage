@@ -1,6 +1,6 @@
 <?php
 	/*
-	*  LibreSignage config runtime.
+	*  LibreSignage config definitions.
 	*/
 
 	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT'].'/..');
@@ -46,7 +46,6 @@
 		// Get the value of a limit.
 		return LS_LIM[$lim];
 	}
-
 	// Load LibreSignage configuration files.
 	define_array_values(load_config_array(
 		LIBRESIGNAGE_ROOT.'/'.CONFIG_DIR

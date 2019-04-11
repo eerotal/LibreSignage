@@ -4,7 +4,7 @@
 *  Convenience functions for including CSS libraries.
 */
 
-require_once(LIBRESIGNAGE_ROOT.'/common/php/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/util.php');
 
 const STYLESHEETS = [

@@ -3,7 +3,7 @@
 *  LibreSignage utility functions.
 */
 
-require_once(LIBRESIGNAGE_ROOT.'/common/php/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 
 function rmdir_recursive($path) {
 	/*

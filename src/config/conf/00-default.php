@@ -27,8 +27,8 @@ return [
 	'DOC_RST_DIR'           => "/public/doc/rst",
 	'LICENSE_LS_RST'        => "/public/doc/rst/LICENSE.rst",
 	'LICENSES_EXT_RST'      => "/public/doc/rst/LICENSES_EXT.rst",
-	'NAV_PATH'              => "/public/public/common/php/nav/nav.php",
-	'FOOTER_PATH'           => "/public/public/common/php/footer/footer.php",
+	'NAV_PATH'              => "/public/common/php/nav/nav.php",
+	'FOOTER_PATH'           => "/public/common/php/footer/footer.php",
 	'USER_DATA_DIR'         => "/data/users",
 	'LOG_DIR'               => "/var/log/libresignage",
 

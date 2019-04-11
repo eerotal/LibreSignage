@@ -8,7 +8,7 @@
 
 require_once(LIBRESIGNAGE_ROOT.'/api/error.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/defs.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/argarray.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/util.php');
 
