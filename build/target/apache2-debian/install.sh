@@ -71,6 +71,13 @@ fi
 cp server/libresignage/conf/* $VHOST_DIR/config/conf/.
 
 ##
+##  Create log directory in /var/log/LibreSignage
+##
+
+echo "[Info] Create log directory '$LOG_DIR'."
+mkdir -p "$LOG_DIR"
+
+##
 ## Set the correct file permissions.
 ##
 
@@ -85,6 +92,11 @@ echo "[Info] Set file permissions for the 'data' directory.";
 chown -R $OWNER:www-data "$VHOST_DIR/data";
 find "$VHOST_DIR/data" -type d -exec chmod 775 "{}" ";";
 find "$VHOST_DIR/data" -type f -exec chmod 664 "{}" ";";
+
+# Permissions for $LOG_DIR.
+echo "[Info] Set log directury group to www-data."
+chown root:www-data "$LOG_DIR"
+chmod 775 "$LOG_DIR"
 
 ##
 ## Apache2 setup.

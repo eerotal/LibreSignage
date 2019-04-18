@@ -5,8 +5,6 @@
 
 	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT']);
 
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/error.php');
-
 	const CONFIG_DIR  = "config/conf";
 	const QUOTA_DIR   = "config/quota";
 	const LIMITS_DIR  = "config/limits";
@@ -27,9 +25,8 @@
 				if (gettype($inc) === 'array') {
 					$tmp = array_merge($tmp, $inc);
 				} else {
-					throw new ConfigException(
-						"Invalid configuration file. An ".
-						"array wasn't returned."
+					throw new Exception(
+						"Invalid configuration file. An array wasn't returned."
 					);
 				}
 			}
@@ -61,10 +58,6 @@
 		LIBRESIGNAGE_ROOT.'/'.QUOTA_DIR
 	));
 
-	// Setup error handling and reporting.
-	error_setup();
-	error_set_debug(LIBRESIGNAGE_DEBUG);
-
 	// Do some checks on the configured values.
 	$max_slides = DEFAULT_QUOTA['slides']['limit']*gtlim('MAX_USERS');
 	if ($max_slides > gtlim('SLIDE_MAX_INDEX') - 1) {
@@ -74,3 +67,8 @@
 		);
 	}
 	unset($max_slides);
+
+	// Load error definitions & functions.
+	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/error.php');
+	error_setup();
+	error_set_debug(LIBRESIGNAGE_DEBUG);

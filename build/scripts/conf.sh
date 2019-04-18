@@ -8,6 +8,7 @@
 SRC_DIR='src';
 DIST_DIR='dist';
 CONF_DIR='server';
+LOG_DIR='/var/log/libresignage'
 
 # Block access to these directories in the server config. This is a
 # vertical bar separated list of directory paths. Note that this

@@ -181,6 +181,7 @@ function api_error_setup() {
 				APIException::map_to_code($e),
 				$e
 			);
+			ls_log($e->__toString(), LOGERR);
 			exit(1);
 		} catch (Exception $e) {
 			/*

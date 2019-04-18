@@ -2,6 +2,7 @@
 /*
 *  LibreSignage error functionality.
 */
+require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/log.php');
 
 $ERROR_DEBUG = FALSE;
 
@@ -14,8 +15,6 @@ const ERROR_CODES = array(
 	HTTP_ERR_403 => '403 Forbidden',
 	HTTP_ERR_500 => '500 Internal Server Error'
 );
-
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
 // Custom exception classes.
 class ArgException extends Exception {};
@@ -56,22 +55,17 @@ function error_setup() {
 
 	// Convert all errors to exceptions.
 	set_error_handler(function($severity, $msg, $file, $line) {
-		if ( !(error_reporting() & $severity) ) {
-			return;
-		}
-		throw new ErrorException(
-			$msg, 0, $severity, $file, $line
-		);
+		if ( !(error_reporting() & $severity) ) { return; }
+		throw new ErrorException($msg, 0, $severity, $file, $line);
 	});
 }
 
-function _notify_contact_admin() {
+function notify_contact_admin() {
 	echo "\n\n## Important! ##\n\n";
 	echo "If you see this message and you aren't ".
-		"the server admin,\nplease email the ".
-		"admin at ".ADMIN_EMAIL." and copy this\n".
-		"whole message (including the text above) ".
-		"into the email.";
+		"the server admin,\nplease email the admin ".
+		"and copy this\nwhole message (including the ".
+		"text above) into the email.";
 }
 
 function error_handle(int $code, Throwable $e = NULL) {
@@ -86,25 +80,20 @@ function error_handle(int $code, Throwable $e = NULL) {
 
 	try {
 		$tmp = $code;
-		if (!array_key_exists($tmp, ERROR_CODES)) {
-			$tmp = HTTP_ERR_500;
-		}
+		if (!array_key_exists($tmp, ERROR_CODES)) { $tmp = HTTP_ERR_500; }
 
 		if ($e && $ERROR_DEBUG) {
 			header('Content-Type: text/plain');
-			echo "\n### Uncaught exception ".
-				"(HTTP: ".$code.") ###\n";
+			echo "\n### Uncaught exception (HTTP: ".$code.") ###\n";
 			echo $e->__toString();
-			_notify_contact_admin();
+			notify_contact_admin();
+			ls_log($e->__toString(), LOGERR);
 			exit(1);
-		} elseif ($e) {
-			error_log($e->__toString());
+		} else if ($e) {
+			ls_log($e->__toString(), LOGERR);
 		}
-
 		header($_SERVER['SERVER_PROTOCOL'].' '.ERROR_CODES[$tmp]);
-		include(
-			$_SERVER['DOCUMENT_ROOT'].ERROR_PAGES.'/'.$tmp.'/index.php'
-		);
+		include($_SERVER['DOCUMENT_ROOT'].ERROR_PAGES.'/'.$tmp.'/index.php');
 		exit(1);
 	} catch (Exception $e){
 		/*
@@ -113,10 +102,9 @@ function error_handle(int $code, Throwable $e = NULL) {
 		*/
 		if ($ERROR_DEBUG) {
 			header('Content-Type: text/plain');
-			echo "\n### ".get_class($e)." thrown in the ".
-					"exception handler ###\n";
+			echo "\n### ".get_class($e)." thrown in the exception handler ###\n";
 			echo $e->__toString();
-			_notify_contact_admin();
+			notify_contact_admin();
 		}
 		exit(1);
 	}

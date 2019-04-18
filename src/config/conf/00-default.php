@@ -30,6 +30,7 @@ return [
 	'NAV_PATH'              => "/common/php/nav/nav.php",
 	'FOOTER_PATH'           => "/common/php/footer/footer.php",
 	'USER_DATA_DIR'         => "/data/users",
+	'LOG_DIR'               => "/var/log/libresignage",
 
 	// Page constants.
 	'LOGIN_PAGE'            => "/login",
@@ -62,5 +63,7 @@ return [
 	'THUMB_MAXH'            => 180,
 	'THUMB_EXT'             => '.png',
 
-	'ASSET_FILENAME_MAXLEN' => 64
+	'ASSET_FILENAME_MAXLEN' => 64,
+
+	'LOG_MAX_LEN'			=> 100
 ];
