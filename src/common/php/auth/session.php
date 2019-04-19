@@ -14,7 +14,8 @@ class Session extends Exportable {
 		'created',
 		'max_age',
 		'permanent',
-		'orphan'
+		'orphan',
+		'orphan_master'
 	];
 
 	static $PRIVATE = [
@@ -26,7 +27,8 @@ class Session extends Exportable {
 		'max_age',
 		'permanent',
 		'token_hash',
-		'orphan'
+		'orphan',
+		'orphan_master'
 	];
 
 	const ID_DELIMITER  = '_';
@@ -43,6 +45,7 @@ class Session extends Exportable {
 	private $token = NULL;
 	private $token_hash = NULL;
 	private $orphan = NULL;
+	private $orphan_master = NULL;
 
 	public function get_username(): string { return $this->username; }
 	public function get_id(): string { return $this->id; }
@@ -54,6 +57,7 @@ class Session extends Exportable {
 	public function get_token(): string { return $this->token; }
 	public function get_token_hash(): string { return $this->token_hash; }
 	public function is_orphan(): bool { return $this->orphan !== NULL; }
+	public function get_orphan_master() { return $this->orphan_master; }
 
 	public function __exportable_set(string $name, $value) {
 		$this->{$name} = $value;
@@ -116,13 +120,29 @@ class Session extends Exportable {
 			$this->get_from(),
 			false
 		);
-		$this->set_orphan();
+		$this->set_orphan($ret);
 
 		return $ret;
 	}
 
-	private function set_orphan(): void {
+	private function set_orphan(Session $master): void {
+		/*
+		*  Mark this session orphan and set $master as the master session
+		*  this one belongs to.
+		*/
+		$this->orphan_master = $master;
 		$this->orphan = time();
+	}
+
+	public function is_orphan_of(Session $master): bool {
+		/*
+		*  Return TRUE if $master is the master session of this one and
+		*  FALSE otherwise.
+		*/
+		return (
+			$this->is_orphan() &&
+			$this->get_orphan_master()->get_id() == $master->get_id()
+		);
 	}
 
 	private function generate_token(): void {
