@@ -1,1 +1,19 @@
-{"__classname":"Slide","__visibility":"private","id":"1","name":"Welcome","index":0,"duration":3000,"markup":"[container top=35% right=0% bottom=0% left=0%]\n    [xcenter]\n        [h size=12%]Welcome to LibreSignage![\/h]\n    [\/xcenter]\n[\/container]","owner":"admin","enabled":true,"sched":false,"sched_t_s":0,"sched_t_e":0,"animation":1,"queue_name":"default","collaborators":[],"lock":null,"assets":[]}
+{
+	"__classname":"Slide",
+	"__visibility":"private",
+	"id":"1",
+	"name":"Welcome",
+	"index":0,
+	"duration":3000,
+	"markup":"[container top=35% right=0% bottom=0% left=0%]\n    [xcenter]\n        [h size=12%]Welcome to LibreSignage![\/h]\n    [\/xcenter]\n[\/container]",
+	"owner":"admin",
+	"enabled":true,
+	"sched":false,
+	"sched_t_s":0,
+	"sched_t_e":0,
+	"animation":1,
+	"queue_name":"default",
+	"collaborators":[],
+	"lock":null,
+	"assets":[]
+}
