@@ -184,8 +184,8 @@ function api_error_setup() {
 			*  Exceptions thrown in the exception handler
 			*  cause hard to debug fatal errors. Handle them.
 			*/
-			echo '{"error":'.API_E_INTERNAL.', "e_msg":"Exception thrown in the '.
-				'exception handler on line '.$e->getLine().'."}';
+			echo '{"error":'.API_E_INTERNAL.', "e_msg":"'.$e->getMessage().
+				' (in exception handler, '.$e->getFile().' '.$e->getLine().')"}';
 		}
 		exit(1);
 	});

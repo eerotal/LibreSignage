@@ -11,7 +11,7 @@ define('LOGERR', LOG_DIR."/error.log");
 
 $LS_LOG_ENABLED = FALSE;
 
-function ls_log_enable(bool $state) {
+function ls_log_enable(bool $state): void {
 	/*
 	*  Enable/disable logging.
 	*/
@@ -80,6 +80,7 @@ function ls_log(string $msg, string $log = LOGDEF): void {
 	/*
 	*  Log a message into one of the log files.
 	*/
+	global $LS_LOG_ENABLED;
 	if (!$LS_LOG_ENABLED) { return; }
 
 	if (!is_dir(dirname($log))) {
@@ -88,7 +89,11 @@ function ls_log(string $msg, string $log = LOGDEF): void {
 		}
 	}
 	$handle = ls_log_open($log, LOCK_EX, 'a');
-	if (fwrite($handle, "[".__FILE__."] [".date('r')."] ".$msg."\n") === FALSE) {
+
+	$bt = debug_backtrace();
+	if (count($bt) !== 0) { $file = $bt[0]['file']; }
+
+	if (fwrite($handle, "[$file] [".date('r')."] ".$msg."\n") === FALSE) {
 		throw new IntException("fwrite() on '$log' failed.");
 	}
 	ls_log_close($handle);
