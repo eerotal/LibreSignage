@@ -26,19 +26,21 @@ class ConfigException extends Exception {};
 
 function error_set_debug(bool $debug) {
 	/*
-	*  Turn on or off debugging.
+	*  Turn on/off debugging.
 	*/
 	global $ERROR_DEBUG;
-
 	$ERROR_DEBUG = $debug;
+
 	if ($debug) {
 		error_reporting(E_ALL | E_NOTICE | E_STRICT);
 		ini_set('display_errors', "1");
 		ini_set('log_errors', "1");
+		ls_log_enable(true);
 	} else {
-		error_reporting(E_ALL | ~E_NOTICE);
+		error_reporting(0);
 		ini_set('display_errors', "0");
-		ini_set('log_errors', "1");
+		ini_set('log_errors', "0");
+		ls_log_enable(false);
 	}
 }
 
@@ -60,14 +62,6 @@ function error_setup() {
 	});
 }
 
-function notify_contact_admin() {
-	echo "\n\n## Important! ##\n\n";
-	echo "If you see this message and you aren't ".
-		"the server admin,\nplease email the admin ".
-		"and copy this\nwhole message (including the ".
-		"text above) into the email.";
-}
-
 function error_handle(int $code, Throwable $e = NULL) {
 	/*
 	*  Redirect the client to the error page corresponding
@@ -77,24 +71,18 @@ function error_handle(int $code, Throwable $e = NULL) {
 	*  exception is logged instead of echoing.
 	*/
 	global $ERROR_DEBUG;
-
 	try {
-		$tmp = $code;
-		if (!array_key_exists($tmp, ERROR_CODES)) { $tmp = HTTP_ERR_500; }
-
+		if (!array_key_exists($code, ERROR_CODES)) { $code = HTTP_ERR_500; }
 		if ($e && $ERROR_DEBUG) {
 			header('Content-Type: text/plain');
 			echo "\n### Uncaught exception (HTTP: ".$code.") ###\n";
 			echo $e->__toString();
-			notify_contact_admin();
 			ls_log($e->__toString(), LOGERR);
-			exit(1);
-		} else if ($e) {
+		} else {
+			header($_SERVER['SERVER_PROTOCOL'].' '.ERROR_CODES[$code]);
+			include($_SERVER['DOCUMENT_ROOT'].ERROR_PAGES.'/'.$code.'/index.php');
 			ls_log($e->__toString(), LOGERR);
 		}
-		header($_SERVER['SERVER_PROTOCOL'].' '.ERROR_CODES[$tmp]);
-		include($_SERVER['DOCUMENT_ROOT'].ERROR_PAGES.'/'.$tmp.'/index.php');
-		exit(1);
 	} catch (Exception $e){
 		/*
 		*  Exceptions thrown in the exception handler cause
@@ -104,8 +92,7 @@ function error_handle(int $code, Throwable $e = NULL) {
 			header('Content-Type: text/plain');
 			echo "\n### ".get_class($e)." thrown in the exception handler ###\n";
 			echo $e->__toString();
-			notify_contact_admin();
 		}
-		exit(1);
 	}
+	exit(1);
 }

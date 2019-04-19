@@ -177,22 +177,16 @@ function api_error_setup() {
 	*/
 	set_exception_handler(function(Throwable $e) {
 		try {
-			echo APIException::make_json_string(
-				APIException::map_to_code($e),
-				$e
-			);
+			echo APIException::make_json_string(APIException::map_to_code($e), $e);
 			ls_log($e->__toString(), LOGERR);
-			exit(1);
 		} catch (Exception $e) {
 			/*
 			*  Exceptions thrown in the exception handler
 			*  cause hard to debug fatal errors. Handle them.
 			*/
-			echo '{"error":'.API_E_INTERNAL.','.
-				'"e_msg":"Exception thrown in the '.
-				'exception handler on line '.
-				$e->getLine().'."}';
-			exit(1);
+			echo '{"error":'.API_E_INTERNAL.', "e_msg":"Exception thrown in the '.
+				'exception handler on line '.$e->getLine().'."}';
 		}
+		exit(1);
 	});
 }

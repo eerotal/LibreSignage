@@ -9,6 +9,16 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 define('LOGDEF', LOG_DIR."/default.log");
 define('LOGERR', LOG_DIR."/error.log");
 
+$LS_LOG_ENABLED = FALSE;
+
+function ls_log_enable(bool $state) {
+	/*
+	*  Enable/disable logging.
+	*/
+	global $LS_LOG_ENABLED;
+	$LS_LOG_ENABLED = $state;
+}
+
 function ls_log_open(string $log, int $lock, string $mode) {
 	/*
 	*  Open and lock a log file.
@@ -70,6 +80,8 @@ function ls_log(string $msg, string $log = LOGDEF): void {
 	/*
 	*  Log a message into one of the log files.
 	*/
+	if (!$LS_LOG_ENABLED) { return; }
+
 	if (!is_dir(dirname($log))) {
 		if (!mkdir(dirname($log))) {
 			throw new IntException('Failed to create log directory.');
