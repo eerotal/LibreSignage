@@ -90,13 +90,15 @@ class Session extends Exportable{
 		return $this->generate_token();
 	}
 
-	public function renew(): string {
+	public function renew(): void {
 		/*
-		*  Renew this session. Returns the newly generated
-		*  session token.
+		*  Renew this session. The session token is preserved. This function
+		*  throws an error if the session is already expired.
 		*/
+		if ($this->is_expired()) {
+			throw new ArgException("Can't renew an expired session.");
+		}
 		$this->created = time();
-		return $this->generate_token();
 	}
 
 	private function generate_token(): string {
