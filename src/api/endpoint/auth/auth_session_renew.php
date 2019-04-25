@@ -2,8 +2,8 @@
 /*
 *  ====>
 *
-*  Request a session renewal. The previous authentication token
-*  is automatically expired when this endpoint is called.
+*  Request a session renewal. The session token is preserved but
+*  its expiration time is reset.
 *
 *  **Request:** POST, application/json
 *
@@ -25,27 +25,16 @@ $AUTH_SESSION_RENEW = new APIEndpoint([
 ]);
 
 $session = $AUTH_SESSION_RENEW->get_session();
-$new_token = $session->renew();
+$session->renew();
 $AUTH_SESSION_RENEW->get_caller()->write();
 
-/*
-*  Set the session cookies. Note that the server setting these
-*  cookies is merely a convenience feature for web browser clients
-*  that need to access the LibreSignage web interface too. Other
-*  clients can ignore these cookies if so desired.
-*/
+// Set the session cookies.
 $exp = 0;
 if ($session->is_permanent()) {
 	$exp = PERMACOOKIE_EXPIRE;
 } else {
 	$exp = $session->get_created() + $session->get_max_age();
 }
-setcookie(
-	$name = 'session_token',
-	$value = $new_token,
-	$expire = $exp,
-	$path = '/'
-);
 setcookie(
 	$name = 'session_created',
 	$value = $session->get_created(),
@@ -66,10 +55,7 @@ setcookie(
 );
 
 $AUTH_SESSION_RENEW->resp_set(array(
-	'session' => array_merge(
-		$AUTH_SESSION_RENEW->get_session()->export(FALSE, FALSE),
-		[ 'token' => $new_token ]
-	),
+	'session' => $AUTH_SESSION_RENEW->get_session()->export(FALSE, FALSE),
 	'error' => API_E_OK
 ));
 $AUTH_SESSION_RENEW->send();
