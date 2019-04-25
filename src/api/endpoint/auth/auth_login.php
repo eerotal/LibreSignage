@@ -67,44 +67,11 @@ if ($user) {
 	);
 	$user->write();
 
-	/*
-	*  Set the session cookies. Note that the server setting these
-	*  cookies is merely a convenience feature that is useful for
-	*  web browser clients that need to access the LibreSignage
-	*  web interface too. Other clients can ignore these cookies
-	*  if so desired.
-	*/
-	$exp = 0;
-	if ($auth_data['session']->is_permanent()) {
-		// Create a "permanent" cookie.
-		$exp = PERMACOOKIE_EXPIRE;
-	} else {
-		$exp = $auth_data['session']->get_created()
-			+ $auth_data['session']->get_max_age();
-	}
-
+	// Set the session token cookie.
 	setcookie(
 		$name = 'session_token',
 		$value = $auth_data['token'],
-		$expire = $exp,
-		$path = '/'
-	);
-	setcookie(
-		$name = 'session_created',
-		$value = $auth_data['session']->get_created(),
-		$expire = $exp,
-		$path = '/'
-	);
-	setcookie(
-		$name = 'session_max_age',
-		$value = $auth_data['session']->get_max_age(),
-		$expire = $exp,
-		$path = '/'
-	);
-	setcookie(
-		$name = 'session_permanent',
-		$value = $auth_data['session']->is_permanent() ? '1' : '0',
-		$expire = $exp,
+		$expire = PERMACOOKIE_EXPIRE,
 		$path = '/'
 	);
 
