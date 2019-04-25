@@ -31,7 +31,7 @@ class Session extends Exportable {
 
 	const ID_DELIMITER  = '_';
 	const TRUNC_LEN     = 45;
-	const ORPHAN_PERIOD = 25;
+	const ORPHAN_PERIOD = 5;
 
 	private $username = NULL;
 	private $id = NULL;
