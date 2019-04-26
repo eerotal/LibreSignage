@@ -4,7 +4,7 @@ var APIUI = require('ls-api-ui');
 var UserView = require('./userview.js').UserView;
 
 $(document).ready(async () => {
-	let API = new APIInterface({standalone: false});
+	let API = new APIInterface();
 	try {
 		await API.init();
 	} catch (e) {

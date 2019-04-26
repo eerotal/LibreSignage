@@ -13,7 +13,7 @@ function logout_redirect() {
 }
 
 async function logout() {
-	if (API.config.session != null) {
+	if (API.get_session() != null) {
 		try {
 			await API.logout();
 		} catch (e) {
@@ -25,7 +25,7 @@ async function logout() {
 }
 
 $(document).ready(async () => {
-	API = new APIInterface({standalone: false});
+	API = new APIInterface();
 	try {
 		await API.init();
 	} catch (e) {

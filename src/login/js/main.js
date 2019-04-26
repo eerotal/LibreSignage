@@ -7,7 +7,7 @@ var APIInterface = require('ls-api').APIInterface;
 var APIUI = require('ls-api-ui');
 
 $(document).ready(async () => {
-	let API = new APIInterface({standalone: false});
+	let API = new APIInterface();
 	try {
 		await API.init();
 	} catch (e) {

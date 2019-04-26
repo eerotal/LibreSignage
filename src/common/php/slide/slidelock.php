@@ -7,23 +7,23 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/session.php');
-
-class SlideLock extends Exportable {
+class SlideLock extends Exportable{
 	static $PRIVATE = [
-		'expire',
-		'session'
+		'session_id',
+		'expire'
 	];
 	static $PUBLIC = [
-		'expire',
-		'session'
+		'session_id',
+		'expire'
 	];
 
+	private $session_id = NULL;
 	private $session = NULL;
 	private $expire = NULL;
 
 	public function __construct($session = NULL) {
 		if ($session !== NULL) {
-			$this->session = $session;
+			$this->session_id = $session->get_id();
 			$this->expire = time() + SLIDE_LOCK_MAX_AGE;
 		}
 	}
@@ -40,8 +40,8 @@ class SlideLock extends Exportable {
 		/*
 		*  Return TRUE if this SlideLock is expired and FALSE otherwise.
 		*/
-		if ($this->session === NULL) { return TRUE; }
-		$s = Session::from_id($this->session->get_id());
+		if (empty($this->session_id)) { return TRUE; }
+		$s = Session::from_id($this->session_id);
 		return $s === NULL || time() > $this->expire;
 	}
 
@@ -50,12 +50,9 @@ class SlideLock extends Exportable {
 		*  Return TRUE if this SlideLock is owned by $session and
 		*  FALSE otherwise.
 		*/
-		return (
-			$this->session->get_id() === $session->get_id()
-			|| $session->is_orphan_of($this->session)
-		);
+		return $this->session_id === $session->get_id();
 	}
 
+	public function get_session_id() { return $this->session_id; }
 	public function get_expire() { return $this->expire; }
-	public function get_session() { return $this->session; }
 }
