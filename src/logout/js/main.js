@@ -25,7 +25,7 @@ async function logout() {
 }
 
 $(document).ready(async () => {
-	API = new APIInterface({standalone: false});
+	API = new APIInterface();
 	try {
 		await API.init();
 	} catch (e) {

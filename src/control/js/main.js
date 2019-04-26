@@ -7,7 +7,7 @@ var APIUI = require('ls-api-ui');
 var ControlPanelView = require('./controlpanelview.js').ControlPanelView;
 
 $(document).ready(async () => {
-	API = new APIInterface({standalone: false});
+	API = new APIInterface();
 	try {
 		await API.init();
 	} catch (e) {

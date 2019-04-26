@@ -5,7 +5,7 @@ var DisplayView = require('./displayview.js').DisplayView;
 var util = require('ls-util');
 
 $(document).ready(async () => {
-	let API = new APIInterface({standalone: false});
+	let API = new APIInterface();
 	try {
 		await API.init();
 	} catch(e) {
