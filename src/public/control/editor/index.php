@@ -46,8 +46,8 @@
 						</div>
 					</div>
 				</div>
-				<?php require_once(LIBRESIGNAGE_ROOT.'/public/control/editor/popups/quick_help.php'); ?>
-				<?php require_once(LIBRESIGNAGE_ROOT.'/public/control/editor/popups/asset_uploader.php'); ?>
+				<?php require_once(LIBRESIGNAGE_ROOT.'/control/editor/popups/quick_help.php'); ?>
+				<?php require_once(LIBRESIGNAGE_ROOT.'/control/editor/popups/asset_uploader.php'); ?>
 			</div>
 		</main>
 		<?php require_once(LIBRESIGNAGE_ROOT.FOOTER_PATH); ?>
