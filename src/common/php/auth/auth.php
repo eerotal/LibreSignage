@@ -3,7 +3,6 @@
 *  Authentication functionality for LibreSignage.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/user.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/util.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/constants.php');

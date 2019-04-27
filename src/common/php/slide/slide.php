@@ -6,7 +6,6 @@
 *  file data and the API endpoints.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slidelock.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slideasset.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/util.php');

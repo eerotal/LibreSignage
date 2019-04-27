@@ -6,7 +6,6 @@
 	*  listed.
 	*/
 
-	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 	require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/auth.php');
 	require_once(LIBRESIGNAGE_ROOT.'/common/php/util.php');
 

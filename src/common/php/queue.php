@@ -5,7 +5,6 @@
 *  list of all the slides in a specific slide queue.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/util.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
