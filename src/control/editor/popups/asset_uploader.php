@@ -9,7 +9,7 @@
 		</div>
 	</div>
 	<div class="row filesel-row">
-		<div class="col-sm filesel-cont">
+		<div class="col-sm filesel-cont h-auto">
 			<input type="file"
 					class="custom-file-input filesel"
 					id="asset-uploader-filesel"
@@ -20,7 +20,7 @@
 			</label>
 			<div class="invalid-feedback"></div>
 		</div>
-		<div class="col-sm-auto">
+		<div class="col-sm-auto h-auto">
 			<button type="button" class="btn btn-primary upload-btn">
 				<span class="on-active">Upload</span>
 				<i class="fas fa-upload on-active"></i>
