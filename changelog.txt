@@ -41,6 +41,9 @@ v1.0.0
   - [feature]  Implement a startup splash screen for the display page.
   - [feature]  Implement automatic deployment of nightly builds to Docker Hub
                from Travis CI.
+  - [internal] Speed up build scripts by changing how 'find' is used.
+  - [bugfix]   Fix a bug where cloning a slide with no thumbnail resulted
+               in an error. (issue #33)
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
