@@ -147,6 +147,7 @@ class SlideAsset extends Exportable {
 	public function get_thumbpath() { return $this->thumbpath; }
 	public function get_mime()      { return $this->mime;      }
 	public function get_uid()       { return $this->uid;       }
+	public function has_thumb()     { return $this->has_thumb; }
 
 	public function clone(Slide $slide): SlideAsset {
 		/*
@@ -161,13 +162,13 @@ class SlideAsset extends Exportable {
 			explode('/', $asset->get_mime())[1],
 			$slide->get_asset_path()
 		);
-		$asset->set_thumb_paths(
-			$asset->get_uid(),
-			$slide->get_asset_path()
-		);
-
 		copy($this->get_fullpath(), $asset->get_fullpath());
-		copy($this->get_thumbpath(), $asset->get_thumbpath());
+
+		// Copy thumbnail if it exists.
+		if ($this->has_thumb()) {
+			$asset->set_thumb_paths($asset->get_uid(), $slide->get_asset_path());
+			copy($this->get_thumbpath(), $asset->get_thumbpath());
+		}
 
 		return $asset;
 	}
