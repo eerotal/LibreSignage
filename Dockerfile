@@ -44,7 +44,7 @@ RUN chown -R docker:www-data "$docroot/data" \
 	&& find "$docroot" -type d -print0 | xargs -0 chmod 755 \
 	&& find "$docroot/data" -type d -print0 | xargs -0 chmod 775 \
 	&& find "$docroot" -type f -print0 | xargs -0 chmod 644 \
-	&& find "$docroot/data" -type f -print0 | xargs -0 chmod 644 \
+	&& find "$docroot/data" -type f -print0 | xargs -0 chmod 664 \
 	&& mkdir -p "$logdir" \
 	&& chown root:www-data "$logdir" \
 	&& chmod 775 "$logdir"
