@@ -31,45 +31,47 @@ LABEL license="BSD 3-clause license"
 
 USER root
 
-# Sanity check install paths.
+# Sanity check install paths and setup users.
 RUN if [ -z "$docroot" ]; then echo '[Error] Empty docroot path.'; exit 1; fi \
-&& if [ -z "$logdir" ]; then echo '[Error] Empty log dir path.'; exit 1; fi
-
-# Setup the user 'docker' that's used to run apache2.
-RUN useradd -r docker && addgroup docker www-data
+	&& if [ -z "$logdir" ]; then echo '[Error] Empty log dir path.'; exit 1; fi \
+	&& useradd -r docker && addgroup docker www-data
 
 # Copy LibreSignage files.
 COPY --chown=docker:docker "dist/" "$docroot"
 
-# Set default file permissions.
-RUN find "$docroot" -type d -exec chmod 755 "{}" ";" \
-&& find "$docroot" -type f -exec chmod 644 "{}" ";" \
-&& chown -R docker:www-data "$docroot/data" \
-&& find "$docroot/data" -type d -exec chmod 775 "{}" ";" \
-&& find "$docroot/data" -type f -exec chmod 664 "{}" ";"
+# Set default file permissions and create the log directory.
+RUN chown -R docker:www-data "$docroot/data" \
+	&& find "$docroot" -type d -print0 | xargs -0 chmod 755 \
+	&& find "$docroot/data" -type d -print0 | xargs -0 chmod 775 \
+	&& find "$docroot" -type f -print0 | xargs -0 chmod 644 \
+	&& find "$docroot/data" -type f -print0 | xargs -0 chmod 644 \
+	&& mkdir -p "$logdir" \
+	&& chown root:www-data "$logdir" \
+	&& chmod 775 "$logdir"
 
-# Create log directory.
-RUN mkdir -p "$logdir" && chown docker:www-data "$logdir" && chmod 775 "$logdir"
-
-# Install PHP extensions and dependencies.
-RUN if [ "$imgthumbs" = "y" ] || [ "$vidthumbs" = "y" ]; then apt-get update; fi
-
+# Install dependencies for image thumbnail generation.
 RUN if [ "$imgthumbs" = "y" ]; then \
-apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
-&& docker-php-ext-configure gd \
---with-freetype-dir=/usr/include \
---with-jpeg-dir=/usr/include \
-&& docker-php-ext-install -j$(nproc) gd; \
-fi
+		apt-get update \
+		&& apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
+		&& docker-php-ext-configure gd \
+			--with-freetype-dir=/usr/include \
+			--with-jpeg-dir=/usr/include \
+		&& docker-php-ext-install -j$(nproc) gd; \
+	fi
 
-RUN if [ "$vidthumbs" = "y" ]; then apt-get install -y ffmpeg; fi
+# Install dependencies for video thumbnail generation.
+RUN if [ "$vidthumbs" = "y" ]; then \
+		apt-get update \
+		&& apt-get install -y ffmpeg; \
+	fi
 
 # Configure PHP.
-RUN if [ "$debug" = "y" ]; then \
-cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/conf.d/01-dev.ini; \
-else \
-cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/conf.d/01-prod.ini; \
-fi
+RUN PHPDIR="/usr/local/etc/php"; \
+	if [ "$debug" = "y" ]; then \
+		cp "$PHPDIR/php.ini-development" "$PHPDIR/conf.d/01-dev.ini"; \
+	else \
+		cp "$PHPDIR/php.ini-production" "$PHPDIR/conf.d/01-prod.ini"; \
+	fi
 COPY server/php/ls-docker.ini /usr/local/etc/php/conf.d/02-ls-docker.ini
 
 # Configure apache2.
