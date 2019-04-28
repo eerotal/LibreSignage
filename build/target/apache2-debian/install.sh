@@ -64,37 +64,21 @@ if [ "$FLAG_PRESERVE_DATA" = "1" ]; then
 	rm -rf /tmp/libresignage;
 fi
 
-##
-##  Copy generated LibreSignage config files.
-##
-
+# Copy config files.
 cp server/libresignage/conf/* $VHOST_DIR/config/conf/.
 
-##
-##  Create log directory in /var/log/LibreSignage
-##
+# Set default file permissions.
+echo "[Info] Set default file permissions.";
+chown -R $OWNER:$OWNER "$VHOST_DIR"
+chown -R $OWNER:www-data "$VHOST_DIR/data";
+find "$VHOST_DIR" -type d -print0 | xargs -0 chmod 755
+find "$VHOST_DIR/data" -type d -print0 | xargs -0 chmod 775
+find "$VHOST_DIR" -type f -print0 | xargs -0 chmod 644
+find "$VHOST_DIR/data" -type f -print0 | xargs -0 chmod 664
 
+# Create $LOG_DIR.
 echo "[Info] Create log directory '$LOG_DIR'."
 mkdir -p "$LOG_DIR"
-
-##
-## Set the correct file permissions.
-##
-
-# Default file permissions.
-echo "[Info] Set default file permissions.";
-chown -R $OWNER:$OWNER $VHOST_DIR
-find $VHOST_DIR -type d -exec chmod 755 "{}" ";";
-find $VHOST_DIR -type f -exec chmod 644 "{}" ";";
-
-# Permissions for the 'data' directory.
-echo "[Info] Set file permissions for the 'data' directory.";
-chown -R $OWNER:www-data "$VHOST_DIR/data";
-find "$VHOST_DIR/data" -type d -exec chmod 775 "{}" ";";
-find "$VHOST_DIR/data" -type f -exec chmod 664 "{}" ";";
-
-# Permissions for $LOG_DIR.
-echo "[Info] Set log directury group to www-data."
 chown root:www-data "$LOG_DIR"
 chmod 775 "$LOG_DIR"
 
