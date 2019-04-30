@@ -66,7 +66,7 @@ echo "# Generated on `date` by"
 echo "# the LibreSignage build system."
 
 echo "CONF_TARGET='apache2-debian-docker'"
-echo "CONF_DOCROOT='/var/www/html'"
+echo "CONF_APPROOT='/var/www/html'"
 echo "CONF_ADMIN_NAME='admin'"
 echo "CONF_ADMIN_EMAIL='admin@example.com'"
 
