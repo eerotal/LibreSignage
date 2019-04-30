@@ -77,6 +77,7 @@ COPY server/php/ls-docker.ini /usr/local/etc/php/conf.d/02-ls-docker.ini
 # Configure apache2.
 COPY server/apache2/ls-docker.conf /etc/apache2/conf-available/ls-docker.conf
 
+RUN a2dissite 000-default
 RUN a2enconf --quiet ls-docker.conf
 RUN a2enmod --quiet rewrite
 
