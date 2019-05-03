@@ -45,7 +45,6 @@ class EditorView {
 	constructor(api) {
 		this.api        = api;
 		this.controller = new EditorController(api);
-		this.ready      = false;
 
 		this.buttons    = null;
 		this.inputs     = null;
@@ -56,6 +55,11 @@ class EditorView {
 		this.preview    = null;
 
 		this.error_id   = null;
+
+		this.defer = {
+			ready: false,
+			timeline: false
+		};
 	}
 
 	async init() {
@@ -88,7 +92,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => e.val(val),
@@ -99,7 +103,7 @@ class EditorView {
 				cond: () => false,
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => e.val(val),
@@ -134,7 +138,7 @@ class EditorView {
 				),
 				enabler: (e, s) => s ? e.enable() : e.disable(),
 				attach: null,
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => e.selected,
 				setter: (e, val) => e.set(val),
@@ -149,7 +153,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => parseFloat(e.val(), 10)*1000,
 				setter: (e, val) => e.val(val/1000),
@@ -164,7 +168,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,	
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => parseInt(e.val(), 10),
 				setter: (e, val) => e.val(val),
@@ -179,7 +183,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,	
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => parseInt(e.val(), 10),
 				setter: (e, val) => e.val(val),
@@ -194,7 +198,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: { change: () => this.update() },
-				defer: () => !this.ready,	
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => e.prop('checked'),
 				setter: (e, val) => e.prop('checked', val),
@@ -210,7 +214,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,	
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
@@ -228,7 +232,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,	
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
@@ -246,7 +250,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,	
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
@@ -264,7 +268,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,	
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
@@ -281,7 +285,7 @@ class EditorView {
 				),
 				enabler: (e, s) => this.editor.setReadOnly(!s),
 				attach: { 'keyup': () => this.render_preview() },
-				defer: () => !this.ready,	
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => this.editor.getValue(),
 				setter: (e, val) => {
@@ -303,7 +307,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready,
 				mod: null,
 				getter: e => e.prop('checked'),
 				setter: (e, val) => e.prop('checked', val),
@@ -321,7 +325,7 @@ class EditorView {
 				),
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready,
 				getter: null,
 				setter: null
 			}),
@@ -334,7 +338,7 @@ class EditorView {
 				),
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready,
 				getter: null,
 				setter: null
 			}),
@@ -347,7 +351,7 @@ class EditorView {
 				),
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready,
 				getter: null,
 				setter: null
 			}),
@@ -356,7 +360,7 @@ class EditorView {
 				cond: d => !d.quota.slides,
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready,
 				getter: null,
 				setter: null
 			}),
@@ -365,7 +369,7 @@ class EditorView {
 				cond: () => true,
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready,
 				getter: null,
 				setter: null
 			}),
@@ -377,14 +381,16 @@ class EditorView {
 				enabler: null,
 				attach: {
 					'component.timeline.click': async (e, data) => {
+						this.defer.timeline = true;
 						if (await this.show_slide(data.get('id'))) {
 							data.then();
 						} else {
 							data.except();
 						}
+						this.defer.timeline = false;
 					}
 				},
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready || this.defer.timeline,
 				getter: null,
 				setter: null
 			}),
@@ -421,7 +427,7 @@ class EditorView {
 						data.then();
 					}
 				},
-				defer: () => !this.ready,
+				defer: () => !this.defer.ready,
 				getter: null,
 				setter: null
 			}),
@@ -433,7 +439,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: { click: async () => await this.new_slide() },
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			save: new UIButton({
 				elem: $('#btn-slide-save'),
@@ -456,7 +462,7 @@ class EditorView {
 				attach: {
 					click: async () => await this.save_slide()
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			duplicate: new UIButton({
 				elem: $('#btn-slide-duplicate'),
@@ -470,7 +476,7 @@ class EditorView {
 				attach: {
 					click: async () => await this.duplicate_slide()
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			preview: new UIButton({
 				elem: $('#btn-slide-preview'),
@@ -479,7 +485,7 @@ class EditorView {
 				attach: {
 					click: () => this.preview_slide()
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			move: new UIButton({
 				elem: $('#btn-slide-move'),
@@ -503,7 +509,7 @@ class EditorView {
 						}
 					}
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			remove: new UIButton({
 				elem: $('#btn-slide-remove'),
@@ -520,7 +526,7 @@ class EditorView {
 						await this.remove_slide();
 					}
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			quick_help: new UIButton({
 				elem: $('#btn-quick-help'),
@@ -529,7 +535,7 @@ class EditorView {
 				attach: {
 					click: () => this.quick_help.visible(true)
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			add_media: new UIButton({
 				elem: $('#btn-add-media'),
@@ -546,7 +552,7 @@ class EditorView {
 						);
 					}
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			preview_16x9: new UIButton({
 				elem: $('#btn-preview-ratio-16x9'),
@@ -555,7 +561,7 @@ class EditorView {
 				attach: {
 					click: () => this.set_preview_ratio('16x9')
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			preview_4x3: new UIButton({
 				elem: $('#btn-preview-ratio-4x3'),
@@ -564,7 +570,7 @@ class EditorView {
 				attach: {
 					click: () => this.set_preview_ratio('4x3')
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			})
 		});
 
@@ -578,7 +584,7 @@ class EditorView {
 						elem.trigger('click');
 					}
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			new Shortcut({ // Control + s => Save slide
 				keys: ['Control', 's'],
@@ -588,7 +594,7 @@ class EditorView {
 						elem.trigger('click');
 					}
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			new Shortcut({ // Control + d => Duplicate slide
 				keys: ['Control', 'd'],
@@ -598,7 +604,7 @@ class EditorView {
 						elem.trigger('click');
 					}
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			}),
 			new Shortcut({ // Control + p => Preview slide
 				keys: ['Control', 'p'],
@@ -608,7 +614,7 @@ class EditorView {
 						elem.trigger('click');
 					}
 				},
-				defer: () => !this.ready
+				defer: () => !this.defer.ready
 			})
 		])
 
@@ -681,7 +687,7 @@ class EditorView {
 		});
 
 		this.update();
-		this.ready = true;
+		this.defer.ready = true;
 	}
 
 	async confirm_slide_hide() {
