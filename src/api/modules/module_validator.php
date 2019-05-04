@@ -1,6 +1,6 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/modules/module.php');
 
 // API type flags.
 const API_P_STR          = (1 << 0);

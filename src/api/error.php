@@ -3,8 +3,6 @@
 *  API error definitions.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-
 /*
 *  This controls whether the API exception handler returns
 *  detailed exception information in the JSON error message.

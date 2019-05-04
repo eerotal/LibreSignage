@@ -1,9 +1,8 @@
 <?php
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/session.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/userquota.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/util.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/session.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/userquota.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/exportable/exportable.php');
 
 class User extends Exportable {
 	static $PRIVATE = [

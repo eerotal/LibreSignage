@@ -3,7 +3,6 @@
 * Logging functions for LibreSignage.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
 
 // Define log destinations.
 define('LOGDEF', LOG_DIR."/default.log");

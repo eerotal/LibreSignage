@@ -3,8 +3,7 @@
 *  Video thumbnail generator handler.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/thumbnail/common.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/thumbnail/common.php');
 
 function gen_vid_thumb(
 	string $src,

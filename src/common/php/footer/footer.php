@@ -1,7 +1,3 @@
-<?php
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-?>
-
 <footer class="container-fluid footer d-flex align-items-center">
 	<div class="container-fluid">
 		<span>

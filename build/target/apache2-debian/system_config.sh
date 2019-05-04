@@ -20,7 +20,7 @@ echo "	ServerName $CONF_NAME"
 if [ -n "$CONF_ALIAS" ]; then
 	echo "	ServerAlias $CONF_ALIAS"
 fi
-echo "	DocumentRoot $CONF_INSTALL_DIR/$CONF_NAME"
+echo "	DocumentRoot $CONF_INSTALL_DIR/$CONF_NAME/public"
 echo "	ErrorLog \${APACHE_LOG_DIR}/$CONF_NAME-error.log"
 echo "	CustomLog \${APACHE_LOG_DIR}/$CONF_NAME-access.log combined"
 
@@ -28,7 +28,7 @@ echo '	ErrorDocument 403 /errors/403/index.php'
 echo '	ErrorDocument 404 /errors/404/index.php'
 echo '	ErrorDocument 500 /errors/500/index.php'
 
-echo "	<Directory \"$CONF_INSTALL_DIR/$CONF_NAME\">"
+echo "	<Directory \"$CONF_INSTALL_DIR/$CONF_NAME/public\">"
 
 # Disable directory indexing.
 echo '		Options -Indexes'

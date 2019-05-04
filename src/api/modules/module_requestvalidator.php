@@ -1,7 +1,6 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/defs.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/modules/module.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/modules/module.php');
 
 class APIRequestValidatorModule extends APIModule {
 	/*

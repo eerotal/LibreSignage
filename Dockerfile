@@ -11,7 +11,7 @@
 #                         config is used otherwise.
 #    version = (string) - The version number used in the image labels.
 #    logdir = (path)    - The log directory path for LibreSignage.
-#    docroot = (path)   - The docroot for LibreSignage.
+#    approot = (path)   - The approot for LibreSignage.
 #
 
 FROM php:7.2-apache
@@ -21,7 +21,7 @@ ARG vidthumbs="n"
 ARG debug="n"
 ARG version="v0.0.0"
 ARG logdir=""
-ARG docroot=""
+ARG approot=""
 
 LABEL description="An open source digital signage solution."
 LABEL version="$version"
@@ -32,19 +32,19 @@ LABEL license="BSD 3-clause license"
 USER root
 
 # Sanity check install paths and setup users.
-RUN if [ -z "$docroot" ]; then echo '[Error] Empty docroot path.'; exit 1; fi \
+RUN if [ -z "$approot" ]; then echo '[Error] Empty approot path.'; exit 1; fi \
 	&& if [ -z "$logdir" ]; then echo '[Error] Empty log dir path.'; exit 1; fi \
 	&& useradd -r docker && addgroup docker www-data
 
 # Copy LibreSignage files.
-COPY --chown=docker:docker "dist/" "$docroot"
+COPY --chown=docker:docker "dist/" "$approot"
 
 # Set default file permissions and create the log directory.
-RUN chown -R docker:www-data "$docroot/data" \
-	&& find "$docroot" -type d -print0 | xargs -0 chmod 755 \
-	&& find "$docroot/data" -type d -print0 | xargs -0 chmod 775 \
-	&& find "$docroot" -type f -print0 | xargs -0 chmod 644 \
-	&& find "$docroot/data" -type f -print0 | xargs -0 chmod 664 \
+RUN chown -R docker:www-data "$approot/data" \
+	&& find "$approot" -type d -print0 | xargs -0 chmod 755 \
+	&& find "$approot/data" -type d -print0 | xargs -0 chmod 775 \
+	&& find "$approot" -type f -print0 | xargs -0 chmod 644 \
+	&& find "$approot/data" -type f -print0 | xargs -0 chmod 664 \
 	&& mkdir -p "$logdir" \
 	&& chown root:www-data "$logdir" \
 	&& chmod 775 "$logdir"
@@ -77,6 +77,7 @@ COPY server/php/ls-docker.ini /usr/local/etc/php/conf.d/02-ls-docker.ini
 # Configure apache2.
 COPY server/apache2/ls-docker.conf /etc/apache2/conf-available/ls-docker.conf
 
+RUN a2dissite 000-default
 RUN a2enconf --quiet ls-docker.conf
 RUN a2enmod --quiet rewrite
 

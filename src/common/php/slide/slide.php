@@ -6,14 +6,13 @@
 *  file data and the API endpoints.
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slidelock.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slideasset.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/uid.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/user.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/queue.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slidelock.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slideasset.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/util.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/uid.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/user.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/queue.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/exportable/exportable.php');
 
 function slides_id_list() {
 	$ids = scandir(LIBRESIGNAGE_ROOT.SLIDES_DIR);

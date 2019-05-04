@@ -14,7 +14,7 @@ set -e
 
 args="--build-arg version=$LS_VER"
 args="$args --build-arg logdir=$LOG_DIR"
-args="$args --build-arg docroot=$CONF_DOCROOT"
+args="$args --build-arg approot=$CONF_APPROOT"
 
 if [ "$CONF_DEBUG" = "TRUE" ]; then
 	args="$args --build-arg debug=y"
