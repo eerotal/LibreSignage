@@ -1,4 +1,6 @@
 v1.1.0
+  - [internal] Separate private and public files in the directory tree
+               to naturally prevent access to private files. (PR #56)
 
 v1.0.0
   - [internal] Modularize and improve the build system.
