@@ -156,7 +156,7 @@ class EditorController {
 	async new_slide() {
 		assert(this.queue != null, "No queue loaded.");
 
-		if (this.slide != null) {
+		if (this.slide != null && this.slide.has('id')) {
 			await this.close_slide();
 		}
 
