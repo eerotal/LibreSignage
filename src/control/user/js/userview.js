@@ -1,4 +1,5 @@
 var $ = require('jquery');
+var BaseView = require('ls-baseview').BaseView;
 var UIController = require('ls-uicontrol').UIController;
 var UIInput = require('ls-uicontrol').UIInput;
 var UIButton = require('ls-uicontrol').UIButton;
@@ -8,18 +9,29 @@ var UserController = require('./usercontroller.js').UserController;
 var UserValidators = require('./uservalidators.js').UserValidators;
 var SessionList = require('./components/sessionlist.js').SessionList;
 
-class UserView {
+class UserView extends BaseView {
 	constructor(api) {
-		this.ready = false;
+		super();
+		this.api = api;
 		this.controller = new UserController(api);
 
+		this.init_state({
+			ready: false,
+			loading: false
+		});
+	}
+
+	async init() {
+		/*
+		*  Initialize the view.
+		*/
 		this.inputs = new UIController({
 			username: new UIInput({
 				elem: $('#user-name'),
 				cond: () => false,
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,
+				defer: null,
 				mod: null,
 				getter: elem => elem.val(),
 				setter: (elem, val) => elem.val(val),
@@ -30,7 +42,7 @@ class UserView {
 				cond: () => false,
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,
+				defer: null,
 				mod: null,
 				getter: elem => elem.val().replace(/\s/g, ''.split(',')),
 				setter: (elem, val) => elem.val(val.join(', ')),
@@ -41,7 +53,7 @@ class UserView {
 				cond: () => true,
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,
+				defer: null,
 				mod: null,
 				getter: elem => elem.val(),
 				setter: null,
@@ -52,7 +64,7 @@ class UserView {
 				cond: () => true,
 				enabler: null,
 				attach: null,
-				defer: () => !this.ready,
+				defer: null,
 				mod: null,
 				getter: elem => elem.val(),
 				setter: null,
@@ -66,18 +78,26 @@ class UserView {
 				cond: () => this.validators.get_state(),
 				enabler: null,
 				attach: {
-					click: async () => await this.save_password()
+					click: async () => {
+						this.state('loading', true);
+						await this.save_password();
+						this.state('loading', false);
+					}
 				},
-				defer: () => !this.ready
+				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			logout_other: new UIButton({
 				elem: $('#btn-logout-other'),
 				cond: () => true,
 				enabler: null,
 				attach: {
-					click: async () => await this.logout_other_sessions()
+					click: async () => {
+						this.state('loading', true);
+						await this.logout_other_sessions();
+						this.state('loading', false);
+					}
 				},
-				defer: () => !this.ready
+				defer: () => !this.state('ready') || this.state('loading')
 			})
 		});
 
@@ -85,17 +105,12 @@ class UserView {
 		this.validators.create_trigger(() => this.update());
 
 		this.sessionlist = new SessionList(
-			api,
+			this.api,
 			$('#user-sessions')[0]
 		);
-	}
 
-	async init() {
-		/*
-		*  Initialize the view.
-		*/
 		await this.populate();
-		this.ready = true;
+		this.state('ready', true);
 	}
 
 	async populate() {
