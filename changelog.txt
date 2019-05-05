@@ -47,6 +47,8 @@ v1.0.0
   - [bugfix]   Fix 'Upload' button placement in the slide media uploader popup.
   - [bugfix]   Fix various bugs where doubleclicking controls caused JS errors
                in the web interface.
+  - [bugfix]   Properly disable the 'Save' button after clearing password inputs
+               in the user settings page.
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
