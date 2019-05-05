@@ -58,6 +58,11 @@ class EditorView extends BaseView {
 		this.preview    = null;
 
 		this.error_id   = null;
+
+		this.init_state({
+			ready: false,
+			loading: false
+		});
 	}
 
 	async init() {
