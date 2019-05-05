@@ -43,16 +43,19 @@ v1.0.0
                (issue #41)
   - [feature]  Check build dependency versions when building.
   - [feature]  Implement a startup splash screen for the display page.
-  - [feature]  Implement automatic deployment of nightly builds to Docker Hub
-               from Travis CI.
+  - [feature]  Implement automatic deployment of nightly builds to Docker
+               Hub from Travis CI.
   - [internal] Speed up build scripts by changing how 'find' is used.
   - [bugfix]   Fix a bug where cloning a slide with no thumbnail resulted
                in an error. (issue #33)
-  - [bugfix]   Fix 'Upload' button placement in the slide media uploader popup.
-  - [bugfix]   Fix various bugs where doubleclicking controls caused JS errors
-               in the web interface.
-  - [bugfix]   Properly disable the 'Save' button after clearing password inputs
-               in the user settings page.
+  - [bugfix]   Fix 'Upload' button placement in the slide media uploader
+               popup.
+  - [bugfix]   Fix various bugs where doubleclicking controls caused JS
+               errors in the web interface.
+  - [bugfix]   Properly disable the 'Save' button after clearing password
+               inputs in the user settings page.
+  - [bugfix]   Fix a bug where certain filetypes couldn't be uploaded in
+               the slide media uploader.
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
