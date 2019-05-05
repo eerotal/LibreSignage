@@ -1,5 +1,6 @@
 var $ = require('jquery');
 var bootstrap = require('bootstrap');
+var BaseView = require('ls-baseview').BaseView;
 var UIController = require('ls-uicontrol').UIController;
 var UIInput = require('ls-uicontrol').UIInput;
 var UIButton = require('ls-uicontrol').UIButton;
@@ -41,8 +42,10 @@ var QueueSelector = require(
 	'./components/queueselector/queueselector.js'
 ).QueueSelector;
 
-class EditorView {
+class EditorView extends BaseView {
 	constructor(api) {
+		super();
+
 		this.api        = api;
 		this.controller = new EditorController(api);
 
@@ -55,11 +58,6 @@ class EditorView {
 		this.preview    = null;
 
 		this.error_id   = null;
-
-		this.defer = {
-			ready: false,
-			timeline: false
-		};
 	}
 
 	async init() {
@@ -92,7 +90,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => e.val(val),
@@ -103,7 +101,7 @@ class EditorView {
 				cond: () => false,
 				enabler: null,
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => e.val(val),
@@ -138,7 +136,7 @@ class EditorView {
 				),
 				enabler: (e, s) => s ? e.enable() : e.disable(),
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				mod: null,
 				getter: e => e.selected,
 				setter: (e, val) => e.set(val),
@@ -153,7 +151,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				mod: null,
 				getter: e => parseFloat(e.val(), 10)*1000,
 				setter: (e, val) => e.val(val/1000),
@@ -168,7 +166,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				mod: null,
 				getter: e => parseInt(e.val(), 10),
 				setter: (e, val) => e.val(val),
@@ -183,7 +181,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				mod: null,
 				getter: e => parseInt(e.val(), 10),
 				setter: (e, val) => e.val(val),
@@ -198,7 +196,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: { change: () => this.update() },
-				defer: () => !this.defer.ready,
+				defer: () => !this.state('ready'),
 				mod: null,
 				getter: e => e.prop('checked'),
 				setter: (e, val) => e.prop('checked', val),
@@ -214,7 +212,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
@@ -232,7 +230,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
@@ -250,7 +248,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
@@ -268,7 +266,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
@@ -285,7 +283,7 @@ class EditorView {
 				),
 				enabler: (e, s) => this.editor.setReadOnly(!s),
 				attach: { 'keyup': () => this.render_preview() },
-				defer: () => !this.defer.ready,
+				defer: () => !this.state('ready'),
 				mod: null,
 				getter: e => this.editor.getValue(),
 				setter: (e, val) => {
@@ -307,7 +305,7 @@ class EditorView {
 				),
 				enabler: null,
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				mod: null,
 				getter: e => e.prop('checked'),
 				setter: (e, val) => e.prop('checked', val),
@@ -325,7 +323,7 @@ class EditorView {
 				),
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				getter: null,
 				setter: null
 			}),
@@ -338,7 +336,7 @@ class EditorView {
 				),
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				getter: null,
 				setter: null
 			}),
@@ -351,7 +349,7 @@ class EditorView {
 				),
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				getter: null,
 				setter: null
 			}),
@@ -360,7 +358,7 @@ class EditorView {
 				cond: d => !d.quota.slides,
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				getter: null,
 				setter: null
 			}),
@@ -369,7 +367,7 @@ class EditorView {
 				cond: () => true,
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
-				defer: () => !this.defer.ready,
+				defer: null,
 				getter: null,
 				setter: null
 			}),
@@ -381,16 +379,16 @@ class EditorView {
 				enabler: null,
 				attach: {
 					'component.timeline.click': async (e, data) => {
-						this.defer.timeline = true;
+						this.state('loading', true);
 						if (await this.show_slide(data.get('id'))) {
 							data.then();
 						} else {
 							data.except();
 						}
-						this.defer.timeline = false;
+						this.state('loading', false);
 					}
 				},
-				defer: () => !this.defer.ready || this.defer.timeline,
+				defer: () => !this.state('ready') || this.state('loading'),
 				getter: null,
 				setter: null
 			}),
@@ -400,34 +398,42 @@ class EditorView {
 				enabler: null,
 				attach: {
 					'component.queueselector.select': async (e, data) => {
+						this.state('loading', true);
 						if (await this.show_queue(data.get('queue'))) {
 							data.then();
 						} else {
 							data.except();
 						}
+						this.state('loading', false);
 					},
 					'component.queueselector.create': async (e, data) => {
+						this.state('loading', true);
 						if (await this.create_queue(data.get('queue'))) {
 							data.then();
 						} else {
 							data.except();
 						}
+						this.state('loading', false);
 					},
 					'component.queueselector.view': (e, data) => {
 						this.view_queue();
 					},
 					'component.queueselector.remove': async (e, data) => {
+						this.state('loading', true);
 						if (await this.remove_queue()) {
 							data.then();
 						} else {
 							data.except();
 						}
+						this.state('loading', false);
 					},
 					'component.queueselector.deselect': (e, data) => {
+						this.state('loading', true);
 						data.then();
+						this.state('loading', false);
 					}
 				},
-				defer: () => !this.defer.ready,
+				defer: () => !this.state('ready') || this.state('loading'),
 				getter: null,
 				setter: null
 			}),
@@ -438,8 +444,14 @@ class EditorView {
 					&& d.queue.loaded
 				),
 				enabler: null,
-				attach: { click: async () => await this.new_slide() },
-				defer: () => !this.defer.ready
+				attach: {
+					click: async () => {
+						this.state('loading', true);
+						await this.new_slide();
+						this.state('loading', false);
+					}
+				},
+				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			save: new UIButton({
 				elem: $('#btn-slide-save'),
@@ -460,9 +472,13 @@ class EditorView {
 				),
 				enabler: null,
 				attach: {
-					click: async () => await this.save_slide()
+					click: async () => {
+						this.state('loading', true);
+						await this.save_slide();
+						this.state('loading', false);
+					}
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			duplicate: new UIButton({
 				elem: $('#btn-slide-duplicate'),
@@ -474,9 +490,13 @@ class EditorView {
 				),
 				enabler: null,
 				attach: {
-					click: async () => await this.duplicate_slide()
+					click: async () => {
+						this.state('loading', true);
+						await this.duplicate_slide();
+						this.state('loading', false);
+					}
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			preview: new UIButton({
 				elem: $('#btn-slide-preview'),
@@ -485,7 +505,7 @@ class EditorView {
 				attach: {
 					click: () => this.preview_slide()
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready')
 			}),
 			move: new UIButton({
 				elem: $('#btn-slide-move'),
@@ -499,17 +519,21 @@ class EditorView {
 				},
 				attach: {
 					'component.dropselect.show': async () => {
+						this.state('loading', true);
 						await this.update_move_slide_options();
+						this.state('loading', false);
 					},
 					'component.dropselect.select': async (e, data) => {
+						this.state('loading', true);
 						if (await this.move_slide(data.get('option'))) {
 							data.then();
 					 	} else {
 							data.except();
 						}
+						this.state('loading', false);
 					}
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			remove: new UIButton({
 				elem: $('#btn-slide-remove'),
@@ -523,10 +547,12 @@ class EditorView {
 				},
 				attach: {
 					'component.dropconfirm.confirm': async () => {
+						this.state('loading', true);
 						await this.remove_slide();
+						this.state('loading', false);
 					}
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			quick_help: new UIButton({
 				elem: $('#btn-quick-help'),
@@ -535,7 +561,7 @@ class EditorView {
 				attach: {
 					click: () => this.quick_help.visible(true)
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready')
 			}),
 			add_media: new UIButton({
 				elem: $('#btn-add-media'),
@@ -552,7 +578,7 @@ class EditorView {
 						);
 					}
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready')
 			}),
 			preview_16x9: new UIButton({
 				elem: $('#btn-preview-ratio-16x9'),
@@ -561,7 +587,7 @@ class EditorView {
 				attach: {
 					click: () => this.set_preview_ratio('16x9')
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready')
 			}),
 			preview_4x3: new UIButton({
 				elem: $('#btn-preview-ratio-4x3'),
@@ -570,7 +596,7 @@ class EditorView {
 				attach: {
 					click: () => this.set_preview_ratio('4x3')
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready')
 			})
 		});
 
@@ -584,7 +610,7 @@ class EditorView {
 						elem.trigger('click');
 					}
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready')
 			}),
 			new Shortcut({ // Control + s => Save slide
 				keys: ['Control', 's'],
@@ -594,7 +620,7 @@ class EditorView {
 						elem.trigger('click');
 					}
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready')
 			}),
 			new Shortcut({ // Control + d => Duplicate slide
 				keys: ['Control', 'd'],
@@ -604,7 +630,7 @@ class EditorView {
 						elem.trigger('click');
 					}
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready')
 			}),
 			new Shortcut({ // Control + p => Preview slide
 				keys: ['Control', 'p'],
@@ -614,7 +640,7 @@ class EditorView {
 						elem.trigger('click');
 					}
 				},
-				defer: () => !this.defer.ready
+				defer: () => !this.state('ready')
 			})
 		])
 
@@ -687,7 +713,7 @@ class EditorView {
 		});
 
 		this.update();
-		this.defer.ready = true;
+		this.state('ready', true);
 	}
 
 	async confirm_slide_hide() {
@@ -1020,6 +1046,7 @@ class EditorView {
 			return false;
 		}
 		if (!(await this.hide_slide())) { return false; }
+
 		return true;
 	}
 
