@@ -149,6 +149,9 @@ class UserView extends BaseView {
 
 		this.inputs.get('password').clear();
 		this.inputs.get('password_confirm').clear();
+
+		// Trigger ValidatorTrigger.
+		this.inputs.get('password').get_elem().trigger('input');
 	}
 
 	async logout_other_sessions() {
