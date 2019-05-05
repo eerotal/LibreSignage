@@ -49,6 +49,8 @@ v1.0.0
   - [bugfix]   Fix a bug where cloning a slide with no thumbnail resulted
                in an error. (issue #33)
   - [bugfix]   Fix 'Upload' button placement in the slide media uploader popup.
+  - [bugfix]   Fix various bugs where doubleclicking controls caused JS errors
+               in the web interface.
 
 v0.2.1
   - [bugfix]   Fix a bug where the timeline didn't update after the
