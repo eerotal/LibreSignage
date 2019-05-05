@@ -1046,6 +1046,7 @@ class EditorView extends BaseView {
 			return false;
 		}
 		if (!(await this.hide_slide())) { return false; }
+		this.update();
 
 		return true;
 	}
