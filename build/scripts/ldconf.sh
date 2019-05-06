@@ -10,16 +10,12 @@
 set -e
 
 if [ -n "$1" ]; then
-	echo "[Info] Load config from '$1'."
 	. "$1"
 else
 	if [ -f "build/link/last.conf" ]; then
-		echo "[Info] Load config from"\
-			"'`readlink -f "build/link/last.conf"`'"
 		. "build/link/last.conf"
 	else
-		echo "[Error] Build config doesn't exist." \
-			"Did you run 'make configure'?"
+		echo "[Error] Build config doesn't exist. Did you run 'make configure'?"
 		exit 1
 	fi
 fi
