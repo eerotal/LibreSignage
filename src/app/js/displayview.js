@@ -5,16 +5,31 @@ var markup = require('ls-markup');
 var MarkupSyntaxError = require('ls-markup').err.MarkupSyntaxError;
 var dialog = require('ls-dialog');
 var APIUI = require('ls-api-ui');
+var UIController = require('ls-uicontrol').UIController;
+var UIButton = require('ls-uicontrol').UIButton;
+var UIStatic = require('ls-uicontrol').UIStatic;
+var BaseView = require('ls-baseview').BaseView;
 
 const DISPLAY_UPDATE_INTERVAL = 5000;
 const BUFFER_UPDATE_PERIOD = 50;
+const CONTROLS_VISIBLE_PERIOD = 3000;
 
-class DisplayView {
+class DisplayView extends BaseView {
 	constructor(api) {
+		super();
+
 		this.controller = new DisplayController(api);
 		this.query_params = util.get_GET_parameters();
 		this.slide_buffer = [];
 		this.markup_buffer = [];
+
+		this.statics = null;
+		this.buttons = null;
+
+		this.controls_interval_id = null;
+		this.ui_state = {
+			controls: false
+		};
 
 		// Disable logging if silent=1 was passed in the URL.
 		if ('silent' in this.query_params) {
@@ -35,6 +50,56 @@ class DisplayView {
 		/*
 		*  Initialize the DisplayView.
 		*/
+		this.statics = new UIController({
+			body: new UIStatic({
+				elem: $('body'),
+				cond: () => true,
+				enabler: null,
+				attach: {
+					mousemove: () => this.show_controls(),
+					touchmove: () => this.show_controls(),
+					click: () => this.show_controls()
+				},
+				defer: () => !this.state('ready'),
+				getter: null,
+				setter: null
+			})
+		});
+		this.buttons = new UIController({
+			back: new UIButton({
+				elem: $('#controls .left'),
+				cond: d => d.controls,
+				enabler: (elem, s) => {
+					if (s) {
+						// The controls are initially hidden; show them.
+						elem.css('visibility', 'visible');
+
+						elem.removeClass('controls-hidden');
+					} else {
+						elem.addClass('controls-hidden');
+					}
+				},
+				attach: { click: e => this.skip_backward() },
+				defer: () => !this.state('ready')
+			}),
+			forward: new UIButton({
+				elem: $('#controls .right'),
+				cond: d => d.controls,
+				enabler: (elem, s) => {
+					if (s) {
+						// The controls are initially hidden; show them.
+						elem.css('visibility', 'visible');
+
+						elem.removeClass('controls-hidden');
+					} else {
+						elem.addClass('controls-hidden');
+					}
+				},
+				attach: { click: e => this.skip_forward() },
+				defer: () => !this.state('ready')
+			})
+		});
+
 		if ('preview' in this.query_params) {
 			await this.preview_slide(this.query_params['preview']);
 		} else if ('q' in this.query_params){
@@ -42,6 +107,8 @@ class DisplayView {
 		} else {
 			await this.prompt_select_queue();
 		}
+
+		this.state('ready', true);
 	}
 
 	async show_splash() {
@@ -57,6 +124,29 @@ class DisplayView {
 		});
 		splash.addClass('splash-fade');
 		return ret;
+	}
+
+	show_controls() {
+		if (this.controls_interval_id != null) {
+			clearInterval(this.controls_interval_id);
+		}
+
+		this.ui_state.controls = true;
+		this.update();
+
+		this.controls_interval_id = setInterval(() => {
+			this.controls_interval_id = null;
+			this.ui_state.controls = false;
+			this.update();
+		}, CONTROLS_VISIBLE_PERIOD);
+	}
+
+	skip_forward() {
+		console.log('Skip forward.');
+	}
+
+	skip_backward() {
+		console.log('Skip backward.');
 	}
 
 	async start_render_loop(queue_name) {
@@ -235,6 +325,17 @@ class DisplayView {
 				window.location.replace(`/app/?q=${val}`);
 			},
 			tmp
+		);
+	}
+
+	update() {
+		this.statics.all(
+			function(d) { this.state(d); },
+			this.ui_state
+		);
+		this.buttons.all(
+			function(d) { this.state(d); },
+			this.ui_state
 		);
 	}
 }
