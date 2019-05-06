@@ -126,8 +126,14 @@ RAM
   Depends on the specific use case.
 
 Tested operating systems
-  * Debian 9 (Stretch)
-  * Ubuntu 18.04 LTS (Bionic Beaver)
+  * Debian
+
+    * 9 (Stretch)
+    * 10 (Buster)
+
+  * Ubuntu
+
+    * 18.04 LTS (Bionic Beaver)
 
 *Required* runtime dependencies
   * PHP (Version 7.x.)
