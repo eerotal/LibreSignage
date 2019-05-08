@@ -9,6 +9,7 @@ var UIController = require('ls-uicontrol').UIController;
 var UIButton = require('ls-uicontrol').UIButton;
 var UIStatic = require('ls-uicontrol').UIStatic;
 var BaseView = require('ls-baseview').BaseView;
+var Timeout = require('ls-timeout').Timeout;
 
 const DISPLAY_UPDATE_INTERVAL = 5000;
 const BUFFER_UPDATE_PERIOD = 50;
@@ -30,6 +31,7 @@ class DisplayView extends BaseView {
 		this.ui_state = {
 			controls: false
 		};
+		this.render_timeouts = [];
 
 		// Disable logging if silent=1 was passed in the URL.
 		if ('silent' in this.query_params) {
@@ -141,14 +143,6 @@ class DisplayView extends BaseView {
 		}, CONTROLS_VISIBLE_PERIOD);
 	}
 
-	skip_forward() {
-		console.log('Skip forward.');
-	}
-
-	skip_backward() {
-		console.log('Skip backward.');
-	}
-
 	async start_render_loop(queue_name) {
 		/*
 		*  Display the LibreSignage splash and start the
@@ -162,6 +156,36 @@ class DisplayView extends BaseView {
 			return;
 		}
 		this.render();
+	}
+
+	skip_forward() {
+		/*
+		*  Skip forwards in the queue.
+		*/
+		if (
+			this.render_timeouts[0] == null
+			&& this.render_timeouts[1] == null
+		) { return; }
+
+		this.render_timeouts[0].exec();
+		this.render_timeouts[1].exec();
+	}
+
+	skip_backward() {
+		/*
+		*  Skip backwards in the queue.
+		*/
+		if (
+			this.render_timeouts[0] == null
+			&& this.render_timeouts[1] == null
+		) { return; }
+
+		this.controller.buffer_next_slide(-1);
+		if (this.render_timeouts[0].has_execd()) {
+			this.controller.buffer_next_slide(-1);
+		}
+		this.render_timeouts[0].cancel();
+		this.render_timeouts[1].exec();
 	}
 
 	animate(elem, animation, end_hook) {
@@ -182,47 +206,28 @@ class DisplayView extends BaseView {
 	}
 
 	render() {
-		/*
-		*  Render the next slide in the loaded slide queue. Slide
-		*  data and markup loads are buffered to improve performance.
-		*/
-		let anim_hide = null;
-		if (this.slide_buffer[0] != null) {
-			anim_hide = this.slide_buffer[0].anim_hide();
+		if (!this.controller.init_slide_buffer()) {
+			setTimeout(() => this.render(), DISPLAY_UPDATE_INTERVAL);
+			return;
 		}
 
-		if (this.slide_buffer[1] == null) {
-			this.update_buffers();
-			if (this.slide_buffer[1] == null) {
-				setTimeout(
-					() => this.render(),
-					DISPLAY_UPDATE_INTERVAL
-				);
-				return;
-			}
-		}
+		let cur = this.controller.get_current_slide();
+		let buf = this.controller.get_buffered_slide();
 
-		this.animate($('#display'), anim_hide, () => {
-			$('#display').html(this.markup_buffer);
+		this.animate($('#display'), cur ? cur.anim_hide() : null, () => {
+			$('#display').html(buf.get_html_buffer());
 			this.animate(
 				$('#display'),
-				this.slide_buffer[1].anim_show(),
+				buf.anim_show(),
 				() => {
-					setTimeout(
-						() => this.render(),
-						this.slide_buffer[1].get('duration')
+					this.render_timeouts[0] = new Timeout(
+						() => this.controller.buffer_next_slide(),
+						BUFFER_UPDATE_PERIOD
 					);
 
-					/*
-					*  Delay the buffer update for BUFFER_UPDATE_PERIOD
-					*  milliseconds. This is done to prevent
-					*  animation lag because the animationend event
-					*  seems to be fired when the last frame(s?) of
-					*  the animation are still running.
-					*/
-					setTimeout(
-						() => this.update_buffers(),
-						BUFFER_UPDATE_PERIOD
+					this.render_timeouts[1] = new Timeout(
+						() => this.render(),
+						buf.get('duration')
 					);
 				}
 			);

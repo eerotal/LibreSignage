@@ -11,10 +11,7 @@ class DisplayController {
 		this.queue = null;
 
 		this.current_slide = null;
-		this.current_content = null;
-
 		this.buffered_slide = null;
-		this.buffered_content = null;
 	}
 
 	async init_queue_update_loop(queue_name) {
@@ -36,20 +33,13 @@ class DisplayController {
 		}, QUEUE_UPDATE_INTERVAL);
 	}
 
-	init_slide_buffers() {
-		/*
-		*  Try to fill the slide buffers with data. Returns
-		*  true if there is enough data available and false
-		*  otherwise.
-		*/
-		if (this.get_current_slide() != null) { return true; }
-		for (let i = 0; i < 2 && this.get_current_slide() == null; i++) {
-			this.buffer_next_slide();
-		}
-		return this.get_current_slide() != null;
+	init_slide_buffer() {
+		if (this.get_buffered_slide() != null) { return true; }
+		this.buffer_next_slide();
+		return this.get_buffered_slide() != null;
 	}
 
-	buffer_next_slide() {
+	buffer_next_slide(dir = 1) {
 		/*
 		*  Load the next slide in the loaded queue to the
 		*  slide buffer.
@@ -60,20 +50,19 @@ class DisplayController {
 		this.current_slide = this.buffered_slide;
 		this.buffered_slide = this.queue.get_slides().filter(
 			{'enabled': true}
-		).next(last != null ? last.get('index') : -1, true);
+		).next(last ? last.get('index') : -1, true, dir);
 
-		// Buffer transpiled content.
-		this.current_content = this.buffered_content;
-		this.buffered_content = markup.parse(
-			util.sanitize_html(this.buffered_slide.get('markup'))
-		);
+		if (this.current_slide != null) {
+			this.current_slide.transpile_html_buffer();
+		}
+		if (this.buffered_slide != null) {
+			this.buffered_slide.transpile_html_buffer();
+		}
 	}
 
 	get_loaded_queue() { return this.queue; }
 	get_current_slide() { return this.current_slide; }
-	get_current_content() { return this.current_content; }
 	get_buffered_slide() { return this.buffered_slide; }
-	get_buffered_content() { return this.buffered_content; }
 
 	async get_queues_sorted() {
 		/*
