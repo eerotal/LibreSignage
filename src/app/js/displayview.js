@@ -27,7 +27,6 @@ class DisplayView extends BaseView {
 		this.buttons = null;
 
 		this.controls_interval_id = null;
-
 		this.ui_state = {
 			controls: false
 		};
@@ -187,27 +186,46 @@ class DisplayView extends BaseView {
 		*  Render the next slide in the loaded slide queue. Slide
 		*  data and markup loads are buffered to improve performance.
 		*/
-		let slide = null;
-
-		// Wait for slides to appear in empty queues.
-		if (!this.controller.init_slide_buffers()) {
-			setTimeout(() => this.render(), DISPLAY_UPDATE_INTERVAL);
-			return;
+		let anim_hide = null;
+		if (this.slide_buffer[0] != null) {
+			anim_hide = this.slide_buffer[0].anim_hide();
 		}
 
-		slide = this.controller.get_current_slide();
-		$('#display').html(this.controller.get_current_content());
+		if (this.slide_buffer[1] == null) {
+			this.update_buffers();
+			if (this.slide_buffer[1] == null) {
+				setTimeout(
+					() => this.render(),
+					DISPLAY_UPDATE_INTERVAL
+				);
+				return;
+			}
+		}
 
-		this.animate($('#display'), slide.anim_show(), () => {
-			setTimeout(() => {
-				setTimeout(() => {
-					this.animate($('#display'), slide.anim_hide(), () => {
-						this.render();
-					});
-				}, slide.get('duration') - BUFFER_UPDATE_PERIOD);
+		this.animate($('#display'), anim_hide, () => {
+			$('#display').html(this.markup_buffer);
+			this.animate(
+				$('#display'),
+				this.slide_buffer[1].anim_show(),
+				() => {
+					setTimeout(
+						() => this.render(),
+						this.slide_buffer[1].get('duration')
+					);
 
-				this.controller.buffer_next_slide();
-			}, BUFFER_UPDATE_PERIOD);
+					/*
+					*  Delay the buffer update for BUFFER_UPDATE_PERIOD
+					*  milliseconds. This is done to prevent
+					*  animation lag because the animationend event
+					*  seems to be fired when the last frame(s?) of
+					*  the animation are still running.
+					*/
+					setTimeout(
+						() => this.update_buffers(),
+						BUFFER_UPDATE_PERIOD
+					);
+				}
+			);
 		});
 	}
 
