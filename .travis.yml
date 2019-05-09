@@ -21,6 +21,12 @@ sudo: required
 git:
     depth: false
 
+branches:
+    only:
+        - master
+        - next
+        - /v[0-9]+.x.x/
+
 matrix:
     include:
         env:
@@ -40,6 +46,7 @@ deploy:
           tags: true
           all_branches: true
           condition: $target = 'apache2-debian-docker'
+          condition: -n $TRAVIS_TAG
 
 install:
     # Install dependencies
