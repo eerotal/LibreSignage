@@ -11,10 +11,11 @@
 *~
 
 # Build
+/server
 /dist
 /dep
 /build/link
-*.iconf
+/build/*.conf
 
 # Exclude generated Python files.
 __pycache__

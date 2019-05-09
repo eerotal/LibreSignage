@@ -1,21 +1,21 @@
 #!/bin/sh
 
-# Configuration values for the LibreSignage build system.
+##
+##  Configuration constants for the LibreSignage build system.
+##
 
-# Source and distribution paths for the build system.
+# Path constants.
 SRC_DIR='src';
 DIST_DIR='dist';
-APACHE_SITES='/etc/apache2/sites-available';
-APACHE_CONFIGS='/etc/apache2/conf-available';
-ICONF_FILE_EXT='.iconf';
-RST_DIR="$DIST_DIR/doc/rst";
-HTML_DIR="$DIST_DIR/doc/html";
-CLIENT_DIR="$DIST_DIR/client";
-API_DOC="$RST_DIR/api.rst";
-API_ENDPOINTS_DIR="$DIST_DIR/api/endpoint";
-LS_README="README.rst";
+CONF_DIR='server';
+LOG_DIR='/var/log/libresignage'
 
-# LibreSignage version information. Used by prep.sh.
+# Block access to these directories in the server config. This is a
+# vertical bar separated list of directory paths. Note that this
+# string is directly used in a regex expression, ie. ...($BLOCK_DIRS)...
+BLOCKED_PATHS='data|common|config';
+
+# LibreSignage version information.
 LS_VER=`git describe --always --tags --dirty`;
 API_VER=2;
 

@@ -27,14 +27,10 @@ $SLIDE_RM = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($SLIDE_RM);
 
 $slide = new Slide();
 $slide->load($SLIDE_RM->get('id'));
-
-// Get the slide owner's quota for freeing some of it.
 $owner = new User($slide->get_owner());
-$owner_quota = new UserQuota($owner);
 
 // Allow admins to remove all slides.
 $ALLOW = FALSE;
@@ -60,7 +56,7 @@ $queue = new Queue($slide->get_queue_name());
 $queue->load();
 $queue->normalize();
 
-$owner_quota->free_quota('slides');
-$owner_quota->flush();
+$owner->get_quota()->free_quota('slides');
+$owner->write();
 
 $SLIDE_RM->send();

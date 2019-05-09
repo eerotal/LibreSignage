@@ -39,7 +39,6 @@ $SLIDE_LOCK_ACQUIRE = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($SLIDE_LOCK_ACQUIRE);
 
 $slide = new Slide();
 $slide->load($SLIDE_LOCK_ACQUIRE->get('id'));
@@ -70,7 +69,7 @@ try {
 $slide->write();
 
 $SLIDE_LOCK_ACQUIRE->resp_set([
-	'expire' => $slide->get_lock()->get_expire(),
+	'lock' => $slide->get_lock()->export(FALSE, FALSE),
 	'error' => API_E_OK
 ]);
 $SLIDE_LOCK_ACQUIRE->send();

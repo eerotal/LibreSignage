@@ -5,9 +5,11 @@ LibreSignage Documentation
 General
 -------
 
-`About LibreSignage </doc?doc=about>`_
-
 `Readme </doc?doc=README>`_
+
+`Contributing </doc?doc=CONTRIBUTING>`_
+
+`Authors </doc?doc=AUTHORS>`_
 
 Web Interface
 -------------
@@ -30,6 +32,13 @@ Miscellaneous
 `Markup </doc?doc=markup>`_
 
 `Display Setup </doc?doc=display_setup>`_
+
+Server setup
+------------
+
+`Configuration </doc?doc=configuration>`_
+
+`Docker </doc?doc=docker>`_
 
 Development
 -----------

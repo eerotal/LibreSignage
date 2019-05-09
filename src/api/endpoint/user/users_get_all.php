@@ -28,7 +28,6 @@ $USERS_GET_ALL = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($USERS_GET_ALL);
 
 if (!$USERS_GET_ALL->get_caller()->is_in_group('admin')) {
 	throw new APIException(

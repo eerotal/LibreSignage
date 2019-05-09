@@ -21,7 +21,6 @@ $AUTH_LOGOUT = new APIEndpoint([
 	APIEndpoint::REQ_QUOTA      => FALSE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ]);
-api_endpoint_init($AUTH_LOGOUT);
 
 $AUTH_LOGOUT->get_caller()->session_rm(
 	$AUTH_LOGOUT->get_session()->get_id()

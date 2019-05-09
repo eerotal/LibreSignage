@@ -3,81 +3,71 @@
 @import 'nav';
 @import 'dialog';
 @import 'multiselect';
+@import 'ls-dropconfirm/css/dropconfirm.scss';
 
-$table-line-height: 50px;
-$data-label-mw: 90px;
+$usermgr-minw: 250px;
 
-#user-manager-heading {
-	margin: {
-		top: 30px;
-		bottom: 30px;
-	}
-}
+$user-inputs-w: 50%;
+$user-inputs-minw: 200px;
+$user-inputs-maxw: 400px;
 
-.usr-table-row {
-	margin: 0;
-	padding: 0;
-	color: $black;
-	background-color: $gray-bg;
-	border-bottom: 1px solid $gray-1;
-}
-
-.usr-table-col {
-	padding: 0;
-	height: $table-line-height;
-	line-height: $table-line-height;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-
-.usr-data-label {
-	min-width: $data-label-mw;
+#users-table {
+	min-width: $usermgr-minw;
 	padding: {
-		left: $s2;
-		right: $s2;
+		left: $s4;
+		right: $s4;
 	}
-	text-align: right;
-}
-
-.usr-edit-row-container {
-	width: 75%;
-	@include media-breakpoint-down(md) { width: 85%; }
-
 	margin: {
-		left: auto;
-		right: auto;
+		top: $s3;
+		bottom: $s3;
+	}
+
+	.card-body {
+		.input-container {
+			width: $user-inputs-w;
+			min-width: $user-inputs-minw;
+			max-width: $user-inputs-maxw;
+			margin: auto;
+
+			border-collapse: separate;
+			border-spacing: $s1 $s1;
+
+			label {
+				margin: 0;
+			}
+
+			td:first-of-type {
+				text-align: right;
+			}
+		}
+
+		.btn-container {
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-end;
+
+			width: $user-inputs-w;
+			min-width: $user-inputs-minw;
+			max-width: $user-inputs-maxw;
+			margin: auto;
+
+			.btn-user-save, .btn-user-remove {
+				margin: {
+					left: $s1;
+					right: $s1;
+				}
+
+				.dropconfirm-open {
+					@extend .btn-danger;
+				}
+			}
+		}
 	}
 }
 
-
-.usr-edit-input-row {
-	padding: {
-		top: 8px;
-		bottom: 8px;
-	}
-}
-
-.usr-edit-btn {
+#user-controls {
 	margin: {
-		left: 2px;
-		right: 2px;
+		bottom: $s3;
 	}
-}
-
-/*
-*  Hide certain user info when the screen is
-*  too small to fit all of it. The info is
-*  shown in the extended column anyway.
-*/
-@include media-breakpoint-down(md) {
-	div[id^="usr-comment-col-"], #heading-usr-comment {
-		display: none;	
-	}
-}
-
-@include media-breakpoint-down(sm) {
-	div[id^="usr-groups-col-"], #heading-usr-groups {
-		display: none;	
-	}
+	text-align: center;
 }

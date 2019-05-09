@@ -1,3 +1,52 @@
+v1.0.0
+  - [internal] Modularize and improve the build system.
+  - [feature]  Implement an improved configuration file loader that
+               supports loading configuration from multiple files.
+  - [feature]  Implement functionality for building LibreSignage
+               Docker images.
+  - [bugfix]   Fix a bug that prevented removing slide assets that didn't
+               have a thumbnail.
+  - [internal] Improve display animation performance by optimizing
+               CSS and JavaScript. Browsers are now also hinted to use
+               GPU acceleration for rendering the display.
+  - [bugfix]   Fix a missing class definition that caused problems when
+               uploading files.
+  - [bugfix]   Fix a bug where the editor media uploader popup didn't
+               close when the (X) button was clicked if an uploade had
+               previously failed.
+  - [feature]  Allow space characters in upload filenames.
+  - [bugfix]   Implement automatic slide lock cleanup on logout.
+  - [feature]  Rewrite the web interface to use a Model, View, Controller
+               architecture. Various JavaScript components used in the
+               interface were also rewritten in the process.
+  - [feature]  Create a LibreSignage logo and use it throughout the
+               web interface.
+  - [bugfix]   Fix a bug where creating more slides than what's allowed
+               by the slide quota caused invalid slides to be left in
+               slide queues. (issue #34)
+  - [feature]  Add a muted parameter to the [video] markup tag.
+  - [internal] Implement EventData to pass data and hook functions to
+               event handlers.
+  - [bugfix]   Properly copy assets when duplicating slides (issue #33).
+  - [internal] Remove non-working API unit tests.
+  - [feature]  Redirect users to the originally requested URL after login.
+               (issue #41)
+  - [feature]  Check build dependency versions when building.
+  - [feature]  Implement a startup splash screen for the display page.
+  - [feature]  Implement automatic deployment of nightly builds to Docker
+               Hub from Travis CI.
+  - [internal] Speed up build scripts by changing how 'find' is used.
+  - [bugfix]   Fix a bug where cloning a slide with no thumbnail resulted
+               in an error. (issue #33)
+  - [bugfix]   Fix 'Upload' button placement in the slide media uploader
+               popup.
+  - [bugfix]   Fix various bugs where doubleclicking controls caused JS
+               errors in the web interface.
+  - [bugfix]   Properly disable the 'Save' button after clearing password
+               inputs in the user settings page.
+  - [bugfix]   Fix a bug where certain filetypes couldn't be uploaded in
+               the slide media uploader.
+
 v0.2.2
   - [bugfix]   Fix a bug that prevented removing slide assets that didn't
                have a thumbnail.

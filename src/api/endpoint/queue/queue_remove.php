@@ -28,7 +28,6 @@ $QUEUE_REMOVE = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($QUEUE_REMOVE);
 
 $tmp = preg_match('/[^a-zA-Z0-9_-]/', $QUEUE_REMOVE->get('name'));
 if ($tmp) {

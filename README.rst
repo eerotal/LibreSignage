@@ -1,11 +1,14 @@
-######################################################
-LibreSignage - An open source digital signage solution
-######################################################
+.. image:: http://etal.mbnet.fi/libresignage/logo/libresignage_text_466x100.png
+    
+A free and open source digital signage solution.
+
+.. image:: https://travis-ci.org/eerotal/LibreSignage.svg?branch=master
+    :target: https://travis-ci.org/eerotal/LibreSignage
 
 Table Of Contents
 -----------------
 
-`1. General`_
+`1. Introduction`_
 
 `2. Features`_
 
@@ -13,30 +16,32 @@ Table Of Contents
 
 `4. Installation`_
 
+* `4.1. Minimum system requirements`_
+
+* `4.2. Using prebuilt Docker images on any distribution`_
+
+* `4.3. Building from source`_
+
+  * `4.3.1. Building a native build on Debian or Ubuntu`_
+
+  * `4.3.2. Building a Docker image on Debian or Ubuntu`_
+
 `5. Default users`_
 
-`6. How to install npm`_
+`6. FAQ`_
 
-`7. LibreSignage in GIT`_
+`7. Screenshots`_
 
-`8. LibreSignage versioning`_
+`8. Make rules`_
 
-`9. FAQ`_
+`9. Documentation`_
 
-`10. Screenshots`_
+`10. Third-party dependencies`_
 
-`11. Make rules`_
+`11. License`_
 
-`12. Documentation`_
-
-`13. Third-party dependencies`_
-
-`14. Build system dependencies`_
-
-`15. License`_
-
-1. General
-----------
+1. Introduction
+---------------
 
 Digital Signage is everything from large-scale commercial billboards
 to smaller advertisement displays, notice boards or digital restaurant
@@ -111,104 +116,242 @@ content. This approach has a few advantages.
 4. Installation
 ---------------
 
-LibreSignage has currently only been tested on Linux based systems,
-however it should be possible to run it on other systems aswell. Running
-LibreSignage on other systems will require some manual configuration
-though, since the build and installation systems won't work out of the
-box. The only requirement for running a LibreSignage server instance is
-the Apache web server with PHP support, which should be available on most
-systems. Building LibreSignage on the other hand requires some additional
-software.
+4.1. Minimum system requirements
+++++++++++++++++++++++++++++++++
 
-LibreSignage is designed to be used with Apache 2.0 and the default
-install system is programmed to use Apache's Virtual Host configuration
-features.
+Disk space
+  > 100MB (Excludes dependencies and uploaded media.)
 
-In a nutshell, Virtual Hosts are a way of hosting multiple websites on
-one server, which is ideal in the case of LibreSignage. Using Virtual
-Hosts makes it really simple to host one or more LibreSignage instances
-on a server and adding or removing instances is also rather easy. You
-can look up more information about Virtual Hosts on the
-`Apache website <https://httpd.apache.org/docs/2.4/vhosts/>`_.
+RAM
+  Depends on the specific use case.
 
-Doing a basic install of LibreSignage is quite simple. The required steps
-are listed below.
+Tested operating systems
+  * Debian
+
+    * 9 (Stretch)
+    * 10 (Buster)
+
+  * Ubuntu
+
+    * 18.04 LTS (Bionic Beaver)
+
+*Required* runtime dependencies
+  * PHP (Version 7.x.)
+  * Apache2 (Version 2.4.x.)
+
+*Optional* runtime dependencies
+  * PHP gd extension for image thumbnail generation.
+  * ffmpeg (Version 4.0.x) for video thumbnail generation.
+
+Build system dependencies
+  * PHP (Version 7.x.) (http://www.php.net/)
+  * GNU Make (Version 4.x or newer.) (https://www.gnu.org/software/make/)
+  * Pandoc (Version 2.2.x or newer.) (https://pandoc.org/)
+  * npm (Version 6.4.x or newer.) (https://nodejs.org/en/)
+  * ImageMagick (Version 6.x or newer.) (https://www.imagemagick.org/)
+
+Build system dependencies installed automatically by npm
+  * Tools
+
+    * SASS (https://sass-lang.com/)
+    * Browserify (http://browserify.org/)
+    * PostCSS (https://postcss.org/)
+    * Autoprefixer (https://github.com/postcss/autoprefixer)
+
+  * Libraries
+
+    * Ace editor (https://ace.c9.io/)
+    * Bootstrap (https://getbootstrap.com/)
+    * jQuery (https://jquery.com/)
+    * Popper.js (https://popper.js.org/)
+    * Font-Awesome Free (https://fontawesome.com/)
+
+
+4.2. Using prebuilt Docker images on any distribution
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+You can easily deploy a containerized LibreSignage instance using the
+LibreSignage Docker images from Docker hub. The required steps are
+listed below.
+
+1. Install `Docker <https://www.docker.com/>`_ if it's not installed yet.
+2. Run the following command, but replace ``[VERSION]`` with the
+   LibreSignage version you want to pull::
+
+       docker run \
+           -d \
+           -p 80:80 \
+           --mount source=ls_vol,target=/var/www/html/data \
+           eerotal/libresignage:[VERSION]
+
+   This command pulls the LibreSignage image from Docker Hub, binds port
+   80 on the host system to the container's port 80 (*-p*) and
+   creates a volume *ls_vol* for storing LibreSignage data (*--mount*).
+3. Navigate to *localhost* and you should see the LibreSignage login
+   page. The file *src/docs/rst/docker.rst* in the LibreSignage source
+   distribution contains a more detailed explanation of using the
+   LibreSignage Docker image. The documentation can also be accessed in
+   the web interface from the *Help* page.
+
+4.3. Building from source
++++++++++++++++++++++++++
+
+4.3.1. Building a native build on Debian or Ubuntu
+..................................................
+
+*These instructions apply on Debian 9 (Stretch) and Ubuntu 18.04
+(Bionic Beaver)*
+
+Building LibreSignage from source isn't too difficult. You can build
+a native LibreSignage build that runs directly on a Debian or Ubuntu
+host (ie. no containers) by following the instructions below.
 
 1. Install software needed for building LibreSignage. You will need the
-   following packages: ``git, apache2, php, php-gd, pandoc, npm, make``.
-   On Debian Stretch all other packages except *npm* can installed by
-   running ``sudo apt install git apache2 php php-gd pandoc make``.
-   Currently *npm* is only available in the Debian Sid repos and even
-   there the package is so old it doesn't work correctly. You can,
-   however, install npm manually. See `6. How to install NPM`_ for
-   more info.
+   following packages: ``git, apache2, php, php-gd, pandoc, npm, make,
+   imagemagick``. All other packages except *npm* can be installed from
+   the distribution repos by running ``sudo apt update && sudo apt install
+   git apache2 php php-gd pandoc make imagemagick``. You can install NPM
+   by following the instructions on the `node.js website <https://nodejs.org/en/download/package-manager/>`_.
+
+   If you want to enable video thumbnail generation, you need to install
+   *ffmpeg* too. You can do that by running ``sudo apt install ffmpeg``.
+
+   See the section `4.1. Minimum system requirements`_ for more info.
 2. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
    The repository will be cloned into the directory *LibreSignage/*.
 4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
-5. Install dependencies from NPM by running ``npm install``.
-6. Run ``make configure``. This script asks you to enter the
-   following configuration values.
+5. Install dependencies from NPM by running ``npm install``. *This command
+   will probably print a warning about an incompatible package. That's
+   normal and doesn't affect the build in any way.*
+6. Run ``make configure TARGET=apache2-debian``. This script asks you
+   to enter the following configuration values:
 
-   * Document root (default: /var/www)
+   * Install directory (default: /var/www)
 
-     * The document root to use.
+     * The directory where LibreSignage is installed. A subdirectory
+       is created in this directory.
 
    * Server name (domain)
 
      * The domain name to use for configuring apache2. If you
        don't have a domain and you are just testing the system,
        you can either use 'localhost', your machines LAN IP or
-       a testing domain you don't actually own. If you use a testing
-       domain, you can add that domain to your */etc/hosts* file.
-       See the end of this section for more info.
+       a test domain you don't actually own. If you use a test
+       domain, you can add it to your */etc/hosts* file to make
+       it work on your machine.
 
    * Server name aliases
+
+     * Domain name aliases for the server. Aliases make it possible
+       to have the server respond from multiple domains. One useful
+       way to use name aliases is to set *localhost* as the main
+       domain and the LAN IP of the server as an alias. This would
+       make it possible to connect to the server either by navigating
+       to *localhost* on the host machine or by connecting to the LAN
+       IP on the local network.
+
    * Admin name
 
-     * Shown to users on the main page.
+     * Shown to users on the main page as contact info in case of
+       any problems.
 
    * Admin email
 
-     * Shown to users on the main page.
+     * Shown to users on the main page as contact info in case of
+       any problems.
 
-   * Enable debugging (y/N)
+   * Enable image thumbnail generation (y/N)
 
-     *  Whether to enable debugging. N is default.
+     * Enable image thumbnail generation on the server. Currently
+       image thumbnails are only generated for uploaded slide
+       media. This option only works if the PHP GD extension is
+       installed and enabled. You can check whether it's enabled
+       by running ``php -m``. If *gd* is in the printed list, it
+       is enabled. If *gd* doesn't appear in the list but is
+       installed, you can run ``sudo phpenmod gd`` to enable it.
 
-   This command generates an instance configuration file needed
+   * Enable video thumbnail generation (y/N) *Requires ffmpeg.*
+
+     * Enable video thumbnail generation. Currently video thumbnails
+       are only generated for uploaded slide media. Note that video
+       thumbnail generation requires *ffmpeg* and *ffprobe* to be
+       available on the host system. If you enable this option,
+       you'll also need to configure the binary paths to *ffmpeg*
+       and *ffprobe* in the LibreSignage configuration files. The
+       paths default to */usr/bin/ffmpeg* and */usr/bin/ffprobe*.
+       See the help page `Libresignage configuration` or the file
+       `src/doc/rst/configuration.rst` for more info.
+
+   * Enable debugging (y/N) *Do not enable on production systems.*
+
+     *  Whether to enable debugging. This enables things like
+        verbose error reporting through the API etc.
+
+   This command generates aa build configuration file needed
    for building LibreSignage. The file is saved in ``build/`` as
-   ``<DOMAIN>.iconf`` where ``<DOMAIN>`` is the domain name you
+   ``<DOMAIN>.conf`` where ``<DOMAIN>`` is the domain name you
    specified.
-7. Run ``make`` to build LibreSignage. You can use the ``-j<MAXJOBS>``
-   CLI option to specify a maximum number of parallel jobs to speed up
-   the building process. The usual recommended value for the max number
-   of jobs is one per CPU core, meaning that for eg. a quad core CPU you
-   should use -j4. See `11. Make rules`_ for more advanced options.
+7. Run ``make -j$(nproc)`` to build LibreSignage. See `8. Make rules`_
+   for more advanced make usage.
 8. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
+9. Disable the default Apache site by running
+   ``sudo a2dissite 000-default.conf``.
+10. Navigate to the domain name you entered and you should see the
+    LibreSignage login page.
 
-After this the LibreSignage instance is fully installed and ready to be
-used via the web interface. If you specified a domain name you don't
-actually own just for testing the install, you can add it to your
-*/etc/hosts* file to be able to test the site using a normal browser.
-This only applies on Linux based systems of course. For example, if you
-specified the server name *example.com*, you could add the following
-line to your */etc/hosts* file.
+4.3.2. Building a Docker image on Debian or Ubuntu
+..................................................
 
-``example.com    127.0.0.1``
+*These instructions apply on Debian 9 (Stretch) and Ubuntu 18.04
+(Bionic Beaver)*
 
-This will redirect all requests for *example.com* to *127.0.0.1*
-(loopback), making it possible to access the site by connecting
-to *example.com*.
+You can build LibreSignage Docker images by following the instructions
+below.
+
+1. Follow the steps 1-5 from `4.3.1. Building a native build on Debian
+   or Ubuntu`_.
+2. Install `Docker <https://www.docker.com/>`_ if it isn't yet installed.
+3. Run the following command::
+
+       make configure \
+           TARGET=apache2-debian-docker \
+           PASS="--features [features]"
+
+   Where ``[features]`` is a comma separated list of features to enable.
+   The recognised features are:
+
+   * imgthumbs = Image thumbnail generation using *PHP gd*.
+   * vidthumbs = Video thumbnail generation using *ffmpeg*.
+   * debug     = Debugging.
+
+4. Run ``make`` to build the LibreSignage distribution.
+5. Run ``make install`` to package LibreSignage in a Docker image.
+   This will take some time as Docker needs to download a lot of stuff.
+   After this command has completed the LibreSignage image is saved in
+   your machine's Docker registry as *libresignage:[version]*. You can
+   use it by following the instructions in `4.2. Using prebuilt Docker
+   images on any distribution`_.
+
+Extra
+*****
+
+ You can also build LibreSignage Docker images automatically using the
+ helper script *build/helpers/docker/build_img.sh*. If you want to build
+ a release image just run the script. If you want to build a development
+ image, pass *dev* as the first argument.
+
+ The *build/helpers/docker/* directory also contains the script
+ *run_dev.sh* for starting a development/testing docker container.
 
 5. Default users
 ----------------
 
-The initial configured users and their groups and passwords are listed
-below. It goes without saying that you should create new users and
-change the passwords if you intend to use LibreSignage on a production
+The default users and their groups and passwords are listed below.
+It goes without saying that you should create new users and change
+the passwords if you intend to use LibreSignage on a production
 system.
 
 =========== ======================== ==========
@@ -219,86 +362,8 @@ user         editor, display          user
 display      display                  display
 =========== ======================== ==========
 
-6. How to install npm
----------------------
 
-If npm doesn't exist in the repos of your Linux distribution of choice,
-is very outdated (like in the case of Debian) or you are not using a
-Linux based distribution at all, you must install it manually. You can
-follow the installation instructions for your OS on the
-`node.js website <https://nodejs.org/en/download/package-manager/>`_.
-
-There are other ways to install npm too. One alternative way to install
-npm is described below. *Note that if you use this method to install
-npm, you shouldn't update npm via it's own update mechanism
-(running npm install npm) since that will install the new version into
-a different directory. To update npm when it's installed this way,
-you should just follow steps 1-3 again.*
-
-1. Download the *node.js* binaries for your system from
-   https://nodejs.org/en/download/.
-2. Extract the tarball with ``tar -xvf <name of tarball>``.
-3. Create a new directory ``/opt/npm`` and copy the extracted
-   files into it.
-4. Run ``ln -s /opt/npm/bin/npm /usr/local/bin/npm`` and
-   ``ln -s /opt/npm/bin/npx /usr/local/bin/npx``. You need to
-   be root when running these commands so prefix them with ``sudo``
-   or log in as root first.
-5. Run ``cd ~/`` to go back to your home directory and verify the
-   installation by running ``npm -v``. This should now print the
-   installed npm version.
-
-7. LibreSignage in GIT
-----------------------
-
-LibreSignage uses the GIT version control system. The LibreSignage
-repository contains multiple branches that all have some differences.
-
-master
-  The master branch always contains the latest stable version of
-  LibreSignage with all the latest backported fixes. If you just
-  wan't to use a fully functioning version of LibreSignage, clone
-  this branch. The actual LibreSignage release points are also marked
-  in the GIT tree as annotated tags. You can clone a release tag too
-  but note that the latest patch release doesn't necessarily contain
-  the latest backports if new fixes have just been backported to master.
-
-v<MAJOR>.<MINOR>.<PATCH>
-  These branches are release branches. Development for a specific
-  LibreSignage version happens in the release branch for that specific
-  version. A new release branch is created every time either the major
-  or the minor version number changes. New eelease branches aren't created
-  for patch releases. Release branches are often quite stable and they
-  generally already work, but they might still contain serious bugs from
-  time to time.
-
-feature/*, bugfix/*, ...
-  Branches that start with a category and have the branch name after
-  a forward slash are development branches. You normally shouldn't
-  clone these because they are actively being worked on and even
-  commit history might be rewritten from time to time. These branches
-  aren't meant to be used by anyone else other than the developers
-  working on the branch.
-
-8. LibreSignage versioning
---------------------------
-
-Each LibreSignage release has a designated version number of the
-form MAJOR.MINOR.PATCH.
-
-* The PATCH version is incremented for each patch release. Patch
-  releases only contain fixes and never contain new features.
-* The MINOR version is incremented for every release where
-  incrementing the MAJOR number is not justified. Minor releases
-  can contain new features and bugfixes etc.
-* The MAJOR version number is only incremented for very big and
-  major releases.
-
-The LibreSignage API also has its own version number that's just
-an integer which is incremented every time a backwards incompatible
-API change is made.
-
-9. FAQ
+6. FAQ
 ------
 
 Why doesn't LibreSignage use framework/library X?
@@ -315,86 +380,99 @@ Why doesn't LibreSignage have feature X?
 Is LibreSignage really free?
   YES! In fact LibreSignage is not only free, it's also open source.
   You can find information about the LibreSignage license in the
-  `15. License`_ section.
+  section `11. License`_.
 
-10. Screenshots
+7. Screenshots
 ---------------
 
 Open these images in a new tab to view the full resolution versions.
-*Note that these screenshots are always the latest ones no matter what
-branch or commit you are viewing.*
 
 **LibreSignage Login**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/login.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/login.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Control Panel**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/control.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/control.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Editor**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/editor.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/editor.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Media Uploader**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/media_uploader.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/media_uploader.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage User Manager**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/user_manager.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/user_manager.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage User Settings**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/user_settings.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/user_settings.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Display**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/display.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/display.png
    :width: 320 px
    :height: 180 px
 
 **LibreSignage Documentation**
 
-.. image:: http://etal.mbnet.fi/libresignage/v0.2.0/docs.png
+.. image:: http://etal.mbnet.fi/libresignage/v1.0.0/docs.png
    :width: 320 px
    :height: 180 px
 
-11. Make rules
+8. Make rules
 --------------
 
 The following ``make`` rules are implemented in the makefile.
 
 all
-  The default rule that builds the LibreSignage distribution.
+  The default rule that builds the LibreSignage distribution. You
+  can pass ``NOHTMLDOCS=y`` if you don't want to generate any HTML
+  documentation.
+
+configure
+  Generate a LibreSignage build configuration file. You need to use
+  ``TARGET=[target]`` to select a build target to use. You can also
+  optionally use ``PASS=[pass]`` to pass any target specific arguments
+  to the build configuration script. The recognized targets are:
+
+  * apache2-debian (Build target for a native install on Debian.)
+  * apache2-debian-docker (Build target for building Docker images.)
+
+    * You can use PASS with ``--features [features]`` where ``[features]``
+      is a comma separated list of features to enable. See the section
+      `4.3.2. Building a Docker image on Debian or Ubuntu`_ for more
+      info.
 
 install
-  Install LibreSignage. This copies the LibreSignage distribution files
-  into a virtual host directory in the configured document root.
-
-utest
-  Run the LibreSignage unit testing scripts. Note that you must install
-  LibreSignage before running this rule.
+  Install the LibreSignage distribution on the machine. Note that
+  the meaning of install depends on the target you are building for.
+  Running ``make install`` for the *apache2-debian-docker* target,
+  for example, builds the Docker image (ie. installs LibreSignage into
+  the Docker image).
 
 clean
   Clean files generated by building LibreSignage.
 
 realclean
-  Same as *clean* but removes all generated files too. This rule
-  effectively resets the LibreSignage directory to how it was right
-  after cloning the repo.
+  Same as *clean* but removes all generated files and build config files
+  too. This rule effectively resets the LibreSignage directory to how it
+  was right after cloning the repo.
 
 LOC
   Count the lines of code in LibreSignage.
@@ -405,20 +483,16 @@ LOD
   are counted from the docs in the dist/ directory. This way the
   generated API endpoint docs can be taken into account too.
 
-You can also pass some other arguments to the LibreSignage makefile.
+You can also pass some other settings to the LibreSignage makefile.
 
-INST=<config file> - (default: Last generated config.)
-  Manually specify a config file to use.
+CONF=<config file> - (default: Last generated config.)
+  Manually specify a config file to use. This setting can be used with
+  the targets *all* and *install*.
 
-VERBOSE=<y/n> - (default: y)
-  Print verbose log output.
+VERBOSE=<Y/n>
+  Print verbose log output. This setting can be used with any target.
 
-NOHTMLDOCS=<y/n> - (default: n)
-  Don't generate HTML documentation from the reStructuredText docs
-  or the API endpoint files. This setting can be used with make rules
-  that build files. Using it with eg. ``make install`` has no effect.
-  
-12. Documentation
+9. Documentation
 -----------------
 
 LibreSignage documentation is written in reStructuredText, which is
@@ -430,7 +504,7 @@ are located in the directory *src/doc/rst/*.
 The reStructuredText files are also compiled into HTML when LibreSignage
 is built and they can be accessed from the *Help* page of LibreSignage.
 
-13. Third-party dependencies
+10. Third-party dependencies
 ----------------------------
 
 Bootstrap (Library, MIT License)
@@ -466,21 +540,13 @@ The full licenses for these third party libraries and resources can be
 found in the file *src/doc/rst/LICENSES_EXT.rst* in the source
 distribution.
 
-14. Build system dependencies
------------------------------
-
-* SASS (https://sass-lang.com/)
-* Browserify (http://browserify.org/)
-* PostCSS (https://postcss.org/)
-* Autoprefixer (https://github.com/postcss/autoprefixer)
-
-15. License
+11. License
 -----------
 
 LibreSignage is licensed under the BSD 3-clause license, which can be
 found in the files *LICENSE.rst* and *src/doc/rst/LICENSE.rst* in the
 source distribution. Third party libraries and resources are licensed
-under their respective licenses. See `13. Third-party dependencies`_ for
+under their respective licenses. See `10. Third-party dependencies`_ for
 more information.
 
-Copyright Eero Talus 2018
+Copyright Eero Talus 2018 and contributors

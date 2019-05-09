@@ -5,31 +5,36 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/session.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/userquota.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/exportable/exportable.php');
 
-class User extends Exportable{
+class User extends Exportable {
 	static $PRIVATE = [
 		'user',
 		'hash',
 		'groups',
-		'sessions'
+		'sessions',
+		'quota'
 	];
 
 	static $PUBLIC = [
 		'user',
 		'groups',
-		'sessions'
+		'sessions',
+		'quota'
 	];
 
 	private $user = '';
 	private $hash = '';
 	private $groups = [];
 	private $sessions = [];
+	private $quota = NULL;
 
 	public function __construct($name = NULL) {
-		/*
-		*  If $name is supplied, load the userdata for the
-		*  user. Otherwise do nothing.
-		*/
-		if (!empty($name)) { $this->load($name); }
+		if (!empty($name)) {
+			// Load userdata for existing users.
+			$this->load($name);
+		} else {
+			// Initialize the user quota for new users.
+			$this->quota = new UserQuota(DEFAULT_QUOTA);
+		}
 	}
 
 	public function __exportable_set(string $name, $value) {
@@ -224,9 +229,14 @@ class User extends Exportable{
 			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
 				throw new ArgException('Too many user groups.');
 			}
+			foreach ($groups as $g) {
+				if (strlen($g) > gtlim('MAX_USER_GROUP_LEN')) {
+					throw new ArgException('Too long user group name.');
+				}
+			}
 			$this->groups = $groups;
 		} else {
-			throw new ArgException("Invalid type for $groups.");
+			throw new ArgException('Invalid type for groups.');
 		}
 	}
 
@@ -270,6 +280,14 @@ class User extends Exportable{
 
 	public function get_name() {
 		return $this->user;
+	}
+
+	public function set_quota(UserQuota $quota) {
+		$this->quota = $quota;
+	}
+
+	public function get_quota() {
+		return $this->quota;
 	}
 }
 

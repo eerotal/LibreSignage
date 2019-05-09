@@ -1,9 +1,17 @@
-#quick-help-popup-content {
-	@import 'src/doc/css/_content.scss';
-	overflow-y: auto;
-	padding: {
-		top: $s2;
-		right: $s5;
-		left: $s5;
+/* Quick help popup styling. */
+
+#quick-help {
+	.popup-content-row, .popup-bar-row {
+		min-height: 1px; /* Fix a flex sizing bug at least on Chrome. */
+	}
+
+	.popup-content {
+		@import 'src/doc/css/_content.scss';
+		overflow-y: auto;
+		padding: {
+			top: $s2;
+			right: $s5;
+			left: $s5;
+		}
 	}
 }

@@ -5,4 +5,3 @@ Keyboard shortcut cheatsheet
 :Ctrl+S:      Save the selected slide.
 :Ctrl+D:      Duplicate the selected slide.
 :Ctrl+P:      Preview the selected slide.
-:Ctrl+Q:      Change the queue of the selected slide.

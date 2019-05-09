@@ -50,3 +50,12 @@ th {
 tr:nth-child(even) {
 	background-color: $gray-3;
 }
+
+/* Image center align. */
+img.align-center {
+	display: block;
+	margin: {
+		left: auto;
+		right: auto;
+	}
+}

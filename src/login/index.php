@@ -13,16 +13,15 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<?php
-			require_css(['font-awesome']);
-		?>
+		<?php require_css(['font-awesome']); ?>
 		<link rel="stylesheet" href="/login/css/login.css">
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/favicon.php'); ?>
 		<title>LibreSignage Login</title>
 	</head>
 	<body>
 		<main class="container-fluid h-100">
 			<div class="form-login-container">
-				<h4 class="display-4 form-login-header">LibreSignage</br>Login</h4>
+				<img class="ls-logo" src="/assets/images/logo/libresignage_text.svg"></img>
 				<div class="alert alert-warning" <?php
 					if (empty($_GET['failed'])) {
 						echo 'style="display: none"';
@@ -90,9 +89,7 @@
 				</div>
 			</div>
 		</main>
-		<?php
-			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
-		?>
+		<?php require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH); ?>
 		<script src="/login/js/main.js"></script>
 	</body>
 </html>

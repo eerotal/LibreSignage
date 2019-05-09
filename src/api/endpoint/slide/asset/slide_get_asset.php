@@ -19,18 +19,17 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
-$SLIDE_GET_ASSET = new APIEndpoint(array(
-	APIEndpoint::METHOD            => API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE     => NULL,
-	APIEndpoint::FORMAT_URL        => [
+$SLIDE_GET_ASSET = new APIEndpoint([
+	APIEndpoint::METHOD          => API_METHOD['GET'],
+	APIEndpoint::RESPONSE_TYPE   => API_MIME['libresignage/passthrough'],
+	APIEndpoint::FORMAT_URL => [
 		'id'   => API_P_STR,
 		'name' => API_P_STR
 	],
 	APIEndpoint::REQ_QUOTA         => TRUE,
 	APIEndpoint::REQ_AUTH          => TRUE,
 	APIEndpoint::ALLOW_COOKIE_AUTH => TRUE
-));
-api_endpoint_init($SLIDE_GET_ASSET);
+]);
 
 if (
 	!check_perm(

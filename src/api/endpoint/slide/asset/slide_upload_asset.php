@@ -50,7 +50,6 @@ $SLIDE_UPLOAD_ASSET = new APIEndpoint([
 	APIEndpoint::REQ_QUOTA      => TRUE,
 	APIEndpoint::REQ_AUTH       => TRUE
 ]);
-api_endpoint_init($SLIDE_UPLOAD_ASSET);
 
 $slide = new Slide();
 $slide->load($SLIDE_UPLOAD_ASSET->get('id'));
@@ -79,7 +78,7 @@ if (!(
 }
 
 $errors = [];
-foreach($SLIDE_UPLOAD_ASSET->get_files() as $f) {
+foreach($SLIDE_UPLOAD_ASSET->get_file_data() as $f) {
 	if ($f['error'] !== UPLOAD_ERR_OK) {
 		$errors[$f['name']] = $f['error'];
 		continue;

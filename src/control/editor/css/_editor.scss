@@ -1,0 +1,20 @@
+/* Editor input styling. */
+
+$slide-input-minh: 45;        // Minimum height of editor in lines.
+$syntax-error-color: #ff6565; // Editor syntax error highlight color.
+
+#slide-input {
+	min-height: $slide-input-minh*1em;
+	border: 1px solid $gray-1;
+	margin-bottom: $s3;
+}
+
+.syntax-error-highlight {
+	position: absolute;
+	background-color: $syntax-error-color;
+}
+
+#slide-label-editor-error {
+	font-family: Inconsolata, monospace;
+	color: $red;
+}

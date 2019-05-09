@@ -94,7 +94,7 @@ class Slide extends Exportable{
 	private $sched_t_e = 0;
 	private $animation = 0;
 	private $queue_name = NULL;
-	private $collaborators = NULL;
+	private $collaborators = [];
 	private $lock = NULL;
 	private $assets = [];
 	private $ready = FALSE;
@@ -124,7 +124,6 @@ class Slide extends Exportable{
 		*/
 		$cstr = NULL;
 		$conf = NULL;
-		$mu = NULL;
 
 		$this->mk_paths($id);
 		if (!is_file($this->conf_path)) {
@@ -143,20 +142,30 @@ class Slide extends Exportable{
 		) { throw new IntException("Slide config decode error!"); }
 
 		$this->import($conf, TRUE);
-		$this->check_sched_enabled();
-
 		$this->set_ready(TRUE);
 		$this->lock_cleanup();
+		$this->check_sched_enabled();
 	}
 
 	function dup() {
 		/*
-		*  Duplicate a slide.
+		*  Duplicate this slide.
 		*/
 		$slide = clone $this;
 		$slide->gen_id();
 		$slide->set_index($slide->get_index() + 1);
 		$slide->set_lock(NULL);
+
+		// Make sure all directories are created.
+		$slide->write();
+
+		$tmp = [];
+		foreach ($this->get_assets() as $a) {
+			$tmp[] = $a->clone($slide);
+		}
+		$slide->set_assets($tmp);
+
+		// Write latest changes.
 		$slide->write();
 
 		$queue = $slide->get_queue();
@@ -207,7 +216,9 @@ class Slide extends Exportable{
 		}
 
 		// Check name length.
-		if (strlen($name) > gtlim('SLIDE_NAME_MAX_LEN')) {
+		if (strlen($name) === 0) {
+			throw new ArgException("Invalid empty slide name.");
+		} else if (strlen($name) > gtlim('SLIDE_NAME_MAX_LEN')) {
 			throw new ArgException("Slide name too long.");
 		}
 		$this->name = $name;
@@ -381,6 +392,7 @@ class Slide extends Exportable{
 	function get_queue_name() { return $this->queue_name; }
 	function get_collaborators() { return $this->collaborators; }
 	function get_lock() { return $this->lock; }
+	function get_asset_path() { return $this->asset_path; }
 
 	function store_uploaded_asset(array $file) {
 		/*
@@ -398,7 +410,7 @@ class Slide extends Exportable{
 		}
 		if (!is_dir($this->asset_path)) { mkdir($this->asset_path); }
 		$asset = new SlideAsset();
-		$asset->new($file, $this->asset_path);
+		$asset->new($file, $this);
 		$this->assets[] = $asset;
 	}
 
@@ -433,6 +445,14 @@ class Slide extends Exportable{
 		return $this->get_uploaded_asset($name) !== NULL;
 	}
 
+	function set_assets(array $assets) {
+		$this->assets = $assets;
+	}
+
+	function get_assets() {
+		return $this->assets;
+	}
+
 	function get_queue() {
 		$queue = new Queue($this->queue_name);
 		$queue->load();
@@ -446,10 +466,11 @@ class Slide extends Exportable{
 		*  overrides the manual 'enabled' control.
 		*/
 		$t = time();
-		if ($this->get_sched() &&
-			$t >= $this->get_sched_t_s() &&
-			$t <= $this->get_sched_t_e()) {
-
+		if (
+			$this->get_sched()
+			&& $t >= $this->get_sched_t_s()
+			&& $t <= $this->get_sched_t_e()
+		) {
 			// Scheduling active -> enable.
 			$this->set_enabled(TRUE);
 			$this->write();

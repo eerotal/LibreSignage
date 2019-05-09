@@ -1,7 +1,9 @@
+/* LibreSignage navigation bar styling. */
+
 @import 'globals';
 @import 'bootstrap';
 
-/* LibreSignage navigation bar styling. */
+$logo-height: 55px;
 
 .nav {
 	padding: {
@@ -10,14 +12,26 @@
 		left: 25px !important;
 		right: 25px !important;
 	}
+
+	.ls-logo {
+		height: $logo-height;
+		margin: {
+			top: -5px;
+		}
+	}
+
+	.nav-link {
+		padding: {
+			left: 10px;
+			right: 10px;
+		}
+	}
 }
 
 .nav-logout-cont {
 	margin: {
-		left: .5rem;
-		right: .5rem;
-		top: .75rem;
-		bottom: .55rem;
+		left: $s1;
+		right: $s1;
 	}
 
 	padding: {

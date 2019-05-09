@@ -20,7 +20,9 @@
 *  This endpoint only allows slide modification if the caller
 *  has locked the slide by calling slide_lock_acquire.php first.
 *  If the slide is not locked or is locked by someone else, the
-*  API_E_LOCK error is returned in the 'error' value.
+*  API_E_LOCK error is returned in the 'error' value. If a new
+*  slide is created, the slide is automatically locked for the
+*  caller.
 *
 *  Note!
 *
@@ -67,7 +69,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/api.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/slide/slide.php');
 
 $SLIDE_SAVE = new APIEndpoint([
-	APIEndpoint::METHOD		=> API_METHOD['POST'],
+	APIEndpoint::METHOD		    => API_METHOD['POST'],
 	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
 	APIEndpoint::FORMAT_BODY => [
 		'id' => API_P_STR|API_P_NULL,
@@ -89,65 +91,57 @@ $SLIDE_SAVE = new APIEndpoint([
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ]);
-api_endpoint_init($SLIDE_SAVE);
-
-$OP = '';
-$ALLOW = FALSE;
-
-$user = $SLIDE_SAVE->get_caller();
-$quota = new UserQuota($user);
 
 $slide = new Slide();
-if ($SLIDE_SAVE->has('id', TRUE)) {
-	$slide->load($SLIDE_SAVE->get('id'));
-}
 
 /*
-*  Check permissions.
+*  Check permissions and route the API call to the correct
+*  handler function.
 */
 if ($SLIDE_SAVE->has('id', TRUE)) {
-	// admin or editor+owner => ALLOW modifying.
-	$ALLOW |= check_perm(
-		'grp:admin;',
-		$SLIDE_SAVE->get_caller()
-	);
-	$ALLOW |= check_perm(
-		'grp:editor&usr:'.$slide->get_owner().';',
-		$SLIDE_SAVE->get_caller()
-	);
-	$OP = 'modify';
-} else {
-	// admin or editor => ALLOW creation.
-	$ALLOW |= check_perm(
-		'grp:admin|grp:editor;',
-		$SLIDE_SAVE->get_caller()
-	);
-	$OP = 'create';
-}
-
-if (!$ALLOW) {
-	// Allow restricted access for collaborators.
+	$slide->load($SLIDE_SAVE->get('id'));
 	if (
+		check_perm(
+			'grp:admin;',
+			$SLIDE_SAVE->get_caller()
+		)
+		|| check_perm(
+			'grp:editor&usr:'.$slide->get_owner().';',
+			$SLIDE_SAVE->get_caller()
+		)
+	) {
+		// admin or editor+owner => ALLOW modifying.
+		modify_slide($SLIDE_SAVE, $slide, TRUE);
+	} else if (
 		check_perm('grp:editor;', $SLIDE_SAVE->get_caller())
 		&& in_array(
 			$SLIDE_SAVE->get_caller()->get_name(),
 			$slide->get_collaborators()
 		)
 	) {
-		$ALLOW = TRUE;
-		$OP = 'modify_collab';
+		// Restricted modification permissions for collaborators.
+		modify_slide($SLIDE_SAVE, $slide, FALSE);
 	} else {
 		throw new APIException(
 			API_E_NOT_AUTHORIZED,
 			"Not authorized."
 		);
 	}
+} else if (
+	check_perm(
+		'grp:admin|grp:editor;',
+		$SLIDE_SAVE->get_caller()
+	)
+) {
+	// admin or editor => ALLOW creation.
+	create_slide($SLIDE_SAVE, $slide);
 }
 
-/*
-*  Check slide lock.
-*/
-if ($OP === 'modify' || $OP === 'modify_collab') {
+function ensure_slide_lock(Slide $slide, Session $caller_session): void {
+	/*
+	*  Ensure that the slide $slide is locked by $session and
+	*  the lock is not expired.
+	*/
 	$lock = $slide->get_lock();
 	if ($lock === NULL) {
 		throw new APIException(
@@ -156,64 +150,108 @@ if ($OP === 'modify' || $OP === 'modify_collab') {
 		);
 	} else if (
 		!$lock->is_expired()
-		&& !$lock->is_owned_by($SLIDE_SAVE->get_session())
+		&& !$lock->is_owned_by($caller_session)
 	) {
 		throw new APIException(
 			API_E_LOCK,
 			"Slide locked by another user."
 		);
-	}
+	}	
 }
 
-if ($OP === 'create') {
+function set_slide_data(
+	APIEndpoint $endpoint,
+	Slide $slide,
+	bool $owner
+): void {
 	/*
-	*  Set the current user as the owner and
-	*  generate an ID for the new slide. Note
-	*  that Slide::set_owner() must be called before
-	*  Slide::set_collaborators(), which is why
-	*  this if statement is here. Don't move it.
+	*  Set the slide data common to all operations.
 	*/
+
+	// Don't set 'queue_name' and 'collaborators' if $owner === FALSE.
+	if ($owner === TRUE) {
+		$slide->set_queue($endpoint->get('queue_name'));
+		$slide->set_collaborators($endpoint->get('collaborators'));
+	}
+
+	$slide->set_name($endpoint->get('name'));
+	$slide->set_index($endpoint->get('index'));
+	$slide->set_duration($endpoint->get('duration'));
+	$slide->set_markup($endpoint->get('markup'));
+	$slide->set_enabled($endpoint->get('enabled'));
+	$slide->set_sched($endpoint->get('sched'));
+	$slide->set_sched_t_s($endpoint->get('sched_t_s'));
+	$slide->set_sched_t_e($endpoint->get('sched_t_e'));
+	$slide->set_animation($endpoint->get('animation'));
+
+	$slide->set_ready(TRUE);
+	$slide->check_sched_enabled();
+}
+
+function create_slide(
+	APIEndpoint $endpoint,
+	Slide $slide
+): void {
+	/*
+	*  Handler function for creating the slide $slide.
+	*
+	*  Note that Slide::set_owner() must be called
+	*  before Slide::set_collaborators()!
+	*/
+	$user = $endpoint->get_caller();
 	$slide->gen_id();
 	$slide->set_owner($user->get_name());
-}
+	$slide->lock_acquire($endpoint->get_session());
 
-/*
-*  Silently discard attempts to modify queue_name and collaborators
-*  if a collaborator is saving the slide.
-*/
-if ($OP !== 'modify_collab') {
-	$slide->set_queue($SLIDE_SAVE->get('queue_name'));
-	$slide->set_collaborators($SLIDE_SAVE->get('collaborators'));
-}
+	set_slide_data($endpoint, $slide, TRUE);
+	if (!$user->get_quota()->has_quota('slides')) {
+		/*
+		*  The user doesn't have slide quota so abort the slide
+		*  creation process. The $queue->load() call below has
+		*  $fix_errors = TRUE, which makes the Queue object
+		*  remove the non-existent slide from the queue.
+		*/
+		$queue = new Queue($slide->get_queue_name());
+		$queue->load(TRUE);
 
-$slide->set_name($SLIDE_SAVE->get('name'));
-$slide->set_index($SLIDE_SAVE->get('index'));
-$slide->set_duration($SLIDE_SAVE->get('duration'));
-$slide->set_markup($SLIDE_SAVE->get('markup'));
-$slide->set_enabled($SLIDE_SAVE->get('enabled'));
-$slide->set_sched($SLIDE_SAVE->get('sched'));
-$slide->set_sched_t_s($SLIDE_SAVE->get('sched_t_s'));
-$slide->set_sched_t_e($SLIDE_SAVE->get('sched_t_e'));
-$slide->set_animation($SLIDE_SAVE->get('animation'));
-$slide->set_ready(TRUE);
-
-if ($OP === 'create') {
-	// Use quota.
-	if (!$quota->use_quota('slides')) {
 		throw new APIException(
 			API_E_QUOTA_EXCEEDED,
 			"Slide quota exceeded."
 		);
+	} else {
+		$user->get_quota()->use_quota('slides');
+		$user->write();
 	}
-	$quota->flush();
+	finish_slide($endpoint, $slide);
 }
 
-$slide->write();
+function modify_slide(
+	APIEndpoint $endpoint,
+	Slide $slide,
+	bool $owner
+): void {
+	/*
+	*  Handler function for modifying the slide $slide.
+	*/
+	ensure_slide_lock($slide, $endpoint->get_session());
+	set_slide_data($endpoint, $slide, $owner);
+	finish_slide($endpoint, $slide);
+}
 
-// Juggle slide indices.
-$queue = new Queue($slide->get_queue_name());
-$queue->load();
-$queue->juggle($slide->get_id());
+function finish_slide(
+	APIEndpoint $endpoint,
+	Slide $slide
+): void {
+	$slide->write();
 
-$SLIDE_SAVE->resp_set($slide->export(FALSE, FALSE));
-$SLIDE_SAVE->send();
+	// Juggle slide indices.
+	$queue = new Queue($slide->get_queue_name());
+	$queue->load();
+	$queue->juggle($slide->get_id());
+
+	// Get the slide data from $queue since $queue->juggle() modifies it.
+	$endpoint->resp_set(
+		$queue->get_slide($slide->get_id())->export(FALSE, FALSE)
+	);
+	$endpoint->send();
+}

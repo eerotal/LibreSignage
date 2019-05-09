@@ -44,7 +44,6 @@ $SLIDE_GET = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> TRUE,
 	APIEndpoint::REQ_AUTH		=> TRUE
 ));
-api_endpoint_init($SLIDE_GET);
 
 $slide = new Slide();
 $slide->load($SLIDE_GET->get('id'));

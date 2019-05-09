@@ -22,7 +22,6 @@ $API_ERR_MSGS = new APIEndpoint(array(
 	APIEndpoint::REQ_QUOTA		=> FALSE,
 	APIEndpoint::REQ_AUTH		=> FALSE
 ));
-api_endpoint_init($API_ERR_MSGS);
 
 $API_ERR_MSGS->resp_set(array('messages' => API_E_MSG));
 $API_ERR_MSGS->send();
