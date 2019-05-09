@@ -21,6 +21,13 @@ sudo: required
 git:
     depth: false
 
+branches:
+    only:
+        - master
+        - next
+        - /v[0-9]+.x.x/
+        - /v[0-9]+.[0-9]+.[0-9]+/
+
 matrix:
     include:
         env:
@@ -38,7 +45,6 @@ deploy:
       script: sh build/scripts/travis/docker_push.sh eerotal release
       on:
           tags: true
-          all_branches: true
           condition: $target = 'apache2-debian-docker'
 
 install:
