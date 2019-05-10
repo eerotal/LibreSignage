@@ -163,9 +163,12 @@ class DisplayView extends BaseView {
 		*  Skip forwards in the queue.
 		*/
 		if (
-			this.render_timeouts[0] == null
-			&& this.render_timeouts[1] == null
-		) { return; }
+			!this.render_timeouts[0].is_active()
+			&& !this.render_timeouts[1].is_active()
+		) {
+			// Don't skip when an animation is running.
+			return;
+		}
 
 		this.render_timeouts[0].exec();
 		this.render_timeouts[1].exec();
@@ -176,36 +179,45 @@ class DisplayView extends BaseView {
 		*  Skip backwards in the queue.
 		*/
 		if (
-			this.render_timeouts[0] == null
-			&& this.render_timeouts[1] == null
-		) { return; }
+			!this.render_timeouts[0].is_active()
+			&& !this.render_timeouts[1].is_active()
+		) {
+			// Don't skip when an animation is running.
+			return;
+		}
 
 		this.controller.buffer_next_slide(-1);
-		if (this.render_timeouts[0].has_execd()) {
+		if (this.render_timeouts[0].is_execd()) {
 			this.controller.buffer_next_slide(-1);
 		}
+
 		this.render_timeouts[0].cancel();
-		this.render_timeouts[1].exec();
+		this.render_timeouts[1].cancel();
+		this.render(true);
 	}
 
 	animate(elem, animation, end_hook) {
 		/*
-		*  Trigger one of the animations defined in 'css/display.css'
-		*  on 'elem'. If 'end_hook' is not null, it's called when
-		*  the animation has finished.
+		*  Trigger an animation on 'elem'. 'animation' is a space
+		*  separated CSS class list to apply to the element.
+		*  'end_hook' is called when the animation has finished.
 		*/
 		if (!animation) {
 			end_hook();
 			return;
 		}
 		elem.addClass(animation);
-		elem.one('animationend', (event) => {
-			event.target.classList.remove(animation);
+		elem.one('animationend', event => {
+			$(event.target).removeClass(animation);
 			if (end_hook) { end_hook(); }
 		});
 	}
 
-	render() {
+	render(rev_once) {
+		/*
+		*  Render the next slide. If rev_once == true, the transitions
+		*  are reversed. Future transitions aren't affected.
+		*/
 		if (!this.controller.init_slide_buffer()) {
 			setTimeout(() => this.render(), DISPLAY_UPDATE_INTERVAL);
 			return;
@@ -213,25 +225,41 @@ class DisplayView extends BaseView {
 
 		let cur = this.controller.get_current_slide();
 		let buf = this.controller.get_buffered_slide();
+		let anim_1 = null;
+		let anim_2 = null;
 
-		this.animate($('#display'), cur ? cur.anim_hide() : null, () => {
-			$('#display').html(buf.get_html_buffer());
-			this.animate(
-				$('#display'),
-				buf.anim_show(),
-				() => {
-					this.render_timeouts[0] = new Timeout(
-						() => this.controller.buffer_next_slide(),
-						BUFFER_UPDATE_PERIOD
-					);
+		if (!rev_once) {
+			// Normal animations.
+			anim_1 = cur ? cur.anim_hide() : null;
+			anim_2 = buf.anim_show();
+		} else {
+			// Reverse animations.
+			anim_1 = cur ? cur.anim_show_rev() : null;
+			anim_2 = buf.anim_hide_rev();
+		}
 
-					this.render_timeouts[1] = new Timeout(
-						() => this.render(),
-						buf.get('duration')
-					);
-				}
-			);
-		});
+		this.animate(
+			$('#display'),
+			anim_1,
+			() => {
+				$('#display').html(buf.get_html_buffer());
+				this.animate(
+					$('#display'),
+					anim_2,
+					() => {
+						this.render_timeouts[0] = new Timeout(
+							() => this.controller.buffer_next_slide(),
+							BUFFER_UPDATE_PERIOD
+						);
+
+						this.render_timeouts[1] = new Timeout(
+							() => this.render(),
+							buf.get('duration')
+						);
+					}
+				);
+			}
+		);
 	}
 
 	async preview_slide(id) {
