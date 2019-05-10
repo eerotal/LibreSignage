@@ -2,6 +2,9 @@
 *  LibreSignage display controls styling.
 */
 
+$contr-color-normal: hsl(0, 0, 75%);
+$contr-color-hover: hsl(0, 0, 25%);
+
 @keyframes controls-fade {
 	0%   { opacity: 0.15; }
 	100% { opacity: 0;    }
@@ -28,13 +31,17 @@
 		justify-content: center;
 
 		height: 100%;
-		width: 15%;
+		width: 10%;
 
 		opacity: 0.15;
-		i { font-size: 8em; }
+		i {
+			font-size: 15vh;
+			color: $contr-color-normal;
+			&:hover { color: $contr-color-hover; }
+		}
 	}
 	.center {
 		height: 100%;
-		width: 70%;
+		width: 80%;
 	}
 }
