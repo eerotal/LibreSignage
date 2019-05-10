@@ -4,7 +4,8 @@
 @import 'dialog';
 @import 'markup';
 @import '_splash.scss';
-@import 'animations/_linear.scss';
+@import '_controls.scss';
+@import 'animations/_animations.scss';
 
 html {
 	overflow-x: hidden;

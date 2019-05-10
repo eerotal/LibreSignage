@@ -23,6 +23,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="/app/css/display.css">
+		<?php require_css(['font-awesome']); ?>
 		<?php require_once(LIBRESIGNAGE_ROOT.'/common/php/favicon.php'); ?>
 		<title>LibreSignage Display</title>
 	</head>
@@ -33,6 +34,15 @@
 				<img
 					src="/assets/images/logo/libresignage_text.svg"
 					alt="LibreSignage logo.">
+			</div>
+			<div id="controls">
+				<div class="left">
+					<i class="fas fa-angle-left"></i>
+				</div>
+				<div class="center"></div>
+				<div class="right">
+					<i class="fas fa-angle-right"></i>
+				</div>
 			</div>
 		</main>
 		<script src="/app/js/main.js"></script>
