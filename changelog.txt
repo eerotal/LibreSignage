@@ -1,3 +1,5 @@
+v1.0.1
+
 v1.0.0
   - [internal] Modularize and improve the build system.
   - [feature]  Implement an improved configuration file loader that
