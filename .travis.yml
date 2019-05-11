@@ -26,6 +26,7 @@ branches:
         - master
         - next
         - /v[0-9]+.x.x/
+        - /v[0-9]+.[0-9]+.[0-9]+/
 
 matrix:
     include:
@@ -44,9 +45,7 @@ deploy:
       script: sh build/scripts/travis/docker_push.sh eerotal release
       on:
           tags: true
-          all_branches: true
           condition: $target = 'apache2-debian-docker'
-          condition: -n $TRAVIS_TAG
 
 install:
     # Install pandoc 2.7.2 from a .deb package because the
