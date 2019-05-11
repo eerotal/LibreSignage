@@ -34,7 +34,10 @@
 		}
 		if (!$found) {
 			// Doc not found.
-			header('Location: '.ERROR_PAGES.'/404');
+			error_handle(
+				HTTP_ERR_404,
+				new Exception('No such documentation file.')
+			);
 			exit(0);
 		}
 		$include_file = $_GET['doc'].'.html';
