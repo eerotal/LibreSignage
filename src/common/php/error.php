@@ -73,7 +73,13 @@ function error_handle(int $code, Throwable $e = NULL) {
 	global $ERROR_DEBUG;
 	try {
 		if (!array_key_exists($code, ERROR_CODES)) { $code = HTTP_ERR_500; }
-		if ($e && $ERROR_DEBUG) {
+		// Make sure we are actually getting a Throwable object.
+		if (!($e instanceof Throwable)) {
+			// From the line above $code is guaranteed to be listed in ERROR_CODES.
+			// The default for unknown codes is HTTP_ERR_500.
+			$e = new ErrorException(ERROR_CODES[$code], $code);
+		}
+		if ($ERROR_DEBUG) {
 			header('Content-Type: text/plain');
 			echo "\n### Uncaught exception (HTTP: ".$code.") ###\n";
 			echo $e->__toString();
