@@ -42,7 +42,7 @@ return [
 	'APP_PAGE'              => "/app",
 	'USER_MGR_PAGE'         => "/control/usermgr",
 	'USER_SETTINGS_PAGE'    => "/control/user",
-	'ERROR_PAGES'           => "/errors",
+	'ERROR_PAGES'           => "/public/errors",
 	'LOGIN_LANDING'         => "/control",
 	'LOGOUT_LANDING'        => "/logout",
 
