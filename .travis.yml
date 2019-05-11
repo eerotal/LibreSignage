@@ -53,7 +53,7 @@ install:
     # version in the repos is too old.
     - |
       wget -O pandoc.deb https://github.com/jgm/pandoc/releases/download/2.7.2/pandoc-2.7.2-1-amd64.deb
-      dpkg -i pandoc.deb
+      sudo dpkg -i pandoc.deb
       rm pandoc.deb
 
     # Install other dependencies from repos & npm.
