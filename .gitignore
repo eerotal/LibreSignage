@@ -22,7 +22,9 @@ __pycache__
 .mypy_cache
 .pyc
 
-# Exclude various temporary NPM files.
+# Exclude various temporary and vendored files.
+/vendor
+composer.lock
 /node_modules
 /package-lock.json
 npm-debug.log

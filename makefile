@@ -16,6 +16,7 @@ POSTCSS_FLAGS := --config postcss.config.js --replace --no-map
 
 # Define required dependency versions.
 NPM_REQ_VER := 6.4.0
+COMPOSER_REQ_VER := 1.8.0
 MAKE_REQ_VER := 4.0
 PANDOC_REQ_VER := 2.0
 IMAGEMAGICK_REQ_VER := 6.0
@@ -28,8 +29,8 @@ TARGET ?=
 PASS ?=
 INITCHK_WARN ?= N
 
-# Production libraries.
-LIBS := $(filter-out \
+# Production JavaScript libraries.
+JS_LIBS := $(filter-out \
 	$(shell printf "$(ROOT)\n"|sed 's:/$$::g'), \
 	$(shell npm ls --prod --parseable|sed 's/\n/ /g') \
 )
@@ -93,14 +94,15 @@ endif
 		realclean LOC
 .ONESHELL:
 
-all:: initchk server docs htmldocs js css api libs logo; @:
+all:: initchk server docs htmldocs js css api js_libs php_libs logo; @:
 server:: $(subst src,dist,$(SRC_NO_COMPILE)); @:
 js:: $(subst src,dist/public,$(SRC_JS)); @:
 api:: $(subst src,dist,$(SRC_ENDPOINT)); @:
 docs:: $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_index.rst; @:
 htmldocs:: $(addprefix dist/public/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
 css:: $(subst src,dist/public,$(SRC_SCSS:.scss=.css)); @:
-libs:: $(subst $(ROOT)node_modules/,dist/public/libs/,$(LIBS)); @:
+js_libs:: $(subst $(ROOT)node_modules/,dist/public/libs/,$(JS_LIBS)); @:
+php_libs:: dist/vendor; @:
 logo:: $(GENERATED_LOGOS); @:
 
 # Copy over non-compiled, non-PHP sources.
@@ -264,6 +266,13 @@ dist/public/libs/%:: node_modules/%
 	$(call status,cp,$<,$@)
 	cp -Rp $</* $@
 
+# Copy the PHP library dir vendor to dist/vendor.
+dist/vendor:: vendor
+	@:
+	set -e
+	$(call status,cp,$<,$@)
+	cp -Rp $< $@
+
 # Convert the LibreSignage SVG logos to PNG logos of various sizes.
 .SECONDEXPANSION:
 $(GENERATED_LOGOS): dist/%.png: src/$$(shell printf '$$*\n' | rev | cut -f 2- -d '_' | rev).svg
@@ -324,10 +333,14 @@ realclean: clean
 	rm -rf build/link
 	$(call status,rm,node_modules,none);
 	rm -rf node_modules
-	$(call status,rm,server,none)
-	rm -rf server
 	$(call status,rm,package-lock.json,none);
 	rm -f package-lock.json
+	$(call status,rm,vendor,none)
+	rm -rf vendor
+	$(call status,rm,composer.lock,none)
+	rm composer.lock
+	$(call status,rm,server,none)
+	rm -rf server
 
 	# Remove temporary nano files.
 	TMP="`find . \
@@ -392,6 +405,8 @@ initchk:
 	./build/scripts/check_shell.sh
 	tmp=$$(expr $$tmp + $$?)
 	./build/scripts/dep_checks/npm_version.sh $(NPM_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/composer_version.sh $(COMPOSER_REQ_VER)
 	tmp=$$(expr $$tmp + $$?)
 	./build/scripts/dep_checks/make_version.sh $(MAKE_REQ_VER)
 	tmp=$$(expr $$tmp + $$?)

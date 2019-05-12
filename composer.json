@@ -1,0 +1,5 @@
+{
+	"require": {
+		"symfony/http-foundation": "4.2.*"
+	}
+}
