@@ -14,11 +14,11 @@ SASS_FLAGS := --no-source-map $(addprefix -I,$(SASS_IPATHS))
 
 POSTCSS_FLAGS := --config postcss.config.js --replace --no-map
 
-# Define required versions.
-NPM_REQUIRED_VERSION := 6.4.0
-MAKE_REQUIRED_VERSION := 4.0
-PANDOC_REQUIRED_VERSION := 1.16
-IMAGEMAGICK_REQUIRED_VERSION := 6.0
+# Define required dependency versions.
+NPM_REQ_VER := 6.4.0
+MAKE_REQ_VER := 4.0
+PANDOC_REQ_VER := 2.0
+IMAGEMAGICK_REQ_VER := 6.0
 
 # Caller supplied build settings.
 VERBOSE ?= Y
@@ -26,6 +26,7 @@ NOHTMLDOCS ?= N
 CONF ?= ""
 TARGET ?=
 PASS ?=
+INITCHK_WARN ?= N
 
 # Production libraries.
 LIBS := $(filter-out \
@@ -385,12 +386,31 @@ LOD:
 
 initchk:
 	@:
-	set -e
+	set +e
+
+	tmp=0
 	./build/scripts/check_shell.sh
-	./build/scripts/dep_checks/npm_version.sh $(NPM_REQUIRED_VERSION)
-	./build/scripts/dep_checks/make_version.sh $(MAKE_REQUIRED_VERSION)
-	./build/scripts/dep_checks/pandoc_version.sh $(PANDOC_REQUIRED_VERSION)
-	./build/scripts/dep_checks/imagemagick_version.sh $(IMAGEMAGICK_REQUIRED_VERSION)
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/npm_version.sh $(NPM_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/make_version.sh $(MAKE_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/pandoc_version.sh $(PANDOC_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/imagemagick_version.sh $(IMAGEMAGICK_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
+
+
+	if [ "$(INITCHK_WARN)" = "N" ] || [ "$(INITCHK_WARN)" = "n" ]; then
+		if [ "$$tmp" -ne "0" ]; then
+			echo "[Info] To continue anyway, pass INITCHK_WARN=Y to make."
+			exit 1
+		fi
+	else
+		if [ "$$tmp" -ne "0" ]; then
+			echo "[Warning] Continuing anyway. You're on your own."
+		fi
+	fi
 
 # Include the dependency makefiles from dep/. If the files don't
 # exist, they are built by running the required targets.
