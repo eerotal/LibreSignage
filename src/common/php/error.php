@@ -77,7 +77,7 @@ function error_handle(int $code, Throwable $e = NULL) {
 		if ($e === NULL) {
 			// From the line above $code is guaranteed to be listed in ERROR_CODES.
 			// The default for unknown codes is HTTP_ERR_500.
-			$e = new ErrorException(ERROR_CODES[$code], $code);
+			$e = new Exception(ERROR_CODES[$code], $code);
 		}
 		if ($ERROR_DEBUG) {
 			header('Content-Type: text/plain');
