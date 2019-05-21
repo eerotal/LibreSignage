@@ -87,13 +87,13 @@ function web_auth(
 	}
 	if ($user_wl) {
 		if (!auth_user_whitelist($d['user'], $user_wl)) {
-			if ($redir) { error_handle(HTTP_ERR_403, new ErrorException(ERROR_CODES[HTTP_ERR_403], HTTP_ERR_403)); }
+			if ($redir) { error_handle(HTTP_ERR_403); }
 			return NULL;
 		}
 	}
 	if ($group_wl) {
 		if (!auth_group_whitelist($d['user'], $group_wl)) {
-			if ($redir) { error_handle(HTTP_ERR_403, new ErrorException(ERROR_CODES[HTTP_ERR_403], HTTP_ERR_403)); }
+			if ($redir) { error_handle(HTTP_ERR_403); }
 			return NULL;
 		}
 	}
