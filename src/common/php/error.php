@@ -74,7 +74,7 @@ function error_handle(int $code, Throwable $e = NULL) {
 	try {
 		if (!array_key_exists($code, ERROR_CODES)) { $code = HTTP_ERR_500; }
 		// Make sure we are actually getting a Throwable object.
-		if (!($e instanceof Throwable)) {
+		if ($e === NULL) {
 			// From the line above $code is guaranteed to be listed in ERROR_CODES.
 			// The default for unknown codes is HTTP_ERR_500.
 			$e = new ErrorException(ERROR_CODES[$code], $code);
