@@ -177,11 +177,11 @@ listed below.
 1. Install `Docker <https://www.docker.com/>`_ if it's not installed yet.
 2. Run the following command:
 
-       docker run \
-           -d \
-           -p 80:80 \
-           --mount source=ls_vol,target=/var/www/html/data \
-           eerotal/libresignage:latest
+   docker run \
+       -d \
+       -p 80:80 \
+       --mount source=ls_vol,target=/var/www/html/data \
+       eerotal/libresignage:latest
 
    This command pulls the LibreSignage image from Docker Hub, binds port
    80 on the host system to the container's port 80 (*-p*) and
