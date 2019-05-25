@@ -20,6 +20,7 @@ var Shortcut = require('ls-shortcut').Shortcut;
 var EditorController = require('./editorcontroller.js').EditorController;
 var EditorValidators = require('./editorvalidators.js').EditorValidators;
 
+var APIError = require('ls-api').APIError;
 var APIUI = require('ls-api-ui');
 var User = require('ls-user').User;
 var Queue = require('ls-queue').Queue;
@@ -380,11 +381,14 @@ class EditorView extends BaseView {
 				attach: {
 					'component.timeline.click': async (e, data) => {
 						this.state('loading', true);
-						if (await this.show_slide(data.get('id'))) {
-							data.then();
-						} else {
+						try {
+							await this.show_slide(data.get('id'));
+						} catch (e) {
+							APIUI.handle_error(e);
 							data.except();
+							return;
 						}
+						data.then();
 						this.state('loading', false);
 					}
 				},
@@ -399,20 +403,26 @@ class EditorView extends BaseView {
 				attach: {
 					'component.queueselector.select': async (e, data) => {
 						this.state('loading', true);
-						if (await this.show_queue(data.get('queue'))) {
-							data.then();
-						} else {
+						try {
+							await this.show_queue(data.get('queue'));
+						} catch (e) {
+							APIUI.handle_error(e);
 							data.except();
+							return;
 						}
+						data.then();
 						this.state('loading', false);
 					},
 					'component.queueselector.create': async (e, data) => {
 						this.state('loading', true);
-						if (await this.create_queue(data.get('queue'))) {
-							data.then();
-						} else {
+						try {
+							await this.create_queue(data.get('queue'));
+						} catch (e) {
+							APIUI.handle_error(e);
 							data.except();
+							return;
 						}
+						data.then();
 						this.state('loading', false);
 					},
 					'component.queueselector.view': (e, data) => {
@@ -420,11 +430,14 @@ class EditorView extends BaseView {
 					},
 					'component.queueselector.remove': async (e, data) => {
 						this.state('loading', true);
-						if (await this.remove_queue()) {
-							data.then();
-						} else {
+						try {
+							await this.remove_queue();
+						} catch (e) {
+							APIUI.handle_error(e);
 							data.except();
+							return;
 						}
+						data.then();
 						this.state('loading', false);
 					},
 					'component.queueselector.deselect': (e, data) => {
@@ -525,11 +538,14 @@ class EditorView extends BaseView {
 					},
 					'component.dropselect.select': async (e, data) => {
 						this.state('loading', true);
-						if (await this.move_slide(data.get('option'))) {
-							data.then();
-					 	} else {
+						try {
+							await this.move_slide(data.get('option'));
+						} catch (e) {
+							APIUI.handle_error(e);
 							data.except();
+							return;
 						}
+						data.then();
 						this.state('loading', false);
 					}
 				},
@@ -738,53 +754,30 @@ class EditorView extends BaseView {
 		/*
 		*  Show the queue 'name'. If a slide is already loaded and it
 		*  has unsaved changes, the user is prompted for confirmation
-		*  before changing the queue. Returns true/false on
-		*  success/failure respectively.
+		*  before changing the queue.
 		*/
-		if (!(await this.confirm_slide_hide())) { return false; }
-		if (!(await this.hide_queue())) { return false; }
-
-		try {
-			await this.controller.open_queue(name);
-		} catch (e) {
-			APIUI.handle_error(e);
-			return false;
-		}
+		if (!(await this.confirm_slide_hide())) { return; }
+		await this.hide_queue();
+		await this.controller.open_queue(name);
 		await this.timeline.show_queue(this.controller.get_queue());
 		this.update();
-
-		return true;
 	}
 
 	async hide_queue() {
 		/*
-		*  Hide the current queue. Returns true/false on success/failure
-		*  respectively.
+		*  Hide the current queue.
 		*/
-		try {
-			await this.hide_slide();
-		} catch (e) {
-			APIUI.handle_error(e);
-			return false;
-		}
+		await this.hide_slide();
 		this.timeline.hide_queue();
 		this.controller.close_queue();
 		this.update();
-		return true;
 	}
 
 	async create_queue(queue) {
 		/*
-		*  Create a new queue. Returns true/false on success/failure
-		*  respectively.
+		*  Create a new queue.
 		*/
-		try {
-			await this.controller.create_queue(queue);
-		} catch (e) {
-			APIUI.handle_error(e);
-			return false;
-		}
-		return true;
+		await this.controller.create_queue(queue);
 	}
 
 	view_queue() {
@@ -793,17 +786,11 @@ class EditorView extends BaseView {
 
 	async remove_queue() {
 		/*
-		*  Remove and hide the current queue. Returns true/false on
-		*  success/failure respectively.
+		*  Remove and hide the current queue.
 		*/
-		try {
-			await this.controller.remove_queue();
-		} catch (e) {
-			APIUI.handle_error(e);
-			return false;
-		}
-		if (!await this.hide_queue()) { return false; }
-		return true;
+		await this.hide_slide();
+		await this.controller.remove_queue();
+		await this.hide_queue();
 	}
 
 	async show_slide(id) {
@@ -812,20 +799,13 @@ class EditorView extends BaseView {
 		*  loaded slide from the EditorController is used.
 		*  If a slide is already loaded and it has unsaved
 		*  changes, the user is prompted for confirmation
-		*  before changing the slide. This function returns
-		*  true if the slide was changed and false otherwise.
+		*  before changing the slide.
 		*/
 		let s = null;
 		if (id != null) {
 			// Only confirm changing the slide if id != null.
-			if (!(await this.confirm_slide_hide())) { return false; }
-
-			try {
-				await this.controller.open_slide(id);
-			} catch (e) {
-				APIUI.handle_error(e);
-				return;
-			}
+			if (!(await this.confirm_slide_hide())) { return; }
+			await this.controller.open_slide(id);
 		}
 		s = this.controller.get_slide();
 
@@ -851,8 +831,6 @@ class EditorView extends BaseView {
 		*/
 		this.validators.enable(true);
 		this.update();
-
-		return true;
 	}
 
 	highlight_error(from, to) {
@@ -937,8 +915,7 @@ class EditorView extends BaseView {
 
 	async hide_slide() {
 		/*
-		*  Hide the currently visible slide. Returns true/false on
-		*  success/failure respectively.
+		*  Hide the currently visible slide.
 		*/
 
 		/*
@@ -948,33 +925,20 @@ class EditorView extends BaseView {
 		this.validators.enable(false);
 
 		if (this.controller.get_state().slide.loaded) {
-			try {
-				await this.controller.close_slide();
-			} catch (e) {
-				APIUI.handle_error(e);
-				return false;
-			}
+			await this.controller.close_slide();
 		}
 		this.inputs.all(function() { this.clear(); });
-		return true;
+		this.update();
 	}
 
 	async new_slide() {
 		/*
 		*  Create a new slide. Note that this function
-		*  doesn't save the slide automatically. Returns
-		*  true if a new slide was created and false
-		*  otherwise.
+		*  doesn't save the slide automatically.
 		*/
-		if (!(await this.confirm_slide_hide())) { return false; }
-		try {
-			await this.controller.new_slide();
-		} catch (e) {
-			APIUI.handle_error(e);
-			return;
-		}
+		if (!(await this.confirm_slide_hide())) { return; }
+		await this.controller.new_slide();
 		await this.show_slide(null);
-		return true;
 	}
 
 	async save_slide() {
@@ -1035,38 +999,22 @@ class EditorView extends BaseView {
 
 	async move_slide(queue) {
 		/*
-		*  Move the current slide to 'queue'. Returns true/false
-		*  on success/failure respectively.
+		*  Move the current slide to 'queue'.
 		*/
-		try {
-			await this.controller.move_slide(queue);
-			await this.timeline.update(false);
-		} catch (e) {
-			APIUI.handle_error(e);
-			return false;
-		}
-		if (!(await this.hide_slide())) { return false; }
+		await this.controller.move_slide(queue);
+		await this.timeline.update(false);
+		await this.hide_slide();
 		this.update();
-
-		return true;
 	}
 
 	async remove_slide() {
 		/*
-		*  Remove the current slide. Returns true/false on success/failure
-		*  respectively.
+		*  Remove the current slide.
 		*/
-		try {
-			await this.controller.remove_slide();
-			await this.timeline.update(false);
-		} catch (e) {
-			APIUI.handle_error(e);
-			return false;
-		}
-		if (!(await this.hide_slide())) { return false; }
+		await this.controller.remove_slide();
+		await this.timeline.update(false);
+		await this.hide_slide();
 		this.update();
-
-		return true;
 	}
 
 	update() {
