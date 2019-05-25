@@ -4,7 +4,6 @@
 #  either 'nightly' or 'release'.
 #
 
-
 #!/bin/sh
 
 set -e
@@ -23,18 +22,21 @@ if [ -z "$DOCKER_PASS" ]; then
 	exit 1
 fi
 
+# Login with credentials from environment variables.
+echo "$DOCKER_PASS" | docker login --username="$DOCKER_USER" --password-stdin
+
 if [ "$BUILD" = "nightly" ]; then
-	DEST="$REPO/libresignage:nightly"
+	docker tag "libresignage:$LS_VER" "$REPO/libresignage:nightly"
+	docker push "$REPO/libresignage:nightly"
 elif [ "$BUILD" = "release" ]; then
-	DEST="$REPO/libresignage:$LS_VER"
+	docker tag "libresignage:$LS_VER" "$REPO/libresignage:$LS_VER"
+	docker push "$REPO/libresignage:$LS_VER"
+
+	docker tag "libresignage:$LS_VER" "$REPO/libresignage:latest"
+	docker push "$REPO/libresignage:latest"
 else
 	echo "[Error] Unknown build type to push."
 	exit 1
 fi
 
-# Login, tag and push to Docker Hub.
-echo "$DOCKER_PASS" | docker login --username="$DOCKER_USER" --password-stdin
-docker tag "libresignage:$LS_VER" "$DEST"
-docker push "$DEST"
-
-echo "[Info] Image '$DEST' pushed to Docker Hub."
+echo "[Info] Image(s) pushed to Docker Hub."
