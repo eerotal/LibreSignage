@@ -111,11 +111,9 @@ class LoginView {
 			);
 		} catch (e) {
 			if (e instanceof APIError) {
-				if (e.response.error === APIError.codes.API_E_INCORRECT_CREDS) {
+				if (e.get_code() === APIError.codes.API_E_INCORRECT_CREDS) {
 					query.failed = '1';
-					window.location.assign(
-						`/login?${util.querify(query)}`
-					);
+					window.location.assign(`/login?${util.querify(query)}`);
 					return;
 				} else {
 					APIUI.handle_error(e);

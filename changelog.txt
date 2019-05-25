@@ -5,6 +5,8 @@ v1.1.0
 v1.0.1
   - [bugfix]   Fix a bug where using forward slashes in slide markup caused
                exceptions. (issue #66)
+  - [bugfix]   Fix a bug where passing a NULL exception to error_handle() caused
+               a fatal exception in some cases. (issue #61)
 
 v1.0.0
   - [internal] Modularize and improve the build system.
