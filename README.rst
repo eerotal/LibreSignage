@@ -146,7 +146,7 @@ Tested operating systems
 Build system dependencies
   * PHP (Version 7.x.) (http://www.php.net/)
   * GNU Make (Version 4.x or newer.) (https://www.gnu.org/software/make/)
-  * Pandoc (Version 2.2.x or newer.) (https://pandoc.org/)
+  * Pandoc (Version 2.0.x or newer.) (https://pandoc.org/)
   * npm (Version 6.4.x or newer.) (https://nodejs.org/en/)
   * ImageMagick (Version 6.x or newer.) (https://www.imagemagick.org/)
 
@@ -491,6 +491,12 @@ CONF=<config file> - (default: Last generated config.)
 
 VERBOSE=<Y/n>
   Print verbose log output. This setting can be used with any target.
+
+INITCHK_WARN=<y/N>
+  Don't abort the build process if one of the initialization checks fails.
+  If this is set to Y, only a warning is printed. This option can be used
+  for example when an incompatible dependency version is used but the user
+  wants to try building LibreSignage with that version anyway.
 
 9. Documentation
 -----------------
