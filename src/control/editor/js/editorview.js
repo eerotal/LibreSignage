@@ -388,8 +388,8 @@ class EditorView extends BaseView {
 							data.except();
 							return;
 						}
-						data.then();
 						this.state('loading', false);
+						data.then();
 					}
 				},
 				defer: () => !this.state('ready') || this.state('loading'),
@@ -410,8 +410,8 @@ class EditorView extends BaseView {
 							data.except();
 							return;
 						}
-						data.then();
 						this.state('loading', false);
+						data.then();
 					},
 					'component.queueselector.create': async (e, data) => {
 						this.state('loading', true);
@@ -422,8 +422,8 @@ class EditorView extends BaseView {
 							data.except();
 							return;
 						}
-						data.then();
 						this.state('loading', false);
+						data.then();
 					},
 					'component.queueselector.view': (e, data) => {
 						this.view_queue();
@@ -437,13 +437,11 @@ class EditorView extends BaseView {
 							data.except();
 							return;
 						}
-						data.then();
 						this.state('loading', false);
+						data.then();
 					},
 					'component.queueselector.deselect': (e, data) => {
-						this.state('loading', true);
 						data.then();
-						this.state('loading', false);
 					}
 				},
 				defer: () => !this.state('ready') || this.state('loading'),
@@ -545,8 +543,8 @@ class EditorView extends BaseView {
 							data.except();
 							return;
 						}
-						data.then();
 						this.state('loading', false);
+						data.then();
 					}
 				},
 				defer: () => !this.state('ready') || this.state('loading')
