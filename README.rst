@@ -175,7 +175,7 @@ LibreSignage Docker images from Docker hub. The required steps are
 listed below.
 
 1. Install `Docker <https://www.docker.com/>`_ if it's not installed yet.
-2. Run the following command:
+2. Run the following command::
 
        docker run \
            -d \
