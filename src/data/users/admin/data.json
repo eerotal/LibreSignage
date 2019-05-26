@@ -12,17 +12,9 @@
 	"quota": {
 		"__classname": "UserQuota",
 		"__visibility": "private",
-		"quota": {
-			"slides": {
-				"limit": 10,
-				"description": "Slides",
-				"used": 3
-			},
-			"api_rate": {
-				"limit": 200,
-				"description": "API quota (calls\/60s)",
-				"used": 0
-			}
+		"used": {
+			"slides": 3,
+			"api_rate": 0
 		},
 		"state": []
 	}

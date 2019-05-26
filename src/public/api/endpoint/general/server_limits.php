@@ -24,5 +24,5 @@ $SERVER_LIMITS = new APIEndpoint([
 	APIEndpoint::REQ_AUTH		=> FALSE
 ]);
 
-$SERVER_LIMITS->resp_set(array('limits' => LS_LIM));
+$SERVER_LIMITS->resp_set(['limits' => LS_LIMITS]);
 $SERVER_LIMITS->send();

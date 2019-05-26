@@ -1,49 +1,26 @@
 <?php
 
 require_once(LIBRESIGNAGE_ROOT.'/common/php/exportable/exportable.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/util.php');
 
 class UserQuota extends Exportable {
 	static $PRIVATE = [
-		'quota',
+		'used',
 		'state'
 	];
 
 	static $PUBLIC = [
-		'quota'
+		'limits',
+		'used'
 	];
 
-	private $quota = [];
-	private $state = [];
+	private $limits = [];
+	private $used   = [];
+	private $state  = [];
 
-	public function __construct($limits = []) {
-		/*
-		*  Initialize the UserQuota object with data
-		*  from $limits. $limits can be an empty array
-		*  if no initial limits are needed.
-		*/
-		foreach ($limits as $key => $data) {
-			// Set limit.
-			if (array_key_exists('limit', $data)) {
-				$this->quota[$key]['limit'] = $data['limit'];
-			} else {
-				// Skip data with no quota limit.
-				continue;
-			}
-
-			// Set description.
-			if (array_key_exists('description', $data)) {
-				$this->quota[$key]['description'] = $data['description'];
-			} else {
-				$this->quota[$key]['description'] = '';
-			}
-
-			// Set used quota.
-			if (array_key_exists('used', $data)) {
-				$this->quota[$key]['used'] = $data['used'];
-			} else {
-				$this->quota[$key]['used'] = 0;
-			}
-		}
+	public function __construct($limits = LS_QUOTAS) {
+		$this->limits = $limits;
+		foreach ($limits as $k => $d) { $this->used[$k] = 0; }
 	}
 
 	public function __exportable_set(string $name, $value) {
@@ -55,19 +32,19 @@ class UserQuota extends Exportable {
 	}
 
 	public function get_description(string $key): string {
-		return $this->quota[$key]['description'];
+		return $this->limits[$key]['description'];
 	}
 
 	public function get_limit(string $key): int {
-		return $this->quota[$key]['limit'];
+		return $this->limits[$key]['limit'];
 	}
 
 	public function set_used(string $key, int $used): void {
-		$this->quota[$key]['used'] = $used;
+		$this->used[$key] = $used;
 	}
 
 	public function get_used(string $key, int $amount): int {
-		return $this->quota[$key]['used'];
+		return $this->used[$key];
 	}
 
 	public function has_quota(string $key, int $amount = 1): bool {
@@ -75,10 +52,7 @@ class UserQuota extends Exportable {
 		*  Check whether there's quota left for $key. Returns
 		*  TRUE when there is quota left and FALSE otherwise.
 		*/
-		return (
-			$this->quota[$key]['limit']
-			- $this->quota[$key]['used']
-		) >= $amount;
+		return ($this->limits[$key]['limit'] - $this->used[$key]) >= $amount;
 	}
 
 	public function use_quota(string $key, int $amount = 1): void {
@@ -89,15 +63,15 @@ class UserQuota extends Exportable {
 		if (!$this->has_quota($key, $amount)) {
 			throw new QuotaException("Not enough quota left for $key.");
 		}
-		$this->quota[$key]['used'] += $amount;
+		$this->used[$key] += $amount;
 	}
 
 	public function free_quota(string $key, int $amount = 1): void {
 		/*
 		*  Free quota from $key.
 		*/
-		if ($this->quota[$key]['used'] > 0) {
-			$this->quota[$key]['used'] -= $amount;
+		if ($this->used[$key] > 0) {
+			$this->used[$key] -= $amount;
 		}
 	}
 
