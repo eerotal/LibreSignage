@@ -33,7 +33,7 @@ class User extends Exportable {
 			$this->load($name);
 		} else {
 			// Initialize the user quota for new users.
-			$this->quota = new UserQuota(DEFAULT_QUOTA);
+			$this->quota = new UserQuota();
 		}
 	}
 
