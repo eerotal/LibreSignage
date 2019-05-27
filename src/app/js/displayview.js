@@ -275,13 +275,7 @@ class DisplayView extends BaseView {
 		}
 
 		try {
-			let content = $(
-				markup.parse(
-					util.sanitize_html(
-						s.get('markup')
-					)
-				)
-			);
+			let content = $(markup.parse(s.get('markup')));
 			if ('static' in this.query_params) {
 				// Don't autoplay video when 'static' is passed in URL.
 				if (content.is('video')) {

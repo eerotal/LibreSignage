@@ -151,12 +151,14 @@ Build system dependencies
   * ImageMagick (Version 6.x or newer.) (https://www.imagemagick.org/)
 
 Build system dependencies installed automatically by npm
-  * Tools
+  * Tools & development libraries
 
     * SASS (https://sass-lang.com/)
     * Browserify (http://browserify.org/)
     * PostCSS (https://postcss.org/)
     * Autoprefixer (https://github.com/postcss/autoprefixer)
+    * node-XMLHttpRequest (https://github.com/driverdan/node-XMLHttpRequest)
+    * JSDOM (https://github.com/jsdom/jsdom)
 
   * Libraries
 
