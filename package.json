@@ -29,7 +29,8 @@
     "browserify": "^16.2.2",
     "postcss-cli": "^6.0.0",
     "sass": "^1.15.0",
-    "xmlhttprequest": "^1.8.0"
+    "xmlhttprequest": "^1.8.0",
+    "jsdom": "^15.1.0"
   },
   "private": true
 }
