@@ -65,7 +65,7 @@ class DisplayView extends BaseView {
 					touchmove: () => this.show_controls(),
 					click: () => this.show_controls()
 				},
-				defer: () => !this.state('ready'),
+				defer: () => !this.state('ready') || this.state('preview'),
 				getter: null,
 				setter: null
 			})
@@ -272,6 +272,8 @@ class DisplayView extends BaseView {
 		let s = null;
 
 		this.state('preview', true);
+		this.apply_state();
+
 		try {
 			s = await this.controller.get_slide(id);
 		} catch (e) {
