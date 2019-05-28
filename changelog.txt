@@ -10,6 +10,7 @@ v1.0.1
   - [bugfix]   Fix a bug where passing a NULL exception to error_handle() caused
                a fatal exception in some cases. (issue #61)
   - [feature]  Tag new Docker releases with the 'latest' tag.
+  - [bugfix]   Fix standalone checks in the API interface module.
 
 v1.0.0
   - [internal] Modularize and improve the build system.
