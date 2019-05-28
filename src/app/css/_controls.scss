@@ -2,8 +2,8 @@
 *  LibreSignage display controls styling.
 */
 
-$contr-color-normal: hsl(0, 0, 75%);
-$contr-color-hover: hsl(0, 0, 25%);
+$contr-color-normal: hsl(0, 0, 30%);
+$contr-color-hover: hsl(0, 0, 10%);
 
 @keyframes controls-fade {
 	0%   { opacity: 0.15; }

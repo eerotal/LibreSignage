@@ -27,11 +27,14 @@ class DisplayView extends BaseView {
 		this.statics = null;
 		this.buttons = null;
 
-		this.controls_interval_id = null;
-		this.ui_state = {
-			controls: false
-		};
+		this.controls_timeout_id = null;
 		this.render_timeouts = [];
+
+		this.init_state({
+			controls: false,
+			preview: false,
+			ready: false
+		});
 
 		// Disable logging if silent=1 was passed in the URL.
 		if ('silent' in this.query_params) {
@@ -129,16 +132,16 @@ class DisplayView extends BaseView {
 	}
 
 	show_controls() {
-		if (this.controls_interval_id != null) {
-			clearInterval(this.controls_interval_id);
+		if (this.controls_timeout_id != null) {
+			clearTimeout(this.controls_timeout_id);
 		}
 
-		this.ui_state.controls = true;
+		this.state('controls', true);
 		this.apply_state();
 
-		this.controls_interval_id = setInterval(() => {
-			this.controls_interval_id = null;
-			this.ui_state.controls = false;
+		this.controls_timeout_id = setTimeout(() => {
+			this.controls_timeout_id = null;
+			this.state('controls', false);
 			this.apply_state();
 		}, CONTROLS_VISIBLE_PERIOD);
 	}
@@ -267,6 +270,8 @@ class DisplayView extends BaseView {
 		*  Preview a slide without starting the display loop.
 		*/
 		let s = null;
+
+		this.state('preview', true);
 		try {
 			s = await this.controller.get_slide(id);
 		} catch (e) {
@@ -336,11 +341,11 @@ class DisplayView extends BaseView {
 	apply_state() {
 		this.statics.all(
 			function(d) { this.state(d); },
-			this.ui_state
+			this.get_state_vars()
 		);
 		this.buttons.all(
 			function(d) { this.state(d); },
-			this.ui_state
+			this.get_state_vars()
 		);
 	}
 }
