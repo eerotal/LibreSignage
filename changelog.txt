@@ -3,6 +3,7 @@ v1.1.0
                to naturally prevent access to private files. (PR #56)
   - [feature]  Implement [bgimg] and [bgcolor] markup tags for styling
                slide backgrounds. (issue #75)
+  - [feature]  Implement buttons for manual slide navigation in display.
 
 v1.0.1
   - [bugfix]   Fix a bug where using forward slashes in slide markup caused
