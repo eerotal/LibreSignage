@@ -12,6 +12,9 @@ v1.0.1
                a fatal exception in some cases. (issue #61)
   - [feature]  Tag new Docker releases with the 'latest' tag.
   - [bugfix]   Fix standalone checks in the API interface module.
+  - [bugfix]   Fix incompatible pandoc version in Travis CI. (issue #58)
+  - [feature]  Implement the INITCHK_WARN make option for ignoring errors
+               from initialization checks.
 
 v1.0.0
   - [internal] Modularize and improve the build system.
