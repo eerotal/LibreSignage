@@ -17,15 +17,13 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
-$VER_INFO = new APIEndpoint([
-	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_AUTH		=> FALSE
-]);
-
-$VER_INFO->resp_set([
-	'ls' => LS_VER,
-	'api' => API_VER
-]);
-$VER_INFO->send();
+APIEndpoint::GET(
+	[],
+	function($req, $resp) {
+		$resp->headers->set('Content-Type', 'application/json');
+		$resp->setContent(APIEndpoint::json_encode([
+			'ls' => LS_VER,
+			'api' => API_VER
+		]));
+	}
+);

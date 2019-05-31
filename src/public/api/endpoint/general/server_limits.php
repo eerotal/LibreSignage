@@ -17,12 +17,10 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
-$SERVER_LIMITS = new APIEndpoint([
-	APIEndpoint::METHOD 		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_AUTH		=> FALSE
-]);
-
-$SERVER_LIMITS->resp_set(['limits' => LS_LIMITS]);
-$SERVER_LIMITS->send();
+APIEndpoint::GET(
+	[],
+	function($req, $resp) {
+		$resp->headers->set('Content-Type', 'application/json');
+		$resp->setContent(APIEndpoint::json_encode(['limits' => LS_LIMITS]));
+	}
+);

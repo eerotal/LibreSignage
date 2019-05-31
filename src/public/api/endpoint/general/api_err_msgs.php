@@ -17,12 +17,10 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
-$API_ERR_MSGS = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::REQ_QUOTA		=> FALSE,
-	APIEndpoint::REQ_AUTH		=> FALSE
-));
-
-$API_ERR_MSGS->resp_set(array('messages' => API_E_MSG));
-$API_ERR_MSGS->send();
+APIEndpoint::GET(
+	[],
+	function($req, $resp) {
+		$resp->headers->set('Content-Type', 'application/json');
+		$resp->setContent(APIEndpoint::json_encode(['messages' => API_E_MSG]));
+	}
+);
