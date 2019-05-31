@@ -28,6 +28,8 @@ class APIEndpoint {
 	private $module_data = [];
 
 	public function __construct(array $modules, string $method, callable $hook) {
+		$ret = NULL;
+
 		api_error_setup();
 
 		$this->method = $method;
@@ -37,8 +39,21 @@ class APIEndpoint {
 		// Only handle requests with the correct HTTP method.
 		if ($this->method !== $this->request->getMethod()) { return; }
 
+		// Run API modules requested by endpoint.
 		foreach ($modules as $m => $args) { $this->run_module($m, $args); }
-		$hook($this->request, $this->response, ...$this->module_data);
+
+		/*
+		*  Run the endpoint hook function. If the function returns an array,
+		*  use it as the JSON response.
+		*/
+		$ret = $hook($this->request, $this->response, $this->module_data);
+		if (is_array($ret)) {
+			// Make sure the error code is set.
+			if (!array_key_exists('error', $ret)) { $ret['error'] = API_E_OK; }
+
+			$this->response->headers->set('Content-Type', 'application/json');
+			$this->response->setContent(APIEndpoint::json_encode($ret));
+		}
 		$this->send();
 	}
 
@@ -52,7 +67,7 @@ class APIEndpoint {
 
 	public function run_module(string $module, array $args) {
 		try {
-			$this->module_data[] = (new $module())->run($this, $args);
+			$this->module_data[$module] = (new $module())->run($this, $args);
 		} catch (IntException $e) {
 			throw new APIException(API_E_INTERNAL, 'No such API module.');
 		}

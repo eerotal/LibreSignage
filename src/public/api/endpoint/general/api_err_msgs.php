@@ -19,8 +19,7 @@ require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
 APIEndpoint::GET(
 	[],
-	function($req, $resp) {
-		$resp->headers->set('Content-Type', 'application/json');
-		$resp->setContent(APIEndpoint::json_encode(['messages' => API_E_MSG]));
+	function($req, $resp, $params) {
+		return ['messages' => API_E_MSG];
 	}
 );

@@ -28,6 +28,7 @@ class APIAuthModule extends APIModule {
 			);
 		}
 
+		// Check auth token.
 		if ($req->headers->get(AUTH_TOKEN_HEADER) !== NULL) {
 			$data = auth_token_verify($req->headers->get(AUTH_TOKEN_HEADER));
 		} else if ($req->cookies->get(AUTH_TOKEN_COOKIE) && $args['cookie_auth']) {

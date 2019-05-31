@@ -41,7 +41,6 @@ PHP_LIBS := $(addprefix vendor/,\
 		composer show | cut -d' ' -f1 \
 	) composer autoload.php \
 )
-$(info $(PHP_LIBS))
 
 # Non-compiled sources.
 SRC_NO_COMPILE := $(shell find src \
