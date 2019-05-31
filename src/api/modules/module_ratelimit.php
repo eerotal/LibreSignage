@@ -1,6 +1,6 @@
 <?php
 
-require_once(LIBRESIGNAGE_ROOT.'/api/modules/module.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/module.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/userquota.php');
 
 class APIRateLimitModule extends APIModule {
@@ -14,11 +14,16 @@ class APIRateLimitModule extends APIModule {
 		parent::__construct();
 	}
 
-	public function run(APIEndpoint $endpoint) {
-		// Use API rate quota  if required.
-		if (!$endpoint->requires_quota()) { return; }
+	public function run(APIEndpoint $e, array $args) {
+		assert(
+			$e->get_caller() !== NULL,
+			new APIException(
+				API_E_INTERNAL,
+				"User data not loaded. You must call APIAuthModule first."
+			)
+		);
 
-		$quota = $endpoint->get_caller()->get_quota();
+		$quota = $e->get_caller()->get_quota();
 		if ($quota->has_state('api_t_start')) {
 			$t = $quota->get_state('api_t_start');
 			if (time() - $t >= gtlim('API_RATE_T')) {
@@ -39,6 +44,6 @@ class APIRateLimitModule extends APIModule {
 		} else {
 			$quota->use_quota('api_rate');
 		}
-		$endpoint->get_caller()->write();
+		$e->get_caller()->write();
 	}
 }
