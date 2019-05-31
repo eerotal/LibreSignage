@@ -35,6 +35,14 @@ JS_LIBS := $(filter-out \
 	$(shell npm ls --prod --parseable|sed 's/\n/ /g') \
 )
 
+# Production PHP libraries.
+PHP_LIBS := $(addprefix vendor/,\
+	$(shell \
+		composer show | cut -d' ' -f1 \
+	) composer autoload.php \
+)
+$(info $(PHP_LIBS))
+
 # Non-compiled sources.
 SRC_NO_COMPILE := $(shell find src \
 	\( -type f -path 'src/node_modules/*' -prune \) \
@@ -102,7 +110,7 @@ docs:: $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_index.rs
 htmldocs:: $(addprefix dist/public/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
 css:: $(subst src,dist/public,$(SRC_SCSS:.scss=.css)); @:
 js_libs:: $(subst $(ROOT)node_modules/,dist/public/libs/,$(JS_LIBS)); @:
-php_libs:: dist/vendor; @:
+php_libs:: $(addprefix dist/,$(PHP_LIBS)); @:
 logo:: $(GENERATED_LOGOS); @:
 
 # Copy over non-compiled, non-PHP sources.
@@ -266,11 +274,12 @@ dist/public/libs/%:: node_modules/%
 	$(call status,cp,$<,$@)
 	cp -Rp $</* $@
 
-# Copy the PHP library dir vendor to dist/vendor.
-dist/vendor:: vendor
+# Copy PHP libraries to dist/vendors.
+dist/vendor/%:: vendor/%
 	@:
 	set -e
 	$(call status,cp,$<,$@)
+	mkdir -p $$(dirname $@)
 	cp -Rp $< $@
 
 # Convert the LibreSignage SVG logos to PNG logos of various sizes.

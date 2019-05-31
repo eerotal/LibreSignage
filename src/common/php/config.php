@@ -5,6 +5,9 @@
 
 	define("LIBRESIGNAGE_ROOT", $_SERVER['DOCUMENT_ROOT'].'/..');
 
+	// Require the composer autoload file.
+	require_once(LIBRESIGNAGE_ROOT.'/vendor/autoload.php');
+
 	const CONFIG_DIR  = "config/conf";
 	const QUOTA_DIR   = "config/quota";
 	const LIMITS_DIR  = "config/limits";

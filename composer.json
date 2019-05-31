@@ -1,5 +1,6 @@
 {
 	"require": {
-		"symfony/http-foundation": "4.2.*"
+		"symfony/http-foundation": "4.2.*",
+		"justinrainbow/json-schema": "5.2.*"
 	}
 }
