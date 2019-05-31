@@ -20,9 +20,6 @@ class APIEndpoint {
 
 	private $method      = NULL;
 
-	private $caller      = NULL;
-	private $session     = NULL;
-
 	private $request     = NULL;
 	private $response    = NULL;
 	private $module_data = [];
@@ -57,13 +54,9 @@ class APIEndpoint {
 		$this->send();
 	}
 
-	public function get_caller(): User { return $this->caller; }
-	public function get_session(): Session { return $this->session; }
 	public function get_request(): Request { return $this->request; }
 	public function get_response(): Response { return $this->response; }
-
-	public function set_caller(User $caller) { $this->caller = $caller; }
-	public function set_session(Session $session) { $this->session = $session; }
+	public function get_module_data(): array { return $this->module_data; }
 
 	public function run_module(string $module, array $args) {
 		try {

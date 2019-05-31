@@ -47,7 +47,9 @@ class APIAuthModule extends APIModule {
 			);
 		}
 
-		$e->set_caller($data['user']);
-		$e->set_session($data['session']);
+		return [
+			'user' => $data['user'],
+			'session' => $data['session']
+		];
 	}
 }

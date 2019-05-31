@@ -16,14 +16,16 @@ class APIRateLimitModule extends APIModule {
 
 	public function run(APIEndpoint $e, array $args) {
 		assert(
-			$e->get_caller() !== NULL,
+			array_key_exists('APIAuthModule', $e->get_module_data()),
 			new APIException(
 				API_E_INTERNAL,
 				"User data not loaded. You must call APIAuthModule first."
 			)
 		);
 
-		$quota = $e->get_caller()->get_quota();
+		$user = $e->get_module_data()['APIAuthModule']['user'];
+		$quota = $user->get_quota();
+
 		if ($quota->has_state('api_t_start')) {
 			$t = $quota->get_state('api_t_start');
 			if (time() - $t >= gtlim('API_RATE_T')) {
@@ -37,13 +39,10 @@ class APIRateLimitModule extends APIModule {
 		}
 
 		if (!$quota->has_quota('api_rate')) {
-			throw new APIException(
-				API_E_RATE,
-				"API rate limited."
-			);
+			throw new APIException(API_E_RATE, "API rate limited.");
 		} else {
 			$quota->use_quota('api_rate');
 		}
-		$e->get_caller()->write();
+		$user->write();
 	}
 }
