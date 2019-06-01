@@ -26,6 +26,9 @@ class User extends Exportable {
 	private $sessions = [];
 	private $quota = NULL;
 
+	const USERNAME_REGEX = '/^[A-Za-z0-9_]+$/';
+	const GROUPS_REGEX = '/^[A-Za-z0-9_]+$/';
+
 	public function __construct($name = NULL) {
 		if (!empty($name)) {
 			// Load userdata for existing users.
@@ -224,11 +227,18 @@ class User extends Exportable {
 			$this->groups = [];
 		} else if (gettype($groups) == 'array') {
 			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
-				throw new ArgException('Too many user groups.');
+				throw new ArgException('Too many groups.');
 			}
 			foreach ($groups as $g) {
 				if (strlen($g) > gtlim('MAX_USER_GROUP_LEN')) {
-					throw new ArgException('Too long user group name.');
+					throw new ArgException('Too long group name.');
+				}
+
+				$tmp = preg_match(User::GROUPS_REGEX, $g);
+				if ($tmp === 0) {
+					throw new ArgException('Invalid chars in groups names.');
+				} else if ($tmp === FALSE) {
+					throw new ArgException('preg_match() failed.');
 				}
 			}
 			$this->groups = $groups;
@@ -269,15 +279,16 @@ class User extends Exportable {
 		if (empty($name)) {
 			throw new ArgException('Invalid username.');
 		}
+
 		if (strlen($name) > gtlim('USERNAME_MAX_LEN')) {
 			throw new ArgException('Username too long.');
 		}
 
-		$tmp = preg_match('/^[A-Za-z0-9_]+$/', $name);
-		if ($tmp === FALSE) {
-			throw new IntException('preg_match() failed.');
-		} else if ($tmp === 0) {
+		$tmp = preg_match(User::USERNAME_REGEX, $name);
+		if ($tmp === 0) {
 			throw new ArgException('Username contains invalid characters.');
+		} else if ($tmp === FALSE) {
+			throw new IntException('preg_match() failed.');
 		}
 
 		$this->user = $name;
