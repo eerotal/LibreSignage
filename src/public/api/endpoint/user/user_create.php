@@ -25,97 +25,91 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
-define('DEFAULT_PASSWD_LEN', 10);
-define('GROUPS_REGEX', '/[^A-Za-z0-9_]/');
-define('USER_REGEX', GROUPS_REGEX);
+APIEndpoint::POST(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => [],
+		'APIJsonValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'user' => [
+						'type' => 'string',
+						'pattern' => substr(User::USERNAME_REGEX, 1, -1)
+					],
+					'groups' => [
+						'type' => ['array', 'null'],
+						'items' => [
+							'type' => 'array',
+							'pattern' => substr(User::GROUPS_REGEX, 1, -1)
+						]
+					]
+				],
+				'required' => ['user']
+			]
+		]
+	],
+	function($req, $resp, $module_data) {
+		$new = NULL;
+		$pass = NULL;
 
-$USER_CREATE = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_BODY => array(
-		'user' => API_P_STR,
-		'groups' => API_P_ARR_STR|API_P_OPT|API_P_NULL
-	),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
+		$user = $module_data['APIAuthModule']['user'];
+		$params = $module_data['APIJsonValidatorModule'];
 
-if (!$USER_CREATE->get_caller()->is_in_group('admin')) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		"Not authorized."
-	);
-}
+		if (!$user->is_in_group('admin')) {
+			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+		}
+		if (user_exists($params['user'])) {
+			throw new APIException(API_E_INVALID_REQUEST, "User already exists.");
+		}
 
-if (user_exists($USER_CREATE->get('user'))) {
-	throw new APIException(
-		API_E_INVALID_REQUEST,
-		"User already exists."
-	);
-}
+		$new = new User();
 
-$user = new User();
-$tmp_pass = '';
+		// Set name.
+		try {
+			$new->set_name($params['user']);
+		} catch (ArgException $e) {
+			throw new APIException(
+				API_E_LIMITED,
+				"Limited.", 0, $e
+			);
+		}
 
-// Validate user name.
-if (preg_match(USER_REGEX, $USER_CREATE->get('user'))) {
-	throw new APIException(
-		API_E_INVALID_REQUEST,
-		"Invalid chars in group names."
-	);
-}
-try {
-	$user->set_name($USER_CREATE->get('user'));
-} catch (Exception $e) {
-	throw new APIException(
-		API_E_LIMITED,
-		"Limited.", 0, $e
-	);
-}
+		// Set groups.
+		if (array_key_exists('groups', $params)) {
+			try {
+				$new->set_groups($params['groups']);
+			} catch (Exception $e) {
+				throw new APIException(
+					API_E_LIMITED,
+					"Limited.", 0, $e
+				);
+			}
+		}
 
-// Validate group names.
-if ($USER_CREATE->has('groups', TRUE)) {
-	if (count(preg_grep(GROUPS_REGEX,
-		$USER_CREATE->get('groups')))) {
+		// Generate password.
+		try {
+			$pass = gen_passwd(GENERATED_PASSWD_LEN);
+		} catch (Exception $e) {
+			throw new APIException(
+				API_E_INTERNAL,
+				"Failed to generate password.", 0, $e
+			);
+		}
+		$new->set_password($pass);
 
-		throw new APIException(
-			API_E_INVALID_REQUEST,
-			"Invalid chars in group names."
-		);
+		// Write to file.
+		if ($new->write() === FALSE) {
+			throw new APIException(API_E_LIMITED, "Too many users.");
+		}
+
+		return [
+			'user' => array_merge(
+				$new->export(FALSE, FALSE),
+				['pass' => $pass]
+			)
+		];
 	}
-	try {
-		$user->set_groups($USER_CREATE->get('groups'));
-	} catch (Exception $e) {
-		throw new APIException(
-			API_E_LIMITED,
-			"Limited.", 0, $e
-		);
-	}
-}
-
-try {
-	$tmp_pass = gen_passwd(DEFAULT_PASSWD_LEN);
-} catch (Exception $e) {
-	throw new APIException(
-		API_E_INTERNAL,
-		"Failed to generate password.", 0, $e
-	);
-}
-$user->set_password($tmp_pass);
-
-if ($user->write() === FALSE) {
-	throw new APIException(
-		API_E_LIMITED,
-		"Too many users."
-	);
-}
-
-$ret = [
-	'user' => array_merge(
-		$user->export(FALSE, FALSE),
-		['pass' => $tmp_pass]
-	)
-];
-
-$USER_CREATE->resp_set($ret);
-$USER_CREATE->send();
+);

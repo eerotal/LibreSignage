@@ -20,16 +20,14 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
-$USER_GET = new APIEndpoint(array(
-	APIEndpoint::METHOD         => API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
-	APIEndpoint::FORMAT_URL     => array(),
-	APIEndpoint::REQ_QUOTA      => TRUE,
-	APIEndpoint::REQ_AUTH       => TRUE
-));
-
-$USER_GET->resp_set([
-	'user' => $USER_GET->get_caller()->export(FALSE, FALSE)
-]);
-$USER_GET->send();
-
+APIEndpoint::GET(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => []
+	],
+	function ($req, $resp, $params) {
+		return ['user' => $params['APIAuthModule']['user']->export(FALSE, FALSE)];
+	}
+);

@@ -24,31 +24,28 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
-$USER_GET = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_URL => array(
-		'user' => API_P_STR
-	),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
+APIEndpoint::GET(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => []
+	],
+	function($req, $resp, $module_data) {
+		$u = NULL;
+		$user = $module_data['APIAuthModule']['user'];
 
-if (!$USER_GET->get_caller()->is_in_group('admin')) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		"Not authorized."
-	);
-}
+		if (!$user->is_in_group('admin')) {
+			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+		}
 
-$u = new User($USER_GET->get('user'));
+		$u = new User($req->query->get('user'));
 
-$ret_data = [
-	'user' => [
-		'user' => $u->get_name(),
-		'groups' => $u->get_groups()
-	]
-];
-
-$USER_GET->resp_set($ret_data);
-$USER_GET->send();
+		return [
+			'user' => [
+				'user' => $u->get_name(),
+				'groups' => $u->get_groups()
+			]
+		];
+	}
+);
