@@ -17,19 +17,20 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
-$AUTH_SESSION_RENEW = new APIEndpoint([
-	APIEndpoint::METHOD         => API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
-	APIEndpoint::FORMAT_BODY    => [],
-	APIEndpoint::REQ_QUOTA      => TRUE,
-	APIEndpoint::REQ_AUTH       => TRUE
-]);
+APIEndpoint::POST(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => []
+	],
+	function($req, $resp, $params) {
+		$user = $params['APIAuthModule']['user'];
+		$session = $params['APIAuthModule']['session'];
 
-$AUTH_SESSION_RENEW->get_session()->renew();
-$AUTH_SESSION_RENEW->get_caller()->write();
+		$session->renew();
+		$user->write();
 
-$AUTH_SESSION_RENEW->resp_set([
-	'session' => $AUTH_SESSION_RENEW->get_session()->export(FALSE, FALSE),
-	'error' => API_E_OK
-]);
-$AUTH_SESSION_RENEW->send();
+		return ['session' => $session->export(FALSE, FALSE)];
+	}
+);

@@ -16,23 +16,24 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
-$AUTH_GET_SESSIONS = new APIEndpoint(array(
-	APIEndpoint::METHOD         => API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
-	APIEndpoint::FORMAT_URL     => array(),
-	APIEndpoint::REQ_QUOTA      => TRUE,
-	APIEndpoint::REQ_AUTH       => TRUE
-));
+APIEndpoint::GET(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => []
+	],
+	function($req, $resp, $params) {
+		$data = [];
+		$tmp = [];
+		$user = $params['APIAuthModule']['user'];
+		$session = $params['APIAuthModule']['session'];		
 
-$resp = [];
-$tmp = [];
-$current_session = $AUTH_GET_SESSIONS->get_session();
-$sessions = $AUTH_GET_SESSIONS->get_caller()->get_sessions();
-
-foreach ($sessions as $k => $s) {
-	$tmp = $s->export(FALSE, FALSE);
-	$tmp['current'] = ($current_session->get_id() === $s->get_id());
-	$resp['sessions'][] = $tmp;
-}
-$AUTH_GET_SESSIONS->resp_set($resp);
-$AUTH_GET_SESSIONS->send();
+		foreach ($user->get_sessions() as $k => $s) {
+			$tmp = $s->export(FALSE, FALSE);
+			$tmp['current'] = ($session->get_id() === $s->get_id());
+			$data['sessions'][] = $tmp;
+		}
+		return $data;
+	}
+);
