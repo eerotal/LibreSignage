@@ -10,6 +10,8 @@ class APIJsonValidatorModule extends APIModule {
 	}
 
 	public function run(APIEndpoint $e, array $args) {
+		$this->check_args(['schema'], $args);
+
 		$data = APIEndpoint::json_decode($e->get_request()->getContent());
 
 		$validator = new JsonSchema\Validator();

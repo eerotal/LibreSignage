@@ -13,6 +13,8 @@ class APIAuthModule extends APIModule {
 	}
 
 	public function run(APIEndpoint $e, array $args) {
+		$this->check_args(['cookie_auth'], $args);
+
 		$data = NULL;
 		$req = $e->get_request();
 
