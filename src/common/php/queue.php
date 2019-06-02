@@ -35,23 +35,17 @@ function queue_list() {
 }
 
 class Queue {
-	private $queue = NULL;
-	private $owner = NULL;
+	const NAME_REGEX = '/^[A-Za-z0-9_-]$/';
+
+	private $name   = NULL;
+	private $owner  = NULL;
 	private $slides = NULL;
-	private $path = NULL;
+	private $path   = NULL;
 	private $loaded = FALSE;
 
-	function __construct(string $queue) {
-		if (!strlen($queue)) {
-			throw new ArgException(
-				'Invalid queue name.'
-			);
-		}
-
-		$this->queue = $queue;
-		$this->slides = array();
-		$this->path = LIBRESIGNAGE_ROOT.QUEUES_DIR.
-				'/'.$queue.'.json';
+	function __construct(string $name) {
+		$this->set_name($name);
+		$this->slides = [];
 	}
 
 	function load(bool $fix_errors = FALSE) {
@@ -63,18 +57,13 @@ class Queue {
 		$errors_fixed = FALSE;
 
 		if (!file_exists($this->path)) {
-			throw new ArgException(
-				"Queue doesn't exist."
-			);
+			throw new ArgException("Queue doesn't exist.");
 		}
 		$json = file_lock_and_get($this->path);
 		$data = json_decode($json, $assoc=TRUE);
 		if (json_last_error() != JSON_ERROR_NONE &&
 			$data === NULL) {
-			throw new IntException(
-				"JSON decoding failed: ".
-				json_last_error_msg()
-			);
+			throw new IntException("JSON decoding failed: ".json_last_error_msg());
 		}
 
 		$this->set_owner($data['owner']);
@@ -237,7 +226,33 @@ class Queue {
 		}
 	}
 
+	public static function set_name_dry(string $name) {
+		/*
+		*  Validate $name for use in Queue::set_name() without
+		*  changing the name.
+		*/
+		if (strlen($name) === 0) {
+			throw new ArgException('Invalid empty queue name.');
+		} else if (strlen($name) > gtlim('QUEUE_NAME_MAX_LEN')) {
+			throw new ArgException('Queue name too long.');
+		}
+
+		$tmp = preg_match(Queue::NAME_REGEX, $name);
+		if ($tmp === 0) {
+			throw new ArgException('Queue name contains invalid characters.');
+		} else if ($tmp === FALSE) {
+			throw new IntException('preg_match() failed.');
+		}
+	}
+
+	function set_name(string $name) {
+		Queue::set_name_dry($name);
+		$this->name = $name;
+		$this->path = LIBRESIGNAGE_ROOT.QUEUES_DIR.'/'.$name.'.json';
+	}
+
 	function set_owner(string $owner) {
+		User::set_name_dry($owner);
 		$this->owner = $owner;
 	}
 

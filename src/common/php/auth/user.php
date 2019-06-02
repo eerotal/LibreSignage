@@ -200,18 +200,46 @@ class User extends Exportable {
 		return NULL;
 	}
 
-	public function set_sessions($sessions) {
-		/*
-		*  Set the Session object array.
-		*/
-		$this->sessions = array_values($sessions);
+	public function get_sessions() {
+		return $this->sessions;
 	}
 
-	public function get_sessions() {
+	public static function set_groups_dry(array $groups = NULL) {
 		/*
-		*  Get the Session object array.
+		*  Validate the $groups array for use in User::set_groups()
+		*  without changing the groups.
 		*/
-		return $this->sessions;
+		if (gettype($groups) === 'array') {
+			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
+				throw new ArgException('Too many groups.');
+			}
+			foreach ($groups as $g) {
+				if (strlen($g) === 0) {
+					throw new ArgException('Invalid empty group name.');
+				} else if (strlen($g) > gtlim('MAX_USER_GROUP_LEN')) {
+					throw new ArgException('Group name too long.');
+				}
+				$tmp = preg_match(User::GROUPS_REGEX, $g);
+				if ($tmp === 0) {
+					throw new ArgException('Invalid chars in groups names.');
+				} else if ($tmp === FALSE) {
+					throw new ArgException('preg_match() failed.');
+				}
+			}
+		}
+	}
+
+	public function set_groups(array $groups = NULL) {
+		/*
+		*  Set the groups of a User. Calling this function
+		*  with NULL removes the User from all groups.
+		*/
+		User::set_groups_dry($groups);
+		if ($groups === NULL) {
+			$this->groups = [];
+		} else {
+			$this->groups = $groups;
+		}
 	}
 
 	public function get_groups() {
@@ -222,52 +250,43 @@ class User extends Exportable {
 		return in_array($group, $this->groups, TRUE);
 	}
 
-	public function set_groups($groups) {
-		if ($groups == NULL) {
-			$this->groups = [];
-		} else if (gettype($groups) == 'array') {
-			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
-				throw new ArgException('Too many groups.');
-			}
-			foreach ($groups as $g) {
-				if (strlen($g) > gtlim('MAX_USER_GROUP_LEN')) {
-					throw new ArgException('Too long group name.');
-				}
-
-				$tmp = preg_match(User::GROUPS_REGEX, $g);
-				if ($tmp === 0) {
-					throw new ArgException('Invalid chars in groups names.');
-				} else if ($tmp === FALSE) {
-					throw new ArgException('preg_match() failed.');
-				}
-			}
-			$this->groups = $groups;
-		} else {
-			throw new ArgException('Invalid type for groups.');
+	public static function set_password_dry(string $password) {
+		/*
+		*  Validate $password for use in User::set_password()
+		*  without changing the password.
+		*/
+		if (strlen($password) === 0) {
+			throw new ArgException('Invalid empty password.');
+		} else if (strlen($password) > gtlim('PASSWORD_MAX_LEN')) {
+			throw new ArgException('Password too long.');
 		}
+		$tmp_hash = password_hash($password, PASSWORD_DEFAULT);
+		if ($tmp_hash === FALSE) {
+			throw new IntException('Password hashing failed.');
+		}
+	}
+
+	public function set_password(string $password) {
+		User::set_password_dry($password);
+		$this->hash = $tmp_hash;
 	}
 
 	public function verify_password(string $pass) {
 		return password_verify($pass, $this->hash);
 	}
 
-	public function set_password(string $password) {
-		if (strlen($password) > gtlim('PASSWORD_MAX_LEN')) {
-			throw new ArgException('Password too long.');
+	public static function set_hash_dry(string $hash) {
+		/*
+		*  Validate $hash for use in User::set_hash() without
+		*  changing it.
+		*/
+		if (strlen($hash) === 0) {
+			throw new ArgException('Invalid password hash.');
 		}
-
-		$tmp_hash = password_hash($password, PASSWORD_DEFAULT);
-		if ($tmp_hash === FALSE) {
-			throw new IntException('Password hashing failed.');
-		}
-
-		$this->hash = $tmp_hash;
 	}
 
 	public function set_hash(string $hash) {
-		if (empty($hash)) {
-			throw new ArgException('Invalid password hash.');
-		}
+		User::set_hash_dry($hash);
 		$this->hash = $hash;
 	}
 
@@ -275,22 +294,26 @@ class User extends Exportable {
 		return $this->hash;
 	}
 
-	public function set_name(string $name) {
-		if (empty($name)) {
+	public static function set_name_dry(string $name) {
+		/*
+		*  Validate $name for use in User::set_name() without
+		*  changing the name.
+		*/
+		if (strlen($name) === 0) {
 			throw new ArgException('Invalid username.');
-		}
-
-		if (strlen($name) > gtlim('USERNAME_MAX_LEN')) {
+		} else if (strlen($name) > gtlim('USERNAME_MAX_LEN')) {
 			throw new ArgException('Username too long.');
 		}
-
 		$tmp = preg_match(User::USERNAME_REGEX, $name);
 		if ($tmp === 0) {
 			throw new ArgException('Username contains invalid characters.');
 		} else if ($tmp === FALSE) {
 			throw new IntException('preg_match() failed.');
 		}
+	}
 
+	public function set_name(string $name) {
+		User::set_name_dry($name);
 		$this->user = $name;
 	}
 
