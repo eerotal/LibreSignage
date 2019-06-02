@@ -3,7 +3,8 @@
 *  ====>
 *
 *  Get a list of all existing users along with the
-*  available userdata.
+*  available userdata. Admin privileges are required
+*  for this endpoint.
 *
 *  **Request:** GET
 *
@@ -22,32 +23,27 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
-$USERS_GET_ALL = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_URL		=> array(),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
+APIEndpoint::GET(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => []
+	],
+	function($req, $resp, $module_data) {
+		$ret = ['users' => []];
+		$caller = $module_data['APIAuthModule']['user'];
 
-if (!$USERS_GET_ALL->get_caller()->is_in_group('admin')) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		"Not authorized."
-	);
-}
+		if (!$caller->is_in_group('admin')) {
+			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+		}
 
-$users = user_array();
-$ret_data = array(
-	'users' => array()
+		foreach (user_array() as $u) {
+			$ret['users'][$u->get_name()] = [
+				'user' => $u->get_name(),
+				'groups' => $u->get_groups()
+			];
+		}
+		return $ret;
+	}
 );
-
-foreach ($users as $u) {
-	$ret_data['users'][$u->get_name()] = array(
-		'user' => $u->get_name(),
-		'groups' => $u->get_groups()
-	);
-}
-
-$USERS_GET_ALL->resp_set($ret_data);
-$USERS_GET_ALL->send();

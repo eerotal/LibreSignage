@@ -18,39 +18,50 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 
-$USER_REMOVE = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_BODY => array(
-		'user' => API_P_STR,
-	),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
+APIEndpoint::POST(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => [],
+		'APIJsonValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'user' => [
+						'type' => 'string'
+					]
+				],
+				'required' => ['user']
+			]
+		]
+	],
+	function($req, $resp, $module_data) {
+		$caller = $module_data['APIAuthModule']['user'];
+		$params = $module_data['APIJsonValidatorModule'];
 
-if (!$USER_REMOVE->get_caller()->is_in_group('admin')) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		"Not authorized."
-	);
-}
+		if (!$caller->is_in_group('admin')) {
+			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+		}
 
-try {
-	$u = new User($USER_REMOVE->get('user'));
-} catch (ArgException $e) {
-	throw new APIException(
-		API_E_INVALID_REQUEST,
-		"Failed to load user.", 0, $e
-	);
-}
+		try {
+			$u = new User($params->user);
+		} catch (ArgException $e) {
+			throw new APIException(
+				API_E_INVALID_REQUEST,
+				"Failed to load user.", 0, $e
+			);
+		}
 
-try {
-	$u->remove();
-} catch (Exception $e) {
-	throw new APIException(
-		API_E_INTERNAL,
-		"Failed to remove.", 0, $e
-	);
-}
+		try {
+			$u->remove();
+		} catch (Exception $e) {
+			throw new APIException(
+				API_E_INTERNAL,
+				"Failed to remove user.", 0, $e
+			);
+		}
 
-$USER_REMOVE->send();
+		return [];
+	}
+);

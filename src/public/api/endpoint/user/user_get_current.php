@@ -27,7 +27,7 @@ APIEndpoint::GET(
 		],
 		'APIRateLimitModule' => []
 	],
-	function ($req, $resp, $params) {
-		return ['user' => $params['APIAuthModule']['user']->export(FALSE, FALSE)];
+	function ($req, $resp, $module_data) {
+		return ['user' => $module_data['APIAuthModule']['user']->export(FALSE, FALSE)];
 	}
 );

@@ -7,8 +7,8 @@
 *  **Request:** POST, application/json
 *
 *  Parameters
-*    * user    = The user to create.
-*    * groups  = New groups (Optionally unset or NULL)
+*    * user    = The name of the user to create.
+*    * groups  = New groups. If NULL or undefined no groups are set.
 *
 *  Return value
 *    * user
@@ -36,14 +36,12 @@ APIEndpoint::POST(
 				'type' => 'object',
 				'properties' => [
 					'user' => [
-						'type' => 'string',
-						'pattern' => substr(User::USERNAME_REGEX, 1, -1)
+						'type' => 'string'
 					],
 					'groups' => [
 						'type' => ['array', 'null'],
 						'items' => [
-							'type' => 'array',
-							'pattern' => substr(User::GROUPS_REGEX, 1, -1)
+							'type' => 'array'
 						]
 					]
 				],
@@ -61,7 +59,7 @@ APIEndpoint::POST(
 		if (!$user->is_in_group('admin')) {
 			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
 		}
-		if (user_exists($params['user'])) {
+		if (user_exists($params->user)) {
 			throw new APIException(API_E_INVALID_REQUEST, "User already exists.");
 		}
 
@@ -69,7 +67,7 @@ APIEndpoint::POST(
 
 		// Set name.
 		try {
-			$new->set_name($params['user']);
+			$new->set_name($params->user);
 		} catch (ArgException $e) {
 			throw new APIException(
 				API_E_LIMITED,
@@ -78,10 +76,10 @@ APIEndpoint::POST(
 		}
 
 		// Set groups.
-		if (array_key_exists('groups', $params)) {
+		if (property_exists($params, 'groups')) {
 			try {
-				$new->set_groups($params['groups']);
-			} catch (Exception $e) {
+				$new->set_groups($params->groups);
+			} catch (ArgException $e) {
 				throw new APIException(
 					API_E_LIMITED,
 					"Limited.", 0, $e
