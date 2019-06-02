@@ -21,9 +21,9 @@ APIEndpoint::POST(
 			'cookie_auth' => FALSE
 		]
 	],
-	function($req, $resp, $params) {
-		$user = $params['APIAuthModule']['user'];
-		$session = $params['APIAuthModule']['session'];
+	function($req, $resp, $module_data) {
+		$user = $module_data['APIAuthModule']['user'];
+		$session = $module_data['APIAuthModule']['session'];
 
 		$user->session_rm($session->get_id());
 		$user->write();

@@ -24,10 +24,10 @@ APIEndpoint::GET(
 		],
 		'APIRateLimitModule' => []
 	],
-	function($req, $resp, $params) {
+	function($req, $resp, $module_data) {
 		return [
-			'user' => $params['APIAuthModule']['user']->export(FALSE, FALSE),
-			'session' => $params['APIAuthModule']['session']->export(FALSE, FALSE)
+			'user' => $module_data['APIAuthModule']['user']->export(FALSE, FALSE),
+			'session' => $module_data['APIAuthModule']['session']->export(FALSE, FALSE)
 		];
 	}
 );

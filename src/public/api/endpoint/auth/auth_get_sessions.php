@@ -23,11 +23,11 @@ APIEndpoint::GET(
 		],
 		'APIRateLimitModule' => []
 	],
-	function($req, $resp, $params) {
+	function($req, $resp, $module_data) {
 		$data = [];
 		$tmp = [];
-		$user = $params['APIAuthModule']['user'];
-		$session = $params['APIAuthModule']['session'];		
+		$user = $module_data['APIAuthModule']['user'];
+		$session = $module_data['APIAuthModule']['session'];
 
 		foreach ($user->get_sessions() as $k => $s) {
 			$tmp = $s->export(FALSE, FALSE);

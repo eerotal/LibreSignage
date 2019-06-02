@@ -24,9 +24,9 @@ APIEndpoint::POST(
 		],
 		'APIRateLimitModule' => []
 	],
-	function($req, $resp, $params) {
-		$user = $params['APIAuthModule']['user'];
-		$session = $params['APIAuthModule']['session'];
+	function($req, $resp, $module_data) {
+		$user = $module_data['APIAuthModule']['user'];
+		$session = $module_data['APIAuthModule']['session'];
 
 		$session->renew();
 		$user->write();

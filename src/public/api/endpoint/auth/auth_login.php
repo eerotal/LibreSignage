@@ -38,14 +38,14 @@ APIEndpoint::POST(
 			]
 		]
 	],
-	function($req, $resp, $params) {
-		$req_p = $params['APIJsonValidatorModule'];
+	function($req, $resp, $module_data) {
+		$params = $module_data['APIJsonValidatorModule'];
 
-		$user = auth_creds_verify($req_p['username'], $req_p['password']);
+		$user = auth_creds_verify($params->username, $params->password);
 		if ($user === NULL) { return ['error' => API_E_INCORRECT_CREDS]; }
 
 		// Try to create a new session.
-		$tmp = preg_match('/[^a-zA-Z0-9_-]/', $req_p['who']);
+		$tmp = preg_match('/[^a-zA-Z0-9_-]/', $params->who);
 		if ($tmp === 1) {
 			throw new APIException(
 				API_E_INVALID_REQUEST,
@@ -58,9 +58,9 @@ APIEndpoint::POST(
 			);
 		}
 		$data = $user->session_new(
-			$req_p['who'],
+			$params->who,
 			$req->getClientIp(),
-			$req_p['permanent']
+			$params->permanent
 		);
 		$user->write();
 
