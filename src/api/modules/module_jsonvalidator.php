@@ -24,11 +24,6 @@ class APIJsonValidatorModule extends APIModule {
 			}
 			throw new APIException(API_E_INVALID_REQUEST, $err_str);
 		}
-
-		/*
-		*  Cast $data back to an array because JsonSchema\Validator converts
-		*  the data fed to it into an object for some reason.
-		*/
-		return (array) $data;
+		return $data;
 	}
 }
