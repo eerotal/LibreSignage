@@ -22,31 +22,28 @@ require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/queue.php');
 
-$QUEUE_GET = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_URL => array(
-		'name' => API_P_STR
-	),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
-
-$tmp = preg_match('/[^a-zA-Z0-9_-]/', $QUEUE_GET->get('name'));
-if ($tmp) {
-	throw new APIException(
-		API_E_INVALID_REQUEST,
-		"Invalid chars in queue name."
-	);
-} else if ($tmp === NULL) {
-	throw new APIException(
-		API_E_INTERNAL,
-		"Regex match failed."
-	);
-}
-
-$queue = new Queue($QUEUE_GET->get('name'));
-$queue->load();
-
-$QUEUE_GET->resp_set($queue->get_data_array());
-$QUEUE_GET->send();
+APIEndpoint::GET(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => [],
+		'APIJsonValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'name' => [
+						'type' => 'string'
+					]
+				],
+				'required' => ['name']
+			]
+		]
+	],
+	function($req, $resp, $module_data) {
+		$params = $module_data['APIJsonValidatorModule'];
+		$queue = new Queue($params->name);
+		$queue->load();
+		return $queue->get_data_array();
+	}
+);
