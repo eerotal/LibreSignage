@@ -36,17 +36,28 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
-$SLIDE_GET = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_URL => array(
-		'id' => API_P_STR
-	),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
-
-$slide = new Slide();
-$slide->load($SLIDE_GET->get('id'));
-$SLIDE_GET->resp_set(['slide' => $slide->export(FALSE, FALSE)]);
-$SLIDE_GET->send();
+APIEndpoint::GET(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => [],
+		'APIQueryValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'id' => [
+						'type' => 'string'
+					]
+				],
+				'required' => ['id']
+			]
+		]
+	],
+	function($req, $resp, $module_data) {
+		$params = $module_data['APIQueryValidatorModule'];
+		$slide = new Slide();
+		$slide->load($params->id);
+		return ['slide' => $slide->export(FALSE, FALSE)];
+	}
+);

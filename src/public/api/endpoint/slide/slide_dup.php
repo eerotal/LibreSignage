@@ -4,7 +4,8 @@
 *
 *  Duplicate a slide. The owner of the new slide is the caller
 *  of this API endpoint. The new slide is also automatically
-*  locked for the caller.
+*  locked for the caller. The operation is authorized if the user
+*  is in the 'admin' or 'editor' groups.
 *
 *  **Request:** POST, application/json
 *
@@ -22,37 +23,49 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
-$SLIDE_DUP = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_BODY => array(
-		'id' => API_P_STR
-	),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
+APIEndpoint::POST(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => [],
+		'APIJsonValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'id' => [
+						'type' => 'string'
+					]
+				],
+				'required' => ['id']
+			]
+		]
+	],
+	function($req, $resp, $module_data) {
+		$new = NULL;
+		$old = NULL;
+		$queue = NULL;
 
-if (!check_perm('grp:admin|grp:editor;', $SLIDE_DUP->get_caller())) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		"Not authorized"
-	);
-}
+		$caller = $module_data['APIAuthModule']['user'];
+		$session = $module_data['APIAuthModule']['session'];
 
-$slide = new Slide();
-$slide->load($SLIDE_DUP->get('id'));
+		if (!$caller->is_in_group('admin') && !$caller->is_in_group('editor')) {
+			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized");
+		}
 
-$new_slide = $slide->dup();
-$new_slide->set_owner($SLIDE_DUP->get_caller()->get_name());
-$new_slide->lock_acquire($SLIDE_DUP->get_session());
+		$old = new Slide();
+		$old->load($params->id);
 
-$new_slide->write();
+		$new = $slide->dup();
+		$new->set_owner($caller->get_name());
+		$new->lock_acquire($session);
+		$new->write();
 
+		// Juggle slide indices to make sure they are correct.
+		$queue = $new->get_queue();
+		$queue->juggle($new->get_id());
+		$queue->write();
 
-// Juggle slide indices to make sure they are correct.
-$queue = $new_slide->get_queue();
-$queue->juggle($new_slide->get_id());
-$queue->write();
-
-$SLIDE_DUP->resp_set(['slide' => $new_slide->export(FALSE, FALSE)]);
-$SLIDE_DUP->send();
+		return ['slide' => $new->export(FALSE, FALSE)];
+	}
+);
