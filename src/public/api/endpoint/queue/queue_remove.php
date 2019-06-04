@@ -2,7 +2,9 @@
 /*
 *  ====>
 *
-*  Remove a slide queue and all slides in it.
+*  Remove a slide queue and all slides in it. The operation is authorized
+*  if the user is in the 'admin' group or if the user is in the editor
+*  group and owns all the slides in the queue.
 *
 *  **Request:** POST, application/json
 *
@@ -20,57 +22,44 @@ require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/queue.php');
 
-$QUEUE_REMOVE = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_BODY => array(
-		'name' => API_P_STR
-	),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
+APIEndpoint::POST(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => [],
+		'APIJsonValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'name' => [
+						'type' => 'string'
+					]
+				],
+				'required' => ['name']
+			]
+		]
+	],
+	function($req, $resp, $module_data) {
+		$caller = $module_data['APIAuthModule']['user'];
+		$params = $module_data['APIJsonValidatorModule'];
 
-$tmp = preg_match('/[^a-zA-Z0-9_-]/', $QUEUE_REMOVE->get('name'));
-if ($tmp) {
-	throw new APIException(
-		API_E_INVALID_REQUEST,
-		"Invalid chars in queue name."
-	);
-} else if ($tmp === NULL) {
-	throw new APIException(
-		API_E_INTERNAL,
-		"Regex match failed."
-	);
-}
+		$queue = new Queue($params->name);
+		$queue->load();
+		$owner = $queue->get_owner();
 
-$queue = new Queue($QUEUE_REMOVE->get('name'));
-$queue->load();
-
-$owner = $queue->get_owner();
-$caller = $QUEUE_REMOVE->get_caller();
-
-$ALLOW = FALSE;
-
-// Allow users in the admin group.
-$ALLOW = check_perm('grp:admin;', $caller);
-
-/*
-*  Allow users in the editor group if they own
-*  the queue and all the slides in it.
-*/
-$ALLOW = $ALLOW || (
-		check_perm("grp:editor&usr:$owner;", $caller) &&
-		array_check($queue->slides(), function($s) use($caller) {
-			return $s->get_owner() == $caller->get_name();
-		})
-	);
-
-if (!$ALLOW) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		"Not authorized."
-	);
-}
-
-$queue->remove();
-$QUEUE_REMOVE->send();
+		if (
+			$caller->is_in_group('admin')
+			|| (
+				$caller->is_in_group('editor')
+				&& array_check($queue->slides(), function($s) use($caller) {
+					return $s->get_owner() === $caller->get_name();
+				})
+			)
+		) {
+			$queue->remove();
+			return [];
+		}
+		throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+	}
+);

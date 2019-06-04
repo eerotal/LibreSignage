@@ -18,13 +18,14 @@ require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/queue.php');
 
-$QUEUE_LIST = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_URL => array(),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
-
-$QUEUE_LIST->resp_set(array('queues' => queue_list()));
-$QUEUE_LIST->send();
+APIEndpoint::GET(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => []
+	],
+	function($req, $resp, $module_data) {
+		return ['queues' => queue_list()];
+	}
+);
