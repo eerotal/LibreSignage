@@ -204,10 +204,9 @@ class User extends Exportable {
 		return $this->sessions;
 	}
 
-	public static function set_groups_dry(array $groups = NULL) {
+	public static function validate_groups(array $groups = NULL) {
 		/*
-		*  Validate the $groups array for use in User::set_groups()
-		*  without changing the groups.
+		*  Validate the $groups array for use in User::set_groups().
 		*/
 		if (gettype($groups) === 'array') {
 			if (count($groups) > gtlim('MAX_USER_GROUPS')) {
@@ -234,7 +233,7 @@ class User extends Exportable {
 		*  Set the groups of a User. Calling this function
 		*  with NULL removes the User from all groups.
 		*/
-		User::set_groups_dry($groups);
+		User::validate_groups($groups);
 		if ($groups === NULL) {
 			$this->groups = [];
 		} else {
@@ -250,10 +249,9 @@ class User extends Exportable {
 		return in_array($group, $this->groups, TRUE);
 	}
 
-	public static function set_password_dry(string $password) {
+	public static function validate_password(string $password) {
 		/*
-		*  Validate $password for use in User::set_password()
-		*  without changing the password.
+		*  Validate $password for use in User::set_password().
 		*/
 		if (strlen($password) === 0) {
 			throw new ArgException('Invalid empty password.');
@@ -267,7 +265,7 @@ class User extends Exportable {
 	}
 
 	public function set_password(string $password) {
-		User::set_password_dry($password);
+		User::validate_password($password);
 		$this->hash = $tmp_hash;
 	}
 
@@ -275,10 +273,9 @@ class User extends Exportable {
 		return password_verify($pass, $this->hash);
 	}
 
-	public static function set_hash_dry(string $hash) {
+	public static function validate_hash(string $hash) {
 		/*
-		*  Validate $hash for use in User::set_hash() without
-		*  changing it.
+		*  Validate $hash for use in User::set_hash().
 		*/
 		if (strlen($hash) === 0) {
 			throw new ArgException('Invalid password hash.');
@@ -286,7 +283,7 @@ class User extends Exportable {
 	}
 
 	public function set_hash(string $hash) {
-		User::set_hash_dry($hash);
+		User::validate_hash($hash);
 		$this->hash = $hash;
 	}
 
@@ -294,10 +291,9 @@ class User extends Exportable {
 		return $this->hash;
 	}
 
-	public static function set_name_dry(string $name) {
+	public static function validate_name(string $name) {
 		/*
-		*  Validate $name for use in User::set_name() without
-		*  changing the name.
+		*  Validate $name for use in User::set_name().
 		*/
 		if (strlen($name) === 0) {
 			throw new ArgException('Invalid username.');
@@ -313,7 +309,7 @@ class User extends Exportable {
 	}
 
 	public function set_name(string $name) {
-		User::set_name_dry($name);
+		User::validate_name($name);
 		$this->user = $name;
 	}
 

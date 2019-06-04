@@ -226,10 +226,9 @@ class Queue {
 		}
 	}
 
-	public static function set_name_dry(string $name) {
+	public static function validate_name(string $name) {
 		/*
-		*  Validate $name for use in Queue::set_name() without
-		*  changing the name.
+		*  Validate $name for use in Queue::set_name().
 		*/
 		if (strlen($name) === 0) {
 			throw new ArgException('Invalid empty queue name.');
@@ -246,13 +245,13 @@ class Queue {
 	}
 
 	function set_name(string $name) {
-		Queue::set_name_dry($name);
+		Queue::validate_name($name);
 		$this->name = $name;
 		$this->path = LIBRESIGNAGE_ROOT.QUEUES_DIR.'/'.$name.'.json';
 	}
 
 	function set_owner(string $owner) {
-		User::set_name_dry($owner);
+		User::validate_name($owner);
 		$this->owner = $owner;
 	}
 
