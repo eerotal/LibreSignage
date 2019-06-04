@@ -2,7 +2,9 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/module.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/auth.php');
+
+use JsonSchema\Validator;
+use JsonSchema\Constraints\Constraint;
 
 class APIJsonValidatorModule extends APIModule {
 	public function __construct() {
@@ -14,8 +16,12 @@ class APIJsonValidatorModule extends APIModule {
 
 		$data = APIEndpoint::json_decode($e->get_request()->getContent());
 
-		$validator = new JsonSchema\Validator();
-		$validator->validate($data, $args['schema']);
+		$validator = new Validator();
+		$validator->validate(
+			$data,
+			$args['schema'],
+			Constraint::CHECK_MODE_APPLY_DEFAULTS
+		);
 
 		if (!$validator->isValid()) {
 			$err_str = "Invalid request data:\n\n";
