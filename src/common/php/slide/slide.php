@@ -39,6 +39,8 @@ function slides_list() {
 class SlideLockException extends Exception {};
 
 class Slide extends Exportable{
+	const ID_REGEX = '/^[a-z0-9]+$/';
+
 	static $PUBLIC = [
 		'id',
 		'name',
@@ -106,11 +108,28 @@ class Slide extends Exportable{
 		return $this->{$name};
 	}
 
+	public static function validate_id(string $id) {
+		/*
+		*  Validate a slide ID for use in Slide::mk_paths() without
+		*  setting the ID.
+		*/
+		if (strlen($id) === 0) {
+			throw new ArgException('Invalid empty slide ID.');
+		}
+		$tmp = preg_match(Slide::ID_REGEX, $id);
+		if ($tmp === 0) {
+			throw new ArgException('Invalid chars in slide ID.');
+		} else if ($tmp === FALSE) {
+			throw new IntException('preg_match() failed.');
+		}
+	}
+
 	private function mk_paths(string $id) {
 		/*
 		*  Create the file path strings needed for
 		*  data storage.
 		*/
+		Slide::validate_id($id);
 		$this->dir_path = LIBRESIGNAGE_ROOT.SLIDES_DIR.'/'.$id;
 		$this->conf_path = $this->dir_path.'/conf.json';
 		$this->asset_path = $this->dir_path.'/assets';
