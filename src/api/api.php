@@ -39,18 +39,19 @@ class APIEndpoint {
 		// Run API modules requested by endpoint.
 		foreach ($modules as $m => $args) { $this->run_module($m, $args); }
 
-		/*
-		*  Run the endpoint hook function. If the function returns an array,
-		*  use it as the JSON response.
-		*/
+		// Use Content-Type: application/json by default.
+
+		// Run the endpoint hook function.
 		$ret = $hook($this->request, $this->response, $this->module_data);
+
+		// Send $ret as the response if it's an array.
 		if (is_array($ret)) {
 			// Make sure the error code is set.
 			if (!array_key_exists('error', $ret)) { $ret['error'] = API_E_OK; }
-
 			$this->response->headers->set('Content-Type', 'application/json');
 			$this->response->setContent(APIEndpoint::json_encode($ret));
 		}
+
 		$this->send();
 	}
 
