@@ -175,6 +175,7 @@ function api_error_setup() {
 	*/
 	set_exception_handler(function(Throwable $e) {
 		try {
+			header('Content-Type: application/json');
 			echo APIException::make_json_string(APIException::map_to_code($e), $e);
 			ls_log($e->__toString(), LOGERR);
 		} catch (Exception $e) {
