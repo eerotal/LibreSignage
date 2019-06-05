@@ -134,6 +134,7 @@ class EditorController {
 		try {
 			await this.slide.load(id, true, true);
 		} catch (e) {
+			if (!(e instanceof APIError)) { throw e; }
 			switch (e.get_code()) {
 				case APIError.codes.API_E_NOT_AUTHORIZED:
 				case APIError.codes.API_E_LOCK:
