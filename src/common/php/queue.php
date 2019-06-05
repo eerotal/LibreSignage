@@ -35,7 +35,7 @@ function queue_list() {
 }
 
 class Queue {
-	const NAME_REGEX = '/^[A-Za-z0-9_-]$/';
+	const NAME_REGEX = '/^[A-Za-z0-9_-]+$/';
 
 	private $name   = NULL;
 	private $owner  = NULL;
