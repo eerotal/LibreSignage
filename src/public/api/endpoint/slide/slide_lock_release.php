@@ -4,7 +4,7 @@
 *
 *  Attempt to lock a slide.
 *
-*  This endpoint succeeds if:
+*  The operation is authorized if the following conditions are met:
 *
 *    * The caller is in the 'admin' or 'editor' groups.
 *    * The slide has previously been locked by the caller.
@@ -29,41 +29,47 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
-$SLIDE_LOCK_RELEASE = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_BODY => array(
-		'id' => API_P_STR
-	),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
+APIEndpoint::POST(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => [],
+		'APIJsonValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'id' => [
+						'type' => 'string'
+					]
+				],
+				'required' => ['id']
+			]
+		]
+	],
+	function($req, $resp, $module_data) {
+		$caller = $module_data['APIAuthModule']['user'];
+		$session = $module_data['APIAuthModule']['session'];
+		$params = $module_data['APIJsonValidatorModule'];
 
-if (
-	!check_perm(
-		'grp:admin|grp:editor;',
-		$SLIDE_LOCK_RELEASE->get_caller()
-	)
-) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		"Not authorized"
-	);
-}
+		if (!$caller->is_in_group('admin') && !$caller->is_in_group('editor')) {
+			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized");
+		}
 
-$slide = new Slide();
-$slide->load($SLIDE_LOCK_RELEASE->get('id'));
-try {
-	$slide->lock_release($SLIDE_LOCK_RELEASE->get_session());
-} catch (SlideLockException $e) {
-	throw new APIException(
-		API_E_LOCK,
-		"Failed to release slide lock.",
-		0,
-		$e
-	);
-}
-$slide->write();
+		$slide = new Slide();
+		$slide->load($params->id);
+		try {
+			$slide->lock_release($session);
+		} catch (SlideLockException $e) {
+			throw new APIException(
+				API_E_LOCK,
+				"Failed to release slide lock.",
+				0,
+				$e
+			);
+		}
+		$slide->write();
 
-$SLIDE_LOCK_RELEASE->resp_set([]);
-$SLIDE_LOCK_RELEASE->send();
+		return [];
+	}
+);

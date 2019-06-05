@@ -4,7 +4,7 @@
 *
 *  Attempt to lock a slide.
 *
-*  This endpoint succeeds if:
+*  The operation is permitted if the following conditions are met:
 *
 *    * The caller is in the 'admin' or 'editor' groups.
 *    * The slide is not already locked by another user.
@@ -21,7 +21,7 @@
 *    * id = The ID of the slide to lock.
 *
 *  Return value
-*    * expire = The lock expiration timestamp.
+*    * lock  = Slide lock data.
 *    * error = An error code or API_E_OK on success.
 *
 *  <====
@@ -31,46 +31,54 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
-$SLIDE_LOCK_ACQUIRE = new APIEndpoint(array(
-	APIEndpoint::METHOD		=> API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_BODY => array(
-		'id' => API_P_STR
-	),
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-));
+APIEndpoint::POST(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => [],
+		'APIJsonValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'id' => [
+						'type' => 'string'
+					]
+				],
+				'required' => ['id']
+			]
+		]
+	],
+	function($req, $resp, $module_data) {
+		$params = $module_data['APIJsonValidatorModule'];
+		$caller = $module_data['APIAuthModule']['user'];
+		$session = $module_data['APIAuthModule']['session'];
 
-$slide = new Slide();
-$slide->load($SLIDE_LOCK_ACQUIRE->get('id'));
+		$slide = new Slide();
+		$slide->load($params->id);
 
-if (
-	!check_perm(
-		'grp:admin|grp:editor;',
-		$SLIDE_LOCK_ACQUIRE->get_caller()
-	)
-	|| !$slide->can_modify($SLIDE_LOCK_ACQUIRE->get_caller())
-) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		"Not authorized"
-	);
-}
+		if (
+			!$slide->can_modify($caller)
+			|| (
+				!$caller->is_in_group('admin')
+				&& !$caller->is_in_group('editor')
+			)
+		) {
+			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized");
+		}
 
-try {
-	$slide->lock_acquire($SLIDE_LOCK_ACQUIRE->get_session());
-} catch (SlideLockException $e) {
-	throw new APIException(
-		API_E_LOCK,
-		"Failed to lock slide.",
-		0,
-		$e
-	);
-}
-$slide->write();
+		try {
+			$slide->lock_acquire($session);
+		} catch (SlideLockException $e) {
+			throw new APIException(
+				API_E_LOCK,
+				"Failed to lock slide.",
+				0,
+				$e
+			);
+		}
+		$slide->write();
 
-$SLIDE_LOCK_ACQUIRE->resp_set([
-	'lock' => $slide->get_lock()->export(FALSE, FALSE),
-	'error' => API_E_OK
-]);
-$SLIDE_LOCK_ACQUIRE->send();
+		return ['lock' => $slide->get_lock()->export(FALSE, FALSE)];
+	}
+);

@@ -46,6 +46,7 @@ APIEndpoint::POST(
 		$old = NULL;
 		$queue = NULL;
 
+		$params = $module_data['APIJsonValidatorModule'];
 		$caller = $module_data['APIAuthModule']['user'];
 		$session = $module_data['APIAuthModule']['session'];
 
@@ -56,7 +57,7 @@ APIEndpoint::POST(
 		$old = new Slide();
 		$old->load($params->id);
 
-		$new = $slide->dup();
+		$new = $old->dup();
 		$new->set_owner($caller->get_name());
 		$new->lock_acquire($session);
 		$new->write();

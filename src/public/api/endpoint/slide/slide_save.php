@@ -56,10 +56,8 @@
 *    * assets        = Unused (see above)
 *
 *  Return value
-*    This endpoint returns all the parameters above as well as
-*    two additional parameters:
+*    This endpoint returns all the parameters above as well as the following:
 *
-*    * owner   = The owner of the slide.
 *    * error   = An error code or API_E_OK on success.
 *
 *  <====
@@ -69,143 +67,133 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
-$SLIDE_SAVE = new APIEndpoint([
-	APIEndpoint::METHOD		    => API_METHOD['POST'],
-	APIEndpoint::RESPONSE_TYPE	=> API_MIME['application/json'],
-	APIEndpoint::FORMAT_BODY => [
-		'id' => API_P_STR|API_P_NULL,
-		'name' => API_P_STR,
-		'index' => API_P_INT,
-		'markup' => API_P_STR|API_P_EMPTY_STR_OK,
-		'owner' => API_P_UNUSED,
-		'duration' => API_P_INT,
-		'enabled' => API_P_BOOL,
-		'sched' => API_P_BOOL,
-		'sched_t_s' => API_P_INT,
-		'sched_t_e' => API_P_INT,
-		'animation' => API_P_INT,
-		'queue_name' => API_P_STR,
-		'collaborators' => API_P_ARR_STR,
-		'lock' => API_P_UNUSED,
-		'assets' => API_P_UNUSED
+APIEndpoint::POST(
+	[
+		'APIAuthModule' => [
+			'cookie_auth' => FALSE
+		],
+		'APIRateLimitModule' => [],
+		'APIJsonValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'id' => ['type' => ['string', 'null']],
+					'name' => ['type' => 'string'],
+					'index' => ['type' => 'integer'],
+					'markup' => ['type' => 'string'],
+					'owner' => [],
+					'duration' => ['type' => 'integer'],
+					'enabled' => ['type' => 'boolean'],
+					'sched' => ['type' => 'boolean'],
+					'sched_t_s' => ['type' => 'integer'],
+					'sched_t_e' => ['type' => 'integer'],
+					'animation' => ['type' => 'integer'],
+					'queue_name' => ['type' => 'string'],
+					'collaborators' => [
+						'type' => 'array',
+						'items' => [
+							'type' => 'string'
+						]
+					],
+					'lock' => [],
+					'assets' => []
+				]
+			]
+		]
 	],
-	APIEndpoint::REQ_QUOTA		=> TRUE,
-	APIEndpoint::REQ_AUTH		=> TRUE
-]);
+	function($req, $resp, $module_data) {
+		$params = $module_data['APIJsonValidatorModule'];
+		$session = $module_data['APIAuthModule']['session'];
+		$caller = $module_data['APIAuthModule']['user'];
+		$slide = new Slide();
 
-$slide = new Slide();
-
-/*
-*  Check permissions and route the API call to the correct
-*  handler function.
-*/
-if ($SLIDE_SAVE->has('id', TRUE)) {
-	$slide->load($SLIDE_SAVE->get('id'));
-	if (
-		check_perm(
-			'grp:admin;',
-			$SLIDE_SAVE->get_caller()
-		)
-		|| check_perm(
-			'grp:editor&usr:'.$slide->get_owner().';',
-			$SLIDE_SAVE->get_caller()
-		)
-	) {
-		// admin or editor+owner => ALLOW modifying.
-		modify_slide($SLIDE_SAVE, $slide, TRUE);
-	} else if (
-		check_perm('grp:editor;', $SLIDE_SAVE->get_caller())
-		&& in_array(
-			$SLIDE_SAVE->get_caller()->get_name(),
-			$slide->get_collaborators()
-		)
-	) {
-		// Restricted modification permissions for collaborators.
-		modify_slide($SLIDE_SAVE, $slide, FALSE);
-	} else {
-		throw new APIException(
-			API_E_NOT_AUTHORIZED,
-			"Not authorized."
-		);
+		/*
+		*  Check permissions and route the API call to the correct
+		*  handler function.
+		*/
+		if ($params->id !== NULL) {
+			$slide->load($params->id);
+			if (
+				$caller->is_in_group('admin')
+				|| (
+					$caller->is_in_group('editor')
+					&& $caller->get_name() === $slide->get_owner()
+				)
+			) {
+				// admin or editor+owner => ALLOW modifying.
+				return modify_slide($session, $slide, $params, TRUE);
+			} else if (
+				$caller->is_in_group('editor')
+				&& in_array($caller->get_name(), $slide->get_collaborators())
+			) {
+				// Restricted modification permissions for collaborators.
+				return modify_slide($session, $slide, $params, FALSE);
+			} else {
+				throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+			}
+		} else if (
+			$caller->is_in_group('admin')
+			|| $caller->is_in_group('editor')
+		) {
+			// admin or editor => ALLOW creation.
+			return create_slide($caller, $session, $slide, $params);
+		} else {
+			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+		}
 	}
-} else if (
-	check_perm(
-		'grp:admin|grp:editor;',
-		$SLIDE_SAVE->get_caller()
-	)
-) {
-	// admin or editor => ALLOW creation.
-	create_slide($SLIDE_SAVE, $slide);
-}
+);
 
-function ensure_slide_lock(Slide $slide, Session $caller_session): void {
+function ensure_slide_lock(Slide $slide, Session $session): void {
 	/*
 	*  Ensure that the slide $slide is locked by $session and
 	*  the lock is not expired.
 	*/
 	$lock = $slide->get_lock();
 	if ($lock === NULL) {
-		throw new APIException(
-			API_E_LOCK,
-			"Slide not locked."
-		);
-	} else if (
-		!$lock->is_expired()
-		&& !$lock->is_owned_by($caller_session)
-	) {
-		throw new APIException(
-			API_E_LOCK,
-			"Slide locked by another user."
-		);
+		throw new APIException(API_E_LOCK, "Slide not locked.");
+	} else if (!$lock->is_expired() && !$lock->is_owned_by($session)) {
+		throw new APIException(API_E_LOCK, "Slide locked by another user.");
 	}	
 }
 
-function set_slide_data(
-	APIEndpoint $endpoint,
-	Slide $slide,
-	bool $owner
-): void {
+function set_slide_data(Slide $slide, $data, bool $owner): void {
 	/*
-	*  Set the slide data common to all operations.
+	*  Set the slide data of $slide.
 	*/
 
 	// Don't set 'queue_name' and 'collaborators' if $owner === FALSE.
 	if ($owner === TRUE) {
-		$slide->set_queue($endpoint->get('queue_name'));
-		$slide->set_collaborators($endpoint->get('collaborators'));
+		$slide->set_queue($data->queue_name);
+		$slide->set_collaborators($data->collaborators);
 	}
 
-	$slide->set_name($endpoint->get('name'));
-	$slide->set_index($endpoint->get('index'));
-	$slide->set_duration($endpoint->get('duration'));
-	$slide->set_markup($endpoint->get('markup'));
-	$slide->set_enabled($endpoint->get('enabled'));
-	$slide->set_sched($endpoint->get('sched'));
-	$slide->set_sched_t_s($endpoint->get('sched_t_s'));
-	$slide->set_sched_t_e($endpoint->get('sched_t_e'));
-	$slide->set_animation($endpoint->get('animation'));
+	$slide->set_name($data->name);
+	$slide->set_index($data->index);
+	$slide->set_duration($data->duration);
+	$slide->set_markup($data->markup);
+	$slide->set_enabled($data->enabled);
+	$slide->set_sched($data->sched);
+	$slide->set_sched_t_s($data->sched_t_s);
+	$slide->set_sched_t_e($data->sched_t_e);
+	$slide->set_animation($data->animation);
 
 	$slide->set_ready(TRUE);
 	$slide->check_sched_enabled();
 }
 
-function create_slide(
-	APIEndpoint $endpoint,
-	Slide $slide
-): void {
+function create_slide(User $caller, Session $session, Slide $slide, $data) {
 	/*
 	*  Handler function for creating the slide $slide.
 	*
 	*  Note that Slide::set_owner() must be called
 	*  before Slide::set_collaborators()!
 	*/
-	$user = $endpoint->get_caller();
 	$slide->gen_id();
-	$slide->set_owner($user->get_name());
-	$slide->lock_acquire($endpoint->get_session());
+	$slide->set_owner($caller->get_name());
+	$slide->lock_acquire($session);
 
-	set_slide_data($endpoint, $slide, TRUE);
-	if (!$user->get_quota()->has_quota('slides')) {
+	set_slide_data($slide, $data, TRUE);
+	if (!$caller->get_quota()->has_quota('slides')) {
 		/*
 		*  The user doesn't have slide quota so abort the slide
 		*  creation process. The $queue->load() call below has
@@ -215,34 +203,24 @@ function create_slide(
 		$queue = new Queue($slide->get_queue_name());
 		$queue->load(TRUE);
 
-		throw new APIException(
-			API_E_QUOTA_EXCEEDED,
-			"Slide quota exceeded."
-		);
+		throw new APIException(API_E_QUOTA_EXCEEDED, "Slide quota exceeded.");
 	} else {
-		$user->get_quota()->use_quota('slides');
-		$user->write();
+		$caller->get_quota()->use_quota('slides');
+		$caller->write();
 	}
-	finish_slide($endpoint, $slide);
+	return finish($slide);
 }
 
-function modify_slide(
-	APIEndpoint $endpoint,
-	Slide $slide,
-	bool $owner
-): void {
+function modify_slide(Session $session, Slide $slide, $data, bool $owner) {
 	/*
-	*  Handler function for modifying the slide $slide.
+	*  Handler function for modifying $slide.
 	*/
-	ensure_slide_lock($slide, $endpoint->get_session());
-	set_slide_data($endpoint, $slide, $owner);
-	finish_slide($endpoint, $slide);
+	ensure_slide_lock($slide, $session);
+	set_slide_data($slide, $data, $owner);
+	return finish($slide);
 }
 
-function finish_slide(
-	APIEndpoint $endpoint,
-	Slide $slide
-): void {
+function finish(Slide $slide) {
 	$slide->write();
 
 	// Juggle slide indices.
@@ -251,8 +229,5 @@ function finish_slide(
 	$queue->juggle($slide->get_id());
 
 	// Get the slide data from $queue since $queue->juggle() modifies it.
-	$endpoint->resp_set(
-		$queue->get_slide($slide->get_id())->export(FALSE, FALSE)
-	);
-	$endpoint->send();
+	return $queue->get_slide($slide->get_id())->export(FALSE, FALSE);
 }

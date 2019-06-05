@@ -28,7 +28,7 @@ APIEndpoint::GET(
 			'cookie_auth' => FALSE
 		],
 		'APIRateLimitModule' => [],
-		'APIJsonValidatorModule' => [
+		'APIQueryValidatorModule' => [
 			'schema' => [
 				'type' => 'object',
 				'properties' => [
@@ -41,7 +41,7 @@ APIEndpoint::GET(
 		]
 	],
 	function($req, $resp, $module_data) {
-		$params = $module_data['APIJsonValidatorModule'];
+		$params = $module_data['APIQueryValidatorModule'];
 		$queue = new Queue($params->name);
 		$queue->load();
 		return $queue->get_data_array();
