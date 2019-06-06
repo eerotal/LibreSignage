@@ -208,11 +208,11 @@ a native LibreSignage build that runs directly on a Debian or Ubuntu
 host (ie. no containers) by following the instructions below.
 
 1. Install software needed for building LibreSignage. You will need the
-   following packages: ``git, apache2, php, php-gd, pandoc, npm, make,
-   imagemagick``. All other packages except *npm* can be installed from
+   following packages: ``git, apache2, php, php-gd, php-xml, pandoc, npm,
+   make, imagemagick``. All other packages except *npm* can be installed from
    the distribution repos by running ``sudo apt update && sudo apt install
-   git apache2 php php-gd pandoc make imagemagick``. You can install NPM
-   by following the instructions on the `node.js website <https://nodejs.org/en/download/package-manager/>`_.
+   git apache2 php php-gd php-xml pandoc make imagemagick``. You can install
+   NPM by following the instructions on the `node.js website <https://nodejs.org/en/download/package-manager/>`_.
 
    If you want to enable video thumbnail generation, you need to install
    *ffmpeg* too. You can do that by running ``sudo apt install ffmpeg``.
