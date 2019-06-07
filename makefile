@@ -14,6 +14,10 @@ SASS_FLAGS := --no-source-map $(addprefix -I,$(SASS_IPATHS))
 
 POSTCSS_FLAGS := --config postcss.config.js --replace --no-map
 
+PHPUNIT_API_HOST ?= http://localhost:80
+PHPUNIT_CONFIG := tests/phpunit.xml
+PHPUNIT_FLAGS := -c "$(PHPUNIT_CONFIG)" --testdox
+
 # Define required dependency versions.
 NPM_REQ_VER := 6.4.0
 COMPOSER_REQ_VER := 1.8.0
@@ -98,7 +102,7 @@ endif
 
 .PHONY: initchk configure dirs server js css api \
 		config libs docs htmldocs install clean \
-		realclean LOC
+		realclean LOC apitest
 .ONESHELL:
 
 all:: initchk server docs htmldocs js css api js_libs php_libs logo; @:
@@ -404,6 +408,13 @@ LOD:
 	printf '[Info] Make sure your 'dist/' is up to date!\n'
 	printf '[Info] Lines Of Documentation: \n'
 	wc -l `find dist -type f -name '*.rst'`
+
+apitest:
+	@:
+	set -e
+	printf '[Info] Running API integration tests...\n'
+	export PHPUNIT_API_HOST="$(PHPUNIT_API_HOST)"
+	vendor/bin/phpunit $(PHPUNIT_FLAGS) --testsuite "API"
 
 initchk:
 	@:

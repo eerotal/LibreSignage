@@ -4,6 +4,7 @@
 		"justinrainbow/json-schema": "5.2.*"
 	},
 	"require-dev": {
-		"phpunit/phpunit": "8.*"
+		"phpunit/phpunit": "8.1.*",
+		"guzzlehttp/guzzle": "6.0.*"
 	}
 }

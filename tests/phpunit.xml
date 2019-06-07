@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="autoload.php">
+	<testsuites>
+		<testsuite name="API">
+			<directory suffix=".php">./api/endpoint</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>

@@ -475,6 +475,11 @@ realclean
   too. This rule effectively resets the LibreSignage directory to how it
   was right after cloning the repo.
 
+apitest
+  Run the API integration tests. Note that you must install LibreSignage
+  first. The API URI can be set by changing the value of ``API_TEST_URI``.
+  See below for more info.
+
 LOC
   Count the lines of code in LibreSignage.
 
@@ -498,6 +503,10 @@ INITCHK_WARN=<y/N>
   If this is set to Y, only a warning is printed. This option can be used
   for example when an incompatible dependency version is used but the user
   wants to try building LibreSignage with that version anyway.
+
+API_TEST_URI=<URI>
+  Use *URI* as the hostname when running API integration tests. This is
+  ``http://localhost:80/`` by default.
 
 9. Documentation
 -----------------

@@ -22,12 +22,17 @@ __pycache__
 .mypy_cache
 .pyc
 
-# Exclude various temporary and vendored files.
+# Exclude composer files.
 /vendor
 composer.lock
+
+# Exclude node and npm files.
 /node_modules
 /package-lock.json
 npm-debug.log
+
+# Exclude PHPUnit files.
+.phpunit.result.cache
 
 # Exclude temporary sass files.
 .sass-cache
