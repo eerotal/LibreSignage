@@ -353,6 +353,8 @@ realclean: clean
 	rm composer.lock
 	$(call status,rm,server,none)
 	rm -rf server
+	$(call status,rm,.phpunit.result.cache,none)
+	rm .phpunit.result.cache
 
 	# Remove temporary nano files.
 	TMP="`find . \
