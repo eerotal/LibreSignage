@@ -4,7 +4,7 @@ namespace classes;
 
 use JsonSchema\Validator;
 
-class APITestUtils {
+final class APITestUtils {
 	public static function json_decode(string $str) {
 		$ret = json_decode($str);
 		if ($ret === NULL && json_last_error() !== JSON_ERROR_NONE) {
