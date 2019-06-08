@@ -4,7 +4,7 @@ use JsonSchema\Validator;
 use classes\APITestCase;
 use classes\APITestUtils;
 
-class api_err_codes extends APITestCase {
+class api_err_msgs extends APITestCase {
 	use traits\TestIsResponseCode200;
 	use traits\TestIsResponseContentTypeJSON;
 
