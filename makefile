@@ -33,6 +33,19 @@ TARGET ?=
 PASS ?=
 INITCHK_WARN ?= N
 
+# Don't search for dependencies when certain targets with no deps are run.
+# The if-statement below is some hacky makefile magic. Don't be scared.
+NODEP_TARGETS := clean realclean LOC LOD apitest configure initchk install
+ifneq ($(filter \
+	0 $(shell expr $(words $(MAKECMDGOALS)) '*' '2'),\
+	$(words \
+		$(filter-out \
+			$(NODEP_TARGETS),\
+			$(MAKECMDGOALS)\
+		)$(MAKECMDGOALS)\
+	)\
+),)
+
 # Production JavaScript libraries.
 JS_LIBS := $(filter-out \
 	$(shell printf "$(ROOT)\n"|sed 's:/$$::g'), \
@@ -89,6 +102,8 @@ SRC_ENDPOINT := $(shell find src/public/api/endpoint \
 # Generated PNG logo paths.
 GENERATED_LOGOS := $(addprefix dist/public/assets/images/logo/libresignage_,16x16.png 32x32.png 96x96.png text_466x100.png)
 
+endif
+
 status = \
 	if [ "`printf '$(VERBOSE)'|cut -c1|sed 's/\n//g'|\
 		tr '[:upper:]' '[:lower:]'`" = "y" ]; then \
@@ -100,9 +115,7 @@ ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [Info] Not going to generate HTML documentation.)
 endif
 
-.PHONY: initchk configure dirs server js css api \
-		config libs docs htmldocs install clean \
-		realclean LOC apitest
+.PHONY: $(NODEP_TARGETS) dirs server js css api config libs docs htmldocs
 .ONESHELL:
 
 all:: initchk server docs htmldocs js css api js_libs php_libs logo; @:
@@ -350,11 +363,11 @@ realclean: clean
 	$(call status,rm,vendor,none)
 	rm -rf vendor
 	$(call status,rm,composer.lock,none)
-	rm composer.lock
+	rm -f composer.lock
 	$(call status,rm,server,none)
 	rm -rf server
 	$(call status,rm,.phpunit.result.cache,none)
-	rm .phpunit.result.cache
+	rm -f .phpunit.result.cache
 
 	# Remove temporary nano files.
 	TMP="`find . \
@@ -388,10 +401,15 @@ LOC:
 	printf 'Lines Of Code: \n'
 	wc -l `find . \
 		\( \
-			-path "./dist/*" -o \
-			-path "./node_modules/*" \
+			-path "./dist/*" \
+			-o -path "./node_modules/*" \
+			-o -path "./vendor/*" \
 		\) -prune \
-		-o -name ".#*" \
+		-o -name ".#*" -printf '' \
+		-o -name 'package-lock.json' -printf '' \
+		-o -name 'composer.lock.json' -printf '' \
+		-o -name "Dockerfile" -print \
+		-o -name "makefile" -print \
 		-o -name "*.py" -print \
 		-o -name "*.php" -print \
 		-o -name "*.js" -print \
@@ -399,10 +417,7 @@ LOC:
 		-o -name "*.css" -print \
 		-o -name "*.scss" -print \
 		-o -name "*.sh" -print \
-		-o -name "Dockerfile" -print \
-		-o -name "makefile" -print \
-		-o ! -name 'package-lock.json' -name "*.json" -print \
-		-o -name "*.py" -print`
+		-o -name "*.json" -print`
 
 LOD:
 	@:
