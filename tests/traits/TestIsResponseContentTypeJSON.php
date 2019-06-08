@@ -4,7 +4,7 @@ namespace traits;
 
 trait TestIsResponseContentTypeJSON {
 	public function test_is_response_content_type_JSON() {
-		$response = $this->client->get('general/api_err_codes.php');
+		$response = $this->client->get($this->get_endpoint_uri());
 		$this->assertEquals(
 			TRUE,
 			$response->hasHeader('Content-Type')
