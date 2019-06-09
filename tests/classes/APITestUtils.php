@@ -13,6 +13,14 @@ final class APITestUtils {
 		return $ret;
 	}
 
+	public static function json_encode($str): string {
+		$ret = json_encode($str);
+		if ($ret === FALSE && json_last_error() !== JSON_ERROR_NONE) {
+			throw new Exception('Failed to encode JSON.');
+		}
+		return $ret;
+	}
+
 	public static function json_schema_error_string(Validator $validator): string {
 		if ($validator->isValid()) { return 'Schema validation OK.'; }
 
