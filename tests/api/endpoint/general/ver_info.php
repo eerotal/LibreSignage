@@ -9,17 +9,17 @@ class ver_info extends APITestCase {
 	use traits\TestIsResponseContentTypeJSON;
 
 	public function setUp(): void {
+		$this->set_endpoint_method('GET');
 		$this->set_endpoint_uri('general/ver_info.php');
 		parent::setUp();
 	}
 
 	public function test_is_response_output_schema_correct(): void {
-		$response = $this->client->get($this->get_endpoint_uri());
-		$data = APITestUtils::json_decode((string) $response->getBody());
+		$resp = $this->api->call($this->get_endpoint_method(), $this->get_endpoint_uri());
 
 		$validator = new Validator();
 		$validator->validate(
-			$data,
+			$resp,
 			[
 				'type' => 'object',
 				'properties' => [
