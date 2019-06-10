@@ -3,6 +3,10 @@
 namespace classes;
 
 final class TestConfig {
+	const INCLUDE_PATHS = [
+		__DIR__.'/..'
+	];
+
 	public function __construct() {
 		TestConfig::setup_error_handling();
 		TestConfig::setup_symbol_autoloading();
@@ -18,13 +22,15 @@ final class TestConfig {
 
 	public static function autoload_symbol(string $name) {
 		$tmp = str_replace('\\', '/', $name);
-		try {
-			include(\get_include_path().'/'.$tmp.'.php');
-		} catch (\Exception $e) {}
+		foreach (TestConfig::INCLUDE_PATHS as $i) {
+			try {
+				include(implode('/', [$i, $tmp.'.php']));
+			} catch (\Exception $e) { continue; }
+			break;
+		}
 	}
 
 	public static function setup_symbol_autoloading() {
-		\set_include_path(\dirname(__DIR__));
 		\spl_autoload_register(['classes\TestConfig', 'autoload_symbol']);
 	}
 }
