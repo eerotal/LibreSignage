@@ -3,6 +3,7 @@
 namespace classes;
 
 use PHPUnit\Framework\TestCase;
+use JsonSchema\Validator;
 use classes\APIInterface;
 
 class APITestCase extends TestCase {
@@ -31,5 +32,16 @@ class APITestCase extends TestCase {
 
 	public function get_endpoint_method(): string {
 		return $this->endpoint_method;
+	}
+
+	public function assert_json_validator_valid(Validator $validator) {
+		/*
+		*  Assert that the validator state of $validator is valid.
+		*/
+		$this->assertEquals(
+			TRUE,
+			$validator->isValid(),
+			APITestUtils::json_schema_error_string($validator)
+		);
 	}
 }

@@ -1,0 +1,38 @@
+{
+	"$ref": "#definitions/full",
+
+	"definitions": {
+		"full": {
+			"type": "object",
+			"properties": {
+				"created": {
+					"type": "integer",
+					"minimum": "0"
+				},
+				"from": {
+					"type": "string",
+					"minLength": 1
+				},
+				"id": {
+					"type": "string",
+					"pattern": "^[A-Za-z0-9_-]+_[a-z0-9]+$",
+					"minLength": 3
+				},
+				"max_age": {
+					"type": "integer",
+					"minimum": 0
+				},
+				"permanent": {
+					"type": "boolean"
+				},
+				"who": {
+					"type": "string",
+					"minLength": 1,
+					"pattern": "[A-Za-z0-9_-]"
+				}
+			},
+			"required": ["created", "from", "id", "max_age", "permanent", "who"],
+			"additionalProperties": false
+		}
+	}
+}

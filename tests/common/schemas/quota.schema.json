@@ -1,0 +1,38 @@
+{
+	"$ref": "#/definitions/full",
+
+	"definitions": {
+		"full": {
+			"type": "object",
+			"limits": {
+				"type": "object",
+				"patternProperties": {
+					"^.+$": {
+						"type": "object",
+						"description": {
+							"type": "string",
+							"minLength": 1
+						},
+						"limit": {
+							"type": "integer"
+						},
+						"required": ["description", "limit"],
+						"additionalProperties": false
+					}
+				},
+				"additionalProperties": false
+			},
+			"used": {
+				"type": "object",
+				"patternProperties": {
+					"^.+$": {
+						"type": "integer"
+					}
+				},
+				"additionalProperties": false
+			},
+			"required": ["limits", "used"],
+			"additionalProperties": false
+		}
+	}
+}

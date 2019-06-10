@@ -1,0 +1,20 @@
+{
+	"type": "object",
+	"properties": {
+		"user": {
+			"type": "object",
+			"properties": {
+				"groups": {
+					"type": "array",
+					"items": { "$ref": "file://user.schema.json#/definitions/group" }
+				},
+				"user": { "$ref": "file://user.schema.json#/definitions/name" }
+			},
+			"required": ["groups", "user"],
+			"additionalProperties": false
+		},
+		"error": { "type": "integer" }
+	},
+	"required": ["user", "error"],
+	"additionalProperties": false
+}
