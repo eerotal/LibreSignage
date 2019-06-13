@@ -1,9 +1,10 @@
 {
+	"id": "tests/",
 	"type": "object",
 	"properties": {
 		"users": {
 			"type": "array",
-			"items": { "$ref": "file://user.schema.json#/definitions/name"}
+			"items": { "$ref": "common/schemas/user.schema.json#/definitions/name"}
 		},
 		"error": {"type": "integer"}
 	},

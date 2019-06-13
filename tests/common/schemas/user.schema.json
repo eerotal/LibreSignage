@@ -1,4 +1,5 @@
 {
+	"id": "tests/",
 	"$ref": "#/definitions/full",
 
 	"definitions": {
@@ -9,10 +10,10 @@
 					"type": "array",
 					"items": { "$ref": "#/definitions/group" }
 				},
-				"quota": { "$ref": "file://quota.schema.json#/definitions" },
+				"quota": { "$ref": "common/schemas/quota.schema.json#/definitions" },
 				"sessions": {
 					"type": "array",
-					"items": { "$ref": "file://session.schema.json#/definitions/full" }
+					"items": { "$ref": "common/schemas/session.schema.json#/definitions/full" }
 				},
 				"user": { "$ref": "#/definitions/name" }
 			},

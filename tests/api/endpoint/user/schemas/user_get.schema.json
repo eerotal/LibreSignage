@@ -1,4 +1,5 @@
 {
+	"id": "tests/",
 	"type": "object",
 	"properties": {
 		"user": {
@@ -6,9 +7,9 @@
 			"properties": {
 				"groups": {
 					"type": "array",
-					"items": { "$ref": "file://user.schema.json#/definitions/group" }
+					"items": { "$ref": "common/schemas/user.schema.json#/definitions/group" }
 				},
-				"user": { "$ref": "file://user.schema.json#/definitions/name" }
+				"user": { "$ref": "common/schemas/user.schema.json#/definitions/name" }
 			},
 			"required": ["groups", "user"],
 			"additionalProperties": false

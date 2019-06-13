@@ -28,17 +28,13 @@ class user_get extends APITestCase {
 			TRUE
 		);
 
-		$validator = APITestUtils::create_json_validator(
-			SCHEMA_PATH,
-			['user.schema.json', 'quota.schema.json', 'session.schema.json']
+		$schema = APITestUtils::read_json_file(
+			dirname(__FILE__).'/schemas/user_get.schema.json'
 		);
 
-		$validator->validate(
-			$resp,
-			APITestUtils::read_json_file(
-				dirname(__FILE__).'/schemas/user_get.schema.json'
-			)
-		);
+		$validator = new Validator();
+		$validator->validate($resp, $schema);
+
 		$this->assert_json_validator_valid($validator);
 	}
 

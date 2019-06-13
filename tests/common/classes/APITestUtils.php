@@ -48,28 +48,4 @@ final class APITestUtils {
 		}
 		return $ret;
 	}
-
-	public static function create_json_validator(
-		string $search_path,
-		array $files
-	): Validator {
-		/*
-		*  Create a JsonSchema\Validator object. $files is a list of external
-		*  schema filenames to add to the Validator. The path $search_path is
-		*  searched for these files. Each external schema is added to the validator
-		*  as 'file://[filename]' so you can access them with a $ref such as
-		*  
-		*    { "$ref": "file://[filename]#/definitions/def" }
-		*/
-
-		$schema = NULL;
-		$storage = new SchemaStorage();
-
-		foreach ($files as $f) {
-			$schema = APITestUtils::read_json_file($search_path.'/'.$f);
-			$storage->addSchema('file://'.$f, $schema);
-		}
-
-		return new Validator(new Factory($storage));
-	}
 }

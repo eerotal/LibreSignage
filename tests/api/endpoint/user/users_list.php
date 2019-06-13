@@ -1,6 +1,7 @@
 <?php
 
 use JsonSchema\Validator;
+
 use classes\APITestCase;
 use classes\APITestUtils;
 
@@ -17,19 +18,20 @@ class users_list extends APITestCase {
 	}
 
 	public function test_is_response_output_schema_correct(): void {
-		$resp = $this->api->call($this->get_endpoint_method(), $this->get_endpoint_uri(), [], [], TRUE);
-
-		$validator = APITestUtils::create_json_validator(
-			SCHEMA_PATH,
-			['user.schema.json', 'quota.schema.json', 'session.schema.json']
+		$resp = $this->api->call(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			[],
+			[],
+			TRUE
 		);
 
-		$validator->validate(
-			$resp,
-			APITestUtils::read_json_file(
-				dirname(__FILE__).'/schemas/users_list.schema.json'
-			)
+		$schema = APITestUtils::read_json_file(
+			dirname(__FILE__).'/schemas/users_list.schema.json'
 		);
+
+		$validator = new Validator();
+		$validator->validate($resp, $schema);
 
 		$this->assert_json_validator_valid($validator);
 	}

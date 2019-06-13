@@ -1,4 +1,5 @@
 {
+	"id": "tests/",
 	"$ref": "#definitions/full",
 
 	"definitions": {
