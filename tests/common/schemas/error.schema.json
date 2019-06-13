@@ -1,0 +1,15 @@
+{
+	"id": "tests/",
+	"type": "object",
+	"properties": {
+		"error": {
+			"type": "integer",
+			"enum": [0]
+		},
+		"thrown_at": { "type": "string" },
+		"e_msg": { "type": "string" },
+		"e_trace": { "type": "string" }
+	},
+	"required": ["error"],
+	"additionalProperties": true
+}

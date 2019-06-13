@@ -6,13 +6,44 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use classes\APITestUtils;
+use classes\APIInterfaceException;
 
 final class APIInterface {
 	private $client = NULL;
 	private $session_token = NULL;
+	private $error_codes = [];
+	private $error_messages = [];
 
 	public function __construct(string $host) {
 		$this->client = new Client(['base_uri' => $host]);
+
+		// Load error codes and messages.
+		$codes = $this->call(
+			'GET',
+			'/api/endpoint/general/api_err_codes.php',
+			[],
+			[],
+			FALSE
+		);
+		if (!property_exists($codes, 'error') || $codes->error !== 0) {
+			throw new APIInterfaceException('Failed to load API error codes.');
+		}
+
+		$msgs = $this->call(
+			'GET',
+			'/api/endpoint/general/api_err_msgs.php',
+			[],
+			[],
+			FALSE
+		);
+		if (!property_exists($msgs, 'error') || $msgs->error !== 0) {
+			throw new APIInterfaceException('Failed to load API error messages.');
+		}
+
+		foreach ((array) $codes->codes as $name => $code) {
+			$this->error_codes[$name] = $code;
+			$this->error_messages[$name] = (array) $msgs->messages[$code];
+		}
 	}
 
 	public function call(
@@ -26,7 +57,13 @@ final class APIInterface {
 
 		// Decode the response body if Content-Type is application/json.
 		if ($resp->getHeader('Content-Type')[0] === 'application/json') {
-			return APITestUtils::json_decode((string) $resp->getBody());
+			try {
+				return APITestUtils::json_decode((string) $resp->getBody());
+			} catch (Exception $e) {
+				throw new APIInterfaceException(
+					'Malformed JSON response received from API.'
+				);
+			}
 		} else {
 			return $resp->getBody();
 		}
@@ -87,5 +124,17 @@ final class APIInterface {
 			[],
 			TRUE
 		);
+	}
+
+	public function get_error_code(string $name) {
+		return $this->error_codes[$name];
+	}
+
+	public function get_error_message_short(string $name) {
+		return $this->error_messages[$name]['short'];
+	}
+
+	public function get_error_message_long(string $name) {
+		return $this->error_messages[$name]['long'];
 	}
 }

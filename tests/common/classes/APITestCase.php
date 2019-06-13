@@ -34,6 +34,8 @@ class APITestCase extends TestCase {
 		return $this->endpoint_method;
 	}
 
+	/* Assertion functions for use in tests. */
+
 	public function assert_json_validator_valid(Validator $validator) {
 		/*
 		*  Assert that the validator state of $validator is valid.
@@ -43,5 +45,19 @@ class APITestCase extends TestCase {
 			$validator->isValid(),
 			APITestUtils::json_schema_error_string($validator)
 		);
+	}
+
+	public function assert_api_errored($response, int $code) {
+		/*
+		*  Assert that $response contains a valid error response from
+		*  the API. $code is the expected error code in the response.
+		*/
+		$schema = APITestUtils::read_json_file(SCHEMA_PATH.'/error.schema.json');
+		$schema->properties->error->enum = [$code];
+
+		$validator = new Validator();
+		$validator->validate($response, $schema);
+
+		$this->assert_json_validator_valid($validator);
 	}
 }
