@@ -1,39 +1,41 @@
 {
-	"id": "tests/",
-	"$ref": "#definitions/full",
-
 	"definitions": {
-		"full": {
-			"type": "object",
-			"properties": {
-				"created": {
-					"type": "integer",
-					"minimum": "0"
-				},
-				"from": {
-					"type": "string",
-					"minLength": 1
-				},
-				"id": {
-					"type": "string",
-					"pattern": "^[A-Za-z0-9_-]+_[a-z0-9]+$",
-					"minLength": 3
-				},
-				"max_age": {
-					"type": "integer",
-					"minimum": 0
-				},
-				"permanent": {
-					"type": "boolean"
-				},
-				"who": {
-					"type": "string",
-					"minLength": 1,
-					"pattern": "[A-Za-z0-9_-]"
-				}
-			},
-			"required": ["created", "from", "id", "max_age", "permanent", "who"],
-			"additionalProperties": false
+		"created": {
+			"type": "integer",
+			"minimum": "0"
+		},
+		"from": {
+			"type": "string",
+			"minLength": 1
+		},
+		"id": {
+			"type": "string",
+			"pattern": "^[A-Za-z0-9_-]+_[a-z0-9]+$",
+			"minLength": 3
+		},
+		"max_age": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"permanent": {
+			"type": "boolean"
+		},
+		"who": {
+			"type": "string",
+			"minLength": 1,
+			"pattern": "[A-Za-z0-9_-]"
 		}
-	}
+	},
+
+	"type": "object",
+	"properties": {
+		"created": { "$ref": "#/definitions/created" },
+		"from": { "$ref": "#/definitions/from" },
+		"id": { "$ref": "#/definitions/id" },
+		"max_age": { "$ref": "#/definitions/max_age" },
+		"permanent": { "$ref": "#definitions/permanent" },
+		"who": { "$ref": "#/definitions/who" }
+	},
+	"required": ["created", "from", "id", "max_age", "permanent", "who"],
+	"additionalProperties": false
 }

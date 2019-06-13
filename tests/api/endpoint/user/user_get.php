@@ -18,7 +18,7 @@ class user_get extends APITestCase {
 		$this->set_endpoint_uri('user/user_get.php');
 	}
 
-	public function test_is_response_output_schema_correct(): void {
+	public function test_is_response_schema_correct(): void {
 		$this->api->login('admin', 'admin');
 		$resp = $this->api->call(
 			$this->get_endpoint_method(),

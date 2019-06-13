@@ -1,25 +1,5 @@
 {
-	"id": "tests/",
-	"$ref": "#/definitions/full",
-
 	"definitions": {
-		"full": {
-			"type": "object",
-			"properties": {
-				"groups": {
-					"type": "array",
-					"items": { "$ref": "#/definitions/group" }
-				},
-				"quota": { "$ref": "common/schemas/quota.schema.json#/definitions" },
-				"sessions": {
-					"type": "array",
-					"items": { "$ref": "common/schemas/session.schema.json#/definitions/full" }
-				},
-				"user": { "$ref": "#/definitions/name" }
-			},
-			"required": ["groups", "quota", "sessions", "user"],
-			"additionalProperties": false
-		},
 		"name": {
 			"type": "string",
 			"pattern": "^[A-Za-z0-9_-]+$"
@@ -28,5 +8,21 @@
 			"type": "string",
 			"pattern": "^[A-Za-z0-9_-]+$"
 		}
-	}
+	},
+
+	"type": "object",
+	"properties": {
+		"groups": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/group" }
+		},
+		"quota": { "$ref": "quota.schema.json" },
+		"sessions": {
+			"type": "array",
+			"items": { "$ref": "session.schema.json" }
+		},
+		"user": { "$ref": "#/definitions/name" }
+	},
+	"required": ["groups", "quota", "sessions", "user"],
+	"additionalProperties": false
 }

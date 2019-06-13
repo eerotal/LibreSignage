@@ -14,7 +14,7 @@ class ver_info extends APITestCase {
 		parent::setUp();
 	}
 
-	public function test_is_response_output_schema_correct(): void {
+	public function test_is_response_schema_correct(): void {
 		$resp = $this->api->call($this->get_endpoint_method(), $this->get_endpoint_uri());
 
 		$validator = new Validator();

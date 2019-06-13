@@ -1,14 +1,20 @@
 {
-	"id": "tests/",
-	"type": "object",
-	"properties": {
+	"definitions": {
 		"error": {
 			"type": "integer",
-			"enum": [0]
+			"minimum": 0,
+			"maximum": 11
 		},
 		"thrown_at": { "type": "string" },
 		"e_msg": { "type": "string" },
 		"e_trace": { "type": "string" }
+	},
+
+	"properties": {
+		"error": { "$ref": "#/definitions/error" },
+		"thrown_at": { "$ref": "#/definitions/thrown_at" },
+		"e_msg": { "$ref": "#/definitions/e_msg" },
+		"e_trace": { "$ref": "#/definitions/e_trace" }
 	},
 	"required": ["error"],
 	"additionalProperties": true
