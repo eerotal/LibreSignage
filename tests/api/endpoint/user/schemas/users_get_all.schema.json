@@ -1,0 +1,27 @@
+{
+	"id": "tests/",
+	"type": "object",
+	"properties": {
+		"users": {
+			"type": "object",
+			"patternProperties": {
+				"^.+$": {
+					"type": "object",
+					"properties": {
+						"user": { "$ref": "common/schemas/user.schema.json#/definitions/name" },
+						"groups": {
+							"type": "array",
+							"items": { "$ref": "common/schemas/user.schema.json#/definitions/group" }
+						}
+					},
+					"required": ["user", "groups"],
+					"additionalProperties": false
+				}
+			},
+			"additionalProperties": false
+		},
+		"error": { "$ref": "common/schemas/error.schema.json#/definitions/error" }
+	},
+	"required": ["users", "error"],
+	"additionalProperties": false
+}
