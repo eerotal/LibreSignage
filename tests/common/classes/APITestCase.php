@@ -53,11 +53,14 @@ class APITestCase extends TestCase {
 		*  the API. $code is the expected error code in the response.
 		*/
 		$schema = APITestUtils::read_json_file(SCHEMA_PATH.'/error.schema.json');
-		$schema->definitions->error->enum = [$code];
 
 		$validator = new Validator();
 		$validator->validate($response, $schema);
 
+		// Assert error schema.
 		$this->assert_json_validator_valid($validator);
+
+		// Assert error code.
+		$this->assertEquals($code, $response->error);
 	}
 }

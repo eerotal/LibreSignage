@@ -1,13 +1,11 @@
 <?php
 
 use JsonSchema\Validator;
-use JsonSchema\SchemaStorage;
-use JsonSchema\Constraints\Factory;
-
 use classes\APITestCase;
 use classes\APITestUtils;
 
 class user_get extends APITestCase {
+	use traits\TestEndpointNotAuthorizedWithoutLogin;
 	use traits\TestIsResponseCode200;
 	use traits\TestIsResponseContentTypeJSON;
 

@@ -37,7 +37,7 @@ class APIAuthModule extends APIModule {
 			$data = auth_token_verify($req->cookies->get(AUTH_TOKEN_COOKIE));
 		} else {
 			throw new APIException(
-				API_E_INVALID_REQUEST,
+				API_E_NOT_AUTHORIZED,
 				'No Auth-Token header or token cookie supplied.'
 			);
 		}
