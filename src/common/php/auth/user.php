@@ -255,14 +255,14 @@ class User extends Exportable {
 		} else if (strlen($password) > gtlim('PASSWORD_MAX_LEN')) {
 			throw new ArgException('Password too long.');
 		}
-		$tmp_hash = password_hash($password, PASSWORD_DEFAULT);
-		if ($tmp_hash === FALSE) {
-			throw new IntException('Password hashing failed.');
-		}
 	}
 
 	public function set_password(string $password) {
 		User::validate_password($password);
+		$tmp_hash = password_hash($password, PASSWORD_DEFAULT);
+		if ($tmp_hash === FALSE) {
+			throw new IntException('Password hashing failed.');
+		}
 		$this->hash = $tmp_hash;
 	}
 
