@@ -50,7 +50,7 @@ class users_get_all extends APITestCase {
 		$validator = new Validator();
 		$validator->validate($resp, $schema);
 
-		$this->assert_json_validator_valid($validator);
+		$this->assert_valid_json($validator);
 
 		$this->api->logout();
 	}

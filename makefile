@@ -16,7 +16,7 @@ POSTCSS_FLAGS := --config postcss.config.js --replace --no-map
 
 PHPUNIT_API_HOST ?= http://localhost:80
 PHPUNIT_CONFIG := tests/phpunit.xml
-PHPUNIT_FLAGS := -c "$(PHPUNIT_CONFIG)" --testdox
+PHPUNIT_FLAGS := -c "$(PHPUNIT_CONFIG)" --testdox --color=auto
 
 # Define required dependency versions.
 NPM_REQ_VER := 6.4.0

@@ -3,6 +3,7 @@
 namespace classes;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Constraint\IsEqual;
 use JsonSchema\Validator;
 use classes\APIInterface;
 
@@ -34,20 +35,26 @@ class APITestCase extends TestCase {
 		return $this->endpoint_method;
 	}
 
-	/* Assertion functions for use in tests. */
+	/* ----- Assertion functions for use in tests. ----- */
 
-	public function assert_json_validator_valid(Validator $validator) {
+	public static function assert_valid_json(
+		Validator $validator,
+		string $message = NULL
+	) {
 		/*
 		*  Assert that the validator state of $validator is valid.
 		*/
-		$this->assertEquals(
-			TRUE,
-			$validator->isValid(),
-			APITestUtils::json_schema_error_string($validator)
-		);
+		if ($message === NULL) {
+			$message = APITestUtils::json_schema_error_string($validator);
+		}
+		self::assertThat($validator->isValid(), self::isTrue(), $message);
 	}
 
-	public function assert_api_errored($response, int $code) {
+	public static function assert_api_errored(
+		$response,
+		int $code,
+		string $message = ''
+	) {
 		/*
 		*  Assert that $response contains a valid error response from
 		*  the API. $code is the expected error code in the response.
@@ -57,10 +64,7 @@ class APITestCase extends TestCase {
 		$validator = new Validator();
 		$validator->validate($response, $schema);
 
-		// Assert error schema.
-		$this->assert_json_validator_valid($validator);
-
-		// Assert error code.
-		$this->assertEquals($code, $response->error);
+		self::assert_valid_json($validator, $message);
+		self::assertThat($response->error, new isEqual($code), $message);
 	}
 }
