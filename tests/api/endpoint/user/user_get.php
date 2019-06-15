@@ -18,6 +18,7 @@ class user_get extends APITestCase {
 
 	public function test_is_response_schema_correct(): void {
 		$this->api->login('admin', 'admin');
+
 		$resp = $this->api->call(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
@@ -25,20 +26,17 @@ class user_get extends APITestCase {
 			[],
 			TRUE
 		);
-
-		$schema = APITestUtils::read_json_file(
+		$this->assert_valid_json(
+			$resp,
 			dirname(__FILE__).'/schemas/user_get.schema.json'
 		);
 
-		$validator = new Validator();
-		$validator->validate($resp, $schema);
-
-		$this->assert_valid_json($validator);
 		$this->api->logout();
 	}
 
 	public function test_invalid_request_error_with_missing_user_parameter(): void {
 		$this->api->login('admin', 'admin');
+
 		$resp = $this->api->call(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
@@ -46,16 +44,17 @@ class user_get extends APITestCase {
 			[],
 			TRUE
 		);
-
 		$this->assert_api_errored(
 			$resp,
 			$this->api->get_error_code('API_E_INVALID_REQUEST')
 		);
+
 		$this->api->logout();
 	}
 
 	public function test_invalid_request_error_with_nonexistent_user(): void {
 		$this->api->login('admin', 'admin');
+
 		$resp = $this->api->call(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
@@ -63,16 +62,17 @@ class user_get extends APITestCase {
 			[],
 			TRUE
 		);		
-
 		$this->assert_api_errored(
 			$resp,
 			$this->api->get_error_code('API_E_INVALID_REQUEST')
 		);
+
 		$this->api->logout();
 	}
 
 	public function test_invalid_request_error_with_empty_user_parameter(): void {
 		$this->api->login('admin', 'admin');
+
 		$resp = $this->api->call(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
@@ -80,16 +80,17 @@ class user_get extends APITestCase {
 			[],
 			TRUE
 		);		
-
 		$this->assert_api_errored(
 			$resp,
 			$this->api->get_error_code('API_E_INVALID_REQUEST')
 		);
+
 		$this->api->logout();
 	}
 
 	public function test_endpoint_not_authorized_for_non_admin_users(): void {
 		$this->api->login('user', 'user');
+
 		$resp = $this->api->call(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
@@ -97,11 +98,11 @@ class user_get extends APITestCase {
 			[],
 			TRUE
 		);		
-
 		$this->assert_api_errored(
 			$resp,
 			$this->api->get_error_code('API_E_NOT_AUTHORIZED')
 		);
+
 		$this->api->logout();
 	}
 }

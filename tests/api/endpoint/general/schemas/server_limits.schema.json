@@ -1,0 +1,10 @@
+{
+	"id": "tests/",
+	"type": "object",
+	"properties": {
+		"limits": { "type": "object" },
+		"error": { "$ref": "common/schemas/error.schema.json#/definitions/error" }
+	},
+	"required": ["limits", "error"],
+	"additionalProperties": false
+}

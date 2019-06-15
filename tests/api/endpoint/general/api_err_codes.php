@@ -15,31 +15,13 @@ class api_err_codes extends APITestCase {
 	}
 
 	public function test_is_response_schema_correct(): void {
-		$resp = $this->api->call($this->get_endpoint_method(), $this->get_endpoint_uri());
-
-		$validator = new Validator();
-		$validator->validate(
-			$resp,
-			[
-				'type' => 'object',
-				'properties' => [
-					'codes' => [
-						'type' => 'object',
-						'patternProperties' => [
-							'^.*$' => [ 'type' => 'integer' ]
-						],
-						'additionalProperties' => FALSE
-					],
-					'error' => ['type' => 'integer']
-				],
-				'required' => ['codes', 'error'],
-				'additionalProperties' => FALSE
-			]
+		$resp = $this->api->call(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri()
 		);
-		$this->assertEquals(
-			TRUE,
-			$validator->isValid(),
-			APITestUtils::json_schema_error_string($validator)
+		$this->assert_valid_json(
+			$resp,
+			dirname(__FILE__).'/schemas/api_err_codes.schema.json'
 		);
 	}
 }

@@ -4,6 +4,7 @@ namespace classes;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Constraint\IsEqual;
+
 use JsonSchema\Validator;
 use classes\APIInterface;
 
@@ -38,6 +39,22 @@ class APITestCase extends TestCase {
 	/* ----- Assertion functions for use in tests. ----- */
 
 	public static function assert_valid_json(
+		$response,
+		string $schema_path,
+		string $message = ''
+	) {
+		/*
+		*  Assert that $response properly validates against the JSON schema
+		*  at $schema_path.
+		*/
+		$schema = APITestUtils::read_json_file($schema_path);
+
+		$validator = new Validator();
+		$validator->validate($response, $schema);
+		self::assert_json_validator_valid($validator, $message);
+	}
+
+	public static function assert_json_validator_valid(
 		Validator $validator,
 		string $message = NULL
 	) {
@@ -59,12 +76,15 @@ class APITestCase extends TestCase {
 		*  Assert that $response contains a valid error response from
 		*  the API. $code is the expected error code in the response.
 		*/
-		$schema = APITestUtils::read_json_file(SCHEMA_PATH.'/error.schema.json');
-
-		$validator = new Validator();
-		$validator->validate($response, $schema);
-
-		self::assert_valid_json($validator, $message);
-		self::assertThat($response->error, new isEqual($code), $message);
+		self::assert_valid_json(
+			$response,
+			SCHEMA_PATH.'/error.schema.json',
+			$message
+		);
+		self::assertThat(
+			$response->error,
+			new isEqual($code),
+			$message
+		);
 	}
 }

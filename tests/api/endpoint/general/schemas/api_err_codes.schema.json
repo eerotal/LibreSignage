@@ -1,0 +1,16 @@
+{
+	"id": "tests/",
+	"type": "object",
+	"properties": {
+		"codes": {
+			"type": "object",
+			"patternProperties": {
+				"^.*$": { "type": "integer" }
+			},
+			"additionalProperties": false
+		},
+		"error": { "$ref": "common/schemas/error.schema.json#/definitions/error" }
+	},
+	"required": ["codes", "error"],
+	"additionalProperties": false
+}
