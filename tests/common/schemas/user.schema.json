@@ -7,6 +7,10 @@
 		"group": {
 			"type": "string",
 			"pattern": "^[A-Za-z0-9_-]+$"
+		},
+		"pass": {
+			"type": "string",
+			"minLength": 1
 		}
 	},
 

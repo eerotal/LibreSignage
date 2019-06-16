@@ -14,7 +14,7 @@
 			"required": ["groups", "user"],
 			"additionalProperties": false
 		},
-		"error": { "type": "integer" }
+		"error": { "$ref": "common/schemas/error.schema.json#/definitions/error" }
 	},
 	"required": ["user", "error"],
 	"additionalProperties": false
