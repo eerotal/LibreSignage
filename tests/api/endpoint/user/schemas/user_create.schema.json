@@ -1,0 +1,11 @@
+{
+	"id": "tests/",
+	"type": "object",
+	"properties": {
+		"user": { "$ref": "common/schemas/user.schema.json#/properties" },
+		"pass": { "$ref": "common/schemas/user.schema.json#/definitions/pass" },
+		"error": { "$ref": "common/schemas/error.schema.json#/definitions/error" }
+	},
+	"required": ["user", "pass", "error"],
+	"additionalProperties": false
+}
