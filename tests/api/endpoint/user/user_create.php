@@ -74,6 +74,13 @@ class user_create extends APITestCase {
 				],
 				'API_E_OK'
 			],
+			'Wrong type for user parameter' => [
+				[
+					'user' => 1,
+					'groups' => ['editor', 'display']
+				],
+				'API_E_INVALID_REQUEST'
+			],
 			'Empty username' => [
 				[
 					'user' => '',
@@ -93,6 +100,13 @@ class user_create extends APITestCase {
 					'user' => self::UNIT_TEST_USER
 				],
 				'API_E_OK'
+			],
+			'Wrong type for groups parameter' => [
+				[
+					'user' => self::UNIT_TEST_USER,
+					'groups' => 'wrong_type'
+				],
+				'API_E_INVALID_REQUEST'
 			],
 			'Empty groups array' => [
 				[
@@ -114,6 +128,13 @@ class user_create extends APITestCase {
 					'groups' => ['']
 				],
 				'API_E_LIMITED'
+			],
+			'Wrong type in groups array' => [
+				[
+					'user' => self::UNIT_TEST_USER,
+					'groups' => [1, 2, 3]
+				],
+				'API_E_INVALID_REQUEST'
 			],
 			'No parameters' => [
 				[],
