@@ -122,6 +122,31 @@ class user_create extends APITestCase {
 		];
 	}
 
+	public function test_invalid_request_error_on_existing_user(): void {
+		$this->api->login('admin', 'admin');
+
+		$resp = NULL;
+		for ($i = 0; $i < 2; $i++) {
+			$resp = $this->api->call(
+				$this->get_endpoint_method(),
+				$this->get_endpoint_uri(),
+				[
+					'user' => self::UNIT_TEST_USER,
+					'groups' => ['editor', 'display']
+				],
+				[],
+				TRUE
+			);
+		}
+
+		$this->assert_api_errored(
+			$resp,
+			$this->api->get_error_code('API_E_INVALID_REQUEST')
+		);
+
+		$this->api->logout();
+	}
+
 	public function test_is_response_schema_correct(): void {
 		$this->api->login('admin', 'admin');
 
