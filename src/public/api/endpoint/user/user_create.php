@@ -41,7 +41,7 @@ APIEndpoint::POST(
 					'groups' => [
 						'type' => ['array', 'null'],
 						'items' => [
-							'type' => 'array'
+							'type' => 'string'
 						]
 					]
 				],
@@ -104,10 +104,8 @@ APIEndpoint::POST(
 		}
 
 		return [
-			'user' => array_merge(
-				$new->export(FALSE, FALSE),
-				['pass' => $pass]
-			)
+			'user' => $new->export(FALSE, FALSE),
+			'pass' => $pass
 		];
 	}
 );
