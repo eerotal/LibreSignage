@@ -41,7 +41,7 @@ class APITestCase extends TestCase {
 	public static function assert_valid_json(
 		$response,
 		string $schema_path,
-		string $message = ''
+		string $message = NULL
 	) {
 		/*
 		*  Assert that $response properly validates against the JSON schema
