@@ -16,24 +16,6 @@ class user_create extends APITestCase {
 		$this->set_endpoint_uri('user/user_create.php');
 	}
 
-	public function test_endpoint_not_authorized_for_non_admin_users(): void {
-		$this->api->login('user', 'user');
-
-		$resp = $this->api->call(
-			$this->get_endpoint_method(),
-			$this->get_endpoint_uri(),
-			[
-				'user' => self::UNIT_TEST_USER,
-				'groups' => ['editor', 'display']
-			],
-			[],
-			TRUE
-		);
-		$this->assert_api_failed($resp, 'API_E_NOT_AUTHORIZED');
-
-		$this->api->logout();
-	}
-
 	/**
 	 * @dataProvider params_provider
 	 */
@@ -171,6 +153,24 @@ class user_create extends APITestCase {
 			$resp,
 			dirname(__FILE__).'/schemas/user_create.schema.json'
 		);
+
+		$this->api->logout();
+	}
+
+	public function test_endpoint_not_authorized_for_non_admin_users(): void {
+		$this->api->login('user', 'user');
+
+		$resp = $this->api->call(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			[
+				'user' => self::UNIT_TEST_USER,
+				'groups' => ['editor', 'display']
+			],
+			[],
+			TRUE
+		);
+		$this->assert_api_failed($resp, 'API_E_NOT_AUTHORIZED');
 
 		$this->api->logout();
 	}

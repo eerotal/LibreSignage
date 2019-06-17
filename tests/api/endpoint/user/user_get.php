@@ -32,7 +32,46 @@ class user_get extends APITestCase {
 		$this->api->logout();
 	}
 
-	public function test_invalid_request_error_with_missing_user_parameter(): void {
+	/**
+	 * @dataProvider params_provider
+	 */
+	public function test_fuzz_params(array $params, string $expect) {
+		$this->api->login('admin', 'admin');
+
+		$resp = $this->api->call(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			$params,
+			[],
+			TRUE
+		);
+		$this->assert_api_failed($resp, $expect);
+
+		$this->api->logout();
+	}
+
+	public static function params_provider(): array {
+		return [
+			'Valid parameters' => [
+				['user' => 'admin'],
+				'API_E_OK'
+			],
+			'Missing user parameter' => [
+				[],
+				'API_E_INVALID_REQUEST'
+			],
+			'Nonexistent user parameter' => [
+				['user' => 'nouser'],
+				'API_E_INVALID_REQUEST'
+			],
+			'Empty user parameter' => [
+				['user' => ''],
+				'API_E_INVALID_REQUEST'
+			]
+		];
+	}
+
+	/*public function test_invalid_request_error_with_missing_user_parameter(): void {
 		$this->api->login('admin', 'admin');
 
 		$resp = $this->api->call(
@@ -75,7 +114,7 @@ class user_get extends APITestCase {
 		$this->assert_api_failed($resp, 'API_E_INVALID_REQUEST');
 
 		$this->api->logout();
-	}
+	}*/
 
 	public function test_endpoint_not_authorized_for_non_admin_users(): void {
 		$this->api->login('user', 'user');
