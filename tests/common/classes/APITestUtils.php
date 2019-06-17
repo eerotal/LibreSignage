@@ -7,22 +7,22 @@ use JsonSchema\SchemaStorage;
 use JsonSchema\Constraints\Factory;
 
 final class APITestUtils {
-	public static function json_decode(string $str) {
+	public static function json_decode(...$args) {
 		/*
 		*  Exception handling wrapper for json_decode.
 		*/
-		$ret = json_decode($str);
+		$ret = call_user_func_array('json_decode', $args);
 		if ($ret === NULL && json_last_error() !== JSON_ERROR_NONE) {
 			throw new \Exception('Failed to decode JSON.');
 		}
 		return $ret;
 	}
 
-	public static function json_encode($str): string {
+	public static function json_encode(...$args): string {
 		/*
 		*  Exception handling wrapper for json_encode.
 		*/
-		$ret = json_encode($str);
+		$ret = call_user_func_array('json_encode', $args);
 		if ($ret === FALSE && json_last_error() !== JSON_ERROR_NONE) {
 			throw new \Exception('Failed to encode JSON.');
 		}

@@ -8,6 +8,10 @@ use PHPUnit\Framework\Constraint\IsEqual;
 use JsonSchema\Validator;
 use classes\APIInterface;
 
+use constraints\IsAPIErrorResponse;
+use constraints\APIErrorEquals;
+use constraints\MatchesJSONSchema;
+
 class APITestCase extends TestCase {
 	public $api = NULL;
 	private $endpoint_uri = NULL;
@@ -36,54 +40,75 @@ class APITestCase extends TestCase {
 		return $this->endpoint_method;
 	}
 
-	/* ----- Assertion functions for use in tests. ----- */
-
-	public static function assert_valid_json(
+	/**
+	 * Assert that the API response object $response matches the JSON Schema
+	 * from the file $schema_path.
+	 *
+	 * @param $response mixed The API response object.
+	 * @param $schema_path string The path to the JSON Schema file.
+	 * @param $message string An optional error message to print when the
+	 *                        assertion fails.
+	 */
+	public static function assert_object_matches_schema(
 		$response,
 		string $schema_path,
-		string $message = NULL
-	) {
-		/*
-		*  Assert that $response properly validates against the JSON schema
-		*  at $schema_path.
-		*/
-		$schema = APITestUtils::read_json_file($schema_path);
-
-		$validator = new Validator();
-		$validator->validate($response, $schema);
-		self::assert_json_validator_valid($validator, $message);
-	}
-
-	public static function assert_json_validator_valid(
-		Validator $validator,
-		string $message = NULL
-	) {
-		/*
-		*  Assert that the validator state of $validator is valid.
-		*/
-		if ($message === NULL) {
-			$message = APITestUtils::json_schema_error_string($validator);
-		}
-		self::assertThat($validator->isValid(), self::isTrue(), $message);
-	}
-
-	public static function assert_api_errored(
-		$response,
-		int $code,
 		string $message = ''
 	) {
-		/*
-		*  Assert that $response contains a valid error response from
-		*  the API. $code is the expected error code in the response.
-		*/
-		self::assert_valid_json(
+		self::assertThat(
 			$response,
-			SCHEMA_PATH.'/error.schema.json',
+			new MatchesJSONSchema($schema_path),
+			$message
+		);
+	}
+
+	/**
+	 * Assert that $response is a well-formed API error response and
+	 * it's error code matches $expect. If $expect === 'API_E_OK', this
+	 * function calls APITestCase::assert_api_succeeded().
+	 *
+	 * @param $response mixed The API response object.
+	 * @param $expect string The expected API error code name.
+	 * @param $message string An optional error message to print when the
+	 *                        assertion fails.
+	 */
+	public function assert_api_failed(
+		$response,
+		string $expect,
+		string $message = ''
+	) {
+		if ($expect === 'API_E_OK') {
+			$this->assert_api_succeeded($response, 'API_E_OK', $message);
+			return;
+		}
+		self::assertThat(
+			$response,
+			new IsAPIErrorResponse($this->api, $expect),
 			$message
 		);
 		self::assertThat(
 			$response->error,
-			new isEqual($code),
+			new APIErrorEquals($this->api, $expect),
+			$message
+		);
+	}
+
+	/**
+	 * Assert that $response succeeded by checking that
+	 * $response->error matches API_E_OK.
+	 *
+	 * @param $response mixed The API response object.
+	 * @param $message string An optional error message to print when
+	 *                        the assertion fails.
+	 */
+	public function assert_api_succeeded($response, string $message = '') {
+		self::assertArrayHasKey(
+			'error',
+			(array) $response,
+			'No error key in API response.'
+		);
+		self::assertThat(
+			$response->error,
+			new APIErrorEquals($this->api, 'API_E_OK'),
 			$message
 		);
 	}

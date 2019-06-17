@@ -6,8 +6,6 @@ use classes\APITestUtils;
 
 class user_get_current extends APITestCase {
 	use traits\TestEndpointNotAuthorizedWithoutLogin;
-	use traits\TestIsResponseCode200;
-	use traits\TestIsResponseContentTypeJSON;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -26,7 +24,7 @@ class user_get_current extends APITestCase {
 			[],
 			TRUE
 		);
-		$this->assert_valid_json(
+		$this->assert_object_matches_schema(
 			$resp,
 			dirname(__FILE__).'/schemas/user_get_current.schema.json'
 		);

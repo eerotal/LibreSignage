@@ -29,10 +29,7 @@ class user_create extends APITestCase {
 			[],
 			TRUE
 		);
-		$this->assert_api_errored(
-			$resp,
-			$this->api->get_error_code('API_E_NOT_AUTHORIZED')
-		);
+		$this->assert_api_failed($resp, 'API_E_NOT_AUTHORIZED');
 
 		$this->api->logout();
 	}
@@ -53,14 +50,7 @@ class user_create extends APITestCase {
 			[],
 			TRUE
 		);
-		if ($error === 'API_E_OK'){
-			$this->assertEquals(
-				$this->api->get_error_code('API_E_OK'),
-				$resp->error
-			);
-		} else {
-			$this->assert_api_errored($resp, $this->api->get_error_code($error));
-		}
+		$this->assert_api_failed($resp, $error);
 
 		$this->api->logout();
 	}
@@ -159,11 +149,7 @@ class user_create extends APITestCase {
 				TRUE
 			);
 		}
-
-		$this->assert_api_errored(
-			$resp,
-			$this->api->get_error_code('API_E_INVALID_REQUEST')
-		);
+		$this->assert_api_failed($resp, 'API_E_INVALID_REQUEST');
 
 		$this->api->logout();
 	}
@@ -181,7 +167,7 @@ class user_create extends APITestCase {
 			[],
 			TRUE
 		);
-		$this->assert_valid_json(
+		$this->assert_object_matches_schema(
 			$resp,
 			dirname(__FILE__).'/schemas/user_create.schema.json'
 		);

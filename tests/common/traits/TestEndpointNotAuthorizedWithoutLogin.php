@@ -14,10 +14,6 @@ trait TestEndpointNotAuthorizedWithoutLogin {
 			[],
 			TRUE
 		);
-
-		$this->assert_api_errored(
-			$response,
-			$this->api->get_error_code('API_E_NOT_AUTHORIZED')
-		);
+		$this->assert_api_failed($response, 'API_E_NOT_AUTHORIZED');
 	}
 }

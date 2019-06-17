@@ -6,8 +6,6 @@ use classes\APITestUtils;
 
 class users_get_all extends APITestCase {
 	use traits\TestEndpointNotAuthorizedWithoutLogin;
-	use traits\TestIsResponseCode200;
-	use traits\TestIsResponseContentTypeJSON;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -26,10 +24,7 @@ class users_get_all extends APITestCase {
 			[],
 			TRUE
 		);
-		$this->assert_api_errored(
-			$resp,
-			$this->api->get_error_code('API_E_NOT_AUTHORIZED')
-		);
+		$this->assert_api_failed($resp, 'API_E_NOT_AUTHORIZED');
 
 		$this->api->logout();
 	}
@@ -44,7 +39,7 @@ class users_get_all extends APITestCase {
 			[],
 			TRUE
 		);
-		$this->assert_valid_json(
+		$this->assert_object_matches_schema(
 			$resp,
 			dirname(__FILE__).'/schemas/users_get_all.schema.json'
 		);

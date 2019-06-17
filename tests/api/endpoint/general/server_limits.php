@@ -5,9 +5,6 @@ use classes\APITestCase;
 use classes\APITestUtils;
 
 class server_limits extends APITestCase {
-	use traits\TestIsResponseCode200;
-	use traits\TestIsResponseContentTypeJSON;
-
 	public function setUp(): void {
 		$this->set_endpoint_method('GET');
 		$this->set_endpoint_uri('general/server_limits.php');
@@ -19,7 +16,7 @@ class server_limits extends APITestCase {
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri()
 		);
-		$this->assert_valid_json(
+		$this->assert_object_matches_schema(
 			$resp,
 			dirname(__FILE__).'/schemas/server_limits.schema.json'
 		);

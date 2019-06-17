@@ -39,8 +39,6 @@ class APIEndpoint {
 		// Run API modules requested by endpoint.
 		foreach ($modules as $m => $args) { $this->run_module($m, $args); }
 
-		// Use Content-Type: application/json by default.
-
 		// Run the endpoint hook function.
 		$ret = $hook($this->request, $this->response, $this->module_data);
 

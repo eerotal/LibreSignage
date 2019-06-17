@@ -55,8 +55,8 @@ final class APIInterface {
 	) {
 		$resp = $this->call_return_raw_response($method, $url, $data, $headers, $use_auth);
 
-		// Decode the response body if Content-Type is application/json.
 		if ($resp->getHeader('Content-Type')[0] === 'application/json') {
+			// Decode the response body if Content-Type is application/json.
 			try {
 				return APITestUtils::json_decode((string) $resp->getBody());
 			} catch (Exception $e) {
@@ -65,7 +65,8 @@ final class APIInterface {
 				);
 			}
 		} else {
-			return $resp->getBody();
+			// Otherwise return it as a string.
+			return (string) $resp->getBody();
 		}
 	}
 
@@ -126,15 +127,24 @@ final class APIInterface {
 		);
 	}
 
-	public function get_error_code(string $name) {
+	public function get_error_code(string $name): int {
 		return $this->error_codes[$name];
 	}
 
-	public function get_error_message_short(string $name) {
+	public function get_error_name(int $code): string {
+		$tmp = array_search($code, $this->error_codes);
+		if ($tmp === FALSE) {
+			throw new APIInterfaceException("API error $code doesn't exist.");
+		} else {
+			return $tmp;
+		}
+	}
+
+	public function get_error_message_short(string $name): string {
 		return $this->error_messages[$name]['short'];
 	}
 
-	public function get_error_message_long(string $name) {
+	public function get_error_message_long(string $name): string {
 		return $this->error_messages[$name]['long'];
 	}
 }
