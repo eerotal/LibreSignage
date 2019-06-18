@@ -11,11 +11,8 @@
 *    * groups  = New groups. If NULL or undefined no groups are set.
 *
 *  Return value
-*    * user
-*
-*      * name   = The name of the user.
-*      * groups = The groups the user is in.
-*      * pass   = The generated cleartext password.
+*    * user = The exported userdata.
+*    * pass = The generated cleartext password.
 *
 *    * error = An error code or API_E_OK on success.
 *

@@ -2,4 +2,4 @@
 
 namespace classes;
 
-final class APIInterfaceException extends Exception {}
+final class APIInterfaceException extends \Exception {}

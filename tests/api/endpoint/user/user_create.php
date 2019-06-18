@@ -1,6 +1,5 @@
 <?php
 
-use JsonSchema\Validator;
 use classes\APITestCase;
 use classes\APITestUtils;
 

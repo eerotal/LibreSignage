@@ -114,7 +114,13 @@ final class APIInterface {
 				'permanent' => TRUE
 			]
 		);
-		$this->session_token = $response->session->token;
+		if ($response->error === $this->get_error_code('API_E_OK')) {
+			$this->session_token = $response->session->token;
+		} else {
+			throw new APIInterfaceException(
+				"Failed to login. ({$this->get_error_name($response->error)})"
+			);
+		}
 	}
 
 	public function logout() {
