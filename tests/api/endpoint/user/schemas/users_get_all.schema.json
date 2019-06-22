@@ -19,7 +19,7 @@
 				}
 			},
 			"additionalProperties": false
-		},
+		}
 	},
 	"required": ["users"],
 	"additionalProperties": false

@@ -8,6 +8,8 @@ use GuzzleHttp\Psr7\Response;
 use classes\APITestUtils;
 use classes\APIInterfaceException;
 
+use \common\php\JSONUtils;
+
 final class APIInterface {
 	private $client = NULL;
 	private $session_token = NULL;
@@ -51,7 +53,7 @@ final class APIInterface {
 			if ($method === 'GET') {
 				$url .= '?'.\http_build_query($data);
 			} else {
-				$body = APITestUtils::json_encode($data);
+				$body = JSONUtils::encode($data);
 			}
 		}
 
@@ -73,7 +75,7 @@ final class APIInterface {
 		if ($resp->getHeader('Content-Type')[0] === 'application/json') {
 			// Decode the response body if Content-Type is application/json.
 			try {
-				return APITestUtils::json_decode((string) $resp->getBody());
+				return JSONUtils::decode((string) $resp->getBody());
 			} catch (Exception $e) {
 				throw new APIInterfaceException(
 					'Malformed JSON response received from API.'

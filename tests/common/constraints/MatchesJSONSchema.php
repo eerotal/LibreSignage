@@ -6,6 +6,9 @@ use PHPUnit\Framework\Constraint\Constraint;
 use JsonSchema\Validator;
 use classes\APITestUtils;
 
+use \common\php\JSONUtils;
+use \common\php\JSONException;
+
 class MatchesJSONSchema extends Constraint {
 	private $schema = NULL;
 	private $validator = NULL;
@@ -21,7 +24,7 @@ class MatchesJSONSchema extends Constraint {
 	}
 
 	protected function failureDescription($other): string {
-		$pretty = APITestUtils::json_encode($other, JSON_PRETTY_PRINT);
+		$pretty = JSONUtils::encode($other, JSON_PRETTY_PRINT);
 		return "the following JSON matches the provided schema:\n".
 				$pretty."\n".
 				$this->toString();

@@ -4,7 +4,8 @@ namespace classes;
 
 final class TestConfig {
 	const INCLUDE_PATHS = [
-		__DIR__.'/..'
+		__DIR__.'/..',
+		__DIR__.'/../../../dist'
 	];
 
 	public function __construct() {
