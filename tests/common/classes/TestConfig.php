@@ -3,12 +3,14 @@
 namespace classes;
 
 final class TestConfig {
+	const LS_DIST_PREFIX = 'dist/';
 	const INCLUDE_PATHS = [
 		__DIR__.'/..',
 		__DIR__.'/../../../dist'
 	];
 
 	public function __construct() {
+		echo "[Info] Configuring the unit test framework...\n";
 		TestConfig::setup_error_handling();
 		TestConfig::setup_symbol_autoloading();
 	}
@@ -32,6 +34,32 @@ final class TestConfig {
 	}
 
 	public static function setup_symbol_autoloading() {
+		$autoloader = require(__DIR__.'/../../../vendor/autoload.php');
+
+		/*
+		* Prefix autoload paths from composer's autoload.php with
+		* LS_DIST_PREFIX to make path resolution work in the dev tree.
+		*/
+		echo "[Info] Applying prefixes to autoload paths...\n";
+		echo "[Info] Make sure your 'dist/' is up-to-date!\n\n";
+
+		$base = realpath(__DIR__.'/../../../');
+		foreach ($autoloader->getPrefixesPsr4() as $namespace => $paths) {
+			foreach ($paths as &$p) {
+				$p = \preg_replace(
+					':^'.$base.':',
+					realpath($base.'/'.TestConfig::LS_DIST_PREFIX),
+					$p
+				);
+				if ($p === NULL) {
+					throw new Exception("preg_match() failed.");
+				} else if (strlen($p) === 0) {
+					throw new Exception("Namespace path doesn't exist.");
+				}
+			}
+			$autoloader->setPsr4($namespace, $paths);
+		}
+
 		\spl_autoload_register(['classes\TestConfig', 'autoload_symbol']);
 	}
 }
