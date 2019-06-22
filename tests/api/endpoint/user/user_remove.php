@@ -33,14 +33,14 @@ class user_remove extends APITestCase {
 	public function test_endpoint_not_authorized_for_non_admin_users(): void {
 		$this->api->login('user', 'user');
 
-		$resp = $this->api->call(
+		$resp = $this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
 			['user' => self::UNIT_TEST_USER],
 			[],
 			TRUE
 		);
-		$this->assert_api_failed($resp, 'API_E_NOT_AUTHORIZED');
+		$this->assert_api_failed($resp, 401);
 
 		$this->api->logout();
 	}

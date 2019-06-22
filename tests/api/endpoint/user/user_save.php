@@ -33,18 +33,18 @@ class user_save extends APITestCase {
 		string $user,
 		string $pass,
 		array $params,
-		string $error
+		int $expect
 	) {
 		$this->api->login($user, $pass);
 
-		$resp =	$this->api->call(
+		$resp =	$this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
 			$params,
 			[],
 			TRUE
 		);
-		$this->assert_api_failed($resp, $error);
+		$this->assert_api_failed($resp, $expect);
 
 		$this->api->logout();
 	}
@@ -58,7 +58,7 @@ class user_save extends APITestCase {
 					'user' => self::UNIT_TEST_USER,
 					'groups' => ['display']
 				],
-				'API_E_OK'
+				200
 			],
 			'Admin user tries to set password' => [
 				'admin',
@@ -68,7 +68,7 @@ class user_save extends APITestCase {
 					'pass' => 'test',
 					'groups' => ['display']
 				],
-				'API_E_NOT_AUTHORIZED'
+				401
 			],
 			'Non-admin tries to set groups' => [
 				'user',
@@ -77,7 +77,7 @@ class user_save extends APITestCase {
 					'user' => 'user',
 					'groups' => ['admin']
 				],
-				'API_E_NOT_AUTHORIZED'
+				401
 			],
 			'Non-admin tries to set password' => [
 				'user',
@@ -86,31 +86,31 @@ class user_save extends APITestCase {
 					'user' => 'display',
 					'pass' => 'test'
 				],
-				'API_E_OK'
+				200
 			],
 			'Missing user parameter' => [
 				'admin',
 				'admin',
 				[],
-				'API_E_INVALID_REQUEST'
+				400,
 			],
 			'Empty user parameter' => [
 				'admin',
 				'admin',
 				['user' => ''],
-				'API_E_INVALID_REQUEST'
+				400
 			],
 			'Wrong type for user parameter' => [
 				'admin',
 				'admin',
 				['user' => 1],
-				'API_E_INVALID_REQUEST'
+				400
 			],
 			'Missing groups parameter' => [
 				'admin',
 				'admin',
 				['user' => self::UNIT_TEST_USER],
-				'API_E_OK'
+				200
 			],
 			'Wrong type in groups array' => [
 				'admin',
@@ -119,7 +119,7 @@ class user_save extends APITestCase {
 					'user' => self::UNIT_TEST_USER,
 					'groups' => [1, 2, 3]
 				],
-				'API_E_INVALID_REQUEST'
+				400
 			],
 			'Empty string in groups array' => [
 				'admin',
@@ -128,7 +128,7 @@ class user_save extends APITestCase {
 					'user' => self::UNIT_TEST_USER,
 					'groups' => ['']
 				],
-				'API_E_INVALID_REQUEST'
+				400
 			],
 			'Empty groups array' => [
 				'admin',
@@ -137,7 +137,7 @@ class user_save extends APITestCase {
 					'user' => self::UNIT_TEST_USER,
 					'groups' => []
 				],
-				'API_E_INVALID_REQUEST'
+				400
 			],
 		];
 	}

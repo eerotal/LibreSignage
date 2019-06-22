@@ -28,6 +28,6 @@ class IsAPIErrorResponse extends Constraint {
 	}
 
 	public function toString(): string {
-		return 'API response matches supplied JSON schema.';
+		return 'API response matches error JSON schema.';
 	}
 }

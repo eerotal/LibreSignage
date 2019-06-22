@@ -3,9 +3,8 @@
 	"type": "object",
 	"properties": {
 		"user": { "$ref": "common/schemas/user.schema.json#/properties" },
-		"pass": { "$ref": "common/schemas/user.schema.json#/definitions/pass" },
-		"error": { "$ref": "common/schemas/error.schema.json#/definitions/error" }
+		"pass": { "$ref": "common/schemas/user.schema.json#/definitions/pass" }
 	},
-	"required": ["user", "pass", "error"],
+	"required": ["user", "pass"],
 	"additionalProperties": false
 }

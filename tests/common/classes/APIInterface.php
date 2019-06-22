@@ -11,39 +11,12 @@ use classes\APIInterfaceException;
 final class APIInterface {
 	private $client = NULL;
 	private $session_token = NULL;
-	private $error_codes = [];
-	private $error_messages = [];
 
 	public function __construct(string $host) {
-		$this->client = new Client(['base_uri' => $host]);
-
-		// Load error codes and messages.
-		$codes = $this->call(
-			'GET',
-			'/api/endpoint/general/api_err_codes.php',
-			[],
-			[],
-			FALSE
-		);
-		if (!property_exists($codes, 'error') || $codes->error !== 0) {
-			throw new APIInterfaceException('Failed to load API error codes.');
-		}
-
-		$msgs = $this->call(
-			'GET',
-			'/api/endpoint/general/api_err_msgs.php',
-			[],
-			[],
-			FALSE
-		);
-		if (!property_exists($msgs, 'error') || $msgs->error !== 0) {
-			throw new APIInterfaceException('Failed to load API error messages.');
-		}
-
-		foreach ((array) $codes->codes as $name => $code) {
-			$this->error_codes[$name] = $code;
-			$this->error_messages[$name] = (array) $msgs->messages[$code];
-		}
+		$this->client = new Client([
+			'base_uri' => $host,
+			'http_errors' => FALSE
+		]);
 	}
 
 	public function call(
@@ -53,21 +26,14 @@ final class APIInterface {
 		array $headers = [],
 		bool $use_auth = FALSE
 	) {
-		$resp = $this->call_return_raw_response($method, $url, $data, $headers, $use_auth);
-
-		if ($resp->getHeader('Content-Type')[0] === 'application/json') {
-			// Decode the response body if Content-Type is application/json.
-			try {
-				return APITestUtils::json_decode((string) $resp->getBody());
-			} catch (Exception $e) {
-				throw new APIInterfaceException(
-					'Malformed JSON response received from API.'
-				);
-			}
-		} else {
-			// Otherwise return it as a string.
-			return (string) $resp->getBody();
-		}
+		$resp = $this->call_return_raw_response(
+			$method,
+			$url,
+			$data,
+			$headers,
+			$use_auth
+		);
+		return APIInterface::decode_raw_response($resp);
 	}
 
 	public function call_return_raw_response(
@@ -103,8 +69,24 @@ final class APIInterface {
 		return $this->client->send($req);
 	}
 
+	public static function decode_raw_response(Response $resp) {
+		if ($resp->getHeader('Content-Type')[0] === 'application/json') {
+			// Decode the response body if Content-Type is application/json.
+			try {
+				return APITestUtils::json_decode((string) $resp->getBody());
+			} catch (Exception $e) {
+				throw new APIInterfaceException(
+					'Malformed JSON response received from API.'
+				);
+			}
+		} else {
+			// Otherwise return it as a string.
+			return (string) $resp->getBody();
+		}
+	}
+
 	public function login(string $user, string $pass) {
-		$response = $this->call(
+		$raw = $this->call_return_raw_response(
 			'POST',
 			'auth/auth_login.php',
 			[
@@ -114,11 +96,13 @@ final class APIInterface {
 				'permanent' => TRUE
 			]
 		);
-		if ($response->error === $this->get_error_code('API_E_OK')) {
-			$this->session_token = $response->session->token;
+		$decoded = APIInterface::decode_raw_response($raw);
+
+		if ($raw->getStatusCode() === 200) {
+			$this->session_token = $decoded->session->token;
 		} else {
 			throw new APIInterfaceException(
-				"Failed to login. ({$this->get_error_name($response->error)})"
+				"Login failed. ({$aw->getStatusCode()})"
 			);
 		}
 	}
@@ -131,26 +115,5 @@ final class APIInterface {
 			[],
 			TRUE
 		);
-	}
-
-	public function get_error_code(string $name): int {
-		return $this->error_codes[$name];
-	}
-
-	public function get_error_name(int $code): string {
-		$tmp = array_search($code, $this->error_codes);
-		if ($tmp === FALSE) {
-			throw new APIInterfaceException("API error $code doesn't exist.");
-		} else {
-			return $tmp;
-		}
-	}
-
-	public function get_error_message_short(string $name): string {
-		return $this->error_messages[$name]['short'];
-	}
-
-	public function get_error_message_long(string $name): string {
-		return $this->error_messages[$name]['long'];
 	}
 }

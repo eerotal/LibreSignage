@@ -20,11 +20,11 @@ class user_create extends APITestCase {
 	 */
 	public function test_fuzz_params(
 		array $params,
-		string $error
+		int $error
 	): void {
 		$this->api->login('admin', 'admin');
 
-		$resp = $this->api->call(
+		$resp = $this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
 			$params,
@@ -43,73 +43,73 @@ class user_create extends APITestCase {
 					'user' => self::UNIT_TEST_USER,
 					'groups' => ['editor', 'display']
 				],
-				'API_E_OK'
+				200
 			],
 			'Wrong type for user parameter' => [
 				[
 					'user' => 1,
 					'groups' => ['editor', 'display']
 				],
-				'API_E_INVALID_REQUEST'
+				400
 			],
 			'Empty username' => [
 				[
 					'user' => '',
 					'groups' => ['editor', 'display']
 				],
-				'API_E_LIMITED'
+				400
 			],
 			'NULL username' => [
 				[
 					'user' => NULL,
 					'groups' => ['editor', 'display']
 				],
-				'API_E_INVALID_REQUEST'
+				400
 			],
 			'No groups parameter' => [
 				[
 					'user' => self::UNIT_TEST_USER
 				],
-				'API_E_OK'
+				200
 			],
 			'Wrong type for groups parameter' => [
 				[
 					'user' => self::UNIT_TEST_USER,
 					'groups' => 'wrong_type'
 				],
-				'API_E_INVALID_REQUEST'
+				400
 			],
 			'Empty groups array' => [
 				[
 					'user' => self::UNIT_TEST_USER,
 					'groups' => []
 				],
-				'API_E_OK'
+				200
 			],
 			'NULL groups parameter' => [
 				[
 					'user' => self::UNIT_TEST_USER,
 					'groups' => NULL
 				],
-				'API_E_OK'
+				200
 			],
 			'Empty group name in groups array' => [
 				[
 					'user' => self::UNIT_TEST_USER,
 					'groups' => ['']
 				],
-				'API_E_LIMITED'
+				400
 			],
 			'Wrong type in groups array' => [
 				[
 					'user' => self::UNIT_TEST_USER,
 					'groups' => [1, 2, 3]
 				],
-				'API_E_INVALID_REQUEST'
+				400
 			],
 			'No parameters' => [
 				[],
-				'API_E_INVALID_REQUEST'
+				400
 			]
 		];
 	}
@@ -119,7 +119,7 @@ class user_create extends APITestCase {
 
 		$resp = NULL;
 		for ($i = 0; $i < 2; $i++) {
-			$resp = $this->api->call(
+			$resp = $this->api->call_return_raw_response(
 				$this->get_endpoint_method(),
 				$this->get_endpoint_uri(),
 				[
@@ -130,7 +130,7 @@ class user_create extends APITestCase {
 				TRUE
 			);
 		}
-		$this->assert_api_failed($resp, 'API_E_INVALID_REQUEST');
+		$this->assert_api_failed($resp, 400);
 
 		$this->api->logout();
 	}
@@ -159,7 +159,7 @@ class user_create extends APITestCase {
 	public function test_endpoint_not_authorized_for_non_admin_users(): void {
 		$this->api->login('user', 'user');
 
-		$resp = $this->api->call(
+		$resp = $this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
 			[
@@ -169,7 +169,7 @@ class user_create extends APITestCase {
 			[],
 			TRUE
 		);
-		$this->assert_api_failed($resp, 'API_E_NOT_AUTHORIZED');
+		$this->assert_api_failed($resp, 401);
 
 		$this->api->logout();
 	}

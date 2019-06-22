@@ -5,9 +5,8 @@
 		"users": {
 			"type": "array",
 			"items": { "$ref": "common/schemas/user.schema.json#/definitions/name" }
-		},
-		"error": { "$ref": "common/schemas/error.schema.json#/definitions/error" }
+		}
 	},
-	"required": ["users", "error"],
+	"required": ["users"],
 	"additionalProperties": false
 }

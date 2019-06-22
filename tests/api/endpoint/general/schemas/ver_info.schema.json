@@ -3,9 +3,8 @@
 	"type": "object",
 	"properties": {
 		"ls": { "type": "string" },
-		"api": { "type": "string" },
-		"error": { "$ref": "common/schemas/error.schema.json#/definitions/error" }
+		"api": { "type": "string" }
 	},
-	"required": ["ls", "api", "error"],
+	"required": ["ls", "api"],
 	"additionalProperties": false
 }

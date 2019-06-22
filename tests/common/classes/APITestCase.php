@@ -2,6 +2,8 @@
 
 namespace classes;
 
+use GuzzleHttp\Psr7\Response;
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Constraint\IsEqual;
 
@@ -9,7 +11,7 @@ use JsonSchema\Validator;
 use classes\APIInterface;
 
 use constraints\IsAPIErrorResponse;
-use constraints\APIErrorEquals;
+use constraints\HTTPStatusEquals;
 use constraints\MatchesJSONSchema;
 
 class APITestCase extends TestCase {
@@ -63,52 +65,50 @@ class APITestCase extends TestCase {
 
 	/**
 	 * Assert that $response is a well-formed API error response and
-	 * it's error code matches $expect. If $expect === 'API_E_OK', this
+	 * it's status code matches $expect. If $expect === 200, this
 	 * function calls APITestCase::assert_api_succeeded().
 	 *
-	 * @param $response mixed The API response object.
-	 * @param $expect string The expected API error code name.
+	 * @param $response Response The HttpFoundation Response object.
+	 * @param $expect string The expected HTTP status code.
 	 * @param $message string An optional error message to print when the
 	 *                        assertion fails.
 	 */
 	public function assert_api_failed(
-		$response,
-		string $expect,
+		Response $response,
+		int $expect,
 		string $message = ''
 	) {
-		if ($expect === 'API_E_OK') {
-			$this->assert_api_succeeded($response, 'API_E_OK', $message);
+		if ($expect === 200) {
+			$this->assert_api_succeeded($response, $message);
 			return;
 		}
 		self::assertThat(
-			$response,
+			APIInterface::decode_raw_response($response),
 			new IsAPIErrorResponse($this->api, $expect),
 			$message
 		);
 		self::assertThat(
-			$response->error,
-			new APIErrorEquals($this->api, $expect),
+			$response->getStatusCode(),
+			new HTTPStatusEquals($this->api, $expect),
 			$message
 		);
 	}
 
 	/**
 	 * Assert that $response succeeded by checking that
-	 * $response->error matches API_E_OK.
+	 * $response->error matches 200.
 	 *
 	 * @param $response mixed The API response object.
 	 * @param $message string An optional error message to print when
 	 *                        the assertion fails.
 	 */
-	public function assert_api_succeeded($response, string $message = '') {
-		self::assertArrayHasKey(
-			'error',
-			(array) $response,
-			'No error key in API response.'
-		);
+	public function assert_api_succeeded(
+		Response $response,
+		string $message = ''
+	) {
 		self::assertThat(
-			$response->error,
-			new APIErrorEquals($this->api, 'API_E_OK'),
+			$response->getStatusCode(),
+			new HTTPStatusEquals($this->api, 200),
 			$message
 		);
 	}

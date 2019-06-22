@@ -35,10 +35,10 @@ class user_get extends APITestCase {
 	/**
 	 * @dataProvider params_provider
 	 */
-	public function test_fuzz_params(array $params, string $expect) {
+	public function test_fuzz_params(array $params, int $expect) {
 		$this->api->login('admin', 'admin');
 
-		$resp = $this->api->call(
+		$resp = $this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
 			$params,
@@ -54,19 +54,19 @@ class user_get extends APITestCase {
 		return [
 			'Valid parameters' => [
 				['user' => 'admin'],
-				'API_E_OK'
+				200
 			],
 			'Missing user parameter' => [
 				[],
-				'API_E_INVALID_REQUEST'
+				400
 			],
 			'Nonexistent user parameter' => [
 				['user' => 'nouser'],
-				'API_E_INVALID_REQUEST'
+				400
 			],
 			'Empty user parameter' => [
 				['user' => ''],
-				'API_E_INVALID_REQUEST'
+				400
 			]
 		];
 	}
@@ -119,14 +119,14 @@ class user_get extends APITestCase {
 	public function test_endpoint_not_authorized_for_non_admin_users(): void {
 		$this->api->login('user', 'user');
 
-		$resp = $this->api->call(
+		$resp = $this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
 			['user' => 'admin'],
 			[],
 			TRUE
 		);		
-		$this->assert_api_failed($resp, 'API_E_NOT_AUTHORIZED');
+		$this->assert_api_failed($resp, 401);
 
 		$this->api->logout();
 	}
