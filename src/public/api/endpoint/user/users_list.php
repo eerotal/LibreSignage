@@ -8,13 +8,12 @@
 *
 *  Return value
 *    * users = An array of usernames.
-*    * error = An error code or API_E_OK on success.
 *
 *  <====
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 
 APIEndpoint::GET(
 	[

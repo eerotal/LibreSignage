@@ -1,16 +1,12 @@
 <?php
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/module.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIModule.php');
 
 use JsonSchema\Validator;
 use JsonSchema\Constraints\Constraint;
 
 class APIQueryValidatorModule extends APIModule {
-	public function __construct() {
-		parent::__construct();
-	}
-
 	public function run(APIEndpoint $e, array $args) {
 		$this->check_args(['schema'], $args);
 
@@ -31,7 +27,10 @@ class APIQueryValidatorModule extends APIModule {
 			foreach ($validator->getErrors() as $e) {
 				$err_str .= sprintf("%s: %s\n", $e['property'], $e['message']);
 			}
-			throw new APIException(API_E_INVALID_REQUEST, $err_str);
+			throw new APIException(
+				$err_str,
+				HTTPStatus::BAD_REQUEST
+			);
 		}
 		return $data;
 	}

@@ -1,6 +1,6 @@
 <?php
 
-require_once(LIBRESIGNAGE_ROOT.'/api/module.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIModule.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/userquota.php');
 
 class APIRateLimitModule extends APIModule {
@@ -10,16 +10,12 @@ class APIRateLimitModule extends APIModule {
 	*  data has been assigned into the endpoint (ie. after
 	*  APIAuthModule).
 	*/
-	public function __construct() {
-		parent::__construct();
-	}
-
 	public function run(APIEndpoint $e, array $args) {
 		assert(
 			array_key_exists('APIAuthModule', $e->get_module_data()),
 			new APIException(
-				API_E_INTERNAL,
-				"User data not loaded. You must call APIAuthModule first."
+				"User data not loaded. You must call APIAuthModule first.",
+				HTTPStatus::INTERNAL_SERVER_ERROR
 			)
 		);
 
@@ -39,7 +35,10 @@ class APIRateLimitModule extends APIModule {
 		}
 
 		if (!$quota->has_quota('api_rate')) {
-			throw new APIException(API_E_RATE, "API rate limited.");
+			throw new APIException(
+				'API rate limited.',
+				HTTPStatus::TOO_MANY_REQUESTS
+			);
 		} else {
 			$quota->use_quota('api_rate');
 		}

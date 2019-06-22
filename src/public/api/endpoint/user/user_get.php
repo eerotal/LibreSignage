@@ -16,13 +16,11 @@
 *      * user     = The name of the user.
 *      * groups   = The groups the user is in.
 *
-*    * error      = An error code or API_E_OK on success.
-*
 *  <====
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 
 APIEndpoint::GET(
 	[
@@ -48,7 +46,10 @@ APIEndpoint::GET(
 		$user = NULL;
 
 		if (!$caller->is_in_group('admin')) {
-			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+			throw new APIException(
+				'Not authorized as non-admin.',
+				HTTPStatus::UNAUTHORIZED
+			);
 		}
 		$user = new User($params->user);
 

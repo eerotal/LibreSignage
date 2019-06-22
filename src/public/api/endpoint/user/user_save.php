@@ -26,13 +26,11 @@
 *      * name     = The name of the user.
 *      * groups   = The groups the user is in.
 *
-*    * error      = An error code or API_E_OK on success.
-*
 *  <====
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 
 APIEndpoint::POST(
 	[
@@ -71,8 +69,8 @@ APIEndpoint::POST(
 		// Check for authorization.
 		if (!$auth_admin && !$auth_usr) {
 			throw new APIException(
-				API_E_NOT_AUTHORIZED,
-				"Not authorized to modify the userdata."
+				'Not authorized to modify the userdata.',
+				HTTPStatus::UNAUTHORIZED
 			);
 		}
 
@@ -80,8 +78,8 @@ APIEndpoint::POST(
 			$u = new User($params->user);
 		} catch (ArgException $e) {
 			throw new APIException(
-				API_E_INVALID_REQUEST,
-				"Failed to load user.", 0, $e
+				"Failed to load user '{$params->user}'.",
+				HTTPStatus::BAD_REQUEST
 			);
 		}
 
@@ -92,14 +90,15 @@ APIEndpoint::POST(
 					$u->set_password($params->pass);
 				} catch (ArgException $e) {
 					throw new APIException(
-						API_E_LIMITED,
-						"Failed to set password.", 0, $e
+						'Failed to set password.',
+						HTTPStatus::BAD_REQUEST,
+						$e
 					);
 				}
 			} else {
 				throw new APIException(
-					API_E_NOT_AUTHORIZED,
-					"Admin users can't change passwords of other users."
+					"Admin users can't change passwords of other users.",
+					HTTPStatus::UNAUTHORIZED
 				);
 			}
 		}
@@ -111,22 +110,24 @@ APIEndpoint::POST(
 					$u->set_groups($params->groups);
 				} catch (ArgException $e) {
 					throw new APIException(
-						API_E_LIMITED,
-						"Failed to set user groups.", 0, $e
+						'Failed to set user groups.',
+						HTTPStatus::BAD_REQUEST,
+						$e
 					);
 				}
 			} else {
 				throw new APIException(
-					API_E_NOT_AUTHORIZED,
-					"Non-admin users can't set groups."
+					"Non-admin users can't set groups.",
+					HTTPStatus::UNAUTHORIZED
 				);
 			}
 		}
 
 		if ($u->write() === FALSE) {
+			// This will fail when there are too many users => return FORBIDDEN.
 			throw new APIException(
-				API_E_LIMITED,
-				"Failed to write userdata."
+				'Failed to write userdata.',
+				HTTPStatus::FORBIDDEN
 			);
 		}
 

@@ -1,7 +1,7 @@
 <?php
 
-require_once(LIBRESIGNAGE_ROOT.'/api/error.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/defs.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIException.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/HTTPStatus.php');
 
 // Require all API modules.
 $mods = array_diff(scandir(LIBRESIGNAGE_ROOT.'/api/modules/'), ['.', '..']);
@@ -19,16 +19,14 @@ class APIEndpoint {
 	const M_OPTIONS = 'OPTIONS';
 
 	private $method      = NULL;
-
 	private $request     = NULL;
 	private $response    = NULL;
 	private $module_data = [];
 
 	public function __construct(array $modules, string $method, callable $hook) {
+		APIException::setup();
+
 		$ret = NULL;
-
-		api_error_setup();
-
 		$this->method = $method;
 		$this->request = Request::createFromGlobals();
 		$this->response = new Response();
@@ -44,8 +42,6 @@ class APIEndpoint {
 
 		// Send $ret as the response if it's an array.
 		if (is_array($ret)) {
-			// Make sure the error code is set.
-			if (!array_key_exists('error', $ret)) { $ret['error'] = API_E_OK; }
 			$this->response->headers->set('Content-Type', 'application/json');
 			$this->response->setContent(APIEndpoint::json_encode($ret));
 		}
@@ -61,7 +57,10 @@ class APIEndpoint {
 		try {
 			$this->module_data[$module] = (new $module())->run($this, $args);
 		} catch (IntException $e) {
-			throw new APIException(API_E_INTERNAL, 'No such API module.');
+			throw new APIException(
+				HTTPStatus::INTERNAL_SERVER_ERROR,
+				'No such API module.'
+			);
 		}
 	}
 
@@ -99,7 +98,10 @@ class APIEndpoint {
 	static function json_encode($data): string {
 		$ret = json_encode($data);
 		if ($ret === FALSE || json_last_error()	!== JSON_ERROR_NONE) {
-			throw new APIException(API_E_INTERNAL, 'Failed to encode JSON.');
+			throw new APIException(
+				HTTPStatus::INTERNAL_SERVER_ERROR,
+				'Failed to encode JSON.'
+			);
 		}
 		return $ret;
 	}
@@ -107,7 +109,10 @@ class APIEndpoint {
 	static function json_decode($data) {
 		$ret = json_decode($data);
 		if ($ret === NULL && json_last_error() !== JSON_ERROR_NONE) {
-			throw new APIException(API_E_INTERNAL, 'Failed to decode JSON.');
+			throw new APIException(
+				HTTPStatus::INTERNAL_SERVER_ERROR,
+				'Failed to decode JSON.'
+			);
 		}
 		return $ret;
 	}

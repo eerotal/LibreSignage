@@ -9,24 +9,21 @@
 *    * The caller is in the 'admin' or 'editor' groups.
 *    * The slide has previously been locked by the caller.
 *
-*  The 'error' value returned by this endpoint is
+*  The HTTP status returned by this endpoint is
 *
-*    * API_E_OK on success.
-*    * API_E_LOCK if the slide is locked by another user.
+*    * '200 OK' on success.
+*    * '423 Locked' if the slide is locked by another user.
 *
 *  **Request:** POST, application/json
 *
 *  Parameters
 *    * id = The ID of the slide to lock.
 *
-*  Return value
-*    * error = An error code or API_E_OK on success.
-*
 *  <====
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
 APIEndpoint::POST(
@@ -53,7 +50,10 @@ APIEndpoint::POST(
 		$params = $module_data['APIJsonValidatorModule'];
 
 		if (!$caller->is_in_group('admin') && !$caller->is_in_group('editor')) {
-			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized");
+			throw new APIException(
+				'Not authorized because user is not admin or editor.',
+				HTTPStatus::UNAUTHORIZED
+			);
 		}
 
 		$slide = new Slide();
@@ -62,9 +62,8 @@ APIEndpoint::POST(
 			$slide->lock_release($session);
 		} catch (SlideLockException $e) {
 			throw new APIException(
-				API_E_LOCK,
-				"Failed to release slide lock.",
-				0,
+				"Can't release slide lock created from another session.",
+				HTTPStatus::LOCKED,
 				$e
 			);
 		}

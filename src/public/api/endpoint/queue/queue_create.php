@@ -9,14 +9,11 @@
 *  Parameters
 *    * name = Queue name.
 *
-*  Return value
-*    * error  = An error code or API_E_OK on success.
-*
 *  <====
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/queue.php');
 
@@ -44,11 +41,17 @@ APIEndpoint::POST(
 		$params = $module_data['APIJsonValidatorModule'];
 
 		if (!$caller->is_in_group('admin') && !$caller->is_in_group('editor')) {
-			throw new APIException(API_E_NOT_AUTHORIZED, 'Not authorized.');
+			throw new APIException(
+				'User not in groups admin or editor not authorized.',
+				HTTPStatus::UNAUTHORIED
+			);
 		}
 
 		if (queue_exists($params->name)) {
-			throw new APIException(API_E_INVALID_REQUEST, 'Queue already exists.');
+			throw new APIException(
+				'Queue already exists.',
+				HTTPStatus::BAD_REQUEST
+			);
 		}
 
 		$queue = new Queue($params->name);

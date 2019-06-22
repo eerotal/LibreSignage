@@ -14,13 +14,11 @@
 *    * user = The exported userdata.
 *    * pass = The generated cleartext password.
 *
-*    * error = An error code or API_E_OK on success.
-*
 *  <====
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 
 APIEndpoint::POST(
 	[
@@ -54,10 +52,16 @@ APIEndpoint::POST(
 		$params = $module_data['APIJsonValidatorModule'];
 
 		if (!$user->is_in_group('admin')) {
-			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+			throw new APIException(
+				'Not authorized as non-admin.',
+				HTTPStatus::UNAUTHORIZED
+			);
 		}
 		if (user_exists($params->user)) {
-			throw new APIException(API_E_INVALID_REQUEST, "User already exists.");
+			throw new APIException(
+				"User '{$params->user}' already exists.",
+				HTTPStatus::BAD_REQUEST
+			);
 		}
 
 		$new = new User();
@@ -67,8 +71,9 @@ APIEndpoint::POST(
 			$new->set_name($params->user);
 		} catch (ArgException $e) {
 			throw new APIException(
-				API_E_LIMITED,
-				"Limited.", 0, $e
+				'Invalid username',
+				HTTPStatus::BAD_REQUEST,
+				$e
 			);
 		}
 
@@ -78,8 +83,9 @@ APIEndpoint::POST(
 				$new->set_groups($params->groups);
 			} catch (ArgException $e) {
 				throw new APIException(
-					API_E_LIMITED,
-					"Limited.", 0, $e
+					'Invalid groups.',
+					HTTPStatus::BAD_REQUEST,
+					$e
 				);
 			}
 		}
@@ -89,15 +95,19 @@ APIEndpoint::POST(
 			$pass = gen_passwd(GENERATED_PASSWD_LEN);
 		} catch (Exception $e) {
 			throw new APIException(
-				API_E_INTERNAL,
-				"Failed to generate password.", 0, $e
+				"Failed to generate password.",
+				HTTPStatus::INTERNAL_SERVER_ERROR,
+				$e
 			);
 		}
 		$new->set_password($pass);
 
 		// Write to file.
 		if ($new->write() === FALSE) {
-			throw new APIException(API_E_LIMITED, "Too many users.");
+			throw new APIException(
+				'Too many users.',
+				HTTPStatus::FORBIDDEN
+			);
 		}
 
 		return [

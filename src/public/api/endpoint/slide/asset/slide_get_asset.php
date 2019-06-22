@@ -17,7 +17,7 @@
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
 $SLIDE_GET_ASSET = new APIEndpoint([

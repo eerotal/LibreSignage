@@ -14,13 +14,12 @@
 *
 *  Return value
 *    * slide = Duplicated slide data. See slide_get.php for more info.
-*    * error = An error code or API_E_OK on success.
 *
 *  <====
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
 APIEndpoint::POST(
@@ -51,7 +50,10 @@ APIEndpoint::POST(
 		$session = $module_data['APIAuthModule']['session'];
 
 		if (!$caller->is_in_group('admin') && !$caller->is_in_group('editor')) {
-			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized");
+			throw new APIException(
+				'Not authorized for users not in the groups admin or editor.',
+				HTTPStatus::UNAUTHORIZED
+			);
 		}
 
 		$old = new Slide();

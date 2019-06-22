@@ -4,7 +4,6 @@ use classes\APITestCase;
 
 class user_save extends APITestCase {
 	const UNIT_TEST_USER = 'unit_test_user';
-	const UNIT_TEST_PASS = 'unit_test_pass';
 
 	public function setUp(): void {
 		parent::setUp();
@@ -14,25 +13,11 @@ class user_save extends APITestCase {
 
 		// Create an initial user for testing.
 		$this->api->login('admin', 'admin');
-		$pass = $this->api->call(
+		$this->api->call(
 			'POST',
 			'user/user_create.php',
 			[
 				'user' => self::UNIT_TEST_USER,
-				'groups' => []
-			],
-			[],
-			TRUE
-		)->pass;
-		$this->api->logout();
-
-		$this->api->login(self::UNIT_TEST_USER, $pass);
-		$this->api->call(
-			'POST',
-			'user/user_save.php',
-			[
-				'user' => self::UNIT_TEST_USER,
-				'pass' => self::UNIT_TEST_PASS,
 				'groups' => []
 			],
 			[],
@@ -86,8 +71,8 @@ class user_save extends APITestCase {
 				'API_E_NOT_AUTHORIZED'
 			],
 			'Non-admin tries to set groups' => [
-				self::UNIT_TEST_USER,
-				self::UNIT_TEST_PASS,
+				'user',
+				'user',
 				[
 					'user' => 'user',
 					'groups' => ['admin']
@@ -95,10 +80,10 @@ class user_save extends APITestCase {
 				'API_E_NOT_AUTHORIZED'
 			],
 			'Non-admin tries to set password' => [
-				self::UNIT_TEST_USER,
-				self::UNIT_TEST_PASS,
+				'user',
+				'user',
 				[
-					'user' => self::UNIT_TEST_USER,
+					'user' => 'display',
 					'pass' => 'test'
 				],
 				'API_E_OK'

@@ -11,14 +11,11 @@
 *  Parameters
 *    * name = Queue name.
 *
-*  Return value
-*    * error  = An error code or API_E_OK on success.
-*
 *  <====
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/queue.php');
 
@@ -60,6 +57,9 @@ APIEndpoint::POST(
 			$queue->remove();
 			return [];
 		}
-		throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+		throw new APIException(
+			'Non-admin user not authorized.',
+			HTTPStatus::UNAUTHORIZED
+		);
 	}
 );

@@ -10,10 +10,10 @@
 *    * The slide is not already locked by another user.
 *    * The user has modification permissions for the slide.
 *
-*  The 'error' value returned by this endpoint is
+*  The HTTP status returned by this endpoint is
 *
-*    * API_E_OK if the slide locking succeeds.
-*    * API_E_LOCK if the slide is already locked by another user.
+*    * '200 OK' if the slide locking succeeds.
+*    * '423 Locked' if the slide is already locked by another user.
 *
 *  **Request:** POST, application/json
 *
@@ -22,13 +22,12 @@
 *
 *  Return value
 *    * lock  = Slide lock data.
-*    * error = An error code or API_E_OK on success.
 *
 *  <====
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
 APIEndpoint::POST(
@@ -64,16 +63,18 @@ APIEndpoint::POST(
 				&& !$caller->is_in_group('editor')
 			)
 		) {
-			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized");
+			throw new APIException(
+				"Operation not permitted for user.",
+				HTTPStatus::UNAUTHORIZED
+			);
 		}
 
 		try {
 			$slide->lock_acquire($session);
 		} catch (SlideLockException $e) {
 			throw new APIException(
-				API_E_LOCK,
-				"Failed to lock slide.",
-				0,
+				'Failed to lock slide.',
+				HTTPStatus::LOCKED,
 				$e
 			);
 		}

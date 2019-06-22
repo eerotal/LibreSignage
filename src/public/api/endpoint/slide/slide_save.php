@@ -20,7 +20,7 @@
 *  This endpoint only allows slide modification if the caller
 *  has locked the slide by calling slide_lock_acquire.php first.
 *  If the slide is not locked or is locked by someone else, the
-*  API_E_LOCK error is returned in the 'error' value. If a new
+*  '424 Failed Dependency' status code is returned. If a new
 *  slide is created, the slide is automatically locked for the
 *  caller.
 *
@@ -56,15 +56,13 @@
 *    * assets        = Unused (see above)
 *
 *  Return value
-*    This endpoint returns all the parameters above as well as the following:
-*
-*    * error   = An error code or API_E_OK on success.
+*    * This endpoint returns all the parameters above.
 *
 *  <====
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
 
 APIEndpoint::POST(
@@ -129,7 +127,10 @@ APIEndpoint::POST(
 				// Restricted modification permissions for collaborators.
 				return modify_slide($session, $slide, $params, FALSE);
 			} else {
-				throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+				throw new APIException(
+					'User not authorized to do this operation.',
+					HTTPStatus::UNAUTHORIZED
+				);
 			}
 		} else if (
 			$caller->is_in_group('admin')
@@ -138,7 +139,10 @@ APIEndpoint::POST(
 			// admin or editor => ALLOW creation.
 			return create_slide($caller, $session, $slide, $params);
 		} else {
-			throw new APIException(API_E_NOT_AUTHORIZED, "Not authorized.");
+			throw new APIException(
+				'User not authorized to do this operation.',
+				HTTPStatus::UNAUTHORIZED
+			);
 		}
 	}
 );
@@ -150,9 +154,15 @@ function ensure_slide_lock(Slide $slide, Session $session): void {
 	*/
 	$lock = $slide->get_lock();
 	if ($lock === NULL) {
-		throw new APIException(API_E_LOCK, "Slide not locked.");
+		throw new APIException(
+			'Slide not locked.',
+			HTTPStatus::FAILED_DEPENDENCY
+		);
 	} else if (!$lock->is_expired() && !$lock->is_owned_by($session)) {
-		throw new APIException(API_E_LOCK, "Slide locked by another user.");
+		throw new APIException(
+			'Slide locked by another user.',
+			HTTPStatus::FAILED_DEPENDENCY
+		);
 	}	
 }
 
@@ -203,7 +213,10 @@ function create_slide(User $caller, Session $session, Slide $slide, $data) {
 		$queue = new Queue($slide->get_queue_name());
 		$queue->load(TRUE);
 
-		throw new APIException(API_E_QUOTA_EXCEEDED, "Slide quota exceeded.");
+		throw new APIException(
+			'Slide quota exceeded.',
+			HTTPStatus::FORBIDDEN
+		);
 	} else {
 		$caller->get_quota()->use_quota('slides');
 		$caller->write();

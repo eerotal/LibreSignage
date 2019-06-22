@@ -15,13 +15,12 @@
 *  Return value
 *    * user    = Current user data.
 *    * session = Current session data.
-*    * error   = An error code or API_E_OK on success.
 *
 *  <====
 */
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/api.php');
+require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 
 APIEndpoint::POST(
 	[
@@ -42,19 +41,24 @@ APIEndpoint::POST(
 		$params = $module_data['APIJsonValidatorModule'];
 
 		$user = auth_creds_verify($params->username, $params->password);
-		if ($user === NULL) { return ['error' => API_E_INCORRECT_CREDS]; }
+		if ($user === NULL) {
+			throw new APIException(
+				'Invalid credentials.',
+				HTTPStatus::UNAUTHORIZED
+			);
+		}
 
 		// Try to create a new session.
 		$tmp = preg_match('/[^a-zA-Z0-9_-]/', $params->who);
 		if ($tmp === 1) {
 			throw new APIException(
-				API_E_INVALID_REQUEST,
-				"Invalid characters in the 'who' parameter."
+				"Invalid characters in the 'who' parameter.",
+				HTTPStatus::BAD_REQUEST
 			);
 		} else if ($tmp === FALSE) {
 			throw new APIException(
-				API_E_INTERNAL,
-				"preg_match() failed."
+				"preg_match() failed.",
+				HTTPStatus::INTERNAL_SERVER_ERROR
 			);
 		}
 		$data = $user->session_new(
