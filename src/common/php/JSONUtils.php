@@ -14,7 +14,9 @@ final class JSONException extends \Exception {};
 */
 final class JSONUtils {
 	/**
-	* Function for encoding an object as JSON.
+	* Function for JSON encoding an object. This function wraps
+	* the builtin function json_decode() but handles errors by
+	* throwing an exception if the encoding fails.
 	*
 	* @param mixed $args All arguments are passed to the builtin
 	*                    function json_encode().
@@ -33,7 +35,7 @@ final class JSONUtils {
 
 	/**
 	* Function for decoding a JSON string. This function wraps
-	* the builtin function json_decode() but handles error by
+	* the builtin function json_decode() but handles errors by
 	* throwing an exception if the decoding fails.
 	*
 	* @param mixed $args All arguments are passed to the builtin
@@ -57,7 +59,7 @@ final class JSONUtils {
 	* This function also returns errors for json_encode() and
 	* json_decode() since JSONUtils uses them under the hood.
 	*
-	* @return string A string describin the error.
+	* @return string A string describing the error.
 	*/
 	public static function json_error_str(): string {
 		switch(\json_last_error()) {
