@@ -104,7 +104,7 @@ final class APIInterface {
 			$this->session_token = $decoded->session->token;
 		} else {
 			throw new APIInterfaceException(
-				"Login failed. ({$aw->getStatusCode()})"
+				"Login failed. ({$raw->getStatusCode()})"
 			);
 		}
 	}

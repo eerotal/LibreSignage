@@ -5,15 +5,25 @@ require_once(LIBRESIGNAGE_ROOT.'/api/APIModule.php');
 
 use JsonSchema\Validator;
 use JsonSchema\Constraints\Constraint;
+use common\php\JSONUtils;
+use common\php\JSONException;
 
 class APIJsonValidatorModule extends APIModule {
 	public function run(APIEndpoint $e, array $args) {
+		$data = NULL;
 		$this->check_args(['schema'], $args);
 
 		if ($e->get_request()->getContent() === '') {
 			$data = (object) [];
 		} else {
-			$data = APIEndpoint::json_decode($e->get_request()->getContent());
+			try {
+				$data = JSONUtils::decode($e->get_request()->getContent());
+			} catch (JSONException $e) {
+				throw new APIException(
+					$e->getMessage(),
+					HTTPStatus::BAD_REQUEST
+				);
+			}
 		}
 
 		$validator = new Validator();

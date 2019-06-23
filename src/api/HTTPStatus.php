@@ -1,5 +1,8 @@
 <?php
 
+use common\php\JSONUtils;
+use common\php\JSONException;
+
 /**
 * HTTPStatus contains all standard HTTP status codes as constants
 * and also some handy function for using them.
@@ -98,6 +101,8 @@ final class HTTPStatus {
 		} catch (FileTypeException $e) {
 			return self::BAD_REQUEST;
 		} catch (ConfigException $e) {
+			return self::INTERNAL_SERVER_ERROR;
+		} catch (JSONException $e) {
 			return self::INTERNAL_SERVER_ERROR;
 		} catch (Exception $e) {
 			return self::INTERNAL_SERVER_ERROR;

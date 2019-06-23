@@ -3,6 +3,8 @@
 require_once(LIBRESIGNAGE_ROOT.'/api/HTTPStatus.php');
 
 use Symfony\Component\HttpFoundation\Response;
+use common\php\JSONUtils;
+use common\php\JSONException;
 
 /**
 * APIException class for sending error responses to clients. This class can
@@ -20,14 +22,16 @@ class APIException extends Exception {
 	* @throws IntException If JSON encoding fails.
 	*/
 	public static function as_json(Throwable $e): string {
-		$str = json_encode([
-			'thrown_at' => $e->getFile().' @ ln: '.$e->getLine(),
-			'e_msg' => $e->getMessage(),
-			'e_trace' => $e->getTraceAsString()
-		]);
-		if ($str === FALSE && json_last_error() !== JSON_ERROR_NONE) {
+		$str = '';
+		try {
+			$str = JSONUtils::encode([
+				'thrown_at' => $e->getFile().' @ ln: '.$e->getLine(),
+				'e_msg' => $e->getMessage(),
+				'e_trace' => $e->getTraceAsString()
+			]);
+		} catch (JSONException $e) {
 			throw new APIException(
-				'Failed to decode JSON',
+				'Failed to encode error response JSON',
 				HTTPStatus::INTERNAL_SERVER_ERROR
 			);
 		}

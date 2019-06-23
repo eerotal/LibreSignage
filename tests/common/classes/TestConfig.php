@@ -5,8 +5,7 @@ namespace classes;
 final class TestConfig {
 	const LS_DIST_PREFIX = 'dist/';
 	const INCLUDE_PATHS = [
-		__DIR__.'/..',
-		__DIR__.'/../../../dist'
+		__DIR__.'/..'
 	];
 
 	public function __construct() {
@@ -46,15 +45,22 @@ final class TestConfig {
 		$base = realpath(__DIR__.'/../../../');
 		foreach ($autoloader->getPrefixesPsr4() as $namespace => $paths) {
 			foreach ($paths as &$p) {
-				$p = \preg_replace(
-					':^'.$base.':',
-					realpath($base.'/'.TestConfig::LS_DIST_PREFIX),
-					$p
-				);
-				if ($p === NULL) {
-					throw new Exception("preg_match() failed.");
-				} else if (strlen($p) === 0) {
-					throw new Exception("Namespace path doesn't exist.");
+				/*
+				* Path doesn't exist as-is, prefix it with LS_DIST_PREFIX.
+				* This check makes sure dev dep paths not copied into dist/
+				* are not modified.
+				*/
+				if (strlen(realpath($p)) === 0) {
+					$p = \preg_replace(
+						':^'.$base.':',
+						realpath($base.'/'.TestConfig::LS_DIST_PREFIX),
+						$p
+					);
+					if ($p === NULL) {
+						throw new \Exception("preg_match() failed.");
+					} else if (strlen(realpath($p)) === 0) {
+						throw new \Exception("Namespace path doesn't exist. ($p)");
+					}
 				}
 			}
 			$autoloader->setPsr4($namespace, $paths);

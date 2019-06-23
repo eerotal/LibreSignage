@@ -10,6 +10,8 @@ foreach ($mods as $m) { require_once(LIBRESIGNAGE_ROOT."/api/modules/$m"); }
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use common\php\JSONUtils;
+
 class APIEndpoint {
 	const M_GET     = 'GET';
 	const M_POST    = 'POST';
@@ -43,7 +45,7 @@ class APIEndpoint {
 		// Send $ret as the response if it's an array.
 		if (is_array($ret)) {
 			$this->response->headers->set('Content-Type', 'application/json');
-			$this->response->setContent(APIEndpoint::json_encode($ret));
+			$this->response->setContent(JSONUtils::encode($ret));
 		}
 
 		$this->send();
@@ -93,27 +95,5 @@ class APIEndpoint {
 
 	static function OPTIONS(array $modules, callable $hook) {
 		return new APIEndpoint($modules, APIEndpoint::M_OPTIONS, $hook);
-	}
-
-	static function json_encode($data): string {
-		$ret = json_encode($data);
-		if ($ret === FALSE || json_last_error()	!== JSON_ERROR_NONE) {
-			throw new APIException(
-				HTTPStatus::INTERNAL_SERVER_ERROR,
-				'Failed to encode JSON.'
-			);
-		}
-		return $ret;
-	}
-
-	static function json_decode($data) {
-		$ret = json_decode($data);
-		if ($ret === NULL && json_last_error() !== JSON_ERROR_NONE) {
-			throw new APIException(
-				HTTPStatus::INTERNAL_SERVER_ERROR,
-				'Failed to decode JSON.'
-			);
-		}
-		return $ret;
 	}
 }

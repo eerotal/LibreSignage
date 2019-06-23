@@ -8,9 +8,12 @@
 # break things since it doesn't add the trailing slash to the path.
 ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-SASSDEP := build/scripts/sassdep.py
+SASS_DEP := build/scripts/sassdep.py
 SASS_IPATHS := $(ROOT) $(ROOT)src/common/css $(ROOT)/src/node_modules
 SASS_FLAGS := --no-source-map $(addprefix -I,$(SASS_IPATHS))
+
+COMPOSER_DEP := build/scripts/composer_prod_deps.sh
+COMPOSER_DEP_FLAGS := --self
 
 POSTCSS_FLAGS := --config postcss.config.js --replace --no-map
 
@@ -33,6 +36,8 @@ TARGET ?=
 PASS ?=
 INITCHK_WARN ?= N
 
+PHP_AUTOLOAD := $(shell find vendor/composer/ -type f) vendor/autoload.php
+
 # Don't search for dependencies when certain targets with no deps are run.
 # The if-statement below is some hacky makefile magic. Don't be scared.
 NODEP_TARGETS := clean realclean LOC LOD apitest configure initchk install
@@ -53,11 +58,9 @@ JS_LIBS := $(filter-out \
 )
 
 # Production PHP libraries.
-PHP_LIBS := $(addprefix vendor/,\
-	$(shell \
-		composer show | cut -d' ' -f1 \
-	) composer autoload.php \
-)
+PHP_LIBS := $(shell find $(addprefix vendor/,\
+	$(shell "./$(COMPOSER_DEP)" "$(COMPOSER_DEP_FLAGS)"|cut -d' ' -f1)\
+) -type f) $(PHP_AUTOLOAD)
 
 # Non-compiled sources.
 SRC_NO_COMPILE := $(shell find src \
@@ -115,7 +118,7 @@ ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [Info] Not going to generate HTML documentation.)
 endif
 
-.PHONY: $(NODEP_TARGETS) dirs server js css api config libs docs htmldocs
+.PHONY: $(NODEP_TARGETS) dirs server js css api config libs docs htmldocs $(PHP_AUTOLOAD)
 .ONESHELL:
 
 all:: initchk server docs htmldocs js css api js_libs php_libs logo; @:
@@ -126,7 +129,7 @@ docs:: $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))) dist/doc/rst/api_index.rs
 htmldocs:: $(addprefix dist/public/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
 css:: $(subst src,dist/public,$(SRC_SCSS:.scss=.css)); @:
 js_libs:: $(subst $(ROOT)node_modules/,dist/public/libs/,$(JS_LIBS)); @:
-php_libs:: $(addprefix dist/,$(PHP_LIBS)); @:
+php_libs:: $(subst vendor/,dist/vendor/,$(PHP_LIBS)); @:
 logo:: $(GENERATED_LOGOS); @:
 
 # Copy over non-compiled, non-PHP sources.
@@ -270,7 +273,7 @@ dep/%.scss.dep: src/%.scss
 
 		TARGET="$(subst src,dist/public,$(<:.scss=.css))"
 		SRC="$(<)"
-		DEPS=`./$(SASSDEP) -l $$SRC $(SASS_IPATHS)|sed 's:$(ROOT)::g'`
+		DEPS=`./$(SASS_DEP) -l $$SRC $(SASS_IPATHS)|sed 's:$(ROOT)::g'`
 
 		# Printf dependency makefile contents.
 		printf "$$TARGET:: $$SRC $$DEPS\n" > $@
@@ -290,7 +293,34 @@ dist/public/libs/%:: node_modules/%
 	$(call status,cp,$<,$@)
 	cp -Rp $</* $@
 
-# Copy PHP libraries to dist/vendors.
+# Dump composer autoload files. Make all the autoload files in vendor/composer
+# depend on vendor/autoload.php so that composer dump-autoload is only run
+# once and not for every autoload file. $(PHP_AUTOLOAD) is also marked PHONY
+# so that autoload files are created every time make is invoked. This makes sure
+# that the correct autoload files are created for unit testing and production
+# versions.
+#
+# Note that the autoload files are not copied into dist/ if $(PHP_AUTOLOAD) is
+# directly specified as a prerequisite (see apitest). This is because the paths
+# in $(PHP_AUTOLOAD) refer to vendor/composer/* and vendor/autoload.php. That
+# means the dist/vendor/% target below is skipped. When make is invoked normally,
+# however, the php_libs target prefixes $(PHP_LIBS) with dist/ so that all the
+# libs and autoload files are copied into dist/ aswell in the dist/vendor/% target.
+$(filter-out vendor/autoload.php,$(PHP_AUTOLOAD)): vendor/autoload.php
+vendor/autoload.php:
+	@:
+	case "$(MAKECMDGOALS)" in
+		*apitest*)
+			echo "[Info] Dump development autoload."
+			composer dump-autoload --no-ansi
+			;;
+		*)
+			echo "[Info] Dump production autoload."
+			composer dump-autoload --no-ansi --no-dev
+			;;
+	esac
+
+# Copy Composer libraries to dist/vendors.
 dist/vendor/%:: vendor/%
 	@:
 	set -e
@@ -426,10 +456,16 @@ LOD:
 	printf '[Info] Lines Of Documentation: \n'
 	wc -l `find dist -type f -name '*.rst'`
 
-apitest:
+apitest: $(PHP_AUTOLOAD)
 	@:
 	set -e
 	printf '[Info] Running API integration tests...\n'
+
+	if [ ! -d 'dist/' ]; then
+		echo "[Error] 'dist'/ doesn't exist. Did you compile first?"
+		exit 1
+	fi
+
 	export PHPUNIT_API_HOST="$(PHPUNIT_API_HOST)"
 	vendor/bin/phpunit $(PHPUNIT_FLAGS) --testsuite "API"
 
