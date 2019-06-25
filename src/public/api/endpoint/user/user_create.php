@@ -17,8 +17,13 @@
 *  <====
 */
 
+namespace pub\api\endpoints\user;
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/user.php');
+use \api\APIEndpoint;
+use \api\APIException;
+use \api\HTTPStatus;
 
 APIEndpoint::POST(
 	[
@@ -26,7 +31,7 @@ APIEndpoint::POST(
 			'cookie_auth' => FALSE
 		],
 		'APIRateLimitModule' => [],
-		'APIJsonValidatorModule' => [
+		'APIJSONValidatorModule' => [
 			'schema' => [
 				'type' => 'object',
 				'properties' => [
@@ -49,7 +54,7 @@ APIEndpoint::POST(
 		$pass = NULL;
 
 		$user = $module_data['APIAuthModule']['user'];
-		$params = $module_data['APIJsonValidatorModule'];
+		$params = $module_data['APIJSONValidatorModule'];
 
 		if (!$user->is_in_group('admin')) {
 			throw new APIException(
@@ -64,7 +69,7 @@ APIEndpoint::POST(
 			);
 		}
 
-		$new = new User();
+		$new = new \User();
 
 		// Set name.
 		try {

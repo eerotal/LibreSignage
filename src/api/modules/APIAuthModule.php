@@ -1,7 +1,14 @@
 <?php
 
-require_once(LIBRESIGNAGE_ROOT.'/api/APIModule.php');
+namespace api\modules;
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/auth.php');
+
+use \api\APIEndpoint;
+use \api\APIModule;
+use \api\HTTPStatus;
+use \api\APIException;
 
 class APIAuthModule extends APIModule {
 	/*
@@ -28,9 +35,9 @@ class APIAuthModule extends APIModule {
 
 		// Check auth token.
 		if ($req->headers->get(AUTH_TOKEN_HEADER) !== NULL) {
-			$data = auth_token_verify($req->headers->get(AUTH_TOKEN_HEADER));
+			$data = \auth_token_verify($req->headers->get(AUTH_TOKEN_HEADER));
 		} else if ($req->cookies->get(AUTH_TOKEN_COOKIE) && $args['cookie_auth']) {
-			$data = auth_token_verify($req->cookies->get(AUTH_TOKEN_COOKIE));
+			$data = \auth_token_verify($req->cookies->get(AUTH_TOKEN_COOKIE));
 		} else {
 			throw new APIException(
 				'No Auth-Token header or token cookie supplied.',

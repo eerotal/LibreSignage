@@ -1,8 +1,12 @@
 <?php
-require_once(LIBRESIGNAGE_ROOT.'/common/php/util.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/session.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/userquota.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/exportable/exportable.php');
+
+
+namespace common\php\auth;
+
+use \common\php\Util;
+use \common\php\auth\Session;
+use \common\php\auth\UserQuota;
+use \common\php\exportable\Exportable;
 
 class User extends Exportable {
 	static $PRIVATE = [

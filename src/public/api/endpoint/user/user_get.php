@@ -19,8 +19,12 @@
 *  <====
 */
 
+namespace pub\api\endpoints\user;
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/user.php');
+use \api\APIEndpoint;
+use \api\APIException;
 
 APIEndpoint::GET(
 	[
@@ -51,7 +55,7 @@ APIEndpoint::GET(
 				HTTPStatus::UNAUTHORIZED
 			);
 		}
-		$user = new User($params->user);
+		$user = new \User($params->user);
 
 		return [
 			'user' => [

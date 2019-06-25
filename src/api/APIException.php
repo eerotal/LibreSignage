@@ -1,10 +1,11 @@
 <?php
 
-require_once(LIBRESIGNAGE_ROOT.'/api/HTTPStatus.php');
+namespace api;
 
-use Symfony\Component\HttpFoundation\Response;
-use common\php\JSONUtils;
-use common\php\JSONException;
+use \api\HTTPStatus;
+use \common\php\JSONUtils;
+use \common\php\JSONException;
+use \Symfony\Component\HttpFoundation\Response;
 
 /**
 * APIException class for sending error responses to clients. This class can
@@ -14,14 +15,14 @@ use common\php\JSONException;
 * since it's a bit more flexible. Call APIException::setup() to setup the
 * global error handler.
 */
-class APIException extends Exception {
+class APIException extends \Exception {
 	/**
 	* Get the API JSON representation of an Exception.
 	*
 	* @return string
 	* @throws IntException If JSON encoding fails.
 	*/
-	public static function as_json(Throwable $e): string {
+	public static function as_json(\Throwable $e): string {
 		$str = '';
 		try {
 			$str = JSONUtils::encode([
@@ -42,7 +43,7 @@ class APIException extends Exception {
 	* Setup exception handling for the API system.
 	*/
 	static function setup() {
-		set_exception_handler(function(Throwable $e) {
+		\set_exception_handler(function(\Throwable $e) {
 			try {
 				$response = new Response();
 				$response->setStatusCode(HTTPStatus::to_http_status($e));
@@ -53,15 +54,15 @@ class APIException extends Exception {
 
 				$response->send();
 				ls_log($e->__toString(), LOGERR);
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				/*
 				* Exceptions thrown in the exception handler
 				* cause hard to debug fatal errors; handle them
 				* here. Use as little code as possible in this
 				* catch block to prevent further exceptions.
 				*/
-				http_response_code(500);
-				header('Content-Type: text/plain');
+				\http_response_code(500);
+				\header('Content-Type: text/plain');
 				echo 'Exception thrown in global handler: '.$e->getMessage();
 			}
 			exit(1);

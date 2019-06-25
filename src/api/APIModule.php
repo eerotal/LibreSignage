@@ -1,5 +1,11 @@
 <?php
 
+namespace api;
+
+use \api\APIEndpoint;
+use \api\APIException;
+use \api\HTTPStatus;
+
 /**
 * Base class for API modules.
 */
@@ -8,9 +14,9 @@ abstract class APIModule {
 	* Entry point function for API modules. Override this to implement
 	* the module.
 	*
-	* @param $e The APIEndpoint object the module is run for.
-	* @param $agrs An array that contains user defined arguments
-	*              for the module.
+	* @param APIEndpoint $e The APIEndpoint object the module is run for.
+	* @param array $args An array that contains user defined arguments
+	*                    for the module.
 	* @return mixed The return data from them module that's accessible
 	*               to API endpoints.
 	*/
@@ -19,10 +25,10 @@ abstract class APIModule {
 	/**
 	* Check that all the required arguments in $req are defined in $args.
 	*
-	* @throws ArgException If all required arguments are not defined in $args.
+	* @throws APIException If all required arguments are not defined in $args.
 	*/
 	final public function check_args(array $req, array $args) {
-		$diff = array_diff($req, array_keys($args));
+		$diff = \array_diff($req, \array_keys($args));
 		if (count($diff) === 0) { return; }
 
 		throw new APIException(

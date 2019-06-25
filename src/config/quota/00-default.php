@@ -12,6 +12,6 @@ return [
 	],
 	'api_rate' => [
 		'limit' => 200,
-		'description' => 'API quota (calls/'.gtlim('API_RATE_T').'s)'
+		'description' => 'API rate quota'
 	]
 ];

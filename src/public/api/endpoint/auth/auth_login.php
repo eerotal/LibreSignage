@@ -19,12 +19,15 @@
 *  <====
 */
 
+namespace pub\api\endpoints\auth;
+
+use \api\APIEndpoint;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
+require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/auth.php');
 
 APIEndpoint::POST(
 	[
-		'APIJsonValidatorModule' => [
+		'APIJSONValidatorModule' => [
 			'schema' => [
 				'type' => 'object',
 				'properties' => [
@@ -38,7 +41,7 @@ APIEndpoint::POST(
 		]
 	],
 	function($req, $resp, $module_data) {
-		$params = $module_data['APIJsonValidatorModule'];
+		$params = $module_data['APIJSONValidatorModule'];
 
 		$user = auth_creds_verify($params->username, $params->password);
 		if ($user === NULL) {

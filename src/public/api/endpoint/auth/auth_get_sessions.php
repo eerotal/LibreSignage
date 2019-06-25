@@ -12,8 +12,10 @@
 *  <====
 */
 
+namespace pub\api\endpoints\auth;
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
+use \api\APIEndpoint;
 
 APIEndpoint::GET(
 	[

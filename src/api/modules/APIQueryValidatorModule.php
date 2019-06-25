@@ -1,10 +1,15 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/APIModule.php');
+namespace api\modules;
 
-use JsonSchema\Validator;
-use JsonSchema\Constraints\Constraint;
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
+
+use \api\APIEndpoint;
+use \api\APIModule;
+use \api\APIException;
+use \api\HTTPStatus;
+use \JsonSchema\Validator;
+use \JsonSchema\Constraints\Constraint;
 
 class APIQueryValidatorModule extends APIModule {
 	public function run(APIEndpoint $e, array $args) {

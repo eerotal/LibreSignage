@@ -1,7 +1,9 @@
 <?php
 
-use common\php\JSONUtils;
-use common\php\JSONException;
+namespace api;
+
+use \common\php\JSONUtils;
+use \common\php\JSONException;
 
 /**
 * HTTPStatus contains all standard HTTP status codes as constants
@@ -87,7 +89,7 @@ final class HTTPStatus {
 	* @param Throwable $e The Throwable object to map to an HTTP error.
 	* @return int The resulting HTTP error code.
 	*/
-	public static function to_http_status(Throwable $e): int {
+	public static function to_http_status(\Throwable $e): int {
 		try {
 			throw $e;
 		} catch (APIException $e) {
@@ -104,7 +106,7 @@ final class HTTPStatus {
 			return self::INTERNAL_SERVER_ERROR;
 		} catch (JSONException $e) {
 			return self::INTERNAL_SERVER_ERROR;
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			return self::INTERNAL_SERVER_ERROR;
 		}
 	}

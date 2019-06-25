@@ -29,8 +29,10 @@
 *  <====
 */
 
+namespace pub\api\endpoints\user;
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
+use \api\APIEndpoint;
 
 APIEndpoint::POST(
 	[
@@ -38,7 +40,7 @@ APIEndpoint::POST(
 			'cookie_auth' => FALSE
 		],
 		'APIRateLimitModule' => [],
-		'APIJsonValidatorModule' => [
+		'APIJSONValidatorModule' => [
 			'schema' => [
 				'type' => 'object',
 				'properties' => [
@@ -61,7 +63,7 @@ APIEndpoint::POST(
 	],
 	function($req, $resp, $module_data) {
 		$caller = $module_data['APIAuthModule']['user'];
-		$params = $module_data['APIJsonValidatorModule'];
+		$params = $module_data['APIJSONValidatorModule'];
 
 		$auth_admin = $caller->is_in_group('admin');
 		$auth_user = $caller->get_name() === $params->user;

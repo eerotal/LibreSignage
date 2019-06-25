@@ -1,7 +1,11 @@
 <?php
 
-require_once(LIBRESIGNAGE_ROOT.'/api/APIModule.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/userquota.php');
+namespace api\modules;
+
+use \api\APIEndpoint;
+use \api\APIModule;
+use \api\APIException;
+use \api\HTTPStatus;
 
 class APIRateLimitModule extends APIModule {
 	/*

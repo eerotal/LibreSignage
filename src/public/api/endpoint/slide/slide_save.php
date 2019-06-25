@@ -61,9 +61,11 @@
 *  <====
 */
 
+namespace pub\api\endpoints\slide;
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
+use \api\APIEndpoint;
 
 APIEndpoint::POST(
 	[
@@ -71,7 +73,7 @@ APIEndpoint::POST(
 			'cookie_auth' => FALSE
 		],
 		'APIRateLimitModule' => [],
-		'APIJsonValidatorModule' => [
+		'APIJSONValidatorModule' => [
 			'schema' => [
 				'type' => 'object',
 				'properties' => [
@@ -100,7 +102,7 @@ APIEndpoint::POST(
 		]
 	],
 	function($req, $resp, $module_data) {
-		$params = $module_data['APIJsonValidatorModule'];
+		$params = $module_data['APIJSONValidatorModule'];
 		$session = $module_data['APIAuthModule']['session'];
 		$caller = $module_data['APIAuthModule']['user'];
 		$slide = new Slide();

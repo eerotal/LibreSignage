@@ -1,16 +1,18 @@
 <?php
 
-require_once(LIBRESIGNAGE_ROOT.'/api/APIException.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/HTTPStatus.php');
+namespace api;
 
-// Require all API modules.
-$mods = array_diff(scandir(LIBRESIGNAGE_ROOT.'/api/modules/'), ['.', '..']);
-foreach ($mods as $m) { require_once(LIBRESIGNAGE_ROOT."/api/modules/$m"); }
+use \api\modules\APIAuthModule;
+use \api\modules\APIJSONValidatorModule;
+use \api\modules\APIQueryValidatorModule;
+use \api\modules\APIRateLimitModule;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use \api\APIException;
+use \api\HTTPStatus;
+use \common\php\JSONUtils;
 
-use common\php\JSONUtils;
+use \Symfony\Component\HttpFoundation\Request;
+use \Symfony\Component\HttpFoundation\Response;
 
 class APIEndpoint {
 	const M_GET     = 'GET';
@@ -57,7 +59,8 @@ class APIEndpoint {
 
 	public function run_module(string $module, array $args) {
 		try {
-			$this->module_data[$module] = (new $module())->run($this, $args);
+			$fq_module = '\\api\\modules\\'.$module;
+			$this->module_data[$module] = (new $fq_module())->run($this, $args);
 		} catch (IntException $e) {
 			throw new APIException(
 				HTTPStatus::INTERNAL_SERVER_ERROR,

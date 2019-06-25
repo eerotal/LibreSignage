@@ -9,7 +9,8 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"common\\php\\": "common/php/"
+			"common\\php\\": "common/php/",
+			"api\\": "api/"
 		}
 	}
 }

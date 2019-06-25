@@ -12,9 +12,11 @@
 *  <====
 */
 
+namespace pub\api\endpoints\slide;
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
+use \api\APIEndpoint;
 
 APIEndpoint::GET(
 	[
