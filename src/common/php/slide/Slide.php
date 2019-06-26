@@ -132,9 +132,8 @@ final class Slide extends Exportable {
 	/**
 	* Generate a new ID for the loaded slide.
 	*/
-	public function gen_id() {
+	private function gen_id() {
 		$this->id = get_uid();
-		$this->mk_paths($this->id);
 	}
 
 	/**
@@ -152,7 +151,6 @@ final class Slide extends Exportable {
 			throw new ArgException("Slide $id doesn't exist.");
 		}
 		$this->id = $id;
-		$this->mk_paths($id);
 	}
 
 	/**
@@ -524,7 +522,10 @@ final class Slide extends Exportable {
 	* @throws IntException if the slide is not ready.
 	*/
 	private function assert_ready() {
-		assert($this->is_ready(), IntException('Slide not ready.'));
+		assert(
+			!empty($this->id),
+			IntException('Slide not ready.')
+		);
 	}
 
 	/**
@@ -532,6 +533,12 @@ final class Slide extends Exportable {
 	*/
 	public function write() {
 		$tmp = '';
+
+		// Generate an ID for unsaved slides.
+		if (empty($this->id)) {
+			$this->gen_id();
+		}
+
 		$this->assert_ready();
 
 		if (!is_dir($this->get_dir_path())) {
@@ -588,7 +595,6 @@ final class Slide extends Exportable {
 	public function get_collaborators() { return $this->collaborators; }
 	public function get_lock() { return $this->lock; }
 	public function get_assets() { return $this->assets; }
-	public function is_ready() { return $this->ready; }
 
 	public function get_queue(): Queue {
 		$queue = new Queue($this->queue_name);

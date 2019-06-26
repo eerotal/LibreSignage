@@ -22,6 +22,7 @@
 namespace pub\api\endpoints\auth;
 
 use \api\APIEndpoint;
+use \common\php\auth\Auth;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
 require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/auth.php');
 
@@ -43,7 +44,7 @@ APIEndpoint::POST(
 	function($req, $resp, $module_data) {
 		$params = $module_data['APIJSONValidatorModule'];
 
-		$user = auth_creds_verify($params->username, $params->password);
+		$user = Auth::verify_creds($params->username, $params->password);
 		if ($user === NULL) {
 			throw new APIException(
 				'Invalid credentials.',

@@ -9,6 +9,7 @@ use \api\APIEndpoint;
 use \api\APIModule;
 use \api\HTTPStatus;
 use \api\APIException;
+use \common\php\auth\Auth;
 
 class APIAuthModule extends APIModule {
 	/*
@@ -34,10 +35,10 @@ class APIAuthModule extends APIModule {
 		}
 
 		// Check auth token.
-		if ($req->headers->get(AUTH_TOKEN_HEADER) !== NULL) {
-			$data = \auth_token_verify($req->headers->get(AUTH_TOKEN_HEADER));
-		} else if ($req->cookies->get(AUTH_TOKEN_COOKIE) && $args['cookie_auth']) {
-			$data = \auth_token_verify($req->cookies->get(AUTH_TOKEN_COOKIE));
+		if ($req->headers->get(Auth::TOKEN_HEADER) !== NULL) {
+			$data = Auth::verify_token($req->headers->get(Auth::TOKEN_HEADER));
+		} else if ($req->cookies->get(Auth::TOKEN_COOKIE) && $args['cookie_auth']) {
+			$data = Auth::verify_token($req->cookies->get(Auth::TOKEN_COOKIE));
 		} else {
 			throw new APIException(
 				'No Auth-Token header or token cookie supplied.',
