@@ -15,10 +15,11 @@ A LibreSignage docker container can be started by running::
         -d \
         -p 80:80
         --mount source=ls_vol,target=/var/www/html/data
-        eerotal/libresignage:[VERSION]
+        eerotal/libresignage:latest
 
-Where ``[VERSION]`` is the LibreSignage version to pull. This
-command does a few things
+You can also subsitute the *latest* tag with a specific version
+to pull if you don't want to pull the latest one. This command
+does a few things
 
 1. If the LibreSignage image is not yet downloaded, it is pulled
    from Docker Hub.

@@ -1,3 +1,15 @@
+v1.0.1
+  - [bugfix]   Fix a bug where using forward slashes in slide markup caused
+               exceptions. (issue #66)
+  - [bugfix]   Fix a bug where passing a NULL exception to error_handle() caused
+               a fatal exception in some cases. (issue #61)
+  - [feature]  Tag new Docker releases with the 'latest' tag.
+  - [bugfix]   Fix standalone checks in the API interface module.
+  - [bugfix]   Fix incompatible pandoc version in Travis CI. (issue #58)
+  - [feature]  Implement the INITCHK_WARN make option for ignoring errors
+               from initialization checks.
+  - [bugfix]   Fix a bug where User::load() didn't properly check usernames.
+
 v1.0.0
   - [internal] Modularize and improve the build system.
   - [feature]  Implement an improved configuration file loader that

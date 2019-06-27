@@ -48,9 +48,16 @@ deploy:
           condition: $target = 'apache2-debian-docker'
 
 install:
-    # Install dependencies
+    # Install pandoc 2.7.2 from a .deb package because the
+    # version in the repos is too old.
+    - |
+      wget -qO pandoc.deb https://github.com/jgm/pandoc/releases/download/2.7.2/pandoc-2.7.2-1-amd64.deb
+      sudo dpkg -i pandoc.deb
+      rm pandoc.deb
+
+    # Install other dependencies from repos & npm.
     - sudo apt-get update
-    - sudo apt-get install pandoc imagemagick
+    - sudo apt-get install imagemagick
     - npm install
 
 before_script:

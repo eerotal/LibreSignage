@@ -44,22 +44,22 @@
 
 	function gtlim(string $lim) {
 		// Get the value of a limit.
-		return LS_LIM[$lim];
+		return LS_LIMITS[$lim];
 	}
 
 	// Load LibreSignage configuration files.
 	define_array_values(load_config_array(
 		LIBRESIGNAGE_ROOT.'/'.CONFIG_DIR
 	));
-	define('LS_LIM', load_config_array(
+	define('LS_LIMITS', load_config_array(
 		LIBRESIGNAGE_ROOT.'/'.LIMITS_DIR
 	));
-	define('DEFAULT_QUOTA', load_config_array(
+	define('LS_QUOTAS', load_config_array(
 		LIBRESIGNAGE_ROOT.'/'.QUOTA_DIR
 	));
 
 	// Do some checks on the configured values.
-	$max_slides = DEFAULT_QUOTA['slides']['limit']*gtlim('MAX_USERS');
+	$max_slides = LS_QUOTAS['slides']['limit']*gtlim('MAX_USERS');
 	if ($max_slides > gtlim('SLIDE_MAX_INDEX') - 1) {
 		throw new Exception(
 			'The configured slide quota conflicts with the '.
