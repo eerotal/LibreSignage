@@ -40,14 +40,7 @@ if (!$USER_GET->get_caller()->is_in_group('admin')) {
 	);
 }
 
-try {
-	$u = new User($USER_GET->get('user'));
-} catch (ArgException $e) {
-	throw new APIException(
-		API_E_INVALID_REQUEST,
-		"Failed to load user.", 0, $e
-	);
-}
+$u = new User($USER_GET->get('user'));
 
 $ret_data = [
 	'user' => [

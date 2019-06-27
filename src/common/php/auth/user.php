@@ -30,7 +30,8 @@ class User extends Exportable {
 	public function __construct($name = NULL) {
 		if (!empty($name)) {
 			// Load userdata for existing users.
-			$this->load($name);
+			$this->set_name($name);
+			$this->load();
 		} else {
 			// Initialize the user quota for new users.
 			$this->quota = new UserQuota();
@@ -45,20 +46,17 @@ class User extends Exportable {
 		return $this->{$name};
 	}
 
-	public function load(string $user) {
+	public function load() {
 		/*
-		*  Load data for the user $user from file.
+		*  Load data for the current user.
 		*/
 		$json = '';
 		$data = NULL;
 		$dir = NULL;
 
-		if (empty($user)) {
-			throw new ArgException('Invalid username.');
-		}
-		$dir = $this->get_data_dir($user);
+		$dir = $this->get_data_dir($this->user);
 		if (!is_dir($dir)) {
-			throw new ArgException("No user named $user.");
+			throw new ArgException("No user named $this->user.");
 		}
 		$json = file_lock_and_get($dir.'/data.json');
 		if ($json === FALSE) {
@@ -275,6 +273,14 @@ class User extends Exportable {
 		if (strlen($name) > gtlim('USERNAME_MAX_LEN')) {
 			throw new ArgException('Username too long.');
 		}
+
+		$tmp = preg_match('/^[A-Za-z0-9_]+$/', $name);
+		if ($tmp === FALSE) {
+			throw new IntException('preg_match() failed.');
+		} else if ($tmp === 0) {
+			throw new ArgException('Username contains invalid characters.');
+		}
+
 		$this->user = $name;
 	}
 
