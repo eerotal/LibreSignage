@@ -15,6 +15,7 @@ v1.0.1
   - [bugfix]   Fix incompatible pandoc version in Travis CI. (issue #58)
   - [feature]  Implement the INITCHK_WARN make option for ignoring errors
                from initialization checks.
+  - [bugfix]   Fix a bug where User::load() didn't properly check usernames.
 
 v1.0.0
   - [internal] Modularize and improve the build system.
