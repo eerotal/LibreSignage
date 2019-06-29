@@ -1,12 +1,13 @@
 <?php
 
-/*
-*  SlideLock object implementation needed in the Slide class.
-*/
+use \common\php\Config;
+use \common\php\Exportable;
+use \common\php\auth\Session;
 
-require_once(LIBRESIGNAGE_ROOT.'/common/php/exportable/exportable.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/session.php');
-class SlideLock extends Exportable{
+/**
+* SlideLock object for locking slides.
+*/
+final class SlideLock extends Exportable {
 	static $PRIVATE = [
 		'session_id',
 		'expire'
@@ -23,7 +24,7 @@ class SlideLock extends Exportable{
 	public function __construct($session = NULL) {
 		if ($session !== NULL) {
 			$this->session_id = $session->get_id();
-			$this->expire = time() + SLIDE_LOCK_MAX_AGE;
+			$this->expire = time() + Config::config('SLIDE_LOCK_MAX_AGE');
 		}
 	}
 
@@ -35,20 +36,25 @@ class SlideLock extends Exportable{
 		return $this->{$name};
 	}
 
-	public function is_expired() {
-		/*
-		*  Return TRUE if this SlideLock is expired and FALSE otherwise.
-		*/
+	/**
+	* Check whether a SlideLock has expired.
+	*
+	* @return bool TRUE = Expired, FALSE = Not expired.
+	*/
+	public function is_expired(): bool {
 		if (empty($this->session_id)) { return TRUE; }
 		$s = Session::from_id($this->session_id);
 		return $s === NULL || time() > $this->expire;
 	}
 
-	public function is_owned_by(Session $session) {
-		/*
-		*  Return TRUE if this SlideLock is owned by $session and
-		*  FALSE otherwise.
-		*/
+	/**
+	* Check whether a SlideLock is owner by a session.
+	*
+	* @param Session $session The Session to check against.
+	*
+	* @return bool TRUE if $session owns lock, FALSE otherwise.
+	*/
+	public function is_owned_by(Session $session): bool {
 		return $this->session_id === $session->get_id();
 	}
 

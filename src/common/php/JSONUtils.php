@@ -27,7 +27,7 @@ final class JSONUtils {
 		$ret = \call_user_func_array('json_encode', $args);
 		if ($ret === FALSE && \json_last_error() !== JSON_ERROR_NONE) {
 			throw new JSONException(
-				"Failed to encode JSON: {JSONUtils::json_error_str()}"
+				'Failed to encode JSON: '.JSONUtils::json_error_str()
 			);
 		}
 		return $ret;

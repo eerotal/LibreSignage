@@ -106,7 +106,7 @@ abstract class Exportable {
 	* @throws ExportableException if $obj doesn't extend Exportable.
 	*/
 	private function exp_obj($obj, bool $private, bool $meta): array {
-		if (is_subclass_of($obj, 'Exportable')) {
+		if (is_subclass_of($obj, '\\common\\php\\Exportable')) {
 			return $obj->export($private, $meta);
 		} else {
 			throw new ExportableException(
@@ -171,7 +171,7 @@ abstract class Exportable {
 	* @throws ExportableException if the visibility value loaded from $arr is invalid.
 	* @throws ExportableException if $check_keys === TRUE and the data keys don't match.
 	*/
-	private function imp_array(array $arr, bool $root, bool $check_keys): array {
+	private function imp_array(array $arr, bool $root, bool $check_keys) {
 		if (
 			$check_keys
 			&& array_key_exists(self::EXP_VISIBILITY, $arr)

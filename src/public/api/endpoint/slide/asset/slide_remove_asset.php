@@ -16,9 +16,9 @@
 *  <====
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/api/APIInterface.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
+require_once(Config::config('LIBRESIGNAGE_ROOT').'/api/APIInterface.php');
+require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/slide/slide.php');
 
 $SLIDE_REMOVE_ASSET = new APIEndpoint([
 	APIEndpoint::METHOD         => API_METHOD['POST'],

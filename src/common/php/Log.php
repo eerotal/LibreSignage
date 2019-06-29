@@ -2,18 +2,18 @@
 
 namespace common\php;
 
+use \common\php\Config;
 use \common\php\Exceptions\IntException;
 
 $LS_LOG_ENABLED = FALSE;
-
-// Define log destinations.
-define('LOGDEF', LOG_DIR."/default.log");
-define('LOGERR', LOG_DIR."/error.log");
 
 /**
 * Logging functions for LibreSignage.
 */
 final class Log {
+	const LOGDEF = 'default.log';
+	const LOGERR = 'error.log';
+
 	/**
 	* Enable/disable logging.
 	*
@@ -25,22 +25,45 @@ final class Log {
 	}
 
 	/**
+	* Check whether logging is enabled.
+	*
+	* @return bool TRUE = Enabled, FALSE = Disabled
+	*/
+	private static function is_enabled(): bool {
+		global $LS_LOG_ENABLED;
+		return $LS_LOG_ENABLED;
+	}
+
+	/**
+	* Get the log path for a logfile.
+	*
+	* @param string $log The log file (Log::LOGERR or Log::LOGDEF).
+	*
+	* @return string The log path.
+	*/
+	private static function get_log_path(string $log): string {
+		return Config::config('LOG_DIR').'/'.$log;
+	}
+
+	/**
 	*  Open and lock a log file.
 	*
-	* @param string $log The logfile path.
+	* @param string $log The logfile to use (Log::LOGERR or Log::LOGDEF).
 	* @param int $lock Lock type (LOCK_EX, LOCK_SH).
 	* @param string $mode The mode to open the file in. See PHP docs for fopen().
+	*
 	* @return resource The opened file handle.
+	*
 	* @throws IntException if opening the file fails.
 	* @throws IntException if locking the file fails.
 	*/
 	private static function open(string $log, int $lock, string $mode) {
-		$handle = fopen($log, $mode);
+		$handle = fopen(self::get_log_path($log), $mode);
 		if ($handle === FALSE) {
 			throw new IntException("Failed to create log file '$log'.");
 		}
 		if (flock($handle, $lock) === FALSE) {
-			throw new IntException("flock('$log', ...) failed.");
+			throw new IntException('flock() failed.');
 		}
 		return $handle;
 	}
@@ -65,10 +88,10 @@ final class Log {
 		);
 
 		if (flock($handle, LOCK_UN) === FALSE) {
-			throw new IntException("flock('$log', LOCK_UN) failed.");
+			throw new IntException("flock() failed to unlock logfile.");
 		}
 		if (fclose($handle) === FALSE) {
-			throw new IntException("fclose() on '$log' failed.");
+			throw new IntException("fclose() on logfile failed.");
 		}
 	}
 
@@ -77,7 +100,7 @@ final class Log {
 	* from the beginning of the file.
 	*
 	* @param int $len The number of lines to truncate the file to.
-	* @param string $log The path to the log file.
+	* @param string $log The logfile to use (Log::LOGERR or Log::LOGDEF).
 	*/
 	private static function truncate(int $len, string $log) {
 		$ln = '';
@@ -101,16 +124,16 @@ final class Log {
 	* Log a message into one of the log files.
 	*
 	* @param string $msg The message to log.
-	* @param string $log The logfile to use. Default is LOGDEF.
+	* @param string $log The logfile to use. (Log::LOGERR or Log::LOGDEF)
+	*
 	* @throws IntException if creating the log directory fails.
 	* @throws IntException if writing to the logfile fails.
 	*/
-	public static function logs(string $msg, string $log = LOGDEF) {
-		global $LS_LOG_ENABLED;
-		if (!$LS_LOG_ENABLED) { return; }
+	public static function logs(string $msg, string $log = Log::LOGDEF) {
+		if (!self::is_enabled()) { return; }
 
-		if (!is_dir(dirname($log))) {
-			if (!mkdir(dirname($log))) {
+		if (!is_dir(dirname(self::get_log_path($log)))) {
+			if (!mkdir(dirname(self::get_log_path($log)))) {
 				throw new IntException('Failed to create log directory.');
 			}
 		}
@@ -120,9 +143,9 @@ final class Log {
 		if (count($bt) !== 0) { $file = $bt[0]['file']; }
 
 		if (fwrite($handle, "[$file] [".date('r')."] ".$msg."\n") === FALSE) {
-			throw new IntException("fwrite() on '$log' failed.");
+			throw new IntException("fwrite() on logfile failed.");
 		}
 		self::close($handle);
-		self::truncate(LOG_MAX_LEN, $log);
+		self::truncate(Config::config('LOG_MAX_LEN'), $log);
 	}
 }

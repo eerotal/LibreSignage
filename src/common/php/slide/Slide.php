@@ -2,6 +2,7 @@
 
 namespace common\php\slide;
 
+use \common\php\Config;
 use \common\php\Util;
 use \common\php\JSONUtil;
 use \common\php\Exportable;
@@ -82,7 +83,7 @@ final class Slide extends Exportable {
 	* @param string $id The ID of the slide to load.
 	*/
 	public function load(string $id) {
-		Slide::validate_id($id);
+		self::validate_id($id);
 
 		$tmp = Util::file_lock_and_get(self::get_conf_path($id));
 		$this->import(JSONUtils::decode($tmp), TRUE);
@@ -131,7 +132,8 @@ final class Slide extends Exportable {
 	/**
 	* Validate the slide ID $id. This function checks that
 	* $id already exists to make sure IDs are always generated
-	* server-side.
+	* server-side; a non-existent ID is considered invalid even
+	* for unsaved slides.
 	*
 	* @param string $id The ID to validate.
 	*
@@ -697,7 +699,10 @@ final class Slide extends Exportable {
 
 	private static function get_dir_path(string $id): string {
 		assert(!empty($id), new \ArgException("Slide ID can't be empty."));
-		return LIBRESIGNAGE_ROOT.SLIDES_DIR.'/'.$id;
+
+		return Config::config('LIBRESIGNAGE_ROOT')
+			.Config::config('SLIDES_DIR')
+			.'/'.$id;
 	}
 
 	private static function get_conf_path(string $id): string {
@@ -736,7 +741,10 @@ final class Slide extends Exportable {
 	* @return array An array of Slide IDs.
 	*/
 	public static function list_ids(): array {
-		$ids = scandir(LIBRESIGNAGE_ROOT.SLIDES_DIR);
+		$ids = scandir(
+			Config::config('LIBRESIGNAGE_ROOT')
+			.Config::config('SLIDES_DIR')
+		);
 
 		// Remove '.', '..' and hidden files.
 		return array_filter($ids, function(string $val) {

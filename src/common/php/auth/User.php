@@ -4,11 +4,12 @@
 namespace common\php\auth;
 
 use \common\php\Config;
+use \common\php\Log;
 use \common\php\Util;
-use \common\php\JSONUtil;
+use \common\php\JSONUtils;
 use \common\php\auth\Session;
 use \common\php\auth\UserQuota;
-use \common\php\exportable\Exportable;
+use \common\php\Exportable;
 use \common\php\Exceptions\IntException;
 use \common\php\Exceptions\ArgException;
 use \common\php\Exceptions\LimitException;
@@ -56,7 +57,9 @@ final class User extends Exportable {
 	* @param string $name The name of the user to load.
 	* @throws ArgException if no user named $name exists.
 	*/
-	private function load(string $name) {
+	public function load(string $name) {
+		User::validate_name($name);
+
 		$json = '';
 		$dir = User::get_data_dir($name);
 
@@ -65,7 +68,7 @@ final class User extends Exportable {
 		}
 
 		$json = Util::file_lock_and_get($dir.'/data.json');
-		$this->import(JSONUtil::decode($json));
+		$this->import(JSONUtils::decode($json, TRUE));
 		$this->session_cleanup();
 	}
 
@@ -101,7 +104,7 @@ final class User extends Exportable {
 			}
 		}
 
-		$json = JSONUtil::encode($this->export(TRUE, TRUE));
+		$json = JSONUtils::encode($this->export(TRUE, TRUE));
 		Util::file_lock_and_put($dir.'/data.json', $json);
 	}
 
@@ -112,7 +115,9 @@ final class User extends Exportable {
 	* @return string The data directory path.
 	*/
 	private static function get_data_dir(string $user): string {
-		return LIBRESIGNAGE_ROOT.USER_DATA_DIR.'/'.$user;
+		return Config::config('LIBRESIGNAGE_ROOT')
+				.Config::config('USER_DATA_DIR')
+				.'/'.$user;
 	}
 
 	/**
@@ -412,9 +417,41 @@ final class User extends Exportable {
 	*/
 	public static function all(): array {
 		$names = self::names();
-		$ret = array();
-		foreach ($names as $n) { array_push($ret, new User($n)); }
+		$ret = [];
+		foreach ($names as $n) {
+			$u = new User();
+			$u->load($n);
+			array_push($ret, $u);
+		}
 		return $ret;
+	}
+
+	/**
+	* Get an array of all the existing usernames.
+	*
+	* @return array An array of usernames.
+	*
+	* @throws IntException if scandir() fails.
+	*/
+	public static function names(): array {
+		$dirs = scandir(
+			Config::config('LIBRESIGNAGE_ROOT')
+			.Config::config('USER_DATA_DIR')
+		);
+		if ($dirs === FALSE) {
+			throw new IntException('scandir() on users dir failed.');
+		}
+
+		$dirs = array_diff($dirs, ['.', '..']);
+		foreach ($dirs as $k => $d) {
+			try {
+				$u = new User();
+				$u->load($d);
+			} catch(\Exception $e) {
+				$dirs[$k] = NULL;
+			}
+		}
+		return array_values(array_filter($dirs));
 	}
 
 	/**
@@ -423,26 +460,6 @@ final class User extends Exportable {
 	* @return bool TRUE if $user exists, FALSE otherwise.
 	*/
 	public static function exists(string $user): bool {
-		return in_array($user, self::users());
-	}
-
-	/**
-	* Get an array of all the existing usernames.
-	*
-	* @return array An array of usernames.
-	* @throws IntException if scandir() fails.
-	*/
-	public static function names(): array {
-		$dirs = scandir(LIBRESIGNAGE_ROOT.USER_DATA_DIR);
-		if ($dirs === FALSE) {
-			throw new IntException('scandir() on users dir failed.');
-		}
-
-		$dirs = array_diff($dirs, ['.', '..']);
-		foreach ($dirs as $k => $d) {
-			if (!User::exists($d)) { $dirs[$k] = NULL; }
-		}
-
-		return array_values(array_filter($dirs));
+		return in_array($user, self::names(), TRUE);
 	}
 }

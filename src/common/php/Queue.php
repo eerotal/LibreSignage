@@ -2,6 +2,7 @@
 
 namespace common\php;
 
+use \common\php\Config;
 use \common\php\Util;
 use \common\php\Slide;
 use \common\php\User;
@@ -28,10 +29,9 @@ final class Queue extends Exportable {
 
 	const NAME_REGEX = '/^[A-Za-z0-9_-]+$/';
 
-	private $name   = NULL;
-	private $owner  = NULL;
-	private $slides = NULL;
-	private $loaded = FALSE;
+	private $name   = '';
+	private $owner  = '';
+	private $slides = [];
 
 	public function __exportable_set(string $name, $value) {
 		$this->{$name} = $value;
@@ -41,71 +41,57 @@ final class Queue extends Exportable {
 		return $this->{$name};
 	}
 
-	function __construct(string $name) {
-		$this->set_name($name);
-		$this->slides = [];
+	/*
+	* Load a queue from file.
+	*
+	* @param string $name The name of the queue to load.
+	*/
+	public function load(string $name) {
+		self::validate_name($name);
+
+		if (!self::exists($name)) {
+			throw new ArgException("Queue '{$name}' doesn't exist.");
+		}
+
+		$json = Util::file_lock_and_get(self::get_path($name));
+		$this->import(JSONUtils::decode($json), $assoc=TRUE);
 	}
 
-	/*
-	* Load a queue from file. If $fix_errors === TRUE, slides
-	* that can't be loaded are automatically removed from the queue.
-	* The changes to the queue are automatically written to file.
+	/**
+	* Remove broken slides from the loaded queue.
 	*
-	* @param bool $fix_errors If TRUE, invalid slides are removed
-	*                         from the loaded queue.
-	* @throws ArgException if the queue $name doesn't exist.
+	* @return bool TRUE if slides were removed, FALSE otherwise.
 	*/
-	public function load(bool $fix_errors = FALSE) {
-		$errors_fixed = FALSE;
+	public function remove_broken_slides(): bool {
+		$fixed = FALSE;
+		$s = NULL;
 
-		if (!file_exists($this->get_path())) {
-			throw new ArgException("Queue doesn't exist.");
-		}
-
-		$json = Util::file_lock_and_get($this->get_path());
-		$data = JSONUtils::decode($json);
-
-		$this->set_owner($data->owner);
-
-		$this->slides = [];
-		foreach ($data->slides as $n) {
-			$tmp = new Slide();
+		foreach ($this->slides as &$n) {
+			$s = new Slide();
 			try {
-				$tmp->load($n);
-			} catch (\Exception $e) {
+				$s->load($n);
+			} catch (Exception $e) {
 				if (
-					!(
-						$e instanceof ArgException
-						|| $e instanceof IntException
-					)
-					|| $fix_errors === FALSE
+					$e instanceof IntException
+					|| $e instanceof JSONException
 				) {
-					throw $e;
-				} else {
-					$errors_fixed = TRUE;
-					continue;
+					$n = NULL;
+					$fixed = TRUE;
 				}
 			}
-			$this->slides[] = $tmp;
 		}
-
-		// Write changes to disk in case any errors were fixed.
-		if ($errors_fixed === TRUE) { $this->write(); }
-
-		$this->loaded = TRUE;
+		return $fixed;
 	}
 
 	/**
 	* Write a queue to file.
 	*
-	* @throws ArgException if the queue doesn't have an owner.
+	* @throws IntException if the queue is not ready.
 	*/
 	public function write() {
-		if (!$this->owner) {
-			throw new ArgException("Queue doesn't have an owner.");
-		}
+		$this->assert_ready();
 		$json = JSONUtils::encode($this->export(TRUE, TRUE));
-		Util::file_lock_and_put($this->get_path(), $json);
+		Util::file_lock_and_put(self::get_path($this->name), $json);
 	}
 
 	/**
@@ -134,6 +120,7 @@ final class Queue extends Exportable {
 	* are sorted based on the indices.
 	*
 	* @param string $keep_id The ID of the slide to keep at it's position.
+	*
 	* @throws ArgException if the slide $keep_id doesn't exist in the queue.
 	*/
 	public function juggle(string $keep_id) {
@@ -182,20 +169,22 @@ final class Queue extends Exportable {
 	/**
 	* Remove the loaded queue.
 	*
-	* @throws IntException if no queue is loaded.
-	* @throws ArgException if the loaded queue doesn't exist anymore.
+	* @throws IntException if the current queue is not ready.
+	* @throws ArgException if the loaded queue doesn't exist.
 	* @throws IntException if unlink() fails.
 	*/
 	function remove() {
-		assert($this->loaded, IntException('Queue not loaded.'));
+		$this->assert_ready();
 
-		if (!file_exists($this->get_path())) {
-			throw new ArgException("Queue doesn't exist.");
+		if (!self::exists($this->name)) {
+			throw new ArgException(
+				"Queue doesn't exist. Unsaved queue?"
+			);
 		}
 
 		foreach ($this->slides() as $s) { $s->remove(); }
 
-		if (!unlink($this->get_path())) {
+		if (!unlink(self::get_path($this->name))) {
 			throw new IntException("Failed to remove queue.");
 		}
 	}
@@ -230,10 +219,6 @@ final class Queue extends Exportable {
 	public function set_owner(string $owner) {
 		User::validate_name($owner);
 		$this->owner = $owner;
-	}
-
-	public function get_path(): string {
-		return LIBRESIGNAGE_ROOT.QUEUES_DIR.'/'.$this->name.'.json';
 	}
 
 	public function get_owner(): string {
@@ -287,9 +272,38 @@ final class Queue extends Exportable {
 	}
 
 	/**
+	* Assert that a Queue object is ready. Use this as
+	* a guard in functions that access files.
+	*
+	* @throws IntException if the queue is not ready.
+	*/
+	private function assert_ready() {
+		if (
+			empty($this->name)
+			|| empty($this->owner)
+		) {
+			throw new IntException('Queue not ready.');
+		}
+	}
+
+	/**
+	* Get the path to the Queue data file.
+	*
+	* @param string $name The name of the queue.
+	*
+	* @return string The full path to the Queue data file.
+	*/
+	public static function get_path(string $name): string {
+		return Config::config('LIBRESIGNAGE_ROOT')
+				.Config::config('QUEUES_DIR')
+				.'/'.$name.'.json';
+	}
+
+	/**
 	* Check whether the queue with name $name exists.
 	*
 	* @param string $name The queue name.
+	*
 	* @return bool TRUE if $name exists and FALSE otherwise.
 	*/
 	public static function exists(string $name): bool {
@@ -313,7 +327,10 @@ final class Queue extends Exportable {
 					return NULL;
 				}
 			},
-			scandir(LIBRESIGNAGE_ROOT.QUEUES_DIR)
+			scandir(
+				Config::config('LIBRESIGNAGE_ROOT')
+				.Config::config('QUEUES_DIR')
+			)
 		);
 		$queues = array_values(
 			array_filter(

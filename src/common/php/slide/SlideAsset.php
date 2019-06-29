@@ -12,7 +12,7 @@ use \common\php\Config;
 use \common\php\Exportable;
 use \common\php\Slide;
 
-require_once(LIBRESIGNAGE_ROOT.'/common/php/thumbnail/thumbnail.php');
+require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/thumbnail/thumbnail.php');
 
 final class SlideAsset extends Exportable {
 	static $PRIVATE = [
@@ -88,8 +88,8 @@ final class SlideAsset extends Exportable {
 		$this->has_thumb = generate_thumbnail(
 			$this->get_internal_path(),
 			$this->get_internal_thumb_path(),
-			THUMB_MAXW,
-			THUMB_MAXH
+			Config::config('THUMB_MAXW'),
+			Config::config('THUMB_MAXH')
 		);
 	}
 
@@ -162,7 +162,7 @@ final class SlideAsset extends Exportable {
 	* @return string The internal thumbnail filename.
 	*/
 	public function get_internal_thumb_name(): string {
-		return $this->uid.'_thumb'.THUMB_EXT;
+		return $this->uid.'_thumb'.Config::config('THUMB_EXT');
 	}
 
 	/**

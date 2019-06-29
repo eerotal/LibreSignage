@@ -15,15 +15,17 @@
 
 namespace pub\api\endpoints\general;
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
+
+use \common\php\Config;
 use \api\APIEndpoint;
 
 APIEndpoint::GET(
 	[],
 	function($req, $resp, $module_data) {
 		return [
-			'ls' => LS_VER,
-			'api' => API_VER
+			'ls' => Config::config('LS_VER'),
+			'api' => Config::config('API_VER')
 		];
 	}
 );

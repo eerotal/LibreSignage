@@ -3,6 +3,8 @@
 namespace api;
 
 use \api\HTTPStatus;
+use \common\php\Config;
+use \common\php\Log;
 use \common\php\JSONUtils;
 use \common\php\JSONException;
 use \Symfony\Component\HttpFoundation\Response;
@@ -42,28 +44,27 @@ class APIException extends \Exception {
 	/**
 	* Setup exception handling for the API system.
 	*/
-	static function setup() {
-		\set_exception_handler(function(\Throwable $e) {
+	public static function setup() {
+		set_exception_handler(function(\Throwable $e) {
 			try {
 				$response = new Response();
 				$response->setStatusCode(HTTPStatus::to_http_status($e));
 				$response->headers->set('Content-Type', 'application/json');
-				if (LIBRESIGNAGE_DEBUG) {
+
+				if (Config::config('LIBRESIGNAGE_DEBUG')) {
 					$response->setContent(APIException::as_json($e));
 				}
 
 				$response->send();
-				ls_log($e->__toString(), LOGERR);
+				Log::logs($e, Log::LOGERR);
 			} catch (\Exception $e) {
 				/*
 				* Exceptions thrown in the exception handler
 				* cause hard to debug fatal errors; handle them
-				* here. Use as little code as possible in this
-				* catch block to prevent further exceptions.
+				* here.
 				*/
-				\http_response_code(500);
-				\header('Content-Type: text/plain');
-				echo 'Exception thrown in global handler: '.$e->getMessage();
+				echo "\n\nException thrown in global handler:\n";
+				echo $e;
 			}
 			exit(1);
 		});

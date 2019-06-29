@@ -28,7 +28,7 @@ final class CSS {
 			if (!array_key_exists($l, self::STYLESHEETS)) {
 				throw newArgException("Stylesheet '$l' doesn't exist.");
 			}
-			echo htmltag('link', '', self::STYLESHEETS[$l]);
+			echo Util::htmltag('link', '', self::STYLESHEETS[$l]);
 		}
 	}
 }

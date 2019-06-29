@@ -2,9 +2,6 @@
 
 namespace api\modules;
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/auth.php');
-
 use \api\APIEndpoint;
 use \api\APIModule;
 use \api\HTTPStatus;

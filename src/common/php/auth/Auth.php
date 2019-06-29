@@ -1,8 +1,9 @@
 <?php
-/*
-*  Authentication functionality for LibreSignage.
-*/
 
+namespace common\php\auth;
+
+use \common\php\Log;
+use \common\php\Config;
 use \common\php\ErrorHandler;
 use \common\php\auth\User;
 
@@ -102,7 +103,7 @@ final class Auth {
 		if ($d === NULL) {
 			if ($redir) {
 				header(
-					'Location: '.LOGIN_PAGE.
+					'Location: '.Config::config('LOGIN_PAGE').
 					'?redir='.urlencode($_SERVER['REQUEST_URI'])
 				);
 				exit(0);

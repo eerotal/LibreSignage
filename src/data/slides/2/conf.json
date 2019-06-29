@@ -1,5 +1,5 @@
 {
-	"__classname":"Slide",
+	"__classname":"\\common\\php\\Slide",
 	"__visibility":"private",
 	"id":"2",
 	"name":"LibreSignage",

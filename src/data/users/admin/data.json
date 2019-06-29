@@ -1,5 +1,5 @@
 {
-	"__classname": "User",
+	"__classname": "\\common\\php\\auth\\User",
 	"__visibility": "private",
 	"user": "admin",
 	"hash": "$2y$10$21MD1KxpFZ5fEbu6BViVSOQL57T4a2xbuO3.lAoSkOEXxi2LZE42.",
@@ -10,7 +10,7 @@
 	],
 	"sessions": [],
 	"quota": {
-		"__classname": "UserQuota",
+		"__classname": "\\common\\php\\auth\\UserQuota",
 		"__visibility": "private",
 		"used": {
 			"slides": 3,

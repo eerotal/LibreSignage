@@ -14,9 +14,10 @@
 
 namespace pub\api\endpoints\slide;
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
+
 use \api\APIEndpoint;
+use \common\php\Slide;
 
 APIEndpoint::GET(
 	[

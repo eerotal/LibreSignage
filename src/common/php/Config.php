@@ -18,22 +18,23 @@ final class Config {
 	* @throws Exception if config values are problematic.
 	*/
 	public static function setup() {
-		define('LIBRESIGNAGE_ROOT', $_SERVER['DOCUMENT_ROOT'].'/..');
-		require_once(LIBRESIGNAGE_ROOT.'/vendor/autoload.php');		
+		$tmp = $_SERVER['DOCUMENT_ROOT'].'/..';
+		require_once($tmp.'/vendor/autoload.php');		
 
-		// Load LibreSignage config.
-		self::define_array_values(
-			self::load_config_array(
-				LIBRESIGNAGE_ROOT.'/'.self::CONFIG_DIR
+		define(
+			'LS_CONFIG',
+			array_merge(
+				self::load_config_array($tmp.'/'.self::CONFIG_DIR),
+				['LIBRESIGNAGE_ROOT' => $tmp]
 			)
 		);
 		define(
 			'LS_LIMITS',
-			self::load_config_array(LIBRESIGNAGE_ROOT.'/'.self::LIMITS_DIR)
+			self::load_config_array($tmp.'/'.self::LIMITS_DIR)
 		);
 		define(
 			'LS_QUOTAS',
-			self::load_config_array(LIBRESIGNAGE_ROOT.'/'.self::QUOTA_DIR)
+			self::load_config_array($tmp.'/'.self::QUOTA_DIR)
 		);
 
 		// Do some checks on the configured values.
@@ -46,7 +47,7 @@ final class Config {
 		}
 
 		ErrorHandler::setup();
-		ErrorHandler::set_debug(LIBRESIGNAGE_DEBUG);
+		ErrorHandler::set_debug(self::config('LIBRESIGNAGE_DEBUG'));
 	}
 
 	/**
@@ -92,13 +93,43 @@ final class Config {
 	}
 
 	/**
-	* Get the value of a limit.
+	* Get a limit.
 	*
 	* @param string $lim The name of the limit.
+	*
 	* @return mixed The value of the limit.
 	*/
 	public static function limit(string $lim) {
 		return LS_LIMITS[$lim];
+	}
+
+	/**
+	* Get the limits array.
+	*
+	* @return array All LibreSignage limits.
+	*/
+	public static function get_limits(): array {
+		return LS_LIMITS;
+	}
+
+	/**
+	* Get a config value.
+	*
+	* @param string $conf The name of the config value.
+	*
+	* @return mixed The config value.
+	*/
+	public static function config(string $conf) {
+		return LS_CONFIG[$conf];
+	}
+
+	/**
+	* Get the config value array.
+	*
+	* @return array All LibreSignage config values.
+	*/
+	public static function get_config(): array {
+		return LS_CONFIG;
 	}
 }
 

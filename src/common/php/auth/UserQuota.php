@@ -1,5 +1,7 @@
 <?php
 
+namespace common\php\auth;
+
 use \common\php\Config;
 use \common\php\Exportable;
 
@@ -23,7 +25,8 @@ final class UserQuota extends Exportable {
 	private $used   = [];
 	private $state  = [];
 
-	public function __construct($limits = LS_QUOTAS) {
+	public function __construct(array $limits = NULL) {
+		if ($limits === NULL) { $limits = Config::get_limits(); }
 		$this->limits = $limits;
 		foreach ($limits as $k => $d) { $this->used[$k] = 0; }
 	}

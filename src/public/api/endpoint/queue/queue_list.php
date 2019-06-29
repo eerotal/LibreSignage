@@ -14,10 +14,11 @@
 
 namespace pub\api\endpoints\queue;
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/queue.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
+
 use \api\APIEndpoint;
+use \common\php\Slide;
+use \common\php\Queue;
 
 
 APIEndpoint::GET(

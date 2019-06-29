@@ -1,12 +1,12 @@
 <?php
-	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-	require_once(LIBRESIGNAGE_ROOT.'/common/php/css.php');
-	require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/auth.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
+	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/css.php');
+	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/auth/auth.php');
 
 	web_auth(NULL, NULL, TRUE);
 
 	// Load the documentation list.
-	$docs = @scandir(LIBRESIGNAGE_ROOT.DOC_HTML_DIR);
+	$docs = @scandir(Config::config('LIBRESIGNAGE_ROOT').DOC_HTML_DIR);
 	if ($docs === FALSE) {
 		throw new Exception('Failed to scan docs dir.');
 	}
@@ -52,14 +52,14 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="/doc/css/doc.css">
-		<?php require_once(LIBRESIGNAGE_ROOT.'/common/php/favicon.php'); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/favicon.php'); ?>
 		<title>LibreSignage Documentation</title>
 	</head>
 	<body>
 		<main class="container-fluid h-100">
 			<div class="row doc-row">
 				<div class="col"><?php
-					include(LIBRESIGNAGE_ROOT.
+					include(Config::config('LIBRESIGNAGE_ROOT').
 						DOC_HTML_DIR.'/'.
 						$include_file);
 				?></div>
@@ -74,7 +74,7 @@
 				?></div>
 			</div>
 		</main>
-		<?php require_once(LIBRESIGNAGE_ROOT.FOOTER_PATH); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').FOOTER_PATH); ?>
 		<script src="/doc/js/main.js"></script>
 	</body>
 </html>

@@ -1,9 +1,11 @@
 <?php
-	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-	require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/auth.php');
-	require_once(LIBRESIGNAGE_ROOT.'/common/php/css.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-	if (web_auth()) {
+	use \common\php\Config;
+	use \common\php\auth\Auth;
+	use \common\php\CSS;
+
+	if (Auth::web_auth()) {
 		header('Location: '.LOGIN_LANDING);
 		exit(0);
 	}
@@ -13,9 +15,9 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<?php require_css(['font-awesome']); ?>
+		<?php CSS::req(['font-awesome']); ?>
 		<link rel="stylesheet" href="/login/css/login.css">
-		<?php require_once(LIBRESIGNAGE_ROOT.'/common/php/favicon.php'); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/favicon.php'); ?>
 		<title>LibreSignage Login</title>
 	</head>
 	<body>
@@ -89,7 +91,7 @@
 				</div>
 			</div>
 		</main>
-		<?php require_once(LIBRESIGNAGE_ROOT.FOOTER_PATH); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').Config::config('FOOTER_PATH')); ?>
 		<script src="/login/js/main.js"></script>
 	</body>
 </html>

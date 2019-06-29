@@ -1,5 +1,7 @@
 <?php
 
+namespace common\php\auth;
+
 use \common\php\Config;
 use \common\php\Util;
 use \common\php\Exportable;
@@ -86,7 +88,7 @@ final class Session extends Exportable{
 		$this->who = substr($who, 0, Session::TRUNC_LEN);
 		$this->from = substr($from, 0, Session::TRUNC_LEN);
 		$this->created = $t;
-		$this->max_age = SESSION_MAX_AGE;
+		$this->max_age = Config::config('SESSION_MAX_AGE');
 		$this->permanent = $permanent;
 		return $this->generate_token();
 	}
@@ -112,7 +114,7 @@ final class Session extends Exportable{
 	* @throws IntException if password_hash() fails.
 	*/
 	private function generate_token(): string {
-		$token = bin2hex(random_bytes(AUTH_TOKEN_LEN));
+		$token = bin2hex(random_bytes(Config::config('AUTH_TOKEN_LEN')));
 		$this->token_hash = password_hash($token, PASSWORD_DEFAULT);
 		if ($this->token_hash === FALSE) {
 			throw new IntException(

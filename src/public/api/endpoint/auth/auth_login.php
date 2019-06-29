@@ -21,10 +21,13 @@
 
 namespace pub\api\endpoints\auth;
 
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
+
+use \common\php\Config;
 use \api\APIEndpoint;
+use \api\APIException;
+use \api\HTTPStatus;
 use \common\php\auth\Auth;
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/auth/auth.php');
 
 APIEndpoint::POST(
 	[
@@ -76,7 +79,7 @@ APIEndpoint::POST(
 		setcookie(
 			$name = 'session_token',
 			$value = $data['token'],
-			$expire = PERMACOOKIE_EXPIRE,
+			$expire = Config::config('PERMACOOKIE_EXPIRE'),
 			$path = '/'
 		);
 

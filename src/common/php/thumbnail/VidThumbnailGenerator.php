@@ -3,7 +3,7 @@
 namespace common\php\thumbnail;
 
 use \common\php\Exceptions\IntException;
-use \common\php\JSONUtil;
+use \common\php\JSONUtils;
 use \common\php\thumbnail\ThumbnailUtil;
 use \common\php\thumbnail\ThumbnailGeneratorException;
 use \common\php\thumbnail\ThumbnailGeneratorInterface;
@@ -86,7 +86,7 @@ final class VidThumbnailGenerator implements ThumbnailGeneratorInterface {
 		);
 
 		if ($ret !== 0) { throw new IntException("ffprobe failed ($ret)."); }
-		$data = JSONUtil::decode(implode('', $raw), $assoc=TRUE);
+		$data = JSONUtils::decode(implode('', $raw), $assoc=TRUE);
 
 		$dim = get_thumbnail_resolution(
 			$data['streams'][0]['width'],

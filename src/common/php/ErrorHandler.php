@@ -47,9 +47,9 @@ final class ErrorHandler {
 	* it's own exception handler.
 	*/
 	public static function setup() {
-		set_exception_handler(function(Throwable $e) {
+		set_exception_handler(function(\Throwable $e) {
 			// Handle uncaught exceptions as internal errors.
-			error_handle(HTTP_ERR_500, $e);
+			ErrorHandler::handle(HTTP_ERR_500, $e);
 		});
 
 		// Convert all errors to exceptions.
@@ -68,7 +68,7 @@ final class ErrorHandler {
 	* @param int $code The HTTP error code.
 	* @param Throwable $e Optional error object to show to the caller.
 	*/
-	public static function handle(int $code, Throwable $e = NULL) {
+	public static function handle(int $code, \Throwable $e = NULL) {
 		global $ERROR_DEBUG;
 		try {
 			if (!array_key_exists($code, ERROR_CODES)) { $code = HTTP_ERR_500; }
@@ -82,21 +82,20 @@ final class ErrorHandler {
 				header('Content-Type: text/plain');
 				echo "\n### Uncaught exception (HTTP: ".$code.") ###\n";
 				echo $e->__toString();
-				Log::logs($e->__toString(), LOGERR);
+				Log::logs($e->__toString(), Log::LOGERR);
 			} else {
 				header($_SERVER['SERVER_PROTOCOL'].' '.ERROR_CODES[$code]);
-				include(LIBRESIGNAGE_ROOT.ERROR_PAGES.'/'.$code.'/index.php');
-				Log::logs($e->__toString(), LOGERR);
+				include($_SERVER['DOCUMENT_ROOT'].'/../'.ERROR_PAGES.'/'.$code.'/index.php');
+				Log::logs($e->__toString(), Log::LOGERR);
 			}
 		} catch (\Exception $e){
 			/*
 			*  Exceptions thrown in the exception handler cause
-			*  hard to debug fatal errors. Handle them.
+			*  hard to debug fatal errors. Handle them here.
 			*/
 			if ($ERROR_DEBUG) {
-				header('Content-Type: text/plain');
-				echo "\n### ".get_class($e)." thrown in the exception handler ###\n";
-				echo $e->__toString();
+				echo "\ņ\nException thrown in global handler:\n";
+				echo $e;
 			}
 		}
 		exit(1);

@@ -63,9 +63,10 @@
 
 namespace pub\api\endpoints\slide;
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-require_once(LIBRESIGNAGE_ROOT.'/common/php/slide/slide.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
+
 use \api\APIEndpoint;
+use \common\php\Slide;
 
 APIEndpoint::POST(
 	[
@@ -207,13 +208,14 @@ function create_slide(User $caller, Session $session, Slide $slide, $data) {
 	set_slide_data($slide, $data, TRUE);
 	if (!$caller->get_quota()->has_quota('slides')) {
 		/*
-		*  The user doesn't have slide quota so abort the slide
-		*  creation process. The $queue->load() call below has
-		*  $fix_errors = TRUE, which makes the Queue object
-		*  remove the non-existent slide from the queue.
+		* The user doesn't have slide quota so abort the slide
+		* creation process. Remove the broken slide from $queue
+		* by calling Queue::remove_broken_slides().
 		*/
-		$queue = new Queue($slide->get_queue_name());
-		$queue->load(TRUE);
+		$queue = new Queue();
+		$queue->load($slide->get_queue_name());
+		$queue->remove_broken_slides(); 
+		$queue->write();
 
 		throw new APIException(
 			'Slide quota exceeded.',

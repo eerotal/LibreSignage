@@ -2,8 +2,6 @@
 
 namespace api\modules;
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/config.php');
-
 use \api\APIEndpoint;
 use \api\APIModule;
 use \api\APIException;
