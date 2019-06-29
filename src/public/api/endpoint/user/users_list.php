@@ -17,6 +17,7 @@ namespace pub\api\endpoints\user;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use \api\APIEndpoint;
+use \common\php\auth\User;
 
 APIEndpoint::GET(
 	[
@@ -27,7 +28,7 @@ APIEndpoint::GET(
 	],
 	function($req, $resp, $module_data) {
 		$ret = ['users' => []];
-		foreach (user_array() as $u) { $ret['users'][] = $u->get_name(); }
+		foreach (User::all() as $u) { $ret['users'][] = $u->get_name(); }
 		return $ret;
 	}
 );

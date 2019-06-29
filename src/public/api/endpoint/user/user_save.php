@@ -34,6 +34,12 @@ namespace pub\api\endpoints\user;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use \api\APIEndpoint;
+use \api\APIException;
+use \api\HTTPStatus;
+use \common\php\auth\User;
+use \common\php\Exceptions\IntException;
+use \common\php\Exceptions\ArgException;
+use \common\php\Exceptions\LimitException;
 
 APIEndpoint::POST(
 	[
@@ -77,8 +83,10 @@ APIEndpoint::POST(
 			);
 		}
 
+		$u = new User();
+
 		try {
-			$u = new User($params->user);
+			$u->load($params->user);
 		} catch (ArgException $e) {
 			throw new APIException(
 				"Failed to load user '{$params->user}'.",
@@ -126,13 +134,7 @@ APIEndpoint::POST(
 			}
 		}
 
-		if ($u->write() === FALSE) {
-			// This will fail when there are too many users => return FORBIDDEN.
-			throw new APIException(
-				'Failed to write userdata.',
-				HTTPStatus::FORBIDDEN
-			);
-		}
+		$u->write();
 
 		return [
 			'user' => [

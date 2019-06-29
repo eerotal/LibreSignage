@@ -17,6 +17,10 @@ namespace pub\api\endpoints\user;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use \api\APIEndpoint;
+use \api\APIException;
+use \api\HTTPStatus;
+use \common\php\Exceptions\IntException;
+use \common\php\Exceptions\ArgException;
 
 APIEndpoint::POST(
 	[
@@ -42,13 +46,15 @@ APIEndpoint::POST(
 
 		if (!$caller->is_in_group('admin')) {
 			throw new APIException(
-				'Non-admin user not authorized.',
+				'Not authorized as a non-admin user.',
 				HTTPStatus::UNAUTHORIZED
 			);
 		}
 
+		$u = new User();
+
 		try {
-			$u = new User($params->user);
+			$u->load($params->user);
 		} catch (ArgException $e) {
 			throw new APIException(
 				"Failed to load user '{$params->user}'.",
@@ -59,7 +65,7 @@ APIEndpoint::POST(
 
 		try {
 			$u->remove();
-		} catch (Exception $e) {
+		} catch (IntException $e) {
 			throw new APIException(
 				"Failed to remove user '{$params->user}'.",
 				HTTPStatus::INTERNAL_SERVER_ERROR,

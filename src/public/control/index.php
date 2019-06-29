@@ -1,8 +1,11 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
-	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/css.php');
-	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/auth/auth.php');
-	web_auth(NULL, NULL, TRUE);
+
+	use \common\php\Config;
+	use \common\php\CSS;
+	use \common\php\auth\Auth;
+
+	Auth::web_auth(NULL, NULL, TRUE);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +17,7 @@
 		<title>LibreSignage Control Panel</title>
 	</head>
 	<body>
-		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').NAV_PATH); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').Config::config('NAV_PATH')); ?>
 		<main class="container-fluid">
 			<div class="row container-fluid mx-auto">
 				<div class="col-md-12 header-col">
@@ -30,15 +33,15 @@
 				<div class="col-md-6 ctrl-panel-col cont-info-primary">
 					<h4>Problems using LibreSignage?</h4>
 					<p>This LibreSignage instance is
-					maintained by <?php echo ADMIN_NAME; ?>.
+					maintained by <?php echo Config::config('ADMIN_NAME'); ?>.
 					If you have any problems using
 					LibreSignage, please email the admin at
-					<a href="mailto: <?php echo ADMIN_EMAIL; ?>">
-					<?php echo ADMIN_EMAIL; ?></a>.</p>
+					<a href="mailto: <?php echo Config::config('ADMIN_EMAIL'); ?>">
+					<?php echo Config::config('ADMIN_EMAIL'); ?></a>.</p>
 				</div>
 			</div>
 		</main>
-		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').FOOTER_PATH); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').Config::config('FOOTER_PATH')); ?>
 		<script src="/control/js/main.js"></script>
 	</body>
 </html>

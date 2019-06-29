@@ -25,6 +25,9 @@ use \api\APIEndpoint;
 use \api\APIException;
 use \api\HTTPStatus;
 use \common\php\auth\User;
+use \common\php\Util;
+use \common\php\Exceptions\ArgException;
+use \common\php\Exceptions\LimitException;
 
 APIEndpoint::POST(
 	[
@@ -63,14 +66,14 @@ APIEndpoint::POST(
 				HTTPStatus::UNAUTHORIZED
 			);
 		}
-		if (user_exists($params->user)) {
+		if (User::exists($params->user)) {
 			throw new APIException(
 				"User '{$params->user}' already exists.",
 				HTTPStatus::BAD_REQUEST
 			);
 		}
 
-		$new = new \User();
+		$new = new User();
 
 		// Set name.
 		try {
@@ -98,7 +101,8 @@ APIEndpoint::POST(
 
 		// Generate password.
 		try {
-			$pass = gen_passwd(GENERATED_PASSWD_LEN);
+			$pass = Util::gen_passwd(Config::config('GENERATED_PASSWD_LEN'));
+			$new->set_password($pass);
 		} catch (Exception $e) {
 			throw new APIException(
 				"Failed to generate password.",
@@ -106,13 +110,19 @@ APIEndpoint::POST(
 				$e
 			);
 		}
-		$new->set_password($pass);
 
 		// Write to file.
-		if ($new->write() === FALSE) {
+		try {
+			$new->write();
+		} catch (LimitException $e) {
 			throw new APIException(
 				'Too many users.',
 				HTTPStatus::FORBIDDEN
+			);
+		} catch (Exception $e) {
+			throw new APIException(
+				'Failed to write userdata.',
+				HTTPStatus::INTERNAL_SERVER_ERROR
 			);
 		}
 

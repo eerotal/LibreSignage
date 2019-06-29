@@ -26,7 +26,7 @@ final class UserQuota extends Exportable {
 	private $state  = [];
 
 	public function __construct(array $limits = NULL) {
-		if ($limits === NULL) { $limits = Config::get_limits(); }
+		if ($limits === NULL) { $limits = Config::get_quotas(); }
 		$this->limits = $limits;
 		foreach ($limits as $k => $d) { $this->used[$k] = 0; }
 	}

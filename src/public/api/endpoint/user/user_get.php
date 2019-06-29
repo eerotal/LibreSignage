@@ -56,7 +56,7 @@ APIEndpoint::GET(
 				HTTPStatus::UNAUTHORIZED
 			);
 		}
-		$user = new \User($params->user);
+		$user = new User($params->user);
 
 		return [
 			'user' => [

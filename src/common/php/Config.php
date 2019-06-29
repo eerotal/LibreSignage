@@ -93,6 +93,17 @@ final class Config {
 	}
 
 	/**
+	* Get a quota.
+	*
+	* @param string $quota The name of the quota.
+	*
+	* @return array The matching quota data.
+	*/
+	public static function quota(string $quota): array {
+		return LS_QUOTAS[$quota];
+	}
+
+	/**
 	* Get a limit.
 	*
 	* @param string $lim The name of the limit.
@@ -101,15 +112,6 @@ final class Config {
 	*/
 	public static function limit(string $lim) {
 		return LS_LIMITS[$lim];
-	}
-
-	/**
-	* Get the limits array.
-	*
-	* @return array All LibreSignage limits.
-	*/
-	public static function get_limits(): array {
-		return LS_LIMITS;
 	}
 
 	/**
@@ -123,14 +125,9 @@ final class Config {
 		return LS_CONFIG[$conf];
 	}
 
-	/**
-	* Get the config value array.
-	*
-	* @return array All LibreSignage config values.
-	*/
-	public static function get_config(): array {
-		return LS_CONFIG;
-	}
+	public static function get_quotas(): array { return LS_QUOTAS; }
+	public static function get_limits(): array { return LS_LIMITS; }
+	public static function get_config(): array { return LS_CONFIG; }
 }
 
 /* Bootstrap */

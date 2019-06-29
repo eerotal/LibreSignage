@@ -2,6 +2,7 @@
 
 namespace api\modules;
 
+use \common\php\Config;
 use \api\APIEndpoint;
 use \api\APIModule;
 use \api\APIException;
@@ -28,7 +29,7 @@ class APIRateLimitModule extends APIModule {
 
 		if ($quota->has_state('api_t_start')) {
 			$t = $quota->get_state('api_t_start');
-			if (time() - $t >= gtlim('API_RATE_T')) {
+			if (time() - $t >= Config::limit('API_RATE_T')) {
 				// Reset rate quota and time after the cutoff.
 				$quota->set_state('api_t_start', time());
 				$quota->set_used('api_rate', 0);

@@ -55,19 +55,18 @@ final class User extends Exportable {
 	* Load user from file.
 	*
 	* @param string $name The name of the user to load.
+	*
 	* @throws ArgException if no user named $name exists.
 	*/
 	public function load(string $name) {
-		User::validate_name($name);
-
 		$json = '';
-		$dir = User::get_data_dir($name);
 
-		if (!is_dir($dir)) {
+		User::validate_name($name);
+		if (!self::exists($name)) {
 			throw new ArgException("No user named '{$name}'.");
 		}
 
-		$json = Util::file_lock_and_get($dir.'/data.json');
+		$json = Util::file_lock_and_get(User::get_data_file_path($name));
 		$this->import(JSONUtils::decode($json, TRUE));
 		$this->session_cleanup();
 	}
@@ -79,9 +78,7 @@ final class User extends Exportable {
 	* @throws IntException if removing the user data fails.
 	*/
 	public function remove() {
-		$dir = User::get_data_dir($this->user);
-
-		if (!is_dir($dir)) {
+		if (!is_dir($dir = User::get_dir_path($this->user))) {
 			throw new IntException("User doesn't exist.");
 		}
 		if (Util::rmdir_recursive($dir) === FALSE) {
@@ -93,31 +90,46 @@ final class User extends Exportable {
 	* Write the user data into file.
 	*
 	* @throws LimitException if the maximum amount of users is reached.
+	*                        A LimitException won't be thrown if the saved
+	*                        user already exists since the number of users
+	*                        doesn't increase.
 	*/
 	public function write() {
-		$dir = User::get_data_dir($this->user);
-
-		if (!is_dir($dir)) {
+		if (!is_dir(self::get_dir_path($this->user))) {
 			// New user, check max users.
-			if (User::count() + 1 > Config::limit('MAX_USERS')) {
+			if (self::count() + 1 > Config::limit('MAX_USERS')) {
 				throw new LimitException('Too many users.');
 			}
 		}
 
 		$json = JSONUtils::encode($this->export(TRUE, TRUE));
-		Util::file_lock_and_put($dir.'/data.json', $json);
+		Util::file_lock_and_put(self::get_data_file_path($this->user), $json);
 	}
 
 	/**
-	* Get the data directory path for $user.
+	* Get the data directory path for a user.
 	*
 	* @param string $user The username to get the path for.
-	* @return string The data directory path.
+	*
+	* @return string The directory path.
 	*/
-	private static function get_data_dir(string $user): string {
-		return Config::config('LIBRESIGNAGE_ROOT')
-				.Config::config('USER_DATA_DIR')
-				.'/'.$user;
+	private static function get_dir_path(string $user): string {
+		return (
+			Config::config('LIBRESIGNAGE_ROOT').
+			Config::config('USER_DATA_DIR').
+			'/'.$user
+		);
+	}
+
+	/**
+	* Get the data file path for a user.
+	*
+	* @param string $user The username to get the path for.
+	*
+	* @return string The data file path.
+	*/
+	private static function get_data_file_path(string $user): string {
+		return self::get_dir_path($user).'/data.json';
 	}
 
 	/**
@@ -434,24 +446,25 @@ final class User extends Exportable {
 	* @throws IntException if scandir() fails.
 	*/
 	public static function names(): array {
-		$dirs = scandir(
-			Config::config('LIBRESIGNAGE_ROOT')
-			.Config::config('USER_DATA_DIR')
-		);
-		if ($dirs === FALSE) {
+		$users = NULL;
+
+		try {
+			$users = scandir(
+				Config::config('LIBRESIGNAGE_ROOT').
+				Config::config('USER_DATA_DIR')
+			);
+		} catch (\ErrorException $e) {
 			throw new IntException('scandir() on users dir failed.');
 		}
 
-		$dirs = array_diff($dirs, ['.', '..']);
-		foreach ($dirs as $k => $d) {
-			try {
-				$u = new User();
-				$u->load($d);
-			} catch(\Exception $e) {
-				$dirs[$k] = NULL;
-			}
+		$users = array_diff($users, ['.', '..']);
+		foreach ($users as &$u) {
+			if (
+				!is_dir(self::get_dir_path($u))
+				|| !is_file(self::get_data_file_path($u))
+			) { $u = NULL; }
 		}
-		return array_values(array_filter($dirs));
+		return array_values(array_filter($users));
 	}
 
 	/**

@@ -23,6 +23,9 @@ namespace pub\api\endpoints\user;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use \api\APIEndpoint;
+use \api\APIException;
+use \api\HTTPStatus;
+use \common\php\auth\User;
 
 APIEndpoint::GET(
 	[
@@ -37,12 +40,12 @@ APIEndpoint::GET(
 
 		if (!$caller->is_in_group('admin')) {
 			throw new APIException(
-				"Not authorized as non-admin.",
+				"Not authorized as non-admin user.",
 				HTTPStatus::UNAUTHORIZED
 			);
 		}
 
-		foreach (user_array() as $u) {
+		foreach (User::all() as $u) {
 			$ret['users'][$u->get_name()] = [
 				'user' => $u->get_name(),
 				'groups' => $u->get_groups()
