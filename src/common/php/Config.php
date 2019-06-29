@@ -2,7 +2,8 @@
 
 namespace common\php;
 
-use common\php\ErrorHandler;
+use \common\php\ErrorHandler;
+use \common\php\exceptions\ConfigException;
 
 /**
 * Setup functions for LibreSignage.

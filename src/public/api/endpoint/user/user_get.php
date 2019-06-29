@@ -25,6 +25,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use \api\APIEndpoint;
 use \api\APIException;
+use \api\HTTPStatus;
 use \common\php\auth\User;
 
 APIEndpoint::GET(
@@ -56,7 +57,9 @@ APIEndpoint::GET(
 				HTTPStatus::UNAUTHORIZED
 			);
 		}
-		$user = new User($params->user);
+
+		$user = new User();
+		$user->load($params->user);
 
 		return [
 			'user' => [

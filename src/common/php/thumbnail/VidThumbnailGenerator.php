@@ -2,7 +2,7 @@
 
 namespace common\php\thumbnail;
 
-use \common\php\Exceptions\IntException;
+use \common\php\exceptions\IntException;
 use \common\php\JSONUtils;
 use \common\php\thumbnail\ThumbnailUtil;
 use \common\php\thumbnail\ThumbnailGeneratorException;

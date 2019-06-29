@@ -19,8 +19,9 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 use \api\APIEndpoint;
 use \api\APIException;
 use \api\HTTPStatus;
-use \common\php\Exceptions\IntException;
-use \common\php\Exceptions\ArgException;
+use \common\php\auth\User;
+use \common\php\exceptions\IntException;
+use \common\php\exceptions\ArgException;
 
 APIEndpoint::POST(
 	[

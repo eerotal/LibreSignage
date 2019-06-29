@@ -60,7 +60,7 @@ class user_get extends APITestCase {
 				[],
 				400
 			],
-			'Nonexistent user parameter' => [
+			'Nonexistent user' => [
 				['user' => 'nouser'],
 				400
 			],

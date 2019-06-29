@@ -9,7 +9,7 @@ use \api\HTTPStatus;
 use \JsonSchema\Validator;
 use \JsonSchema\Constraints\Constraint;
 use \common\php\JSONUtils;
-use \common\php\JSONException;
+use \common\php\exceptions\JSONException;
 
 class APIJSONValidatorModule extends APIModule {
 	public function run(APIEndpoint $e, array $args) {

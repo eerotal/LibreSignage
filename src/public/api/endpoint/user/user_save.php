@@ -37,9 +37,9 @@ use \api\APIEndpoint;
 use \api\APIException;
 use \api\HTTPStatus;
 use \common\php\auth\User;
-use \common\php\Exceptions\IntException;
-use \common\php\Exceptions\ArgException;
-use \common\php\Exceptions\LimitException;
+use \common\php\exceptions\IntException;
+use \common\php\exceptions\ArgException;
+use \common\php\exceptions\LimitException;
 
 APIEndpoint::POST(
 	[
@@ -76,9 +76,9 @@ APIEndpoint::POST(
 		$auth_user = $caller->get_name() === $params->user;
 
 		// Check for authorization.
-		if (!$auth_admin && !$auth_usr) {
+		if (!$auth_admin && !$auth_user) {
 			throw new APIException(
-				'Not authorized to modify the userdata.',
+				'Not authorized to modify userdata.',
 				HTTPStatus::UNAUTHORIZED
 			);
 		}

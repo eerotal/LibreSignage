@@ -2,10 +2,7 @@
 
 namespace common\php;
 
-/**
-* An Exception class used in JSONUtils.
-*/
-final class JSONException extends \Exception {};
+use \common\php\exceptions\JSONException;
 
 /**
 * Utility functions for encoding and decoding JSON. These

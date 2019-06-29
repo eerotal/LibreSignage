@@ -8,9 +8,9 @@ use \common\php\Slide;
 use \common\php\User;
 use \common\php\Exportable;
 use \common\php\JSONUtils;
-use \common\php\JSONException;
-use \common\php\Exceptions\ArgException;
-use \common\php\Exceptions\IntException;
+use \common\php\exceptions\JSONException;
+use \common\php\exceptions\ArgException;
+use \common\php\exceptions\IntException;
 
 /**
 * Queue class for handling LibreSignage queue data.

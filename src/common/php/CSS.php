@@ -3,7 +3,7 @@
 namespace common\php;
 
 use \common\php\Util;
-use \common\php\Exceptions\IntException;
+use \common\php\exceptions\IntException;
 
 /**
 * Functions for conveniently including CSS stylesheets in PHP code.

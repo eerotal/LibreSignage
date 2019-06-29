@@ -83,8 +83,8 @@ class user_save extends APITestCase {
 				'user',
 				'user',
 				[
-					'user' => 'display',
-					'pass' => 'test'
+					'user' => 'user',
+					'pass' => 'user'
 				],
 				200
 			],
@@ -137,7 +137,7 @@ class user_save extends APITestCase {
 					'user' => self::UNIT_TEST_USER,
 					'groups' => []
 				],
-				400
+				200
 			],
 		];
 	}

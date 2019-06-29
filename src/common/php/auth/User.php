@@ -10,9 +10,9 @@ use \common\php\JSONUtils;
 use \common\php\auth\Session;
 use \common\php\auth\UserQuota;
 use \common\php\Exportable;
-use \common\php\Exceptions\IntException;
-use \common\php\Exceptions\ArgException;
-use \common\php\Exceptions\LimitException;
+use \common\php\exceptions\IntException;
+use \common\php\exceptions\ArgException;
+use \common\php\exceptions\LimitException;
 
 final class User extends Exportable {
 	static $PRIVATE = [
@@ -97,7 +97,7 @@ final class User extends Exportable {
 	public function write() {
 		if (!is_dir(self::get_dir_path($this->user))) {
 			// New user, check max users.
-			if (self::count() + 1 > Config::limit('MAX_USERS')) {
+			if (count(self::names()) + 1 > Config::limit('MAX_USERS')) {
 				throw new LimitException('Too many users.');
 			}
 		}
@@ -220,6 +220,7 @@ final class User extends Exportable {
 	* the supplied ID doesn't exist.
 	*
 	* @param string $id The session ID to use.
+	*
 	* @return Session|NULL The matching Session or NULL if no session matches.
 	*/
 	public function session_get(string $id) {
@@ -233,7 +234,9 @@ final class User extends Exportable {
 	* Validate that the $groups array contains valid group names.
 	*
 	* @param array $groups The groups array.
+	*
 	* @throws ArgException if count($groups) > MAX_USER_GROUPS.
+	* @throws ArgException if there are non-string elements in $groups.
 	* @throws ArgException if $groups contains empty strings.
 	* @throws ArgException if there's a group longer than MAX_USER_GROUP_LEN.
 	* @throws ArgException if a group name contains invalid chars.
@@ -244,9 +247,11 @@ final class User extends Exportable {
 			throw new ArgException('Too many groups.');
 		}
 		foreach ($groups as $g) {
-			if (strlen($g) === 0) {
+			if (gettype($g) !== 'string') {
+				throw new ArgException('Invalid type for group name.');
+			} else if (empty($g)) {
 				throw new ArgException('Invalid empty group name.');
-			} else if (strlen($g) > gtlim('MAX_USER_GROUP_LEN')) {
+			} else if (strlen($g) > Config::limit('MAX_USER_GROUP_LEN')) {
 				throw new ArgException('Group name too long.');
 			}
 			$tmp = preg_match(User::GROUPS_REGEX, $g);
@@ -262,15 +267,15 @@ final class User extends Exportable {
 	* Set the groups of a User. Calling this function with $groups = NULL
 	* removes the User from all groups.
 	*
-	* @see user::validate_group() For validation exceptions.
+	* @see User::validate_group() For validation exceptions.
 	*
 	* @param array $groups An array of groups or NULL for no groups.
 	*/
 	public function set_groups(array $groups = NULL) {
-		User::validate_groups($groups);
 		if ($groups === NULL) {
 			$this->groups = [];
 		} else {
+			User::validate_groups($groups);
 			$this->groups = $groups;
 		}
 	}

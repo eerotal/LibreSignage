@@ -2,8 +2,8 @@
 
 namespace common\php;
 
-use common\php\Exceptions\IntException;
-use common\php\Exceptions\ArgException;
+use common\php\exceptions\IntException;
+use common\php\exceptions\ArgException;
 
 /**
 * LibreSignage utility functions.

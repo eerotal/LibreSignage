@@ -3,7 +3,7 @@
 namespace common\php;
 
 use \common\php\Config;
-use \common\php\Exceptions\IntException;
+use \common\php\exceptions\IntException;
 
 $LS_LOG_ENABLED = FALSE;
 

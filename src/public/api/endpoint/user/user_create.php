@@ -21,13 +21,14 @@ namespace pub\api\endpoints\user;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
+use \common\php\Config;
 use \api\APIEndpoint;
 use \api\APIException;
 use \api\HTTPStatus;
 use \common\php\auth\User;
 use \common\php\Util;
-use \common\php\Exceptions\ArgException;
-use \common\php\Exceptions\LimitException;
+use \common\php\exceptions\ArgException;
+use \common\php\exceptions\LimitException;
 
 APIEndpoint::POST(
 	[

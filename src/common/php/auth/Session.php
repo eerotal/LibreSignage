@@ -6,8 +6,8 @@ use \common\php\Config;
 use \common\php\Util;
 use \common\php\Exportable;
 use \common\php\auth\User;
-use \common\php\Exceptions\IntException;
-use \common\php\Exceptions\ArgException;
+use \common\php\exceptions\IntException;
+use \common\php\exceptions\ArgException;
 
 /**
 * Class for handling session data and authentication.

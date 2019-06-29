@@ -2,8 +2,9 @@
 
 namespace api;
 
-use \common\php\JSONUtils;
-use \common\php\JSONException;
+use \common\php\exceptions\ArgException;
+use \common\php\exceptions\FileTypeException;
+use \common\php\exceptions\LimitException;
 
 /**
 * HTTPStatus contains all standard HTTP status codes as constants
@@ -96,16 +97,10 @@ final class HTTPStatus {
 			return $e->getCode();
 		} catch (ArgException $e) {
 			return self::BAD_REQUEST;
-		} catch (IntException $e) {
-			return self::INTERNAL_SERVER_ERROR;
 		} catch (LimitException $e) {
 			return self::FORBIDDEN;
 		} catch (FileTypeException $e) {
 			return self::BAD_REQUEST;
-		} catch (ConfigException $e) {
-			return self::INTERNAL_SERVER_ERROR;
-		} catch (JSONException $e) {
-			return self::INTERNAL_SERVER_ERROR;
 		} catch (\Exception $e) {
 			return self::INTERNAL_SERVER_ERROR;
 		}

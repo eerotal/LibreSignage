@@ -6,7 +6,7 @@ use \api\HTTPStatus;
 use \common\php\Config;
 use \common\php\Log;
 use \common\php\JSONUtils;
-use \common\php\JSONException;
+use \common\php\exceptions\JSONException;
 use \Symfony\Component\HttpFoundation\Response;
 
 /**

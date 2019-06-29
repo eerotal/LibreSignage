@@ -27,8 +27,6 @@ APIEndpoint::GET(
 		'APIRateLimitModule' => []
 	],
 	function($req, $resp, $module_data) {
-		$ret = ['users' => []];
-		foreach (User::all() as $u) { $ret['users'][] = $u->get_name(); }
-		return $ret;
+		return ['users' => User::names()];
 	}
 );

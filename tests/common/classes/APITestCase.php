@@ -88,7 +88,7 @@ class APITestCase extends TestCase {
 			$message
 		);
 		self::assertThat(
-			$response->getStatusCode(),
+			$response,
 			new HTTPStatusEquals($this->api, $expect),
 			$message
 		);
@@ -107,7 +107,7 @@ class APITestCase extends TestCase {
 		string $message = ''
 	) {
 		self::assertThat(
-			$response->getStatusCode(),
+			$response,
 			new HTTPStatusEquals($this->api, 200),
 			$message
 		);

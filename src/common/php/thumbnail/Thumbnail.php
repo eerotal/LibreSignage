@@ -2,7 +2,7 @@
 
 namespace common\php\thumbnail;
 
-use \common\php\ArgException;
+use \common\php\exceptions\ArgException;
 
 final class Thumbnail {
 	private $generators = [];

@@ -3,6 +3,7 @@
 namespace constraints;
 
 use PHPUnit\Framework\Constraint\Constraint;
+use GuzzleHttp\Psr7\Response;
 use classes\APIInterface;
 
 class HTTPStatusEquals extends Constraint {
@@ -14,15 +15,15 @@ class HTTPStatusEquals extends Constraint {
 		$this->expect = $expect;
 	}
 
-	public function matches($other): bool {
-		return $this->expect === $other;
+	public function matches(Response $other): bool {
+		return $this->expect === $other->getStatusCode();
 	}
 
-	protected function failureDescription($other): string {
-		return "{$other} {$this->toString()}";
+	protected function failureDescription(Response $other): string {
+		return "{$other->getStatusCode()} matches the expected ".
+			"HTTP status {$this->expect}. Response dump:\n".
+			(string) $other->getBody();
 	}
 
-	public function toString(): string {
-		return "matches the expected HTTP status {$this->expect}";
-	}
+	public function toString(): string {}
 }
