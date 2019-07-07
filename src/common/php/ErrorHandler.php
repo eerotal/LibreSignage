@@ -79,7 +79,6 @@ final class ErrorHandler {
 				$e = new \Exception(ERROR_CODES[$code], $code);
 			}
 			if ($ERROR_DEBUG) {
-				header('Content-Type: text/plain');
 				echo "\n### Uncaught exception (HTTP: ".$code.") ###\n";
 				echo $e->__toString();
 				Log::logs($e->__toString(), Log::LOGERR);
