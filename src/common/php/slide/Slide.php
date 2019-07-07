@@ -4,12 +4,14 @@ namespace common\php\slide;
 
 use \common\php\Config;
 use \common\php\Util;
-use \common\php\JSONUtil;
+use \common\php\JSONUtils;
 use \common\php\Exportable;
 use \common\php\auth\User;
+use \common\php\auth\Session;
 use \common\php\Queue;
 use \common\php\slide\SlideLock;
 use \common\php\slide\SlideAsset;
+use \common\php\Log;
 
 final class SlideLockException extends \Exception {};
 
@@ -86,7 +88,7 @@ final class Slide extends Exportable {
 		self::validate_id($id);
 
 		$tmp = Util::file_lock_and_get(self::get_conf_path($id));
-		$this->import(JSONUtils::decode($tmp), TRUE);
+		$this->import(JSONUtils::decode($tmp, $assoc=TRUE), TRUE);
 
 		$this->lock_cleanup();
 		$this->check_sched_enabled();
@@ -665,9 +667,7 @@ final class Slide extends Exportable {
 		$tmp = '';
 
 		// Generate an ID for unsaved slides.
-		if (empty($this->id)) {
-			$this->gen_id();
-		}
+		if (empty($this->id)) { $this->gen_id(); }
 
 		$this->assert_ready();
 
