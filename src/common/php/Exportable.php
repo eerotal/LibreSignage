@@ -200,7 +200,7 @@ abstract class Exportable {
 					);
 			}
 
-			$diff = arraydiff(
+			$diff = Util::arraydiff(
 				$keys,
 				array_diff(array_keys($arr), self::EXP_RESERVED)
 			);
