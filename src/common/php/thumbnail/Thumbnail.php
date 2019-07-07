@@ -50,6 +50,8 @@ final class Thumbnail {
 	* @param string $dest The destionation path.
 	* @param int $wmax    Maximum width.
 	* @param int $hmax    Maximum height
+	*
+	* @throws ThumbnailGeneratorException if a suitable generator is not found.
 	*/
 	public function create(
 		string $src,
@@ -69,7 +71,12 @@ final class Thumbnail {
 					$g::provides_export(),
 					TRUE
 				)
-			) { $g::create($src, $dest, $wmax, $hmax); }
+				&& $g::is_enabled()
+			) {
+				$g::create($src, $dest, $wmax, $hmax);
+			} else {
+				throw new ThumbnailGeneratorException('No suitable thumbnail generator.');
+			}
 		}
 	}
 }
