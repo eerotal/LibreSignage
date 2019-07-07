@@ -11,7 +11,7 @@
 *
 *  Return value
 *    * owner  = The owner of the queue.
-*    * slides = A list containing the IDs of the slides in the queue.
+*    * slides = An array of the slide IDs in the requested queue.
 *
 *  <====
 */
@@ -21,7 +21,7 @@ namespace pub\api\endpoints\queue;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use \api\APIEndpoint;
-use \common\php\Slide;
+use \common\php\slide\Slide;
 use \common\php\Queue;
 
 APIEndpoint::GET(
@@ -44,8 +44,8 @@ APIEndpoint::GET(
 	],
 	function($req, $resp, $module_data) {
 		$params = $module_data['APIQueryValidatorModule'];
-		$queue = new Queue($params->name);
-		$queue->load();
-		return $queue->get_data_array();
+		$queue = new Queue();
+		$queue->load($params->name);
+		return $queue->export(FALSE, FALSE);
 	}
 );

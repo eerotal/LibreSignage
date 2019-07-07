@@ -1,8 +1,11 @@
 <?php
 
+namespace common\php\slide;
+
 use \common\php\Config;
 use \common\php\Exportable;
 use \common\php\auth\Session;
+use \common\php\Log;
 
 /**
 * SlideLock object for locking slides.
@@ -18,10 +21,9 @@ final class SlideLock extends Exportable {
 	];
 
 	private $session_id = NULL;
-	private $session = NULL;
 	private $expire = NULL;
 
-	public function __construct($session = NULL) {
+	public function __construct(Session $session = NULL) {
 		if ($session !== NULL) {
 			$this->session_id = $session->get_id();
 			$this->expire = time() + Config::config('SLIDE_LOCK_MAX_AGE');

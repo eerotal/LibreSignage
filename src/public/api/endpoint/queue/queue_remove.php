@@ -19,7 +19,7 @@ namespace pub\api\endpoints\queue;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use \api\APIEndpoint;
-use \common\php\Slide;
+use \common\php\slide\Slide;
 use \common\php\Queue;
 
 APIEndpoint::POST(
@@ -44,8 +44,8 @@ APIEndpoint::POST(
 		$caller = $module_data['APIAuthModule']['user'];
 		$params = $module_data['APIJSONValidatorModule'];
 
-		$queue = new Queue($params->name);
-		$queue->load();
+		$queue = new Queue();
+		$queue->load($params->name);
 		$owner = $queue->get_owner();
 
 		if (

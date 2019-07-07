@@ -17,9 +17,8 @@ namespace pub\api\endpoints\queue;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use \api\APIEndpoint;
-use \common\php\Slide;
+use \common\php\slide\Slide;
 use \common\php\Queue;
-
 
 APIEndpoint::GET(
 	[
@@ -29,6 +28,6 @@ APIEndpoint::GET(
 		'APIRateLimitModule' => []
 	],
 	function($req, $resp, $module_data) {
-		return ['queues' => queue_list()];
+		return ['queues' => Queue::list()];
 	}
 );
