@@ -4,7 +4,7 @@ namespace common\php;
 
 use \common\php\Config;
 use \common\php\Util;
-use \common\php\Slide;
+use \common\php\slide\Slide;
 use \common\php\User;
 use \common\php\Exportable;
 use \common\php\JSONUtils;
@@ -54,7 +54,7 @@ final class Queue extends Exportable {
 		}
 
 		$json = Util::file_lock_and_get(self::get_path($name));
-		$this->import(JSONUtils::decode($json), $assoc=TRUE);
+		$this->import(JSONUtils::decode($json, $assoc=TRUE));
 	}
 
 	/**
@@ -328,8 +328,8 @@ final class Queue extends Exportable {
 				}
 			},
 			scandir(
-				Config::config('LIBRESIGNAGE_ROOT')
-				.Config::config('QUEUES_DIR')
+				Config::config('LIBRESIGNAGE_ROOT').
+				Config::config('QUEUES_DIR')
 			)
 		);
 		$queues = array_values(
