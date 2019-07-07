@@ -59,8 +59,8 @@ final class Session extends Exportable{
 	* @return Session|NULL The Session on success or NULL on failure.
 	*/
 	public static function from_id(string $id) {
-		$p = explode(Session::ID_DELIMITER, $id);
-		$u = new User($p[0]);
+		$u = new User();
+		$u->load(explode(Session::ID_DELIMITER, $id)[0]);
 		return $u->session_get($id);
 	}
 
