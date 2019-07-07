@@ -1,19 +1,16 @@
 <?php
 
-/*
-*  SlideAsset class declaration used in the Slide class. This class
-*  is used for handling uploaded slide assets.
-*/
-
 namespace common\php\slide;
 
 use \common\php\Util;
 use \common\php\Config;
 use \common\php\Exportable;
-use \common\php\Slide;
+use \common\php\slide\Slide;
+use \common\php\thumbnail\Thumbnail;
 
-require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/thumbnail/thumbnail.php');
-
+/**
+* A class for handling file uploads to slides.
+*/
 final class SlideAsset extends Exportable {
 	static $PRIVATE = [
 		'filename',
@@ -85,12 +82,15 @@ final class SlideAsset extends Exportable {
 			throw new IntException('Failed to store uploaded asset.');
 		}
 
-		$this->has_thumb = generate_thumbnail(
-			$this->get_internal_path(),
-			$this->get_internal_thumb_path(),
-			Config::config('THUMB_MAXW'),
-			Config::config('THUMB_MAXH')
-		);
+		$this->has_thumb = TRUE;
+		try {
+			Thumbnail::create(
+				$this->get_internal_path(),
+				$this->get_internal_thumb_path(),
+				Config::config('THUMB_MAXW'),
+				Config::config('THUMB_MAXH')
+			);
+		} catch (Exception $e) { $this->has_thumb = FALSE; }
 	}
 
 	/**
