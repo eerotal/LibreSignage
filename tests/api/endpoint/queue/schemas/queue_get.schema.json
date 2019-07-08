@@ -1,0 +1,4 @@
+{
+	"id": "tests/",
+	"$ref": "common/schemas/Queue.schema.json"
+}
