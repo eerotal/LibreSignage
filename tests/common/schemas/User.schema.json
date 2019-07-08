@@ -20,10 +20,10 @@
 			"type": "array",
 			"items": { "$ref": "#/definitions/group" }
 		},
-		"quota": { "$ref": "quota.schema.json" },
+		"quota": { "$ref": "Quota.schema.json" },
 		"sessions": {
 			"type": "array",
-			"items": { "$ref": "session.schema.json" }
+			"items": { "$ref": "Session.schema.json" }
 		},
 		"user": { "$ref": "#/definitions/name" }
 	},
