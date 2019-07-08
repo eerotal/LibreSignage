@@ -46,7 +46,7 @@ APIEndpoint::POST(
 		if (!$caller->is_in_group('admin') && !$caller->is_in_group('editor')) {
 			throw new APIException(
 				'User not in groups admin or editor not authorized.',
-				HTTPStatus::UNAUTHORIED
+				HTTPStatus::UNAUTHORIZED
 			);
 		}
 
