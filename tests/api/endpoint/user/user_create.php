@@ -1,10 +1,11 @@
 <?php
 
-use classes\APITestCase;
-use classes\APITestUtils;
+use \classes\APITestCase;
+use \classes\APITestUtils;
+use \api\HTTPStatus;
 
 class user_create extends APITestCase {
-	use traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	const UNIT_TEST_USER = 'unit_test_user';
 
@@ -43,73 +44,73 @@ class user_create extends APITestCase {
 					'user' => self::UNIT_TEST_USER,
 					'groups' => ['editor', 'display']
 				],
-				200
+				HTTPStatus::OK
 			],
 			'Wrong type for user parameter' => [
 				[
 					'user' => 1,
 					'groups' => ['editor', 'display']
 				],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'Empty username' => [
 				[
 					'user' => '',
 					'groups' => ['editor', 'display']
 				],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'NULL username' => [
 				[
 					'user' => NULL,
 					'groups' => ['editor', 'display']
 				],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'No groups parameter' => [
 				[
 					'user' => self::UNIT_TEST_USER
 				],
-				200
+				HTTPStatus::OK
 			],
 			'Wrong type for groups parameter' => [
 				[
 					'user' => self::UNIT_TEST_USER,
 					'groups' => 'wrong_type'
 				],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'Empty groups array' => [
 				[
 					'user' => self::UNIT_TEST_USER,
 					'groups' => []
 				],
-				200
+				HTTPStatus::OK
 			],
 			'NULL groups parameter' => [
 				[
 					'user' => self::UNIT_TEST_USER,
 					'groups' => NULL
 				],
-				200
+				HTTPStatus::OK
 			],
 			'Empty group name in groups array' => [
 				[
 					'user' => self::UNIT_TEST_USER,
 					'groups' => ['']
 				],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'Wrong type in groups array' => [
 				[
 					'user' => self::UNIT_TEST_USER,
 					'groups' => [1, 2, 3]
 				],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'No parameters' => [
 				[],
-				400
+				HTTPStatus::BAD_REQUEST
 			]
 		];
 	}

@@ -1,14 +1,15 @@
 <?php
 
-use JsonSchema\Validator;
-use classes\APITestCase;
-use classes\APITestUtils;
+use \JsonSchema\Validator;
+use \classes\APITestCase;
+use \classes\APITestUtils;
 
 class server_limits extends APITestCase {
 	public function setUp(): void {
+		parent::setUp();
+
 		$this->set_endpoint_method('GET');
 		$this->set_endpoint_uri('general/server_limits.php');
-		parent::setUp();
 	}
 
 	public function test_is_response_schema_correct(): void {

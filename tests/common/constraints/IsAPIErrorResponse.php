@@ -2,10 +2,10 @@
 
 namespace constraints;
 
-use PHPUnit\Framework\Constraint\Constraint;
-use JsonSchema\Validator;
-use classes\APIInterface;
-use classes\APITestUtils;
+use \PHPUnit\Framework\Constraint\Constraint;
+use \JsonSchema\Validator;
+use \classes\APIInterface;
+use \classes\APITestUtils;
 
 class IsAPIErrorResponse extends Constraint {
 	private $api = NULL;
@@ -17,7 +17,7 @@ class IsAPIErrorResponse extends Constraint {
 	}
 
 	public function matches($response): bool {
-		$schema = APITestUtils::read_json_file(SCHEMA_PATH.'/error.schema.json');
+		$schema = APITestUtils::read_json_file(SCHEMA_PATH.'/APIException.schema.json');
 		$validator = new Validator();
 		$validator->validate($response, $schema);
 		return $validator->isValid();

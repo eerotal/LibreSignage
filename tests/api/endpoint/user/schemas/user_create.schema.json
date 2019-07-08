@@ -2,8 +2,8 @@
 	"id": "tests/",
 	"type": "object",
 	"properties": {
-		"user": { "$ref": "common/schemas/user.schema.json#/properties" },
-		"pass": { "$ref": "common/schemas/user.schema.json#/definitions/pass" }
+		"user": { "$ref": "common/schemas/User.schema.json#/properties" },
+		"pass": { "$ref": "common/schemas/User.schema.json#/definitions/pass" }
 	},
 	"required": ["user", "pass"],
 	"additionalProperties": false

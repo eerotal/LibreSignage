@@ -1,6 +1,7 @@
 <?php
 
-use classes\APITestCase;
+use \classes\APITestCase;
+use \api\HTTPStatus;
 
 class user_save extends APITestCase {
 	const UNIT_TEST_USER = 'unit_test_user';
@@ -58,7 +59,7 @@ class user_save extends APITestCase {
 					'user' => self::UNIT_TEST_USER,
 					'groups' => ['display']
 				],
-				200
+				HTTPStatus::OK
 			],
 			'Admin user tries to set password' => [
 				'admin',
@@ -68,7 +69,7 @@ class user_save extends APITestCase {
 					'pass' => 'test',
 					'groups' => ['display']
 				],
-				401
+				HTTPStatus::UNAUTHORIZED
 			],
 			'Non-admin tries to set groups' => [
 				'user',
@@ -77,7 +78,7 @@ class user_save extends APITestCase {
 					'user' => 'user',
 					'groups' => ['admin']
 				],
-				401
+				HTTPStatus::UNAUTHORIZED
 			],
 			'Non-admin tries to set password' => [
 				'user',
@@ -86,31 +87,31 @@ class user_save extends APITestCase {
 					'user' => 'user',
 					'pass' => 'user'
 				],
-				200
+				HTTPStatus::OK
 			],
 			'Missing user parameter' => [
 				'admin',
 				'admin',
 				[],
-				400,
+				HTTPStatus::BAD_REQUEST,
 			],
 			'Empty user parameter' => [
 				'admin',
 				'admin',
 				['user' => ''],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'Wrong type for user parameter' => [
 				'admin',
 				'admin',
 				['user' => 1],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'Missing groups parameter' => [
 				'admin',
 				'admin',
 				['user' => self::UNIT_TEST_USER],
-				200
+				HTTPStatus::OK
 			],
 			'Wrong type in groups array' => [
 				'admin',
@@ -119,7 +120,7 @@ class user_save extends APITestCase {
 					'user' => self::UNIT_TEST_USER,
 					'groups' => [1, 2, 3]
 				],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'Empty string in groups array' => [
 				'admin',
@@ -128,7 +129,7 @@ class user_save extends APITestCase {
 					'user' => self::UNIT_TEST_USER,
 					'groups' => ['']
 				],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'Empty groups array' => [
 				'admin',
@@ -137,8 +138,8 @@ class user_save extends APITestCase {
 					'user' => self::UNIT_TEST_USER,
 					'groups' => []
 				],
-				200
-			],
+				HTTPStatus::OK
+			]
 		];
 	}
 

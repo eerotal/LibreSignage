@@ -1,11 +1,12 @@
 <?php
 
-use JsonSchema\Validator;
-use classes\APITestCase;
-use classes\APITestUtils;
+use \JsonSchema\Validator;
+use \classes\APITestCase;
+use \classes\APITestUtils;
+use \api\HTTPStatus;
 
 class user_remove extends APITestCase {
-	use traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	const UNIT_TEST_USER = 'unit_test_user';
 
@@ -40,7 +41,7 @@ class user_remove extends APITestCase {
 			[],
 			TRUE
 		);
-		$this->assert_api_failed($resp, 401);
+		$this->assert_api_failed($resp, HTTPStatus::UNAUTHORIZED);
 
 		$this->api->logout();
 	}

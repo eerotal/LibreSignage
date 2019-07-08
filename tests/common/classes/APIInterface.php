@@ -2,13 +2,14 @@
 
 namespace classes;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
-use classes\APITestUtils;
-use classes\APIInterfaceException;
+use \GuzzleHttp\Client;
+use \GuzzleHttp\Psr7\Request;
+use \GuzzleHttp\Psr7\Response;
+use \classes\APITestUtils;
+use \classes\APIInterfaceException;
 
 use \common\php\JSONUtils;
+use \api\HTTPStatus;
 
 final class APIInterface {
 	private $client = NULL;
@@ -100,7 +101,7 @@ final class APIInterface {
 		);
 		$decoded = APIInterface::decode_raw_response($raw);
 
-		if ($raw->getStatusCode() === 200) {
+		if ($raw->getStatusCode() === HTTPStatus::OK) {
 			$this->session_token = $decoded->session->token;
 		} else {
 			throw new APIInterfaceException(

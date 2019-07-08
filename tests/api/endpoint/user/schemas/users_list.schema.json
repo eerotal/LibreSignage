@@ -4,7 +4,7 @@
 	"properties": {
 		"users": {
 			"type": "array",
-			"items": { "$ref": "common/schemas/user.schema.json#/definitions/name" }
+			"items": { "$ref": "common/schemas/User.schema.json#/definitions/name" }
 		}
 	},
 	"required": ["users"],

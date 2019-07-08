@@ -2,9 +2,9 @@
 
 namespace constraints;
 
-use PHPUnit\Framework\Constraint\Constraint;
-use GuzzleHttp\Psr7\Response;
-use classes\APIInterface;
+use \PHPUnit\Framework\Constraint\Constraint;
+use \GuzzleHttp\Psr7\Response;
+use \classes\APIInterface;
 
 class HTTPStatusEquals extends Constraint {
 	private $api = NULL;

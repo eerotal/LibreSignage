@@ -2,17 +2,19 @@
 
 namespace classes;
 
-use GuzzleHttp\Psr7\Response;
+use \GuzzleHttp\Psr7\Response;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Constraint\IsEqual;
+use \PHPUnit\Framework\TestCase;
+use \PHPUnit\Framework\Constraint\IsEqual;
 
-use JsonSchema\Validator;
-use classes\APIInterface;
+use \JsonSchema\Validator;
+use \classes\APIInterface;
 
-use constraints\IsAPIErrorResponse;
-use constraints\HTTPStatusEquals;
-use constraints\MatchesJSONSchema;
+use \constraints\IsAPIErrorResponse;
+use \constraints\HTTPStatusEquals;
+use \constraints\MatchesJSONSchema;
+
+use \api\HTTPStatus;
 
 class APITestCase extends TestCase {
 	public $api = NULL;
@@ -43,14 +45,14 @@ class APITestCase extends TestCase {
 	}
 
 	/**
-	 * Assert that the API response object $response matches the JSON Schema
-	 * from the file $schema_path.
-	 *
-	 * @param $response mixed The API response object.
-	 * @param $schema_path string The path to the JSON Schema file.
-	 * @param $message string An optional error message to print when the
-	 *                        assertion fails.
-	 */
+	* Assert that the API response object $response matches the JSON Schema
+	* from the file $schema_path.
+	*
+	* @param $response mixed The API response object.
+	* @param $schema_path string The path to the JSON Schema file.
+	* @param $message string An optional error message to print when the
+	*                        assertion fails.
+	*/
 	public static function assert_object_matches_schema(
 		$response,
 		string $schema_path,
@@ -64,21 +66,21 @@ class APITestCase extends TestCase {
 	}
 
 	/**
-	 * Assert that $response is a well-formed API error response and
-	 * it's status code matches $expect. If $expect === 200, this
-	 * function calls APITestCase::assert_api_succeeded().
-	 *
-	 * @param $response Response The HttpFoundation Response object.
-	 * @param $expect string The expected HTTP status code.
-	 * @param $message string An optional error message to print when the
-	 *                        assertion fails.
-	 */
+	* Assert that $response is a well-formed API error response and
+	* it's status code matches $expect. If $expect === HTTPStatus::OK,
+	* this function calls APITestCase::assert_api_succeeded().
+	*
+	* @param $response Response The HttpFoundation Response object.
+	* @param $expect string The expected HTTP status code.
+	* @param $message string An optional error message to print when the
+	*                        assertion fails.
+	*/
 	public function assert_api_failed(
 		Response $response,
 		int $expect,
 		string $message = ''
 	) {
-		if ($expect === 200) {
+		if ($expect === HTTPStatus::OK) {
 			$this->assert_api_succeeded($response, $message);
 			return;
 		}
@@ -95,20 +97,20 @@ class APITestCase extends TestCase {
 	}
 
 	/**
-	 * Assert that $response succeeded by checking that
-	 * $response->error matches 200.
-	 *
-	 * @param $response mixed The API response object.
-	 * @param $message string An optional error message to print when
-	 *                        the assertion fails.
-	 */
+	* Assert that $response succeeded by checking that
+	* $response->error matches HTTPStatus::OK.
+	*
+	* @param $response mixed The API response object.
+	* @param $message string An optional error message to print when
+	*                        the assertion fails.
+	*/
 	public function assert_api_succeeded(
 		Response $response,
 		string $message = ''
 	) {
 		self::assertThat(
 			$response,
-			new HTTPStatusEquals($this->api, 200),
+			new HTTPStatusEquals($this->api, HTTPStatus::OK),
 			$message
 		);
 	}

@@ -1,11 +1,12 @@
 <?php
 
-use JsonSchema\Validator;
-use classes\APITestCase;
-use classes\APITestUtils;
+use \JsonSchema\Validator;
+use \classes\APITestCase;
+use \classes\APITestUtils;
+use \api\HTTPStatus;
 
 class user_get extends APITestCase {
-	use traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -54,19 +55,19 @@ class user_get extends APITestCase {
 		return [
 			'Valid parameters' => [
 				['user' => 'admin'],
-				200
+				HTTPStatus::OK
 			],
 			'Missing user parameter' => [
 				[],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'Nonexistent user' => [
 				['user' => 'nouser'],
-				400
+				HTTPStatus::BAD_REQUEST
 			],
 			'Empty user parameter' => [
 				['user' => ''],
-				400
+				HTTPStatus::BAD_REQUEST
 			]
 		];
 	}

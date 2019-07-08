@@ -2,9 +2,9 @@
 
 namespace constraints;
 
-use PHPUnit\Framework\Constraint\Constraint;
-use JsonSchema\Validator;
-use classes\APITestUtils;
+use \PHPUnit\Framework\Constraint\Constraint;
+use \JsonSchema\Validator;
+use \classes\APITestUtils;
 
 use \common\php\JSONUtils;
 use \common\php\JSONException;

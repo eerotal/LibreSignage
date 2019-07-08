@@ -1,11 +1,11 @@
 <?php
 
-use JsonSchema\Validator;
-use classes\APITestCase;
-use classes\APITestUtils;
+use \JsonSchema\Validator;
+use \classes\APITestCase;
+use \classes\APITestUtils;
 
 class user_get_current extends APITestCase {
-	use traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();

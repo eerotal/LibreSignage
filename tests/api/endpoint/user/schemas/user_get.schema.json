@@ -7,9 +7,9 @@
 			"properties": {
 				"groups": {
 					"type": "array",
-					"items": { "$ref": "common/schemas/user.schema.json#/definitions/group" }
+					"items": { "$ref": "common/schemas/User.schema.json#/definitions/group" }
 				},
-				"user": { "$ref": "common/schemas/user.schema.json#/definitions/name" }
+				"user": { "$ref": "common/schemas/User.schema.json#/definitions/name" }
 			},
 			"required": ["groups", "user"],
 			"additionalProperties": false

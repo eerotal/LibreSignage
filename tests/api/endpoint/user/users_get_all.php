@@ -1,11 +1,12 @@
 <?php
 
-use JsonSchema\Validator;
-use classes\APITestCase;
-use classes\APITestUtils;
+use \JsonSchema\Validator;
+use \classes\APITestCase;
+use \classes\APITestUtils;
+use \api\HTTPStatus;
 
 class users_get_all extends APITestCase {
-	use traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -24,7 +25,7 @@ class users_get_all extends APITestCase {
 			[],
 			TRUE
 		);
-		$this->assert_api_failed($resp, 401);
+		$this->assert_api_failed($resp, HTTPStatus::UNAUTHORIZED);
 
 		$this->api->logout();
 	}

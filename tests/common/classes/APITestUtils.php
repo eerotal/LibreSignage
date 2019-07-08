@@ -2,9 +2,9 @@
 
 namespace classes;
 
-use JsonSchema\Validator;
-use JsonSchema\SchemaStorage;
-use JsonSchema\Constraints\Factory;
+use \JsonSchema\Validator;
+use \JsonSchema\SchemaStorage;
+use \JsonSchema\Constraints\Factory;
 
 use \common\php\JSONUtils;
 
