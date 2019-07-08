@@ -50,14 +50,15 @@ APIEndpoint::POST(
 			);
 		}
 
-		if (queue_exists($params->name)) {
+		if (Queue::exists($params->name)) {
 			throw new APIException(
 				'Queue already exists.',
 				HTTPStatus::BAD_REQUEST
 			);
 		}
 
-		$queue = new Queue($params->name);
+		$queue = new Queue();
+		$queue->set_name($params->name);
 		$queue->set_owner($caller->get_name());
 		$queue->write();
 

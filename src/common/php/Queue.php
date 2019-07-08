@@ -5,7 +5,7 @@ namespace common\php;
 use \common\php\Config;
 use \common\php\Util;
 use \common\php\slide\Slide;
-use \common\php\User;
+use \common\php\auth\User;
 use \common\php\Exportable;
 use \common\php\JSONUtils;
 use \common\php\exceptions\JSONException;
