@@ -11,7 +11,16 @@ use \JsonSchema\Constraints\Constraint;
 use \common\php\JSONUtils;
 use \common\php\exceptions\JSONException;
 
+/**
+* API module for validating and decoding a request
+* with a JSON body.
+*/
 class APIJSONValidatorModule extends APIModule {
+	/**
+	* Decode and validate the request body JSON.
+	*
+	* @see APIModule for argument and return value descriptions.
+	*/
 	public function run(APIEndpoint $e, array $args) {
 		$data = NULL;
 		$this->check_args(['schema'], $args);

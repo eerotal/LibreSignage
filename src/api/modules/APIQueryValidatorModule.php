@@ -9,7 +9,15 @@ use \api\HTTPStatus;
 use \JsonSchema\Validator;
 use \JsonSchema\Constraints\Constraint;
 
+/**
+* API module for validating a GET query.
+*/
 class APIQueryValidatorModule extends APIModule {
+	/**
+	* Validate the query.
+	*
+	* @see APIModule for argument and return value descriptions.
+	*/
 	public function run(APIEndpoint $e, array $args) {
 		$this->check_args(['schema'], $args);
 

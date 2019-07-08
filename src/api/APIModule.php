@@ -17,8 +17,8 @@ abstract class APIModule {
 	* @param APIEndpoint $e The APIEndpoint object the module is run for.
 	* @param array $args An array that contains user defined arguments
 	*                    for the module.
-	* @return mixed The return data from them module that's accessible
-	*               to API endpoints.
+	* @return mixed      The return data from them module that's accessible
+	*                    to API endpoints.
 	*/
 	abstract function run(APIEndpoint $e, array $args);
 

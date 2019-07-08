@@ -8,12 +8,16 @@ use \api\APIModule;
 use \api\APIException;
 use \api\HTTPStatus;
 
+/**
+* API module for imposing rate limits on API endpoints.
+* This module must be called after checking authentication,
+* ie. after APIAuthModule.
+*/
 class APIRateLimitModule extends APIModule {
-	/*
-	*  Make sure the caller has rate quota left and use it
-	*  if needed. This module must be called after the user
-	*  data has been assigned into the endpoint (ie. after
-	*  APIAuthModule).
+	/**
+	* Make sure the caller has rate quota left and use it if needed.
+	*
+	* @see APIModule for argument and return value descriptions.
 	*/
 	public function run(APIEndpoint $e, array $args) {
 		assert(

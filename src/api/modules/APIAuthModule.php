@@ -9,9 +9,11 @@ use \api\APIException;
 use \common\php\auth\Auth;
 
 class APIAuthModule extends APIModule {
-	/*
-	*  Check authentication and assign the user and session
-	*  data into the supplied endpoint.
+	/**
+	* Check authentication and assign the user and session
+	* data into the supplied endpoint.
+	*
+	* @see APIModule for argument and return value descriptions.
 	*/
 	public function run(APIEndpoint $e, array $args) {
 		$this->check_args(['cookie_auth'], $args);
@@ -20,8 +22,8 @@ class APIAuthModule extends APIModule {
 		$req = $e->get_request();
 
 		/*
-		*  Prevent using cookie auth on POST endpoints because that
-		*  would enable CSRF attacks.
+		* Prevent using cookie auth on POST endpoints because that
+		* would enable CSRF attacks.
 		*/
 		if ($req->getMethod() === APIEndpoint::M_POST && $args['cookie_auth']) {
 			throw new APIException(
