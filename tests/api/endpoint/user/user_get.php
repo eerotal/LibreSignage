@@ -34,21 +34,19 @@ class user_get extends APITestCase {
 	}
 
 	/**
-	 * @dataProvider params_provider
-	 */
-	public function test_fuzz_params(array $params, int $expect) {
-		$this->api->login('admin', 'admin');
-
-		$resp = $this->api->call_return_raw_response(
-			$this->get_endpoint_method(),
-			$this->get_endpoint_uri(),
+	* @dataProvider params_provider
+	*/
+	public function test_fuzz_params(
+		array $params,
+		int $error
+	): void {
+		$this->call_api_and_assert_failed(
 			$params,
 			[],
-			TRUE
+			$error,
+			'admin',
+			'admin'
 		);
-		$this->assert_api_failed($resp, $expect);
-
-		$this->api->logout();
 	}
 
 	public static function params_provider(): array {

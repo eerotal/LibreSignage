@@ -23,18 +23,13 @@ class user_create extends APITestCase {
 		array $params,
 		int $error
 	): void {
-		$this->api->login('admin', 'admin');
-
-		$resp = $this->api->call_return_raw_response(
-			$this->get_endpoint_method(),
-			$this->get_endpoint_uri(),
+		$this->call_api_and_assert_failed(
 			$params,
 			[],
-			TRUE
+			$error,
+			'admin',
+			'admin'
 		);
-		$this->assert_api_failed($resp, $error);
-
-		$this->api->logout();
 	}
 
 	public function params_provider(): array {

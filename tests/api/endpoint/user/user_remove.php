@@ -47,23 +47,23 @@ class user_remove extends APITestCase {
 	}
 
 
-	/*public function test_is_response_schema_correct(): void {
+	public function test_is_response_schema_correct(): void {
 		$this->api->login('admin', 'admin');
 
 		$resp = $this->api->call(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
-			[],
+			['user' => self::UNIT_TEST_USER],
 			[],
 			TRUE
 		);
-		$this->assert_valid_json(
+		$this->assert_object_matches_schema(
 			$resp,
 			dirname(__FILE__).'/schemas/user_remove.schema.json'
 		);
 
 		$this->api->logout();
-	}*/
+	}
 
 	public function tearDown(): void {
 		// Remove the initial user in case it wasn't successfully removed.

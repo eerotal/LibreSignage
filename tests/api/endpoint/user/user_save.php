@@ -28,26 +28,21 @@ class user_save extends APITestCase {
 	}
 
 	/**
-	 * @dataProvider params_provider
-	 */
+	* @dataProvider params_provider
+	*/
 	public function test_fuzz_params(
 		string $user,
 		string $pass,
 		array $params,
-		int $expect
-	) {
-		$this->api->login($user, $pass);
-
-		$resp =	$this->api->call_return_raw_response(
-			$this->get_endpoint_method(),
-			$this->get_endpoint_uri(),
+		int $error
+	): void {
+		$this->call_api_and_assert_failed(
 			$params,
 			[],
-			TRUE
+			$error,
+			$user,
+			$pass
 		);
-		$this->assert_api_failed($resp, $expect);
-
-		$this->api->logout();
 	}
 
 	public function params_provider(): array {
@@ -141,6 +136,27 @@ class user_save extends APITestCase {
 				HTTPStatus::OK
 			]
 		];
+	}
+
+	public function test_is_response_schema_correct(): void {
+		$this->api->login('admin', 'admin');
+
+		$resp = $this->api->call(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			[
+				'user' => self::UNIT_TEST_USER,
+				'groups' => ['editor']
+			],
+			[],
+			TRUE
+		);
+		$this->assert_object_matches_schema(
+			$resp,
+			dirname(__FILE__).'/schemas/user_save.schema.json'
+		);
+
+		$this->api->logout();
 	}
 
 	public function tearDown(): void {
