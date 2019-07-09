@@ -102,7 +102,7 @@ final class APIInterface {
 		$decoded = APIInterface::decode_raw_response($raw);
 
 		if ($raw->getStatusCode() === HTTPStatus::OK) {
-			$this->session_token = $decoded->session->token;
+			$this->session_token = $decoded->token;
 		} else {
 			throw new APIInterfaceException(
 				"Login failed. ({$raw->getStatusCode()})"
