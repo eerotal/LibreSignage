@@ -114,4 +114,40 @@ class APITestCase extends TestCase {
 			$message
 		);
 	}
+
+	/**
+	* Call an API endpoint and assert that the call failed.
+	* This is a wrapper for APITestCase::assert_api_failed()
+	* and various APIInterface functions to reduce code duplication.
+	*
+	* @param array $params The parameters to pass to the API endpoint.
+	* @param array $headers The headers to pass to the API endpoint.
+	* @param int $error The expected HTTP status code.
+	* @param string $user The username to use for login or NULL for no auth.
+	* @param string $pass The password to use for login or NULL for no auth. 
+	*/
+	public function call_api_and_assert_failed(
+		array $params,
+		array $headers,
+		int $error,
+		string $user = NULL,
+		string $pass = NULL
+	) {
+		if ($user !== NULL && $pass !== NULL) {
+			$this->api->login($user, $pass);
+		}
+
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			$params,
+			$headers,
+			$user !== NULL && $pass !== NULL
+		);
+		$this->assert_api_failed($resp, $error);
+
+		if ($user !== NULL && $pass !== NULL) {
+			$this->api->logout();
+		}
+	}
 }
