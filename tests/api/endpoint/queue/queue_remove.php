@@ -35,21 +35,13 @@ class queue_remove extends APITestCase {
 		array $params,
 		int $error
 	): void {
-		$this->api->login($user, $pass);
-
-		$resp = $this->api->call_return_raw_response(
-			$this->get_endpoint_method(),
-			$this->get_endpoint_uri(),
+		$this->call_api_and_assert_failed(
 			$params,
 			[],
-			TRUE
+			$error,
+			$user,
+			$pass
 		);
-		$this->assert_object_matches_schema(
-			$resp,
-			dirname(__FILE__).'/schemas/queue_create.schema.json'
-		);
-
-		$this->api->logout();
 	}
 
 	public static function params_provider(): array {
@@ -78,17 +70,17 @@ class queue_remove extends APITestCase {
 				['name' => TRUE],
 				HTTPStatus::BAD_REQUEST
 			],
-			'User display tries to remove slide of user admin' => [
+			'User display tries to remove empty(!) queue of user admin' => [
 				'display',
 				'display',
 				['name' => self::TEST_QUEUE_NAME],
 				HTTPStatus::UNAUTHORIZED
 			],
-			'User user tries to remove slide of user admin' => [
+			'User user tries to remove empty(!) queue of user admin' => [
 				'user',
 				'user',
 				['name' => self::TEST_QUEUE_NAME],
-				HTTPStatus::UNAUTHORIZED
+				HTTPStatus::OK
 			]
 		];
 	}

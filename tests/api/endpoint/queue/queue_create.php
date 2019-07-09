@@ -19,21 +19,13 @@ class queue_create extends APITestCase {
 	* @dataProvider params_provider
 	*/
 	public function test_fuzz_params(array $params, int $error): void {
-		$this->api->login('admin', 'admin');
-
-		$resp = $this->api->call_return_raw_response(
-			$this->get_endpoint_method(),
-			$this->get_endpoint_uri(),
+		$this->call_api_and_assert_failed(
 			$params,
 			[],
-			TRUE
+			$error,
+			'admin',
+			'admin'
 		);
-		$this->assert_object_matches_schema(
-			$resp,
-			dirname(__FILE__).'/schemas/queue_create.schema.json'
-		);
-
-		$this->api->logout();
 	}
 
 	public static function params_provider(): array {
@@ -55,6 +47,23 @@ class queue_create extends APITestCase {
 				HTTPStatus::BAD_REQUEST
 			]
 		];
+	}
+
+	public function test_is_response_schema_correct(): void {
+		$this->api->login('admin', 'admin');
+
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			['name' => self::TEST_QUEUE_NAME],
+			[]
+		);
+		$this->assert_object_matches_schema(
+			$resp,
+			dirname(__FILE__).'/schemas/queue_create.schema.json'
+		);
+
+		$this->api->logout();
 	}
 
 	public function tearDown(): void {
