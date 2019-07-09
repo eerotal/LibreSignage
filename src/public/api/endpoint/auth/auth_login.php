@@ -15,6 +15,7 @@
 *  Return value
 *    * user    = Current user data.
 *    * session = Current session data.
+*    * token   = Current session token.
 *
 *  <====
 */
@@ -85,10 +86,8 @@ APIEndpoint::POST(
 
 		return [
 			'user' => $user->export(FALSE, FALSE),
-			'session' => array_merge(
-				$data['session']->export(FALSE, FALSE),
-				[ 'token' => $data['token'] ]
-			)
+			'session' => $data['session']->export(FALSE, FALSE),
+			'token' => $data['token']
 		];
 	}
 );
