@@ -47,7 +47,7 @@ class APIEndpoint {
 		// Send $ret as the response if it's an array.
 		if (is_array($ret)) {
 			$this->response->headers->set('Content-Type', 'application/json');
-			$this->response->setContent(JSONUtils::encode($ret));
+			$this->response->setContent(JSONUtils::encode((object) $ret));
 		}
 
 		$this->send();
