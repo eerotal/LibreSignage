@@ -27,14 +27,11 @@ APIEndpoint::GET(
 	],
 	function($req, $resp, $module_data) {
 		$data = [];
-		$tmp = [];
 		$user = $module_data['APIAuthModule']['user'];
 		$session = $module_data['APIAuthModule']['session'];
 
-		foreach ($user->get_sessions() as $k => $s) {
-			$tmp = $s->export(FALSE, FALSE);
-			$tmp['current'] = ($session->get_id() === $s->get_id());
-			$data['sessions'][] = $tmp;
+		foreach ($user->get_sessions() as $s) {
+			$data['sessions'][] = $s->export(FALSE, FALSE);
 		}
 		return $data;
 	}
