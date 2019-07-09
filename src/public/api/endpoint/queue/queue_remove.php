@@ -19,8 +19,11 @@ namespace pub\api\endpoints\queue;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use \api\APIEndpoint;
+use \api\APIException;
+use \api\HTTPStatus;
 use \common\php\slide\Slide;
 use \common\php\Queue;
+use \common\php\Util;
 
 APIEndpoint::POST(
 	[
@@ -52,7 +55,7 @@ APIEndpoint::POST(
 			$caller->is_in_group('admin')
 			|| (
 				$caller->is_in_group('editor')
-				&& array_check($queue->slides(), function($s) use($caller) {
+				&& Util::array_check($queue->slides(), function($s) use($caller) {
 					return $s->get_owner() === $caller->get_name();
 				})
 			)
