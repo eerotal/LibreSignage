@@ -1,0 +1,11 @@
+{
+	"id": "tests/",
+	"type": "object",
+	"properties": {
+		"user": { "$ref": "common/schemas/User.schema.json" },
+		"session": { "$ref": "common/schemas/Session.schema.json" },
+		"token": { "$ref": "common/schemas/User.schema.json#/definitions/token" },
+	},
+	"required": ["user", "session", "token"],
+	"additionalProperties": false
+}
