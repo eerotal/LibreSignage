@@ -8,7 +8,7 @@
 *  **Request:** POST, application/json
 *
 *  Return value
-*    * session = An associative array with the latest session data.
+*    * session = The renewed session data.
 *
 *  <====
 */

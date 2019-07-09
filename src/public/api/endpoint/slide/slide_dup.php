@@ -23,6 +23,8 @@ namespace pub\api\endpoints\slide;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use \api\APIEndpoint;
+use \api\APIException;
+use \api\HTTPStatus;
 use \common\php\slide\Slide;
 
 APIEndpoint::POST(
