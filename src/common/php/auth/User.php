@@ -138,9 +138,12 @@ final class User extends Exportable {
 	* the new Session object and 'token' contains the generated
 	* session token.
 	*
-	* @param string $who A string describing the caller.
-	* @param string $from The IP address of the caller.
-	* @bool $permanent (Optional) Pass TRUE to create a permanent session.
+	* @param string $who       A string describing the caller.
+	* @param string $from      The IP address of the caller.
+	* @param bool   $permanent (optional) TRUE = Create a permanent session.
+	*
+	* @return array An array with the created session object
+	*               and a session token.
 	*/
 	public function session_new(
 		string $who,
