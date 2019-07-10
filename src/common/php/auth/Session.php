@@ -34,6 +34,7 @@ final class Session extends Exportable{
 
 	const ID_DELIMITER = '_';
 	const TRUNC_LEN    = 45;
+	const WHO_REGEX    = '/^[A-Za-z0-9_-]+$/';
 
 	private $id = NULL;
 	private $who = NULL;
@@ -52,6 +53,75 @@ final class Session extends Exportable{
 	}
 
 	/**
+	* Validate a caller description string.
+	*
+	* @param string $who The string to validate.
+	*
+	* @throws ArgException if $who is empty.
+	* @throws IntException if preg_match() fails.
+	* @throws ArgException if $who contains invalid characters.
+	*/
+	public static function validate_who(string $who) {
+		if (empty($who)) {
+			throw new ArgException("Invalid empty 'who'.");
+		}
+
+		$tmp = preg_match(self::WHO_REGEX, $who);
+		if ($tmp === FALSE) {
+			throw new IntException('preg_match() failed.');
+		} else if ($tmp === 0) {
+			throw new ArgException("Invalid characters in 'who'.");
+		}
+	}
+
+	/**
+	* Set the 'who' description of a session.
+	*
+	* @param string $who The description.
+	*
+	* @see Session::validate_who() for validation exceptions.
+	*/
+	public function set_who(string $who) {
+		self::validate_who($who);
+		$this->who = substr($who, 0, Session::TRUNC_LEN);
+	}
+
+	/**
+	* Validate a 'from' IP address.
+	*
+	* @param string $from The IP address to validate.
+	*
+	* @throws ArgException if $from is not a valid IP address.
+	*/
+	public static function validate_from(string $from) {
+		if (!filter_var($from, FILTER_VALIDATE_IP)) {
+			throw new ArgException("Invalid 'from' IP address.");
+		}
+	}
+
+	/**
+	* Set the 'from' IP address of a session.
+	*
+	* @param strinf $from The IP address.
+	*
+	* @see Session::validate_from() for validation exceptions.
+	*/
+	public function set_from(string $from) {
+		self::validate_from($from);
+		$this->from = substr($from, 0, Session::TRUNC_LEN);
+	}
+
+	/**
+	* Generate an ID for a session.
+	*
+	* @param User $user The user the session belongs to.
+	* @param int  $time The timestamp to add to the ID.
+	*/
+	private function gen_id(User $user, int $time) {
+		$this->id = $user->get_name().Session::ID_DELIMITER.$time;
+	}
+
+	/**
 	* Load a session based on its ID.
 	*
 	* @param string $id The ID of the session to load.
@@ -67,7 +137,7 @@ final class Session extends Exportable{
 	/**
 	* Create a new session and return the generated session token.
 	* Note that only the session token hash is stored in this object
-	* and the actual token is not. Note that $who and $from are truncated
+	* and the actual token is not. $who and $from are truncated
 	* to 45 characters.
 	*
 	* @param User $user      The User object the new session belongs to.
@@ -76,6 +146,9 @@ final class Session extends Exportable{
 	* @param bool $permanent Whether to create a permanent session or not.
 	*
 	* @return string The generated session token.
+	*
+	* @see Session::validate_who() for validation exceptions.
+	* @see Session::validate_from() for validation exceptions.
 	*/
 	public function new(
 		User $user,
@@ -84,12 +157,15 @@ final class Session extends Exportable{
 		bool $permanent = FALSE
 	): string {
 		$t = time();
-		$this->id = $user->get_name().Session::ID_DELIMITER.$t;
-		$this->who = substr($who, 0, Session::TRUNC_LEN);
-		$this->from = substr($from, 0, Session::TRUNC_LEN);
+
+		$this->gen_id($user, $t);
+		$this->set_who($who);
+		$this->set_from($from);
+
 		$this->created = $t;
 		$this->max_age = Config::config('SESSION_MAX_AGE');
 		$this->permanent = $permanent;
+
 		return $this->generate_token();
 	}
 

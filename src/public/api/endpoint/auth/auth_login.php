@@ -56,19 +56,6 @@ APIEndpoint::POST(
 			);
 		}
 
-		// Try to create a new session.
-		$tmp = preg_match('/[^a-zA-Z0-9_-]/', $params->who);
-		if ($tmp === 1) {
-			throw new APIException(
-				"Invalid characters in the 'who' parameter.",
-				HTTPStatus::BAD_REQUEST
-			);
-		} else if ($tmp === FALSE) {
-			throw new APIException(
-				"preg_match() failed.",
-				HTTPStatus::INTERNAL_SERVER_ERROR
-			);
-		}
 		$data = $user->session_new(
 			$params->who,
 			$req->getClientIp(),
