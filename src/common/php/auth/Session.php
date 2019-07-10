@@ -115,10 +115,9 @@ final class Session extends Exportable{
 	* Generate an ID for a session.
 	*
 	* @param User $user The user the session belongs to.
-	* @param int  $time The timestamp to add to the ID.
 	*/
-	private function gen_id(User $user, int $time) {
-		$this->id = $user->get_name().Session::ID_DELIMITER.$time;
+	private function gen_id(User $user) {
+		$this->id = $user->get_name().Session::ID_DELIMITER.Util::get_uid();
 	}
 
 	/**
@@ -156,13 +155,11 @@ final class Session extends Exportable{
 		string $from,
 		bool $permanent = FALSE
 	): string {
-		$t = time();
-
-		$this->gen_id($user, $t);
+		$this->gen_id($user);
 		$this->set_who($who);
 		$this->set_from($from);
 
-		$this->created = $t;
+		$this->created = time();
 		$this->max_age = Config::config('SESSION_MAX_AGE');
 		$this->permanent = $permanent;
 

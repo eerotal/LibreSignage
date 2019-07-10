@@ -219,7 +219,8 @@ final class Util {
 	* @param int $length The length of the new UID in characters.
 	* @return string The generated UID.
 	*/
-	public static function get_uid(int $length = DEFAULT_UID_LEN): string {
-		return bin2hex(random_bytes(ceil($length/2)));
+	public static function get_uid(int $len = NULL): string {
+		$len = ($len === NULL) ? Config::config('DEFAULT_UID_LEN') : $len;
+		return bin2hex(random_bytes(ceil($len/2)));
 	}
 }
