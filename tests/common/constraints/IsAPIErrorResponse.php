@@ -4,15 +4,12 @@ namespace constraints;
 
 use \PHPUnit\Framework\Constraint\Constraint;
 use \JsonSchema\Validator;
-use \classes\APIInterface;
 use \classes\APITestUtils;
 
 class IsAPIErrorResponse extends Constraint {
-	private $api = NULL;
 	private $expect = NULL;
 
-	public function __construct(APIInterface $api, string $expect) {
-		$this->api = $api;
+	public function __construct(string $expect) {
 		$this->expect = $expect;
 	}
 

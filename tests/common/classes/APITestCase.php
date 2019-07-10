@@ -70,28 +70,28 @@ class APITestCase extends TestCase {
 	* it's status code matches $expect. If $expect === HTTPStatus::OK,
 	* this function calls APITestCase::assert_api_succeeded().
 	*
-	* @param $response Response The HttpFoundation Response object.
-	* @param $expect string The expected HTTP status code.
-	* @param $message string An optional error message to print when the
-	*                        assertion fails.
+	* @param Response $response The HttpFoundation Response object.
+	* @param string   $expect   The expected HTTP status code.
+	* @param string   $message  An optional error message to print when the
+	*                           assertion fails.
 	*/
-	public function assert_api_failed(
+	public static function assert_api_failed(
 		Response $response,
 		int $expect,
 		string $message = ''
 	) {
 		if ($expect === HTTPStatus::OK) {
-			$this->assert_api_succeeded($response, $message);
+			self::assert_api_succeeded($response, $message);
 			return;
 		}
 		self::assertThat(
 			APIInterface::decode_raw_response($response),
-			new IsAPIErrorResponse($this->api, $expect),
+			new IsAPIErrorResponse($expect),
 			$message
 		);
 		self::assertThat(
 			$response,
-			new HTTPStatusEquals($this->api, $expect),
+			new HTTPStatusEquals($expect),
 			$message
 		);
 	}
@@ -104,27 +104,32 @@ class APITestCase extends TestCase {
 	* @param $message string An optional error message to print when
 	*                        the assertion fails.
 	*/
-	public function assert_api_succeeded(
+	public static function assert_api_succeeded(
 		Response $response,
 		string $message = ''
 	) {
 		self::assertThat(
 			$response,
-			new HTTPStatusEquals($this->api, HTTPStatus::OK),
+			new HTTPStatusEquals(HTTPStatus::OK),
 			$message
 		);
 	}
 
 	/**
-	* Call an API endpoint and assert that the call failed.
-	* This is a wrapper for APITestCase::assert_api_failed()
-	* and various APIInterface functions to reduce code duplication.
+	* Call the configured API endpoint and assert that the call failed. The
+	* endpoint that's called is set using APITestCase::set_endpoint_method()
+	* and APITestCase::set_endpoint_uri().
 	*
-	* @param array $params The parameters to pass to the API endpoint.
-	* @param array $headers The headers to pass to the API endpoint.
-	* @param int $error The expected HTTP status code.
-	* @param string $user The username to use for login or NULL for no auth.
-	* @param string $pass The password to use for login or NULL for no auth. 
+	* If you pass the $user and $pass arguments, this function also
+	* authenticates to the API using the provided credentials.
+	*
+	* @see APITestCase::assert_api_failed() (The wrapped function.)
+	*
+	* @param array  $params  The parameters to pass to the API endpoint.
+	* @param array  $headers The headers to pass to the API endpoint.
+	* @param int    $error   The expected HTTP status code.
+	* @param string $user    The username to use or NULL for no login.
+	* @param string $pass    The password to use or NULL for no login. 
 	*/
 	public function call_api_and_assert_failed(
 		array $params,
@@ -145,6 +150,48 @@ class APITestCase extends TestCase {
 			$user !== NULL && $pass !== NULL
 		);
 		$this->assert_api_failed($resp, $error);
+
+		if ($user !== NULL && $pass !== NULL) {
+			$this->api->logout();
+		}
+	}
+
+	/**
+	* Call the configured API endpoint and assert that the response
+	* schema matches the schema loaded from $schema_path. The endpoint
+	* that's called is set using APITestCase::set_endpoint_method() and
+	* APITestCase::set_endpoint_uri().
+	*
+	* If you pass the $user and $pass arguments, this function also
+	* authenticates to the API using the provided credentials.
+	*
+	* @see APITestCase::assert_object_matches_schema() (The wrapped function.)
+	*
+	* @param array  $params       The parameters to pass to the API endpoint.
+	* @param array  $headers      The headers to pass to the API endpoint.
+	* @param string $schema_path  The path to the expected response schema.
+	* @param string $user         The username to use or NULL for no login.
+	* @param string $pass         The password to use or NULL for no login. 
+	*/
+	public function call_api_and_check_response_schema(
+		array $params,
+		array $headers,
+		string $schema_path,
+		string $user = NULL,
+		string $pass = NULL
+	) {
+		if ($user !== NULL && $pass !== NULL) {
+			$this->api->login($user, $pass);
+		}
+
+		$resp = $this->api->call(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			$params,
+			$headers,
+			$user !== NULL && $pass !== NULL
+		);
+		self::assert_object_matches_schema($resp, $schema_path);
 
 		if ($user !== NULL && $pass !== NULL) {
 			$this->api->logout();

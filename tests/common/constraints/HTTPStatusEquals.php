@@ -4,14 +4,11 @@ namespace constraints;
 
 use \PHPUnit\Framework\Constraint\Constraint;
 use \GuzzleHttp\Psr7\Response;
-use \classes\APIInterface;
 
 class HTTPStatusEquals extends Constraint {
-	private $api = NULL;
 	private $expect = NULL;
 
-	public function __construct(APIInterface $api, int $expect) {
-		$this->api = $api;
+	public function __construct(int $expect) {
 		$this->expect = $expect;
 	}
 
