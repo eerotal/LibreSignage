@@ -742,13 +742,13 @@ final class Slide extends Exportable {
 		);
 
 		// Remove '.', '..' and hidden files.
-		return array_filter($ids, function(string $val) {
+		return array_values(array_filter($ids, function(string $val) {
 			return (
 				substr($val, 0, 1) != '.'
 				&& is_dir(self::get_dir_path($val))
 				&& is_file(self::get_conf_path($val))
 			);
-		});
+		}));
 	}
 
 	/**
