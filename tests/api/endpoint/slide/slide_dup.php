@@ -9,6 +9,8 @@ class slide_dup extends APITestCase {
 	private $orig_slide_id = NULL;
 	private $dup_slide_id = NULL;
 
+	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+
 	public function setUp(): void {
 		parent::setUp();
 
