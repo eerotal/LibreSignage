@@ -29,7 +29,12 @@
 			"type": "array",
 			"items": { "$ref": "User.schema.json#/definitions/name" }
 		},
-		"lock": { "$ref": "SlideLock.schema.json" },
+		"lock": {
+			"oneOf": [
+				{"$ref": "SlideLock.schema.json" },
+				{"type": "null"}
+			]
+		},
 		"assets": {
 			"type": "array",
 			"items": { "$ref": "SlideAsset.schema.json" }
