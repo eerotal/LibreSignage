@@ -34,6 +34,7 @@ use \api\APIEndpoint;
 use \api\APIException;
 use \api\HTTPStatus;
 use \common\php\slide\Slide;
+use \common\php\slide\SlideLockException;
 
 APIEndpoint::POST(
 	[

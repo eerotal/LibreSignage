@@ -11,11 +11,10 @@ use \common\php\auth\Session;
 use \common\php\Queue;
 use \common\php\slide\SlideLock;
 use \common\php\slide\SlideAsset;
+use \common\php\slide\SlideLockException;
 use \common\php\Log;
 use \common\php\exceptions\ArgException;
 use \common\php\exceptions\IntException;
-
-final class SlideLockException extends \Exception {};
 
 final class Slide extends Exportable {
 	static $PUBLIC = [
