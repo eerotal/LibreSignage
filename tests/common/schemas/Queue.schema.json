@@ -1,7 +1,7 @@
 {
 	"definitions": {
 		"owner": { "$ref": "User.schema.json#/definitions/name" },
-		"slides": {
+		"slide_ids": {
 			"type": "array",
 			"items": { "$ref": "Slide.schema.json#/definitions/id" }
 		},
@@ -14,9 +14,10 @@
 
 	"type": "object",
 	"properties": {
+		"name": { "$ref": "#/definitions/name" },
 		"owner": { "$ref": "#/definitions/owner" },
-		"slides": { "$ref": "#/definitions/slides" }
+		"slide_ids": { "$ref": "#/definitions/slide_ids" }
 	},
-	"required": ["owner", "slides"],
+	"required": ["owner", "slide_ids"],
 	"additionalProperties": false
 }

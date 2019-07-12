@@ -7,7 +7,7 @@
 	"type": "object",
 	"properties": {
 		"session_id": { "$ref": "#/definitions/session_id" },
-		"expire": { "$ref": "#/definitions/expire" },
+		"expire": { "$ref": "#/definitions/expire" }
 	},
 	"required": ["session_id", "expire"],
 	"additionalProperties": false

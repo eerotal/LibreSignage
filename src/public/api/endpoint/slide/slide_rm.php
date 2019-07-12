@@ -20,6 +20,8 @@ use \api\APIEndpoint;
 use \api\APIException;
 use \api\HTTPStatus;
 use \common\php\slide\Slide;
+use \common\php\slide\Queue;
+use \common\php\auth\User;
 
 APIEndpoint::POST(
 	[
@@ -45,7 +47,9 @@ APIEndpoint::POST(
 
 		$slide = new Slide();
 		$slide->load($params->id);
-		$owner = new User($slide->get_owner());
+
+		$owner = new User();
+		$owner->load($slide->get_owner());
 
 		if (
 			!$caller->is_in_group('admin')
@@ -55,18 +59,13 @@ APIEndpoint::POST(
 			)
 		) {
 			throw new APIException(
-				'Not authorized because user is not either in the group admin or '.
-				'owner of the slide and in the group editor.',
+				'Not authorized because user is not either in the group '.
+				'admin or owner of the slide and in the group editor.',
 				HTTPStatus::UNAUTHORIZED
 			);
 		}
 
 		$slide->remove();
-
-		// Normalize slide indices now that one is left unused.
-		$queue = new Queue($slide->get_queue_name());
-		$queue->load();
-		$queue->normalize();
 
 		$owner->get_quota()->free_quota('slides');
 		$owner->write();

@@ -13,6 +13,7 @@ final class Util {
 	* Recursively remove a directory and files within it.
 	*
 	* @param string $path The path to remove.
+	*
 	* @throws IntException if scandir() fails.
 	* @throws IntException if unlink() fails.
 	* @throws IntException if rmdir() fails.
@@ -26,7 +27,7 @@ final class Util {
 
 		foreach ($files as $f) {
 			if (is_dir($path.'/'.$f)) {
-				rmdir_recursive($path.'/'.$f);
+				self::rmdir_recursive($path.'/'.$f);
 			} else {
 				if (!unlink($path.'/'.$f)) {
 					throw new IntException('unlink() failed.');

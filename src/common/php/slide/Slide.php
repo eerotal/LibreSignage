@@ -12,6 +12,8 @@ use \common\php\Queue;
 use \common\php\slide\SlideLock;
 use \common\php\slide\SlideAsset;
 use \common\php\Log;
+use \common\php\exceptions\ArgException;
+use \common\php\exceptions\IntException;
 
 final class SlideLockException extends \Exception {};
 
@@ -125,10 +127,10 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Generate a new ID for the loaded slide.
+	* Generate a new ID for a slide.
 	*/
-	private function gen_id() {
-		$this->id = get_uid();
+	public function gen_id() {
+		$this->id = Util::get_uid();
 	}
 
 	/**
@@ -196,8 +198,8 @@ final class Slide extends Exportable {
 	* @throes ArgException if the slide name is longer than SLIDE_NAME_MAX_LEN chars.
 	*/
 	public static function validate_name(string $name) {
-		$tmp = preg_match('/[^a-zA-Z0-9_-]/', $name);
-		if ($tmp) {
+		$tmp = preg_match('/^[A-Za-z0-9_-]+$/', $name);
+		if ($tmp === 0) {
 			throw new ArgException("Invalid chars in slide name.");
 		} else if ($tmp === NULL) {
 			throw new IntException("preg_match() match failed.");
@@ -431,8 +433,8 @@ final class Slide extends Exportable {
 
 			// Add slide to the the new queue.
 			$this->queue_name = $name;
-			$n = new Queue($name);
-			$n->load();
+			$n = new Queue();
+			$n->load($name);
 			$n->add($this);
 			$n->write();
 		}
@@ -444,25 +446,13 @@ final class Slide extends Exportable {
 	* @param array $collaborators An array of collaborator usernames.
 	*
 	* @throws ArgException if count($collaborators) > SLIDE_MAX_COLLAB.
-	* @throws ArgException if the slide owner is not set.
-	* @throws ArgException if the slide owner is a collaborator.
 	* @throws ArgException if a collaborator doesn't exist.
 	*/
 	public static function validate_collaborators(array $collaborators) {
 		if (count($collaborators) > Config::limit('SLIDE_MAX_COLLAB')) {
-			throw new ArgException( "Too many collaborators.");
-		}
-		if (empty($this->get_owner())) {
-			throw new ArgException(
-				"Can't set collaborators before owner."
-			);
+			throw new ArgException("Too many collaborators.");
 		}
 		foreach ($collaborators as $k => $c) {
-			if ($c == $this->get_owner()) {
-				throw new ArgException(
-					"Can't set owner as collaborator."
-				);
-			}
 			if (!User::exists($c)) {
 				throw new ArgException("User $c doesn't exist.");
 			}
@@ -474,10 +464,19 @@ final class Slide extends Exportable {
 	*
 	* @see Slide::validate_collaborators() for validation exceptions.
 	*
+	* @throws ArgException if the slide owner is not set.
+	* @throws ArgException if the slide owner is a collaborator.
+	*
 	* @param array $collaborators An array of collaborator usernames.
 	*/
 	function set_collaborators(array $collaborators) {
 		self::validate_collaborators($collaborators);
+		if (empty($this->get_owner())) {
+			throw new ArgException("Can't set collaborators before owner.");
+		}
+		if (in_array($this->get_owner(), $collaborators)) {
+			throw new ArgException("Can't set owner as collaborator.");
+		}
 		$this->collaborators = $collaborators;
 	}
 
@@ -665,10 +664,6 @@ final class Slide extends Exportable {
 	*/
 	public function write() {
 		$tmp = '';
-
-		// Generate an ID for unsaved slides.
-		if (empty($this->id)) { $this->gen_id(); }
-
 		$this->assert_ready();
 
 		if (!is_dir(self::get_dir_path($this->id))) {
@@ -730,8 +725,8 @@ final class Slide extends Exportable {
 	public function get_assets() { return $this->assets; }
 
 	public function get_queue(): Queue {
-		$queue = new Queue($this->queue_name);
-		$queue->load();
+		$queue = new Queue();
+		$queue->load($this->queue_name);
 		return $queue;
 	}
 

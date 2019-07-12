@@ -2,7 +2,7 @@
 	"definitions": {
 		"created": {
 			"type": "integer",
-			"minimum": "0"
+			"minimum": 0
 		},
 		"from": {
 			"type": "string",

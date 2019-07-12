@@ -27,6 +27,6 @@ APIEndpoint::GET(
 		'APIRateLimitModule' => []
 	],
 	function($req, $params, $module_data) {
-		return ['slides' => slides_id_list()];		
+		return ['slides' => Slide::list_ids()];
 	}
 );

@@ -19,19 +19,21 @@ final class Queue extends Exportable {
 	static $PRIVATE = [
 		'name',
 		'owner',
-		'slides'
+		'slide_ids'
 	];
 
 	static $PUBLIC = [
+		'name',
 		'owner',
-		'slides'
+		'slide_ids'
 	];
 
 	const NAME_REGEX = '/^[A-Za-z0-9_-]+$/';
 
-	private $name   = '';
-	private $owner  = '';
-	private $slides = [];
+	private $name      = '';
+	private $owner     = '';
+	private $slides    = [];
+	private $slide_ids = [];
 
 	public function __exportable_set(string $name, $value) {
 		$this->{$name} = $value;
@@ -55,18 +57,17 @@ final class Queue extends Exportable {
 
 		$json = Util::file_lock_and_get(self::get_path($name));
 		$this->import(JSONUtils::decode($json, $assoc=TRUE));
+
+		$this->load_slide_objects();
 	}
 
 	/**
-	* Remove broken slides from the loaded queue.
-	*
-	* @return bool TRUE if slides were removed, FALSE otherwise.
+	* Load the slide objects of a Queue and remove any
+	* broken slides.
 	*/
-	public function remove_broken_slides(): bool {
-		$fixed = FALSE;
+	public function load_slide_objects() {
 		$s = NULL;
-
-		foreach ($this->slides as &$n) {
+		foreach ($this->slide_ids as &$n) {
 			$s = new Slide();
 			try {
 				$s->load($n);
@@ -74,13 +75,11 @@ final class Queue extends Exportable {
 				if (
 					$e instanceof IntException
 					|| $e instanceof JSONException
-				) {
-					$n = NULL;
-					$fixed = TRUE;
-				}
+				) { $n = NULL; }
 			}
+			if ($n) { $this->slides[] = $s; }
 		}
-		return $fixed;
+		$this->normalize();
 	}
 
 	/**
@@ -231,7 +230,9 @@ final class Queue extends Exportable {
 	* @param Slide $slide The slide object to add.
 	*/
 	public function add(Slide $slide) {
+		$this->slide_ids[] = $slide->get_id();
 		$this->slides[] = $slide;
+		$this->normalize();
 	}
 
 	/**
@@ -240,12 +241,19 @@ final class Queue extends Exportable {
 	* @param Slide $slide The slide object to remove.
 	*/
 	public function remove_slide(Slide $slide) {
+		$this->slide_ids = array_filter(
+			$this->slide_ids,
+			function($id) use ($slide) {
+				return $id !== $slide->get_id();
+			}
+		);
 		$this->slides = array_filter(
 			$this->slides,
 			function($s) use ($slide) {
-				return $s->get_id() != $slide->get_id();
+				return $s->get_id() !== $slide->get_id();
 			}
 		);
+		$this->normalize();
 	}
 
 	/**

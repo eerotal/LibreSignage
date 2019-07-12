@@ -1,6 +1,7 @@
 {
+	"name": "default",
 	"owner": "admin",
-	"slides": [
+	"slide_ids": [
 		"1",
 		"2",
 		"3"

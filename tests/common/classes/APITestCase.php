@@ -130,6 +130,8 @@ class APITestCase extends TestCase {
 	* @param int    $error   The expected HTTP status code.
 	* @param string $user    The username to use or NULL for no login.
 	* @param string $pass    The password to use or NULL for no login. 
+	*
+	* @return Response The response returned by the API.
 	*/
 	public function call_api_and_assert_failed(
 		array $params,
@@ -154,6 +156,8 @@ class APITestCase extends TestCase {
 		if ($user !== NULL && $pass !== NULL) {
 			$this->api->logout();
 		}
+
+		return $resp;
 	}
 
 	/**
@@ -172,6 +176,8 @@ class APITestCase extends TestCase {
 	* @param string $schema_path  The path to the expected response schema.
 	* @param string $user         The username to use or NULL for no login.
 	* @param string $pass         The password to use or NULL for no login. 
+	*
+	* @return Response The response returned by the API.
 	*/
 	public function call_api_and_check_response_schema(
 		array $params,
@@ -184,17 +190,22 @@ class APITestCase extends TestCase {
 			$this->api->login($user, $pass);
 		}
 
-		$resp = $this->api->call(
+		$resp = $this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
 			$params,
 			$headers,
 			$user !== NULL && $pass !== NULL
 		);
-		self::assert_object_matches_schema($resp, $schema_path);
+		self::assert_object_matches_schema(
+			APIInterface::decode_raw_response($resp),
+			$schema_path
+		);
 
 		if ($user !== NULL && $pass !== NULL) {
 			$this->api->logout();
 		}
+
+		return $resp;
 	}
 }

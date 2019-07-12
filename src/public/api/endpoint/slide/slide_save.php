@@ -39,7 +39,7 @@
 *
 *  Parameters
 *    * id            = The ID of the slide to modify or either
-*      undefined or null for new slide.
+*                      undefined or null for new slide.
 *    * name          = The name of the slide.
 *    * index         = The index of the slide.
 *    * duration      = The duration of the slide.
@@ -68,7 +68,10 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 use \api\APIEndpoint;
 use \api\APIException;
 use \api\HTTPStatus;
+use \common\php\Queue;
 use \common\php\slide\Slide;
+use \common\php\auth\User;
+use \common\php\auth\Session;
 
 APIEndpoint::POST(
 	[
@@ -100,6 +103,19 @@ APIEndpoint::POST(
 					],
 					'lock' => [],
 					'assets' => []
+				],
+				'required' => [
+					'name',
+					'index',
+					'markup',
+					'duration',
+					'enabled',
+					'sched',
+					'sched_t_s',
+					'sched_t_e',
+					'animation',
+					'queue_name',
+					'collaborators'
 				]
 			]
 		]
@@ -191,8 +207,6 @@ function set_slide_data(Slide $slide, $data, bool $owner): void {
 	$slide->set_sched_t_s($data->sched_t_s);
 	$slide->set_sched_t_e($data->sched_t_e);
 	$slide->set_animation($data->animation);
-
-	$slide->set_ready(TRUE);
 	$slide->check_sched_enabled();
 }
 
@@ -216,7 +230,7 @@ function create_slide(User $caller, Session $session, Slide $slide, $data) {
 		*/
 		$queue = new Queue();
 		$queue->load($slide->get_queue_name());
-		$queue->remove_broken_slides(); 
+		$queue->remove_slide($slide);
 		$queue->write();
 
 		throw new APIException(
@@ -243,8 +257,8 @@ function finish(Slide $slide) {
 	$slide->write();
 
 	// Juggle slide indices.
-	$queue = new Queue($slide->get_queue_name());
-	$queue->load();
+	$queue = new Queue();
+	$queue->load($slide->get_queue_name());
 	$queue->juggle($slide->get_id());
 
 	// Get the slide data from $queue since $queue->juggle() modifies it.
