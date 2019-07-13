@@ -127,10 +127,10 @@ APIEndpoint::POST(
 		$slide = new Slide();
 
 		/*
-		*  Check permissions and route the API call to the correct
-		*  handler function.
+		* Check permissions and route the API call to the correct
+		* handler function.
 		*/
-		if ($params->id !== NULL) {
+		if (property_exists($params, 'id') && $params->id !== NULL) {
 			$slide->load($params->id);
 			if (
 				$caller->is_in_group('admin')
