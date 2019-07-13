@@ -128,7 +128,7 @@ class auth_login extends APITestCase {
 					'password' => 'admin',
 					'who' => 'LibreSignage-Unit-Tests',
 				],
-				HTTPStatus::OK
+				HTTPStatus::BAD_REQUEST
 			],
 			'Wrong type for permanent parameter' => [
 				[
