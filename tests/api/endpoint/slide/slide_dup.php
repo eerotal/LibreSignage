@@ -19,7 +19,6 @@ class slide_dup extends APITestCase {
 
 		// Create an initial slide to duplicate.
 		$this->api->login('admin', 'admin');
-
 		$resp = $this->api->call_return_raw_response(
 			'POST',
 			'slide/slide_save.php',
@@ -43,6 +42,8 @@ class slide_dup extends APITestCase {
 			[],
 			TRUE
 		);
+		$this->api->logout();
+
 		if ($resp->getStatusCode() !== HTTPStatus::OK) {
 			throw new Exception(
 				"Failed to create initial slide: ".
@@ -50,8 +51,6 @@ class slide_dup extends APITestCase {
 			);
 		}
 		$this->orig_slide_id = APIInterface::decode_raw_response($resp)->id;
-
-		$this->api->logout();
 	}
 
 	/**

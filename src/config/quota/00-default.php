@@ -11,7 +11,7 @@ return [
 		'description' => 'Slides'
 	],
 	'api_rate' => [
-		'limit' => 200,
+		'limit' => 400,
 		'description' => 'API rate quota'
 	]
 ];
