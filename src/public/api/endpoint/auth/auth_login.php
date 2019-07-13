@@ -10,7 +10,7 @@
 *    * username    = Username
 *    * password    = Password
 *    * who         = A string that identifies the caller.
-*    * permanent   = Create permanent session. Optional, FALSE by default.
+*    * permanent   = If TRUE, create a permanent session.
 *
 *  Return value
 *    * user    = Current user data.
@@ -39,9 +39,9 @@ APIEndpoint::POST(
 					'username' => ['type' => 'string'],
 					'password' => ['type' => 'string'],
 					'who' => ['type' => 'string'],
-					'permanent' => ['type' => 'boolean', 'default' => FALSE]
+					'permanent' => ['type' => 'boolean']
 				],
-				'required' => ['username', 'password', 'who']
+				'required' => ['username', 'password', 'who', 'permanent']
 			]
 		]
 	],
