@@ -32,6 +32,30 @@ class slide_save extends APITestCase {
 		$this->set_endpoint_uri('slide/slide_save.php');
 	}
 
+	public function setup_create_slide(
+		string $user,
+		string $pass,
+		array $params
+	) {
+		// Create a slide for testing.
+		$this->api->login($user, $pass);
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			$params,
+			[],
+			TRUE
+		);
+		if ($resp->getStatusCode() !== HTTPStatus::OK) {
+			throw new Exception(
+				'Failed to create slide for testing: '.
+				(string) $resp->getBody()
+			);
+		}
+		$this->slide_id = APIInterface::decode_raw_response($resp)->id;
+		$this->api->logout();
+	}
+
 	/**
 	* @dataProvider params_provider
 	*/
@@ -54,7 +78,6 @@ class slide_save extends APITestCase {
 	}
 
 	public static function params_provider(): array {
-
 		return [
 			'Valid parameters' => [
 				'admin',
@@ -295,61 +318,65 @@ class slide_save extends APITestCase {
 				'display',
 				self::VALID_PARAMS,
 				HTTPStatus::UNAUTHORIZED
-			],
-			'Slide owner saves slide' => [
-				'admin',
-				'admin',
-				array_merge(self::VALID_PARAMS, ['id' => '1']),
-				HTTPStatus::UNAUTHORIZED
-			],
-			'Non slide owner tries to save slide' => [
-				'user',
-				'user',
-				array_merge(self::VALID_PARAMS, ['id' => '1']),
-				HTTPStatus::UNAUTHORIZED
-			],
-			'User not in editor or admin groups tries to save slide' => [
-				'display',
-				'display',
-				array_merge(self::VALID_PARAMS, ['id' => '1']),
-				HTTPStatus::UNAUTHORIZED
-			]
+			 ]
 		];
 	}
 
-	public function test_allow_collaborators_to_edit_slides() {
-		// Create a slide for testing.
-		$this->api->login('admin', 'admin');
-		$resp = $this->api->call_return_raw_response(
-			$this->get_endpoint_method(),
-			$this->get_endpoint_uri(),
-			self::VALID_PARAMS,
-			[],
-			TRUE
-		);
-		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new Exception(
-				'Failed to create slide for testing: '.
-				(string) $resp->getBody()
-			);
-		}
-		$this->slide_id = APIInterface::decode_raw_response($resp)->id;
-		$this->api->logout();
+	public function test_fail_when_modifying_unlocked_slide() {
+		$this->setup_create_slide('admin', 'admin', self::VALID_PARAMS);
 
-		// Try to modify the slide as a collaborator.
-		$this->api->login('user', 'user');
+		$this->api->login('admin', 'admin');
 		$resp = $this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
 			array_merge(
 				self::VALID_PARAMS,
-				['markup' => 'Different Test Markup']
+				[
+					'id' => $this->slide_id,
+    				'markup' => 'Modified'
+				]
 			),
 			[],
 			TRUE
 		);
-		$this->assert_api_succeeded($resp);
 		$this->api->logout();
+
+		$this->assert_api_failed($resp, HTTPStatus::FAILED_DEPENDENCY);
+	}
+
+	public function test_succeed_when_modifying_locked_slide() {
+		$this->setup_create_slide('admin', 'admin', self::VALID_PARAMS);
+
+		// Lock the slide.
+		$this->api->login('admin', 'admin');
+		$resp = $this->api->call_return_raw_response(
+			'POST',
+			'slide/slide_lock_acquire.php',
+			['id' => $this->slide_id],
+			[],
+			TRUE
+		);
+		$this->assert_api_succeeded(
+			$resp,
+			'Failed to lock slide as owner.'
+		);
+
+		// Try to modify the slide.
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			array_merge(
+				array_merge(self::VALID_PARAMS, ['id' => $this->slide_id]),
+				['markup' => 'Modified']
+			),
+			[],
+			TRUE
+		);
+		$this->api->logout();
+		$this->assert_api_succeeded(
+			$resp,
+			'Failed to save slide as a collaborator.'
+		);
 	}
 
 	public function test_is_response_schema_correct() {
