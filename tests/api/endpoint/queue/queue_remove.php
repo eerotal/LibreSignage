@@ -85,6 +85,16 @@ class queue_remove extends APITestCase {
 		];
 	}
 
+	public function test_is_response_schema_correct() {
+		$this->call_api_and_check_response_schema(
+			['name' => self::TEST_QUEUE_NAME],
+			[],
+			dirname(__FILE__).'/schemas/queue_remove.schema.json',
+			'admin',
+			'admin'
+		);
+	}
+
 	public function tearDown(): void {
 		// Make sure the initial slide is removed.
 		$this->api->login('admin', 'admin');
