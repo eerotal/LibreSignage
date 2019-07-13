@@ -10,6 +10,7 @@ use \JsonSchema\Validator;
 use \JsonSchema\Constraints\Constraint;
 use \common\php\JSONUtils;
 use \common\php\exceptions\JSONException;
+use \common\php\Util;
 
 /**
 * API module for validating and decoding a request
@@ -41,8 +42,8 @@ class APIJSONValidatorModule extends APIModule {
 		$validator = new Validator();
 		$validator->validate(
 			$data,
-			$args['schema'],
-			Constraint::CHECK_MODE_APPLY_DEFAULTS
+			Util::assoc_array_to_object($args['schema']),
+			Constraint::CHECK_MODE_NORMAL
 		);
 
 		if (!$validator->isValid()) {
