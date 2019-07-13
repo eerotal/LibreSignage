@@ -241,18 +241,18 @@ final class Queue extends Exportable {
 	* @param Slide $slide The slide object to remove.
 	*/
 	public function remove_slide(Slide $slide) {
-		$this->slide_ids = array_filter(
+		$this->slide_ids = array_values(array_filter(
 			$this->slide_ids,
 			function($id) use ($slide) {
 				return $id !== $slide->get_id();
 			}
-		);
-		$this->slides = array_filter(
+		));
+		$this->slides = array_values(array_filter(
 			$this->slides,
 			function($s) use ($slide) {
 				return $s->get_id() !== $slide->get_id();
 			}
-		);
+		));
 		$this->normalize();
 	}
 
