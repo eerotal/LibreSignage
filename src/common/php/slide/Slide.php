@@ -561,10 +561,11 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Remove an uploaded asset from the 'assets' directory of this slide.
+	* Remove an uploaded asset from a slide.
 	*
-	* @param string $name The name of the asset to remove.
-	* @throws ArgException if the asset $name doesn't exist.
+	* @param string $name The name of the asset.
+	*
+	* @throws ArgException if the assetdoesn't exist.
 	*/
 	public function remove_uploaded_asset(string $name) {
 		$this->assert_ready();
@@ -583,20 +584,19 @@ final class Slide extends Exportable {
 	* Get the SlideAsset named $name.
 	*
 	* @param string $name The name of the asset.
-	* @return SlideAsset|NULL The requested SlideAsset or NULL
-	*                         if it doesn't exist.
+	*
+	* @throws ArgException if the asset doesn't exist.
+	*
+	* @return SlideAsset The requested asset.
 	*/
-	public function get_uploaded_asset(string $name) {
-		if (empty($this->assets)) { return NULL; }
+	public function get_uploaded_asset(string $name): SlideAsset {
 		foreach ($this->assets as $a) {
-			if ($a->get_filename() === $name) {
-				return $a;
-			}
+			if ($a->get_filename() === $name) { return $a; }
 		}
-		return NULL;
+		throw new ArgException("Asset '$name' doesn't exist.");
 	}
 
-	public function has_uploaded_asset(string $name) {
+	public function has_uploaded_asset(string $name): bool {
 		return $this->get_uploaded_asset($name) !== NULL;
 	}
 

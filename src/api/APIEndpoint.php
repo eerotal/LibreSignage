@@ -44,10 +44,12 @@ class APIEndpoint {
 		// Run the endpoint hook function.
 		$ret = $hook($this->request, $this->response, $this->module_data);
 
-		// Send $ret as the response if it's an array.
+		// Send $ret as the response if it's an array or Response.
 		if (is_array($ret)) {
 			$this->response->headers->set('Content-Type', 'application/json');
 			$this->response->setContent(JSONUtils::encode((object) $ret));
+		} else if ($ret instanceof Response) {
+			$this->response = $ret;
 		}
 
 		$this->send();
