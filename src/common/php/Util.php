@@ -224,4 +224,95 @@ final class Util {
 		$len = ($len === NULL) ? Config::config('DEFAULT_UID_LEN') : $len;
 		return bin2hex(random_bytes(ceil($len/2)));
 	}
+
+	/**
+	* Check whether an array is numerically indexed.
+	*
+	* @param array $arr The array to check.
+	*
+	* @return bool TRUE if $arr is numerically indexed and FALSE otherwise.
+	*/
+	public static function array_is_numerically_indexed(array $arr): bool {
+		return count(array_filter(array_keys($arr), '\is_string')) === 0;
+	}
+
+
+	/**
+	* Recursively convert an associative array (or object) into an object.
+	*
+	* @param array|object $arr      The array or object to convert.
+	* @param array $prev            An internal variable used to keep track of
+	*                               recursion in objects.
+	* @param bool $preserve_num_arr If TRUE, numerically indexed arrays are
+	*                               preserved. All objects in arrays are still
+	*                               converted normally.
+	*
+	* @return object|array          The converted object or in some cases an
+	*                               array if $preserve_num_arr is TRUE.
+	*/
+	public static function assoc_array_to_object(
+		$arr,
+		bool $preserve_num_arr = TRUE,
+		array $prev = []
+	) {
+		assert(is_array($arr) || is_object($arr));
+
+		$ret_arr = [];
+		$ret_obj = new \stdClass();
+		$circular = FALSE;
+
+		/*
+		* Special case for preserving numerically indexed arrays when
+		* $preserve_num_arr == TRUE.
+		*/
+		if (
+			\is_array($arr)
+			&& self::array_is_numerically_indexed($arr)
+			&& $preserve_num_arr
+		) {
+			foreach ($arr as $value) {
+				if (is_array($value) || is_object($value)) {
+					$ret_arr[] = self::assoc_array_to_object(
+						$value,
+						TRUE,
+						array_merge(
+							$prev,
+							[(object) ['from' => $arr, 'to' => $ret_arr]]
+						)
+					);
+				} else {
+					$ret_arr[] = $value;
+				}
+			}
+			return $ret_arr;
+		}
+
+		// Convert $arr to and object recursively.
+		foreach ($arr as $key => $value) {
+			if (is_array($value) || is_object($value)) {
+				foreach ($prev as $tmp) {
+					if ($tmp->from === $value) {
+						$ret_obj->{$key} = $tmp->to;
+						$circular = TRUE;
+					}
+				}
+				if ($circular) {
+					$circular = FALSE;
+					continue;
+				}
+
+				$ret_obj->{$key} = self::assoc_array_to_object(
+					$value,
+					$preserve_num_arr,
+					array_merge(
+						$prev,
+						[(object) ['from' => $arr, 'to' => $ret_obj]]
+					)
+				);
+			} else {
+				$ret_obj->{$key} = $value;
+			}
+		}
+		return $ret_obj;
+	}
 }
