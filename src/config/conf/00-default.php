@@ -62,7 +62,7 @@ return [
 
 	'THUMB_MAXW'            => 320,
 	'THUMB_MAXH'            => 180,
-	'THUMB_EXT'             => '.png',
+	'THUMB_MIME'            => 'image/png',
 
 	'ASSET_FILENAME_MAXLEN' => 64,
 

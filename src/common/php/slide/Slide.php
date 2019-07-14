@@ -15,6 +15,7 @@ use \common\php\slide\SlideLockException;
 use \common\php\Log;
 use \common\php\exceptions\ArgException;
 use \common\php\exceptions\IntException;
+use \Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class Slide extends Exportable {
 	static $PUBLIC = [
@@ -540,10 +541,11 @@ final class Slide extends Exportable {
 	* Store an uploaded asset in the 'assets' directory of this
 	* slide. This function also generates a thumbnail for the asset.
 	*
-	* @param array $file The upload data from $_FILE.
+	* @param UploadedFile $file The upload data from $_FILE.
+	*
 	* @throws LimitException if the asset limit SLIDE_MAX_ASSETS is reached.
 	*/
-	public function store_uploaded_asset(array $file) {
+	public function store_uploaded_asset(UploadedFile $file) {
 		$this->assert_ready();
 
 		if (
@@ -552,9 +554,11 @@ final class Slide extends Exportable {
 		) {
 			throw new LimitException('Too many slide assets.');
 		}
+
 		if (!is_dir(self::get_asset_path($this->id))) {
 			mkdir(self::get_asset_path($this->id));
 		}
+
 		$asset = new SlideAsset();
 		$asset->new($file, $this);
 		$this->assets[] = $asset;
@@ -597,7 +601,12 @@ final class Slide extends Exportable {
 	}
 
 	public function has_uploaded_asset(string $name): bool {
-		return $this->get_uploaded_asset($name) !== NULL;
+		try {
+			$this->get_uploaded_asset($name);
+		} catch (ArgException $e) {
+			return FALSE;
+		}
+		return TRUE;
 	}
 
 	public function set_assets(array $assets) {
@@ -691,7 +700,7 @@ final class Slide extends Exportable {
 		Util::rmdir_recursive(self::get_dir_path($this->id));
 	}
 
-	private static function get_dir_path(string $id): string {
+	public static function get_dir_path(string $id): string {
 		assert(!empty($id), new \ArgException("Slide ID can't be empty."));
 
 		return Config::config('LIBRESIGNAGE_ROOT')
@@ -699,11 +708,11 @@ final class Slide extends Exportable {
 			.'/'.$id;
 	}
 
-	private static function get_conf_path(string $id): string {
+	public static function get_conf_path(string $id): string {
 		return self::get_dir_path($id).'/conf.json';
 	}
 
-	private static function get_asset_path(string $id): string {
+	public static function get_asset_path(string $id): string {
 		return self::get_dir_path($id).'/assets';
 	}
 

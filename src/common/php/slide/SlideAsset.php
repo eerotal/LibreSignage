@@ -7,6 +7,8 @@ use \common\php\Config;
 use \common\php\Exportable;
 use \common\php\slide\Slide;
 use \common\php\thumbnail\Thumbnail;
+use \Symfony\Component\HttpFoundation\File\UploadedFile;
+use \Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /**
 * A class for handling file uploads to slides.
@@ -26,6 +28,7 @@ final class SlideAsset extends Exportable {
 	];
 
 	const FILENAME_REGEX = '/^[ A-Za-z0-9_.-]*$/';
+	const THUMB_SUFFIX   = '_thumb';
 
 	private $filename = NULL;
 	private $mime = NULL;
@@ -43,50 +46,65 @@ final class SlideAsset extends Exportable {
 	}
 
 	/**
+	* Validate an UploadedFile.
+	*
+	* @throws ArgException if the original filename is too long.
+	* @throws ArgException if the original filename contains invalid chars.
+	* @throws ArgException if the mime type of the file is invalid.
+	*/
+	public static function validate_file(UploadedFile $file) {
+		$name = $file->getClientOriginalName();
+		if (strlen($name) > Config::limit('SLIDE_ASSET_NAME_MAX_LEN')) {
+			throw new ArgException('Filename too long.');
+		}
+		if (!preg_match(SlideAsset::FILENAME_REGEX, $name)) {
+			throw new ArgException('Filename contains invalid characters.');
+		}
+		if (
+			!in_array(
+				$file->getMimeType(),
+				Config::limit('SLIDE_ASSET_VALID_MIMES'),
+				TRUE
+			)
+		) { throw new FileTypeException('Invalid file MIME type.'); }
+	}
+
+	/**
 	* Create a new asset instance and move the uploaded asset to
 	* the asset store of $slide.
 	*
-	* @param array $file        The upload data for a single file from $_FILES.
+	* @see SlideAsset::validate_file() for validation exceptions.
+	*
+	* @param UploadedFile $file The upload data for a single file.
 	* @param Slide $slide       The slide to move the asset to.
 	*
-	* @throws ArgException      if the asset filename is longer
-	*                           than SLIDE_ASSET_NAME_MAX_LEN
-	* @throws ArgException      if the asset name contains invalid chars.
-	* @throws FileTypeException if the asset MIME type is not allowed.
-	* @throws IntException      if move_uploaded_file() fails.
+	* @throws IntException      if moving the file fails.
 	*/
-	public function new(array $file, Slide $slide) {
-		assert(
-			!empty($file),
-			new ArgException('$file cannot be empty')
-		);
-
-		if (strlen($file['name']) > Config::limit('SLIDE_ASSET_NAME_MAX_LEN')) {
-			throw new ArgException('Asset filename too long.');
-		}
-
-		if (!preg_match(SlideAsset::FILENAME_REGEX, $file['name'])) {
-			throw new ArgException('Asset name contains invalid characters.');
-		}
+	public function new(UploadedFile $file, Slide $slide) {
+		self::validate_file($file);
 
 		$this->slide_id = $slide->get_id();
+		$this->mime = $file->getMimeType();
+		$this->filename = $file->getClientOriginalName();
 		$this->gen_uid();
 
-		$this->filename = basename($file['name']);
-		$this->mime = mime_content_type($file['tmp_name']);
-
-		if (!in_array($this->mime, Config::limit('SLIDE_ASSET_VALID_MIMES'), TRUE)) {
-			throw new FileTypeException('Invalid asset MIME type.');
-		}
-		if (!move_uploaded_file($file['tmp_name'], $this->get_internal_path())) {
+		try {
+			$file->move(
+				$this->get_internal_dir(),
+				$this->get_internal_name()
+			);
+		} catch (FileException $e) {
 			throw new IntException('Failed to store uploaded asset.');
 		}
 
 		$this->has_thumb = TRUE;
 		try {
-			Thumbnail::create(
+			$thumb = new Thumbnail();
+			$thumb->create(
 				$this->get_internal_path(),
-				$this->get_internal_thumb_path(),
+				$this->get_internal_thumb_dir(),
+				self::THUMB_SUFFIX,
+				Config::config('THUMB_MIME'),
 				Config::config('THUMB_MAXW'),
 				Config::config('THUMB_MAXH')
 			);
@@ -133,7 +151,7 @@ final class SlideAsset extends Exportable {
 	* Generate a new UID for an asset.
 	*/
 	public function gen_uid() {
-		$this->uid = get_uid();
+		$this->uid = Util::get_uid();
 	}
 
 	/**
@@ -142,7 +160,16 @@ final class SlideAsset extends Exportable {
 	* @return string The internal asset filename.
 	*/
 	public function get_internal_name(): string {
-		return $this->uid.explode('/', $this->mime)[1];
+		return $this->uid.'.'.explode('/', $this->mime)[1];
+	}
+
+	/**
+	* Get the internal directory path of an asset.
+	*
+	* @return string The internal directory path.
+	*/
+	public function get_internal_dir(): string {
+		return Slide::get_asset_path($this->slide_id);
 	}
 
 	/**
@@ -151,9 +178,7 @@ final class SlideAsset extends Exportable {
 	* @return string The internal asset path.
 	*/
 	public function get_internal_path(): string {
-		$s = new Slide();
-		$s->load($this->slide_id);
-		return $s->get_asset_path().'/'.$this->get_internal_name();
+		return $this->get_internal_dir().'/'.$this->get_internal_name();
 	}
 
 	/**
@@ -162,7 +187,19 @@ final class SlideAsset extends Exportable {
 	* @return string The internal thumbnail filename.
 	*/
 	public function get_internal_thumb_name(): string {
-		return $this->uid.'_thumb'.Config::config('THUMB_EXT');
+		return $this->uid.
+			self::THUMB_SUFFIX.
+			'.'.
+			explode('/', Config::config('THUMB_MIME'))[1];
+	}
+
+	/**
+	* Get the internal directory path for thumbnails.
+	*
+	* @return string The thumbnail directory path.
+	*/
+	public function get_internal_thumb_dir(): string {
+		return Slide::get_asset_path($this->slide_id);
 	}
 
 	/**
@@ -171,9 +208,7 @@ final class SlideAsset extends Exportable {
 	* @return string The internal thumbnail path.
 	*/
 	public function get_internal_thumb_path(): string {
-		$s = new Slide();
-		$s->load($this->slide_id);
-		return $s->get_asset_path().'/'.$this->get_internal_thumb_name();
+		return $this->get_internal_thumb_dir().'/'.$this->get_internal_thumb_name();
 	}
 
 	public function get_filename()  { return $this->filename;  }
@@ -197,12 +232,22 @@ final class SlideAsset extends Exportable {
 		$asset = clone $this;
 		$asset->gen_uid();		
 
-		if (!copy($this->get_fullpath(), $asset->get_fullpath())) {
+		if (
+			!copy(
+				$this->get_internal_path(),
+				$asset->get_internal_path()
+			)
+		) {
 			throw new IntException('Failed to copy asset.');
 		}
 
 		if ($this->has_thumb()) {
-			if (!copy($this->get_thumbpath(), $asset->get_thumbpath())) {
+			if (
+				!copy(
+					$this->get_internal_thumb_path(),
+					$asset->get_internal_thumb_path()
+				)
+			) {
 				throw new IntException('Failed to copy asset thumbnail.');	
 			}
 		}
