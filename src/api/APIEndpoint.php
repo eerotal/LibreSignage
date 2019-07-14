@@ -5,6 +5,7 @@ namespace api;
 use \api\modules\APIAuthModule;
 use \api\modules\APIJSONValidatorModule;
 use \api\modules\APIQueryValidatorModule;
+use \api\modules\APIMultipartRequestValidatorModule;
 use \api\modules\APIRateLimitModule;
 
 use \api\APIException;

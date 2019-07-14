@@ -11,26 +11,51 @@ use \JsonSchema\Constraints\Constraint;
 use \common\php\JSONUtils;
 use \common\php\exceptions\JSONException;
 use \common\php\Util;
+use \common\php\Log;
 
 /**
-* API module for validating and decoding a request
-* with a JSON body.
+* API module for validating and decoding a request with a JSON body.
 */
 class APIJSONValidatorModule extends APIModule {
 	/**
 	* Decode and validate the request body JSON.
 	*
 	* @see APIModule for argument and return value descriptions.
+	*
+	* @throws APIException if the request Content-Type is not application/json.
+	* @throws APIException if decoding the request JSON fails.
+	* @throws APIException if the request JSON doesn't match the
+	*                      provided JSON schema.
 	*/
 	public function run(APIEndpoint $e, array $args) {
 		$data = NULL;
 		$this->check_args(['schema'], $args);
 
-		if ($e->get_request()->getContent() === '') {
+		$content_type = $e->get_request()->headers->get('Content-Type');
+		if ($content_type !== 'application/json') {
+			throw new APIException(
+				"Wrong Content-Type: $content_type. Expected application/json.",
+				HTTPStatus::BAD_REQUEST
+			);
+		}
+		return $this->validate($e->get_request()->getContent(), $args['schema']);
+	}
+
+	/**
+	* Decode a JSON string and validate the resulting object
+	* against a JSON schema.
+	*
+	* @param string $json         The JSON input string.
+	* @param object|array $schema The JSON schema.
+	*
+	* @return object The decoded and validated JSON.
+	*/
+	public function validate(string $json, $schema) {
+		if ($json === '') {
 			$data = (object) [];
 		} else {
 			try {
-				$data = JSONUtils::decode($e->get_request()->getContent());
+				$data = JSONUtils::decode($json);
 			} catch (JSONException $e) {
 				throw new APIException(
 					$e->getMessage(),
@@ -42,7 +67,7 @@ class APIJSONValidatorModule extends APIModule {
 		$validator = new Validator();
 		$validator->validate(
 			$data,
-			Util::assoc_array_to_object($args['schema']),
+			Util::assoc_array_to_object($schema),
 			Constraint::CHECK_MODE_NORMAL
 		);
 
