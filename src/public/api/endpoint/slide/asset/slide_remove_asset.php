@@ -16,49 +16,55 @@
 *  <====
 */
 
+namespace pub\api\endpoint\slide\asset;
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
-require_once(Config::config('LIBRESIGNAGE_ROOT').'/api/APIInterface.php');
-require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/slide/slide.php');
 
-$SLIDE_REMOVE_ASSET = new APIEndpoint([
-	APIEndpoint::METHOD         => API_METHOD['POST'],
-	APIEndpoint::REQUEST_TYPE   => API_MIME['application/json'],
-	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
-	APIEndpoint::FORMAT_BODY    => [
-		'id' => API_P_STR,
-		'name' => API_P_STR
+use \Symfony\Component\HttpFoundation\BinaryFileResponse;
+use \api\APIEndpoint;
+use \api\APIException;
+use \api\HTTPStatus;
+use \common\php\slide\Slide;
+use \common\php\exceptions\ArgException;
+
+APIEndpoint::POST(
+	[
+		'APIAuthModule' => ['cookie_auth' => FALSE],
+		'APIRateLimitModule' => [],
+		'APIJSONValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'id' => ['type' => 'string'],
+					'name' => ['type' => 'string']
+				],
+				'required' => ['id', 'name']
+			]
+		]
 	],
-	APIEndpoint::REQ_QUOTA      => TRUE,
-	APIEndpoint::REQ_AUTH       => TRUE
-]);
+	function ($req, $resp, $module_data) {
+		$slide = NULL;
 
-$slide = new Slide();
-$slide->load($SLIDE_REMOVE_ASSET->get('id'));
+		$params = $module_data['APIJSONValidatorModule'];
+		$caller = $module_data['APIAuthModule']['user'];
 
-// Allow admins, slide owners and slide collaborators to remove assets.
-if (!(
-	check_perm(
-		'grp:admin;',
-		$SLIDE_REMOVE_ASSET->get_caller()
-	)
-	|| check_perm(
-		'grp:editor&usr:'.$slide->get_owner().';',
-		$SLIDE_REMOVE_ASSET->get_caller())
-	|| (
-		check_perm('grp:editor;', $SLIDE_REMOVE_ASSET->get_caller())
-		&& in_array(
-			$SLIDE_REMOVE_ASSET->get_caller()->get_name(),
-			$slide->get_owner()
-		)
-	)
-)) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		'Not authorized.'
-	);
-}
+		$slide = new Slide();
+		$slide->load($params->id);
 
-$slide->remove_uploaded_asset($SLIDE_REMOVE_ASSET->get('name'));
-$slide->write();
+		if (!$slide->can_modify($caller)) {
+			throw new APIException(
+				'User not authorized to remove asset.',
+				HTTPStatus::UNAUTHORIZED
+			);
+		}
 
-$SLIDE_REMOVE_ASSET->send();
+		try {
+			$slide->remove_uploaded_asset($params->name);
+		} catch (ArgException $e) {
+			throw new APIException('No such asset.', HTTPStatus::NOT_FOUND);
+		}
+		$slide->write();
+
+		return [];
+	}
+);

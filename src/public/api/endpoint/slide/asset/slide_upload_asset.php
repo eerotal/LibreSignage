@@ -34,79 +34,85 @@
 *  Return value
 *    * failed        = The number of failed uploads.
 *    * upload_errors = Error codes for failed uploads.
-*    * error         = An error code or API_E_OK on success.
 *
 *  <====
 */
 
+namespace pub\api\endpoint\slide\asset;
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
-require_once(Config::config('LIBRESIGNAGE_ROOT').'/api/APIInterface.php');
-require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/slide/slide.php');
 
-$SLIDE_UPLOAD_ASSET = new APIEndpoint([
-	APIEndpoint::METHOD         => API_METHOD['POST'],
-	APIEndpoint::REQUEST_TYPE   => API_MIME['multipart/form-data'],
-	APIEndpoint::RESPONSE_TYPE  => API_MIME['application/json'],
-	APIEndpoint::FORMAT_BODY    => [ 'id' => API_P_STR ],
-	APIEndpoint::REQ_QUOTA      => TRUE,
-	APIEndpoint::REQ_AUTH       => TRUE
-]);
+use \api\APIEndpoint;
+use \api\APIException;
+use \api\HTTPStatus;
+use \common\php\slide\Slide;
+use \common\php\Log;
 
-$slide = new Slide();
-$slide->load($SLIDE_UPLOAD_ASSET->get('id'));
+const UPLOAD_ERR_EXISTS          = -1;
+const UPLOAD_ERR_INTERNAL        = -2;
+const UPLOAD_ERR_BAD_REQUEST     = -3;
+const UPLOAD_ERR_BAD_FILETYPE    = -4;
+const UPLOAD_ERR_TOO_MANY_ASSETS = -5;
 
-// Allow admins, slide owners or slide collaborators to upload assets.
-if (!(
-	check_perm(
-		'grp:admin;',
-		$SLIDE_UPLOAD_ASSET->get_caller()
-	)
-	|| check_perm(
-		'grp:editor&usr:'.$slide->get_owner().';',
-		$SLIDE_UPLOAD_ASSET->get_caller())
-	|| (
-		check_perm('grp:editor;', $SLIDE_UPLOAD_ASSET->get_caller())
-		&& in_array(
-			$SLIDE_UPLOAD_ASSET->get_caller()->get_name(),
-			$slide->get_owner()
-		)
-	)
-)) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		'Not authorized.'
-	);
-}
+APIEndpoint::POST(
+	[
+		'APIAuthModule' => ['cookie_auth' => FALSE],
+		'APIRateLimitModule' => [],
+		'APIMultipartRequestValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'id' => ['type' => 'string']
+				],
+				'required' => ['id']
+			]
+		]
+	],
+	function ($req, $resp, $module_data) {
+		$slide = NULL;
+		$errors = [];
 
-$errors = [];
-foreach($SLIDE_UPLOAD_ASSET->get_file_data() as $f) {
-	if ($f['error'] !== UPLOAD_ERR_OK) {
-		$errors[$f['name']] = $f['error'];
-		continue;
+		$params = $module_data['APIMultipartRequestValidatorModule'];
+		$caller = $module_data['APIAuthModule']['user'];
+
+		$slide = new Slide();
+		$slide->load($params->id);
+
+		if (!$slide->can_modify($caller)) {
+			throw new APIException(
+				'User not allowed to upload assets to this slide.',
+				HTTPStatus::UNAUTHORIZED
+			);
+		}
+
+		foreach ($req->files->all() as $f) {
+			$name = $f->getClientOriginalName();
+
+			if ($f->getError() !== UPLOAD_ERR_OK) {
+				$errors[$name] = $f->getError();
+				continue;
+			} else if ($slide->has_uploaded_asset($name)) {
+				$errors[$name] = UPLOAD_ERR_EXISTS;
+				continue;
+			}
+
+			try {
+				$slide->store_uploaded_asset($f);
+			} catch (ArgException $e) {
+				$errors[$name] = UPLOAD_ERR_BAD_REQUEST;
+			} catch (FileTypeException $e) {
+				$errors[$name] = UPLOAD_ERR_BAD_FILETYPE;
+			} catch (LimitException $e) {
+				$errors[$name] = UPLOAD_ERR_TOO_MANY_ASSETS;
+			} catch (Exception $e) {
+				$errors[$name] = UPLOAD_ERR_INTERNAL;
+			}
+		}
+		$slide->write();
+
+		return [
+			'failed' => count($errors),
+			'upload_errors' => $errors
+		];
 	}
-	if ($slide->has_uploaded_asset($f['name'])) {
-		$errors[$f['name']] = -4;
-		continue;
-	}
-	try {
-		$slide->store_uploaded_asset($f);
-	} catch (IntException $e) {
-		$errors[$f['name']] = -1;		
-	} catch (ArgException $e) {
-		$errors[$f['name']] = -2;
-	} catch (FileTypeException $e) {
-		$errors[$f['name']] = -3;
-	} catch (LimitException $e) {
-		$errors[$f['name']] = -5;
-	}
-}
-$slide->write();
-
-$resp = [
-	'failed' => count($errors),
-	'error' => count($errors) !== 0 ? API_E_UPLOAD : API_E_OK
-];
-if (API_ERROR_TRACE) { $resp['upload_errors'] = $errors; }
-
-$SLIDE_UPLOAD_ASSET->resp_set($resp);
-$SLIDE_UPLOAD_ASSET->send();
+);

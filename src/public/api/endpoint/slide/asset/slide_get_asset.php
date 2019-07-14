@@ -20,12 +20,12 @@ namespace pub\api\endpoint\slide\asset;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 use \api\APIEndpoint;
 use \api\APIException;
 use \api\HTTPStatus;
 use \common\php\slide\Slide;
 use \common\php\exceptions\ArgException;
+use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 APIEndpoint::GET(
 	[
@@ -45,6 +45,9 @@ APIEndpoint::GET(
 		]
 	],
 	function($req, $resp, $module_data) {
+		$slide = NULL;
+		$asset = NULL;
+
 		$params = $module_data['APIQueryValidatorModule'];
 		$caller = $module_data['APIAuthModule']['user'];
 
@@ -55,7 +58,7 @@ APIEndpoint::GET(
 			);
 		}
 
-		$slide = new Slide;
+		$slide = new Slide();
 		$slide->load($params->id);
 
 		try {
@@ -64,6 +67,6 @@ APIEndpoint::GET(
 			throw new APIException('No such asset.', HTTPStatus::NOT_FOUND);
 		}
 
-		return new BinaryFileResponse($asset->get_fullpath());
+		return new BinaryFileResponse($asset->get_internal_path());
 	}
 );

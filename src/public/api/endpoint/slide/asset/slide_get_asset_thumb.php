@@ -20,56 +20,62 @@
 *  <====
 */
 
+namespace pub\api\endpoint\slide\asset;
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
-require_once(Config::config('LIBRESIGNAGE_ROOT').'/api/APIInterface.php');
-require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/slide/slide.php');
 
-$SLIDE_GET_ASSET_THUMB = new APIEndpoint(array(
-	APIEndpoint::METHOD          => API_METHOD['GET'],
-	APIEndpoint::RESPONSE_TYPE   => API_MIME['libresignage/passthrough'],
-	APIEndpoint::FORMAT_URL => [
-		'id'   => API_P_STR,
-		'name' => API_P_STR
+use \api\APIEndpoint;
+use \api\APIException;
+use \api\HTTPStatus;
+use \common\php\slide\Slide;
+use \common\php\exceptions\ArgException;
+use \Symfony\Component\HttpFoundation\BinaryFileResponse;
+
+APIEndpoint::GET(
+	[
+		'APIAuthModule' => ['cookie_auth' => TRUE],
+		'APIRateLimitModule' => [],
+		'APIQueryValidatorModule' => [
+			'schema' => [
+				'type' => 'object',
+				'properties' => [
+					'id' => ['type' => 'string'],
+					'name' => ['type' => 'string']
+				],
+				'required' => ['id', 'name']
+			]
+		]
 	],
-	APIEndpoint::REQ_QUOTA         => TRUE,
-	APIEndpoint::REQ_AUTH          => TRUE,
-	APIEndpoint::ALLOW_COOKIE_AUTH => TRUE
-));
+	function ($req, $resp, $module_data) {
+		$slide = NULL;
+		$asset = NULL;
 
-if (
-	!check_perm(
-		'grp:admin|grp:editor|grp:display;',
-		$SLIDE_GET_ASSET_THUMB->get_caller()
-	)
-) {
-	throw new APIException(
-		API_E_NOT_AUTHORIZED,
-		"Not authorized"
-	);
-}
+		$params = $module_data['APIQueryValidatorModule'];
+		$caller = $module_data['APIAuthModule']['user'];
 
-$slide = new Slide();
-$slide->load($SLIDE_GET_ASSET_THUMB->get('id'));
+		if (!$caller->is_in_group(['admin', 'editor', 'display'])) {
+			throw new APIException(
+				'User not authorized to view thumbnails.',
+				HTTPStatus::UNAUTHORIZED
+			);
+		}
 
-$asset = $slide->get_uploaded_asset($SLIDE_GET_ASSET_THUMB->get('name'));
-if ($asset === NULL) {
-	throw new APIException(
-		API_E_INVALID_REQUEST,
-		'No such asset.'
-	);
-}
+		$slide = new Slide();
+		$slide->load($params->id);
 
-if ($asset->get_thumbpath() === NULL) {
-	// No thumbnail exists -> send an empty response.
-	header('Content-Type: application/octet-stream');
-	header('Content-Length: 0');
-	$SLIDE_GET_ASSET_THUMB->send();
-} else {
-	// Send the asset thumbnail.
-	header('Content-Type: '.mime_content_type($asset->get_thumbpath()));
-	header('Content-Length: '.filesize($asset->get_thumbpath()));
-	$SLIDE_GET_ASSET_THUMB->resp_set(
-		fopen($asset->get_thumbpath(), 'rb')
-	);
-	$SLIDE_GET_ASSET_THUMB->send();
-}
+		try {
+			$asset = $slide->get_uploaded_asset($params->name);
+		} catch (ArgException $e) {
+			throw new APIException(
+				'No such asset.',
+				HTTPStatus::NOT_FOUND
+			);
+		}
+
+		if ($asset->has_thumb()) {
+			return new BinaryFileResponse($asset->get_internal_thumb_path());
+		} else {
+			return new BinaryFileResponse();
+		}
+	}
+);
