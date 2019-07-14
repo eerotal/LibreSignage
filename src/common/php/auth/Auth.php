@@ -112,13 +112,13 @@ final class Auth {
 		}
 		if ($user_wl !== NULL) {
 			if (!$d['user']->is_user($user_wl)) {
-				if ($redir) { ErrorHandler::handle(HTTP_ERR_403); }
+				if ($redir) { ErrorHandler::handle(ErrorHandler::FORBIDDEN); }
 				return NULL;
 			}
 		}
 		if ($group_wl !== NULL) {
 			if (!$d['user']->is_in_group($group_wl)) {
-				if ($redir) { ErrorHandler::handle(HTTP_ERR_403); }
+				if ($redir) { ErrorHandler::handle(ErrorHandler::FORBIDDEN); }
 				return NULL;
 			}
 		}

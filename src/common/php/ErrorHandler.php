@@ -1,4 +1,4 @@
-<?php
+'<?php
 /*
 *  LibreSignage error functionality.
 */
@@ -8,17 +8,17 @@ use \common\php\Log;
 
 $ERROR_DEBUG = FALSE;
 
-const HTTP_ERR_404 = 404;
-const HTTP_ERR_403 = 403;
-const HTTP_ERR_500 = 500;
-
-const ERROR_CODES = array(
-	HTTP_ERR_404 => '404 Not Found',
-	HTTP_ERR_403 => '403 Forbidden',
-	HTTP_ERR_500 => '500 Internal Server Error'
-);
-
 final class ErrorHandler {
+	const NOT_FOUND = 404;
+	const FORBIDDEN = 403;
+	const INTERNAL_SERVER_ERROR = 500;
+
+	const ERROR_CODES = [
+		NOT_FOUND => '404 Not Found',
+		FORBIDDEN => '403 Forbidden',
+		INTERNAL_SERVER_ERROR => '500 Internal Server Error'
+	];
+
 	/**
 	* Turn on/off debugging.
 	*
@@ -49,7 +49,7 @@ final class ErrorHandler {
 	public static function setup() {
 		set_exception_handler(function(\Throwable $e) {
 			// Handle uncaught exceptions as internal errors.
-			ErrorHandler::handle(HTTP_ERR_500, $e);
+			ErrorHandler::handle(self::INTERNAL_SERVER_ERROR, $e);
 		});
 
 		// Convert all errors to exceptions.
@@ -66,16 +66,23 @@ final class ErrorHandler {
 	* exception is logged instead of echoing.
 	*
 	* @param int $code The HTTP error code.
+	*
 	* @param Throwable $e Optional error object to show to the caller.
 	*/
 	public static function handle(int $code, \Throwable $e = NULL) {
 		global $ERROR_DEBUG;
 		try {
-			if (!array_key_exists($code, ERROR_CODES)) { $code = HTTP_ERR_500; }
+			if (!array_key_exists($code, ERROR_CODES)) {
+				$code = self::INTERNAL_SERVER_ERROR;
+			}
+
 			// Make sure we are actually getting a Throwable object.
 			if ($e === NULL) {
-				// From the line above $code is guaranteed to be listed in ERROR_CODES.
-				// The default for unknown codes is HTTP_ERR_500.
+				/*
+				* From the line above $code is guaranteed to be listed in
+				* ERROR_CODES. The default for unknown codes is
+				* self::INTERNAL_SERVER_ERROR.
+				*/
 				$e = new \Exception(ERROR_CODES[$code], $code);
 			}
 			if ($ERROR_DEBUG) {
