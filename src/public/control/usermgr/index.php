@@ -1,8 +1,11 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
-	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/css.php');
-	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/auth/auth.php');
-	web_auth(NULL, array('admin'), TRUE);
+
+	use \common\php\Config;
+	use \common\php\CSS;
+	use \common\php\auth\Auth;
+
+	Auth::web_auth(NULL, ['admin'], TRUE);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,13 +13,13 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<?php require_css(['font-awesome']); ?>
+		<?php CSS::req(['font-awesome']); ?>
 		<link rel="stylesheet" href="/control/usermgr/css/usermgr.css">
 		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/favicon.php'); ?>
 		<title>LibreSignage User Manager</title>
 	</head>
 	<body>
-		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').NAV_PATH); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').Config::config('NAV_PATH')); ?>
 
 		<div class="container">
 			<div id="users-table"></div>
@@ -30,7 +33,7 @@
 			</div>
 		</div>
 
-		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').FOOTER_PATH); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').Config::config('FOOTER_PATH')); ?>
 		<script src="/control/usermgr/js/main.js"></script>
 	</body>
 </html>

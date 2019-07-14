@@ -1,7 +1,7 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
-	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/css.php');
-	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/auth/auth.php');
+
+	use \common\php\Config;
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +19,7 @@
 				<h4 class="display-4">Logged out!</h4>
 			</div>
 		</main>
-		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').FOOTER_PATH); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').Config::config('FOOTER_PATH')); ?>
 		<script src="/logout/js/main.js"></script>
 	</body>
 </html>

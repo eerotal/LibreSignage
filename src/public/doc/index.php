@@ -1,16 +1,19 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
-	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/css.php');
-	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/auth/auth.php');
 
-	web_auth(NULL, NULL, TRUE);
+	use \common\php\Config;
+	use \common\php\auth\Auth;
+	use \common\php\ErrorHandler;
+
+	Auth::web_auth(NULL, NULL, TRUE);
 
 	// Load the documentation list.
-	$docs = @scandir(Config::config('LIBRESIGNAGE_ROOT').DOC_HTML_DIR);
-	if ($docs === FALSE) {
-		throw new Exception('Failed to scan docs dir.');
-	}
-	$docs = array_diff($docs, array('.', '..'));
+	$docs = scandir(
+		Config::config('LIBRESIGNAGE_ROOT').
+		Config::config('DOC_HTML_DIR')
+	);
+	if ($docs === FALSE) { throw new \Exception('Failed to scan docs dir.'); }
+	$docs = array_diff($docs, ['.', '..']);
 
 	if (!empty($_GET['doc'])) {
 		$found = FALSE;
@@ -23,22 +26,17 @@
 					$found = TRUE;
 					break;
 				}
-			} elseif ($d == $_GET['doc']) {
-				/*
-				*  No file extension, compare
-				*  original strings.
-				*/
+			} else if ($d == $_GET['doc']) {
+				// No file extension, compare original strings.
 				$found = TRUE;
 				break;
 			}
 		}
 		if (!$found) {
-			// Doc not found.
-			error_handle(
-				HTTP_ERR_404,
-				new Exception('No such documentation file.')
+			ErrorHandler::handle(
+				ErrorHandler::NOT_FOUND,
+				new \Exception('No such documentation file.')
 			);
-			exit(0);
 		}
 		$include_file = $_GET['doc'].'.html';
 	} else {
@@ -59,9 +57,11 @@
 		<main class="container-fluid h-100">
 			<div class="row doc-row">
 				<div class="col"><?php
-					include(Config::config('LIBRESIGNAGE_ROOT').
-						DOC_HTML_DIR.'/'.
-						$include_file);
+					include(
+						Config::config('LIBRESIGNAGE_ROOT').
+						Config::config('DOC_HTML_DIR').
+						'/'.$include_file
+					);
 				?></div>
 			</div>
 			<div class="row doc-row">
@@ -74,7 +74,7 @@
 				?></div>
 			</div>
 		</main>
-		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').FOOTER_PATH); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').Config::config('FOOTER_PATH')); ?>
 		<script src="/doc/js/main.js"></script>
 	</body>
 </html>

@@ -1,8 +1,10 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
-	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/css.php');
-	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/auth/auth.php');
-	web_auth(NULL, NULL, TRUE);
+
+	use \common\php\Config;
+	use \common\php\auth\Auth;
+
+	Auth::web_auth(NULL, NULL, TRUE);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +16,7 @@
 		<title>LibreSignage User Settings</title>
 	</head>
 	<body>
-		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').NAV_PATH); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').Config::config('NAV_PATH')); ?>
 		<main class="container-fluid">
 			<div class="user-settings-cont container mx-auto">
 				<h2>User settings</h2>
@@ -97,7 +99,7 @@
 				</div>
 			</div>
 		</main>
-		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').FOOTER_PATH); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').Config::config('FOOTER_PATH')); ?>
 		<script src="/control/user/js/main.js"></script>
 	</body>
 </html>
