@@ -2,6 +2,7 @@
 
 namespace common\php\thumbnail;
 
+use \common\php\Config;
 use \common\php\exceptions\IntException;
 use \common\php\JSONUtils;
 use \common\php\thumbnail\ThumbnailUtil;
@@ -33,22 +34,24 @@ final class VidThumbnailGenerator implements ThumbnailGeneratorInterface {
 	* @see ThumbnailGeneratorInterface::is_enabled()
 	*/
 	public static function is_enabled(): bool {
-		return ENABLE_FFMPEG_THUMBS;
+		return Config::config('ENABLE_FFMPEG_THUMBS');
 	}
 
 	/**
 	* @see ThumbnailGeneratorInterface::ensure_prerequisites_met()
 	*/
 	public static function ensure_prerequisites_met() {
-		if (!is_file(FFMPEG_PATH)) {
+		if (!is_file(Config::config('FFMPEG_PATH'))) {
 			throw new ThumbnailGeneratorException(
-				"Invalid ffmpeg binary path. (".FFMPEG_PATH.")"
+				"Invalid ffmpeg binary path. (".
+				Config::config('FFMPEG_PATH').")"
 			);
 		}
 
-		if (!is_file(FFPROBE_PATH)) {
+		if (!is_file(Config::config('FFPROBE_PATH'))) {
 			throw new ThumbnailGeneratorException(
-				"Invalid ffprobe binary path. (".FFPROBE_PATH.")"
+				"Invalid ffprobe binary path. (".
+				Config::config('FFPROBE_PATH').")"
 			);
 		}
 
@@ -75,7 +78,7 @@ final class VidThumbnailGenerator implements ThumbnailGeneratorInterface {
 		if (!self::is_enabled()) { return; }
 
 		exec(
-			FFPROBE_PATH." ".
+			Config::config('FFPROBE_PATH')." ".
 				"-v quiet ".
 				"-select_streams v:0 ".
 				"-show_entries stream=width,height ".
@@ -96,7 +99,7 @@ final class VidThumbnailGenerator implements ThumbnailGeneratorInterface {
 		);
 
 		exec(
-			FFMPEG_PATH." ".
+			Config::config('FFMPEG_PATH')." ".
 				"-v quiet ".
 				"-y ".
 				"-ss 00:00:10 ".

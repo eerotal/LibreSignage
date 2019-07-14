@@ -2,6 +2,7 @@
 
 namespace common\php\thumbnail;
 
+use \common\php\Config;
 use \common\php\thumbnail\ThumbnailUtil;
 use \common\php\thumbnail\ThumbnailGeneratorException;
 use \common\php\thumbnail\ThumbnailGeneratorInterface;
@@ -30,7 +31,7 @@ final class ImgThumbnailGenerator implements ThumbnailGeneratorInterface {
 	* @see ThumbnailGeneratorInterface::is_enabled()
 	*/
 	public static function is_enabled(): bool {
-		return ENABLE_GD_THUMBS;
+		return Config::config('ENABLE_GD_THUMBS');
 	}
 
 	/**
@@ -54,7 +55,7 @@ final class ImgThumbnailGenerator implements ThumbnailGeneratorInterface {
 		int $hmax
 	) {
 		if (!self::is_enabled()) { return; }
-		$img = self::load_img($src, $mime);
+		$img = self::load_img($src);
 
 		$w = imagesx($img);
 		$h = imagesy($img);
@@ -82,7 +83,7 @@ final class ImgThumbnailGenerator implements ThumbnailGeneratorInterface {
 	*
 	* @throws ThumbnailGeneratorException if a file of invalid type is supplied.
 	*/
-	function load_img(string $src) {
+	public static function load_img(string $src) {
 		$mime = mime_content_type($src);
 		switch($mime) {
 			case 'image/png':
@@ -105,7 +106,7 @@ final class ImgThumbnailGenerator implements ThumbnailGeneratorInterface {
 	* @param resource $img The image resource.
 	* @param string $dest  The destination path.
 	*/
-	function write_img($img, string $dest) {
+	public static function write_img($img, string $dest) {
 		$mime = 'image/'.pathinfo($dest, PATHINFO_EXTENSION);
 		switch($mime) {
 			case 'image/png':

@@ -3,13 +3,15 @@
 namespace common\php\thumbnail;
 
 use \common\php\exceptions\ArgException;
+use \common\php\thumbnail\ThumbnailGeneratorException;
+use \common\php\Log;
 
 final class Thumbnail {
 	private $generators = [];
 
 	public function __construct() {
-		$this->register_generator('\\commmon\\php\\thumbnail\ImgThumbnailGenerator');
-		$this->register_generator('\\commmon\\php\\thumbnail\VidThumbnailGenerator');
+		$this->register_generator('common\\php\\thumbnail\\ImgThumbnailGenerator');
+		$this->register_generator('common\\php\\thumbnail\\VidThumbnailGenerator');
 	}
 
 	/**
@@ -46,16 +48,20 @@ final class Thumbnail {
 	* The original image is scaled so that it fits into the bounds
 	* defined by $wmax x $hmax.
 	*
-	* @param string $src  The source path.
-	* @param string $dest The destionation path.
-	* @param int $wmax    Maximum width.
-	* @param int $hmax    Maximum height
+	* @param string $src         The source path.
+	* @param string $dest_mime   The destination file MIME type.
+	* @param string $dest_suffix A suffix to add to the original filename.
+	* @param string $dest_dir    The destionation directory.
+	* @param int $wmax           Maximum width.
+	* @param int $hmax           Maximum height
 	*
 	* @throws ThumbnailGeneratorException if a suitable generator is not found.
 	*/
 	public function create(
 		string $src,
-		string $dest,
+		string $dest_dir,
+		string $dest_suffix,
+		string $dest_mime,
 		int $wmax,
 		int $hmax
 	) {
@@ -67,13 +73,21 @@ final class Thumbnail {
 					TRUE
 				)
 				&& in_array(
-					mime_content_type($dest),
+					$dest_mime,
 					$g::provides_export(),
 					TRUE
 				)
 				&& $g::is_enabled()
 			) {
+				$dest = $dest_dir.
+					'/'.
+					pathinfo($src, PATHINFO_FILENAME).
+					$dest_suffix.
+					'.'.
+					explode('/', $dest_mime)[1];
+
 				$g::create($src, $dest, $wmax, $hmax);
+				return;
 			} else {
 				throw new ThumbnailGeneratorException('No suitable thumbnail generator.');
 			}
