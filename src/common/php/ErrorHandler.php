@@ -1,4 +1,4 @@
-'<?php
+<?php
 /*
 *  LibreSignage error functionality.
 */
@@ -13,10 +13,10 @@ final class ErrorHandler {
 	const FORBIDDEN = 403;
 	const INTERNAL_SERVER_ERROR = 500;
 
-	const ERROR_CODES = [
-		NOT_FOUND => '404 Not Found',
-		FORBIDDEN => '403 Forbidden',
-		INTERNAL_SERVER_ERROR => '500 Internal Server Error'
+	const ERROR_STRINGS = [
+		self::NOT_FOUND => '404 Not Found',
+		self::FORBIDDEN => '403 Forbidden',
+		self::INTERNAL_SERVER_ERROR => '500 Internal Server Error'
 	];
 
 	/**
@@ -72,7 +72,7 @@ final class ErrorHandler {
 	public static function handle(int $code, \Throwable $e = NULL) {
 		global $ERROR_DEBUG;
 		try {
-			if (!array_key_exists($code, ERROR_CODES)) {
+			if (!array_key_exists($code, self::ERROR_STRINGS)) {
 				$code = self::INTERNAL_SERVER_ERROR;
 			}
 
@@ -80,18 +80,29 @@ final class ErrorHandler {
 			if ($e === NULL) {
 				/*
 				* From the line above $code is guaranteed to be listed in
-				* ERROR_CODES. The default for unknown codes is
+				* self::ERROR_STRINGS. The default for unknown codes is
 				* self::INTERNAL_SERVER_ERROR.
 				*/
-				$e = new \Exception(ERROR_CODES[$code], $code);
+				$e = new \Exception(self::ERROR_STRINGS[$code], $code);
 			}
 			if ($ERROR_DEBUG) {
 				echo "\n### Uncaught exception (HTTP: ".$code.") ###\n";
 				echo $e->__toString();
 				Log::logs($e->__toString(), Log::LOGERR);
 			} else {
-				header($_SERVER['SERVER_PROTOCOL'].' '.ERROR_CODES[$code]);
-				include($_SERVER['DOCUMENT_ROOT'].'/../'.ERROR_PAGES.'/'.$code.'/index.php');
+				header(
+					$_SERVER['SERVER_PROTOCOL'].
+					' '.
+					self::ERROR_STRINGS[$code]
+				);
+				include(
+					$_SERVER['DOCUMENT_ROOT'].
+					'/../'.
+					Config::config('ERROR_PAGES').
+					'/'.
+					$code.
+					'/index.php'
+				);
 				Log::logs($e->__toString(), Log::LOGERR);
 			}
 		} catch (\Exception $e){
