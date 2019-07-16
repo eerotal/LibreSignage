@@ -466,8 +466,12 @@ apitest: $(PHP_AUTOLOAD)
 		exit 1
 	fi
 
+	sh tests/setup.sh "API"
+
 	export PHPUNIT_API_HOST="$(PHPUNIT_API_HOST)"
 	vendor/bin/phpunit $(PHPUNIT_FLAGS) --testsuite "API"
+
+	sh tests/cleanup.sh "API"
 
 initchk:
 	@:
