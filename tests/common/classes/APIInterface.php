@@ -5,10 +5,13 @@ namespace classes;
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Psr7\Request;
 use \GuzzleHttp\Psr7\Response;
+use \Psr\Http\Message\StreamInterface;
+
 use \classes\APITestUtils;
 use \classes\APIInterfaceException;
 
 use \common\php\JSONUtils;
+use \common\php\exceptions\JSONException;
 use \api\HTTPStatus;
 
 final class APIInterface {
@@ -25,16 +28,18 @@ final class APIInterface {
 	public function call(
 		string $method,
 		string $url,
-		array $data = [],
+		$data,
 		array $headers = [],
-		bool $use_auth = FALSE
+		bool $use_auth = FALSE,
+		callable $fallback_encoder = NULL
 	) {
 		$resp = $this->call_return_raw_response(
 			$method,
 			$url,
 			$data,
 			$headers,
-			$use_auth
+			$use_auth,
+			$fallback_encoder
 		);
 		return APIInterface::decode_raw_response($resp);
 	}
@@ -42,49 +47,125 @@ final class APIInterface {
 	public function call_return_raw_response(
 		string $method,
 		string $url,
-		array $data = [],
+		$data,
 		array $headers = [],
-		bool $use_auth = FALSE
+		bool $use_auth = FALSE,
+		callable $fallback_encoder = NULL
 	): Response {
-		$body = NULL;
-		$req = NULL;
-
-		// Pass request data in URL or body.
-		if (!empty($data)) {
-			if ($method === 'GET') {
-				$url .= '?'.\http_build_query($data);
-			} else {
-				$body = JSONUtils::encode($data);
-			}
-		}
-
-		// Set the default request content type.
-		if ($method === 'POST' && empty($headers['Content-Type'])) {
-			$headers['Content-Type'] = 'application/json';
-		}
-
-		// Pass session token in the Auth-Token header.
-		if ($use_auth && !empty($this->session_token)) {
-			$headers['Auth-Token'] = $this->session_token;
-		}
-
-		$req = new Request($method, $url, $headers, $body);
+		$req = APIInterface::encode_raw_request(
+			$method,
+			$url,
+			$data,
+			$headers,
+			$fallback_encoder
+		);
+		if ($use_auth) { $req = $this->authenticate_request($req); }
 		return $this->client->send($req);
 	}
 
-	public static function decode_raw_response(Response $resp) {
-		if ($resp->getHeader('Content-Type')[0] === 'application/json') {
-			// Decode the response body if Content-Type is application/json.
-			try {
-				return JSONUtils::decode((string) $resp->getBody());
-			} catch (Exception $e) {
-				throw new APIInterfaceException(
-					'Malformed JSON response received from API.'
+	/**
+	* Add the current authentication token to a Request. If
+	* the API is not authenticated, no action is taken.
+	*
+	* @param Request $req The Request object to use.
+	*
+	* @return Request The modified Request.
+	*/
+	public function authenticate_request(Request $req): Request {
+		if (!empty($this->session_token)) {
+			return $req->withHeader('Auth-Token', $this->session_token);
+		} else {
+			return $req;
+		}
+	}
+
+	/**
+	* Encode raw request data into a Request object.
+	*
+	* @param string   $method     The HTTP method to use.
+	* @param string   $url        The API endpoint URL.
+	* @param mized    $data       The data to send to the endpoint.
+	* @param array    $headers    And associative array of headers.
+	* @param callable $fallback   A fallback function to use for encoding for
+	*                             datatypes other than string, array, object,
+	*                             NULL and StreamInterface. The default is
+	*                             strval().
+	*
+	* @return Request The created Request object.
+	*/
+	public static function encode_raw_request(
+		string $method,
+		string $url,
+		$data,
+		array $headers,
+		callable $fallback = NULL
+	): Request {
+		$body = NULL;
+		$fallback = ($fallback === NULL) ? 'strval' : $fallback;
+
+		if (
+			is_array($data)
+			|| is_object($data)
+			&& !($data instanceof StreamInterface)
+		) {
+			if ($method === 'GET') {
+				$url .= '?'.http_build_query($data);
+			} else {
+				if (empty($headers['Content-Type'])) {
+					$headers['Content-Type'] = 'application/json';
+				}
+				$body = JSONUtils::encode($data);
+			}
+		} else if (is_string($data)) {
+			if (empty($headers['Content-Type'])) {
+				$headers['Content-Type'] = 'text/plain';
+			}
+			$body = $data;
+		} else if ($data instanceof StreamInterface) {
+			if ($method === 'GET') {
+				throw new APIInterfaceExcption(
+					"Can't send data streams with a GET request."
 				);
 			}
+			$body = $data;
+		} else if ($data === NULL) {
+			$body = '';
 		} else {
-			// Otherwise return it as a string.
-			return (string) $resp->getBody();
+			$body = $fallback($data);
+		}
+
+		return new Request($method, $url, $headers, $body);
+	}
+
+	/**
+	* Decode raw response data into a suitable datatype.
+	*
+	* @param Response $resp The Response object to use.
+	* @param callable $fallback A fallback decoder function to use for	
+	*                           mimetypes other than application/json.
+	*                           The default is strval().
+	*
+	* @throws APIInterfaceException if the response is malformed JSON.
+	*
+	* @return mixed The decoded response data.
+	*/
+	public static function decode_raw_response(
+		Response $resp,
+		callable $fallback = NULL
+	) {
+		if ($fallback === NULL) { $fallback = 'strval'; }
+
+		switch ($resp->getHeader('Content-Type')[0]) {
+			case 'application/json':
+				try {
+					return JSONUtils::decode((string) $resp->getBody());
+				} catch (JSONException $e) {
+					throw new APIInterfaceException(
+						'Malformed JSON response received from API.'
+					);
+				}
+			default;
+				return $fallback($resp->getBody());
 		}
 	}
 

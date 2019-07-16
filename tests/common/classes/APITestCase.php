@@ -13,6 +13,8 @@ use \classes\APIInterface;
 use \constraints\IsAPIErrorResponse;
 use \constraints\HTTPStatusEquals;
 use \constraints\MatchesJSONSchema;
+use \constraints\HeaderEquals;
+use \constraints\HeaderExists;
 
 use \api\HTTPStatus;
 
@@ -45,13 +47,58 @@ class APITestCase extends TestCase {
 	}
 
 	/**
+	* Assert that a Response has a header.
+	*
+	* @param Response $response The Response object to check.
+	* @param string   $header   The expected header.
+	* @param string   $message  An optional error message to print when
+	*                           the assertion fails.
+	*/
+	public static function assert_header_exists(
+		Response $response,
+		string $header,
+		string $message = ''
+	) {
+		self::assertThat(
+			$response,
+			new HeaderExists($header),
+			$message
+		);
+	}
+
+	/**
+	* Assert that a Response header matches a specific header.
+	*
+	* @param Response $response The Response object to check.
+	* @param string   $key      The header name.
+	* @param array    $value    The expected header value(s).
+	* @param callable $matcher  A matcher function for HeaderEquals.
+	*                           @see HeaderEquals::__construct()
+	* @param string   $message  An optional error message to print when
+	*                           the assertion fails.
+	*/
+	public static function assert_header_matches(
+		Response $response,
+		string $key,
+		array $value,
+		callable $matcher = NULL,
+		string $message = ''
+	) {
+		self::assertThat(
+			$response,
+			new HeaderEquals($key, $value, $matcher),
+			$message
+		);
+	}
+
+	/**
 	* Assert that the API response object $response matches the JSON Schema
 	* from the file $schema_path.
 	*
-	* @param $response mixed The API response object.
-	* @param $schema_path string The path to the JSON Schema file.
-	* @param $message string An optional error message to print when the
-	*                        assertion fails.
+	* @param mixed  $response     The API response object.
+	* @param string $schema_path  The path to the JSON Schema file.
+	* @param string $message      An optional error message to print when the
+	*                             assertion fails.
 	*/
 	public static function assert_object_matches_schema(
 		$response,
@@ -100,9 +147,9 @@ class APITestCase extends TestCase {
 	* Assert that $response succeeded by checking that
 	* $response->error matches HTTPStatus::OK.
 	*
-	* @param $response mixed The API response object.
-	* @param $message string An optional error message to print when
-	*                        the assertion fails.
+	* @param mixed  $response The API response object.
+	* @param string $message  An optional error message to print when
+	*                         the assertion fails.
 	*/
 	public static function assert_api_succeeded(
 		Response $response,
