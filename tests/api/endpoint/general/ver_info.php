@@ -15,7 +15,8 @@ class ver_info extends APITestCase {
 	public function test_is_response_schema_correct(): void {
 		$resp = $this->api->call(
 			$this->get_endpoint_method(),
-			$this->get_endpoint_uri()
+			$this->get_endpoint_uri(),
+			NULL
 		);
 		$this->assert_object_matches_schema(
 			$resp,
