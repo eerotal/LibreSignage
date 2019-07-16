@@ -51,7 +51,7 @@ APIEndpoint::GET(
 		$params = $module_data['APIQueryValidatorModule'];
 		$caller = $module_data['APIAuthModule']['user'];
 
-		if (!$caller->is_in_group(['admin', 'editor'])) {
+		if (!$caller->is_in_group(['admin', 'editor', 'display'])) {
 			throw new APIException(
 				'User not in admin or editor groups.',
 				HTTPStatus::UNAUTHORIZED
