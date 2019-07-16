@@ -1,5 +1,7 @@
 <?php
-	require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/css.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
+
+	use \common\php\Config;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,7 +20,7 @@
 			</div>
 		</main>
 		<?php
-			require_once(Config::config('LIBRESIGNAGE_ROOT').FOOTER_PATH);
+			require_once(Config::config('LIBRESIGNAGE_ROOT').Config::config('FOOTER_PATH'));
 		?>
 	</body>
 </html>
