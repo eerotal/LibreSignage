@@ -1,3 +1,7 @@
+v1.0.2
+  - [bugfix]   Apply a workaround for docker-library/php#865 which broke
+               LibreSignage Docker image builds.
+
 v1.0.1
   - [bugfix]   Fix a bug where using forward slashes in slide markup caused
                exceptions. (issue #66)
