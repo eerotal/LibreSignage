@@ -33,6 +33,7 @@ npm-debug.log
 
 # Exclude PHPUnit files.
 .phpunit.result.cache
+tests/tmp
 
 # Exclude temporary sass files.
 .sass-cache
