@@ -14,7 +14,7 @@
 #    approot = (path)   - The approot for LibreSignage.
 #
 
-FROM php:7.2-apache
+FROM php:7.2-apache-stretch
 
 ARG imgthumbs="n"
 ARG vidthumbs="n"
