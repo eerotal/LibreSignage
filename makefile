@@ -356,6 +356,7 @@ install-deps:
 	set -e
 	npm install
 	composer install
+	composer dump-autoload
 
 configure: install-deps
 	@:
