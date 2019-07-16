@@ -36,11 +36,11 @@ TARGET ?=
 PASS ?=
 INITCHK_WARN ?= N
 
-PHP_AUTOLOAD := $(shell find vendor/composer/ -type f) vendor/autoload.php
-
 # Don't search for dependencies when certain targets with no deps are run.
 # The if-statement below is some hacky makefile magic. Don't be scared.
-NODEP_TARGETS := clean realclean LOC LOD apitest configure initchk install
+NODEP_TARGETS := clean realclean LOC LOD configure\
+	initchk install install-deps
+
 ifneq ($(filter \
 	0 $(shell expr $(words $(MAKECMDGOALS)) '*' '2'),\
 	$(words \
@@ -50,6 +50,8 @@ ifneq ($(filter \
 		)$(MAKECMDGOALS)\
 	)\
 ),)
+
+PHP_AUTOLOAD := $(shell find vendor/composer/ -type f) vendor/autoload.php
 
 # Production JavaScript libraries.
 JS_LIBS := $(filter-out \
@@ -349,7 +351,13 @@ install:
 	set -e
 	./build/scripts/install.sh $(CONF)
 
-configure:
+install-deps:
+	@:
+	set -e
+	npm install
+	composer install
+
+configure: install-deps
 	@:
 	set -e
 	if [ -z "$(TARGET)" ]; then
