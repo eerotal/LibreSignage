@@ -6,6 +6,7 @@ use \GuzzleHttp\Psr7\Request;
 use \GuzzleHttp\Psr7\MultipartStream;
 use \common\php\JSONUtils;
 use \api\HTTPStatus;
+use \classes\SlideUtils;
 
 class slide_get_asset extends APITestCase {
 	const TEST_SLIDE_ID = '1';
@@ -19,31 +20,12 @@ class slide_get_asset extends APITestCase {
 		$this->set_endpoint_method('GET');
 		$this->set_endpoint_uri('slide/asset/slide_get_asset.php');
 
-
+		// Upload an initial asset.
 		$this->api->login('admin', 'admin');
-		$ms = new MultipartStream(
-			[
-				[
-					'name' => 'body',
-					'contents' => JSONUtils::encode([
-						'id' => self::TEST_SLIDE_ID,
-						'name' => basename(self::TEST_ASSET_PATH)
-					])
-				],
-				[
-					'name' => '0',
-					'contents' => fopen(self::TEST_ASSET_PATH, 'r'),
-					'filename' => basename(self::TEST_ASSET_PATH)
-				]
-			]
-		);
-		$resp = $this->api->call_return_raw_response(
-			'POST',
-			'slide/asset/slide_upload_asset.php',
-			$ms,
-			['Content-Type' =>
-				'multipart/form-data; boundary='.$ms->getBoundary()],
-			TRUE
+		$resp = SlideUtils::upload_asset(
+			$this->api,
+			self::TEST_SLIDE_ID,
+			self::TEST_ASSET_PATH
 		);
 		$this->api->logout();
 
@@ -168,7 +150,6 @@ class slide_get_asset extends APITestCase {
 		);
 		$this->api->logout();
 
-		// MIME
 		$this->assert_header_exists($resp, 'Content-Type');
 		$this->assert_header_matches(
 			$resp,
@@ -176,7 +157,6 @@ class slide_get_asset extends APITestCase {
 			[mime_content_type(self::TEST_ASSET_PATH)]
 		);
 
-		// Size
 		$this->assert_header_exists($resp, 'Content-Length');
 		$this->assert_header_matches(
 			$resp,
@@ -186,16 +166,12 @@ class slide_get_asset extends APITestCase {
 	}
 
 	public function tearDown(): void {
+		// Remove the initial asset.
 		$this->api->login('admin', 'admin');
-		$resp = $this->api->call_return_raw_response(
-			'POST',
-			'slide/asset/slide_remove_asset.php',
-			[
-				'id' => self::TEST_SLIDE_ID,
-				'name' => basename(self::TEST_ASSET_PATH)
-			],
-			[],
-			TRUE
+		$resp = SlideUtils::remove_asset(
+			$this->api,
+			self::TEST_SLIDE_ID,
+			basename(self::TEST_ASSET_PATH)
 		);
 		$this->api->logout();
 
