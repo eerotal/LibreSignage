@@ -148,17 +148,17 @@ Build system dependencies
   * GNU Make (Version 4.x or newer.) (https://www.gnu.org/software/make/)
   * Pandoc (Version 2.0.x or newer.) (https://pandoc.org/)
   * npm (Version 6.4.x or newer.) (https://nodejs.org/en/)
+  * composer (Version 1.8.x or newer) (https://getcomposer.org/)
   * ImageMagick (Version 6.x or newer.) (https://www.imagemagick.org/)
 
-Build system dependencies installed automatically by npm
+Build system dependencies installed automatically by *npm* or *composer*
   * Tools & development libraries
 
     * SASS (https://sass-lang.com/)
     * Browserify (http://browserify.org/)
     * PostCSS (https://postcss.org/)
     * Autoprefixer (https://github.com/postcss/autoprefixer)
-    * node-XMLHttpRequest (https://github.com/driverdan/node-XMLHttpRequest)
-    * JSDOM (https://github.com/jsdom/jsdom)
+    * PHPUnit (https://phpunit.de/)
 
   * Libraries
 
@@ -167,7 +167,13 @@ Build system dependencies installed automatically by npm
     * jQuery (https://jquery.com/)
     * Popper.js (https://popper.js.org/)
     * Font-Awesome Free (https://fontawesome.com/)
+	* Symfony/HttpFoundation (https://symfony.com/)
+    * Guzzle (https://github.com/guzzle/guzzle)
+    * json-schema (https://github.com/justinrainbow/json-schema)
+    * JSDOM (https://github.com/jsdom/jsdom)
+    * node-XMLHttpRequest (https://github.com/driverdan/node-XMLHttpRequest)
 
+See `10. Third-party dependencies`_ for license information.
 
 4.2. Using prebuilt Docker images on any distribution
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -209,10 +215,11 @@ host (ie. no containers) by following the instructions below.
 
 1. Install software needed for building LibreSignage. You will need the
    following packages: ``git, apache2, php, php-gd, php-xml, pandoc, npm,
-   make, imagemagick``. All other packages except *npm* can be installed from
-   the distribution repos by running ``sudo apt update && sudo apt install
-   git apache2 php php-gd php-xml pandoc make imagemagick``. You can install
-   NPM by following the instructions on the `node.js website <https://nodejs.org/en/download/package-manager/>`_.
+   composer, make, imagemagick``. All other packages except *npm* can be
+   installed from the distribution repos by running ``sudo apt update &&
+   sudo apt install git apache2 php php-gd php-xml pandoc composer make
+   imagemagick``. You can install NPM by following the instructions on the
+   `node.js website <https://nodejs.org/en/download/package-manager/>`_.
 
    If you want to enable video thumbnail generation, you need to install
    *ffmpeg* too. You can do that by running ``sudo apt install ffmpeg``.
@@ -223,11 +230,9 @@ host (ie. no containers) by following the instructions below.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
    The repository will be cloned into the directory *LibreSignage/*.
 4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
-5. Install dependencies from NPM by running ``npm install``. *This command
-   will probably print a warning about an incompatible package. That's
-   normal and doesn't affect the build in any way.*
-6. Run ``make configure TARGET=apache2-debian``. This script asks you
-   to enter the following configuration values:
+5. Run ``make configure TARGET=apache2-debian``. This target installs any
+   needed *composer* and *npm* dependencies first and then prompts you for
+   some configuration values:
 
    * Install directory (default: /var/www)
 
@@ -294,13 +299,13 @@ host (ie. no containers) by following the instructions below.
    for building LibreSignage. The file is saved in ``build/`` as
    ``<DOMAIN>.conf`` where ``<DOMAIN>`` is the domain name you
    specified.
-7. Run ``make -j$(nproc)`` to build LibreSignage. See `8. Make rules`_
+6. Run ``make -j$(nproc)`` to build LibreSignage. See `8. Make rules`_
    for more advanced make usage.
-8. Finally, to install LibreSignage, run ``sudo make install`` and answer
+7. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
-9. Disable the default Apache site by running
+8. Disable the default Apache site by running
    ``sudo a2dissite 000-default.conf``.
-10. Navigate to the domain name you entered and you should see the
+9. Navigate to the domain name you entered and you should see the
     LibreSignage login page.
 
 4.3.2. Building a Docker image on Debian or Ubuntu
@@ -446,6 +451,11 @@ all
   can pass ``NOHTMLDOCS=y`` if you don't want to generate any HTML
   documentation.
 
+install-deps
+  Install the *composer* and *npm* dependencies needed for building
+  LibreSignage. This target is a prerequisite of ``configure`` so it's
+  not necessary to run it manually.
+
 configure
   Generate a LibreSignage build configuration file. You need to use
   ``TARGET=[target]`` to select a build target to use. You can also
@@ -523,19 +533,34 @@ is built and they can be accessed from the *Help* page of LibreSignage.
 10. Third-party dependencies
 ----------------------------
 
-Bootstrap (Library, MIT License)
+Bootstrap (Library, MIT License) (https://getbootstrap.com/)
   Copyright (c) 2011-2016 Twitter, Inc.
 
-JQuery (Library, MIT License)
+JQuery (Library, MIT License) (https://jquery.com/)
   Copyright JS Foundation and other contributors, https://js.foundation/
 
-Popper.JS (Library, MIT License)
+Popper.JS (Library, MIT License) (https://popper.js.org/)
   Copyright (C) 2016 Federico Zivolo and contributors
 
-Ace (Library, 3-clause BSD License)
+Ace (Library, 3-clause BSD License) (https://ace.c9.io/)
   Copyright (c) 2010, Ajax.org B.V. All rights reserved.
 
-Raleway (Font, SIL Open Font License 1.1) 
+JSDOM (Library, MIT License) (https://github.com/jsdom/jsdom)
+  Copyright (c) 2010 Elijah Insua
+
+node-XMLHttprequest (Library, MIT License) (https://github.com/driverdan/node-XMLHttpRequest)
+  Copyright (c) 2010 passive.ly LLC
+
+Guzzle (Library, MIT License) (https://github.com/guzzle/guzzle)
+  Copyright (c) 2011-2018 Michael Dowling, https://github.com/mtdowling <mtdowling@gmail.com>
+
+json-schema (Library, MIT License) (https://github.com/justinrainbow/json-schema)
+  Copyright (c) 2016
+
+Symfony/HttpFoundation (Library, MIT License) (https://symfony.com/)
+  Copyright (c) 2004-2019 Fabien Potencier
+
+Raleway (Font, SIL Open Font License 1.1) (https://github.com/impallari/Raleway)
   Copyright (c) 2010, Matt McInerney (matt@pixelspread.com),  
 
   Copyright (c) 2011, Pablo Impallari (www.impallari.com|impallari@gmail.com),  
@@ -543,13 +568,13 @@ Raleway (Font, SIL Open Font License 1.1)
   Copyright (c) 2011, Rodrigo Fuenzalida (www.rfuenzalida.com|hello@rfuenzalida.com),  
   with Reserved Font Name Raleway
 
-Montserrat (Font, SIL Open Font License 1.1)
+Montserrat (Font, SIL Open Font License 1.1) (https://github.com/JulietaUla/Montserrat)
   Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)  
 
-Inconsolata (Font, SIL Open Font License 1.1)
+Inconsolata (Font, SIL Open Font License 1.1) (https://github.com/googlefonts/Inconsolata)
   Copyright 2006 The Inconsolata Project Authors (https://github.com/cyrealtype/Inconsolata)
 
-Font-Awesome (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+Font-Awesome (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) (https://fontawesome.com/)
   Font Awesome Free 5.1.0 by @fontawesome - https://fontawesome.com
 
 The full licenses for these third party libraries and resources can be
