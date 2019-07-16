@@ -3,6 +3,7 @@
 use \classes\APITestCase;
 use \classes\APIInterface;
 use \api\HTTPStatus;
+use \classes\SlideUtils;
 
 class slide_save extends APITestCase {
 	const VALID_PARAMS = [
@@ -396,24 +397,14 @@ class slide_save extends APITestCase {
 	public function tearDown(): void {
 		if ($this->slide_id !== NULL) {
 			$this->api->login('admin', 'admin');
-
-			$resp = $this->api->call_return_raw_response(
-				'POST',
-				'slide/slide_rm.php',
-				['id' => $this->slide_id],
-				[],
-				TRUE
-			);
-			$this->slide_id = NULL;
+			$resp = SlideUtils::remove_slide($this->api, $this->slide_id);
 
 			if ($resp->getStatusCode() !== HTTPStatus::OK) {
-				throw new Exception(
-					'Failed to cleanup created slide: '.
-					(string) $resp->getBody()
-				);
+				throw new \Exception("Failed to cleanup created slide.");
 			}
 
 			$this->api->logout();
+			$this->slide_id = NULL;
 		}
 	}
 }

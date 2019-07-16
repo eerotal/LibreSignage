@@ -14,6 +14,48 @@ use \common\php\JSONUtils;
 */
 final class SlideUtils {
 	/**
+	* Lock a slide.
+	*
+	* @param APIInterface $api An APIInterface object.
+	* @param string       $id  The ID of the slide to lock.
+	*
+	* @return Response The API response.
+	*/
+	public static function slide_lock(
+		APIInterface $api,
+		string $id
+	): Response {
+		return $api->call_return_raw_response(
+			'POST',
+			'slide/slide_lock_acquire.php',
+			['id' => $id],
+			[],
+			TRUE
+		);
+	}
+
+	/**
+	* Release a slide lock.
+	*
+	* @param APIInterface $api An APIInterface object.
+	* @param string       $id  The ID of the slide to release
+	*
+	* @return Response The API response.
+	*/
+	public static function slide_release(
+		APIInterface $api,
+		string $id
+	): Response {
+		return $api->call_return_raw_response(
+			'POST',
+			'slide/slide_lock_release.php',
+			['id' => $id],
+			[],
+			TRUE
+		);
+	}
+
+	/**
 	* Save a slide.
 	*
 	* @param APIInterface $api An APIInterface object.

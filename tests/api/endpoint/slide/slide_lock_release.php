@@ -3,6 +3,7 @@
 use \classes\APITestCase;
 use \classes\APIInterface;
 use \api\HTTPStatus;
+use \classes\SlideUtils;
 
 class slide_lock_relase extends APITestCase {
 	use \traits\TestEndpointNotAuthorizedWithoutLogin;
@@ -20,18 +21,10 @@ class slide_lock_relase extends APITestCase {
 		* would automatically release the lock.
 		*/
 		$this->api->login('admin', 'admin');
-		$resp = $this->api->call_return_raw_response(
-			'POST',
-			'slide/slide_lock_acquire.php',
-			['id' => self::TEST_SLIDE_ID],
-			[],
-			TRUE
-		);
+		$resp = SlideUtils::slide_lock($this->api, self::TEST_SLIDE_ID);
 
 		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new Exception(
-				'Failed to lock slide: '.(string) $resp->getBody()
-			);
+			throw new \Exception("Failed to acquire initial slide lock.");
 		}
 	}
 
@@ -157,10 +150,7 @@ class slide_lock_relase extends APITestCase {
 			TRUE
 		);
 		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new Exception(
-				'Failed to logout other sessions: '.
-				(string) $resp->getBody()
-			);
+			throw new \Exception("Failed to logout other sessions.");
 		}
 
 		$this->api->logout();

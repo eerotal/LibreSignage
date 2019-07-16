@@ -2,6 +2,7 @@
 
 use \classes\APITestCase;
 use \api\HTTPStatus;
+use \classes\SlideUtils;
 
 class slide_lock_acquire extends APITestCase {
 	use \traits\TestEndpointNotAuthorizedWithoutLogin;
@@ -109,13 +110,11 @@ class slide_lock_acquire extends APITestCase {
 	public function tearDown(): void {
 		// Make sure the test slide is unlocked.
 		$this->api->login('admin', 'admin');
-		$this->api->call(
-			'POST',
-			'slide/slide_lock_release.php',
-			['id' => self::TEST_SLIDE_ID],
-			[],
-			TRUE
-		);
+		$resp = SlideUtils::slide_release($this->api, self::TEST_SLIDE_ID);
 		$this->api->logout();
+
+		if ($resp->getStatusCode() !== HTTPStatus::OK) {
+			throw new \Exception("Failed to release initial slide lock.");
+		}
 	}
 }
