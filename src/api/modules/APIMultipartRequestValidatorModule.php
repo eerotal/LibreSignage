@@ -3,8 +3,10 @@
 namespace api\modules;
 
 use \api\APIEndpoint;
+use \api\HTTPStatus;
 use \api\modules\APIJSONValidatorModule;
 use \common\php\Util;
+use \common\php\Log;
 
 /**
 * API module for validating multipart requests. This module decodes the
@@ -22,6 +24,30 @@ class APIMultipartRequestValidatorModule extends APIJSONValidatorModule {
 	*/
 	public function run(APIEndpoint $e, array $args) {
 		$this->check_args(['schema'], $args);
+
+		$tmp = preg_match(
+			':multipart/form-data; ?boundary=.+:',
+			$e->get_request()->headers->get('Content-Type', '')
+		);
+		if ($tmp === 0) {
+			throw new APIException(
+				"Invalid Content-Type. Expected 'multipart/form-data'.",
+				HTTPStatus::BAD_REQUEST
+			);
+		} else if ($tmp === FALSE) {
+			throw new APIException(
+				'preg_match() failed.',
+				HTTPStatus::INTERNAL_SERVER_ERROR
+			);
+		}
+
+		if (!$e->get_request()->request->has('body')) {
+			throw new APIException(
+				"POST parameter 'body' missing from request.",
+				HTTPStatus::BAD_REQUEST
+			);
+		}
+
 		return $this->validate(
 			$e->get_request()->request->get('body'),
 			$args['schema']
