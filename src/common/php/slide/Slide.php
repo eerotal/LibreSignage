@@ -644,11 +644,16 @@ final class Slide extends Exportable {
 	function can_modify(User $user): bool {
 		return (
 			$user->is_in_group('admin')
-			|| $this->get_owner() === $user->get_name()
-			|| in_array(
-				$user->get_name(),
-				$this->get_collaborators(),
-				TRUE
+			|| (
+				$user->is_in_group('editor')
+				&& (
+					$this->get_owner() === $user->get_name()
+					|| in_array(
+						$user->get_name(),
+						$this->get_collaborators(),
+						TRUE
+					)
+				)
 			)
 		);
 	}
