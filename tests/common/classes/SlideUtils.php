@@ -193,4 +193,30 @@ final class SlideUtils {
 			TRUE
 		);
 	}
+
+	/**
+	* Get a slide asset.
+	*
+	* @param APIInterface $api  An APIInterface object.
+	* @param string       $id   The id of the slide.
+	* @param string       $name The name of the file get.
+	*
+	* @return Response The API response.
+	*/
+	public static function get_asset(
+		APIInterface $api,
+		string $id,
+		string $name
+	): Response {
+		return $api->call_return_raw_response(
+			'GET',
+			'slide/asset/slide_get_asset.php',
+			[
+				'id' => $id,
+				'name' => $name
+			],
+			[],
+			TRUE
+		);
+	}
 }
