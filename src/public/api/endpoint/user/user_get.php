@@ -46,7 +46,7 @@ APIEndpoint::GET(
 			]
 		]
 	],
-	function($req, $resp, $module_data) {
+	function($req, $module_data) {
 		$caller = $module_data['APIAuthModule']['user'];
 		$params = $module_data['APIQueryValidatorModule'];
 		$user = NULL;

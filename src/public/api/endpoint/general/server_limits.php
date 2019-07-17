@@ -21,7 +21,7 @@ use \api\APIEndpoint;
 
 APIEndpoint::GET(
 	[],
-	function($req, $resp, $module_data) {
+	function($req, $module_data) {
 		return ['limits' => LS_LIMITS];
 	}
 );

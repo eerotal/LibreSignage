@@ -40,7 +40,7 @@ APIEndpoint::POST(
 			]
 		]
 	],
-	function($req, $resp, $module_data) {
+	function($req, $module_data) {
 		$queue = NULL;
 		$caller = $module_data['APIAuthModule']['user'];
 		$params = $module_data['APIJSONValidatorModule'];

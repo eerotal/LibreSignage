@@ -54,7 +54,7 @@ APIEndpoint::POST(
 			]
 		]
 	],
-	function($req, $resp, $module_data) {
+	function($req, $module_data) {
 		$new = NULL;
 		$pass = NULL;
 

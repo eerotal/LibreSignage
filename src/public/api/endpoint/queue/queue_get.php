@@ -42,7 +42,7 @@ APIEndpoint::GET(
 			]
 		]
 	],
-	function($req, $resp, $module_data) {
+	function($req, $module_data) {
 		$params = $module_data['APIQueryValidatorModule'];
 		$queue = new Queue();
 		$queue->load($params->name);

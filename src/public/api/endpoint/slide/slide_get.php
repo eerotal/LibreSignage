@@ -55,7 +55,7 @@ APIEndpoint::GET(
 			]
 		]
 	],
-	function($req, $resp, $module_data) {
+	function($req, $module_data) {
 		$params = $module_data['APIQueryValidatorModule'];
 		$slide = new Slide();
 		$slide->load($params->id);

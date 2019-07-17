@@ -22,7 +22,7 @@ use \api\APIEndpoint;
 
 APIEndpoint::GET(
 	[],
-	function($req, $resp, $module_data) {
+	function($req, $module_data) {
 		return [
 			'ls' => Config::config('LS_VER'),
 			'api' => Config::config('API_VER')

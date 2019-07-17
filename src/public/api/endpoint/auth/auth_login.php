@@ -45,7 +45,7 @@ APIEndpoint::POST(
 			]
 		]
 	],
-	function($req, $resp, $module_data) {
+	function($req, $module_data) {
 		$params = $module_data['APIJSONValidatorModule'];
 
 		$user = Auth::verify_creds($params->username, $params->password);

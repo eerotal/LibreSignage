@@ -34,7 +34,6 @@ class APIEndpoint {
 		$ret = NULL;
 		$this->method = $method;
 		$this->request = Request::createFromGlobals();
-		$this->response = new Response();
 
 		// Only handle requests with the correct HTTP method.
 		if ($this->method !== $this->request->getMethod()) { return; }
@@ -43,7 +42,7 @@ class APIEndpoint {
 		foreach ($modules as $m => $args) { $this->run_module($m, $args); }
 
 		// Run the endpoint hook function.
-		$ret = $hook($this->request, $this->response, $this->module_data);
+		$ret = $hook($this->request, $this->module_data);
 
 		// Send $ret as the response if it's an array or Response.
 		if (is_array($ret)) {
@@ -51,6 +50,8 @@ class APIEndpoint {
 			$this->response->setContent(JSONUtils::encode((object) $ret));
 		} else if ($ret instanceof Response) {
 			$this->response = $ret;
+		} else {
+			$this->response = new Response();
 		}
 
 		$this->send();

@@ -34,7 +34,7 @@ APIEndpoint::GET(
 		],
 		'APIRateLimitModule' => []
 	],
-	function($req, $resp, $module_data) {
+	function($req, $module_data) {
 		$ret = ['users' => []];
 		$caller = $module_data['APIAuthModule']['user'];
 

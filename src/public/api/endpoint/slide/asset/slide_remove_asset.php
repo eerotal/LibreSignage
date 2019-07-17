@@ -42,7 +42,7 @@ APIEndpoint::POST(
 			]
 		]
 	],
-	function ($req, $resp, $module_data) {
+	function($req, $module_data) {
 		$slide = NULL;
 
 		$params = $module_data['APIJSONValidatorModule'];
