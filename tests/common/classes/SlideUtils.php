@@ -150,10 +150,7 @@ final class SlideUtils {
 			[
 				[
 					'name' => 'body',
-					'contents' => JSONUtils::encode([
-						'id' => $id,
-						'name' => basename($path)
-					])
+					'contents' => JSONUtils::encode(['id' => $id])
 				],
 				[
 					'name' => '0',
