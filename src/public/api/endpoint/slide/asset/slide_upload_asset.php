@@ -78,6 +78,13 @@ APIEndpoint::POST(
 		$slide = new Slide();
 		$slide->load($params->id);
 
+		if (!$caller->is_in_group(['admin', 'editor'])) {
+			throw new APIException(
+				'User not allowed to upload assets.',
+				HTTPStatus::UNAUTHORIZED
+			);
+		}
+
 		if (!$slide->can_modify($caller)) {
 			throw new APIException(
 				'User not allowed to upload assets to this slide.',
