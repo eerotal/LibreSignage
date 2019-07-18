@@ -66,5 +66,5 @@ return [
 
 	'ASSET_FILENAME_MAXLEN' => 64,
 
-	'LOG_MAX_LEN'			=> 100
+	'LOG_MAX_LEN'			=> 300
 ];
