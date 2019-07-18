@@ -38,31 +38,30 @@ INITCHK_WARN ?= N
 
 # Don't search for dependencies when certain targets with no deps are run.
 # The if-statement below is some hacky makefile magic. Don't be scared.
-NODEP_TARGETS := clean realclean LOC LOD configure\
-	initchk install install-deps
-
+NODEP_TARGETS := clean realclean LOC LOD configure initchk install install-deps
 ifneq ($(filter \
 	0 $(shell expr $(words $(MAKECMDGOALS)) '*' '2'),\
 	$(words \
 		$(filter-out \
 			$(NODEP_TARGETS),\
 			$(MAKECMDGOALS)\
-		)$(MAKECMDGOALS)\
+		) $(MAKECMDGOALS)\
 	)\
 ),)
 
-PHP_AUTOLOAD := $(shell find vendor/composer/ -type f) vendor/autoload.php
+# PHP autoload files from vendor/composer/.
+PHP_AUTOLOAD := $(shell find vendor/composer/ -type f -name '*.php') vendor/autoload.php
+
+# Production PHP libraries.
+PHP_LIBS := $(shell find $(addprefix vendor/,\
+	$(shell "./$(COMPOSER_DEP)" "$(COMPOSER_DEP_FLAGS)"|cut -d' ' -f1)\
+) -type f) $(PHP_AUTOLOAD)
 
 # Production JavaScript libraries.
 JS_LIBS := $(filter-out \
 	$(shell printf "$(ROOT)\n"|sed 's:/$$::g'), \
 	$(shell npm ls --prod --parseable|sed 's/\n/ /g') \
 )
-
-# Production PHP libraries.
-PHP_LIBS := $(shell find $(addprefix vendor/,\
-	$(shell "./$(COMPOSER_DEP)" "$(COMPOSER_DEP_FLAGS)"|cut -d' ' -f1)\
-) -type f) $(PHP_AUTOLOAD)
 
 # Non-compiled sources.
 SRC_NO_COMPILE := $(shell find src \
@@ -120,7 +119,9 @@ ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [Info] Not going to generate HTML documentation.)
 endif
 
-.PHONY: $(NODEP_TARGETS) dirs server js css api config libs docs htmldocs $(PHP_AUTOLOAD)
+.PHONY: $(NODEP_TARGETS) dirs server js css api config libs \
+	docs htmldocs $(PHP_AUTOLOAD)
+
 .ONESHELL:
 
 all:: initchk server docs htmldocs js css api js_libs php_libs logo; @:
@@ -318,7 +319,7 @@ vendor/autoload.php:
 			;;
 		*)
 			echo "[Info] Dump production autoload."
-			composer dump-autoload --no-ansi --no-dev
+			composer dump-autoload --no-ansi --no-dev --optimize
 			;;
 	esac
 
@@ -356,7 +357,6 @@ install-deps:
 	set -e
 	npm install
 	composer install
-	composer dump-autoload
 
 configure: install-deps
 	@:
