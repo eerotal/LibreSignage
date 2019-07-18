@@ -4,6 +4,18 @@ v1.1.0
   - [feature]  Implement [bgimg] and [bgcolor] markup tags for styling
                slide backgrounds. (issue #75)
   - [feature]  Implement buttons for manual slide navigation in display.
+  - [internal] Mostly rewrite the API system
+  - [internal] Use PHP autoloading and namespaces instead of direct
+               file includes.
+  - [internal] Improve various classes and PHP files to make the more object
+               oriented.
+  - [internal] Implement a testing framework with PHPUnit and write tests
+               for all API endpoints.
+  - [bugfix]   Fix various bugs in the backend that were discovered while
+               writing tests.
+  - [build]    Make the build system more modular.
+  - [build]    Write separate interactive and CLI versions of the apache2-debian
+               target. (apache2-debian-interactive and apache2-debian)
 
 v1.0.2
   - [bugfix]   Apply a workaround for docker-library/php#865 which broke
