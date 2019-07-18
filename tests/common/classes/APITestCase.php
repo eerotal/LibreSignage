@@ -190,7 +190,6 @@ class APITestCase extends TestCase {
 		if ($user !== NULL && $pass !== NULL) {
 			$this->api->login($user, $pass);
 		}
-
 		$resp = $this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
@@ -198,11 +197,11 @@ class APITestCase extends TestCase {
 			$headers,
 			$user !== NULL && $pass !== NULL
 		);
-		$this->assert_api_failed($resp, $error);
-
 		if ($user !== NULL && $pass !== NULL) {
 			$this->api->logout();
 		}
+
+		$this->assert_api_failed($resp, $error);
 
 		return $resp;
 	}
@@ -236,7 +235,6 @@ class APITestCase extends TestCase {
 		if ($user !== NULL && $pass !== NULL) {
 			$this->api->login($user, $pass);
 		}
-
 		$resp = $this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
@@ -244,14 +242,14 @@ class APITestCase extends TestCase {
 			$headers,
 			$user !== NULL && $pass !== NULL
 		);
+		if ($user !== NULL && $pass !== NULL) {
+			$this->api->logout();
+		}
+
 		self::assert_object_matches_schema(
 			APIInterface::decode_raw_response($resp),
 			$schema_path
 		);
-
-		if ($user !== NULL && $pass !== NULL) {
-			$this->api->logout();
-		}
 
 		return $resp;
 	}
