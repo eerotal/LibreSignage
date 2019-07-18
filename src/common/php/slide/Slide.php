@@ -93,7 +93,8 @@ final class Slide extends Exportable {
 		$this->import(JSONUtils::decode($tmp, $assoc=TRUE), TRUE);
 
 		$this->lock_cleanup();
-		$this->check_sched_enabled();
+		$this->update_sched_enabled();
+		$this->write();
 	}
 
 	/**
@@ -614,24 +615,20 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Check whether the slide is enabled based on
-	* the scheduling config. This function basically
-	* overrides the manual 'enabled' control.
+	* Update $this->enabled based on whether a scheduled slide
+	* should be enabled. This function overrides manual control
+	* of $this->enabled.
 	*/
-	public function check_sched_enabled() {
+	public function update_sched_enabled() {
 		$t = time();
 		if (
 			$this->get_sched()
 			&& $t >= $this->get_sched_t_s()
 			&& $t <= $this->get_sched_t_e()
 		) {
-			// Scheduling active -> enable.
 			$this->set_enabled(TRUE);
-			$this->write();
 		} else if ($this->get_sched()){
-			// Scheduling inactive -> disable.
 			$this->set_enabled(FALSE);
-			$this->write();
 		}
 	}
 
