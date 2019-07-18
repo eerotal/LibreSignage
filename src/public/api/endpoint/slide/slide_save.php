@@ -72,6 +72,7 @@ use \common\php\Queue;
 use \common\php\slide\Slide;
 use \common\php\auth\User;
 use \common\php\auth\Session;
+use \common\php\Log;
 
 APIEndpoint::POST(
 	[
@@ -153,10 +154,7 @@ APIEndpoint::POST(
 					HTTPStatus::UNAUTHORIZED
 				);
 			}
-		} else if (
-			$caller->is_in_group('admin')
-			|| $caller->is_in_group('editor')
-		) {
+		} else if ($caller->is_in_group(['admin', 'editor'])) {
 			// admin or editor => ALLOW creation.
 			return create_slide($caller, $session, $slide, $params);
 		} else {
@@ -207,7 +205,7 @@ function set_slide_data(Slide $slide, $data, bool $owner): void {
 	$slide->set_sched_t_s($data->sched_t_s);
 	$slide->set_sched_t_e($data->sched_t_e);
 	$slide->set_animation($data->animation);
-	$slide->check_sched_enabled();
+	$slide->update_sched_enabled();
 }
 
 function create_slide(User $caller, Session $session, Slide $slide, $data) {
@@ -217,22 +215,8 @@ function create_slide(User $caller, Session $session, Slide $slide, $data) {
 	*  Note that Slide::set_owner() must be called
 	*  before Slide::set_collaborators()!
 	*/
-	$slide->gen_id();
-	$slide->set_owner($caller->get_name());
-	$slide->lock_acquire($session);
 
-	set_slide_data($slide, $data, TRUE);
 	if (!$caller->get_quota()->has_quota('slides')) {
-		/*
-		* The user doesn't have slide quota so abort the slide
-		* creation process. Remove the broken slide from $queue
-		* by calling Queue::remove_broken_slides().
-		*/
-		$queue = new Queue();
-		$queue->load($slide->get_queue_name());
-		$queue->remove_slide($slide);
-		$queue->write();
-
 		throw new APIException(
 			'Slide quota exceeded.',
 			HTTPStatus::FORBIDDEN
@@ -240,6 +224,20 @@ function create_slide(User $caller, Session $session, Slide $slide, $data) {
 	} else {
 		$caller->get_quota()->use_quota('slides');
 		$caller->write();
+	}
+
+	try {
+		$slide->gen_id();
+		$slide->set_owner($caller->get_name());
+		$slide->lock_acquire($session);
+
+		set_slide_data($slide, $data, TRUE);
+	} catch (\Exception $e) {
+		$slide->remove();
+		$caller->get_quota()->free_quota('slides');
+		$caller->write();
+
+		throw $e;
 	}
 	return finish($slide);
 }
