@@ -465,22 +465,22 @@ configure
 
   * apache2-debian
 
-    * A target for building a native install on Debian with Apache2.
-    * Run ``make configure TARGET=apache2-debian PASS="--help"`` to
-      get a list of accepted CLI options.
+      * A target for building a native install on Debian with Apache2.
+      * Run ``make configure TARGET=apache2-debian PASS="--help"`` to
+        get a list of accepted CLI options.
 
   * apache2-debian-interactive
 
-    * An interactive version of *apache2-debian*.
-    * This target doesn't accept any CLI options.
+      * An interactive version of *apache2-debian*.
+      * This target doesn't accept any CLI options.
 
   * apache2-debian-docker (Build target for building Docker images.)
 
-    * A target for building Docker images.
-    * You can use PASS with ``--features [features]`` where ``[features]``
-      is a comma separated list of features to enable. See the section
-      `4.3.2. Building a Docker image on Debian or Ubuntu`_ for more
-      info.
+      * A target for building Docker images.
+      * You can use PASS with ``--features [features]`` where ``[features]``
+        is a comma separated list of features to enable. See the section
+        `4.3.2. Building a Docker image on Debian or Ubuntu`_ for more
+        info.
 
 install
   Install the LibreSignage distribution on the machine. Note that
