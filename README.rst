@@ -464,13 +464,18 @@ configure
   to the build configuration script. The recognized targets are:
 
   * apache2-debian
+
     * A target for building a native install on Debian with Apache2.
     * Run ``make configure TARGET=apache2-debian PASS="--help"`` to
       get a list of accepted CLI options.
+
   * apache2-debian-interactive
+
     * An interactive version of *apache2-debian*.
     * This target doesn't accept any CLI options.
+
   * apache2-debian-docker (Build target for building Docker images.)
+
     * A target for building Docker images.
     * You can use PASS with ``--features [features]`` where ``[features]``
       is a comma separated list of features to enable. See the section
