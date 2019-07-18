@@ -108,7 +108,7 @@ final class SlideAsset extends Exportable {
 				Config::config('THUMB_MAXW'),
 				Config::config('THUMB_MAXH')
 			);
-		} catch (Exception $e) { $this->has_thumb = FALSE; }
+		} catch (\Exception $e) { $this->has_thumb = FALSE; }
 	}
 
 	/**

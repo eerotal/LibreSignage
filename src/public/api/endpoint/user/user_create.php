@@ -104,7 +104,7 @@ APIEndpoint::POST(
 		try {
 			$pass = Util::gen_passwd(Config::config('GENERATED_PASSWD_LEN'));
 			$new->set_password($pass);
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			throw new APIException(
 				"Failed to generate password.",
 				HTTPStatus::INTERNAL_SERVER_ERROR,
@@ -120,7 +120,7 @@ APIEndpoint::POST(
 				'Too many users.',
 				HTTPStatus::FORBIDDEN
 			);
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			throw new APIException(
 				'Failed to write userdata.',
 				HTTPStatus::INTERNAL_SERVER_ERROR

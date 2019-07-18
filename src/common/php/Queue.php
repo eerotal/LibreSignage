@@ -71,7 +71,7 @@ final class Queue extends Exportable {
 			$s = new Slide();
 			try {
 				$s->load($n);
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				if (
 					$e instanceof IntException
 					|| $e instanceof JSONException

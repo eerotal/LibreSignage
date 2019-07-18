@@ -47,6 +47,9 @@ use \api\APIException;
 use \api\HTTPStatus;
 use \common\php\slide\Slide;
 use \common\php\Log;
+use \common\php\exceptions\ArgException;
+use \common\php\exceptions\FileTypeException;
+use \common\php\exceptions\LimitException;
 
 const UPLOAD_ERR_EXISTS          = -1;
 const UPLOAD_ERR_INTERNAL        = -2;
@@ -104,7 +107,7 @@ APIEndpoint::POST(
 				$errors[$name] = UPLOAD_ERR_BAD_FILETYPE;
 			} catch (LimitException $e) {
 				$errors[$name] = UPLOAD_ERR_TOO_MANY_ASSETS;
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				$errors[$name] = UPLOAD_ERR_INTERNAL;
 			}
 		}
