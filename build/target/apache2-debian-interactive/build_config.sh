@@ -1,16 +1,13 @@
 #!/bin/sh
 
 #
-# Interactive build configuration script for LibreSignage.
-#
-# This script wraps build/target/apache2-debian/build_config.sh in order
-# to provide a nicer interface for configuring LibreSignage builds.
+# Build configuration script for the apache2-debian-interactive target.
 #
 
 set -e
 . build/scripts/conf.sh
 . build/scripts/fancyread.sh
-. build/target/apache2-debian/build_config_defaults.sh
+. build/target/apache2-debian-interactive/build_config_defaults.sh
 
 CONF_INSTALL_DIR=$(fancyread "Install directory" "$CONF_INSTALL_DIR")
 CONF_NAME=$(fancyread "Server domain" "$CONF_NAME")

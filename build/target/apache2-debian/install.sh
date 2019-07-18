@@ -1,9 +1,8 @@
 #!/bin/sh
 
-##
-##  A LibreSignage target specific install handler for apache2
-##  on Debian. This script is interactive.
-##
+#
+# An install handler for the apache2-debian target.
+#
 
 set -e
 . build/scripts/conf.sh

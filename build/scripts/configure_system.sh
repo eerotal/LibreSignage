@@ -1,9 +1,9 @@
 #!/bin/sh
 
-##
-##  Execute the system config generator script for the
-##  configured target.
-##
+#
+# Execute the system config generator script for the
+# configured target.
+#
 
 set -e
 

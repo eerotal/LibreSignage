@@ -3,9 +3,6 @@
 #
 # LibreSignage build configuration script for the apache2-debian target.
 #
-# You can also use build/scripts/apache2-debian/build_config_interactive.sh
-# for an interactve wrapper for this script.
-#
 
 set -e
 . build/scripts/conf.sh

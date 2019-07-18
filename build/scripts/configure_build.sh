@@ -1,11 +1,11 @@
 #!/bin/sh
 
-##
-##  Select a target and execute the build config generator for that
-##  target. You must pass the target name [TARGET] by using
-##  --target [TARGET] when executing this script. Any additional
-##  arguments are passed to the build config generator script.
-##
+#
+# Select a target and execute the build config generator for that
+# target. You must pass the target name [TARGET] by using
+# --target [TARGET] when executing this script. Any additional
+# arguments are passed to the build config generator script.
+#
 
 set -e
 

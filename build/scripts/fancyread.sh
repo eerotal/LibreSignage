@@ -11,18 +11,27 @@
 # All remaining arguments are considered allowed values.
 #
 fancyread() {
-	read -p "$1 [$2]: " ret
+	prompt="$1"
+	default="$2"
+	tmp=""
+	ret=""
+
+	shift 2
+
+	if [ -n "$1" ]; then
+		tmp=" ($(echo "$@" | sed 's: :/:g'))"
+	fi
+
+	read -p "$prompt$tmp [default: $default]: " ret
 	if [ -z "$ret" ]; then
-		echo "$2"
-	elif [ -n "$3" ]; then
-		shift 2
-		allowed="$@"
-		case $@ in
+		echo "$default"
+	elif [ -n "$1" ]; then
+		case "$@" in
 			*"$ret"*)
 				echo "$ret"
 				;;
 			*)
-				echo "[Error] Expected one of: $allowed" > /dev/stderr
+				echo "[Error] Expected one of: $@" > /dev/stderr
 				exit 1
 				;;
 		esac
