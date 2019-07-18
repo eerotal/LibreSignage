@@ -34,6 +34,7 @@ class APIEndpoint {
 		$ret = NULL;
 		$this->method = $method;
 		$this->request = Request::createFromGlobals();
+		$this->response = new Response();
 
 		// Only handle requests with the correct HTTP method.
 		if ($this->method !== $this->request->getMethod()) { return; }
@@ -50,8 +51,6 @@ class APIEndpoint {
 			$this->response->setContent(JSONUtils::encode((object) $ret));
 		} else if ($ret instanceof Response) {
 			$this->response = $ret;
-		} else {
-			$this->response = new Response();
 		}
 
 		$this->send();
