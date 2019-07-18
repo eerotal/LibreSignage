@@ -47,14 +47,12 @@ class slide_save extends APITestCase {
 			[],
 			TRUE
 		);
+		$this->api->logout();
+
 		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new Exception(
-				'Failed to create slide for testing: '.
-				(string) $resp->getBody()
-			);
+			throw new \Exception("Failed to create slide for testing.");
 		}
 		$this->slide_id = APIInterface::decode_raw_response($resp)->id;
-		$this->api->logout();
 	}
 
 	/**
@@ -73,6 +71,7 @@ class slide_save extends APITestCase {
 			$user,
 			$pass
 		);
+
 		if ($resp->getStatusCode() === HTTPStatus::OK) {
 			$this->slide_id = APIInterface::decode_raw_response($resp)->id;
 		}
@@ -167,8 +166,8 @@ class slide_save extends APITestCase {
 			'Empty markup parameter' => [
 				'admin',
 				'admin',
-				\array_merge(self::VALID_PARAMS, ['markup' => '']),
-				HTTPStatus::OK
+				\array_merge(self::VALID_PARAMS, ['markup' => 123]),
+				HTTPStatus::BAD_REQUEST
 			],
 			'Wrong type for markup parameter' => [
 				'admin',
@@ -390,7 +389,7 @@ class slide_save extends APITestCase {
 		);
 
 		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$slide_id = APIInterface::decode_raw_response($resp)->id;
+			$this->slide_id = APIInterface::decode_raw_response($resp)->id;
 		}
 	}
 
@@ -398,12 +397,11 @@ class slide_save extends APITestCase {
 		if ($this->slide_id !== NULL) {
 			$this->api->login('admin', 'admin');
 			$resp = SlideUtils::remove_slide($this->api, $this->slide_id);
+			$this->api->logout();
 
 			if ($resp->getStatusCode() !== HTTPStatus::OK) {
 				throw new \Exception("Failed to cleanup created slide.");
 			}
-
-			$this->api->logout();
 			$this->slide_id = NULL;
 		}
 	}
