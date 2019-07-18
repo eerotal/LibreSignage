@@ -230,16 +230,16 @@ host (ie. no containers) by following the instructions below.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
    The repository will be cloned into the directory *LibreSignage/*.
 4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
-5. Run ``make configure TARGET=apache2-debian``. This target installs any
-   needed *composer* and *npm* dependencies first and then prompts you for
-   some configuration values:
+5. Run ``make configure TARGET=apache2-debian-interactive``. This target
+   installs any needed *composer* and *npm* dependencies first and then
+   prompts you for some configuration values:
 
-   * Install directory (default: /var/www)
+   * Install directory [default: /var/www]
 
      * The directory where LibreSignage is installed. A subdirectory
        is created in this directory.
 
-   * Server name (domain)
+   * Server domain [default: localhost]
 
      * The domain name to use for configuring apache2. If you
        don't have a domain and you are just testing the system,
@@ -248,7 +248,7 @@ host (ie. no containers) by following the instructions below.
        domain, you can add it to your */etc/hosts* file to make
        it work on your machine.
 
-   * Server name aliases
+   * Domain aliases [default: ]
 
      * Domain name aliases for the server. Aliases make it possible
        to have the server respond from multiple domains. One useful
@@ -258,17 +258,17 @@ host (ie. no containers) by following the instructions below.
        to *localhost* on the host machine or by connecting to the LAN
        IP on the local network.
 
-   * Admin name
+   * Admin name [default: Example Admin]
 
      * Shown to users on the main page as contact info in case of
        any problems.
 
-   * Admin email
+   * Admin email [default: admin@example.com]
 
      * Shown to users on the main page as contact info in case of
        any problems.
 
-   * Enable image thumbnail generation (y/N)
+   * Enable image thumbnail generation? (Y/N/y/n) [default: N]
 
      * Enable image thumbnail generation on the server. Currently
        image thumbnails are only generated for uploaded slide
@@ -278,24 +278,25 @@ host (ie. no containers) by following the instructions below.
        is enabled. If *gd* doesn't appear in the list but is
        installed, you can run ``sudo phpenmod gd`` to enable it.
 
-   * Enable video thumbnail generation (y/N) *Requires ffmpeg.*
+   * Enable video thumbnail generation? (Y/N/y/n) [default: N]
 
      * Enable video thumbnail generation. Currently video thumbnails
-       are only generated for uploaded slide media. Note that video
-       thumbnail generation requires *ffmpeg* and *ffprobe* to be
-       available on the host system. If you enable this option,
+       are only generated for uploaded slide media. **Note that video
+       thumbnail generation requires ffmpeg and ffprobe to be
+       available on the host system.** If you enable this option,
        you'll also need to configure the binary paths to *ffmpeg*
        and *ffprobe* in the LibreSignage configuration files. The
        paths default to */usr/bin/ffmpeg* and */usr/bin/ffprobe*.
        See the help page `Libresignage configuration` or the file
        `src/doc/rst/configuration.rst` for more info.
 
-   * Enable debugging (y/N) *Do not enable on production systems.*
+   * Enable debugging? (Y/N/y/n) [default: N]
 
      *  Whether to enable debugging. This enables things like
-        verbose error reporting through the API etc.
+        verbose error reporting through the API etc. **DO NOT
+        enabled debugging on production systems.**
 
-   This command generates aa build configuration file needed
+   This command generates a build configuration file needed
    for building LibreSignage. The file is saved in ``build/`` as
    ``<DOMAIN>.conf`` where ``<DOMAIN>`` is the domain name you
    specified.
@@ -306,7 +307,7 @@ host (ie. no containers) by following the instructions below.
 8. Disable the default Apache site by running
    ``sudo a2dissite 000-default.conf``.
 9. Navigate to the domain name you entered and you should see the
-    LibreSignage login page.
+   LibreSignage login page.
 
 4.3.2. Building a Docker image on Debian or Ubuntu
 ..................................................
@@ -462,9 +463,15 @@ configure
   optionally use ``PASS=[pass]`` to pass any target specific arguments
   to the build configuration script. The recognized targets are:
 
-  * apache2-debian (Build target for a native install on Debian.)
+  * apache2-debian
+    * A target for building a native install on Debian with Apache2.
+    * Run ``make configure TARGET=apache2-debian PASS="--help"`` to
+      get a list of accepted CLI options.
+  * apache2-debian-interactive
+    * An interactive version of *apache2-debian*.
+    * This target doesn't accept any CLI options.
   * apache2-debian-docker (Build target for building Docker images.)
-
+    * A target for building Docker images.
     * You can use PASS with ``--features [features]`` where ``[features]``
       is a comma separated list of features to enable. See the section
       `4.3.2. Building a Docker image on Debian or Ubuntu`_ for more
