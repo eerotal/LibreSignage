@@ -1,5 +1,7 @@
 <?php
 
+namespace api\endpoint\queue;
+
 use \classes\APITestCase;
 
 class queue_list extends APITestCase {

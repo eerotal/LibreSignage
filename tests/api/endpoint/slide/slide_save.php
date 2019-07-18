@@ -1,5 +1,7 @@
 <?php
 
+namespace api\endpoint\slide;
+
 use \classes\APITestCase;
 use \classes\APIInterface;
 use \api\HTTPStatus;
@@ -25,6 +27,8 @@ class slide_save extends APITestCase {
 	];
 
 	private $slide_id = NULL;
+
+	use \traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();

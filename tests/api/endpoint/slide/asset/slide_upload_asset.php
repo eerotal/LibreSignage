@@ -1,5 +1,7 @@
 <?php
 
+namespace api\endpoint\slide\asset;
+
 use \classes\APITestCase;
 use \classes\SlideUtils;
 use \classes\APIInterface;

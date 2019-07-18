@@ -1,5 +1,7 @@
 <?php
 
+namespace api\endpoint\auth;
+
 use \classes\APITestCase;
 use \api\HTTPStatus;
 

@@ -1,5 +1,7 @@
 <?php
 
+namespace api\endpoint\general;
+
 use \JsonSchema\Validator;
 use \classes\APITestCase;
 use \classes\APITestUtils;

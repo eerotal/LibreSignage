@@ -1,5 +1,7 @@
 <?php
 
+namespace api\endpoint\slide;
+
 use \classes\APITestCase;
 
 class slide_list extends APITestCase {

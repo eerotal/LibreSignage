@@ -1,5 +1,7 @@
 <?php
 
+namespace api\endpoint\slide;
+
 use \classes\APITestCase;
 use \api\HTTPStatus;
 use \classes\SlideUtils;

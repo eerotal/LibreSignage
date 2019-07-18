@@ -1,5 +1,7 @@
 <?php
 
+namespace api\endpoint\auth;
+
 use \classes\APITestCase;
 
 class auth_session_renew extends APITestCase {

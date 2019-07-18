@@ -1,10 +1,12 @@
 <?php
 
+namespace api\endpoint\queue;
+
 use \classes\APITestCase;
 use \api\HTTPStatus;
 
 class queue_create extends APITestCase {
-	use traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	const TEST_QUEUE_NAME = 'test_queue';
 
