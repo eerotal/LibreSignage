@@ -34,11 +34,13 @@ Table Of Contents
 
 `8. Make rules`_
 
-`9. Documentation`_
+`9. Build targets`_
 
-`10. Third-party dependencies`_
+`10. Documentation`_
 
-`11. License`_
+`11. Third-party dependencies`_
+
+`12. License`_
 
 1. Introduction
 ---------------
@@ -173,7 +175,7 @@ Build system dependencies installed automatically by *npm* or *composer*
     * JSDOM (https://github.com/jsdom/jsdom)
     * node-XMLHttpRequest (https://github.com/driverdan/node-XMLHttpRequest)
 
-See `10. Third-party dependencies`_ for license information.
+See `11. Third-party dependencies`_ for license information.
 
 4.2. Using prebuilt Docker images on any distribution
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -387,7 +389,7 @@ Why doesn't LibreSignage have feature X?
 Is LibreSignage really free?
   YES! In fact LibreSignage is not only free, it's also open source.
   You can find information about the LibreSignage license in the
-  section `11. License`_.
+  section `12. License`_.
 
 7. Screenshots
 ---------------
@@ -452,35 +454,27 @@ all
   can pass ``NOHTMLDOCS=y`` if you don't want to generate any HTML
   documentation.
 
-install-deps
-  Install the *composer* and *npm* dependencies needed for building
-  LibreSignage. This target is a prerequisite of ``configure`` so it's
-  not necessary to run it manually.
-
 configure
   Generate a LibreSignage build configuration file. You need to use
   ``TARGET=[target]`` to select a build target to use. You can also
   optionally use ``PASS=[pass]`` to pass any target specific arguments
-  to the build configuration script. The recognized targets are:
+  to the build configuration script. See `9. Build targets`_
 
-  * apache2-debian
+install-deps
+  Install the *composer* and *npm* dependencies needed for building
+  LibreSignage. **You don't need to run this target manually because the
+  configure target runs this one aswell.**
 
-      * A target for building a native install on Debian with Apache2.
-      * Run ``make configure TARGET=apache2-debian PASS="--help"`` to
-        get a list of accepted CLI options.
+configure-build
+  Generate a LibreSignage build configuration file. You need to pass
+  ``TARGET=[target]`` to select a build target to use. You can also optionally
+  use ``PASS=[pass]`` to pass any target specific arguments to the build
+  configuration script. See `9. Build targets`_ **You don't need to run this
+  target because the configure target runs this one aswell.**
 
-  * apache2-debian-interactive
-
-      * An interactive version of *apache2-debian*.
-      * This target doesn't accept any CLI options.
-
-  * apache2-debian-docker (Build target for building Docker images.)
-
-      * A target for building Docker images.
-      * You can use PASS with ``--features [features]`` where ``[features]``
-        is a comma separated list of features to enable. See the section
-        `4.3.2. Building a Docker image on Debian or Ubuntu`_ for more
-        info.
+configure-system
+  Generate LibreSignage system configuration files. **You don't need to run
+  this target because the configure target runs this one aswell.**
 
 install
   Install the LibreSignage distribution on the machine. Note that
@@ -530,7 +524,27 @@ API_TEST_URI=<URI>
   Use *URI* as the hostname when running API integration tests. This is
   ``http://localhost:80/`` by default.
 
-9. Documentation
+9. Build targets
+----------------
+
+* apache2-debian
+
+  * A target for building a native install on Debian with Apache2.
+  * Run ``make configure TARGET=apache2-debian PASS="--help"`` to
+    get a list of accepted CLI options.
+
+* apache2-debian-interactive
+
+  * An interactive version of *apache2-debian*.
+  * This target doesn't accept any CLI options.
+
+* apache2-debian-docker (Build target for building Docker images.)
+
+  * A target for building Docker images.
+  * Run ``make configure TARGET=apache2-debian-docker PASS="--help"`` to
+    get a list of accepted CLI options.
+
+10. Documentation
 -----------------
 
 LibreSignage documentation is written in reStructuredText, which is
@@ -542,7 +556,7 @@ are located in the directory *src/doc/rst/*.
 The reStructuredText files are also compiled into HTML when LibreSignage
 is built and they can be accessed from the *Help* page of LibreSignage.
 
-10. Third-party dependencies
+11. Third-party dependencies
 ----------------------------
 
 Bootstrap (Library, MIT License) (https://getbootstrap.com/)
@@ -593,13 +607,13 @@ The full licenses for these third party libraries and resources can be
 found in the file *src/doc/rst/LICENSES_EXT.rst* in the source
 distribution.
 
-11. License
+12. License
 -----------
 
 LibreSignage is licensed under the BSD 3-clause license, which can be
 found in the files *LICENSE.rst* and *src/doc/rst/LICENSE.rst* in the
 source distribution. Third party libraries and resources are licensed
-under their respective licenses. See `10. Third-party dependencies`_ for
+under their respective licenses. See `11. Third-party dependencies`_ for
 more information.
 
 Copyright Eero Talus 2018 and contributors

@@ -38,7 +38,8 @@ INITCHK_WARN ?= N
 
 # Don't search for dependencies when certain targets with no deps are run.
 # The if-statement below is some hacky makefile magic. Don't be scared.
-NODEP_TARGETS := clean realclean LOC LOD configure initchk install install-deps
+NODEP_TARGETS := clean realclean LOC LOD configure configure-build \
+	configure-system initchk install install-deps
 ifneq ($(filter \
 	0 $(shell expr $(words $(MAKECMDGOALS)) '*' '2'),\
 	$(words \
@@ -350,7 +351,9 @@ $(GENERATED_LOGOS): dist/%.png: src/$$(shell printf '$$*\n' | rev | cut -f 2- -d
 install:
 	@:
 	set -e
-	./build/scripts/install.sh $(CONF)
+	./build/scripts/install.sh --config="$(CONF)"
+
+configure: install-deps configure-build configure-system
 
 install-deps:
 	@:
@@ -358,17 +361,20 @@ install-deps:
 	npm install
 	composer install
 
-configure: install-deps
+configure-build:
 	@:
 	set -e
 	if [ -z "$(TARGET)" ]; then
-		printf "[Error] Specify a target using 'TARGET=[target]'.\n"
+		printf "[Error] Please specify a build target using 'TARGET=[target]'.\n" > /dev/stderr
 		exit 1
 	fi
-	target="--target $(TARGET)"
 
-	./build/scripts/configure_build.sh $$target $(PASS)
-	./build/scripts/configure_system.sh
+	./build/scripts/configure_build.sh --target="$(TARGET)" $(PASS)
+
+configure-system:
+	@:
+	set -e
+	./build/scripts/configure_system.sh --config="$(CONF)"
 
 clean:
 	@:
