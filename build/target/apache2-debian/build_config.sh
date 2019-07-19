@@ -10,9 +10,11 @@ set -e
 . build/target/apache2-debian/build_config_defaults.sh
 
 script_help() {
-	echo 'Usage: ./build/target/apache2-debian/build_configure.sh [OPTION]...'
+	echo 'Usage:'
+	echo '  make configure TARGET=apache2-debian PASS="[OPTION]..."'
+	echo '  ./build/target/apache2-debian/build_config.sh [OPTION]...'
 	echo ''
-	echo 'Create a LibreSignage build configuration file.'
+	echo 'Create a build configuration file for apache2-debian.'
 	echo ''
 	echo 'Options:'
 	echo ''
@@ -67,7 +69,8 @@ while [ $# -gt 0 ]; do
 	esac
 
 	set +e
-	shift > /dev/null 2>&1 && if [ ! "$?" = 0 ]; then break; fi
+	shift > /dev/null 2>&1
+	if [ ! "$?" = 0 ]; then break; fi
 	set -e
 done
 
