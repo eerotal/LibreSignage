@@ -5,7 +5,7 @@
 #
 
 set -e
-set +x
+
 . build/scripts/conf.sh
 . build/scripts/ldconf.sh
 . build/scripts/args.sh
@@ -70,7 +70,14 @@ APPROOT="${CONF_INSTALL_DIR:?}/${CONF_NAME:?}";
 #
 
 if [ ! -d "${APACHE_SITES_DIR:?}" ]; then
-	echo "[Error] '$APACHE_SITES_DIR' doesn't exist. Is apache2 installed?" > /dev/stderr
+	echo "[Error] Directory '${APACHE_SITES_DIR:?}' doesn't exist." > /dev/stderr
+	echo '[Error] Is apache2 installed?' > /dev/stderr
+	exit 1
+fi
+
+if [ ! -d "${CONF_DIR:?}" ]; then
+	echo "[Error] Directory '${CONF_DIR:?}' doesn't exist." > /dev/stderr
+	echo "[Error] Have you run 'make configure'?" > /dev/stderr
 	exit 1
 fi
 
