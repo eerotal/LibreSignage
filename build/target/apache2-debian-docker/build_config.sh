@@ -34,7 +34,7 @@ while [ $# -gt 0 ]; do
 			;;
 		--help)
 			script_help
-			exit 1
+			exit 0
 			;;
 		*)
 			echo "[Error] Unknown option '$1'." > /dev/stderr
@@ -46,7 +46,10 @@ while [ $# -gt 0 ]; do
 
 	set +e
 	shift > /dev/null 2>&1
-	if [ ! "$?" = 0 ]; then break; fi
+	if [ ! "$?" = 0 ]; then
+		set -e
+		break
+	fi
 	set -e
 done
 

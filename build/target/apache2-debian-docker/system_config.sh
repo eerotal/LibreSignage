@@ -1,14 +1,62 @@
 #!/bin/sh
 
-##
-##  LibreSignage target config generator for the
-##  apache2-debian-docker target used for building
-##  LibreSignage Docker images.
-##
+#
+# System configuration generator for the apache2-debian-docker target.
+#
 
 set -e
 . build/scripts/conf.sh
 . build/scripts/ldconf.sh
+. build/scripts/args.sh
+
+#
+# Setup and parse arguments.
+#
+
+script_help() {
+	echo 'Usage: ./build/target/apache2-debian-docker/system_config.sh [OPTION]...'
+	echo ''
+	echo 'Generate LibreSignage system configuration files.'
+	echo ''
+	echo 'Options:'
+	echo '  OPTION (DEFAULT VALUE) .... DESCRIPTION'
+	echo '  --config=FILE (last generated) ... Use a specific configuration file.'
+	echo '  --help ........................... Print this message and exit.'
+}
+
+BUILD_CONFIG=''
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--config=*)
+			BUILD_CONFIG="$(get_arg_value "$1")"
+			;;
+		--help)
+			script_help
+			exit 0
+			;;
+		*)
+			echo "[Error] Unknown option '$1'." > /dev/stderr
+			echo ''
+			script_help
+			exit 1
+			;;
+	esac
+
+	set +e
+	shift > /dev/null 2>&1
+	if [ ! "$?" = "0" ]; then
+		set -e
+		break
+	fi
+	set -e
+done
+
+load_build_config "$BUILD_CONFIG"
+
+#
+# Generate configuration files.
+#
 
 mkdir -p "$CONF_DIR"
 
