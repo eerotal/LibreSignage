@@ -9,6 +9,10 @@ set -e
 . build/scripts/args.sh
 . build/target/apache2-debian/build_config_defaults.sh
 
+#
+# Setup and parse arguments.
+#
+
 script_help() {
 	echo 'Usage:'
 	echo '  make configure TARGET=apache2-debian PASS="[OPTION]..."'
@@ -33,19 +37,19 @@ script_help() {
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--install-dir=*)
-			CONF_INSTALL_DIR=$(get_arg_value "$1")
+			CONF_INSTALL_DIR="$(get_arg_value "$1")"
 			;;
 		--server-name=*)
-			CONF_NAME=$(get_arg_value "$1")
+			CONF_NAME="$(get_arg_value "$1")"
 			;;
 		--server-aliases=*)
-			CONF_ALIAS=$(get_arg_value "$1")
+			CONF_ALIAS="$(get_arg_value "$1")"
 			;;
 		--admin-name=*)
-			CONF_ADMIN_NAME=$(get_arg_value "$1")
+			CONF_ADMIN_NAME="$(get_arg_value "$1")"
 			;;
 		--admin-email=*)
-			CONF_ADMIN_EMAIL=$(get_arg_value "$1")
+			CONF_ADMIN_EMAIL="$(get_arg_value "$1")"
 			;;
 		--feature-imgthumbs)
 			CONF_FEATURE_IMGTHUMBS="TRUE"
