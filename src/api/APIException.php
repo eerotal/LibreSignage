@@ -21,7 +21,7 @@ class APIException extends \Exception {
 	/**
 	* Get the API JSON representation of an Exception.
 	*
-	* @return string
+	* @return string The JSON representation of the Exception.
 	* @throws IntException If JSON encoding fails.
 	*/
 	public static function as_json(\Throwable $e): string {

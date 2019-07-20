@@ -28,6 +28,13 @@ class APIEndpoint {
 	private $response    = NULL;
 	private $module_data = [];
 
+	/**
+	* Construct the an APIEndpoint object.
+	*
+	* @param array    $modules An array of classnames to use for the APIEndpoint.
+	* @param string   $method  The HTTP method of the endpoint in uppercase.
+	* @param callable $hook    The worker function of the endpoint.
+	*/
 	public function __construct(array $modules, string $method, callable $hook) {
 		APIException::setup();
 
@@ -36,13 +43,10 @@ class APIEndpoint {
 		$this->request = Request::createFromGlobals();
 		$this->response = new Response();
 
-		// Only handle requests with the correct HTTP method.
 		if ($this->method !== $this->request->getMethod()) { return; }
 
-		// Run API modules requested by endpoint.
 		foreach ($modules as $m => $args) { $this->run_module($m, $args); }
 
-		// Run the endpoint hook function.
 		$ret = $hook($this->request, $this->module_data);
 
 		// Send $ret as the response if it's an array or Response.
@@ -56,10 +60,14 @@ class APIEndpoint {
 		$this->send();
 	}
 
-	public function get_request(): Request { return $this->request; }
-	public function get_response(): Response { return $this->response; }
-	public function get_module_data(): array { return $this->module_data; }
-
+	/**
+	* Run a module on an APIEndpoint.
+	*
+	* @param string $module The classname of the module.
+	* @param array  $args   Arguments to pass to the module.
+	*
+	* @throws APIException if the module is not found.
+	*/
 	public function run_module(string $module, array $args) {
 		try {
 			$fq_module = '\\api\\modules\\'.$module;
@@ -72,33 +80,73 @@ class APIEndpoint {
 		}
 	}
 
-	public function send() {
+	/**
+	* Send the APIEndpoint response.
+	*/
+	private function send() {
 		$this->response->prepare($this->request);
 		$this->response->send();
 	}
 
-	/* Static functions */
+	public function get_request(): Request { return $this->request; }
+	public function get_module_data(): array { return $this->module_data; }
 
+	/**
+	* Construct a GET APIEndpoint.
+	*
+	* @param array    $modules API modules to use for the endpoint.
+	* @param callable $hook    The worker function of the endpoint.
+	*/
 	static function GET(array $modules, callable $hook) {
 		return new APIEndpoint($modules, APIEndpoint::M_GET, $hook);
 	}
 
+	/**
+	* Construct a POST APIEndpoint.
+	*
+	* @param array    $modules API modules to use for the endpoint.
+	* @param callable $hook    The worker function of the endpoint.
+	*/
 	static function POST(array $modules, callable $hook) {
 		return new APIEndpoint($modules, APIEndpoint::M_POST, $hook);
 	}
 
+	/**
+	* Construct a PUT APIEndpoint.
+	*
+	* @param array    $modules API modules to use for the endpoint.
+	* @param callable $hook    The worker function of the endpoint.
+	*/
 	static function PUT(array $modules, callable $hook) {
 		return new APIEndpoint($modules, APIEndpoint::M_PUT, $hook);
 	}
 
+	/**
+	* Construct a PATCH APIEndpoint.
+	*
+	* @param array    $modules API modules to use for the endpoint.
+	* @param callable $hook    The worker function of the endpoint.
+	*/
 	static function PATCH(array $modules, callable $hook) {
 		return new APIEndpoint($modules, APIEndpoint::M_PATCH, $hook);
 	}
 
+	/**
+	* Construct a DELETE APIEndpoint.
+	*
+	* @param array    $modules API modules to use for the endpoint.
+	* @param callable $hook    The worker function of the endpoint.
+	*/
 	static function DELETE(array $modules, callable $hook) {
 		return new APIEndpoint($modules, APIEndpoint::M_DELETE, $hook);
 	}
 
+	/**
+	* Construct a OPTIONS APIEndpoint.
+	*
+	* @param array    $modules API modules to use for the endpoint.
+	* @param callable $hook    The worker function of the endpoint.
+	*/
 	static function OPTIONS(array $modules, callable $hook) {
 		return new APIEndpoint($modules, APIEndpoint::M_OPTIONS, $hook);
 	}
