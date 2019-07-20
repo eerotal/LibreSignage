@@ -38,3 +38,6 @@ tests/tmp
 # Exclude temporary sass files.
 .sass-cache
 
+# Exclude Doxygen generated docs
+doxygen_docs/
+

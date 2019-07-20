@@ -39,7 +39,7 @@ INITCHK_WARN ?= N
 # Don't search for dependencies when certain targets with no deps are run.
 # The if-statement below is some hacky makefile magic. Don't be scared.
 NODEP_TARGETS := clean realclean LOC LOD configure configure-build \
-	configure-system initchk install install-deps
+	configure-system initchk install install-deps doxygen-docs
 ifneq ($(filter \
 	0 $(shell expr $(words $(MAKECMDGOALS)) '*' '2'),\
 	$(words \
@@ -487,6 +487,11 @@ apitest: $(PHP_AUTOLOAD)
 	vendor/bin/phpunit $(PHPUNIT_FLAGS) --testsuite "API"
 
 	sh tests/cleanup.sh "API"
+
+doxygen-docs:
+	@:
+	set -e
+	doxygen Doxyfile
 
 initchk:
 	@:
