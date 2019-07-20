@@ -152,7 +152,7 @@ $(filter %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
 	$(call makedir,$@)
 	cp -p $< $@
 	$(call status,prep.sh,<inplace>,$@)
-	./build/scripts/prep.sh $(CONF) $@
+	./build/scripts/prep.sh --config="$(CONF)" $@
 	php -l $@ > /dev/null
 
 # Copy API endpoint PHP files and generate corresponding docs.
