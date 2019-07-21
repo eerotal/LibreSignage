@@ -16,23 +16,42 @@ script_help() {
 	echo 'Run the installation script for a target.'
 	echo 'The target name is loaded from an existing build config file.'
 	echo ''
+	echo 'All options not recognize by this script are passed to the target'
+	echo 'installation script.'
+	echo ''
 	echo 'Options:'
 	echo '  OPTION (DEFAULT VALUE) ..... DESCRIPTION'
 	echo '  --config=FILE .............. Use a specific build config file.'
+	echo '  --pass ..................... All arguments after --pass are passed'
+	echo '                               to the target installation script.'
+	echo '  --help ......................Print this message and exit.'
 }
 
 BUILD_CONFIG=''
+PASS_REMAINING=0
+PASS=''
 
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--config=*)
 			BUILD_CONFIG="$(get_arg_value "$1")"
 			;;
-		*)
-			echo "[Error] Unknown option '$1'." > /dev/stderr
-			echo ''
+		--pass)
+			PASS_REMAINING=1
+			;;
+		--help)
 			script_help
-			exit 1
+			exit 0
+			;;
+		*)
+			if [ "$PASS_REMAINING" = "1" ]; then
+				PASS="$(if [ -z "$PASS" ]; then echo "$1"; else echo "$PASS $1"; fi)"
+			else
+				echo "[Error] Unknown option '$1'." > /dev/stderr
+				echo ''
+				script_help
+				exit 1
+			fi
 			;;
 	esac
 	
@@ -47,4 +66,6 @@ done
 
 load_build_config "$BUILD_CONFIG"
 
-sh "build/target/${CONF_TARGET:?}/install.sh" "$@"
+echo "[Info] Pass to target installation script: '$PASS'."
+
+sh "build/target/${CONF_TARGET:?}/install.sh" $PASS

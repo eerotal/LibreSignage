@@ -24,15 +24,34 @@ script_help() {
 	echo 'Options:'
 	echo '  OPTION (DEFAULT VALUE) ..... DESCRIPTION'
 	echo '  --target=TARGET ............ The target name to use.'
+	echo '  --pass ..................... All options after --pass are passed'
+	echo '                               to the target build config script.'
+	echo '  --help ..................... Print this message and exit.'
 }
+
+PASS_REMAINING=1
 
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--target=*)
 			TARGET="$(get_arg_value "$1")"	
 			;;
+		--pass)
+			PASS_REMAINING=1
+			;;
+		--help)
+			script_help
+			exit 0
+			;;
 		*)
-			PASS="$(if [ -z "$PASS" ]; then echo "$1"; else echo "$PASS $1"; fi)"
+			if [ "$PASS_REMAINING" = "1" ]; then
+				PASS="$(if [ -z "$PASS" ]; then echo "$1"; else echo "$PASS $1"; fi)"
+			else
+				echo "[Error] Unknown option '$1'." > /dev/stderr
+				echo ''
+				script_help
+				exit 1
+			fi
 			;;
 	esac
 

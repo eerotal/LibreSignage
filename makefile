@@ -351,7 +351,7 @@ $(GENERATED_LOGOS): dist/%.png: src/$$(shell printf '$$*\n' | rev | cut -f 2- -d
 install:
 	@:
 	set -e
-	./build/scripts/install.sh --config="$(CONF)"
+	./build/scripts/install.sh --config="$(CONF)" --pass $(PASS)
 
 configure: install-deps configure-build configure-system
 
@@ -369,7 +369,7 @@ configure-build:
 		exit 1
 	fi
 
-	./build/scripts/configure_build.sh --target="$(TARGET)" $(PASS)
+	./build/scripts/configure_build.sh --target="$(TARGET)" --pass $(PASS)
 
 configure-system:
 	@:

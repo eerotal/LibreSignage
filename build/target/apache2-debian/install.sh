@@ -5,6 +5,7 @@
 #
 
 set -e
+#set -x
 
 . build/scripts/conf.sh
 . build/scripts/ldconf.sh
@@ -88,10 +89,9 @@ if [ -d "${APPROOT:?}" ]; then
 		mkdir -p "${TMP_DATA_DIR:?}";
 
 		set +e
-		cp -Rp "${APPROOT:?}"/data/* "${TMP_DATA_DIR:?}"/.;
+		cp -Rp "${APPROOT:?}"/data/* "${TMP_DATA_DIR:?}"/. > /dev/null 2>&1
 		if [ ! "$?" = "0" ]; then
 			echo '[Info] No existing data directory exists.'
-			echo '[Info] Will use --no-presere-data implicitly.'
 			NO_PRESERVE_DATA=1
 		fi
 		set -e
@@ -99,12 +99,14 @@ if [ -d "${APPROOT:?}" ]; then
 	echo "[Info] Remove old files from ${APPROOT:?}."
 	rm -rf "${APPROOT:?}";
 else
-	mkdir -p "${APPROOT:?}";
+	echo '[Info] No existing virtual host directory exists.'
+	NO_PRESERVE_DATA=1
 fi
 
 # Copy new files to $APPROOT.
+mkdir -p "${APPROOT:?}";
 echo "[Info] Copy new files to ${APPROOT:?}."
-cp -Rp "${DIST_DIR:?}"/ "${APPROOT:?}"/
+cp -Rp "${DIST_DIR:?}"/* "${APPROOT:?}"
 cp "${CONF_DIR:?}"/libresignage/conf/* "${APPROOT:?}"/config/conf/.
 
 # Replace new data with old data if needed.
