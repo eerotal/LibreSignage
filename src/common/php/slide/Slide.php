@@ -1,21 +1,21 @@
 <?php
 
-namespace common\php\slide;
+namespace libresignage\common\php\slide;
 
-use \common\php\Config;
-use \common\php\Util;
-use \common\php\JSONUtils;
-use \common\php\Exportable;
-use \common\php\auth\User;
-use \common\php\auth\Session;
-use \common\php\Queue;
-use \common\php\slide\SlideLock;
-use \common\php\slide\SlideAsset;
-use \common\php\slide\SlideLockException;
-use \common\php\Log;
-use \common\php\exceptions\ArgException;
-use \common\php\exceptions\IntException;
-use \Symfony\Component\HttpFoundation\File\UploadedFile;
+use libresignage\common\php\Config;
+use libresignage\common\php\Util;
+use libresignage\common\php\JSONUtils;
+use libresignage\common\php\Exportable;
+use libresignage\common\php\auth\User;
+use libresignage\common\php\auth\Session;
+use libresignage\common\php\Queue;
+use libresignage\common\php\slide\SlideLock;
+use libresignage\common\php\slide\SlideAsset;
+use libresignage\common\php\slide\SlideLockException;
+use libresignage\common\php\Log;
+use libresignage\common\php\exceptions\ArgException;
+use libresignage\common\php\exceptions\IntException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class Slide extends Exportable {
 	static $PUBLIC = [

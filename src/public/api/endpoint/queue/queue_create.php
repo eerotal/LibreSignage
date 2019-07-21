@@ -16,11 +16,11 @@ namespace pub\api\endpoints\queue;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-use \api\APIEndpoint;
-use \api\APIException;
-use \api\HTTPStatus;
-use \common\php\slide\Slide;
-use \common\php\Queue;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
+use libresignage\common\php\slide\Slide;
+use libresignage\common\php\Queue;
 
 APIEndpoint::POST(
 	[

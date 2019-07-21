@@ -1,6 +1,6 @@
 <?php
 
-use \common\php\Config;
+use libresignage\common\php\Config;
 
 ?>
 

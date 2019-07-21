@@ -1,8 +1,8 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-	use \common\php\Config;
-	use \common\php\auth\Auth;
+	use libresignage\common\php\Config;
+	use libresignage\common\php\auth\Auth;
 
 	Auth::web_auth(NULL, NULL, TRUE);
 ?>

@@ -1,9 +1,9 @@
 <?php
 
-namespace common\php;
+namespace libresignage\common\php;
 
-use \common\php\Config;
-use \common\php\exceptions\IntException;
+use libresignage\common\php\Config;
+use libresignage\common\php\exceptions\IntException;
 
 $LS_LOG_ENABLED = FALSE;
 

@@ -1,16 +1,16 @@
 <?php
 
-namespace common\php;
+namespace libresignage\common\php;
 
-use \common\php\Config;
-use \common\php\Util;
-use \common\php\slide\Slide;
-use \common\php\auth\User;
-use \common\php\Exportable;
-use \common\php\JSONUtils;
-use \common\php\exceptions\JSONException;
-use \common\php\exceptions\ArgException;
-use \common\php\exceptions\IntException;
+use libresignage\common\php\Config;
+use libresignage\common\php\Util;
+use libresignage\common\php\slide\Slide;
+use libresignage\common\php\auth\User;
+use libresignage\common\php\Exportable;
+use libresignage\common\php\JSONUtils;
+use libresignage\common\php\exceptions\JSONException;
+use libresignage\common\php\exceptions\ArgException;
+use libresignage\common\php\exceptions\IntException;
 
 /**
 * Queue class for handling LibreSignage queue data.

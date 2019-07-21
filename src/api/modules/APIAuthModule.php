@@ -1,12 +1,12 @@
 <?php
 
-namespace api\modules;
+namespace libresignage\api\modules;
 
-use \api\APIEndpoint;
-use \api\APIModule;
-use \api\HTTPStatus;
-use \api\APIException;
-use \common\php\auth\Auth;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIModule;
+use libresignage\api\HTTPStatus;
+use libresignage\api\APIException;
+use libresignage\common\php\auth\Auth;
 
 class APIAuthModule extends APIModule {
 	/**

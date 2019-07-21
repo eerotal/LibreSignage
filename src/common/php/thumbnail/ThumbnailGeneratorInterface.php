@@ -1,6 +1,6 @@
 <?php
 
-namespace common\php\thumbnail;
+namespace libresignage\common\php\thumbnail;
 
 /**
 * Interface for implementing thumbnail generators for

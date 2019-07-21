@@ -16,12 +16,12 @@ namespace pub\api\endpoints\slide;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-use \api\APIEndpoint;
-use \api\APIException;
-use \api\HTTPStatus;
-use \common\php\slide\Slide;
-use \common\php\slide\Queue;
-use \common\php\auth\User;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
+use libresignage\common\php\slide\Slide;
+use libresignage\common\php\slide\Queue;
+use libresignage\common\php\auth\User;
 
 APIEndpoint::POST(
 	[

@@ -23,10 +23,10 @@ namespace pub\api\endpoints\user;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-use \api\APIEndpoint;
-use \api\APIException;
-use \api\HTTPStatus;
-use \common\php\auth\User;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
+use libresignage\common\php\auth\User;
 
 APIEndpoint::GET(
 	[

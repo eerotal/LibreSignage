@@ -1,13 +1,13 @@
 <?php
 
-namespace api;
+namespace libresignage\api;
 
-use \api\HTTPStatus;
-use \common\php\Config;
-use \common\php\Log;
-use \common\php\JSONUtils;
-use \common\php\exceptions\JSONException;
-use \Symfony\Component\HttpFoundation\Response;
+use libresignage\api\HTTPStatus;
+use libresignage\common\php\Config;
+use libresignage\common\php\Log;
+use libresignage\common\php\JSONUtils;
+use libresignage\common\php\exceptions\JSONException;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
 * APIException class for sending error responses to clients. This class can

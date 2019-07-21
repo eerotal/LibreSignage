@@ -1,12 +1,12 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-	use \common\php\Config;
-	use \common\php\auth\Auth;
-	use \common\php\CSS;
+	use libresignage\common\php\Config;
+	use libresignage\common\php\auth\Auth;
+	use libresignage\common\php\CSS;
 
 	if (Auth::web_auth()) {
-		header('Location: '.LOGIN_LANDING);
+		header('Location: '.Config::config('LOGIN_LANDING'));
 		exit(0);
 	}
 ?>

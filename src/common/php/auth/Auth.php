@@ -1,11 +1,11 @@
 <?php
 
-namespace common\php\auth;
+namespace libresignage\common\php\auth;
 
-use \common\php\Log;
-use \common\php\Config;
-use \common\php\ErrorHandler;
-use \common\php\auth\User;
+use libresignage\common\php\Log;
+use libresignage\common\php\Config;
+use libresignage\common\php\ErrorHandler;
+use libresignage\common\php\auth\User;
 
 /**
 * Class with functions for authenticating users.

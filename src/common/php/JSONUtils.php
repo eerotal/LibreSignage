@@ -1,8 +1,8 @@
 <?php
 
-namespace common\php;
+namespace libresignage\common\php;
 
-use \common\php\exceptions\JSONException;
+use libresignage\common\php\exceptions\JSONException;
 
 /**
 * Utility functions for encoding and decoding JSON. These

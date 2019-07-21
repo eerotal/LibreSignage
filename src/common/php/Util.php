@@ -1,9 +1,9 @@
 <?php
 
-namespace common\php;
+namespace libresignage\common\php;
 
-use common\php\exceptions\IntException;
-use common\php\exceptions\ArgException;
+use libresignage\commonphp\exceptions\IntException;
+use libresignage\commonphp\exceptions\ArgException;
 
 /**
 * LibreSignage utility functions.

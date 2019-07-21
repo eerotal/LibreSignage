@@ -17,8 +17,8 @@ namespace pub\api\endpoints\general;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-use \common\php\Config;
-use \api\APIEndpoint;
+use libresignage\common\php\Config;
+use libresignage\api\APIEndpoint;
 
 APIEndpoint::GET(
 	[],

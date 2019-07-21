@@ -42,14 +42,14 @@ namespace pub\api\endpoint\slide\asset;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-use \api\APIEndpoint;
-use \api\APIException;
-use \api\HTTPStatus;
-use \common\php\slide\Slide;
-use \common\php\Log;
-use \common\php\exceptions\ArgException;
-use \common\php\exceptions\FileTypeException;
-use \common\php\exceptions\LimitException;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
+use libresignage\common\php\slide\Slide;
+use libresignage\common\php\Log;
+use libresignage\common\php\exceptions\ArgException;
+use libresignage\common\php\exceptions\FileTypeException;
+use libresignage\common\php\exceptions\LimitException;
 
 const UPLOAD_ERR_EXISTS          = -1;
 const UPLOAD_ERR_INTERNAL        = -2;

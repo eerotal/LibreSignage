@@ -4,8 +4,8 @@
 * $NAV_PAGE_LINKS should have all the pages to show on the bar listed.
 */
 
-use \common\php\Config;
-use \common\php\auth\Auth;
+use libresignage\common\php\Config;
+use libresignage\common\php\auth\Auth;
 
 $d = Auth::web_auth(NULL, NULL, FALSE);
 if (!$d) {

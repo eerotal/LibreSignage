@@ -65,14 +65,14 @@ namespace pub\api\endpoints\slide;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-use \api\APIEndpoint;
-use \api\APIException;
-use \api\HTTPStatus;
-use \common\php\Queue;
-use \common\php\slide\Slide;
-use \common\php\auth\User;
-use \common\php\auth\Session;
-use \common\php\Log;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
+use libresignage\common\php\Queue;
+use libresignage\common\php\slide\Slide;
+use libresignage\common\php\auth\User;
+use libresignage\common\php\auth\Session;
+use libresignage\common\php\Log;
 
 APIEndpoint::POST(
 	[

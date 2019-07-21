@@ -33,8 +33,8 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"common\\php\\": "common/php/",
-			"api\\": "api/"
+			"libresignage\\common\\php\\": "common/php/",
+			"libresignage\\api\\": "api/"
 		}
 	}
 }

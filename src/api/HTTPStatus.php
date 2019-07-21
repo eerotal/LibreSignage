@@ -1,10 +1,10 @@
 <?php
 
-namespace api;
+namespace libresignage\api;
 
-use \common\php\exceptions\ArgException;
-use \common\php\exceptions\FileTypeException;
-use \common\php\exceptions\LimitException;
+use libresignage\common\php\exceptions\ArgException;
+use libresignage\common\php\exceptions\FileTypeException;
+use libresignage\common\php\exceptions\LimitException;
 
 /**
 * HTTPStatus contains all standard HTTP status codes as constants

@@ -1,5 +1,5 @@
 {
-	"__classname":"\\common\\php\\Slide",
+	"__classname":"libresignage\\common\\php\\Slide",
 	"__visibility":"private",
 	"id":"3",
 	"name":"Columns",

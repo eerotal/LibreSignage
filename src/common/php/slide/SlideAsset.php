@@ -1,14 +1,14 @@
 <?php
 
-namespace common\php\slide;
+namespace libresignage\common\php\slide;
 
-use \common\php\Util;
-use \common\php\Config;
-use \common\php\Exportable;
-use \common\php\slide\Slide;
-use \common\php\thumbnail\Thumbnail;
-use \Symfony\Component\HttpFoundation\File\UploadedFile;
-use \Symfony\Component\HttpFoundation\File\Exception\FileException;
+use libresignage\common\php\Util;
+use libresignage\common\php\Config;
+use libresignage\common\php\Exportable;
+use libresignage\common\php\slide\Slide;
+use libresignage\common\php\thumbnail\Thumbnail;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /**
 * A class for handling file uploads to slides.

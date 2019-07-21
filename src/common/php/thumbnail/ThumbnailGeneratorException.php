@@ -1,5 +1,5 @@
 <?php
 
-namespace common\php\thumbnail;
+namespace libresignage\common\php\thumbnail;
 
 class ThumbnailGeneratorException extends \Exception {};

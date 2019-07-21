@@ -1,6 +1,6 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
-	use \common\php\Config;
+	use libresignage\common\php\Config;
 
 	$ERROR_PAGE_HEADING = '403 Forbidden';
 	$ERROR_PAGE_TEXT = 'You are not allowed to access this page.';

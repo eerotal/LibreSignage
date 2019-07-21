@@ -1,12 +1,12 @@
 <?php
 
-namespace api\modules;
+namespace libresignage\api\modules;
 
-use \api\APIEndpoint;
-use \api\HTTPStatus;
-use \api\modules\APIJSONValidatorModule;
-use \common\php\Util;
-use \common\php\Log;
+use libresignage\api\APIEndpoint;
+use libresignage\api\HTTPStatus;
+use libresignage\api\modules\APIJSONValidatorModule;
+use libresignage\common\php\Util;
+use libresignage\common\php\Log;
 
 /**
 * API module for validating multipart requests. This module decodes the

@@ -1,9 +1,9 @@
 <?php
 
-namespace common\php\auth;
+namespace libresignage\common\php\auth;
 
-use \common\php\Config;
-use \common\php\Exportable;
+use libresignage\common\php\Config;
+use libresignage\common\php\Exportable;
 
 final class QuotaException extends \Exception {};
 

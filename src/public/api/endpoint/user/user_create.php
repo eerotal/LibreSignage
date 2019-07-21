@@ -21,14 +21,14 @@ namespace pub\api\endpoints\user;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-use \common\php\Config;
-use \api\APIEndpoint;
-use \api\APIException;
-use \api\HTTPStatus;
-use \common\php\auth\User;
-use \common\php\Util;
-use \common\php\exceptions\ArgException;
-use \common\php\exceptions\LimitException;
+use libresignage\common\php\Config;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
+use libresignage\common\php\auth\User;
+use libresignage\common\php\Util;
+use libresignage\common\php\exceptions\ArgException;
+use libresignage\common\php\exceptions\LimitException;
 
 APIEndpoint::POST(
 	[

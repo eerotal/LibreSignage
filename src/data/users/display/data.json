@@ -1,5 +1,5 @@
 {
-	"__classname": "\\common\\php\\auth\\User",
+	"__classname": "libresignage\\common\\php\\auth\\User",
 	"__visibility": "private",
 	"user": "display",
 	"hash": "$2y$10$S\/YAg.iz1ndDXo\/g3CF4Gu34YeQxsmwpJtCHTPBn0i3vBCHhxveVy",
@@ -8,7 +8,7 @@
 	],
 	"sessions": [],
 	"quota": {
-		"__classname": "\\common\\php\\auth\\UserQuota",
+		"__classname": "libresignage\\common\\php\\auth\\UserQuota",
 		"__visibility": "private",
 		"used": {
 			"slides": 0,

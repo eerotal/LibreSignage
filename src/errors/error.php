@@ -1,7 +1,7 @@
 <?php
 	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-	use \common\php\Config;
+	use libresignage\common\php\Config;
 ?>
 <!DOCTYPE html>
 <html lang="en">

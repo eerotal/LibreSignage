@@ -16,8 +16,8 @@ namespace pub\api\endpoints\slide;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-use \api\APIEndpoint;
-use \common\php\slide\Slide;
+use libresignage\api\APIEndpoint;
+use libresignage\common\php\slide\Slide;
 
 APIEndpoint::GET(
 	[

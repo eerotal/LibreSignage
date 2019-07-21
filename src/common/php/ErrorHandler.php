@@ -2,9 +2,9 @@
 /*
 *  LibreSignage error functionality.
 */
-namespace common\php;
+namespace libresignage\common\php;
 
-use \common\php\Log;
+use libresignage\common\php\Log;
 
 $ERROR_DEBUG = FALSE;
 

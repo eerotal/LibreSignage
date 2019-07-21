@@ -1,9 +1,9 @@
 <?php
 
-namespace common\php;
+namespace libresignage\common\php;
 
-use \common\php\ErrorHandler;
-use \common\php\exceptions\ConfigException;
+use libresignage\common\php\ErrorHandler;
+use libresignage\common\php\exceptions\ConfigException;
 
 /**
 * Setup functions for LibreSignage.
@@ -20,7 +20,7 @@ final class Config {
 	*/
 	public static function setup() {
 		$tmp = $_SERVER['DOCUMENT_ROOT'].'/..';
-		require_once($tmp.'/vendor/autoload.php');		
+		require($tmp.'/vendor/autoload.php');
 
 		define(
 			'LS_CONFIG',

@@ -13,7 +13,7 @@ namespace pub\api\endpoints\auth;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-use \api\APIEndpoint;
+use libresignage\api\APIEndpoint;
 
 APIEndpoint::POST(
 	[

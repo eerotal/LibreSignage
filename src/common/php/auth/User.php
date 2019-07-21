@@ -1,18 +1,18 @@
 <?php
 
 
-namespace common\php\auth;
+namespace libresignage\common\php\auth;
 
-use \common\php\Config;
-use \common\php\Log;
-use \common\php\Util;
-use \common\php\JSONUtils;
-use \common\php\auth\Session;
-use \common\php\auth\UserQuota;
-use \common\php\Exportable;
-use \common\php\exceptions\IntException;
-use \common\php\exceptions\ArgException;
-use \common\php\exceptions\LimitException;
+use libresignage\common\php\Config;
+use libresignage\common\php\Log;
+use libresignage\common\php\Util;
+use libresignage\common\php\JSONUtils;
+use libresignage\common\php\auth\Session;
+use libresignage\common\php\auth\UserQuota;
+use libresignage\common\php\Exportable;
+use libresignage\common\php\exceptions\IntException;
+use libresignage\common\php\exceptions\ArgException;
+use libresignage\common\php\exceptions\LimitException;
 
 final class User extends Exportable {
 	static $PRIVATE = [

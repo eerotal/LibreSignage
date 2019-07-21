@@ -1,13 +1,13 @@
 <?php
 
-namespace api\modules;
+namespace libresignage\api\modules;
 
-use \api\APIEndpoint;
-use \api\APIModule;
-use \api\APIException;
-use \api\HTTPStatus;
-use \JsonSchema\Validator;
-use \JsonSchema\Constraints\Constraint;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIModule;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
+use JsonSchema\Validator;
+use JsonSchema\Constraints\Constraint;
 
 /**
 * API module for validating a GET query.

@@ -24,11 +24,11 @@ namespace pub\api\endpoints\auth;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
-use \common\php\Config;
-use \api\APIEndpoint;
-use \api\APIException;
-use \api\HTTPStatus;
-use \common\php\auth\Auth;
+use libresignage\common\php\Config;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
+use libresignage\common\php\auth\Auth;
 
 APIEndpoint::POST(
 	[

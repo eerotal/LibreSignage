@@ -1,19 +1,19 @@
 <?php
 
-namespace api;
+namespace libresignage\api;
 
-use \api\modules\APIAuthModule;
-use \api\modules\APIJSONValidatorModule;
-use \api\modules\APIQueryValidatorModule;
-use \api\modules\APIMultipartRequestValidatorModule;
-use \api\modules\APIRateLimitModule;
+use libresignage\api\modules\APIAuthModule;
+use libresignage\api\modules\APIJSONValidatorModule;
+use libresignage\api\modules\APIQueryValidatorModule;
+use libresignage\api\modules\APIMultipartRequestValidatorModule;
+use libresignage\api\modules\APIRateLimitModule;
 
-use \api\APIException;
-use \api\HTTPStatus;
-use \common\php\JSONUtils;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
+use libresignage\common\php\JSONUtils;
 
-use \Symfony\Component\HttpFoundation\Request;
-use \Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class APIEndpoint {
 	const M_GET     = 'GET';
@@ -70,7 +70,7 @@ class APIEndpoint {
 	*/
 	public function run_module(string $module, array $args) {
 		try {
-			$fq_module = '\\api\\modules\\'.$module;
+			$fq_module = 'libresignage\\api\\modules\\'.$module;
 			$this->module_data[$module] = (new $fq_module())->run($this, $args);
 		} catch (IntException $e) {
 			throw new APIException(

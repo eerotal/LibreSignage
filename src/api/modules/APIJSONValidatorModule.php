@@ -1,17 +1,17 @@
 <?php
 
-namespace api\modules;
+namespace libresignage\api\modules;
 
-use \api\APIEndpoint;
-use \api\APIModule;
-use \api\APIException;
-use \api\HTTPStatus;
-use \JsonSchema\Validator;
-use \JsonSchema\Constraints\Constraint;
-use \common\php\JSONUtils;
-use \common\php\exceptions\JSONException;
-use \common\php\Util;
-use \common\php\Log;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIModule;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
+use JsonSchema\Validator;
+use JsonSchema\Constraints\Constraint;
+use libresignage\common\php\JSONUtils;
+use libresignage\common\php\exceptions\JSONException;
+use libresignage\common\php\Util;
+use libresignage\common\php\Log;
 
 /**
 * API module for validating and decoding a request with a JSON body.

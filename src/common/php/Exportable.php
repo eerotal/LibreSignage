@@ -6,9 +6,9 @@
 * example.
 */
 
-namespace common\php;
+namespace libresignage\common\php;
 
-use \common\php\Util;
+use libresignage\common\php\Util;
 
 final class ExportableException extends \Exception {}
 
@@ -106,7 +106,7 @@ abstract class Exportable {
 	* @throws ExportableException if $obj doesn't extend Exportable.
 	*/
 	private function exp_obj($obj, bool $private, bool $meta): array {
-		if (is_subclass_of($obj, '\\common\\php\\Exportable')) {
+		if (is_subclass_of($obj, 'libresignage\\common\\php\\Exportable')) {
 			return $obj->export($private, $meta);
 		} else {
 			throw new ExportableException(

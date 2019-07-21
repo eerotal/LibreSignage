@@ -1,11 +1,11 @@
 <?php
 
-namespace common\php\thumbnail;
+namespace libresignage\common\php\thumbnail;
 
-use \common\php\Config;
-use \common\php\thumbnail\ThumbnailUtil;
-use \common\php\thumbnail\ThumbnailGeneratorException;
-use \common\php\thumbnail\ThumbnailGeneratorInterface;
+use libresignage\common\php\Config;
+use libresignage\common\php\thumbnail\ThumbnailUtil;
+use libresignage\common\php\thumbnail\ThumbnailGeneratorException;
+use libresignage\common\php\thumbnail\ThumbnailGeneratorInterface;
 
 /**
 * Thumbnail generator for image files.

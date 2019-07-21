@@ -1,13 +1,13 @@
 <?php
 
-namespace common\php\auth;
+namespace libresignage\common\php\auth;
 
-use \common\php\Config;
-use \common\php\Util;
-use \common\php\Exportable;
-use \common\php\auth\User;
-use \common\php\exceptions\IntException;
-use \common\php\exceptions\ArgException;
+use libresignage\common\php\Config;
+use libresignage\common\php\Util;
+use libresignage\common\php\Exportable;
+use libresignage\common\php\auth\User;
+use libresignage\common\php\exceptions\IntException;
+use libresignage\common\php\exceptions\ArgException;
 
 /**
 * Class for handling session data and authentication.

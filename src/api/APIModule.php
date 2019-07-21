@@ -1,10 +1,10 @@
 <?php
 
-namespace api;
+namespace libresignage\api;
 
-use \api\APIEndpoint;
-use \api\APIException;
-use \api\HTTPStatus;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
 
 /**
 * Base class for API modules.

@@ -1,10 +1,10 @@
 <?php
 
-namespace common\php\thumbnail;
+namespace libresignage\common\php\thumbnail;
 
-use \common\php\exceptions\ArgException;
-use \common\php\thumbnail\ThumbnailGeneratorException;
-use \common\php\Log;
+use libresignage\common\php\exceptions\ArgException;
+use libresignage\common\php\thumbnail\ThumbnailGeneratorException;
+use libresignage\common\php\Log;
 
 final class Thumbnail {
 	private $generators = [];

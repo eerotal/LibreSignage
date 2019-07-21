@@ -1,12 +1,12 @@
 <?php
 
-namespace api\modules;
+namespace libresignage\api\modules;
 
-use \common\php\Config;
-use \api\APIEndpoint;
-use \api\APIModule;
-use \api\APIException;
-use \api\HTTPStatus;
+use libresignage\common\php\Config;
+use libresignage\api\APIEndpoint;
+use libresignage\api\APIModule;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
 
 /**
 * API module for imposing rate limits on API endpoints.

@@ -1,9 +1,9 @@
 <?php
 
-namespace common\php;
+namespace libresignage\common\php;
 
-use \common\php\Util;
-use \common\php\exceptions\IntException;
+use libresignage\common\php\Util;
+use libresignage\common\php\exceptions\IntException;
 
 /**
 * Functions for conveniently including CSS stylesheets in PHP code.
