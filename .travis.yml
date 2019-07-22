@@ -52,10 +52,10 @@ after_success:
     - |
       # Run tests with apache2-debian-docker.
       if [ "$target" = "apache2-debian-docker" ]; then
-          tag="$(sudo docker image ls|grep libresignage|tr -s ' '|cut -d ' ' -f2)"
+          tag="$(sudo docker image ls|grep libresignage|head -n1|tr -s ' '|cut -d ' ' -f2)"
           sudo docker run -d -p80:80 "libresignage:$tag"
           make test-api
-		  sudo docker stop $(sudo docker ps -a -q)
+          sudo docker stop $(sudo docker ps -a -q)
       fi
 
 deploy:
