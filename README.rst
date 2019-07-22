@@ -498,6 +498,10 @@ test-api
   first. The API URI can be set by changing the value of ``PHPUNIT_API_HOST``.
   See below for more info.
 
+doxygen-docs
+  Build the Doxygen documentation for LibreSignage. The docs are output in
+  the ``doxygen_docs/`` directory.
+
 LOC
   Count the lines of code in LibreSignage.
 
