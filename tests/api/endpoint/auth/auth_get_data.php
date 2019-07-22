@@ -1,11 +1,11 @@
 <?php
 
-namespace api\endpoint\auth;
+namespace libresignage\tests\api\endpoint\auth;
 
-use \classes\APITestCase;
+use libresignage\tests\common\classes\APITestCase;
 
 class auth_get_data extends APITestCase {
-	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();

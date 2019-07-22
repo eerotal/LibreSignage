@@ -1,12 +1,12 @@
 <?php
 
-namespace classes;
+namespace libresignage\tests\common\classes;
 
 use \JsonSchema\Validator;
 use \JsonSchema\SchemaStorage;
 use \JsonSchema\Constraints\Factory;
 
-use \common\php\JSONUtils;
+use libresignage\common\php\JSONUtils;
 
 final class APITestUtils {
 	public static function read_json_file(string $path) {

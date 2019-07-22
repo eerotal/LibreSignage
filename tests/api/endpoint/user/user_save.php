@@ -1,9 +1,9 @@
 <?php
 
-namespace api\endpoint\user;
+namespace libresignage\tests\api\endpoint\user;
 
-use \classes\APITestCase;
-use \api\HTTPStatus;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\api\HTTPStatus;
 
 class user_save extends APITestCase {
 	const UNIT_TEST_USER = 'unit_test_user';

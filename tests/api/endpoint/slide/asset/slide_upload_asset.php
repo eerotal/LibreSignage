@@ -1,12 +1,12 @@
 <?php
 
-namespace api\endpoint\slide\asset;
+namespace libresignage\tests\api\endpoint\slide\asset;
 
-use \classes\APITestCase;
-use \classes\SlideUtils;
-use \classes\APIInterface;
-use \common\php\JSONUtils;
-use \api\HTTPStatus;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\SlideUtils;
+use libresignage\tests\common\classes\APIInterface;
+use libresignage\common\php\JSONUtils;
+use libresignage\api\HTTPStatus;
 use \GuzzleHttp\Psr7\MultipartStream;
 
 class slide_upload_asset extends APITestCase {
@@ -15,7 +15,7 @@ class slide_upload_asset extends APITestCase {
 
 	private $upload_success = FALSE;
 
-	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();

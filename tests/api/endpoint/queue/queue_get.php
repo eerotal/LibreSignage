@@ -1,12 +1,12 @@
 <?php
 
-namespace api\endpoint\queue;
+namespace libresignage\tests\api\endpoint\queue;
 
-use \classes\APITestCase;
-use \api\HTTPStatus;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\api\HTTPStatus;
 
 class queue_get extends APITestCase {
-	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();

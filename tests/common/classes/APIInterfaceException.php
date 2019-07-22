@@ -1,5 +1,5 @@
 <?php
 
-namespace classes;
+namespace libresignage\tests\common\classes;
 
 final class APIInterfaceException extends \Exception {}

@@ -1,14 +1,14 @@
 <?php
 
-namespace api\endpoint\user;
+namespace libresignage\tests\api\endpoint\user;
 
 use \JsonSchema\Validator;
-use \classes\APITestCase;
-use \classes\APITestUtils;
-use \api\HTTPStatus;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\APITestUtils;
+use libresignage\api\HTTPStatus;
 
 class user_remove extends APITestCase {
-	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	const UNIT_TEST_USER = 'unit_test_user';
 

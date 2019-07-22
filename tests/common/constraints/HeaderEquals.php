@@ -1,10 +1,10 @@
 <?php
 
-namespace constraints;
+namespace libresignage\tests\common\constraints;
 
 use \PHPUnit\Framework\Constraint\Constraint;
 use \GuzzleHttp\Psr7\Response;
-use \common\php\JSONUtils;
+use libresignage\common\php\JSONUtils;
 
 class HeaderEquals extends Constraint {
 	private $header = NULL;
@@ -36,14 +36,18 @@ class HeaderEquals extends Constraint {
 			: $matcher;
 	}
 
-	public function matches(Response $other): bool {
+	public function matches($other): bool {
+		assert($other instanceof Response);
+
 		return ($this->matcher)(
 			$this->expect,
 			$other->getHeader($this->header)
 		);
 	}
 
-	protected function failureDescription(Response $other): string {
+	protected function failureDescription($other): string {
+		assert($other instanceof Response);
+
 		$got = JSONUtils::encode($other->getHeader($this->header));
 		$ex = JSONUtils::encode($this->expect);
 

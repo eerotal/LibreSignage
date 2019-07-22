@@ -1,13 +1,13 @@
 <?php
 
-namespace api\endpoint\user;
+namespace libresignage\tests\api\endpoint\user;
 
 use \JsonSchema\Validator;
-use \classes\APITestCase;
-use \classes\APITestUtils;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\APITestUtils;
 
 class users_list extends APITestCase {
-	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();

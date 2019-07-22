@@ -1,18 +1,18 @@
 <?php
 
-namespace api\endpoint\slide;
+namespace libresignage\tests\api\endpoint\slide;
 
-use \classes\APITestCase;
-use \classes\APIInterface;
-use \api\HTTPStatus;
-use \common\php\JSONUtils;
-use \classes\SlideUtils;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\APIInterface;
+use libresignage\api\HTTPStatus;
+use libresignage\common\php\JSONUtils;
+use libresignage\tests\common\classes\SlideUtils;
 
 class slide_dup extends APITestCase {
 	private $orig_slide_id = NULL;
 	private $dup_slide_id = NULL;
 
-	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();

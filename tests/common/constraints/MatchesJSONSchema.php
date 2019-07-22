@@ -1,13 +1,13 @@
 <?php
 
-namespace constraints;
+namespace libresignage\tests\common\constraints;
 
 use \PHPUnit\Framework\Constraint\Constraint;
 use \JsonSchema\Validator;
-use \classes\APITestUtils;
+use libresignage\tests\common\classes\APITestUtils;
 
-use \common\php\JSONUtils;
-use \common\php\JSONException;
+use libresignage\common\php\JSONUtils;
+use libresignage\common\php\JSONException;
 
 class MatchesJSONSchema extends Constraint {
 	private $schema = NULL;
@@ -19,11 +19,15 @@ class MatchesJSONSchema extends Constraint {
 	}
 
 	public function matches($other): bool {
+		assert(is_object($other));
+
 		$this->validator->validate($other, $this->schema);
 		return $this->validator->isValid();
 	}
 
 	protected function failureDescription($other): string {
+		assert(is_object($other));
+
 		$pretty = JSONUtils::encode($other, JSON_PRETTY_PRINT);
 		return "the following JSON matches the provided schema:\n".
 				$pretty."\n".

@@ -1,10 +1,10 @@
 <?php
 
-namespace constraints;
+namespace libresignage\tests\common\constraints;
 
 use \PHPUnit\Framework\Constraint\Constraint;
 use \JsonSchema\Validator;
-use \classes\APITestUtils;
+use libresignage\tests\common\classes\APITestUtils;
 
 class IsAPIErrorResponse extends Constraint {
 	private $expect = NULL;
@@ -13,10 +13,12 @@ class IsAPIErrorResponse extends Constraint {
 		$this->expect = $expect;
 	}
 
-	public function matches($response): bool {
+	public function matches($other): bool {
+		assert(is_object($other));
+
 		$schema = APITestUtils::read_json_file(SCHEMA_PATH.'/APIException.schema.json');
 		$validator = new Validator();
-		$validator->validate($response, $schema);
+		$validator->validate($other, $schema);
 		return $validator->isValid();
 	}
 

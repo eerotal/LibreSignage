@@ -1,9 +1,9 @@
 <?php
 
-namespace api\endpoint\auth;
+namespace libresignage\tests\api\endpoint\auth;
 
-use \classes\APITestCase;
-use \api\HTTPStatus;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\api\HTTPStatus;
 
 class auth_login extends APITestCase {
 	public function setUp(): void {

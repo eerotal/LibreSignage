@@ -1,16 +1,16 @@
 <?php
 
-namespace api\endpoint\slide\asset;
+namespace libresignage\tests\api\endpoint\slide\asset;
 
-use \classes\APITestCase;
-use \classes\SlideUtils;
-use \api\HTTPStatus;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\SlideUtils;
+use libresignage\api\HTTPStatus;
 
 class slide_get_asset_thumb extends APITestCase {
 	const TEST_SLIDE_ID = '1';
 	const TEST_ASSET_PATH = 'tests/tmp/test.png';
 
-	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();

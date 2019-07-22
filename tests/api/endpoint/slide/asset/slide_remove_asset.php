@@ -1,10 +1,10 @@
 <?php
 
-namespace api\endpoint\slide\asset;
+namespace libresignage\tests\api\endpoint\slide\asset;
 
-use \classes\APITestCase;
-use \classes\SlideUtils;
-use \api\HTTPStatus;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\SlideUtils;
+use libresignage\api\HTTPStatus;
 
 class slide_remove_asset extends APITestCase {
 	const TEST_SLIDE_ID = '1';
@@ -12,7 +12,7 @@ class slide_remove_asset extends APITestCase {
 
 	private $asset_removed = FALSE;
 
-	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();

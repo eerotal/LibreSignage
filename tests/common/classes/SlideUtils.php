@@ -1,11 +1,11 @@
 <?php
 
-namespace classes;
+namespace libresignage\tests\common\classes;
 
-use \classes\APIInterface;
+use libresignage\tests\common\classes\APIInterface;
 use \GuzzleHttp\Psr7\Response;
 use \GuzzleHttp\Psr7\MultipartStream;
-use \common\php\JSONUtils;
+use libresignage\common\php\JSONUtils;
 
 /**
 * Slide utility functions. These are mainly supposed to be used

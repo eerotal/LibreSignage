@@ -1,8 +1,8 @@
 <?php
 
-namespace traits;
+namespace libresignage\tests\common\traits;
 
-use \api\HTTPStatus;
+use libresignage\api\HTTPStatus;
 
 trait TestEndpointNotAuthorizedWithoutLogin {
 	public function test_endpoint_not_authorized_without_login(): void {

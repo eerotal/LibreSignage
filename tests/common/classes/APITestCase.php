@@ -1,6 +1,6 @@
 <?php
 
-namespace classes;
+namespace libresignage\tests\common\classes;
 
 use \GuzzleHttp\Psr7\Response;
 
@@ -8,15 +8,15 @@ use \PHPUnit\Framework\TestCase;
 use \PHPUnit\Framework\Constraint\IsEqual;
 
 use \JsonSchema\Validator;
-use \classes\APIInterface;
+use libresignage\tests\common\classes\APIInterface;
 
-use \constraints\IsAPIErrorResponse;
-use \constraints\HTTPStatusEquals;
-use \constraints\MatchesJSONSchema;
-use \constraints\HeaderEquals;
-use \constraints\HeaderExists;
+use libresignage\tests\common\constraints\IsAPIErrorResponse;
+use libresignage\tests\common\constraints\HTTPStatusEquals;
+use libresignage\tests\common\constraints\MatchesJSONSchema;
+use libresignage\tests\common\constraints\HeaderEquals;
+use libresignage\tests\common\constraints\HeaderExists;
 
-use \api\HTTPStatus;
+use libresignage\api\HTTPStatus;
 
 class APITestCase extends TestCase {
 	public $api = NULL;

@@ -1,6 +1,6 @@
 <?php
 
-namespace classes;
+namespace libresignage\tests\common\classes;
 
 final class TestConfig {
 	const LS_DIST_PREFIX = 'dist/';
@@ -39,7 +39,7 @@ final class TestConfig {
 		* Prefix autoload paths from composer's autoload.php with
 		* LS_DIST_PREFIX to make path resolution work in the dev tree.
 		*/
-		echo "[Info] Applying prefixes to autoload paths...\n";
+		echo "[Info] Applying prefixes to production autoload paths...\n";
 		echo "[Info] Make sure your 'dist/' is up-to-date!\n\n";
 
 		$base = realpath(__DIR__.'/../../../');
@@ -66,6 +66,6 @@ final class TestConfig {
 			$autoloader->setPsr4($namespace, $paths);
 		}
 
-		\spl_autoload_register(['classes\TestConfig', 'autoload_symbol']);
+		//\spl_autoload_register(['classes\TestConfig', 'autoload_symbol']);
 	}
 }

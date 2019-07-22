@@ -1,12 +1,12 @@
 <?php
 
-namespace api\endpoint\slide;
+namespace libresignage\tests\api\endpoint\slide;
 
-use \classes\APITestCase;
-use \api\HTTPStatus;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\api\HTTPStatus;
 
 class slide_get extends APITestCase {
-	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();

@@ -1,6 +1,6 @@
 <?php
 
-namespace constraints;
+namespace libresignage\tests\common\constraints;
 
 use \PHPUnit\Framework\Constraint\Constraint;
 use \GuzzleHttp\Psr7\Response;
@@ -17,11 +17,15 @@ class HeaderExists extends Constraint {
 		$this->header = $header;
 	}
 
-	public function matches(Response $other): bool {
+	public function matches($other): bool {
+		assert($other instanceof Response);
+
 		return $other->hasHeader($this->header);
 	}
 
-	protected function failureDescription(Response $other): string {
+	protected function failureDescription($other): string {
+		assert($other instanceof Response);
+
 		return "response has expected header {$this->header}";
 	}
 

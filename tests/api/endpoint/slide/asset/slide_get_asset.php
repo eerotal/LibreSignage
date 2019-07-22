@@ -1,20 +1,20 @@
 <?php
 
-namespace api\endpoint\slide\asset;
+namespace libresignage\tests\api\endpoint\slide\asset;
 
-use \classes\APITestCase;
-use \classes\APIInterface;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\APIInterface;
 use \GuzzleHttp\Psr7\Request;
 use \GuzzleHttp\Psr7\MultipartStream;
-use \common\php\JSONUtils;
-use \api\HTTPStatus;
-use \classes\SlideUtils;
+use libresignage\common\php\JSONUtils;
+use libresignage\api\HTTPStatus;
+use libresignage\tests\common\classes\SlideUtils;
 
 class slide_get_asset extends APITestCase {
 	const TEST_SLIDE_ID = '1';
 	const TEST_ASSET_PATH = 'tests/tmp/test.png';
 
-	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	public function setUp(): void {
 		parent::setUp();

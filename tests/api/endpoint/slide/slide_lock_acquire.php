@@ -1,13 +1,13 @@
 <?php
 
-namespace api\endpoint\slide;
+namespace libresignage\tests\api\endpoint\slide;
 
-use \classes\APITestCase;
-use \api\HTTPStatus;
-use \classes\SlideUtils;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\api\HTTPStatus;
+use libresignage\tests\common\classes\SlideUtils;
 
 class slide_lock_acquire extends APITestCase {
-	use \traits\TestEndpointNotAuthorizedWithoutLogin;
+	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	const TEST_SLIDE_ID = '1';
 

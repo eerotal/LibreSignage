@@ -1,6 +1,6 @@
 <?php
 
-namespace constraints;
+namespace libresignage\tests\common\constraints;
 
 use \PHPUnit\Framework\Constraint\Constraint;
 use \GuzzleHttp\Psr7\Response;
@@ -12,11 +12,15 @@ class HTTPStatusEquals extends Constraint {
 		$this->expect = $expect;
 	}
 
-	public function matches(Response $other): bool {
+	public function matches($other): bool {
+		assert($other instanceof Response);
+
 		return $this->expect === $other->getStatusCode();
 	}
 
-	protected function failureDescription(Response $other): string {
+	protected function failureDescription($other): string {
+		assert($other instanceof Response);
+
 		return "{$other->getStatusCode()} matches the expected ".
 			"HTTP status {$this->expect}. Response dump:\n".
 			(string) $other->getBody();

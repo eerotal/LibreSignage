@@ -1,10 +1,10 @@
 <?php
 
-namespace api\endpoint\general;
+namespace libresignage\tests\api\endpoint\general;
 
 use \JsonSchema\Validator;
-use \classes\APITestCase;
-use \classes\APITestUtils;
+use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\APITestUtils;
 
 class ver_info extends APITestCase {
 	public function setUp(): void {

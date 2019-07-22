@@ -1,18 +1,18 @@
 <?php
 
-namespace classes;
+namespace libresignage\tests\common\classes;
 
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Psr7\Request;
 use \GuzzleHttp\Psr7\Response;
 use \Psr\Http\Message\StreamInterface;
 
-use \classes\APITestUtils;
-use \classes\APIInterfaceException;
+use libresignage\tests\common\classes\APITestUtils;
+use libresignage\tests\common\classes\APIInterfaceException;
 
-use \common\php\JSONUtils;
-use \common\php\exceptions\JSONException;
-use \api\HTTPStatus;
+use libresignage\common\php\JSONUtils;
+use libresignage\common\php\exceptions\JSONException;
+use libresignage\api\HTTPStatus;
 
 final class APIInterface {
 	private $client = NULL;
