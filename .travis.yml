@@ -40,9 +40,14 @@ install:
     # Install other dependencies from repos & npm.
     - sudo apt-get update
     - sudo apt-get install -y imagemagick
+    - |
+      if [ "$target" = "apache2-debian" ]; then
+          sudo apt-get install -y apache2 composer php-gd php-xml
 
-    # Install apache2 for the apache2-debian target.
-    - if [ "$target" = "apache2-debian" ]; then sudo apt-get install -y apache2; fi
+          # Install a recent version of Node and NPM.
+          curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+      fi
 
 before_script:
     # Configure the build
