@@ -8,8 +8,6 @@ dist: xenial
 language: php
 php:
     - '7.2'
-node_js:
-    - "stable"
 
 services:
     - docker
@@ -31,16 +29,19 @@ matrix:
         - env: target="apache2-debian-docker" opts="--feature-imgthumbs"
 
 install:
+    # Add the nodesource repo.
+    - curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+
+    # Install other dependencies from repos & npm.
+    - sudo apt-get update
+    - sudo apt-get install -y imagemagick composer php-xml nodejs
+
     # Install pandoc 2.7.2 from a .deb package because the
     # version in the repos is too old.
     - |
       wget -qO pandoc.deb https://github.com/jgm/pandoc/releases/download/2.7.2/pandoc-2.7.2-1-amd64.deb
       sudo dpkg -i pandoc.deb
       rm pandoc.deb
-
-    # Install other dependencies from repos & npm.
-    - sudo apt-get update
-    - sudo apt-get install -y imagemagick composer php-xml
 
 before_script:
     # Configure the build
