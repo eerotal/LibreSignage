@@ -39,7 +39,10 @@ install:
 
     # Install other dependencies from repos & npm.
     - sudo apt-get update
-    - sudo apt-get install imagemagick
+    - sudo apt-get install -y imagemagick
+
+	# Install apache2 for the apache2-debian target.
+	- if [ "$target" = "apache2-debian" ]; then sudo apt-get install -y apache2
 
 before_script:
     # Configure the build
@@ -51,7 +54,7 @@ script:
 
 after_success:
     # Run tests for apache2-debian.
-    - if [ "$target" = "apache2-debian" ]; then make apitest; fi
+    - if [ "$target" = "apache2-debian" ]; then make test-api; fi
 
 deploy:
     - provider: script
