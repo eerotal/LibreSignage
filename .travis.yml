@@ -26,11 +26,8 @@ branches:
 
 matrix:
     include:
-        env:
-            - target="apache2-debian"
-              opts="--feature-imgthumbs"
-            - target="apache2-debian-docker"
-              opts="--features imgthumbs"
+        - env: target="apache2-debian" opts="--feature-imgthumbs"
+        - env: target="apache2-debian-docker" opts="--feature-imgthumbs"
 
 install:
     # Install pandoc 2.7.2 from a .deb package because the
