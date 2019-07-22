@@ -38,6 +38,7 @@ RUN if [ -z "$approot" ]; then echo '[Error] Empty approot path.'; exit 1; fi \
 
 # Copy LibreSignage files.
 COPY --chown=docker:docker "dist/" "$approot"
+COPY --chown=docker:docker "server/libresignage/conf/*" "$approot/config/conf/."
 
 # Set default file permissions and create the log directory.
 RUN chown -R docker:www-data "$approot/data" \

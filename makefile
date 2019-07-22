@@ -39,7 +39,7 @@ INITCHK_WARN ?= N
 # Don't search for dependencies when certain targets with no deps are run.
 # The if-statement below is some hacky makefile magic. Don't be scared.
 NODEP_TARGETS := clean realclean LOC LOD configure configure-build \
-	configure-system initchk install install-deps doxygen-docs
+	configure-system initchk install doxygen-docs
 ifneq ($(filter \
 	0 $(shell expr $(words $(MAKECMDGOALS)) '*' '2'),\
 	$(words \
@@ -289,6 +289,12 @@ dep/%.scss.dep: src/%.scss
 		printf "\tnpx postcss $$TARGET $(POSTCSS_FLAGS)\n" >> $@
 	fi
 
+# Install deps from NPM.
+node_modules:
+	@:
+	set -e
+	npm install
+
 # Copy production node modules to 'dist/public/libs/'.
 dist/public/libs/%:: node_modules/%
 	@:
@@ -296,6 +302,12 @@ dist/public/libs/%:: node_modules/%
 	mkdir -p $@
 	$(call status,cp,$<,$@)
 	cp -Rp $</* $@
+
+# Install deps from Composer.
+vendor:
+	@:
+	set -e
+	composer install
 
 # Dump composer autoload files. Make all the autoload files in vendor/composer
 # depend on vendor/autoload.php so that composer dump-autoload is only run
@@ -348,19 +360,6 @@ $(GENERATED_LOGOS): dist/%.png: src/$$(shell printf '$$*\n' | rev | cut -f 2- -d
 ##  PHONY targets
 ##
 
-install:
-	@:
-	set -e
-	./build/scripts/install.sh --config="$(CONF)" --pass $(PASS)
-
-configure: install-deps configure-build configure-system
-
-install-deps:
-	@:
-	set -e
-	npm install
-	composer install
-
 configure-build:
 	@:
 	set -e
@@ -375,6 +374,13 @@ configure-system:
 	@:
 	set -e
 	./build/scripts/configure_system.sh --config="$(CONF)"
+
+configure: vendor node_modules configure-build configure-system
+
+install:
+	@:
+	set -e
+	./build/scripts/install.sh --config="$(CONF)" --pass $(PASS)
 
 clean:
 	@:

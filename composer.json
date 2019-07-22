@@ -36,5 +36,10 @@
 			"libresignage\\common\\php\\": "common/php/",
 			"libresignage\\api\\": "api/"
 		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"libresignage\\tests\\": "tests/"
+		}
 	}
 }

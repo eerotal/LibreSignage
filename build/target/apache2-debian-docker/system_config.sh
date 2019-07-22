@@ -92,7 +92,7 @@ echo '</Directory>'
 
 } > "$CONF_DIR/apache2/ls-docker.conf"
 
-# PHP configuration.
+# Configure PHP.
 mkdir -p "$CONF_DIR/php"
 {
 
@@ -108,3 +108,18 @@ if [ "$CONF_FEATURE_IMGTHUMBS" = "TRUE" ]; then
 fi
 
 } > "$CONF_DIR/php/ls-docker.ini"
+
+# Configure LibreSignage.
+mkdir -p "$CONF_DIR/libresignage/conf"
+{
+
+echo "<?php"
+echo "return ["
+echo "	'LS_VER' => '$LS_VER',"
+echo "	'API_VER' => '$API_VER',"
+echo "	'LIBRESIGNAGE_DEBUG' => $CONF_DEBUG,"
+echo "	'ENABLE_FFMPEG_THUMBS' => $CONF_FEATURE_VIDTHUMBS,"
+echo "	'ENABLE_GD_THUMBS' => $CONF_FEATURE_IMGTHUMBS"
+echo "];"
+
+} > "$CONF_DIR/libresignage/conf/01-server-config.php"
