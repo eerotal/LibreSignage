@@ -26,7 +26,7 @@
 *  <====
 */
 
-namespace libresignage\api\endpoints\slide;
+namespace libresignage\api\endpoint\slide;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
