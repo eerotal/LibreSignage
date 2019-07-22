@@ -41,8 +41,8 @@ install:
     - sudo apt-get update
     - sudo apt-get install -y imagemagick
 
-	# Install apache2 for the apache2-debian target.
-	- if [ "$target" = "apache2-debian" ]; then sudo apt-get install -y apache2
+    # Install apache2 for the apache2-debian target.
+    - if [ "$target" = "apache2-debian" ]; then sudo apt-get install -y apache2
 
 before_script:
     # Configure the build
