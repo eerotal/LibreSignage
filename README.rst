@@ -32,7 +32,11 @@ Table Of Contents
 
 `7. Screenshots`_
 
-`8. Make rules`_
+`8. Makefile`_
+
+`8.1. Targets`_
+
+`8.2. Option variables`_
 
 `9. Build targets`_
 
@@ -444,10 +448,13 @@ Open these images in a new tab to view the full resolution versions.
    :width: 320 px
    :height: 180 px
 
-8. Make rules
---------------
+8. Makefile
+-----------
 
-The following ``make`` rules are implemented in the makefile.
+8.1. Targets
+++++++++++++
+
+The following ``make`` targets are implemented.
 
 all
   The default rule that builds the LibreSignage distribution. You
@@ -458,26 +465,21 @@ configure
   Generate a LibreSignage build configuration file. You need to use
   ``TARGET=[target]`` to select a build target to use. You can also
   optionally use ``PASS=[pass]`` to pass any target specific arguments
-  to the build configuration script. See `9. Build targets`_
-
-install-deps
-  Install the *composer* and *npm* dependencies needed for building
-  LibreSignage. **You don't need to run this target manually because the
-  configure target runs this one aswell.**
+  to the build configuration script. See `9. Build targets`_ for more info.
 
 configure-build
   Generate a LibreSignage build configuration file. You need to pass
   ``TARGET=[target]`` to select a build target to use. You can also optionally
   use ``PASS=[pass]`` to pass any target specific arguments to the build
-  configuration script. See `9. Build targets`_ **You don't need to run this
-  target because the configure target runs this one aswell.**
+  configuration script. See `9. Build targets`_ for more info. **You don't need
+  to run this target because the configure target runs this one aswell.**
 
 configure-system
   Generate LibreSignage system configuration files. **You don't need to run
   this target because the configure target runs this one aswell.**
 
 install
-  Install the LibreSignage distribution on the machine. Note that
+  Install the LibreSignage distribution on the system. Note that
   the meaning of install depends on the target you are building for.
   Running ``make install`` for the *apache2-debian-docker* target,
   for example, builds the Docker image (ie. installs LibreSignage into
@@ -493,7 +495,7 @@ realclean
 
 test-api
   Run the API integration tests. Note that you must install LibreSignage
-  first. The API URI can be set by changing the value of ``API_TEST_URI``.
+  first. The API URI can be set by changing the value of ``PHPUNIT_API_HOST``.
   See below for more info.
 
 LOC
@@ -505,11 +507,15 @@ LOD
   are counted from the docs in the dist/ directory. This way the
   generated API endpoint docs can be taken into account too.
 
-You can also pass some other settings to the LibreSignage makefile.
+8.2. Option variables
++++++++++++++++++++++
+
+You can also pass some other variables to the LibreSignage makefile.
 
 CONF=<config file> - (default: Last generated config.)
-  Manually specify a config file to use. This setting can be used with
-  the targets *all* and *install*.
+  Use a specific build configuration file when building or installing
+  LibreSignage. This option can be used with the targets *all* and
+  *install*.
 
 VERBOSE=<Y/n>
   Print verbose log output. This setting can be used with any target.
@@ -520,7 +526,7 @@ INITCHK_WARN=<y/N>
   for example when an incompatible dependency version is used but the user
   wants to try building LibreSignage with that version anyway.
 
-API_TEST_URI=<URI>
+PHPUNIT_API_HOST=<URI>
   Use *URI* as the hostname when running API integration tests. This is
   ``http://localhost:80/`` by default.
 
