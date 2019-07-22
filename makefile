@@ -490,6 +490,7 @@ LOC: initchk
 			-path "./dist/*" \
 			-o -path "./node_modules/*" \
 			-o -path "./vendor/*" \
+			-o -path "./doxygen_docs/*" \
 		\) -prune \
 		-o -name ".#*" -printf '' \
 		-o -name 'package-lock.json' -printf '' \
