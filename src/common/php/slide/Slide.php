@@ -545,6 +545,8 @@ final class Slide extends Exportable {
 	* @param UploadedFile $file The upload data from $_FILE.
 	*
 	* @throws LimitException if the asset limit SLIDE_MAX_ASSETS is reached.
+	*
+	* @see SlideAsset::new() for additional exceptions.
 	*/
 	public function store_uploaded_asset(UploadedFile $file) {
 		$this->assert_ready();

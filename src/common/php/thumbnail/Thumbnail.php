@@ -4,14 +4,17 @@ namespace libresignage\common\php\thumbnail;
 
 use libresignage\common\php\exceptions\ArgException;
 use libresignage\common\php\thumbnail\ThumbnailGeneratorException;
-use libresignage\common\php\Log;
 
 final class Thumbnail {
 	private $generators = [];
 
 	public function __construct() {
-		$this->register_generator('common\\php\\thumbnail\\ImgThumbnailGenerator');
-		$this->register_generator('common\\php\\thumbnail\\VidThumbnailGenerator');
+		$this->register_generator(
+			'libresignage\\common\\php\\thumbnail\\ImgThumbnailGenerator'
+		);
+		$this->register_generator(
+			'libresignage\\common\\php\\thumbnail\\VidThumbnailGenerator'
+		);
 	}
 
 	/**

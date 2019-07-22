@@ -75,7 +75,10 @@ APIEndpoint::GET(
 		if ($asset->has_thumb()) {
 			return new BinaryFileResponse($asset->get_internal_thumb_path());
 		} else {
-			return new BinaryFileResponse();
+			throw new APIException(
+				"Asset doesn't have a thumbnail.",
+				HTTPStatus::NOT_FOUND
+			);
 		}
 	}
 );
