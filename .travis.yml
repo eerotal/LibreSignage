@@ -26,7 +26,6 @@ branches:
 
 matrix:
     include:
-        - env: target="apache2-debian" opts="--feature-imgthumbs"
         - env: target="apache2-debian-docker" opts="--feature-imgthumbs"
 
 install:
@@ -40,11 +39,6 @@ install:
     # Install other dependencies from repos & npm.
     - sudo apt-get update
     - sudo apt-get install -y imagemagick
-    - |
-      if [ "$target" = "apache2-debian" ]; then
-          curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-          sudo apt-get install -y apache2 composer php-gd php-xml nodejs
-      fi
 
 before_script:
     # Configure the build
@@ -55,8 +49,14 @@ script:
     - make -j$(nproc) && sudo make install
 
 after_success:
-    # Run tests for apache2-debian.
-    - if [ "$target" = "apache2-debian" ]; then make test-api; fi
+    - |
+      # Run tests with apache2-debian-docker.
+      if [ "$target" = "apache2-debian-docker" ]; then
+          tag="$(sudo docker image ls|grep libresignage|tr -s ' '|cut -d ' ' -f2)"
+          sudo docker run -d -p80:80 "libresignage:$tag"
+          make test-api
+		  sudo docker stop $(sudo docker ps -a -q)
+      fi
 
 deploy:
     - provider: script
