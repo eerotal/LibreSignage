@@ -27,6 +27,7 @@ COMPOSER_REQ_VER := 1.8.0
 MAKE_REQ_VER := 4.0
 PANDOC_REQ_VER := 2.0
 IMAGEMAGICK_REQ_VER := 6.0
+DOXYGEN_REQ_VER := 1.8.0
 
 # Caller supplied build settings.
 VERBOSE ?= Y
@@ -109,12 +110,48 @@ GENERATED_LOGOS := $(addprefix dist/public/assets/images/logo/libresignage_,16x1
 
 endif
 
+#
+# Command definitions.
+#
+
+#
+# Print a status message.
+#
+# $(1) = The program doing the work. (cp, rm, etc.)
+# $(2) = The source file.
+# $(3) = The destination file.
+#
 status = \
 	if [ "`printf '$(VERBOSE)'|cut -c1|sed 's/\n//g'|\
 		tr '[:upper:]' '[:lower:]'`" = "y" ]; then \
 		printf "$(1): $(2) >> $(3)\n"|tr -s ' '|sed 's/^ *$///g'; \
 	fi
+
+#
+# Recursively create the directory path for a file.
+#
+# $(1) = The filepath to use.
+#
 makedir = mkdir -p $(dir $(1))
+
+#
+# Print the initialization check info/warning.
+#
+# $(1) = The status code of the initialization checks.
+#
+initchk_warn =\
+	if [ ! "$(1)" = "0" ]; then\
+		case "$(INITCHK_WARN)" in \
+			[nN]*)\
+				echo "[Info] To continue anyway, pass INITCHK_WARN=Y to make.";\
+				exit 1;\
+				;;\
+			*)\
+				echo "[Warning] Continuing anyway. You're on your own.";\
+				;;\
+		esac;\
+	fi
+
 
 ifeq ($(NOHTMLDOCS),$(filter $(NOHTMLDOCS),y Y))
 $(info [Info] Not going to generate HTML documentation.)
@@ -358,7 +395,7 @@ $(GENERATED_LOGOS): dist/%.png: src/$$(shell printf '$$*\n' | rev | cut -f 2- -d
 ##  PHONY targets
 ##
 
-configure-build:
+configure-build: initchk
 	@:
 	set -e
 	if [ -z "$(TARGET)" ]; then
@@ -368,19 +405,19 @@ configure-build:
 
 	./build/scripts/configure_build.sh --target="$(TARGET)" --pass $(PASS)
 
-configure-system:
+configure-system: initchk
 	@:
 	set -e
 	./build/scripts/configure_system.sh --config="$(CONF)"
 
-configure: vendor node_modules configure-build configure-system
+configure: initchk vendor node_modules configure-build configure-system
 
-install:
+install: initchk
 	@:
 	set -e
 	./build/scripts/install.sh --config="$(CONF)" --pass $(PASS)
 
-clean:
+clean: initchk
 	@:
 	set -e
 	$(call status,rm,dist,none)
@@ -398,7 +435,7 @@ clean:
 		fi
 	done
 
-realclean: clean
+realclean: initchk clean
 	@:
 	set -e
 	$(call status,rm,build/*.conf,none);
@@ -444,7 +481,7 @@ realclean: clean
 
 
 # Count the lines of code in LibreSignage.
-LOC:
+LOC: initchk
 	@:
 	set -e
 	printf 'Lines Of Code: \n'
@@ -468,14 +505,14 @@ LOC:
 		-o -name "*.sh" -print \
 		-o -name "*.json" -print`
 
-LOD:
+LOD: initchk
 	@:
 	set -e
 	printf '[Info] Make sure your 'dist/' is up to date!\n'
 	printf '[Info] Lines Of Documentation: \n'
 	wc -l `find dist -type f -name '*.rst'`
 
-test-api: $(PHP_AUTOLOAD)
+test-api: initchk $(PHP_AUTOLOAD)
 	@:
 	set -e
 	printf '[Info] Running API integration tests...\n'
@@ -492,8 +529,14 @@ test-api: $(PHP_AUTOLOAD)
 
 	sh tests/cleanup.sh "API"
 
-doxygen-docs:
+doxygen-docs: initchk
 	@:
+	set +e
+
+
+	./build/scripts/dep_checks/doxygen_version.sh $(DOXYGEN_REQ_VER)
+	$(call initchk_warn,$$?)
+
 	set -e
 	doxygen Doxyfile
 
@@ -515,17 +558,7 @@ initchk:
 	./build/scripts/dep_checks/imagemagick_version.sh $(IMAGEMAGICK_REQ_VER)
 	tmp=$$(expr $$tmp + $$?)
 
-
-	if [ "$(INITCHK_WARN)" = "N" ] || [ "$(INITCHK_WARN)" = "n" ]; then
-		if [ "$$tmp" -ne "0" ]; then
-			echo "[Info] To continue anyway, pass INITCHK_WARN=Y to make."
-			exit 1
-		fi
-	else
-		if [ "$$tmp" -ne "0" ]; then
-			echo "[Warning] Continuing anyway. You're on your own."
-		fi
-	fi
+	$(call initchk_warn,$$tmp)
 
 # Include the dependency makefiles from dep/. If the files don't
 # exist, they are built by running the required targets.

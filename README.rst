@@ -146,10 +146,11 @@ Tested operating systems
   * Apache2 (Version 2.4.x.)
 
 *Optional* runtime dependencies
-  * PHP gd extension for image thumbnail generation.
+  * php-gd extension for image thumbnail generation.
   * ffmpeg (Version 4.0.x) for video thumbnail generation.
+  * php-xml extension for running PHPUnit.
 
-Build system dependencies
+*Required* build system dependencies
   * PHP (Version 7.x.) (http://www.php.net/)
   * GNU Make (Version 4.x or newer.) (https://www.gnu.org/software/make/)
   * Pandoc (Version 2.0.x or newer.) (https://pandoc.org/)
@@ -157,7 +158,10 @@ Build system dependencies
   * composer (Version 1.8.x or newer) (https://getcomposer.org/)
   * ImageMagick (Version 6.x or newer.) (https://www.imagemagick.org/)
 
-Build system dependencies installed automatically by *npm* or *composer*
+*Optional* build system dependencies.
+  * Doxygen (Version 1.8.x or newer.) (http://www.doxygen.nl/)
+
+Dependencies installed automatically by *npm* or *composer*
   * Tools & development libraries
 
     * SASS (https://sass-lang.com/)
@@ -220,15 +224,22 @@ a native LibreSignage build that runs directly on a Debian or Ubuntu
 host (ie. no containers) by following the instructions below.
 
 1. Install software needed for building LibreSignage. You will need the
-   following packages: ``git, apache2, php, php-gd, php-xml, pandoc, npm,
-   composer, make, imagemagick``. All other packages except *npm* can be
-   installed from the distribution repos by running ``sudo apt update &&
-   sudo apt install git apache2 php php-gd php-xml pandoc composer make
-   imagemagick``. You can install NPM by following the instructions on the
+   following packages: ``git, apache2, php, php-gd, pandoc, npm, composer,
+   make, imagemagick``. All other packages except *npm* can be installed
+   from the distribution repos by running ``sudo apt update && sudo apt
+   install git apache2 php php-gd pandoc composer make imagemagick``.
+   You can install NPM by following the instructions on the
    `node.js website <https://nodejs.org/en/download/package-manager/>`_.
 
-   If you want to enable video thumbnail generation, you need to install
-   *ffmpeg* too. You can do that by running ``sudo apt install ffmpeg``.
+   * If you want to enable video thumbnail generation, you need to install
+     *ffmpeg* too. You can do that by running ``sudo apt install ffmpeg``.
+
+   * If you want to run the PHPUnit unit tests you need to install the php-xml
+     extension. You can do that by running ``sudo apt install php-xml``.
+
+   * If you want to generate Doxygen documentation for LibreSignage, you
+     need to install Doxygen. You can do that by running
+     ``sudo apt install doxygen``
 
    See the section `4.1. Minimum system requirements`_ for more info.
 2. Use ``cd`` to move to the directory where you want to download the
@@ -306,7 +317,7 @@ host (ie. no containers) by following the instructions below.
    for building LibreSignage. The file is saved in ``build/`` as
    ``<DOMAIN>.conf`` where ``<DOMAIN>`` is the domain name you
    specified.
-6. Run ``make -j$(nproc)`` to build LibreSignage. See `8. Make rules`_
+6. Run ``make -j$(nproc)`` to build LibreSignage. See `8. Makefile`_
    for more advanced make usage.
 7. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
