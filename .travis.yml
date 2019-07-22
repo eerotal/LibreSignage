@@ -8,6 +8,8 @@ dist: xenial
 language: php
 php:
     - '7.2'
+node_js:
+    - "stable"
 
 services:
     - docker
@@ -38,7 +40,7 @@ install:
 
     # Install other dependencies from repos & npm.
     - sudo apt-get update
-    - sudo apt-get install -y imagemagick
+    - sudo apt-get install -y imagemagick composer php-xml
 
 before_script:
     # Configure the build
