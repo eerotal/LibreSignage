@@ -50,7 +50,7 @@ before_script:
 
 script:
     # Build and install
-    - make -j$(nproc) && make install
+    - make -j$(nproc) && sudo make install
 
 after_success:
     # Run tests for apache2-debian.
