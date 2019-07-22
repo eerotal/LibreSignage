@@ -29,10 +29,10 @@ matrix:
         - env: target="apache2-debian-docker" opts="--feature-imgthumbs"
 
 install:
-    # Add the nodesource repo.
+    # Add the NodeSource repo.
     - curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
-    # Install other dependencies from repos & npm.
+    # Install other dependencies from repos.
     - sudo apt-get update
     - sudo apt-get install -y imagemagick composer php-xml nodejs
 
