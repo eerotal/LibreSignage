@@ -64,6 +64,7 @@ while [ $# -gt 0 ]; do
 done
 
 load_build_config "$BUILD_CONFIG"
+
 APPROOT="${CONF_INSTALL_DIR:?}/${CONF_NAME:?}";
 
 #

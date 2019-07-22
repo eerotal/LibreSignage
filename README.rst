@@ -491,7 +491,7 @@ realclean
   too. This rule effectively resets the LibreSignage directory to how it
   was right after cloning the repo.
 
-apitest
+test-api
   Run the API integration tests. Note that you must install LibreSignage
   first. The API URI can be set by changing the value of ``API_TEST_URI``.
   See below for more info.

@@ -16,6 +16,9 @@ script_help() {
 	echo 'Run the system configuration generator script for a target.'
 	echo 'The target name is loaded from an existing build config file.'
 	echo ''
+	echo 'The --config option is automatically passed to the target config'
+	echo 'generator script..'
+	echo ''
 	echo 'Options:'
 	echo '  OPTION (DEFAULT VALUE) ..... DESCRIPTION'
 	echo '  --config=FILE .............. Use a specific build config file.'
@@ -47,4 +50,6 @@ done
 
 load_build_config "$BUILD_CONFIG"
 
-sh "build/target/${CONF_TARGET:?}/system_config.sh" $@
+echo "[Info] Pass to target config generator: --config='$BUILD_CONFIG'"
+
+sh "build/target/${CONF_TARGET:?}/system_config.sh" --config="$BUILD_CONFIG"

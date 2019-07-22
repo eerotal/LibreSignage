@@ -151,8 +151,6 @@ $(filter %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
 	$(call status,cp,$<,$@)
 	$(call makedir,$@)
 	cp -p $< $@
-	$(call status,prep.sh,<inplace>,$@)
-	./build/scripts/prep.sh --config="$(CONF)" $@
 	php -l $@ > /dev/null
 
 # Copy API endpoint PHP files and generate corresponding docs.
@@ -317,7 +315,7 @@ vendor:
 # versions.
 #
 # Note that the autoload files are not copied into dist/ if $(PHP_AUTOLOAD) is
-# directly specified as a prerequisite (see apitest). This is because the paths
+# directly specified as a prerequisite (see test-api). This is because the paths
 # in $(PHP_AUTOLOAD) refer to vendor/composer/* and vendor/autoload.php. That
 # means the dist/vendor/% target below is skipped. When make is invoked normally,
 # however, the php_libs target prefixes $(PHP_LIBS) with dist/ so that all the
@@ -326,7 +324,7 @@ $(filter-out vendor/autoload.php,$(PHP_AUTOLOAD)): vendor/autoload.php
 vendor/autoload.php:
 	@:
 	case "$(MAKECMDGOALS)" in
-		*apitest*)
+		*test-api*)
 			echo "[Info] Dump development autoload."
 			composer dump-autoload --no-ansi
 			;;
@@ -477,7 +475,7 @@ LOD:
 	printf '[Info] Lines Of Documentation: \n'
 	wc -l `find dist -type f -name '*.rst'`
 
-apitest: $(PHP_AUTOLOAD)
+test-api: $(PHP_AUTOLOAD)
 	@:
 	set -e
 	printf '[Info] Running API integration tests...\n'
