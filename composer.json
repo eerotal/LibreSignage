@@ -34,7 +34,8 @@
 	"autoload": {
 		"psr-4": {
 			"libresignage\\common\\php\\": "common/php/",
-			"libresignage\\api\\": "api/"
+			"libresignage\\api\\": "api/",
+			"libresignage\\api\\endpoint\\": "public/api/endpoint/"
 		}
 	},
 	"autoload-dev": {

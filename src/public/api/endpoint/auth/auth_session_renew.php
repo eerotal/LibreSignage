@@ -13,7 +13,7 @@
 *  <====
 */
 
-namespace pub\api\endpoints\auth;
+namespace libresignage\api\endpoints\auth;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 

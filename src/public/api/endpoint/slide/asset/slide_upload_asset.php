@@ -38,7 +38,7 @@
 *  <====
 */
 
-namespace pub\api\endpoint\slide\asset;
+namespace libresignage\api\endpoint\slide\asset;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 

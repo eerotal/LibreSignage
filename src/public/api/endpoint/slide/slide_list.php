@@ -12,7 +12,7 @@
 *  <====
 */
 
-namespace pub\api\endpoints\slide;
+namespace libresignage\api\endpoints\slide;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 

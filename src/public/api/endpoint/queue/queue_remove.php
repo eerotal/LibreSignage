@@ -14,7 +14,7 @@
 *  <====
 */
 
-namespace pub\api\endpoints\queue;
+namespace libresignage\api\endpoints\queue;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
