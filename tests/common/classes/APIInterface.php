@@ -158,7 +158,7 @@ final class APIInterface {
 		switch ($resp->getHeader('Content-Type')[0]) {
 			case 'application/json':
 				if ((int) $resp->getHeader('Content-Length')[0] === 0) {
-					return [];
+					return (object) [];
 				} else {
 					try {
 						return JSONUtils::decode((string) $resp->getBody());
