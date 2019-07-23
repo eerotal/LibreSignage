@@ -1,15 +1,19 @@
 <?php
-/*
-*  ====>
+/** \file
+* Get the active sessions of the current user as an array.
 *
-*  Get a list of the active sessions for the current user.
+* @method{GET}
+* @auth{By token}
+* @groups{admin|editor|display}
+* @ratelimit_yes
 *
-*  **Request:** GET
+* @response_start{application/json}
+* @response{array,sessions,An array of session objects.}
+* @response_end
 *
-*  Return value
-*    * sessions = An array of sessions.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\auth;

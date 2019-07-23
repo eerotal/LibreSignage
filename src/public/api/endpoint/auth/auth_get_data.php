@@ -1,17 +1,20 @@
 <?php
-
-/*
-*  ====>
+/** \file
+* Get the authentication data for the current session.
 *
-*  Get the current authentication data.
+* @method{GET}
+* @auth{By token}
+* @groups{admin|editor|display}
+* @ratelimit_yes
 *
-*  **Request:** GET
+* @response_start{application/json}
+* @response{User,user,Current user data.}
+* @response{Session,session,Current session data.}
+* @response_end
 *
-*  Return value
-*    * user = Current use data.
-*    * session = Current session data.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\auth;

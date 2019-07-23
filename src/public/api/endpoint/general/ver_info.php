@@ -1,16 +1,20 @@
 <?php
-/*
-*  ====>
+/** \file
+* Get version information.
 *
-*  Get LibreSignage version information.
+* @method{GET}
+* @auth{Not required}
+* @groups{N/A}
+* @ratelimit_no
 *
-*  **Request:** GET
+* @response_start{application/json}
+* @response{string,ls,The LibreSignage version string.}
+* @response{string,api,The LibreSignage API version string.}
+* @response_end
 *
-*  Return value
-*    * main    = The LibreSignage version string.
-*    * api     = The API version number.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\general;

@@ -1,16 +1,19 @@
 <?php
-/*
-*  ====>
+/** \file
+* Renew the current session.
 *
-*  Request a session renewal. The session token is preserved but
-*  its expiration time is reset.
+* @method{POST}
+* @auth{By token}
+* @groups{admin|editor|display}
+* @ratelimit_yes
 *
-*  **Request:** POST, application/json
+* @response_start{application/json}
+* @response{Session,session,The renewed session object.}
+* @response_end
 *
-*  Return value
-*    * session = The renewed session data.
-*
-*  <====
+* @status_start
+* @status{200,On success}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\auth;

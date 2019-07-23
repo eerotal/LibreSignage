@@ -1,4 +1,16 @@
 <?php
+/** \file
+* Log out from the API.
+*
+* @method{POST}
+* @auth{By token}
+* @groups{admin|editor|display}
+* @ratelimit_no
+*
+* @status_start
+* @status{200,On success.}
+* @status_end
+*/
 /*
 *  ====>
 *

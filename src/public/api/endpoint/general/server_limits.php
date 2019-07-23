@@ -1,4 +1,21 @@
 <?php
+/** \file
+* Get the configured server limits.
+*
+* @method{GET}
+* @auth{Not required}
+* @groups{N/A}
+* @ratelimit_no
+*
+* @response_start
+* @response{object,limits,An associative array of server limits.}
+* @response_end
+*
+* @status_start
+* @status{200,On success.}
+* @status_end
+*/
+
 /*
 *  ====>
 *

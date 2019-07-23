@@ -1,15 +1,22 @@
 <?php
-/*
-*  ====>
+/** \file
+* Create a new queue.
 *
-*  Create a slide queue.
+* @method{POST}
+* @auth{By token}
+* @groups{admin|editor}
+* @ratelimit_yes
 *
-*  **Request:** POST, application/json
+* @request_start{application/json}
+* @request{string,name,The name of the new queue.,required}
+* @request_end
 *
-*  Parameters
-*    * name = Queue name.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status{400,If the request parameters are invalid.}
+* @status{400,If the queue already exists.}
+* @status{401,If the caller is not allowed to create queues.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\queue;

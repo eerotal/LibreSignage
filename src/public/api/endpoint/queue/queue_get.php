@@ -1,4 +1,27 @@
 <?php
+/** \file
+* Get queue data.
+*
+* @method{GET}
+* @auth{By token}
+* @groups{admin|editor|display}
+* @ratelimit_yes
+*
+* @request_start{application/json}
+* @request{string,name,The name of the queue to fetch.,required}
+* @request_end
+*
+* @response_start{application/json}
+* @response{Queue,queue,The requested queue object.}
+* @response_end
+*
+* @status_start
+* @status{200,On success.}
+* @status{400,If the request parameters are invalid.}
+* @status{400,If the requested queue doesn't exist.}
+* @status_end
+*/
+
 /*
 *  ====>
 *
@@ -46,6 +69,6 @@ APIEndpoint::GET(
 		$params = $module_data['APIQueryValidatorModule'];
 		$queue = new Queue();
 		$queue->load($params->name);
-		return $queue->export(FALSE, FALSE);
+		return ['queue' => $queue->export(FALSE, FALSE)];
 	}
 );

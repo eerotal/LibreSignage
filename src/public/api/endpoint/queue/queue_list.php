@@ -1,4 +1,20 @@
 <?php
+/** \file
+* Get the existing queue names as an array.
+*
+* @method{GET}
+* @auth{By token}
+* @groups{admin|editor|display}
+* @ratelimit_yes
+*
+* @response_start{application/json}
+* @response{array,queues,The queue names as an array.}
+* @response_end
+*
+* @status_start
+* @status{200,On success.}
+* @status_end
+*/
 /*
 *  ====>
 *

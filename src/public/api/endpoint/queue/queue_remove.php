@@ -1,17 +1,25 @@
 <?php
-/*
-*  ====>
+/** \file
+* Remove a slide queue and all slides in it.
 *
-*  Remove a slide queue and all slides in it. The operation is authorized
-*  if the user is in the 'admin' group or if the user is in the editor
-*  group and owns all the slides in the queue.
+* The operation is allowed if the caller is in the 'admin' group or if
+* the caller is in the editor group and owns all the slides in the queue.
 *
-*  **Request:** POST, application/json
+* @method{POST}
+* @auth{By token}
+* @groups{admin|editor}
+* @ratelimit_yes
 *
-*  Parameters
-*    * name = Queue name.
+* @request_start{application/json}
+* @request{string,name,The name of the queue to remove.,required}
+* @request_end
 *
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status{401,If the user is not allowed to remove the queue.}
+* @status{400,If the request parameters are invalid.}
+* @status{400,If the requested queue doesn't exist.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\queue;

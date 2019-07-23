@@ -1,23 +1,31 @@
 <?php
-/*
-*  ====>
+/** \file
+* Log in to the API.
 *
-*  Login using the authentication system.
+* @method{POST}
+* @auth{Not required}
+* @groups{admin|editor|display}
+* @ratelimit_yes
 *
-*  **Request:** POST, application/json
+* @request_start{application/json}
+* @request{string,username,The username to use for login.,required}
+* @request{string,password,The password to use for login.,required}
+* @request{string,who,A string that identifies the caller.,required}
+* @request{bool,permanent,Whether to create a permanent session.,required}
+* @request_end
 *
-*  POST parameters
-*    * username    = Username
-*    * password    = Password
-*    * who         = A string that identifies the caller.
-*    * permanent   = If TRUE, create a permanent session.
+* @response_start{application/json}
+* @response{User,user,Current user data.}
+* @response{Session,session,Current session data.}
+* @response{string,token,Current session token.}
+* @response_end
 *
-*  Return value
-*    * user    = Current user data.
-*    * session = Current session data.
-*    * token   = Current session token.
+* @status_start
+* @status{200,On success.}
+* @status{401,On invalid credentials.}
+* @status{400,If the request parameters are invalid.}
+* @status_end
 *
-*  <====
 */
 
 namespace libresignage\api\endpoint\auth;

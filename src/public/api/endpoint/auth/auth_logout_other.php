@@ -1,13 +1,15 @@
 <?php
-/*
-*  ====>
+/** \file
+* Log out all sessions of the current user except the calling one.
 *
-*  Logout all sessions of the user corresponding to the supplied
-*  authentication key except the calling session.
+* @method{POST}
+* @auth{By token}
+* @groups{admin|editor|display}
+* @ratelimit_yes
 *
-*  **Request:** POST, application/json
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\auth;
