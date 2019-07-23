@@ -123,7 +123,7 @@ final class APIInterface {
 			$body = $data;
 		} else if ($data instanceof StreamInterface) {
 			if ($method === 'GET') {
-				throw new APIInterfaceExcption(
+				throw new APIInterfaceException(
 					"Can't send data streams with a GET request."
 				);
 			}
@@ -157,12 +157,17 @@ final class APIInterface {
 
 		switch ($resp->getHeader('Content-Type')[0]) {
 			case 'application/json':
-				try {
-					return JSONUtils::decode((string) $resp->getBody());
-				} catch (JSONException $e) {
-					throw new APIInterfaceException(
-						'Malformed JSON response received from API.'
-					);
+				if ((int) $resp->getHeader('Content-Length')[0] === 0) {
+					return NULL;
+				} else {
+					try {
+						return JSONUtils::decode((string) $resp->getBody());
+					} catch (JSONException $e) {
+						var_dump($resp->getBody()->getContents());
+						throw new APIInterfaceException(
+							'Malformed JSON response received from API.'
+						);
+					}
 				}
 			default;
 				return $fallback($resp->getBody());

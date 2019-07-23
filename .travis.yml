@@ -29,7 +29,8 @@ matrix:
         - env: target="apache2-debian-docker" opts="--feature-imgthumbs"
 
 install:
-    # Add the NodeSource repo.
+    # Add the NodeSource repo for Node v12.x. The builtin node installation
+    # is not used because it's not in $PATH and doesn't work from scripts.
     - curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
     # Install other dependencies from repos.
