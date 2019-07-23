@@ -29,13 +29,9 @@ matrix:
         - env: target="apache2-debian-docker" opts="--feature-imgthumbs"
 
 install:
-    # Add the NodeSource repo for Node v12.x. The builtin node installation
-    # is not used because it's not in $PATH and doesn't work from scripts.
-    - curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-
     # Install other dependencies from repos.
     - sudo apt-get update
-    - sudo apt-get install -y imagemagick composer php-xml nodejs
+    - sudo apt-get install -y imagemagick composer php-xml
 
     # Install pandoc 2.7.2 from a .deb package because the
     # version in the repos is too old.
@@ -50,11 +46,10 @@ before_script:
 
 script:
     # Build and install
-    - make -j$(nproc) && sudo make install
+    - make -j$(nproc) && make install
 
-after_success:
+    # Run integration tests.
     - |
-      # Run tests with apache2-debian-docker.
       if [ "$target" = "apache2-debian-docker" ]; then
           tag="$(sudo docker image ls|grep libresignage|head -n1|tr -s ' '|cut -d ' ' -f2)"
           sudo docker run -d -p80:80 "libresignage:$tag"
