@@ -56,7 +56,7 @@ class slide_save extends APITestCase {
 		if ($resp->getStatusCode() !== HTTPStatus::OK) {
 			throw new \Exception("Failed to create slide for testing.");
 		}
-		$this->slide_id = APIInterface::decode_raw_response($resp)->id;
+		$this->slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 	}
 
 	/**
@@ -77,7 +77,7 @@ class slide_save extends APITestCase {
 		);
 
 		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->slide_id = APIInterface::decode_raw_response($resp)->id;
+			$this->slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 		}
 	}
 
@@ -393,7 +393,7 @@ class slide_save extends APITestCase {
 		);
 
 		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->slide_id = APIInterface::decode_raw_response($resp)->id;
+			$this->slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 		}
 	}
 

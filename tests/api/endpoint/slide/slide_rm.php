@@ -40,7 +40,7 @@ class slide_rm extends APITestCase {
 		if ($resp->getStatusCode() !== HTTPStatus::OK) {
 			throw new \Exception("Failed to create initial slide.");
 		}
-		$this->slide_id = APIInterface::decode_raw_response($resp)->id;
+		$this->slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 	}
 
 	/**

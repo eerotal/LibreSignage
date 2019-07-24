@@ -42,7 +42,7 @@ class slide_dup extends APITestCase {
 		if ($resp->getStatusCode() !== HTTPStatus::OK) {
 			throw new \Exception("Failed to create initial slide.");
 		}
-		$this->orig_slide_id = APIInterface::decode_raw_response($resp)->id;
+		$this->orig_slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 	}
 
 	/**
