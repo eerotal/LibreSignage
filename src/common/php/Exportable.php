@@ -50,8 +50,10 @@ abstract class Exportable {
 	* proper data structure when importing.
 	*
 	* @param bool $private If TRUE, also export properties listed in static::$PRIVATE.
-	* @param bool $meta If TRUE, metadata is also exported.
+	* @param bool $meta    If TRUE, metadata is also exported.
+	*
 	* @return array The exported data as an associative array.
+	*
 	* @throws ExportableException if a reserved key is used as an object property name.
 	*/
 	public function export(bool $private = FALSE, bool $meta = FALSE): array {
@@ -99,10 +101,12 @@ abstract class Exportable {
 	/**
 	* Handle object exporting.
 	*
-	* @param mixed The object to export.
-	* @param bool $private Parameter originally passed to Exportable::export();
-	* @param bool $meta Parameter originally passed to Exportable::export();
+	* @param  mixed $obj     The object to export.
+	* @param  bool  $private Parameter originally passed to Exportable::export();
+	* @param  bool  $meta    Parameter originally passed to Exportable::export();
+	*
 	* @return array The exported object as an associative array.
+	*
 	* @throws ExportableException if $obj doesn't extend Exportable.
 	*/
 	private function exp_obj($obj, bool $private, bool $meta): array {
@@ -118,9 +122,10 @@ abstract class Exportable {
 	/**
 	* Handle array exporting.
 	*
-	* @param array The array to export.
-	* @param bool $private Parameter originally passed to Exportable::export();
-	* @param bool $meta Parameter originally passed to Exportable::export();
+	* @param array $arr     The array to export.
+	* @param bool  $private Parameter originally passed to Exportable::export();
+	* @param bool  $meta    Parameter originally passed to Exportable::export();
+	*
 	* @return array The exported array.
 	*/
 	private function exp_array(array $arr, bool $private, bool $meta) {
@@ -151,9 +156,9 @@ abstract class Exportable {
 	* was used when exporting. Note that this also only works if
 	* metadata was originally exported.
 	*
-	* @param array $data The data to import.
-	* @param bool $check_keys If TRUE, check that the imported keys
-	*                         match the original ones.
+	* @param array $data       The data to import.
+	* @param bool  $check_keys If TRUE, check that the imported keys
+	*                          match the original ones.
 	*/
 	public function import(array $data, bool $check_keys = FALSE) {
 		foreach ($this->imp_array($data, TRUE, $check_keys) as $k => $v) {
@@ -164,10 +169,12 @@ abstract class Exportable {
 	/**
 	* Handle array importing.
 	*
-	* @param array $arr The array to import.
-	* @param bool $root Whether this array is the root array or not.
-	* @param bool $check_keys Parameter originally passed to Exportable::import().
+	* @param array $arr        The array to import.
+	* @param bool  $root       Whether this array is the root array or not.
+	* @param bool  $check_keys Parameter originally passed to Exportable::import().
+	*
 	* @return array The imported data as an array.
+	*
 	* @throws ExportableException if the visibility value loaded from $arr is invalid.
 	* @throws ExportableException if $check_keys === TRUE and the data keys don't match.
 	*/

@@ -285,7 +285,7 @@ final class User extends Exportable {
 	* Check whether a user is in a a group or in an array of groups. Strict
 	* comparison is used when comparing groups (strings).
 	*
-	* @param mixed $group A group or an array of groups (strings) to check.
+	* @param mixed $groups A group or an array of groups (strings) to check.
 	*
 	* @return bool TRUE if the loaded user is in $groups, FALSE otherwise.
 	*

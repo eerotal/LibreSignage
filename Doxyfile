@@ -239,6 +239,8 @@ TAB_SIZE               = 4
 # newlines.
 
 ALIASES                +=\
+						dataProvider=""\
+						\
 						method{1}="\par HTTP Method\n\1" \
 						auth{1}="\par Authentication\n\1" \
 						groups{1}="\par Allowed groups\n\c \1" \

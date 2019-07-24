@@ -7,7 +7,7 @@
 * @groups{N/A}
 * @ratelimit_no
 *
-* @response_start
+* @response_start{application/json}
 * @response{object,limits,An associative array of server limits.}
 * @response_end
 *

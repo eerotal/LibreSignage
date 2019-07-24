@@ -11,7 +11,7 @@ class HeaderExists extends Constraint {
 	/**
 	* Construct the header constraint.
 	*
-	* @parma string $header The expected header name.
+	* @param string $header The expected header name.
 	*/
 	public function __construct(string $header) {
 		$this->header = $header;

@@ -43,8 +43,9 @@ final class Util {
 	* Check if array $a has the same values as array $b. Returns
 	* TRUE if $a is equal to $b and FALSE otherwise.
 	*
-	* @params array $a Set A.
-	* @params array $b Set B.
+	* @param array $a Set A.
+	* @param array $b Set B.
+	*
 	* @returns bool TRUE if the values of $a and $b match, FALSE otherwise.
 	*/
 	static function array_is_equal(array $a, array $b): bool {
@@ -57,6 +58,7 @@ final class Util {
 	*
 	* @param array $a Set A.
 	* @param array $b Set B.
+	*
 	* @return bool TRUE if $a E $b and FALSE otherwise.
 	*/
 	static function array_is_subset(array $a, array $b): bool {
@@ -69,6 +71,7 @@ final class Util {
 	*
 	* @params string $path The path to the file to read.
 	* @return string The data read from file.
+	*
 	* @throws IntException if fopen() fails.
 	* @throws IntException if locking the file fails.
 	*/
@@ -102,7 +105,8 @@ final class Util {
 	*
 	* @param string $path The path to the file to write.
 	* @param string $data The data to write to the file.
-	* @param bool $create Whether to create paths that don't exist.
+	* @param bool   $create Whether to create paths that don't exist.
+	*
 	* @throws IntException if creating the file dir fails ($create === TRUE).
 	* @throws ArgException if the file dir doesn't exist ($create === FALSE).
 	* @throws ArgException if the file doesn't exist ($create === FALSE).
@@ -140,6 +144,7 @@ final class Util {
 	* Generate a random password with $len chars in it.
 	*
 	* @param int $len The length of the generated password.
+	*
 	* @return string The generated password.
 	*/
 	static function gen_passwd(int $len): string {
@@ -158,8 +163,9 @@ final class Util {
 	* return TRUE if every call to $func returns TRUE. Otherwise
 	* return false.
 	*
-	* @param array $arr The array to check.
+	* @param array    $arr  The array to check.
 	* @param Callable $func The function used for checking the array.
+	*
 	* @return bool The result of the operation.
 	*/
 	static function array_check(array $arr, Callable $func): bool {
@@ -172,9 +178,10 @@ final class Util {
 	/**
 	* Create a HTML tag.
 	*
-	* @param string $type The HTML tag type, for example div, p or table etc.
+	* @param string $type    The HTML tag type, for example div, p or table etc.
 	* @param string $content The inner HTML of the tag.
-	* @param array @params An associative array of parameters for the tag.
+	* @param array  $params  An associative array of parameters for the tag.
+	*
 	* @return string The generated HTML tag string.
 	*/
 	static function htmltag(string $type, string $content, array $params): string {
@@ -192,6 +199,7 @@ final class Util {
 	*
 	* @param array $arr1 First array for comparison.
 	* @param array $arr2 Second array for comparison.
+	*
 	* @return array The return value described in the function description.
 	*/
 	static function arraydiff(array $arr1, array $arr2): array {
@@ -217,7 +225,9 @@ final class Util {
 	/**
 	* Generate a new UID.
 	*
-	* @param int $length The length of the new UID in characters.
+	* @param int $len The length of the new UID in characters or NULL
+	*                 for the default value ``DEFAULT_UID_LEN``.
+	*
 	* @return string The generated UID.
 	*/
 	public static function get_uid(int $len = NULL): string {

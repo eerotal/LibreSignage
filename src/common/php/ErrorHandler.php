@@ -14,9 +14,9 @@ final class ErrorHandler {
 	const INTERNAL_SERVER_ERROR = 500;
 
 	const ERROR_STRINGS = [
-		self::NOT_FOUND => '404 Not Found',
-		self::FORBIDDEN => '403 Forbidden',
-		self::INTERNAL_SERVER_ERROR => '500 Internal Server Error'
+		ErrorHandler::NOT_FOUND => '404 Not Found',
+		ErrorHandler::FORBIDDEN => '403 Forbidden',
+		ErrorHandler::INTERNAL_SERVER_ERROR => '500 Internal Server Error'
 	];
 
 	/**

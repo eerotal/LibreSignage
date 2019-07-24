@@ -197,7 +197,7 @@ final class Slide extends Exportable {
 	* @throws ArgException if the slide name contains invalid characters.
 	* @throws IntException if preg_match() fails.
 	* @throws ArgException if the slide name is empty.
-	* @throes ArgException if the slide name is longer than SLIDE_NAME_MAX_LEN chars.
+	* @throws ArgException if the slide name is longer than SLIDE_NAME_MAX_LEN chars.
 	*/
 	public static function validate_name(string $name) {
 		$tmp = preg_match('/^[A-Za-z0-9_-]+$/', $name);

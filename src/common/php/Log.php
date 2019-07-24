@@ -48,8 +48,8 @@ final class Log {
 	/**
 	*  Open and lock a log file.
 	*
-	* @param string $log The logfile to use (Log::LOGERR or Log::LOGDEF).
-	* @param int $lock Lock type (LOCK_EX, LOCK_SH).
+	* @param string $log  The logfile to use (Log::LOGERR or Log::LOGDEF).
+	* @param int    $lock Lock type (LOCK_EX, LOCK_SH).
 	* @param string $mode The mode to open the file in. See PHP docs for fopen().
 	*
 	* @return resource The opened file handle.
@@ -71,7 +71,8 @@ final class Log {
 	/**
 	* Unlock and close a log file.
 	*
-	* @param resource $hanle The file handle to unlock and close.
+	* @param resource $handle The file handle to unlock and close.
+	*
 	* @throws AssertionError if $handle is not a resource.
 	* @throws AssertionError if $handle is not an open file handle.
 	* @throws IntException if unlocking the file fails.
@@ -99,7 +100,7 @@ final class Log {
 	* Truncate a log file to $len lines by deleting lines starting
 	* from the beginning of the file.
 	*
-	* @param int $len The number of lines to truncate the file to.
+	* @param int    $len The number of lines to truncate the file to.
 	* @param string $log The logfile to use (Log::LOGERR or Log::LOGDEF).
 	*/
 	private static function truncate(int $len, string $log) {
