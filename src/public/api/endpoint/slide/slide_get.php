@@ -1,33 +1,25 @@
 <?php
-/*
-*  ====>
+/** \file
+* Get the data of a slide.
 *
-*  Get the data of a slide.
+* @method{GET}
+* @auth{By token}
+* @groups{admin|editor|display}
+* @ratelimit_yes
 *
-*  **Request:** GET
+* @request_start{application/json}
+* @request{string,id,The ID of the slide to fetch.,required}
+* @request_end
 *
-*  Parameters
-*    * id = The id of the slide to get.
+* @response_start{application/json}
+* @response{Slide,slide,The requested slide object.}
+* @response_end
 *
-*  Return value
-*    * slide
-*
-*      * id            = The ID of the slide.
-*      * name          = The name of the slide.
-*      * index         = The index of the slide.
-*      * duration      = The duration of the slide.
-*      * markup        = The markup of the slide.
-*      * owner         = The owner of the slide.
-*      * enabled       = Whether the slide is enabled or not.
-*      * sched         = Whether the slide is scheduled or not.
-*      * sched_t_s     = The slide schedule starting timestamp.
-*      * sched_t_e     = The slide schedule ending timestamp.
-*      * animation     = The slide animation identifier.
-*      * collaborators = The collaborators of the slide.
-*      * lock          = Slide lock data object.
-*      * assets        = Slide assets data object.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status{400,If the request parameters are invalid.}
+* @status{404,If the requested slide doesn't exist.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\slide;
@@ -35,7 +27,10 @@ namespace libresignage\api\endpoint\slide;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use libresignage\api\APIEndpoint;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
 use libresignage\common\php\slide\Slide;
+use libresignage\common\php\slide\exceptions\SlideNotFoundException;
 
 APIEndpoint::GET(
 	[
@@ -57,8 +52,17 @@ APIEndpoint::GET(
 	],
 	function($req, $module_data) {
 		$params = $module_data['APIQueryValidatorModule'];
+
 		$slide = new Slide();
-		$slide->load($params->id);
+		try {
+			$slide->load($params->id);
+		} catch(SlideNotFoundException $e) {
+			throw new APIException(
+				"Slide '{$params->id}' doesn't exist.",
+				HTTPStatus::NOT_FOUND
+			);
+		}
+
 		return ['slide' => $slide->export(FALSE, FALSE)];
 	}
 );

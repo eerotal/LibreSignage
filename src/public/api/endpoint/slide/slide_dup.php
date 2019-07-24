@@ -1,21 +1,29 @@
 <?php
-/*
-*  ====>
+/** \file
+* Duplicate a slide.
 *
-*  Duplicate a slide. The owner of the new slide is the caller
-*  of this API endpoint. The new slide is also automatically
-*  locked for the caller. The operation is authorized if the user
-*  is in the 'admin' or 'editor' groups.
+* The caller is set as the owner of the new slide and the slide is
+* automatically locked for the caller.
 *
-*  **Request:** POST, application/json
+* @method{POST}
+* @auth{By token}
+* @groups{admin|editor}
+* @ratelimit_yes
 *
-*  Parameters
-*    * id = The ID of the slide to duplicate.
+* @request_start{application/json}
+* @request{string,id,The ID of the slide to duplicate.,required}
+* @request_end
 *
-*  Return value
-*    * slide = Duplicated slide data. See slide_get.php for more info.
+* @response_start{application/json}
+* @response{Slide,slide,The duplicated slide object.}
+* @response_end
 *
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status{400,If the request parameters are invalid.}
+* @status{401,If the user is not allowed to duplicate slides.}
+* @status{404,If the requested slide doesn't exist.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\slide;
@@ -26,6 +34,7 @@ use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
 use libresignage\common\php\slide\Slide;
+use libresignage\common\php\slide\exceptions\SlideNotFoundException;
 
 APIEndpoint::POST(
 	[
@@ -54,7 +63,7 @@ APIEndpoint::POST(
 		$caller = $module_data['APIAuthModule']['user'];
 		$session = $module_data['APIAuthModule']['session'];
 
-		if (!$caller->is_in_group('admin') && !$caller->is_in_group('editor')) {
+		if (!$caller->is_in_group(['admin', 'editor'])) {
 			throw new APIException(
 				'Not authorized for users not in the groups admin or editor.',
 				HTTPStatus::UNAUTHORIZED
@@ -62,7 +71,15 @@ APIEndpoint::POST(
 		}
 
 		$old = new Slide();
-		$old->load($params->id);
+		try {
+			$old->load($params->id);
+		} catch (SlideNotFoundException $e) {
+			throw new APIException(
+				"Slide '{$params->id}' not found.",
+				HTTPStatus::NOT_FOUND,
+				$e
+			);
+		}
 
 		$new = $old->dup();
 		$new->set_owner($caller->get_name());

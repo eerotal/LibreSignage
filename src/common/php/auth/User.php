@@ -9,6 +9,7 @@ use libresignage\common\php\Util;
 use libresignage\common\php\JSONUtils;
 use libresignage\common\php\auth\Session;
 use libresignage\common\php\auth\UserQuota;
+use libresignage\common\php\auth\exceptions\UserNotFoundException;
 use libresignage\common\php\Exportable;
 use libresignage\common\php\exceptions\IntException;
 use libresignage\common\php\exceptions\ArgException;
@@ -56,14 +57,11 @@ final class User extends Exportable {
 	*
 	* @param string $name The name of the user to load.
 	*
-	* @throws ArgException if no user named $name exists.
+	* @throws UserNotFoundException if no user named $name exists.
 	*/
 	public function load(string $name) {
-		$json = '';
-
-		User::validate_name($name);
 		if (!self::exists($name)) {
-			throw new ArgException("No user named '{$name}'.");
+			throw new UserNotFoundException("Use '$name' doesn't exist.");
 		}
 
 		$json = Util::file_lock_and_get(User::get_data_file_path($name));

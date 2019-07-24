@@ -20,6 +20,7 @@ use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
 use libresignage\common\php\auth\User;
+use libresignage\common\php\auth\exceptions\UserNotFoundException;
 use libresignage\common\php\exceptions\IntException;
 use libresignage\common\php\exceptions\ArgException;
 
@@ -53,13 +54,12 @@ APIEndpoint::POST(
 		}
 
 		$u = new User();
-
 		try {
 			$u->load($params->user);
-		} catch (ArgException $e) {
+		} catch (UserNotFoundException $e) {
 			throw new APIException(
-				"Failed to load user '{$params->user}'.",
-				HTTPStatus::BAD_REQUEST,
+				"User '{$params->user}' doesn't exist.",
+				HTTPStatus::NOT_FOUND,
 				$e
 			);
 		}

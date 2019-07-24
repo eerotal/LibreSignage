@@ -1,41 +1,49 @@
 <?php
-/*
-*  ====>
+/** \file
+* Upload a slide asset.
 *
-*  Upload a slide asset.
+* If debugging is enabled, the \c upload_errors field of the returned
+* data contains an error code for all failed uploads. Positive integers
+* indicate PHP upload errors and negative integers are LibreSignage
+* specific errors. Below is a list of the negative error codes.
 *
-*  If debugging is enabled (``API_ERROR_TRACE === TRUE``), the
-*  *upload_errors* field of the returned data contains an error code
-*  for all failed uploads. Positive integers indicate PHP upload
-*  `errors`_ and negative integers are LibreSignage specific errors.
-*  Below is a list of the negative error codes.
+* * -1 = \c move_uploaded_file() failed.
+* * -2 = Asset filename invalid.
+* * -3 = Invalid asset file type.
+* * -4 = Asset already exists.
+* * -5 = Too many slide assets.
 *
-*  * -1 = move_uploaded_file() failed.
-*  * -2 = Asset filename invalid.
-*  * -3 = Invalid asset file type.
-*  * -4 = Asset already exists.
-*  * -5 = Too many slide assets.
+* [You can find the PHP errors here.](http://php.net/manual/en/features.file-upload.errors.php)
 *
-*  This API endpoint only accepts asset filenames that have a length
-*  less than or equal to the server limit SLIDE_ASSET_NAME_MAX_LEN.
-*  The asset names may only contain the characters A-Z, a-z, 0-9,
-*  ., _ and -. The accepted filetypes are defined in the server limit
-*  SLIDE_ASSET_VALID_MIMES.
+* This API endpoint only accepts asset filenames that have a length
+* less than or equal to the server limit ``SLIDE_ASSET_NAME_MAX_LEN``.
+* The asset names may only contain the characters A-Z, a-z, 0-9,
+* ., _ and -. The accepted filetypes are defined in the server limit
+* ``SLIDE_ASSET_VALID_MIMES``.
 *
-*  .. _errors: http://php.net/manual/en/features.file-upload.errors.php
+* @method{POST}
+* @auth{By token}
+* @groups{admin|editor}
+* @ratelimit_yes
 *
-*  **Request:** POST, multipart/form-data
+* @par Parameters
+* multipart/form-data
+* \li ``file``  **0...n** The file(s) to upload. [*required*]
+* \li ``string`` **body** The JSON encoded request body. See below. [*required*]
 *
-*  Form-data parameters
-*    * file_1 ... file_n = The file(s) to upload.
-*    * body = JSON encoded body data.
-*      * id = The slide ID to use.
+* @par JSON body
+* application/json
+* \li ``string`` **id** The ID of the slide. [*required*]
 *
-*  Return value
-*    * failed        = The number of failed uploads.
-*    * upload_errors = Error codes for failed uploads.
+* @response_start{application/json}
+* @response{int,failed,The number of failed uploads.}
+* @response_end
 *
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status{401,If the caller is not allowed to upload assets to the slide.}
+* @status{404,If the slide doesn't exist.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\slide\asset;
@@ -46,7 +54,7 @@ use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
 use libresignage\common\php\slide\Slide;
-use libresignage\common\php\Log;
+use libresignage\common\php\slide\exceptions\SlideNotFoundException;
 use libresignage\common\php\exceptions\ArgException;
 use libresignage\common\php\exceptions\FileTypeException;
 use libresignage\common\php\exceptions\LimitException;
@@ -79,7 +87,15 @@ APIEndpoint::POST(
 		$caller = $module_data['APIAuthModule']['user'];
 
 		$slide = new Slide();
-		$slide->load($params->id);
+		try {
+			$slide->load($params->id);
+		} catch (SlideNotFoundException $e) {
+			throw new APIException(
+				"Slide '{$params->id}' doesn't exist.",
+				HTTPStatus::NOT_FOUND,
+				$e
+			);
+		}
 
 		if (!$slide->can_modify($caller)) {
 			throw new APIException(

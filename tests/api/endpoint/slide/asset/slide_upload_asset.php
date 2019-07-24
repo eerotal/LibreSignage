@@ -89,7 +89,7 @@ class slide_upload_asset extends APITestCase {
 						return $valid_ms_contents;
 					})()
 				),
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Nonexistent id' => [
 				'display',
@@ -102,7 +102,7 @@ class slide_upload_asset extends APITestCase {
 						return $valid_ms_contents;
 					})()
 				),
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Wrong type for id parameter' => [
 				'display',

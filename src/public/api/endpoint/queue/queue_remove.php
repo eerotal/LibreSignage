@@ -18,7 +18,7 @@
 * @status{200,On success.}
 * @status{401,If the user is not allowed to remove the queue.}
 * @status{400,If the request parameters are invalid.}
-* @status{400,If the requested queue doesn't exist.}
+* @status{404,If the requested queue doesn't exist.}
 * @status_end
 */
 
@@ -29,8 +29,8 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
-use libresignage\common\php\slide\Slide;
-use libresignage\common\php\Queue;
+use libresignage\common\php\queue\Queue;
+use libresignage\common\php\queue\exceptions\QueueNotFoundException;
 use libresignage\common\php\Util;
 
 APIEndpoint::POST(
@@ -56,7 +56,15 @@ APIEndpoint::POST(
 		$params = $module_data['APIJSONValidatorModule'];
 
 		$queue = new Queue();
-		$queue->load($params->name);
+		try {
+			$queue->load($params->name);
+		} catch (QueueNotFoundException $e) {
+			throw new APIException(
+				"Queue '{$params->name}' doesn't exist.",
+				HTTPStatus::NOT_FOUND,
+				$e
+			);
+		}
 		$owner = $queue->get_owner();
 
 		if (

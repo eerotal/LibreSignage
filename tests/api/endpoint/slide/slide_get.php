@@ -45,7 +45,7 @@ class slide_get extends APITestCase {
 				'admin',
 				'admin',
 				['id' => ''],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Missing id parameter' => [
 				'admin',
@@ -57,13 +57,7 @@ class slide_get extends APITestCase {
 				'admin',
 				'admin',
 				['id' => 'aabbccddeeff'],
-				HTTPStatus::BAD_REQUEST
-			],
-			'Wrong type for id parameter' => [
-				'admin',
-				'admin',
-				['id' => 123],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			]
 		];
 	}

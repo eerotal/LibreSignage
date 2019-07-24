@@ -1,25 +1,28 @@
 <?php
-/*
-*  ====>
+/** \file
+* Attempt to lock a slide.
 *
-*  Attempt to lock a slide.
+* The operation is permitted if the following conditions are met:
 *
-*  The operation is authorized if the following conditions are met:
+*   * The caller is in the 'admin' or 'editor' groups.
+*   * The slide has previously been locked by the calling session.
 *
-*    * The caller is in the 'admin' or 'editor' groups.
-*    * The slide has previously been locked by the caller.
+* @method{POST}
+* @auth{By token}
+* @groups{admin|editor}
+* @ratelimit_yes
 *
-*  The HTTP status returned by this endpoint is
+* @request_start{application/json}
+* @response{string,id,The ID of the slide to unlock.}
+* @request_end
 *
-*    * '200 OK' on success.
-*    * '423 Locked' if the slide is locked by another user.
-*
-*  **Request:** POST, application/json
-*
-*  Parameters
-*    * id = The ID of the slide to lock.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status{400,If the request parameters are invalid.}
+* @status{401,If the user is not allowed to unlock the slide.}
+* @status{404,If the slide doesn't exist.}
+* @status{423,If the slide is locked by another session.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\slide;
@@ -30,7 +33,8 @@ use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
 use libresignage\common\php\slide\Slide;
-use libresignage\common\php\slide\SlideLockException;
+use libresignage\common\php\slide\exceptions\SlideLockException;
+use libresignage\common\php\slide\exceptions\SlideNotFoundException;
 
 APIEndpoint::POST(
 	[
@@ -55,7 +59,7 @@ APIEndpoint::POST(
 		$session = $module_data['APIAuthModule']['session'];
 		$params = $module_data['APIJSONValidatorModule'];
 
-		if (!$caller->is_in_group('admin') && !$caller->is_in_group('editor')) {
+		if (!$caller->is_in_group(['admin', 'editor'])) {
 			throw new APIException(
 				'Not authorized because user is not admin or editor.',
 				HTTPStatus::UNAUTHORIZED
@@ -63,7 +67,16 @@ APIEndpoint::POST(
 		}
 
 		$slide = new Slide();
-		$slide->load($params->id);
+		try {
+			$slide->load($params->id);
+		} catch (SlideNotFoundException $e) {
+			throw new APIException(
+				"Slide '{$params->id}' doesn't exist.",
+				HTTPStatus::NOT_FOUND,
+				$e
+			);
+		}
+
 		try {
 			$slide->lock_release($session);
 		} catch (SlideLockException $e) {

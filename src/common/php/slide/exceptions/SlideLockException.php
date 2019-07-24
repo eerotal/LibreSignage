@@ -1,5 +1,5 @@
 <?php
 
-namespace libresignage\common\php\slide;
+namespace libresignage\common\php\slide\exceptions;
 
 final class SlideLockException extends \Exception {}

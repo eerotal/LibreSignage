@@ -48,7 +48,7 @@ class slide_lock_acquire extends APITestCase {
 				'admin',
 				'admin',
 				['id' => ''],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Missing id parameter' => [
 				'admin',
@@ -60,7 +60,7 @@ class slide_lock_acquire extends APITestCase {
 				'admin',
 				'admin',
 				['id' => 'aabbccddeeff'],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'User user tries to lock slide of user admin' => [
 				'user',

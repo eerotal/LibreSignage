@@ -18,25 +18,8 @@
 * @status_start
 * @status{200,On success.}
 * @status{400,If the request parameters are invalid.}
-* @status{400,If the requested queue doesn't exist.}
+* @status{404,If the requested queue doesn't exist.}
 * @status_end
-*/
-
-/*
-*  ====>
-*
-*  Get a slide queue.
-*
-*  **Request:** GET
-*
-*  Parameters
-*    * name = The name of the queue to get.
-*
-*  Return value
-*    * owner  = The owner of the queue.
-*    * slides = An array of the slide IDs in the requested queue.
-*
-*  <====
 */
 
 namespace libresignage\api\endpoint\queue;
@@ -44,8 +27,11 @@ namespace libresignage\api\endpoint\queue;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use libresignage\api\APIEndpoint;
+use libresignage\api\APIException;
+use libresignage\api\HTTPStatus;
 use libresignage\common\php\slide\Slide;
-use libresignage\common\php\Queue;
+use libresignage\common\php\queue\Queue;
+use libresignage\common\php\queue\exceptions\QueueNotFoundException;
 
 APIEndpoint::GET(
 	[
@@ -67,8 +53,18 @@ APIEndpoint::GET(
 	],
 	function($req, $module_data) {
 		$params = $module_data['APIQueryValidatorModule'];
+
 		$queue = new Queue();
-		$queue->load($params->name);
+		try {
+			$queue->load($params->name);
+		} catch(QueueNotFoundException $e) {
+			throw new APIException(
+				"Queue '{$params->name}' doesn't exist.",
+				HTTPStatus::NOT_FOUND,
+				$e
+			);
+		}
+
 		return ['queue' => $queue->export(FALSE, FALSE)];
 	}
 );

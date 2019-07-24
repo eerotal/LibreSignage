@@ -93,7 +93,13 @@ class slide_dup extends APITestCase {
 				'admin',
 				'admin',
 				['id' => ''],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
+			],
+			'Nonexistent id' => [
+				'admin',
+				'admin',
+				['id' => 'aabbccddee'],
+				HTTPStatus::NOT_FOUND
 			],
 			'Editor not in admin or user groups duplicates slide' => [
 				'display',
@@ -130,7 +136,7 @@ class slide_dup extends APITestCase {
 		if ($this->dup_slide_id !== NULL) {
 			$resp = SlideUtils::remove_slide($this->api, $this->dup_slide_id);
 			if ($resp->getStatusCode() !== HTTPStatus::OK) {
-				throw new Exception("Failed to remove duplicated slide.");
+				throw new \Exception("Failed to remove duplicated slide.");
 			}
 			$this->dup_slide_id = NULL;
 		}

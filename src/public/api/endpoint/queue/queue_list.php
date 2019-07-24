@@ -34,7 +34,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
 use libresignage\api\APIEndpoint;
 use libresignage\common\php\slide\Slide;
-use libresignage\common\php\Queue;
+use libresignage\common\php\queue\Queue;
 
 APIEndpoint::GET(
 	[

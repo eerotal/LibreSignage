@@ -77,11 +77,11 @@ class slide_lock_relase extends APITestCase {
 			],
 			'Empty slide id' => [
 				['id' => ''],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Nonexistent slide id' => [
 				['id' => 'aabbccddeeff'],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Wrong type for id parameter' => [
 				['id' => 123],

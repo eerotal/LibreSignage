@@ -63,11 +63,11 @@ class user_get extends APITestCase {
 			],
 			'Nonexistent user' => [
 				['user' => 'nouser'],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Empty user parameter' => [
 				['user' => ''],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			]
 		];
 	}

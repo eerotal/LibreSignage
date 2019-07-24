@@ -38,7 +38,7 @@ class slide_rm extends APITestCase {
 		$this->api->logout();
 
 		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new Exception("Failed to create initial slide.");
+			throw new \Exception("Failed to create initial slide.");
 		}
 		$this->slide_id = APIInterface::decode_raw_response($resp)->id;
 	}
@@ -85,14 +85,14 @@ class slide_rm extends APITestCase {
 				'admin',
 				['id' => 'aabbccddeeff'],
 				FALSE,
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Empty id parameter' => [
 				'admin',
 				'admin',
 				['id' => ''],
 				FALSE,
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Missing id parameter' => [
 				'admin',

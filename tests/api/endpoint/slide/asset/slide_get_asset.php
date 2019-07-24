@@ -98,7 +98,7 @@ class slide_get_asset extends APITestCase {
 					'id' => '',
 					'name' => basename(self::TEST_ASSET_PATH)
 				],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Nonexistent slide id' => [
 				'admin',
@@ -107,7 +107,7 @@ class slide_get_asset extends APITestCase {
 					'id' => '11bbcceeddff',
 					'name' => basename(self::TEST_ASSET_PATH)
 				],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Missing name parameter' => [
 				'admin',

@@ -81,7 +81,7 @@ class slide_remove_asset extends APITestCase {
 					'id' => '',
 					'name' => basename(self::TEST_ASSET_PATH)
 				],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Nonexistent id' => [
 				'admin',
@@ -90,7 +90,7 @@ class slide_remove_asset extends APITestCase {
 					'id' => 'aabbccddeeff',
 					'name' => basename(self::TEST_ASSET_PATH)
 				],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Wrong type for id parameter' => [
 				'admin',

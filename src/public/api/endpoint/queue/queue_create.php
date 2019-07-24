@@ -27,7 +27,7 @@ use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
 use libresignage\common\php\slide\Slide;
-use libresignage\common\php\Queue;
+use libresignage\common\php\queue\Queue;
 
 APIEndpoint::POST(
 	[

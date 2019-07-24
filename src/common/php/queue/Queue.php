@@ -1,6 +1,6 @@
 <?php
 
-namespace libresignage\common\php;
+namespace libresignage\common\php\queue;
 
 use libresignage\common\php\Config;
 use libresignage\common\php\Util;
@@ -11,6 +11,7 @@ use libresignage\common\php\JSONUtils;
 use libresignage\common\php\exceptions\JSONException;
 use libresignage\common\php\exceptions\ArgException;
 use libresignage\common\php\exceptions\IntException;
+use libresignage\common\php\queue\exceptions\QueueNotFoundException;
 
 /**
 * Queue class for handling LibreSignage queue data.
@@ -47,12 +48,12 @@ final class Queue extends Exportable {
 	* Load a queue from file.
 	*
 	* @param string $name The name of the queue to load.
+	*
+	* @throws QueueNotFoundException if the requested queue doesn't exist.
 	*/
 	public function load(string $name) {
-		self::validate_name($name);
-
 		if (!self::exists($name)) {
-			throw new ArgException("Queue '{$name}' doesn't exist.");
+			throw new QueueNotFoundException("Queue '{$name}' doesn't exist.");
 		}
 
 		$json = Util::file_lock_and_get(self::get_path($name));

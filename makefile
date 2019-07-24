@@ -526,7 +526,7 @@ test-api: initchk $(PHP_AUTOLOAD)
 	sh tests/setup.sh "API"
 
 	export PHPUNIT_API_HOST="$(PHPUNIT_API_HOST)"
-	vendor/bin/phpunit $(PHPUNIT_FLAGS) --testsuite "API"
+	vendor/bin/phpunit $(PHPUNIT_FLAGS) $(PASS) --testsuite "API"
 
 	sh tests/cleanup.sh "API"
 

@@ -96,7 +96,13 @@ class user_save extends APITestCase {
 				'admin',
 				'admin',
 				['user' => ''],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
+			],
+			'Nonexistent user' => [
+				'admin',
+				'admin',
+				['user' => 'nosuchuser'],
+				HTTPStatus::NOT_FOUND
 			],
 			'Wrong type for user parameter' => [
 				'admin',

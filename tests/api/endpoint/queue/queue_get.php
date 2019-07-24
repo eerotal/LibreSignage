@@ -40,7 +40,7 @@ class queue_get extends APITestCase {
 			],
 			'Empty queue name parameter' => [
 				['name' => ''],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			]
 		];
 	}

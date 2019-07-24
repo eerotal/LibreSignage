@@ -1,19 +1,24 @@
 <?php
-/*
-*  ====>
+/** \file
+* Remove a slide asset.
 *
-*  Remove a slide asset based on its name.
+* @method{POST}
+* @auth{By token}
+* @groups{admin|editor}
+* @ratelimit_yes
 *
-*  **Request:** POST, application/json
+* @request_start{application/json}
+* @request{string,id,The ID of the slide.,required}
+* @request{string,name,The name of the asset to remove.,required}
+* @request_end
 *
-*  JSON parameters
-*    * id   = The ID of the Slide to access.
-*    * name = The asset name to remove.
-*
-*  Return value
-*    * error         = An error code or API_E_OK on success.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status{400,If the request parameters are invalid.}
+* @status{401,If the caller is not allowed to remove the asset.}
+* @status{404,If the asset doesn't exist.}
+* @status{404,If the slide doesn't exist.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\slide\asset;
@@ -25,6 +30,7 @@ use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
 use libresignage\common\php\slide\Slide;
+use libresignage\common\php\slide\exceptions\SlideNotFoundException;
 use libresignage\common\php\exceptions\ArgException;
 
 APIEndpoint::POST(
@@ -49,7 +55,15 @@ APIEndpoint::POST(
 		$caller = $module_data['APIAuthModule']['user'];
 
 		$slide = new Slide();
-		$slide->load($params->id);
+		try {
+			$slide->load($params->id);
+		} catch (SlideNotFoundException $e) {
+			throw new APIException(
+				"Slide '{$params->id}' doesn't exist.",
+				HTTPStatus::NOT_FOUND,
+				$e
+			);
+		}
 
 		if (!$slide->can_modify($caller)) {
 			throw new APIException(
@@ -61,7 +75,11 @@ APIEndpoint::POST(
 		try {
 			$slide->remove_uploaded_asset($params->name);
 		} catch (ArgException $e) {
-			throw new APIException('No such asset.', HTTPStatus::NOT_FOUND);
+			throw new APIException(
+				"Asset '{$params->name}' doesn't exist.",
+				HTTPStatus::NOT_FOUND,
+				$e
+			);
 		}
 		$slide->write();
 

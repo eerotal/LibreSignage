@@ -27,6 +27,7 @@ use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
 use libresignage\common\php\auth\User;
+use libresignage\common\php\auth\exceptions\UserNotFoundException;
 
 APIEndpoint::GET(
 	[
@@ -59,7 +60,15 @@ APIEndpoint::GET(
 		}
 
 		$user = new User();
-		$user->load($params->user);
+		try {
+			$user->load($params->user);
+		} catch (UserNotFoundException $e) {
+			throw new APIException(
+				"User '{$params->user}' doesn't exist.",
+				HTTPStatus::NOT_FOUND,
+				$e
+			);
+		}
 
 		return [
 			'user' => [

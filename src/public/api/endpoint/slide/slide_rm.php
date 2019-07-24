@@ -1,15 +1,22 @@
 <?php
-/*
-*  ====>
+/** \file
+* Remove a slide.
 *
-*  Remove a slide.
+* @method{POST}
+* @auth{By token}
+* @groups{admin|editor}
+* @ratelimit_yes
 *
-*  **Request:** POST, application/json
+* @request_start{application/json}
+* @request{string,id,The ID of the slide to remove.,required}
+* @request_end
 *
-*  Parameters
-*    * id = The id of the slide to remove.
-*
-*  <====
+* @status_start
+* @status{200,On success.},
+* @status{400,If the request parameters are invalid.}
+* @status{401,If the caller is not allowed to remove the slide.}
+* @status{404,If the slide doesn't exist.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\slide;
@@ -20,7 +27,9 @@ use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
 use libresignage\common\php\slide\Slide;
-use libresignage\common\php\slide\Queue;
+use libresignage\common\php\slide\exceptions\SlideNotFoundException;
+use libresignage\common\php\queue\Queue;
+use libresignage\common\php\queue\exceptions\QueueNotFoundException;
 use libresignage\common\php\auth\User;
 
 APIEndpoint::POST(
@@ -46,10 +55,27 @@ APIEndpoint::POST(
 		$params = $module_data['APIJSONValidatorModule'];
 
 		$slide = new Slide();
-		$slide->load($params->id);
+		try {
+			$slide->load($params->id);
+		} catch (SlideNotFoundException $e) {
+			throw new APIException(
+				"Slide '{$params->id}' doesn't exist.",
+				HTTPStatus::NOT_FOUND,
+				$e
+			);
+		}
 
 		$owner = new User();
-		$owner->load($slide->get_owner());
+		try {
+			$owner->load($slide->get_owner());
+		} catch (UserNotFoundException $e) {
+			throw new APIException(
+				"Owner '{$slide->get_owner()}' of '{$slide->get_id()}' ".
+				"doesn't exist. This shouldn't happen.",
+				HTTPStatus::INTERNAL_SERVER_ERROR,
+				$e
+			);
+		}
 
 		if (
 			!$caller->is_in_group('admin')

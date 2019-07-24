@@ -8,10 +8,11 @@ use libresignage\common\php\JSONUtils;
 use libresignage\common\php\Exportable;
 use libresignage\common\php\auth\User;
 use libresignage\common\php\auth\Session;
-use libresignage\common\php\Queue;
+use libresignage\common\php\queue\Queue;
 use libresignage\common\php\slide\SlideLock;
 use libresignage\common\php\slide\SlideAsset;
-use libresignage\common\php\slide\SlideLockException;
+use libresignage\common\php\slide\exceptions\SlideLockException;
+use libresignage\common\php\slide\exceptions\SlideNotFoundException;
 use libresignage\common\php\Log;
 use libresignage\common\php\exceptions\ArgException;
 use libresignage\common\php\exceptions\IntException;
@@ -142,11 +143,11 @@ final class Slide extends Exportable {
 	*
 	* @param string $id The ID to validate.
 	*
-	* @throws ArgException if the ID doesn't already exist.
+	* @throws SlideNotFoundException if the ID doesn't already exist.
 	*/
 	public static function validate_id(string $id) {
 		if (!self::exists($id)) {
-			throw new ArgException("Slide $id doesn't exist.");
+			throw new SlideNotFoundException("Slide '$id' doesn't exist.");
 		}
 	}
 

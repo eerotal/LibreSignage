@@ -1,15 +1,19 @@
 <?php
-/*
-*  ====>
+/** \file
+* Get the existing slide IDs as an array.
 *
-*  Get a list of all the existing slides.
+* @method{GET}
+* @auth{By token}
+* @groups{admin|editor|display}
+* @ratelimit_yes
 *
-*  **Request:** GET
+* @response_start{application/json}
+* @response{array,slides,An array of slide IDs.}
+* @response_end
 *
-*  Return value
-*    * An array with all the existing slide IDs.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\slide;

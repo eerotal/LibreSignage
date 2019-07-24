@@ -1,64 +1,74 @@
 <?php
-/*
-*  ====>
+/** \file
 *
-*   Save a slide. Whether a user is allowed to access this
-*   API endpoint depends on the parameters passed to the
-*   endpoint.
+* Save a slide. Whether a user is allowed to access this
+* API endpoint depends on the parameters passed to the
+* endpoint.
 *
-*  Permissions
-*   * id != null => Allow if the caller is in the admin
-*     group or the caller is the owner of the slide and is
-*     in the editor group.
-*   * id == null => Allow if the caller is in the admin or
-*     editor group.
-*   * Otherwise allow restricted access if the caller is in
-*     the collaborators array of the slide. In this case the
-*     queue_name and collaborators parameters of the API
-*     call are silently discarded.
+* Permissions
+*  * \c id != null
+*    * Allow if the caller is in the admin group or the caller
+*      is the owner of the slide and is in the editor group.
+*    * Otherwise allow restricted access if the caller is in
+*      the collaborators array of the slide. In this case the
+*      queue_name and collaborators parameters of the API
+*      call are silently discarded.
+*  * \c id == null
+*    * Allow if the caller is in the admin or editor groups.
 *
-*  This endpoint only allows slide modification if the caller
-*  has locked the slide by calling slide_lock_acquire.php first.
-*  If the slide is not locked or is locked by someone else, the
-*  '424 Failed Dependency' status code is returned. If a new
-*  slide is created, the slide is automatically locked for the
-*  caller.
+* This endpoint only allows slide modification if the caller
+* has locked the slide by calling \c slide_lock_acquire.php first.
+* If the slide is not locked or is locked by someone else, the
+* '424 Failed Dependency' status code is returned. If a new
+* slide is created, the slide is automatically locked for the
+* caller.
 *
-*  Note!
+* @par Note!
+* This endpoint accepts a few unused parameters to simplify
+* implementing the client interface for this endpoint.
+* Specifically, clients *must* be able to send all data
+* received from \c slide_get.php back to this endpoint, even if
+* it's not actually used. This makes it possible to implement
+* a simple Object Oriented interface that just sends all data
+* fields in the client side Slide object to this endpoint
+* without filtering what can be sent.
 *
-*  This endpoint accepts a few unused parameters to simplify
-*  implementing the client interface for this endpoint.
-*  Specifically, clients *must* be able to send all data
-*  received from slide_get.php back to this endpoint, even if
-*  it's not actually used. This makes it possible to implement
-*  a simple Object Oriented interface that just sends all data
-*  fields in the client side Slide object to this endpoint
-*  without filtering what can be sent.
+* @method{POST}
+* @auth{By token}
+* @groups{admin|editor}
+* @ratelimit_yes
 *
-*  **Request:** POST, application/json
+* @request_start{application/json}
+* @request{string,id,The ID of the slide to modify or NULL for new.,optional}
+* @request{string,name,The new name of the slide.,required}
+* @request{int,index,The new 0-based index of the slide.,required}
+* @request{int,duration,The new slide duration in seconds.,required}
+* @request{string,markup,The new markup of the slide.,required}
+* @request{bool,enabled,Whether the slide is enabled or not.,required}
+* @request{bool,sched,Whether scheduling is enabled or not.,required}
+* @request{int,sched_t_s,The start unix timestamp of scheduling.,required}
+* @request{int,sched_t_e,The end unix timestamp of scheduling.,required}
+* @request{int,animation,The new ID of the slide transition animation.,required}
+* @request{string,queue_name,The new queue name of the slide.,required}
+* @request{array,collaborators,An array of collaborator usernames.,required}
+* @request{mixed,owner,Unused.,optional}
+* @request{mixed,lock,Unused.,optional}
+* @request{mixed,assets,Unused.,optional}
+* @request_end
 *
-*  Parameters
-*    * id            = The ID of the slide to modify or either
-*                      undefined or null for new slide.
-*    * name          = The name of the slide.
-*    * index         = The index of the slide.
-*    * duration      = The duration of the slide.
-*    * markup        = The markup of the slide.
-*    * enabled       = Whether the slide is enabled or not.
-*    * sched         = Whether the slide is scheduled or not.
-*    * sched_t_s     = The slide schedule starting timestamp.
-*    * sched_t_e     = The slide schedule ending timestamp.
-*    * animation     = The slide animation identifier.
-*    * queue_name    = The name of the slide queue of this slide.
-*    * collaborators = A list of slide collaborators.
-*    * owner         = Unused (see above)
-*    * lock          = Unused (see above)
-*    * assets        = Unused (see above)
+* @response_start{application/json}
+* @response{Slide,slide,The saved slide object.}
+* @response_end
 *
-*  Return value
-*    * This endpoint returns all the parameters above.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status{400,If the request parameters are invalid.}
+* @status{401,If the caller is not allowed to modify or create a slide.}
+* @status{403,If the slide quota was reached.}
+* @status{404,If the id parameter is defined and no such slide exists.}
+* @status{424,If the slide corresponding to id is not locked.}
+* @status{424,If the slide corresponding to id is locked by another session.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\slide;
@@ -68,8 +78,10 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
-use libresignage\common\php\Queue;
+use libresignage\common\php\queue\Queue;
+use libresignage\common\php\queue\exceptions\QueueNotFoundException;
 use libresignage\common\php\slide\Slide;
+use libresignage\common\php\slide\exceptions\SlideNotFoundException;
 use libresignage\common\php\auth\User;
 use libresignage\common\php\auth\Session;
 use libresignage\common\php\Log;
@@ -132,7 +144,16 @@ APIEndpoint::POST(
 		* handler function.
 		*/
 		if (property_exists($params, 'id') && $params->id !== NULL) {
-			$slide->load($params->id);
+			try {
+				$slide->load($params->id);
+			} catch (SlideNotFoundException $e) {
+				throw new APIException(
+					"Slide '{$params->id}' doesn't exist.",
+					HTTPStatus::NOT_FOUND,
+					$e
+				);
+			}
+
 			if (
 				$caller->is_in_group('admin')
 				|| (
@@ -141,13 +162,13 @@ APIEndpoint::POST(
 				)
 			) {
 				// admin or editor+owner => ALLOW modifying.
-				return modify_slide($session, $slide, $params, TRUE);
+				return ['slide' => modify_slide($session, $slide, $params, TRUE)];
 			} else if (
 				$caller->is_in_group('editor')
 				&& in_array($caller->get_name(), $slide->get_collaborators())
 			) {
 				// Restricted modification permissions for collaborators.
-				return modify_slide($session, $slide, $params, FALSE);
+				return ['slide' => modify_slide($session, $slide, $params, FALSE)];
 			} else {
 				throw new APIException(
 					'User not authorized to do this operation.',
@@ -156,7 +177,7 @@ APIEndpoint::POST(
 			}
 		} else if ($caller->is_in_group(['admin', 'editor'])) {
 			// admin or editor => ALLOW creation.
-			return create_slide($caller, $session, $slide, $params);
+			return ['slide' => create_slide($caller, $session, $slide, $params)];
 		} else {
 			throw new APIException(
 				'User not authorized to do this operation.',
@@ -179,7 +200,7 @@ function ensure_slide_lock(Slide $slide, Session $session): void {
 		);
 	} else if (!$lock->is_expired() && !$lock->is_owned_by($session)) {
 		throw new APIException(
-			'Slide locked by another user.',
+			'Slide locked by another session.',
 			HTTPStatus::FAILED_DEPENDENCY
 		);
 	}	
@@ -256,7 +277,16 @@ function finish(Slide $slide) {
 
 	// Juggle slide indices.
 	$queue = new Queue();
-	$queue->load($slide->get_queue_name());
+	try {
+		$queue->load($slide->get_queue_name());
+	} catch (QueueNotFoundException $e) {
+		throw new APIException(
+			"Queue '{$slide->get_queue_name()}' of '{$slide->get_id()}' ".
+			"doesn't exist. This shouldn't happen happen.",
+			HTTPStatus::INTERNAL_SERVER_ERROR,
+			$e
+		);
+	}
 	$queue->juggle($slide->get_id());
 
 	// Get the slide data from $queue since $queue->juggle() modifies it.

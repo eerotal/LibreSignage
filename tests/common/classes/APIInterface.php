@@ -163,7 +163,6 @@ final class APIInterface {
 					try {
 						return JSONUtils::decode((string) $resp->getBody());
 					} catch (JSONException $e) {
-						var_dump($resp->getBody()->getContents());
 						throw new APIInterfaceException(
 							'Malformed JSON response received from API.'
 						);

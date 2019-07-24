@@ -64,7 +64,7 @@ class queue_remove extends APITestCase {
 				'admin',
 				'admin',
 				['name' => ''],
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Wrong type for name paremeter' => [
 				'admin',
