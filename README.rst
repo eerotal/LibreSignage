@@ -177,7 +177,7 @@ Dependencies installed automatically by *npm* or *composer*
     * jQuery (https://jquery.com/)
     * Popper.js (https://popper.js.org/)
     * Font-Awesome Free (https://fontawesome.com/)
-	* Symfony/HttpFoundation (https://symfony.com/)
+    * HttpFoundation (https://symfony.com/)
     * Guzzle (https://github.com/guzzle/guzzle)
     * json-schema (https://github.com/justinrainbow/json-schema)
     * JSDOM (https://github.com/jsdom/jsdom)
