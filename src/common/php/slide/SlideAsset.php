@@ -19,7 +19,8 @@ final class SlideAsset extends Exportable {
 		'mime',
 		'uid',
 		'slide_id',
-		'has_thumb'
+		'has_thumb',
+		'hash'
 	];
 	static $PUBLIC = [
 		'mime',
@@ -34,8 +35,8 @@ final class SlideAsset extends Exportable {
 	private $mime = NULL;
 	private $uid = NULL;
 	private $slide_id = NULL;
-
 	private $has_thumb = FALSE;
+	private $hash = NULL;
 
 	public function __exportable_get(string $name) {
 		return $this->{$name};
@@ -97,6 +98,8 @@ final class SlideAsset extends Exportable {
 			throw new IntException('Failed to store uploaded asset.');
 		}
 
+		$this->hash();
+
 		$this->has_thumb = TRUE;
 		try {
 			$thumb = new Thumbnail();
@@ -152,6 +155,13 @@ final class SlideAsset extends Exportable {
 	*/
 	public function gen_uid() {
 		$this->uid = Util::get_uid();
+	}
+
+	/**
+	* Calculate and store the MD5 hash an asset.
+	*/
+	public function hash() {
+		$this->hash = md5_file($this->get_internal_path());
 	}
 
 	/**
@@ -215,6 +225,16 @@ final class SlideAsset extends Exportable {
 	public function get_mime()      { return $this->mime;      }
 	public function get_uid()       { return $this->uid;       }
 	public function has_thumb()     { return $this->has_thumb; }
+	public function get_hash()      { return $this->hash;      }
+
+	/**
+	* Get the last modified time of an asset.
+	*
+	* @return int The asset modification Unix timestamp.
+	*/
+	public function get_mtime(): int {
+		return filemtime($this->get_internal_path());
+	}
 
 	/**
 	* Clone this SlideAsset into the slide $slide.

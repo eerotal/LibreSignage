@@ -83,5 +83,8 @@ return [
 	'THUMB_MIME'            => 'image/png',
 
 	// Maximum log length in lines.
-	'LOG_MAX_LEN'			=> 300
+	'LOG_MAX_LEN'			=> 300,
+
+	// Default Cache-Control: max-age value.
+	'CACHE_DEFAULT_MAX_AGE' => 600
 ];

@@ -6,6 +6,7 @@
 * @auth{By cookie or token}
 * @groups{admin|editor|display}
 * @ratelimit_yes
+* @cache_yes
 *
 * @request_start{application/json}
 * @request{string,id,The ID of the slide.,required}
@@ -28,6 +29,7 @@ namespace libresignage\api\endpoint\slide\asset;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 
+use libresignage\common\php\Config;
 use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
@@ -54,6 +56,7 @@ APIEndpoint::GET(
 		]
 	],
 	function($req, $module_data) {
+		$response = NULL;
 		$slide = NULL;
 		$asset = NULL;
 
@@ -87,6 +90,22 @@ APIEndpoint::GET(
 			);
 		}
 
-		return new BinaryFileResponse($asset->get_internal_path());
+		/*
+		* Create the BinaryFileResponde and set the proper cache headers.
+		* Note that the Cache-Control: no-cache directive is set so that
+		* the client always validates the cached data before displaying it.
+		* This way images are always up-to-date.
+		*/
+		$response = new BinaryFileResponse($asset->get_internal_path());
+		$last_modified = (new \DateTime())->setTimestamp($asset->get_mtime());
+
+		$response
+			->setEtag($asset->get_hash())
+			->setLastModified($last_modified)
+			->setPrivate()
+			->headers->addCacheControlDirective('no-cache');
+		$response->isNotModified($req);
+
+		return $response;
 	}
 );

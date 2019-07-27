@@ -244,8 +244,12 @@ ALIASES                +=\
 						method{1}="\par HTTP Method\n\1" \
 						auth{1}="\par Authentication\n\1" \
 						groups{1}="\par Allowed groups\n\c \1" \
+						\
 						ratelimit_yes="\par Rate limiting\nThis endpoint is rate limited." \
 						ratelimit_no="\par Rate limiting\nThis endpoint is not rate limited." \
+						\
+						cache_yes="\par Cache\nThis endpoint supports HTTP caching."\
+						cache_no="\par Cache\nThis endpoint doesn't support caching."\
 						\
 						request_start{1}="\par Parameters\n \e \1" \
 						request{4}="\li \e \1 \b \2 \3 [\e \4] \n" \
