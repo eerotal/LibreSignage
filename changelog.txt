@@ -18,6 +18,8 @@ v1.1.0
                target. (apache2-debian-interactive and apache2-debian)
   - [build]    Various improvements to the build system.
   - [docs]     Generate documentation with Doxygen.
+  - [internal] Implement HTTP cache support for slide asset fetching endpoints.
+               (issue #53)
 
 v1.0.2
   - [bugfix]   Apply a workaround for docker-library/php#865 which broke
