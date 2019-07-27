@@ -82,7 +82,7 @@ class user_remove extends APITestCase {
 
 	public function tearDown(): void {
 		// Remove the initial user in case it wasn't successfully removed.
-		if ($this->user_removed) {
+		if (!$this->user_removed) {
 			$this->api->login('admin', 'admin');
 
 			APIInterface::assert_success($this->api->call_return_raw_response(
