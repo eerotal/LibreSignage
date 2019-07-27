@@ -7,7 +7,7 @@ v1.1.0
   - [internal] Mostly rewrite the API system
   - [internal] Use PHP autoloading and namespaces instead of direct
                file includes.
-  - [internal] Improve various classes and PHP files to make the more object
+  - [internal] Improve various classes and PHP files to make them more object
                oriented.
   - [internal] Implement a testing framework with PHPUnit and write tests
                for all API endpoints.

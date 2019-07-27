@@ -311,7 +311,7 @@ host (ie. no containers) by following the instructions below.
 
      *  Whether to enable debugging. This enables things like
         verbose error reporting through the API etc. **DO NOT
-        enabled debugging on production systems.**
+        enable debugging on production systems.**
 
    This command generates a build configuration file needed
    for building LibreSignage. The file is saved in ``build/`` as
