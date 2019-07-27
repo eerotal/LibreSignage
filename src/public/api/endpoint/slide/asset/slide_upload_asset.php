@@ -43,6 +43,8 @@
 * @status{200,On success.}
 * @status{401,If the caller is not allowed to upload assets to the slide.}
 * @status{404,If the slide doesn't exist.}
+* @status{424,If the slide is not locked.}
+* @status{424,If the slide is locked by another session}
 * @status_end
 */
 
@@ -81,10 +83,12 @@ APIEndpoint::POST(
 	],
 	function($req, $module_data) {
 		$slide = NULL;
+		$lock = NULL;
 		$errors = [];
 
 		$params = $module_data['APIMultipartRequestValidatorModule'];
 		$caller = $module_data['APIAuthModule']['user'];
+		$session = $module_data['APIAuthModule']['session'];
 
 		$slide = new Slide();
 		try {
@@ -101,6 +105,19 @@ APIEndpoint::POST(
 			throw new APIException(
 				'User not allowed to upload assets to this slide.',
 				HTTPStatus::UNAUTHORIZED
+			);
+		}
+
+		$lock = $slide->get_lock();
+		if ($lock === NULL) {
+			throw new APIException(
+				"Slide not locked.",
+				HTTPStatus::FAILED_DEPENDENCY
+			);
+		} else if (!$lock->is_expired() && !$lock->is_owned_by($session)) {
+			throw new APIException(
+				"Slide locked by another session.",
+				HTTPStatus::FAILED_DEPENDENCY
 			);
 		}
 
