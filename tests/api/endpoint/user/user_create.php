@@ -5,6 +5,7 @@ namespace libresignage\tests\api\endpoint\user;
 use libresignage\tests\common\classes\APITestCase;
 use libresignage\tests\common\classes\APITestUtils;
 use libresignage\tests\common\classes\APIInterface;
+use libresignage\tests\common\classes\UserUtils;
 use libresignage\api\HTTPStatus;
 
 class user_create extends APITestCase {
@@ -35,10 +36,7 @@ class user_create extends APITestCase {
 			'admin',
 			'admin'
 		);
-
-		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->user_created = TRUE;
-		}
+		$this->user_created = ($resp->getStatusCode() === HTTPStatus::OK);
 	}
 
 	public function params_provider(): array {
@@ -157,9 +155,7 @@ class user_create extends APITestCase {
 			[],
 			TRUE
 		);
-		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->user_created = TRUE;
-		}
+		$this->user_created = ($resp->getStatusCode() === HTTPStatus::OK);
 
 		$this->assert_object_matches_schema(
 			APIInterface::decode_raw_response($resp),
@@ -182,9 +178,7 @@ class user_create extends APITestCase {
 			[],
 			TRUE
 		);
-		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->user_created = TRUE;
-		}
+		$this->user_created = ($resp->getStatusCode() === HTTPStatus::OK);
 		$this->assert_api_failed($resp, 401);
 
 		$this->api->logout();
@@ -194,12 +188,9 @@ class user_create extends APITestCase {
 		if ($this->user_created) {
 			$this->api->login('admin', 'admin');
 
-			APIInterface::assert_success($this->api->call_return_raw_response(
-				'POST',
-				'user/user_remove.php',
-				[ 'user' => self::UNIT_TEST_USER ],
-				[],
-				true
+			APIInterface::assert_success(UserUtils::remove(
+				$this->api,
+				self::UNIT_TEST_USER
 			), 'Failed to cleanup created user.', [$this->api, 'logout']);
 			$this->user_created = FALSE;
 

@@ -6,6 +6,7 @@ use \JsonSchema\Validator;
 use libresignage\tests\common\classes\APITestCase;
 use libresignage\tests\common\classes\APITestUtils;
 use libresignage\tests\common\classes\APIInterface;
+use libresignage\tests\common\classes\UserUtils;
 use libresignage\api\HTTPStatus;
 
 class user_remove extends APITestCase {
@@ -24,15 +25,10 @@ class user_remove extends APITestCase {
 		// Create an initial user that the tests try to remove.
 		$this->api->login('admin', 'admin');
 
-		APIInterface::assert_success($this->api->call_return_raw_response(
-			'POST',
-			'user/user_create.php',
-			[
-				'user' => self::UNIT_TEST_USER,
-				'groups' => ['editor', 'display']
-			],
-			[],
-			TRUE
+		APIInterface::assert_success(UserUtils::create(
+			$this->api,
+			self::UNIT_TEST_USER,
+			['editor', 'display']
 		), 'Failed to create initial user.', [$this, 'abort']);
 
 		$this->api->logout();
@@ -48,9 +44,7 @@ class user_remove extends APITestCase {
 			[],
 			TRUE
 		);
-		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->user_removed = TRUE;
-		}
+		$this->user_removed = ($resp->getStatusCode() === HTTPStatus::OK);
 
 		$this->assert_api_failed($resp, HTTPStatus::UNAUTHORIZED);
 
@@ -68,9 +62,7 @@ class user_remove extends APITestCase {
 			[],
 			TRUE
 		);
-		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->user_removed = TRUE;
-		}
+		$this->user_removed = ($resp->getStatusCode() === HTTPStatus::OK);
 
 		$this->assert_object_matches_schema(
 			APIInterface::decode_raw_response($resp),
@@ -85,12 +77,9 @@ class user_remove extends APITestCase {
 		if (!$this->user_removed) {
 			$this->api->login('admin', 'admin');
 
-			APIInterface::assert_success($this->api->call_return_raw_response(
-				$this->get_endpoint_method(),
-				$this->get_endpoint_uri(),
-				['user' => self::UNIT_TEST_USER],
-				[],
-				TRUE
+			APIInterface::assert_success(UserUtils::remove(
+				$this->api,
+				self::UNIT_TEST_USER
 			), 'Failed to remove initial user.', [$this->api, 'logout']);
 			$this->user_removed = FALSE;
 
