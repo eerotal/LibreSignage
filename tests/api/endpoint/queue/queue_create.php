@@ -3,12 +3,16 @@
 namespace libresignage\tests\api\endpoint\queue;
 
 use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\APIInterface;
+use libresignage\tests\common\classes\QueueUtils;
 use libresignage\api\HTTPStatus;
 
 class queue_create extends APITestCase {
 	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	const TEST_QUEUE_NAME = 'test_queue';
+
+	private $queue_created = FALSE;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -21,13 +25,16 @@ class queue_create extends APITestCase {
 	* @dataProvider params_provider
 	*/
 	public function test_fuzz_params(array $params, int $error): void {
-		$this->call_api_and_assert_failed(
+		$resp = $this->call_api_and_assert_failed(
 			$params,
 			[],
 			$error,
 			'admin',
 			'admin'
 		);
+		if ($resp->getStatusCode() === HTTPStatus::OK) {
+			$this->queue_created = TRUE;
+		}
 	}
 
 	public static function params_provider(): array {
@@ -69,17 +76,16 @@ class queue_create extends APITestCase {
 	}
 
 	public function tearDown(): void {
-		$this->api->logout();
-		$this->api->login('admin', 'admin');
+		if ($this->queue_created) {
+			$this->api->login('admin', 'admin');
 
-		$this->api->call(
-			'POST',
-			'queue/queue_remove.php',
-			['name' => self::TEST_QUEUE_NAME],
-			[],
-			TRUE
-		);
+			APIInterface::assert_success(QueueUtils::remove(
+				$this->api,
+				self::TEST_QUEUE_NAME
+			), 'Failed to remove initial queue.', [$this->api, 'logout']);
 
-		$this->api->logout();
+			$this->queue_created = FALSE;
+			$this->api->logout();
+		}
 	}
 }

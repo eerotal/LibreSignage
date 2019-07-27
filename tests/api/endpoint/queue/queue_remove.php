@@ -3,6 +3,8 @@
 namespace libresignage\tests\api\endpoint\queue;
 
 use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\APIInterface;
+use libresignage\tests\common\classes\QueueUtils;
 use libresignage\api\HTTPStatus;
 
 class queue_remove extends APITestCase {
@@ -10,21 +12,22 @@ class queue_remove extends APITestCase {
 
 	const TEST_QUEUE_NAME = 'test_queue';
 
+	private $queue_removed = FALSE;
+
 	public function setUp(): void {
 		parent::setUp();
 
 		$this->set_endpoint_method('POST');
 		$this->set_endpoint_uri('queue/queue_remove.php');
 
-		// Create an initial slide to remove.
+		// Create an initial queue to remove.
 		$this->api->login('admin', 'admin');
-		$this->api->call(
-			'POST',
-			'queue/queue_create.php',
-			['name' => self::TEST_QUEUE_NAME],
-			[],
-			TRUE
-		);
+
+		APIInterface::assert_success(QueueUtils::create(
+			$this->api,
+			self::TEST_QUEUE_NAME
+		), 'Failed to create initial queue.', [$this, 'abort']);
+
 		$this->api->logout();
 	}
 
@@ -37,13 +40,14 @@ class queue_remove extends APITestCase {
 		array $params,
 		int $error
 	): void {
-		$this->call_api_and_assert_failed(
+		$resp = $this->call_api_and_assert_failed(
 			$params,
 			[],
 			$error,
 			$user,
 			$pass
 		);
+		$this->queue_removed = ($resp->getStatusCode() === HTTPStatus::OK);
 	}
 
 	public static function params_provider(): array {
@@ -88,25 +92,26 @@ class queue_remove extends APITestCase {
 	}
 
 	public function test_is_response_schema_correct() {
-		$this->call_api_and_check_response_schema(
+		$resp = $this->call_api_and_check_response_schema(
 			['name' => self::TEST_QUEUE_NAME],
 			[],
 			dirname(__FILE__).'/schemas/queue_remove.schema.json',
 			'admin',
 			'admin'
 		);
+		$this->queue_removed = ($resp->getStatusCode() === HTTPStatus::OK);		
 	}
 
 	public function tearDown(): void {
-		// Make sure the initial slide is removed.
-		$this->api->login('admin', 'admin');
-		$this->api->call(
-			'POST',
-			'queue/queue_remove.php',
-			['name' => self::TEST_QUEUE_NAME],
-			[],
-			TRUE
-		);
-		$this->api->logout();
+		if (!$this->queue_removed) {
+			$this->api->login('admin', 'admin');
+
+			APIInterface::assert_success(QueueUtils::remove(
+				$this->api,
+				self::TEST_QUEUE_NAME
+			), 'Failed to remove initial queue.', [$this->api, 'logout']);
+
+			$this->api->logout();
+		}
 	}
 }
