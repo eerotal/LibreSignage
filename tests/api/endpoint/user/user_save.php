@@ -3,6 +3,7 @@
 namespace libresignage\tests\api\endpoint\user;
 
 use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\APIInterface;
 use libresignage\api\HTTPStatus;
 
 class user_save extends APITestCase {
@@ -16,7 +17,7 @@ class user_save extends APITestCase {
 
 		// Create an initial user for testing.
 		$this->api->login('admin', 'admin');
-		$this->api->call(
+		APIInterface::assert_success($this->api->call_return_raw_response(
 			'POST',
 			'user/user_create.php',
 			[
@@ -25,7 +26,7 @@ class user_save extends APITestCase {
 			],
 			[],
 			TRUE
-		);
+		), 'Failed to create initial user.', [$this, 'abort']);
 		$this->api->logout();
 	}
 
@@ -170,13 +171,15 @@ class user_save extends APITestCase {
 	public function tearDown(): void {
 		// Remove the initial user.
 		$this->api->login('admin', 'admin');
-		$this->api->call(
+
+		APIInterface::assert_success($this->api->call_return_raw_response(
 			'POST',
 			'user/user_remove.php',
 			['user' => self::UNIT_TEST_USER],
 			[],
 			TRUE
-		);
+		), 'Failed to remove initial user.', [$this->api, 'logout']);
+
 		$this->api->logout();		
 	}	
 }

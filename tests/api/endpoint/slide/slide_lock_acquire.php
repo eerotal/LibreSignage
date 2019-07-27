@@ -3,8 +3,10 @@
 namespace libresignage\tests\api\endpoint\slide;
 
 use libresignage\tests\common\classes\APITestCase;
+use libresignage\tests\common\classes\APIInterface;
 use libresignage\api\HTTPStatus;
 use libresignage\tests\common\classes\SlideUtils;
+use libresignage\tests\common\classes\AuthUtils;
 
 class slide_lock_acquire extends APITestCase {
 	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
@@ -99,24 +101,10 @@ class slide_lock_acquire extends APITestCase {
 		}
 		$this->assert_api_failed($resp, HTTPStatus::LOCKED);
 
-		// Logout the previous session.
-		$this->api->call(
-			'POST',
-			'auth/auth_logout_other.php',
-			[],
-			[],
-			TRUE
-		);
-	}
+		APIInterface::assert_success(AuthUtils::logout_other(
+			$this->api
+		), 'Failed to logout other sessions.', [$this->api, 'logout']);
 
-	public function tearDown(): void {
-		// Make sure the test slide is unlocked.
-		$this->api->login('admin', 'admin');
-		$resp = SlideUtils::slide_release($this->api, self::TEST_SLIDE_ID);
 		$this->api->logout();
-
-		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new \Exception("Failed to release initial slide lock.");
-		}
 	}
 }

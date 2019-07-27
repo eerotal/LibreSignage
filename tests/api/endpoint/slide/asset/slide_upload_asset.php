@@ -25,6 +25,18 @@ class slide_upload_asset extends APITestCase {
 	}
 
 	/**
+	* Lock the testing slide self::TEST_SLIDE_ID.
+	*/
+	public function setup_lock_slide() {
+		APIInterface::assert_success(SlideUtils::slide_lock(
+			$this->api,
+			self::TEST_SLIDE_ID
+		), 'Failed to lock slide for testing.', [$this, 'abort']);
+	}
+
+	/**
+	* Fuzz parameters passed to the endpoint.
+	*
 	* @dataProvider params_provider
 	*/
 	public function test_fuzz_params(
@@ -34,6 +46,8 @@ class slide_upload_asset extends APITestCase {
 		int $error
 	) {
 		$this->api->login($user, $pass);
+		$this->setup_lock_slide();
+
 		$resp = $this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
@@ -68,8 +82,8 @@ class slide_upload_asset extends APITestCase {
 				HTTPStatus::OK
 			],
 			'Missing id parameter' => [
-				'display',
-				'display',
+				'admin',
+				'admin',
 				new MultipartStream(
 					(function() use ($valid_ms_contents) {
 						$valid_ms_contents[0]['contents'] = '{}';
@@ -79,8 +93,8 @@ class slide_upload_asset extends APITestCase {
 				HTTPStatus::BAD_REQUEST
 			],
 			'Empty id parameter' => [
-				'display',
-				'display',
+				'admin',
+				'admin',
 				new MultipartStream(
 					(function() use ($valid_ms_contents) {
 						$valid_ms_contents[0]['contents'] = JSONUtils::encode([
@@ -92,8 +106,8 @@ class slide_upload_asset extends APITestCase {
 				HTTPStatus::NOT_FOUND
 			],
 			'Nonexistent id' => [
-				'display',
-				'display',
+				'admin',
+				'admin',
 				new MultipartStream(
 					(function() use ($valid_ms_contents) {
 						$valid_ms_contents[0]['contents'] = JSONUtils::encode([
@@ -105,8 +119,8 @@ class slide_upload_asset extends APITestCase {
 				HTTPStatus::NOT_FOUND
 			],
 			'Wrong type for id parameter' => [
-				'display',
-				'display',
+				'admin',
+				'admin',
 				new MultipartStream(
 					(function() use ($valid_ms_contents) {
 						$valid_ms_contents[0]['contents'] = JSONUtils::encode([
@@ -120,21 +134,53 @@ class slide_upload_asset extends APITestCase {
 		];
 	}
 
+	/**
+	* Test that assets can't be uploaded without locking the slide first.
+	*/
+	public function test_asset_uploading_not_allowed_on_unlocked_slide() {
+		$this->api->login('admin', 'admin');
+
+		$stream = new MultipartStream([
+			[
+				'name' => 'body',
+				'contents' => JSONUtils::encode(['id' => self::TEST_SLIDE_ID])
+			],
+			[
+				'name' => '0',
+				'contents' => fopen(self::TEST_ASSET_PATH, 'r'),
+				'filename' => basename(self::TEST_ASSET_PATH)
+			]
+		]);
+
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			$stream,
+			['Content-Type' => 'multipart/form-data; boundary='.$stream->getBoundary()],
+			TRUE
+		);
+
+		$this->upload_success = ($resp->getStatusCode() === HTTPStatus::OK);
+		$this->api->logout();
+
+		$this->assert_api_failed($resp, HTTPStatus::FAILED_DEPENDENCY);
+	}
+
+	/**
+	* Cleanup uploaded assets and release slide locks.
+	*/
 	public function tearDown(): void {
-		// Cleanup uploaded asset.
+		$this->api->login('admin', 'admin');
+
 		if ($this->upload_success) {
-			$this->api->login('admin', 'admin');
-			$resp = SlideUtils::remove_asset(
+			APIInterface::assert_success(SlideUtils::remove_asset(
 				$this->api,
 				self::TEST_SLIDE_ID,
 				basename(self::TEST_ASSET_PATH)
-			);
+			), 'Failed to cleanup uploaded asset.', [$this->api, 'logout']);
 			$this->upload_success = FALSE;
-			$this->api->logout();
-
-			if ($resp->getStatusCode() !== HTTPStatus::OK) {
-				throw new \Exception("Failed to cleanup uploaded asset.");
-			}
 		}
+
+		$this->api->logout();
 	}
 }

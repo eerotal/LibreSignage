@@ -24,16 +24,22 @@ class slide_get_asset extends APITestCase {
 
 		// Upload an initial asset.
 		$this->api->login('admin', 'admin');
-		$resp = SlideUtils::upload_asset(
+
+		APIInterface::assert_success(SlideUtils::slide_lock(
+			$this->api,
+			self::TEST_SLIDE_ID
+		), 'Failed to lock testing slide.', [$this, 'abort']);
+		APIInterface::assert_success(SlideUtils::upload_asset(
 			$this->api,
 			self::TEST_SLIDE_ID,
 			self::TEST_ASSET_PATH
-		);
-		$this->api->logout();
+		), 'Failed to upload initial asset.', [$this, 'abort']);
+		APIInterface::assert_success(SlideUtils::slide_release(
+			$this->api,
+			self::TEST_SLIDE_ID
+		), 'Failed to release initial slide lock.', [$this, 'abort']);
 
-		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new \Exception('Failed to upload initial asset.');
-		}
+		$this->api->logout();
 	}
 
 	/**
@@ -170,15 +176,13 @@ class slide_get_asset extends APITestCase {
 	public function tearDown(): void {
 		// Remove the initial asset.
 		$this->api->login('admin', 'admin');
-		$resp = SlideUtils::remove_asset(
+
+		APIInterface::assert_success(SlideUtils::remove_asset(
 			$this->api,
 			self::TEST_SLIDE_ID,
 			basename(self::TEST_ASSET_PATH)
-		);
-		$this->api->logout();
+		), 'Failed to remove initial asset.', [$this->api, 'logout']);
 
-		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new \Exception('Failed to remove initial asset.');
-		}
+		$this->api->logout();
 	}
 }

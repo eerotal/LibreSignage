@@ -28,4 +28,57 @@ final class APITestUtils {
 		}
 		return $ret;
 	}
+
+	/**
+	* Return a variable pretty printed in a YAML-esque format.
+	*
+	* @param string|object|array $data     The data to return.
+	* @param int                 $indent   The initial indent level.
+	* @param array               $previous Internal variable for handling
+	*                                      recursive objects.
+	*/
+	public static function pretty_print(
+		$data,
+		int $indent = 0,
+		array $previous = []
+	): string {
+		$ret = '';
+		$i = 0;
+
+		if (is_array($data) || is_object($data)) {
+			// Array or object.
+			$previous[] = $data;
+
+			foreach ($data as $key => $value) {
+				$ret .= str_repeat("\t", $indent).
+						(($indent !== 0 || $i++ !== 0) ? "\n" : '').
+						"$key: ";
+
+				if (in_array($value, $previous, TRUE)) {
+					$ret .= 'RECURSION';
+				} else {
+					$ret .= self::pretty_print(
+						$value,
+						$indent + 1,
+						$previous
+					);
+				}
+			}
+			return $ret;
+		} else if (is_string($data) && substr_count($data, "\n") > 1) {
+			// Multiline string.
+			return 
+				((1) ? "\n" : '').
+				str_repeat("\t", $indent).
+				preg_replace(
+					'/\n/',
+					"\n".str_repeat("\t", $indent),
+					$data
+				);
+		} else {
+			// Other types.
+			return (string) $data;
+		}
+	}
+
 }

@@ -22,7 +22,7 @@ class slide_dup extends APITestCase {
 
 		// Create an initial slide to duplicate.
 		$this->api->login('admin', 'admin');
-		$resp = SlideUtils::save_slide(
+		$resp = APIInterface::assert_success(SlideUtils::save_slide(
 			$this->api,
 			NULL,
 			'Unit-Test-Slide',
@@ -36,12 +36,9 @@ class slide_dup extends APITestCase {
 			0,
 			'default',
 			[]
-		);
+		), 'Failed to create initial slide.', [$this, 'abort']);
 		$this->api->logout();
 
-		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new \Exception("Failed to create initial slide.");
-		}
 		$this->orig_slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 	}
 
@@ -126,18 +123,18 @@ class slide_dup extends APITestCase {
 		$this->api->login('admin', 'admin');
 
 		// Remove the initial slide.
-		$resp = SlideUtils::remove_slide($this->api, $this->orig_slide_id);
-		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new \Exception("Failed to remove original slide.");
-		}
+		APIInterface::assert_success(SlideUtils::remove_slide(
+			$this->api,
+			$this->orig_slide_id
+		), 'Failed to remove original slide.', [$this->api, 'logout']);
 		$this->orig_slide_id = NULL;
 
 		// Remove duplicated slide if it was created.
 		if ($this->dup_slide_id !== NULL) {
-			$resp = SlideUtils::remove_slide($this->api, $this->dup_slide_id);
-			if ($resp->getStatusCode() !== HTTPStatus::OK) {
-				throw new \Exception("Failed to remove duplicated slide.");
-			}
+			APIInterface::assert_success(SlideUtils::remove_slide(
+				$this->api,
+				$this->dup_slide_id
+			), 'Failed to remove duplicated slide.', [$this->api, 'logout']);
 			$this->dup_slide_id = NULL;
 		}
 

@@ -44,18 +44,16 @@ class slide_save extends APITestCase {
 	) {
 		// Create a slide for testing.
 		$this->api->login($user, $pass);
-		$resp = $this->api->call_return_raw_response(
+
+		$resp = APIInterface::assert_success($this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
 			$params,
 			[],
 			TRUE
-		);
-		$this->api->logout();
+		), 'Failed to create slide for testing.', [$this, 'abort']);
 
-		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new \Exception("Failed to create slide for testing.");
-		}
+		$this->api->logout();
 		$this->slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 	}
 
@@ -400,12 +398,13 @@ class slide_save extends APITestCase {
 	public function tearDown(): void {
 		if ($this->slide_id !== NULL) {
 			$this->api->login('admin', 'admin');
-			$resp = SlideUtils::remove_slide($this->api, $this->slide_id);
-			$this->api->logout();
 
-			if ($resp->getStatusCode() !== HTTPStatus::OK) {
-				throw new \Exception("Failed to cleanup created slide.");
-			}
+			APIInterface::assert_success(SlideUtils::remove_slide(
+				$this->api,
+				$this->slide_id
+			), 'Failed to cleanup created slide.', [$this->api, 'logout']);
+
+			$this->api->logout();
 			$this->slide_id = NULL;
 		}
 	}

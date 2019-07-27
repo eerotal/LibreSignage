@@ -47,6 +47,16 @@ class APITestCase extends TestCase {
 	}
 
 	/**
+	* Abort a test. This function also logs out of the API.
+	*
+	* @param Throwable $e (optional) An explanatory exception object.
+	*/
+	public function abort(\Throwable $e = NULL) {
+		$this->api->logout();
+		$this->markTestSkipped($e !== NULL ? (string) $e : 'Aborted.');
+	}
+
+	/**
 	* Assert that a Response has a header.
 	*
 	* @param Response $response The Response object to check.

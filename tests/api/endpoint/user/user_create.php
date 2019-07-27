@@ -4,12 +4,15 @@ namespace libresignage\tests\api\endpoint\user;
 
 use libresignage\tests\common\classes\APITestCase;
 use libresignage\tests\common\classes\APITestUtils;
+use libresignage\tests\common\classes\APIInterface;
 use libresignage\api\HTTPStatus;
 
 class user_create extends APITestCase {
 	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 
 	const UNIT_TEST_USER = 'unit_test_user';
+
+	private $user_created = FALSE;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -25,13 +28,17 @@ class user_create extends APITestCase {
 		array $params,
 		int $error
 	): void {
-		$this->call_api_and_assert_failed(
+		$resp = $this->call_api_and_assert_failed(
 			$params,
 			[],
 			$error,
 			'admin',
 			'admin'
 		);
+
+		if ($resp->getStatusCode() === HTTPStatus::OK) {
+			$this->user_created = TRUE;
+		}
 	}
 
 	public function params_provider(): array {
@@ -115,9 +122,9 @@ class user_create extends APITestCase {
 	public function test_invalid_request_error_on_existing_user(): void {
 		$this->api->login('admin', 'admin');
 
-		$resp = NULL;
+		$resp = [];
 		for ($i = 0; $i < 2; $i++) {
-			$resp = $this->api->call_return_raw_response(
+			$resp[$i] = $this->api->call_return_raw_response(
 				$this->get_endpoint_method(),
 				$this->get_endpoint_uri(),
 				[
@@ -128,7 +135,11 @@ class user_create extends APITestCase {
 				TRUE
 			);
 		}
-		$this->assert_api_failed($resp, 400);
+
+		$this->assert_api_succeeded($resp[0]);
+		$this->user_created = TRUE;
+
+		$this->assert_api_failed($resp[1], 400);
 
 		$this->api->logout();
 	}
@@ -136,7 +147,7 @@ class user_create extends APITestCase {
 	public function test_is_response_schema_correct(): void {
 		$this->api->login('admin', 'admin');
 
-		$resp = $this->api->call(
+		$resp = $this->api->call_return_raw_response(
 			$this->get_endpoint_method(),
 			$this->get_endpoint_uri(),
 			[
@@ -146,8 +157,12 @@ class user_create extends APITestCase {
 			[],
 			TRUE
 		);
+		if ($resp->getStatusCode() === HTTPStatus::OK) {
+			$this->user_created = TRUE;
+		}
+
 		$this->assert_object_matches_schema(
-			$resp,
+			APIInterface::decode_raw_response($resp),
 			dirname(__FILE__).'/schemas/user_create.schema.json'
 		);
 
@@ -167,20 +182,28 @@ class user_create extends APITestCase {
 			[],
 			TRUE
 		);
+		if ($resp->getStatusCode() === HTTPStatus::OK) {
+			$this->user_created = TRUE;
+		}
 		$this->assert_api_failed($resp, 401);
 
 		$this->api->logout();
 	}
 
 	public function tearDown(): void {
-		$this->api->login('admin', 'admin');
-		$this->api->call(
-			'POST',
-			'user/user_remove.php',
-			[ 'user' => self::UNIT_TEST_USER ],
-			[],
-			true
-		);
-		$this->api->logout();
+		if ($this->user_created) {
+			$this->api->login('admin', 'admin');
+
+			APIInterface::assert_success($this->api->call_return_raw_response(
+				'POST',
+				'user/user_remove.php',
+				[ 'user' => self::UNIT_TEST_USER ],
+				[],
+				true
+			), 'Failed to cleanup created user.', [$this->api, 'logout']);
+			$this->user_created = FALSE;
+
+			$this->api->logout();
+		}
 	}
 }

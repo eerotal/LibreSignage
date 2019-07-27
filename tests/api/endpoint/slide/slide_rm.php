@@ -20,7 +20,7 @@ class slide_rm extends APITestCase {
 
 		// Create an initial slide that's removed.
 		$this->api->login('admin', 'admin');
-		$resp = SlideUtils::save_slide(
+		$resp = APIInterface::assert_success(SlideUtils::save_slide(
 			$this->api,
 			NULL,
 			'Unit-Test-Slide',
@@ -34,12 +34,9 @@ class slide_rm extends APITestCase {
 			0,
 			'default',
 			[]
-		);
+		), 'Failed to create initial slide.', [$this, 'abort']);
 		$this->api->logout();
 
-		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new \Exception("Failed to create initial slide.");
-		}
 		$this->slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 	}
 
@@ -135,12 +132,13 @@ class slide_rm extends APITestCase {
 		// Make sure the initial slide is removed.
 		if ($this->slide_id !== NULL) {
 			$this->api->login('admin', 'admin');
-			$resp = SlideUtils::remove_slide($this->api, $this->slide_id);
-			$this->api->logout();
 
-			if ($resp->getStatusCode() !== HTTPStatus::OK) {
-				throw new \Exception("Failed to remove initial slide.");
-			}
+			APIInterface::assert_success(SlideUtils::remove_slide(
+				$this->api,
+				$this->slide_id
+			), 'Failed to remove initial slide.', [$this->api, 'logout']);
+
+			$this->api->logout();
 			$this->slide_id = NULL;
 		}
 	}

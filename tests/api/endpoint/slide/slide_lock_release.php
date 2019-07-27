@@ -6,6 +6,7 @@ use libresignage\tests\common\classes\APITestCase;
 use libresignage\tests\common\classes\APIInterface;
 use libresignage\api\HTTPStatus;
 use libresignage\tests\common\classes\SlideUtils;
+use libresignage\tests\common\classes\AuthUtils;
 
 class slide_lock_relase extends APITestCase {
 	use \libresignage\tests\common\traits\TestEndpointNotAuthorizedWithoutLogin;
@@ -23,11 +24,10 @@ class slide_lock_relase extends APITestCase {
 		* would automatically release the lock.
 		*/
 		$this->api->login('admin', 'admin');
-		$resp = SlideUtils::slide_lock($this->api, self::TEST_SLIDE_ID);
-
-		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new \Exception("Failed to acquire initial slide lock.");
-		}
+		APIInterface::assert_success(SlideUtils::slide_lock(
+			$this->api,
+			self::TEST_SLIDE_ID
+		), 'Failed to lock testing slide.', [$this, 'abort']);
 	}
 
 	/**
@@ -120,8 +120,8 @@ class slide_lock_relase extends APITestCase {
 	*/
 	public function test_locks_automatically_released_on_logout() {
 		$this->api->logout();
-		$this->api->login('admin', 'admin');
 
+		$this->api->login('admin', 'admin');
 		$resp = $this->api->call_return_raw_response(
 			'GET',
 			'slide/slide_get.php',
@@ -129,31 +129,21 @@ class slide_lock_relase extends APITestCase {
 			[],
 			TRUE
 		);
-		$this->assert_api_failed($resp, HTTPStatus::OK);
-		$this->assertNull(
-			APIInterface::decode_raw_response($resp)->slide->lock
-		);
-
 		$this->api->logout();
+
+		$this->assert_api_failed($resp, HTTPStatus::OK);
+		$this->assertNull(APIInterface::decode_raw_response(
+			$resp
+		)->slide->lock);
 	}
 
 	public function tearDown(): void {
 		$this->api->login('admin', 'admin');
 
-		/*
-		* Logout all other sessions. This also automatically
-		* releases all slides locked to other sessions.
-		*/
-		$resp = $this->api->call_return_raw_response(
-			'POST',
-			'auth/auth_logout_other.php',
-			[],
-			[],
-			TRUE
-		);
-		if ($resp->getStatusCode() !== HTTPStatus::OK) {
-			throw new \Exception("Failed to logout other sessions.");
-		}
+		// Logout the initial session.
+		APIInterface::assert_success(AuthUtils::logout_other(
+			$this->api
+		), 'Failed to logout other sessions.', [$this->api, 'logout']);
 
 		$this->api->logout();
 	}

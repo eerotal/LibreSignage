@@ -52,5 +52,8 @@ class auth_logout_other extends APITestCase {
 		);
 
 		$this->api->logout();
+
+		// Properly keep track of zombie sessions.
+		$this->api->pop_sessions_of('admin');
 	}
 }
