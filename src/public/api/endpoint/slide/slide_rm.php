@@ -52,6 +52,7 @@ APIEndpoint::POST(
 	],
 	function($req, $module_data) {
 		$caller = $module_data['APIAuthModule']['user'];
+		$session = $module_data['APIAuthModule']['session'];
 		$params = $module_data['APIJSONValidatorModule'];
 
 		$slide = new Slide();
@@ -88,6 +89,13 @@ APIEndpoint::POST(
 				'Not authorized because user is not either in the group '.
 				'admin or owner of the slide and in the group editor.',
 				HTTPStatus::UNAUTHORIZED
+			);
+		}
+
+		if (!$slide->is_locked_by($session)) {
+			throw new APIException(
+				'Slide not locked by the calling session.',
+				HTTPStatus::FAILED_DEPENDENCY
 			);
 		}
 

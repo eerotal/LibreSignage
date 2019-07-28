@@ -41,6 +41,8 @@ class slide_rm extends APITestCase {
 	}
 
 	/**
+	* Fuzz request parameters.
+	*
 	* @dataProvider params_provider
 	*/
 	public function test_fuzz_params(
@@ -52,20 +54,31 @@ class slide_rm extends APITestCase {
 	) {
 		if ($pass_initial_slide_id) { $params['id'] = $this->slide_id; }
 
-		$resp = $this->call_api_and_assert_failed(
+		$this->api->login($user, $pass);
+
+		/*
+		* Don't test this for errors so that we can test the slide_rm
+		* call even when the slide isn't locked.
+		*/
+		if (isset($params['id'])) {
+			SlideUtils::lock($this->api, $params['id']);
+		}
+
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
 			$params,
 			[],
-			$error,
-			$user,
-			$pass
+			TRUE
 		);
-
 		if (
 			$pass_initial_slide_id
 			&& $resp->getStatusCode() === HTTPStatus::OK
-		) {
-			$this->slide_id = NULL;
-		}
+		) { $this->slide_id = NULL; }
+
+		$this->assert_api_failed($resp, $error);
+
+		$this->api->logout();
 	}
 
 	public static function params_provider(): array {
@@ -115,17 +128,49 @@ class slide_rm extends APITestCase {
 		];
 	}
 
+	/**
+	* Test that the response schema is correct.
+	*/
 	public function test_is_response_schema_correct() {
-		$resp = $this->call_api_and_check_response_schema(
+		$this->api->login('admin', 'admin');
+
+		$this->assert_api_succeeded(SlideUtils::lock(
+			$this->api,
+			$this->slide_id
+		));
+
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
 			['id' => $this->slide_id],
 			[],
-			dirname(__FILE__).'/schemas/slide_rm.schema.json',
-			'admin',
-			'admin'
+			TRUE
 		);
+		$this->assert_api_succeeded($resp);
+
 		if ($resp->getStatusCode() === HTTPStatus::OK) {
 			$this->slide_id = NULL;
 		}
+
+		$this->assert_object_matches_schema(
+			APIInterface::decode_raw_response($resp),
+			dirname(__FILE__).'/schemas/slide_rm.schema.json'
+		);
+
+		$this->api->logout();
+	}
+
+	/**
+	* Test that unlocked slides can't be removed.
+	*/
+	public function test_removing_unlocked_slides_not_allowed() {
+		$this->call_api_and_assert_failed(
+			['id' => $this->slide_id],
+			[],
+			HTTPStatus::FAILED_DEPENDENCY,
+			'admin',
+			'admin'
+		);
 	}
 
 	public function tearDown(): void {
@@ -133,13 +178,18 @@ class slide_rm extends APITestCase {
 		if ($this->slide_id !== NULL) {
 			$this->api->login('admin', 'admin');
 
+			APIInterface::assert_success(SlideUtils::lock(
+				$this->api,
+				$this->slide_id
+			), 'Failed to lock initial slide.', [$this->api, 'logout']);
+
 			APIInterface::assert_success(SlideUtils::remove(
 				$this->api,
 				$this->slide_id
 			), 'Failed to remove initial slide.', [$this->api, 'logout']);
+			$this->slide_id = NULL;
 
 			$this->api->logout();
-			$this->slide_id = NULL;
 		}
 	}
 }
