@@ -20,7 +20,7 @@ class slide_rm extends APITestCase {
 
 		// Create an initial slide that's removed.
 		$this->api->login('admin', 'admin');
-		$resp = APIInterface::assert_success(SlideUtils::save_slide(
+		$resp = APIInterface::assert_success(SlideUtils::save(
 			$this->api,
 			NULL,
 			'Unit-Test-Slide',
@@ -133,7 +133,7 @@ class slide_rm extends APITestCase {
 		if ($this->slide_id !== NULL) {
 			$this->api->login('admin', 'admin');
 
-			APIInterface::assert_success(SlideUtils::remove_slide(
+			APIInterface::assert_success(SlideUtils::remove(
 				$this->api,
 				$this->slide_id
 			), 'Failed to remove initial slide.', [$this->api, 'logout']);

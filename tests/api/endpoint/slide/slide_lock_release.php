@@ -24,7 +24,7 @@ class slide_lock_relase extends APITestCase {
 		* would automatically release the lock.
 		*/
 		$this->api->login('admin', 'admin');
-		APIInterface::assert_success(SlideUtils::slide_lock(
+		APIInterface::assert_success(SlideUtils::lock(
 			$this->api,
 			self::TEST_SLIDE_ID
 		), 'Failed to lock testing slide.', [$this, 'abort']);

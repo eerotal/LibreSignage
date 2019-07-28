@@ -21,7 +21,7 @@ final class SlideUtils {
 	*
 	* @return Response The API response.
 	*/
-	public static function slide_lock(
+	public static function lock(
 		APIInterface $api,
 		string $id
 	): Response {
@@ -42,7 +42,7 @@ final class SlideUtils {
 	*
 	* @return Response The API response.
 	*/
-	public static function slide_release(
+	public static function release(
 		APIInterface $api,
 		string $id
 	): Response {
@@ -74,7 +74,7 @@ final class SlideUtils {
 	*
 	* @return Response The API response.
 	*/
-	public static function save_slide(
+	public static function save(
 		APIInterface $api,
 		$id,
 		string $name,
@@ -119,7 +119,7 @@ final class SlideUtils {
 	*
 	* @return Response The API response.
 	*/
-	public static function remove_slide(
+	public static function remove(
 		APIInterface $api,
 		string $id
 	): Response {

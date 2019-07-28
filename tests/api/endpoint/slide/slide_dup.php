@@ -22,7 +22,7 @@ class slide_dup extends APITestCase {
 
 		// Create an initial slide to duplicate.
 		$this->api->login('admin', 'admin');
-		$resp = APIInterface::assert_success(SlideUtils::save_slide(
+		$resp = APIInterface::assert_success(SlideUtils::save(
 			$this->api,
 			NULL,
 			'Unit-Test-Slide',
@@ -123,7 +123,7 @@ class slide_dup extends APITestCase {
 		$this->api->login('admin', 'admin');
 
 		// Remove the initial slide.
-		APIInterface::assert_success(SlideUtils::remove_slide(
+		APIInterface::assert_success(SlideUtils::remove(
 			$this->api,
 			$this->orig_slide_id
 		), 'Failed to remove original slide.', [$this->api, 'logout']);
@@ -131,7 +131,7 @@ class slide_dup extends APITestCase {
 
 		// Remove duplicated slide if it was created.
 		if ($this->dup_slide_id !== NULL) {
-			APIInterface::assert_success(SlideUtils::remove_slide(
+			APIInterface::assert_success(SlideUtils::remove(
 				$this->api,
 				$this->dup_slide_id
 			), 'Failed to remove duplicated slide.', [$this->api, 'logout']);

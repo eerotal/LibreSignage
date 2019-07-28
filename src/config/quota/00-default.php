@@ -15,7 +15,7 @@ return [
 	// is calls/60s by default. You can find the API_RATE_T constant
 	// in the config file, although you probably don't want to change it.
 	'api_rate' => [
-		'limit' => 400,
+		'limit' => 500,
 		'description' => 'API rate quota'
 	]
 ];

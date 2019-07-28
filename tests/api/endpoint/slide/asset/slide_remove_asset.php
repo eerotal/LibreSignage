@@ -24,7 +24,7 @@ class slide_remove_asset extends APITestCase {
 		// Upload an initial asset.
 		$this->api->login('admin', 'admin');
 
-		APIInterface::assert_success(SlideUtils::slide_lock(
+		APIInterface::assert_success(SlideUtils::lock(
 			$this->api,
 			self::TEST_SLIDE_ID
 		), 'Failed to lock testing slide.', [$this, 'abort']);
@@ -33,7 +33,7 @@ class slide_remove_asset extends APITestCase {
 			self::TEST_SLIDE_ID,
 			self::TEST_ASSET_PATH
 		), 'Failed to upload initial asset.', [$this, 'abort']);
-		APIInterface::assert_success(SlideUtils::slide_release(
+		APIInterface::assert_success(SlideUtils::release(
 			$this->api,
 			self::TEST_SLIDE_ID
 		), 'Failed to release initial slide lock.', [$this, 'abort']);
@@ -50,16 +50,27 @@ class slide_remove_asset extends APITestCase {
 		array $params,
 		int $error
 	) {
-		$resp = $this->call_api_and_assert_failed(
+		$this->api->login($user, $pass);
+		$this->assert_api_succeeded(SlideUtils::lock(
+			$this->api,
+			self::TEST_SLIDE_ID
+		));
+
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
 			$params,
 			[],
-			$error,
-			$user,
-			$pass
+			TRUE
 		);
-		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->asset_removed = TRUE;
-		}
+		$this->asset_removed = ($resp->getStatusCode() === HTTPStatus::OK);
+		$this->assert_api_failed($resp, $error);
+
+		$this->assert_api_succeeded(SlideUtils::release(
+			$this->api,
+			self::TEST_SLIDE_ID
+		));
+		$this->api->logout();
 	}
 
 	public static function params_provider(): array {
@@ -146,7 +157,47 @@ class slide_remove_asset extends APITestCase {
 		];
 	}
 
+	/**
+	* Test that the asset is actually removed after calling this endpoint.
+	*/
 	public function test_asset_is_removed() {
+		$this->api->login('admin', 'admin');
+		$this->assert_api_succeeded(SlideUtils::lock(
+			$this->api,
+			self::TEST_SLIDE_ID
+		));
+
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			[
+				'id' => self::TEST_SLIDE_ID,
+				'name' => basename(self::TEST_ASSET_PATH)
+			],
+			[],
+			TRUE
+		);
+		$this->asset_removed = ($resp->getStatusCode() === HTTPStatus::OK);
+		$this->assert_api_succeeded($resp);
+
+		$resp = SlideUtils::get_asset(
+			$this->api,
+			self::TEST_SLIDE_ID,
+			basename(self::TEST_ASSET_PATH)
+		);
+		$this->assert_api_failed($resp, HTTPStatus::NOT_FOUND);
+
+		$this->assert_api_succeeded(SlideUtils::release(
+			$this->api,
+			self::TEST_SLIDE_ID
+		));
+		$this->api->logout();
+	}
+
+	/**
+	* Test that assets can't be removed without locking the slide first.
+	*/
+	public function test_asset_removing_not_allowed_on_unlocked_slides() {
 		$this->api->login('admin', 'admin');
 
 		$resp = $this->api->call_return_raw_response(
@@ -159,15 +210,7 @@ class slide_remove_asset extends APITestCase {
 			[],
 			TRUE
 		);
-		$this->assert_api_succeeded($resp);
-
-		$resp = SlideUtils::get_asset(
-			$this->api,
-			self::TEST_SLIDE_ID,
-			basename(self::TEST_ASSET_PATH)
-		);
-		$this->assert_api_failed($resp, HTTPStatus::NOT_FOUND);
-		$this->asset_removed = TRUE;
+		$this->assert_api_failed($resp, HTTPStatus::FAILED_DEPENDENCY);
 
 		$this->api->logout();
 	}
@@ -176,11 +219,19 @@ class slide_remove_asset extends APITestCase {
 		if (!$this->asset_removed) {
 			$this->api->login('admin', 'admin');
 
+			APIInterface::assert_success(SlideUtils::lock(
+				$this->api,
+				self::TEST_SLIDE_ID
+			), 'Failed to lock initial slide.', [$this->api, 'logout']);
 			APIInterface::assert_success(SlideUtils::remove_asset(
 				$this->api,
 				self::TEST_SLIDE_ID,
 				basename(self::TEST_ASSET_PATH)
 			), 'Failed to remove initial asset.', [$this->api, 'logout']);
+			APIInterface::assert_success(SlideUtils::release(
+				$this->api,
+				self::TEST_SLIDE_ID
+			), 'Failed to release initial slide.', [$this->api, 'logout']);
 
 			$this->api->logout();
 			$this->asset_removed = FALSE;

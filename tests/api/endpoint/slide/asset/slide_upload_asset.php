@@ -28,7 +28,7 @@ class slide_upload_asset extends APITestCase {
 	* Lock the testing slide self::TEST_SLIDE_ID.
 	*/
 	public function setup_lock_slide() {
-		APIInterface::assert_success(SlideUtils::slide_lock(
+		APIInterface::assert_success(SlideUtils::lock(
 			$this->api,
 			self::TEST_SLIDE_ID
 		), 'Failed to lock slide for testing.', [$this, 'abort']);
@@ -173,12 +173,22 @@ class slide_upload_asset extends APITestCase {
 		$this->api->login('admin', 'admin');
 
 		if ($this->upload_success) {
+			APIInterface::assert_success(SlideUtils::lock(
+				$this->api,
+				self::TEST_SLIDE_ID
+			), 'Failed to lock test slide.', [$this->api, 'logout']);
+
 			APIInterface::assert_success(SlideUtils::remove_asset(
 				$this->api,
 				self::TEST_SLIDE_ID,
 				basename(self::TEST_ASSET_PATH)
 			), 'Failed to cleanup uploaded asset.', [$this->api, 'logout']);
 			$this->upload_success = FALSE;
+
+			APIInterface::assert_success(SlideUtils::release(
+				$this->api,
+				self::TEST_SLIDE_ID
+			), 'Failed to release lock on test slide.', [$this->api, 'logout']);
 		}
 
 		$this->api->logout();

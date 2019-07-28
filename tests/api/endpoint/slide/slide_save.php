@@ -399,7 +399,7 @@ class slide_save extends APITestCase {
 		if ($this->slide_id !== NULL) {
 			$this->api->login('admin', 'admin');
 
-			APIInterface::assert_success(SlideUtils::remove_slide(
+			APIInterface::assert_success(SlideUtils::remove(
 				$this->api,
 				$this->slide_id
 			), 'Failed to cleanup created slide.', [$this->api, 'logout']);

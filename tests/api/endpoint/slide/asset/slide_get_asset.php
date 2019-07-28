@@ -25,7 +25,7 @@ class slide_get_asset extends APITestCase {
 		// Upload an initial asset.
 		$this->api->login('admin', 'admin');
 
-		APIInterface::assert_success(SlideUtils::slide_lock(
+		APIInterface::assert_success(SlideUtils::lock(
 			$this->api,
 			self::TEST_SLIDE_ID
 		), 'Failed to lock testing slide.', [$this, 'abort']);
@@ -34,7 +34,7 @@ class slide_get_asset extends APITestCase {
 			self::TEST_SLIDE_ID,
 			self::TEST_ASSET_PATH
 		), 'Failed to upload initial asset.', [$this, 'abort']);
-		APIInterface::assert_success(SlideUtils::slide_release(
+		APIInterface::assert_success(SlideUtils::release(
 			$this->api,
 			self::TEST_SLIDE_ID
 		), 'Failed to release initial slide lock.', [$this, 'abort']);
@@ -177,11 +177,19 @@ class slide_get_asset extends APITestCase {
 		// Remove the initial asset.
 		$this->api->login('admin', 'admin');
 
+		APIInterface::assert_success(SlideUtils::lock(
+			$this->api,
+			self::TEST_SLIDE_ID
+		), 'Failed to lock test slide.', [$this->api, 'logout']);
 		APIInterface::assert_success(SlideUtils::remove_asset(
 			$this->api,
 			self::TEST_SLIDE_ID,
 			basename(self::TEST_ASSET_PATH)
 		), 'Failed to remove initial asset.', [$this->api, 'logout']);
+		APIInterface::assert_success(SlideUtils::release(
+			$this->api,
+			self::TEST_SLIDE_ID
+		), 'Failed to release lock on test slide.', [$this->api, 'logout']);
 
 		$this->api->logout();
 	}
