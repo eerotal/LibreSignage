@@ -67,7 +67,6 @@
 * @status{403,If the slide quota was reached.}
 * @status{404,If the id parameter is defined and no such slide exists.}
 * @status{424,If the slide corresponding to id is not locked.}
-* @status{424,If the slide corresponding to id is locked by another session.}
 * @status_end
 */
 
@@ -187,29 +186,10 @@ APIEndpoint::POST(
 	}
 );
 
-function ensure_slide_lock(Slide $slide, Session $session): void {
-	/*
-	*  Ensure that the slide $slide is locked by $session and
-	*  the lock is not expired.
-	*/
-	$lock = $slide->get_lock();
-	if ($lock === NULL) {
-		throw new APIException(
-			'Slide not locked.',
-			HTTPStatus::FAILED_DEPENDENCY
-		);
-	} else if (!$lock->is_expired() && !$lock->is_owned_by($session)) {
-		throw new APIException(
-			'Slide locked by another session.',
-			HTTPStatus::FAILED_DEPENDENCY
-		);
-	}	
-}
-
+/**
+* Set the slide data of $slide.
+*/
 function set_slide_data(Slide $slide, $data, bool $owner): void {
-	/*
-	*  Set the slide data of $slide.
-	*/
 
 	// Don't set 'queue_name' and 'collaborators' if $owner === FALSE.
 	if ($owner === TRUE) {
@@ -229,14 +209,10 @@ function set_slide_data(Slide $slide, $data, bool $owner): void {
 	$slide->update_sched_enabled();
 }
 
+/**
+* Handler function for creating the slide $slide.
+*/
 function create_slide(User $caller, Session $session, Slide $slide, $data) {
-	/*
-	*  Handler function for creating the slide $slide.
-	*
-	*  Note that Slide::set_owner() must be called
-	*  before Slide::set_collaborators()!
-	*/
-
 	if (!$caller->get_quota()->has_quota('slides')) {
 		throw new APIException(
 			'Slide quota exceeded.',
@@ -263,15 +239,23 @@ function create_slide(User $caller, Session $session, Slide $slide, $data) {
 	return finish($slide);
 }
 
+/**
+* Handler function for modifying $slide.
+*/
 function modify_slide(Session $session, Slide $slide, $data, bool $owner) {
-	/*
-	*  Handler function for modifying $slide.
-	*/
-	ensure_slide_lock($slide, $session);
+	if (!$slide->is_locked_by($session)) {
+		throw new APIException(
+			'Slide not locked by the calling session.',
+			HTTPStatus::FAILED_DEPENDENCY
+		);
+	}
 	set_slide_data($slide, $data, $owner);
 	return finish($slide);
 }
 
+/**
+* Finish saving the slide.
+*/
 function finish(Slide $slide) {
 	$slide->write();
 

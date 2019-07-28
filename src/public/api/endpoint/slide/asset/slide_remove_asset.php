@@ -18,6 +18,7 @@
 * @status{401,If the caller is not allowed to remove the asset.}
 * @status{404,If the asset doesn't exist.}
 * @status{404,If the slide doesn't exist.}
+* @status{424,If the slide is not locked by the calling session.}
 * @status_end
 */
 
@@ -53,6 +54,7 @@ APIEndpoint::POST(
 
 		$params = $module_data['APIJSONValidatorModule'];
 		$caller = $module_data['APIAuthModule']['user'];
+		$session = $module_data['APIAuthModule']['session'];
 
 		$slide = new Slide();
 		try {
@@ -69,6 +71,13 @@ APIEndpoint::POST(
 			throw new APIException(
 				'User not authorized to remove asset.',
 				HTTPStatus::UNAUTHORIZED
+			);
+		}
+
+		if (!$slide->is_locked_by($session)) {
+			throw new APIException(
+				'Slide not locked by the calling session.',
+				HTTPStatus::FAILED_DEPENDENCY
 			);
 		}
 

@@ -540,6 +540,21 @@ final class Slide extends Exportable {
 	}
 
 	/**
+	* Check whether a slide is locked by a session.
+	*
+	* @param Session $session The session to check the lock against.
+	*
+	* @return bool TRUE if the slide is locked by $session and FALSE otherwise.
+	*/
+	public function is_locked_by(Session $session) {
+		return (
+			$this->lock !== NULL
+			&& !$this->lock->is_expired()
+			&& $this->lock->is_owned_by($session)
+		);
+	}
+
+	/**
 	* Store an uploaded asset in the 'assets' directory of this
 	* slide. This function also generates a thumbnail for the asset.
 	*

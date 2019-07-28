@@ -28,12 +28,12 @@
 *
 * @par Parameters
 * multipart/form-data
-* \li ``file``  **0...n** The file(s) to upload. [*required*]
-* \li ``string`` **body** The JSON encoded request body. See below. [*required*]
+* * ``file``  **0...n** The file(s) to upload. [*required*]
+* * ``string`` **body** The JSON encoded request body. See below. [*required*]
 *
 * @par JSON body
 * application/json
-* \li ``string`` **id** The ID of the slide. [*required*]
+* * ``string`` **id** The ID of the slide. [*required*]
 *
 * @response_start{application/json}
 * @response{int,failed,The number of failed uploads.}
@@ -108,15 +108,9 @@ APIEndpoint::POST(
 			);
 		}
 
-		$lock = $slide->get_lock();
-		if ($lock === NULL) {
+		if (!$slide->is_locked_by($session)) {
 			throw new APIException(
-				"Slide not locked.",
-				HTTPStatus::FAILED_DEPENDENCY
-			);
-		} else if (!$lock->is_expired() && !$lock->is_owned_by($session)) {
-			throw new APIException(
-				"Slide locked by another session.",
+				'Slide not locked by the calling session.',
 				HTTPStatus::FAILED_DEPENDENCY
 			);
 		}
