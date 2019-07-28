@@ -1,18 +1,19 @@
 <?php
-/*
-*  ====>
+/** \file
+* Get information about the calling user.
 *
-*  Get the data of the current user.
+* @method{GET}
+* @auth{By token}
+* @groups{ALL}
+* @ratelimit_yes
 *
-*  **Request:** GET
+* @response_start{application/json}
+* @response{User,user,The userdata of the calling user.}
+* @response_end
 *
-*  Return value
-*    * user
-*
-*      * user     = The name of the user.
-*      * groups   = The groups the user is in.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\user;

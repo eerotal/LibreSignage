@@ -1,22 +1,27 @@
 <?php
-/*
-*  ====>
+/** \file
+* Get information about a user. This endpoint only returns data
+* that's not secret, ie. no passwords or sessions are returned.
 *
-*  Get a user's data based on a username. This endpoint
-*  doesn't return any secret information like passwords.
+* @method{GET}
+* @auth{By token}
+* @groups{admin}
+* @ratelimit_yes
 *
-*  **Request:** GET
+* @request_start{application/json}
+* @request{string,user,The name of the user to fetch.,required}
+* @request_end
 *
-*  Parameters
-*    * user = The username to query.
+* @response_start{application/json}
+* @response{string,user,The name of the user.}
+* @response{array,groups,The groups of the user.}
+* @response_end
 *
-*  Return value
-*    * user
-*
-*      * user     = The name of the user.
-*      * groups   = The groups the user is in.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status{401,If the user is not allowed to get information about other users.}
+* @status{404,If the user doesn't exist.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\user;

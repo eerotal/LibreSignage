@@ -243,7 +243,7 @@ ALIASES                +=\
 						\
 						method{1}="\par HTTP Method\n\1" \
 						auth{1}="\par Authentication\n\1" \
-						groups{1}="\par Allowed groups\n\c \1" \
+						groups{1}="\par Allowed groups\n `\1`" \
 						\
 						ratelimit_yes="\par Rate limiting\nThis endpoint is rate limited." \
 						ratelimit_no="\par Rate limiting\nThis endpoint is not rate limited." \
@@ -251,16 +251,16 @@ ALIASES                +=\
 						cache_yes="\par Cache\nThis endpoint supports HTTP caching."\
 						cache_no="\par Cache\nThis endpoint doesn't support caching."\
 						\
-						request_start{1}="\par Parameters\n \e \1" \
-						request{4}="\li \e \1 \b \2 \3 [\e \4] \n" \
+						request_start{1}="\par Parameters\n \1" \
+						request{4}="* `\1` **\2** \3 [*\4*] \n" \
 						request_end="\n" \
 						\
-						response_start{1}="\par Response\n \e \1" \
-						response{3}="\li \e \1 \b \2 \3 \n"\
+						response_start{1}="\par Response\n \1" \
+						response{3}="* `\1` **\2** \3 \n"\
 						response_end="\n" \
 						\
 						status_start="\par Status\n" \
-						status{2}="\li \b \1 \c \2 \n"\
+						status{2}="* **\1** \2 \n"\
 						status_end="\n" \
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).

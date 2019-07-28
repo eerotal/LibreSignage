@@ -1,32 +1,38 @@
 <?php
-/*
-*  ====>
+/** \file
+* Save a user.
 *
-*  Save a user's data.
+* * The operation is permitted if
+*   * The caller is in the group *admin* and *pass* is NULL or unset
+*     in the request, ie. the caller is not trying to set the password
+*     of the user. This prevents the admin from taking over an account.
+*   * The caller is the user that's being saved and *groups* is NULL or
+*     unset in the request, ie. the caller is not trying to set groups.
+*     This prevents privilege escalation.
 *
-*  Access is granted in any of the following cases.
+* @method{POST}
+* @auth{By token}
+* @groups{ALL}
+* @ratelimit_yes
 *
-*    1. The authenticated user is in the group 'admin' and
-*       they are not trying to set a new password ie .pass is NULL
-*       or unset. This prevents the admin taking over an account.
-*    2. The authenticated user is the user to be modified and
-*       they are not trying to set user groups ie. groups is NULL
-*       or unset. This prevents privilege escalation.
+* @request_start{application/json}
+* @request{string,user,The name of the user to save.,required}
+* @request{string|NULL,pass,The new password of the user.,optional}
+* @request{array|NULL,groups,The new groups of the user.,optional}
+* @request_end
 *
-*  **Request:** POST, application/json
+* @response_start{application/json}
+* @response{object,user,}
+*   @response{string,name,The name of the saved user.}
+*   @response{array,groups,The new groups of the user.}
+* @response_end
 *
-*  Parameters
-*    * user    = The user to modify.
-*    * pass    = New password (Optionally unset or NULL)
-*    * groups  = New groups (Optionally unset or NULL)
-*
-*  Return value
-*    * user
-*
-*      * name     = The name of the user.
-*      * groups   = The groups the user is in.
-*
-*  <====
+* @status_start
+* @status{200,On success}
+* @status{400,If the request parameters are invalid.}
+* @status{401,If the caller is not allowed to save the user data. See above.}
+* @status{404,If the user is not found.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\user;

@@ -1,21 +1,23 @@
 <?php
-/*
-*  ====>
+/** \file
+* Get information about all users.
 *
-*  Get a list of all existing users along with the
-*  available userdata. Admin privileges are required
-*  for this endpoint.
+* @method{GET}
+* @auth{By token}
+* @groups{admin}
+* @ratelimit_yes
 *
-*  **Request:** GET
+* @response_start{application/json}
+* @response{array,users,}
+*   @response{object,[username],}
+*     @response{string,user,The name of the user.}
+*     @response{array,groups,The groups of the user.}
+* @response_end
 *
-*  Return value
-*    * users = A dictionary of the users and their data
-*      with the usernames as the keys.
-*
-*      * user     = The name of the user.
-*      * groups   = The groups the user is in.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status{401,If the user is not allowed to get information about all users.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\user;

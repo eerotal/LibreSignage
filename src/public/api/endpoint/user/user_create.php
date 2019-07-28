@@ -1,20 +1,28 @@
 <?php
-/*
-*  ====>
+/** \file
+* Create a new user.
 *
-*  Create a new user.
+* @method{POST}
+* @auth{By token}
+* @groups{admin}
+* @ratelimit_yes
 *
-*  **Request:** POST, application/json
+* @request_start{application/json}
+* @request{string,user,The name of the new user.,required}
+* @request{array|NULL,groups,An array of groups or NULL for no groups.,optional}
+* @request_end
 *
-*  Parameters
-*    * user    = The name of the user to create.
-*    * groups  = New groups. If NULL or undefined no groups are set.
+* @response_start{application/json}
+* @response{User,user,The new User object.}
+* @response{string,pass,The random password of the new user.}
+* @response_end
 *
-*  Return value
-*    * user = The exported userdata.
-*    * pass = The generated cleartext password.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status{400,If the request parameters are invalid.}
+* @status{401,If the caller is not allowed to create users.}
+* @status{403,If the maximum number of users is reached.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\user;

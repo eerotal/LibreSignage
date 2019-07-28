@@ -1,15 +1,19 @@
 <?php
-/*
-*  ====>
+/** \file
+* Get all usernames as an array.
 *
-*  Get a list of the existing usernames.
+* @method{GET}
+* @auth{By token}
+* @groups{ALL}
+* @ratelimit_yes
 *
-*  **Request:** GET
+* @response_start{application/json}
+* @response{array,users,An array of usernames.}
+* @response_end
 *
-*  Return value
-*    * users = An array of usernames.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\user;

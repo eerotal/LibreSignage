@@ -1,15 +1,19 @@
 <?php
-/*
-*  ====>
+/** \file
+* Remove a user.
 *
-*  Remove a user based on a username.
+* @method{POST}
+* @auth{By token}
+* @groups{admin}
+* @ratelimit_yes
 *
-*  **Request:** POST, application/json
+* @request_start{application/json}
+* @request{string,user,The name of the user to remove.,required}
+* @request_end
 *
-*  Parameters
-*    * user    = The user to remove.
-*
-*  <====
+* @status_start
+* @status{200,On success.}
+* @status_end
 */
 
 namespace libresignage\api\endpoint\user;
