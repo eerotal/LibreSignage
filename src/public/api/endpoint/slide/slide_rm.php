@@ -16,6 +16,7 @@
 * @status{400,If the request parameters are invalid.}
 * @status{401,If the caller is not allowed to remove the slide.}
 * @status{404,If the slide doesn't exist.}
+* @status{424,If the slide is not locked by the calling session.}
 * @status_end
 */
 
