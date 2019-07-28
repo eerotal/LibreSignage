@@ -20,6 +20,10 @@ v1.1.0
   - [docs]     Generate documentation with Doxygen.
   - [internal] Implement HTTP cache support for slide asset fetching endpoints.
                (issue #53)
+  - [bugfix]   Fix a bug where uploading/removing slide assets was allowed even
+               when the slide was not locked. (issue #81)
+  - [bugfix]   Fix a bug where a slide could be deleted even when it was
+               not locked. (issue #80)
 
 v1.0.2
   - [bugfix]   Apply a workaround for docker-library/php#865 which broke
