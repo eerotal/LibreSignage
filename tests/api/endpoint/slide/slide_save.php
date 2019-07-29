@@ -399,6 +399,10 @@ class slide_save extends APITestCase {
 		if ($this->slide_id !== NULL) {
 			$this->api->login('admin', 'admin');
 
+			APIInterface::assert_success(SlideUtils::lock(
+				$this->api,
+				$this->slide_id
+			), 'Failed to lock initial slide.', [$this->api, 'logout']);
 			APIInterface::assert_success(SlideUtils::remove(
 				$this->api,
 				$this->slide_id

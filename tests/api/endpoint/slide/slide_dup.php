@@ -123,6 +123,10 @@ class slide_dup extends APITestCase {
 		$this->api->login('admin', 'admin');
 
 		// Remove the initial slide.
+		APIInterface::assert_success(SlideUtils::lock(
+			$this->api,
+			$this->orig_slide_id
+		), 'Failed to lock original slide.', [$this->api, 'logout']);
 		APIInterface::assert_success(SlideUtils::remove(
 			$this->api,
 			$this->orig_slide_id
@@ -131,6 +135,10 @@ class slide_dup extends APITestCase {
 
 		// Remove duplicated slide if it was created.
 		if ($this->dup_slide_id !== NULL) {
+			APIInterface::assert_success(SlideUtils::lock(
+				$this->api,
+				$this->dup_slide_id
+			), 'Failed to lock duplicated slide.', [$this->api, 'logout']);
 			APIInterface::assert_success(SlideUtils::remove(
 				$this->api,
 				$this->dup_slide_id
