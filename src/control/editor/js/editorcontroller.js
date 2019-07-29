@@ -24,6 +24,9 @@ class EditorController {
 			},
 			quota: {
 				slides: false
+			},
+			user: {
+				admin: false
 			}
 		};
 
@@ -48,6 +51,10 @@ class EditorController {
 		*  Initialize the EditorController.
 		*/
 		await this.update_quotas();
+
+		this.state.user = {
+			'admin': this.api.get_session().get_user().is_in_group('admin')
+		};
 	}
 
 	async update_quotas() {
