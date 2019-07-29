@@ -516,12 +516,6 @@ doxygen-docs
 LOC
   Count the lines of code in LibreSignage.
 
-LOD
-  Count the lines of documentation in LibreSignage. This target will
-  only work after building LibreSignage since the documentation lines
-  are counted from the docs in the dist/ directory. This way the
-  generated API endpoint docs can be taken into account too.
-
 8.2. Option variables
 +++++++++++++++++++++
 

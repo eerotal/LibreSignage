@@ -39,7 +39,7 @@ INITCHK_WARN ?= N
 
 # Don't search for dependencies when certain targets with no deps are run.
 # The if-statement below is some hacky makefile magic. Don't be scared.
-NODEP_TARGETS := clean realclean LOC LOD configure configure-build \
+NODEP_TARGETS := clean realclean LOC configure configure-build \
 	configure-system initchk install doxygen-docs
 ifneq ($(filter \
 	0 $(shell expr $(words $(MAKECMDGOALS)) '*' '2'),\
@@ -506,13 +506,6 @@ LOC: initchk
 		-o -name "*.sh" -print \
 		-o -name "*.json" -print`
 
-LOD: initchk
-	@:
-	set -e
-	printf '[Info] Make sure your 'dist/' is up to date!\n'
-	printf '[Info] Lines Of Documentation: \n'
-	wc -l `find dist -type f -name '*.rst'`
-
 test-api: initchk $(PHP_AUTOLOAD)
 	@:
 	set -e
@@ -563,7 +556,7 @@ initchk:
 
 # Include the dependency makefiles from dep/. If the files don't
 # exist, they are built by running the required targets.
-ifeq (,$(filter LOC LOD clean realclean configure initchk,$(MAKECMDGOALS)))
+ifeq (,$(filter LOC clean realclean configure initchk,$(MAKECMDGOALS)))
 include $(subst src,dep,$(SRC_JS:.js=.js.dep))
 include $(subst src,dep,$(SRC_SCSS:.scss=.scss.dep))
 endif
