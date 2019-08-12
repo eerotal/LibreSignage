@@ -25,7 +25,8 @@ final class SlideAsset extends Exportable {
 	static $PUBLIC = [
 		'mime',
 		'filename',
-		'has_thumb'
+		'has_thumb',
+		'hash'
 	];
 
 	const FILENAME_REGEX = '/^[ A-Za-z0-9_.-]*$/';

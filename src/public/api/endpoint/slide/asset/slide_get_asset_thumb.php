@@ -2,6 +2,11 @@
 /** \file
 * Get an asset thumbnail of a slide.
 *
+* You can (and probably should) pass the asset hash in the 'hash'
+* request parameter to prevent problems loading cached versions of
+* asset thumbs when the asset has changed. The server does send the proper
+* ETag headers but HTML <img> tags, for example, don't seem to obey them.
+*
 * @method{GET}
 * @auth{By cookie or token}
 * @groups{admin|editor|display}
@@ -11,6 +16,7 @@
 * @request_start{application/json}
 * @request{string,id,The ID of the slide.,required}
 * @request{string,name,The name of the asset.,required}
+* @request{string,hash,The asset hash (see description).,optional}
 * @request_end
 *
 * @response_start{The requested asset.}
@@ -48,7 +54,8 @@ APIEndpoint::GET(
 				'type' => 'object',
 				'properties' => [
 					'id' => ['type' => 'string'],
-					'name' => ['type' => 'string']
+					'name' => ['type' => 'string'],
+					'hash' => []
 				],
 				'required' => ['id', 'name']
 			]
