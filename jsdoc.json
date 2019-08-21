@@ -1,0 +1,13 @@
+{
+	"plugins": [],
+	"recurseDepth": 100,
+	"source": {
+		"include": [ "src/" ]
+	},
+	"opts": {
+		"destination": "jsdoc/",
+		"recurse": true,
+		"encoding": "utf8",
+		"verbose": true
+	}
+}

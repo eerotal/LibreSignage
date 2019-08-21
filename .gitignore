@@ -41,3 +41,5 @@ tests/tmp
 # Exclude Doxygen generated docs
 doxygen_docs/
 
+# Exclude JSDoc generated docs.
+jsdoc/
