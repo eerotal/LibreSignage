@@ -1,7 +1,8 @@
 var $ = require('jquery');
-var APIInterface = require('libresignage/APIInterface').APIInterface;
-var APIEnpoints = require('libresignage/APIInterface').APIEndpoints;
 var APIUI = require('ls-api-ui');
+
+var APIInterface = require('libresignage/api/APIInterface');
+var APIEnpoints = require('libresignage/api/APIEndpoints');
 
 var API = null;
 const LOGOUT_REDIR_TIME = 2000;

@@ -5,7 +5,7 @@
 		"include": [ "src/" ]
 	},
 	"opts": {
-		"destination": "jsdoc/",
+		"destination": "jsdoc_docs/",
 		"recurse": true,
 		"encoding": "utf8",
 		"verbose": true

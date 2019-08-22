@@ -1,7 +1,8 @@
 var $ = require('jquery');
 var EditorView = require('./editorview.js').EditorView;
-var APIInterface = require('libresignage/APIInterface').APIInterface;
 var APIUI = require('ls-api-ui');
+
+var APIInterface = require('libresignage/api/APIInterface');
 
 $(document).ready(async () => {
 	let API = new APIInterface();

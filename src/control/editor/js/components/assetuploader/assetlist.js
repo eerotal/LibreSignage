@@ -1,5 +1,5 @@
 var $ = require('jquery');
-var util = require('ls-util');
+var UIUtil = require('libresignage/util/UIUtil');
 
 /*
 *  Asset list thumbnail template. 'slide' is the slide
@@ -62,7 +62,7 @@ class AssetList {
 			if (this.slide.get('assets')[a.filename].has_thumb()) {
 				t_url = this.slide.get('assets')[a.filename].get_thumb_url();
 			} else {
-				t_url = util.fa_svg_uri('solid', 'image');
+				t_url = UIUtil.fa_svg_uri('solid', 'image');
 			}
 
 			html = $(asset_thumb_template(a.filename, t_url));

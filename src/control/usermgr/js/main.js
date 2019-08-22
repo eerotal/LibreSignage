@@ -1,7 +1,8 @@
 var $ = require('jquery');
-var APIInterface = require('libresignage/APIInterface').APIInterface;
 var APIUI = require('ls-api-ui');
 var UserManagerView = require('./usermanagerview.js').UserManagerView;
+
+var APIInterface = require('libresignage/api/APIInterface');
 
 $(document).ready(async () => {
 	var API = new APIInterface();

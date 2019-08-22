@@ -1,6 +1,5 @@
 var $ = require('jquery');
 var DisplayController = require('./displaycontroller.js').DisplayController;
-var util = require('ls-util');
 var markup = require('ls-markup');
 var MarkupSyntaxError = require('ls-markup').err.MarkupSyntaxError;
 var dialog = require('ls-dialog');
@@ -11,6 +10,8 @@ var UIStatic = require('ls-uicontrol').UIStatic;
 var BaseView = require('ls-baseview').BaseView;
 var Timeout = require('ls-timeout').Timeout;
 
+var Util = require('libresignage/util/Util');
+
 const DISPLAY_UPDATE_INTERVAL = 5000;
 const BUFFER_UPDATE_PERIOD = 50;
 const CONTROLS_VISIBLE_PERIOD = 3000;
@@ -20,7 +21,7 @@ class DisplayView extends BaseView {
 		super();
 
 		this.controller = new DisplayController(api);
-		this.query_params = util.get_GET_parameters();
+		this.query_params = Util.get_GET_parameters();
 		this.slide_buffer = [];
 		this.markup_buffer = [];
 

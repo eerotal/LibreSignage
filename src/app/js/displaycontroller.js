@@ -1,6 +1,5 @@
 var Slide = require('ls-slide').Slide;
 var Queue = require('ls-queue').Queue;
-var util = require('ls-util');
 var markup = require('ls-markup');
 
 const QUEUE_UPDATE_INTERVAL = 60000;

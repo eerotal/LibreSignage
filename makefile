@@ -184,6 +184,7 @@ LOC:
 			-o -path "./node_modules/*" \
 			-o -path "./vendor/*" \
 			-o -path "./doxygen_docs/*" \
+			-o -path "./jsdoc_docs/*" \
 		\) -prune \
 		-o -name ".#*" -printf '' \
 		-o -name 'package-lock.json' -printf '' \

@@ -38,8 +38,6 @@ tests/tmp
 # Exclude temporary sass files.
 .sass-cache
 
-# Exclude Doxygen generated docs
+# Exclude Doxygen and JSDoc generated docs
 doxygen_docs/
-
-# Exclude JSDoc generated docs.
-jsdoc/
+jsdoc_docs/

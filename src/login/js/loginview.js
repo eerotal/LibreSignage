@@ -4,8 +4,6 @@
 
 var $ = require('jquery');
 var bootstrap = require('bootstrap');
-var APIError = require('libresignage/APIInterface').APIError;
-var HTTPStatus = require('libresignage/APIInterface').HTTPStatus;
 var APIUI = require('ls-api-ui');
 
 var UIController = require('ls-uicontrol').UIController;
@@ -14,7 +12,9 @@ var UIButton = require('ls-uicontrol').UIButton;
 
 var LoginController = require('./logincontroller.js').LoginController;
 
-var util = require('ls-util');
+var Util = require('libresignage/util/Util');
+var APIError = require('libresignage/api/APIError');
+var HTTPStatus = require('libresignage/api/HTTPStatus');
 
 class LoginView {
 	constructor(api) {
@@ -103,7 +103,7 @@ class LoginView {
 		/*
 		*  Login using the credentials in the input fields.
 		*/
-		let query = util.get_GET_parameters();
+		let query = Util.get_GET_parameters();
 		try {
 			await this.controller.login(
 				this.inputs.get('username').get(),
@@ -114,7 +114,7 @@ class LoginView {
 			if (e instanceof APIError) {
 				if (e.is(HTTPStatus.UNAUTHORIZED)) {
 					query.failed = '1';
-					window.location.assign(`/login?${util.querify(query)}`);
+					window.location.assign(`/login?${Util.querify(query)}`);
 					return;
 				} else {
 					APIUI.handle_error(e);

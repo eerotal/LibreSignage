@@ -20,14 +20,13 @@ var Shortcut = require('ls-shortcut').Shortcut;
 var EditorController = require('./editorcontroller.js').EditorController;
 var EditorValidators = require('./editorvalidators.js').EditorValidators;
 
-var APIError = require('libresignage/APIInterface').APIError;
 var APIUI = require('ls-api-ui');
 var User = require('ls-user').User;
 var Queue = require('ls-queue').Queue;
 var MarkupError = require('ls-markup').err.MarkupError;
 
 var dialog = require('ls-dialog');
-var util = require('ls-util');
+
 var ace_range = ace.require('ace/range');
 
 var AssetUploader = require(
@@ -42,6 +41,9 @@ var Preview = require(
 var QueueSelector = require(
 	'./components/queueselector/queueselector.js'
 ).QueueSelector;
+
+var APIError = require('libresignage/api/APIError');
+var Util = require('libresignage/util/Util');
 
 class EditorView extends BaseView {
 	constructor(api) {
@@ -222,7 +224,7 @@ class EditorView extends BaseView {
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
-					e.val(util.tstamp_to_datetime(val)[0]);
+					e.val(Util.tstamp_to_datetime(val)[0]);
 				},
 				clearer: e => e.val('')
 			}),
@@ -240,7 +242,7 @@ class EditorView extends BaseView {
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
-					e.val(util.tstamp_to_datetime(val)[1]);
+					e.val(Util.tstamp_to_datetime(val)[1]);
 				},
 				clearer: e => e.val('')
 			}),
@@ -258,7 +260,7 @@ class EditorView extends BaseView {
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
-					e.val(util.tstamp_to_datetime(val)[0]);
+					e.val(Util.tstamp_to_datetime(val)[0]);
 				},
 				clearer: e => e.val('')
 			}),
@@ -276,7 +278,7 @@ class EditorView extends BaseView {
 				mod: null,
 				getter: e => e.val(),
 				setter: (e, val) => {
-					e.val(util.tstamp_to_datetime(val)[1]);
+					e.val(Util.tstamp_to_datetime(val)[1]);
 				},
 				clearer: e => e.val('')
 			}),
@@ -901,11 +903,11 @@ class EditorView extends BaseView {
 			index:         this.inputs.get('index').get(),
 			animation:     this.inputs.get('animation').get(),
 			sched:         this.inputs.get('schedule_enable').get(),
-			sched_t_s: util.datetime_to_tstamp(
+			sched_t_s: Util.datetime_to_tstamp(
 				this.inputs.get('schedule_date_start').get(),
 				this.inputs.get('schedule_time_start').get()
 			),
-			sched_t_e: util.datetime_to_tstamp(
+			sched_t_e: Util.datetime_to_tstamp(
 				this.inputs.get('schedule_date_end').get(),
 				this.inputs.get('schedule_time_end').get()
 			),
@@ -915,7 +917,7 @@ class EditorView extends BaseView {
 	}
 
 	is_slide_modified() {
-		return !util.object_contains(
+		return !Util.object_contains(
 			this.get_editor_input_data(),
 			this.controller.get_slide().get_data()
 		);

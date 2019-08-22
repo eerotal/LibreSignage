@@ -1,9 +1,10 @@
-var APIInterface = require('libresignage/APIInterface').APIInterface;
-var APIError = require('libresignage/APIInterface').APIError;
 var Slide = require('ls-slide').Slide;
 var Queue = require('ls-queue').Queue;
 var assert = require('ls-assert').assert;
 var User = require('ls-user').User;
+
+var APIInterface = require('libresignage/api/APIInterface');
+var APIError = require('libresignage/api/APIError');
 
 class EditorController {
 	constructor(api) {
