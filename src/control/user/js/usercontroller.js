@@ -1,4 +1,4 @@
-var APIEndpoints = require('ls-api').APIEndpoints;
+var APIEndpoints = require('libresignage/APIInterface').APIEndpoints;
 
 class UserController {
 	constructor(api) {

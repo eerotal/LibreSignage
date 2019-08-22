@@ -20,7 +20,7 @@ var Shortcut = require('ls-shortcut').Shortcut;
 var EditorController = require('./editorcontroller.js').EditorController;
 var EditorValidators = require('./editorvalidators.js').EditorValidators;
 
-var APIError = require('ls-api').APIError;
+var APIError = require('libresignage/APIInterface').APIError;
 var APIUI = require('ls-api-ui');
 var User = require('ls-user').User;
 var Queue = require('ls-queue').Queue;

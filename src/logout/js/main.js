@@ -1,6 +1,6 @@
 var $ = require('jquery');
-var APIInterface = require('ls-api').APIInterface;
-var APIEnpoints = require('ls-api').APIEndpoints;
+var APIInterface = require('libresignage/APIInterface').APIInterface;
+var APIEnpoints = require('libresignage/APIInterface').APIEndpoints;
 var APIUI = require('ls-api-ui');
 
 var API = null;

@@ -1,5 +1,5 @@
-var APIInterface = require('ls-api').APIInterface;
-var APIError = require('ls-api').APIError;
+var APIInterface = require('libresignage/APIInterface').APIInterface;
+var APIError = require('libresignage/APIInterface').APIError;
 var Slide = require('ls-slide').Slide;
 var Queue = require('ls-queue').Queue;
 var assert = require('ls-assert').assert;

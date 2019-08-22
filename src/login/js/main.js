@@ -3,7 +3,7 @@
 */
 var $ = require('jquery');
 var LoginView = require('./loginview.js').LoginView;
-var APIInterface = require('ls-api').APIInterface;
+var APIInterface = require('libresignage/APIInterface').APIInterface;
 var APIUI = require('ls-api-ui');
 
 $(document).ready(async () => {

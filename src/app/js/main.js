@@ -1,5 +1,5 @@
 var $ = require('jquery');
-var APIInterface = require('ls-api').APIInterface;
+var APIInterface = require('libresignage/APIInterface').APIInterface;
 var APIUI = require('ls-api-ui');
 var DisplayView = require('./displayview.js').DisplayView;
 var util = require('ls-util');

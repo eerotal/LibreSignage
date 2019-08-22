@@ -4,8 +4,8 @@
 
 var $ = require('jquery');
 var bootstrap = require('bootstrap');
-var APIError = require('ls-api').APIError;
-var HTTPStatus = require('ls-api').HTTPStatus;
+var APIError = require('libresignage/APIInterface').APIError;
+var HTTPStatus = require('libresignage/APIInterface').HTTPStatus;
 var APIUI = require('ls-api-ui');
 
 var UIController = require('ls-uicontrol').UIController;
