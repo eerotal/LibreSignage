@@ -4,7 +4,6 @@ var UIInput = require('ls-uicontrol').UIInput;
 var UIButton = require('ls-uicontrol').UIButton;
 var UIController = require('ls-uicontrol').UIController;
 var Popup = require('ls-popup').Popup;
-var assert = require('ls-assert').assert;
 var APIUI = require('ls-api-ui');
 
 var AssetUploaderController = require('./assetuploader_controller.js').AssetUploaderController;
@@ -13,6 +12,8 @@ var AssetList = require('./assetlist.js').AssetList;
 var ValidatorSelector = require('ls-validator').ValidatorSelector;
 var ValidatorTrigger = require('ls-validator').ValidatorTrigger;
 var FileSelectorValidator = require('ls-validator').FileSelectorValidator;
+
+var Assert = require('libresignage/util/assert/Assert');
 
 class AssetUploader {
 	constructor(container, api) {
@@ -223,7 +224,7 @@ class AssetUploader {
 		/*
 		*  Open the asset uploader for 'slide'.
 		*/
-		assert(slide != null, "No slide specified.");
+		Assert.assert(slide != null, "No slide specified.");
 		this.controller.open(slide);
 		this.assetlist.show(slide);
 		this.popup.visible(true);

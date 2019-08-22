@@ -1,4 +1,4 @@
-var assert = require('ls-assert').assert;
+var Assert = require('libresignage/util/assert/Assert');
 
 class AssetUploaderController {
 	constructor(api) {
@@ -56,7 +56,7 @@ class AssetUploaderController {
 		/*
 		*  Remove asset 'name'.
 		*/
-		assert(name != null && name.length != 0, "Empty slide name.");
+		Assert.assert(name != null && name.length != 0, "Empty slide name.");
 		await this.slide.remove_asset(name);
 		this.update_file_limit_state();
 	}
@@ -68,8 +68,8 @@ class AssetUploaderController {
 		*  object or a similarly structured one. This function
 		*  sets the 'uploading' state value.
 		*/
-		assert(files.length != 0, "Empty files list.");
-		assert(this.slide, "No slide loaded.");
+		Assert.assert(files.length != 0, "Empty files list.");
+		Assert.assert(this.slide, "No slide loaded.");
 
 		this.state.slide.uploading = true;
 		try {
