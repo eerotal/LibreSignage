@@ -1,5 +1,5 @@
 var $ = require('jquery');
-var User = require('ls-user').User;
+var User = require('libresignage/user/User');
 
 const session_row = (who, from, created, cur) => `
 <tr><td>

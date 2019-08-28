@@ -1,4 +1,4 @@
-var User = require('ls-user').User;
+var User = require('libresignage/user/User');
 
 class UserManagerController {
 	constructor(api) {

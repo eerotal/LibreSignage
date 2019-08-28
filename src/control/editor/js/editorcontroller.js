@@ -1,6 +1,6 @@
 var Queue = require('ls-queue').Queue;
-var User = require('ls-user').User;
 
+var User = require('libresignage/user/User');
 var APIInterface = require('libresignage/api/APIInterface');
 var APIError = require('libresignage/api/APIError');
 var Assert = require('libresignage/util/assert/Assert');
