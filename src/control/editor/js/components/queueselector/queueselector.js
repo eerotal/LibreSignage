@@ -2,7 +2,6 @@ var $ = require('jquery');
 var UIController = require('ls-uicontrol').UIController;
 var UIButton = require('ls-uicontrol').UIButton;
 var UIInput = require('ls-uicontrol').UIInput;
-var Queue = require('ls-queue').Queue;
 var APIUI = require('ls-api-ui');
 var DropSelect = require('ls-dropselect').DropSelect;
 var DropConfirm = require('ls-dropconfirm').DropConfirm;
@@ -11,6 +10,8 @@ var EventData = require('ls-eventdata').EventData;
 
 var StrValidator = require('ls-validator').StrValidator;
 var BlacklistValidator = require('ls-validator').BlacklistValidator;
+
+var Queue = require('libresignage/queue/Queue');
 
 class QueueSelector {
 	constructor(container_id, api) {

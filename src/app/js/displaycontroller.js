@@ -1,7 +1,7 @@
-var Queue = require('ls-queue').Queue;
 var markup = require('ls-markup');
 
 var Slide = require('libresignage/slide/Slide');
+var Queue = require('libresignage/queue/Queue');
 
 const QUEUE_UPDATE_INTERVAL = 60000;
 

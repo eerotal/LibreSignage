@@ -21,7 +21,6 @@ var EditorController = require('./editorcontroller.js').EditorController;
 var EditorValidators = require('./editorvalidators.js').EditorValidators;
 
 var APIUI = require('ls-api-ui');
-var Queue = require('ls-queue').Queue;
 var MarkupError = require('ls-markup').err.MarkupError;
 
 var dialog = require('ls-dialog');
@@ -44,6 +43,7 @@ var QueueSelector = require(
 var APIError = require('libresignage/api/APIError');
 var Util = require('libresignage/util/Util');
 var User = require('libresignage/user/User');
+var Queue = require('libresignage/queue/Queue');
 
 class EditorView extends BaseView {
 	constructor(api) {

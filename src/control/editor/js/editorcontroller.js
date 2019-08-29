@@ -1,5 +1,4 @@
-var Queue = require('ls-queue').Queue;
-
+var Queue = require('libresignage/queue/Queue');
 var User = require('libresignage/user/User');
 var APIInterface = require('libresignage/api/APIInterface');
 var APIError = require('libresignage/api/APIError');
