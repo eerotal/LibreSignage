@@ -64,7 +64,7 @@ class Timeline {
 		this.container.html('');
 		this.thumbs = {};
 
-		while (s = queue.get_slides().next(index, false)) {
+		for (let s of [...queue.get_slides()]) {
 			index = s.get('index');
 
 			let id = s.get('id');

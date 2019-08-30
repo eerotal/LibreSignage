@@ -12,6 +12,8 @@ class DisplayController {
 
 		this.current_slide = null;
 		this.buffered_slide = null;
+
+		this.slidelist_iterator = null;
 	}
 
 	async init_queue_update_loop(queue_name) {
@@ -39,19 +41,19 @@ class DisplayController {
 		return this.get_buffered_slide() != null;
 	}
 
-	buffer_next_slide(dir = 1) {
-		/*
-		*  Load the next slide in the loaded queue to the
-		*  slide buffer.
-		*/
-		let last = this.buffered_slide;
+	buffer_next_slide(step = 1) {
+		// Initialize the iterator if it's null.
+		if (this.slidelist_iterator == null) {
+			this.slidelist_iterator = this.queue.get_slides().filter(
+				{'enabled': true}
+			)[Symbol.iterator](true, step, 0);
+		}
 
-		// Buffer slide objects.
+		// Buffer the next slide.
+		this.slidelist_iterator.set_step(step);
 		this.current_slide = this.buffered_slide;
-		this.buffered_slide = this.queue.get_slides().filter(
-			{'enabled': true}
-		).next(last ? last.get('index') : -1, true, dir);
-
+		this.buffered_slide = this.slidelist_iterator.next().value;
+		
 		if (this.current_slide != null) {
 			this.current_slide.transpile_html_buffer();
 		}

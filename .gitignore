@@ -41,3 +41,6 @@ tests/tmp
 # Exclude Doxygen and JSDoc generated docs
 doxygen_docs/
 jsdoc_docs/
+
+# Exclude all debug & development related files in src/debug.
+src/debug/
