@@ -28,9 +28,7 @@ class DisplayController {
 				console.log('DisplayController: Queue update.');
 				await this.queue.update();
 			} catch (e) {
-				console.warn(
-					'DisplayController: Failed to update queue.'
-				);
+				console.warn('DisplayController: Failed to update queue.');
 			}
 		}, QUEUE_UPDATE_INTERVAL);
 	}
@@ -44,9 +42,9 @@ class DisplayController {
 	buffer_next_slide(step = 1) {
 		// Initialize the iterator if it's null.
 		if (this.slidelist_iterator == null) {
-			this.slidelist_iterator = this.queue.get_slides().filter(
-				{'enabled': true}
-			)[Symbol.iterator](true, step, 0);
+			this.slidelist_iterator = this.queue
+				.get_slidelist()
+				.filter_dict({'enabled': true})[Symbol.iterator](true, step, 0);
 		}
 
 		// Buffer the next slide.
