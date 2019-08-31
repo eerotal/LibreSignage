@@ -41,8 +41,7 @@ class Timeline {
 		/*
 		*  Select a slide from the timeline.
 		*/
-		let slides = this.queue.get_slides().get_slides();
-		for (let s of Object.values(slides)) {
+		for (let s of [...this.queue.get_slidelist()]) {
 			if (s.get('id') === id) {
 				this.slide = s;
 				$(`#tl-slide-btn-${s.get('id')}`).addClass('selected');
@@ -63,8 +62,8 @@ class Timeline {
 		this.slide = null;
 		this.container.html('');
 		this.thumbs = {};
-
-		for (let s of [...queue.get_slides()]) {
+		
+		for (let s of [...this.queue.get_slidelist()]) {
 			index = s.get('index');
 
 			let id = s.get('id');
