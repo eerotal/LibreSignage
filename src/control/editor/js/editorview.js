@@ -5,14 +5,9 @@ var UIController = require('ls-uicontrol').UIController;
 var UIInput = require('ls-uicontrol').UIInput;
 var UIButton = require('ls-uicontrol').UIButton;
 var UIStatic = require('ls-uicontrol').UIStatic;
-var MultiSelect = require('ls-multiselect').MultiSelect;
 var DropConfirm = require('ls-dropconfirm').DropConfirm;
 var DropSelect = require('ls-dropselect').DropSelect;
 var Popup = require('ls-popup').Popup;
-
-var StrValidator = require('libresignage/ui/validator/StrValidator');
-var WhitelistValidator = require('libresignage/ui/validator/WhitelistValidator');
-var BlacklistValidator = require('libresignage/ui/validator/BlacklistValidator');
 
 var ShortcutController = require('ls-shortcut').ShortcutController;
 var Shortcut = require('ls-shortcut').Shortcut;
@@ -40,6 +35,10 @@ var QueueSelector = require(
 	'./components/queueselector/queueselector.js'
 ).QueueSelector;
 
+var MultiSelect = require('libresignage/ui/components/MultiSelect');
+var StrValidator = require('libresignage/ui/validator/StrValidator');
+var WhitelistValidator = require('libresignage/ui/validator/WhitelistValidator');
+var BlacklistValidator = require('libresignage/ui/validator/BlacklistValidator');
 var APIError = require('libresignage/api/APIError');
 var Util = require('libresignage/util/Util');
 var User = require('libresignage/user/User');
