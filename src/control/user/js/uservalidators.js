@@ -1,9 +1,9 @@
 var $ = require('jquery');
 
-var ValidatorController = require('ls-validator').ValidatorController;
-var ValidatorSelector = require('ls-validator').ValidatorSelector;
-var EqValidator = require('ls-validator').EqValidator;
-var StrValidator = require('ls-validator').StrValidator;
+var ValidatorController = require('libresignage/ui/validator/ValidatorController');
+var ValidatorSelector = require('libresignage/ui/validator/ValidatorSelector');
+var EqValidator = require('libresignage/ui/validator/EqValidator');
+var StrValidator = require('libresignage/ui/validator/StrValidator');
 
 class UserValidators extends ValidatorController {
 	constructor() {

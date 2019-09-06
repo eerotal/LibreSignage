@@ -10,9 +10,9 @@ var DropConfirm = require('ls-dropconfirm').DropConfirm;
 var DropSelect = require('ls-dropselect').DropSelect;
 var Popup = require('ls-popup').Popup;
 
-var StrValidator = require('ls-validator').StrValidator;
-var WhitelistValidator = require('ls-validator').WhitelistValidator;
-var BlacklistValidator = require('ls-validator').BlacklistValidator;
+var StrValidator = require('libresignage/ui/validator/StrValidator');
+var WhitelistValidator = require('libresignage/ui/validator/WhitelistValidator');
+var BlacklistValidator = require('libresignage/ui/validator/BlacklistValidator');
 
 var ShortcutController = require('ls-shortcut').ShortcutController;
 var Shortcut = require('ls-shortcut').Shortcut;

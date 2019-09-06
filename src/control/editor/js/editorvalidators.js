@@ -3,11 +3,11 @@
 */
 
 var $ = require('jquery');
-var ValidatorController = require('ls-validator').ValidatorController;
-var ValidatorSelector = require('ls-validator').ValidatorSelector;
-var ValidatorTrigger = require('ls-validator').ValidatorTrigger;
-var StrValidator = require('ls-validator').StrValidator;
-var NumValidator = require('ls-validator').NumValidator;
+var ValidatorController = require('libresignage/ui/validator/ValidatorController');
+var ValidatorSelector = require('libresignage/ui/validator/ValidatorSelector');
+var ValidatorTrigger = require('libresignage/ui/validator/ValidatorTrigger');
+var StrValidator = require('libresignage/ui/validator/StrValidator');
+var NumValidator = require('libresignage/ui/validator/NumValidator');
 
 class EditorValidators extends ValidatorController {
 	constructor(api) {

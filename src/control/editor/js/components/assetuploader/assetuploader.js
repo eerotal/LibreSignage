@@ -9,10 +9,9 @@ var APIUI = require('ls-api-ui');
 var AssetUploaderController = require('./assetuploader_controller.js').AssetUploaderController;
 var AssetList = require('./assetlist.js').AssetList;
 
-var ValidatorSelector = require('ls-validator').ValidatorSelector;
-var ValidatorTrigger = require('ls-validator').ValidatorTrigger;
-var FileSelectorValidator = require('ls-validator').FileSelectorValidator;
-
+var ValidatorSelector = require('libresignage/ui/validator/ValidatorSelector');
+var ValidatorTrigger = require('libresignage/ui/validator/ValidatorTrigger');
+var FileSelectorValidator = require('libresignage/ui/validator/FileSelectorValidator');
 var Assert = require('libresignage/util/assert/Assert');
 
 class AssetUploader {

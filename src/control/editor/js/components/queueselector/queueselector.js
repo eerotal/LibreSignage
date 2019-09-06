@@ -8,9 +8,8 @@ var DropConfirm = require('ls-dropconfirm').DropConfirm;
 var dialog = require('ls-dialog');
 var EventData = require('ls-eventdata').EventData;
 
-var StrValidator = require('ls-validator').StrValidator;
-var BlacklistValidator = require('ls-validator').BlacklistValidator;
-
+var StrValidator = require('libresignage/ui/validator/StrValidator');
+var BlacklistValidator = require('libresignage/ui/validator/BlacklistValidator');
 var Queue = require('libresignage/queue/Queue');
 
 class QueueSelector {

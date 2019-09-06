@@ -1,8 +1,9 @@
 var $ = require('jquery');
 var MultiSelect = require('ls-multiselect').MultiSelect;
 var DropConfirm = require('ls-dropconfirm').DropConfirm;
-var StrValidator = require('ls-validator').StrValidator;
 var EventData = require('ls-eventdata').EventData;
+
+var StrValidator = require('libresignage/ui/validator/StrValidator');
 
 // Template for the UserListEntry HTML.
 const user_list_entry = (name, password) => `

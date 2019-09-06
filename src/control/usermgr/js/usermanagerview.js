@@ -6,12 +6,13 @@ var UIController = require('ls-uicontrol').UIController;
 var UIButton = require('ls-uicontrol').UIButton;
 var UIInput = require('ls-uicontrol').UIInput;
 
-var StrValidator = require('ls-validator').StrValidator;
 var dialog = require('ls-dialog');
 var APIUI = require('ls-api-ui');
 
 var UserManagerController = require('./usermanagercontroller.js').UserManagerController;
 var UserList = require('./components/userlist.js').UserList;
+
+var StrValidator = require('libresignage/ui/validator/StrValidator');
 
 class UserManagerView extends BaseView {
 	constructor(api) {
