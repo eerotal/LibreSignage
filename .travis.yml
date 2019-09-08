@@ -57,7 +57,7 @@ install:
 
     # Install other dependencies from repos & npm.
     - sudo apt-get update
-    - sudo apt-get install imagemagick inkscape
+    - sudo apt-get install librsvg2-bin
     - npm install
 
 before_script:

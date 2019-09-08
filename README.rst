@@ -154,8 +154,7 @@ Build system dependencies
   * GNU Make (Version 4.x or newer.) (https://www.gnu.org/software/make/)
   * Pandoc (Version 2.0.x or newer.) (https://pandoc.org/)
   * npm (Version 6.4.x or newer.) (https://nodejs.org/en/)
-  * ImageMagick (Version 6.x or newer.) (https://www.imagemagick.org/)
-  * Inkscape (Version 0.92.x or newer.) (https://inkscape.org/)
+  * rsvg-convert (Version 2.44.x or newer.) (https://gitlab.gnome.org/GNOME/librsvg)
 
 Build system dependencies installed automatically by npm
   * Tools
@@ -225,10 +224,10 @@ host (ie. no containers) by following the instructions below.
 
 1. Install software needed for building LibreSignage. You will need the
    following packages: ``git, apache2, php, php-gd, pandoc, npm, make,
-   imagemagick, inkscape``. All other packages except *npm* can be installed
+   rsvg-convert, inkscape``. All other packages except *npm* can be installed
    from the distribution repos by running ``sudo apt update && sudo apt install
-   -y git apache2 php php-gd pandoc make imagemagick inkscape``. You can install
-    NPM by following the instructions on the
+   -y git apache2 php php-gd pandoc make librsvg2-bin inkscape``. You can
+   install  NPM by following the instructions on the
    `node.js website <https://nodejs.org/en/download/package-manager/>`_.
 
    * If you want to enable video thumbnail generation, you need to install

@@ -18,8 +18,7 @@ POSTCSS_FLAGS := --config postcss.config.js --replace --no-map
 NPM_REQ_VER := 6.4.0
 MAKE_REQ_VER := 4.0
 PANDOC_REQ_VER := 2.0
-IMAGEMAGICK_REQ_VER := 6.0
-INKSCAPE_REQ_VER := 0.91
+RSVG_REQ_VER := 2.40.0
 
 # Caller supplied build settings.
 VERBOSE ?= Y
@@ -398,9 +397,7 @@ initchk:
 	tmp=$$(expr $$tmp + $$?)
 	./build/scripts/dep_checks/pandoc_version.sh $(PANDOC_REQ_VER)
 	tmp=$$(expr $$tmp + $$?)
-	./build/scripts/dep_checks/imagemagick_version.sh $(IMAGEMAGICK_REQ_VER)
-	tmp=$$(expr $$tmp + $$?)
-	./build/scripts/dep_checks/inkscape_version.sh $(INKSCAPE_REQ_VER)
+	./build/scripts/dep_checks/rsvg_version.sh $(RSVG_REQ_VER)
 	tmp=$$(expr $$tmp + $$?)
 
 
