@@ -224,10 +224,10 @@ host (ie. no containers) by following the instructions below.
 
 1. Install software needed for building LibreSignage. You will need the
    following packages: ``git, apache2, php, php-gd, pandoc, npm, make,
-   rsvg-convert, inkscape``. All other packages except *npm* can be installed
-   from the distribution repos by running ``sudo apt update && sudo apt install
-   -y git apache2 php php-gd pandoc make librsvg2-bin inkscape``. You can
-   install  NPM by following the instructions on the
+   rsvg-convert``. All other packages except *npm* can be installed from
+   the distribution repos by running ``sudo apt update && sudo apt install
+   -y git apache2 php php-gd pandoc make librsvg2-bin``. You can install
+   NPM by following the instructions on the
    `node.js website <https://nodejs.org/en/download/package-manager/>`_.
 
    * If you want to enable video thumbnail generation, you need to install
