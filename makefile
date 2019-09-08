@@ -19,7 +19,7 @@ NPM_REQ_VER := 6.4.0
 MAKE_REQ_VER := 4.0
 PANDOC_REQ_VER := 2.0
 IMAGEMAGICK_REQ_VER := 6.0
-INKSCAPE_REQ_VER := 0.92
+INKSCAPE_REQ_VER := 0.91
 
 # Caller supplied build settings.
 VERBOSE ?= Y
