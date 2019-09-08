@@ -28,6 +28,8 @@ MAKE_REQ_VER := 4.0
 PANDOC_REQ_VER := 2.0
 IMAGEMAGICK_REQ_VER := 6.0
 DOXYGEN_REQ_VER := 1.8.0
+INKSCAPE_REQ_VER := 0.92
+
 
 # Caller supplied build settings.
 VERBOSE ?= Y
@@ -550,6 +552,8 @@ initchk:
 	./build/scripts/dep_checks/pandoc_version.sh $(PANDOC_REQ_VER)
 	tmp=$$(expr $$tmp + $$?)
 	./build/scripts/dep_checks/imagemagick_version.sh $(IMAGEMAGICK_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/inkscape_version.sh $(INKSCAPE_REQ_VER)
 	tmp=$$(expr $$tmp + $$?)
 
 	$(call initchk_warn,$$tmp)

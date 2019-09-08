@@ -132,10 +132,16 @@ RAM
   Depends on the specific use case.
 
 Tested operating systems
+
+*The following is a list of distributions where LibreSignage has successfully
+been run. The list is not complete. It gets updated as more distributions are
+tested.*
+
   * Debian
 
     * 9 (Stretch)
     * 10 (Buster)
+    * 11 (Bullseye)
 
   * Ubuntu
 
@@ -157,6 +163,7 @@ Tested operating systems
   * npm (Version 6.4.x or newer.) (https://nodejs.org/en/)
   * composer (Version 1.8.x or newer) (https://getcomposer.org/)
   * ImageMagick (Version 6.x or newer.) (https://www.imagemagick.org/)
+  * Inkscape (Version 0.92.x or newer.) (https://inkscape.org/)
 
 *Optional* build system dependencies.
   * Doxygen (Version 1.8.x or newer.) (http://www.doxygen.nl/)
@@ -189,8 +196,19 @@ See `11. Third-party dependencies`_ for license information.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 You can easily deploy a containerized LibreSignage instance using the
-LibreSignage Docker images from Docker hub. The required steps are
-listed below.
+LibreSignage Docker images from Docker Hub. The LibreSignage Docker
+repository `eerotal/libresignage` contains the following images:
+
+* **eerotal/libresignage:latest  - (Recommended) The latest stable image.**
+* eerotal/libresignage:nightly   - The latest development build. This image
+                                   is built from the `next` branch every night
+                                   at 00:00.
+* eerotal/libresignage:<version> - The current and all prevous stable releases.
+                                   If you want to use the latest stable release,
+                                   prefer the `latest` tag instead. `<version>`
+                                   is the version number of the release.
+
+The steps required to run a LibreSignage Docker image are listed below.
 
 1. Install `Docker <https://www.docker.com/>`_ if it's not installed yet.
 2. Run the following command::
@@ -201,9 +219,12 @@ listed below.
            --mount source=ls_vol,target=/var/www/html/data \
            eerotal/libresignage:latest
 
-   This command pulls the LibreSignage image from Docker Hub, binds port
-   80 on the host system to the container's port 80 (*-p*) and
+   This command pulls the latest stable LibreSignage image from Docker Hub,
+   binds port 80 on the host system to the container's port 80 (*-p*) and
    creates a volume *ls_vol* for storing LibreSignage data (*--mount*).
+   `eerotal/libresignage:latest` is the image to run. Replace the tag after
+   `:` to run a different image. *You might need to prefix the above command
+   with `sudo` depending on your system configuration.*
 3. Navigate to *localhost* and you should see the LibreSignage login
    page. The file *src/docs/rst/docker.rst* in the LibreSignage source
    distribution contains a more detailed explanation of using the
@@ -216,30 +237,27 @@ listed below.
 4.3.1. Building a native build on Debian or Ubuntu
 ..................................................
 
-*These instructions apply on Debian 9 (Stretch) and Ubuntu 18.04
-(Bionic Beaver)*
-
 Building LibreSignage from source isn't too difficult. You can build
 a native LibreSignage build that runs directly on a Debian or Ubuntu
 host (ie. no containers) by following the instructions below.
 
 1. Install software needed for building LibreSignage. You will need the
    following packages: ``git, apache2, php, php-gd, pandoc, npm, composer,
-   make, imagemagick``. All other packages except *npm* can be installed
-   from the distribution repos by running ``sudo apt update && sudo apt
-   install git apache2 php php-gd pandoc composer make imagemagick``.
-   You can install NPM by following the instructions on the
+   make, imagemagick, inkscape``. All other packages except *npm* can be
+   installed from the distribution repos by running ``sudo apt update && sudo
+   apt install -y git apache2 php php-gd pandoc composer make imagemagick
+   inkscape``. You can install NPM by following the instructions on the
    `node.js website <https://nodejs.org/en/download/package-manager/>`_.
 
    * If you want to enable video thumbnail generation, you need to install
-     *ffmpeg* too. You can do that by running ``sudo apt install ffmpeg``.
+     *ffmpeg* too. You can do that by running ``sudo apt install -y ffmpeg``.
 
    * If you want to run the PHPUnit unit tests you need to install the php-xml
-     extension. You can do that by running ``sudo apt install php-xml``.
+     extension. You can do that by running ``sudo apt install -y php-xml``.
 
    * If you want to generate Doxygen documentation for LibreSignage, you
      need to install Doxygen. You can do that by running
-     ``sudo apt install doxygen``
+     ``sudo apt install -y doxygen``
 
    See the section `4.1. Minimum system requirements`_ for more info.
 2. Use ``cd`` to move to the directory where you want to download the
@@ -328,9 +346,6 @@ host (ie. no containers) by following the instructions below.
 
 4.3.2. Building a Docker image on Debian or Ubuntu
 ..................................................
-
-*These instructions apply on Debian 9 (Stretch) and Ubuntu 18.04
-(Bionic Beaver)*
 
 You can build LibreSignage Docker images by following the instructions
 below.
