@@ -107,7 +107,14 @@ SRC_ENDPOINT := $(shell find src/public/api/endpoint \
 )
 
 # Generated PNG logo paths.
-GENERATED_LOGOS := $(addprefix dist/public/assets/images/logo/libresignage_,16x16.png 32x32.png 96x96.png text_466x100.png)
+GENERATED_LOGOS := $(addprefix \
+	dist/public/assets/images/logo/libresignage_,\
+	16x16.png \
+	32x32.png \
+	96x96.png \
+	text_466x100.png \
+	text_inverted_466x100.png\
+)
 
 endif
 
