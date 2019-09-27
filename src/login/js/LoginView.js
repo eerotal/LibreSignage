@@ -1,21 +1,18 @@
-/*
-*  View object for the Login page.
-*/
-
-var $ = require('jquery');
 var bootstrap = require('bootstrap');
 var APIUI = require('ls-api-ui');
 
-var UIController = require('ls-uicontrol').UIController;
-var UIInput = require('ls-uicontrol').UIInput;
-var UIButton = require('ls-uicontrol').UIButton;
-
-var LoginController = require('./logincontroller.js').LoginController;
+var LoginController = require('./LoginController.js');
 
 var Util = require('libresignage/util/Util');
 var APIError = require('libresignage/api/APIError');
 var HTTPStatus = require('libresignage/api/HTTPStatus');
+var UIController = require('libresignage/ui/controller/UIController')
+var UIInput = require('libresignage/ui/controller/UIInput')
+var UIButton = require('libresignage/ui/controller/UIButton');
 
+/**
+* View class for the Login page.
+*/
 class LoginView {
 	constructor(api) {
 		this.ready = false;
@@ -23,13 +20,13 @@ class LoginView {
 		this.controller = new LoginController(api);
 	}
 
+	/**
+	* Initialize the view.
+	*/
 	init() {
-		/*
-		*  Initialize the input controllers etc.
-		*/
 		this.inputs = new UIController({
 			username: new UIInput({
-				elem: $('#input-user'),
+				elem: document.querySelector('#input-user'),
 				cond: () => true,
 				enabler: null,
 				attach: {
@@ -44,12 +41,12 @@ class LoginView {
 				},
 				defer: () => !this.ready,
 				mod: null,
-				getter: elem => elem.val(),
+				getter: elem => elem.value,
 				setter: null,
 				clearer: null
 			}),
 			password: new UIInput({
-				elem: $('#input-pass'),
+				elem: document.querySelector('#input-pass'),
 				cond: () => true,
 				enabler: null,
 				attach: {
@@ -64,25 +61,25 @@ class LoginView {
 				},
 				defer: () => !this.ready,
 				mod: null,
-				getter: elem => elem.val(),
+				getter: elem => elem.value,
 				setter: null,
 				clearer: null
 			}),
 			permanent: new UIInput({
-				elem: $('#checkbox-perm-session'),
+				elem: document.querySelector('#checkbox-perm-session'),
 				cond: () => true,
 				enabler: null,
 				attach: null,
 				defer: () => !this.ready,
 				mod: null,
-				getter: elem => elem.prop('checked'),
+				getter: elem => elem.checked,
 				setter: null,
 				clearer: null
 			})
 		});
 		this.buttons = new UIController({
 			login: new UIButton({
-				elem: $('#btn-login'),
+				elem: document.querySelector('#btn-login'),
 				cond: () => {
 					return(
 						this.inputs.get('password').get().length
@@ -99,10 +96,10 @@ class LoginView {
 		this.ready = true;
 	}
 
+	/**
+	* Login using credentials from the input fields.
+	*/
 	async login() {
-		/*
-		*  Login using the credentials in the input fields.
-		*/
 		let query = Util.get_GET_parameters();
 		try {
 			await this.controller.login(
@@ -126,11 +123,11 @@ class LoginView {
 		}
 
 		/*
-		*  Redirect the user
-		*   * to the originally requested URL if the query parameter
-		*     'redir' is set.
-		*   * to '/app' if a permanent session is made.
-		*   * to '/control' otherwise.
+		* Redirect the user
+		*  * to the originally requested URL if the query
+		*    parameter 'redir' is set.
+		*  * to '/app' if a permanent session is made.
+		*  * to '/control' otherwise.
 		*/
 		if ('redir' in query) {
 			window.location.assign(decodeURIComponent(query.redir));
@@ -143,12 +140,12 @@ class LoginView {
 		}
 	}
 
+	/**
+	* Update the UI elements.
+	*/
 	update() {
-		/*
-		*  Update the UI elements.
-		*/
 		this.inputs.all(function() { this.state(); });
 		this.buttons.all(function() { this.state(); });
 	}
 }
-exports.LoginView = LoginView;
+module.exports = LoginView;

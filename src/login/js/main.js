@@ -1,13 +1,13 @@
-/*
-*  JavaScript entry point for the Login page.
+/**
+* @file Entry point for the Login page.
 */
-var $ = require('jquery');
-var LoginView = require('./loginview.js').LoginView;
+
 var APIUI = require('ls-api-ui');
 
 var APIInterface = require('libresignage/api/APIInterface');
+var LoginView = require('./LoginView.js');
 
-$(document).ready(async () => {
+document.addEventListener('DOMContentLoaded', async () => {
 	let API = new APIInterface();
 	try {
 		await API.init();
