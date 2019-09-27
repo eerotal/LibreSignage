@@ -113,7 +113,9 @@ class EditorController {
 
 	async close_slide() {
 		if (this.slide != null) {
-			await this.slide.lock_release();
+			if (this.slide.is_locked_from_here()) {
+				await this.slide.lock_release();
+			}
 			this.slide = null;
 		}
 		Object.assign(this.state.slide, {
