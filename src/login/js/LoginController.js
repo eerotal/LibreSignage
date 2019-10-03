@@ -1,7 +1,16 @@
 /**
+* @file Controller code for the login page.
+*/
+
+/**
 * Controller class for the Login page.
 */
 class LoginController {
+	/**
+	* Construct a new LoginController object.
+	*
+	* @param {APIInterface} api An APIInterface object.
+	*/
 	constructor(api) {
 		this.api = api;
 	}

@@ -1,8 +1,11 @@
+/**
+* @file JS for handling interactions on the Login page.
+*/
+
 var bootstrap = require('bootstrap');
 var APIUI = require('ls-api-ui');
 
-var LoginController = require('./LoginController.js');
-
+var LoginController = require('./LoginController');
 var Util = require('libresignage/util/Util');
 var APIError = require('libresignage/api/APIError');
 var HTTPStatus = require('libresignage/api/HTTPStatus');
@@ -14,6 +17,11 @@ var UIButton = require('libresignage/ui/controller/UIButton');
 * View class for the Login page.
 */
 class LoginView {
+	/**
+	* Construct a new LoginView object.
+	*
+	* @param {APIInterface} api An APIInterface object.
+	*/
 	constructor(api) {
 		this.ready = false;
 		this.api = api;
@@ -80,12 +88,10 @@ class LoginView {
 		this.buttons = new UIController({
 			login: new UIButton({
 				elem: document.querySelector('#btn-login'),
-				cond: () => {
-					return(
-						this.inputs.get('password').get().length
-						&& this.inputs.get('username').get().length
-					);
-				},
+				cond: () => (
+					this.inputs.get('password').get().length
+					&& this.inputs.get('username').get().length
+				),
 				enabler: null,
 				attach: { click: async () => { await this.login(); } },
 				defer: () => !this.ready
@@ -98,6 +104,9 @@ class LoginView {
 
 	/**
 	* Login using credentials from the input fields.
+	*
+	* @throws {APIError} If login via the API fails for a reason other than
+	*                    invalid credentials.
 	*/
 	async login() {
 		let query = Util.get_GET_parameters();
@@ -141,7 +150,7 @@ class LoginView {
 	}
 
 	/**
-	* Update the UI elements.
+	* Update UI elements.
 	*/
 	update() {
 		this.inputs.all(function() { this.state(); });
