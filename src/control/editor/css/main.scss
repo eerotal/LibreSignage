@@ -3,11 +3,11 @@
 @import 'default';
 @import 'footer';
 @import 'nav';
-@import 'dialog';
-@import 'multiselect';
-@import 'ls-dropselect/css/dropselect.scss';
-@import 'ls-dropconfirm/css/dropconfirm.scss';
-@import 'ls-popup/css/popup.scss';
+@import 'libresignage/ui/components/Dialog/css/Dialog.scss';
+@import 'libresignage/ui/components/MultiSelect/css/MultiSelect.scss';
+@import 'libresignage/ui/components/DropSelect/css/DropSelect.scss';
+@import 'libresignage/ui/components/DropConfirm/css/DropConfirm.scss';
+@import 'libresignage/ui/components/Popup/css/Popup.scss';
 
 @import 'timeline';
 @import 'preview';
