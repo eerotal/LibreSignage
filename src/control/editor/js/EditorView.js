@@ -1,6 +1,3 @@
-var $ = require('jquery');
-var bootstrap = require('bootstrap');
-
 var ShortcutController = require('ls-shortcut').ShortcutController;
 var Shortcut = require('ls-shortcut').Shortcut;
 
@@ -20,6 +17,7 @@ var QueueSelector = require(
 	'./components/queueselector/queueselector.js'
 ).QueueSelector;
 
+var bootstrap = require('bootstrap');
 var ace_range = ace.require('ace/range');
 var MultiSelect = require('libresignage/ui/components/MultiSelect');
 var StrValidator = require('libresignage/ui/validator/StrValidator');
@@ -86,7 +84,7 @@ class EditorView extends BaseView {
 		// Define UI element controllers for the editor.
 		this.inputs = new UIController({
 			name: new UIInput({
-				elem: $('#slide-name'),
+				elem: document.querySelector('#slide-name'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -101,7 +99,7 @@ class EditorView extends BaseView {
 				clearer: e => e.val('')
 			}),
 			owner: new UIInput({
-				elem: $('#slide-owner'),
+				elem: document.querySelector('#slide-owner'),
 				cond: () => false,
 				enabler: null,
 				attach: null,
@@ -147,7 +145,7 @@ class EditorView extends BaseView {
 				clearer: e => e.set([])
 			}),
 			duration: new UIInput({
-				elem: $('#slide-duration'),
+				elem: document.querySelector('#slide-duration'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -162,7 +160,7 @@ class EditorView extends BaseView {
 				clearer: e => e.val('')
 			}),
 			index: new UIInput({
-				elem: $('#slide-index'),
+				elem: document.querySelector('#slide-index'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -177,7 +175,7 @@ class EditorView extends BaseView {
 				clearer: e => e.val('')
 			}),
 			animation: new UIInput({
-				elem: $('#slide-animation'),
+				elem: document.querySelector('#slide-animation'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -192,7 +190,7 @@ class EditorView extends BaseView {
 				clearer: e => e.val('')
 			}),
 			schedule_enable: new UIInput({
-				elem: $('#slide-schedule-enable'),
+				elem: document.querySelector('#slide-schedule-enable'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -207,7 +205,7 @@ class EditorView extends BaseView {
 				clearer: e => e.prop('checked', false)
 			}),
 			schedule_date_start: new UIInput({
-				elem: $('#slide-sched-date-s'),
+				elem: document.querySelector('#slide-sched-date-s'),
 				cond: d => (
 					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
@@ -225,7 +223,7 @@ class EditorView extends BaseView {
 				clearer: e => e.val('')
 			}),
 			schedule_time_start: new UIInput({
-				elem: $('#slide-sched-time-s'),
+				elem: document.querySelector('#slide-sched-time-s'),
 				cond: d => (
 					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
@@ -243,7 +241,7 @@ class EditorView extends BaseView {
 				clearer: e => e.val('')
 			}),
 			schedule_date_end: new UIInput({
-				elem: $('#slide-sched-date-e'),
+				elem: document.querySelector('#slide-sched-date-e'),
 				cond: d => (
 					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
@@ -261,7 +259,7 @@ class EditorView extends BaseView {
 				clearer: e => e.val('')
 			}),
 			schedule_time_end: new UIInput({
-				elem: $('#slide-sched-time-e'),
+				elem: document.querySelector('#slide-sched-time-e'),
 				cond: d => (
 					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
@@ -279,7 +277,7 @@ class EditorView extends BaseView {
 				clearer: e => e.val('')
 			}),
 			editor: new UIInput({
-				elem: $('#slide-input'),
+				elem: document.querySelector('#slide-input'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -300,7 +298,7 @@ class EditorView extends BaseView {
 				}
 			}),
 			enable: new UIInput({
-				elem: $('#slide-enable'),
+				elem: document.querySelector('#slide-enable'),
 				cond: d => (
 					!this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
@@ -318,7 +316,7 @@ class EditorView extends BaseView {
 		});
 		this.statics = new UIController({
 			label_readonly: new UIStatic({
-				elem: $('#slide-label-readonly'),
+				elem: document.querySelector('#slide-label-readonly'),
 				cond: d => (
 					d.slide.loaded
 					&& !d.slide.locked
@@ -332,7 +330,7 @@ class EditorView extends BaseView {
 				setter: null
 			}),
 			label_edited: new UIStatic({
-				elem: $('#slide-label-edited'),
+				elem: document.querySelector('#slide-label-edited'),
 				cond: d => (
 					d.slide.loaded
 					&& !d.slide.locked
@@ -345,7 +343,7 @@ class EditorView extends BaseView {
 				setter: null
 			}),
 			label_collaborate: new UIStatic({
-				elem: $('#slide-label-collaborate'),
+				elem: document.querySelector('#slide-label-collaborate'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -358,7 +356,7 @@ class EditorView extends BaseView {
 				setter: null
 			}),
 			label_no_quota: new UIStatic({
-				elem: $('#slide-label-no-quota'),
+				elem: document.querySelector('#slide-label-no-quota'),
 				cond: d => !d.quota.slides,
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
@@ -367,7 +365,7 @@ class EditorView extends BaseView {
 				setter: null
 			}),
 			label_editor_error: new UIStatic({
-				elem: $('#slide-label-editor-error'),
+				elem: document.querySelector('#slide-label-editor-error'),
 				cond: () => true,
 				enabler: (e, s) => s ? e.show() : e.hide(),
 				attach: null,
@@ -378,7 +376,7 @@ class EditorView extends BaseView {
 		});
 		this.buttons = new UIController({
 			timeline: new UIStatic({
-				elem: $('#timeline'),
+				elem: document.querySelector('#timeline'),
 				cond: () => true,
 				enabler: null,
 				attach: {
@@ -400,7 +398,7 @@ class EditorView extends BaseView {
 				setter: null
 			}),
 			queueselector: new UIStatic({
-				elem: $('#queueselector'),
+				elem: document.querySelector('#queueselector'),
 				cond: () => true,
 				enabler: null,
 				attach: {
@@ -452,7 +450,7 @@ class EditorView extends BaseView {
 				setter: null
 			}),
 			new: new UIButton({
-				elem: $('#btn-slide-new'),
+				elem: document.querySelector('#btn-slide-new'),
 				cond: d => (
 					d.quota.slides
 					&& d.queue.loaded
@@ -468,7 +466,7 @@ class EditorView extends BaseView {
 				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			save: new UIButton({
-				elem: $('#btn-slide-save'),
+				elem: document.querySelector('#btn-slide-save'),
 				cond: d => (
 					this.validators.get_state()
 					&& (
@@ -499,7 +497,7 @@ class EditorView extends BaseView {
 				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			duplicate: new UIButton({
-				elem: $('#btn-slide-duplicate'),
+				elem: document.querySelector('#btn-slide-duplicate'),
 				cond: d => (
 					d.quota.slides
 					&& d.slide.loaded
@@ -517,7 +515,7 @@ class EditorView extends BaseView {
 				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			preview: new UIButton({
-				elem: $('#btn-slide-preview'),
+				elem: document.querySelector('#btn-slide-preview'),
 				cond: d => d.slide.loaded,
 				enabler: null,
 				attach: {
@@ -526,7 +524,7 @@ class EditorView extends BaseView {
 				defer: () => !this.state('ready')
 			}),
 			move: new UIButton({
-				elem: $('#btn-slide-move'),
+				elem: document.querySelector('#btn-slide-move'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -557,7 +555,7 @@ class EditorView extends BaseView {
 				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			remove: new UIButton({
-				elem: $('#btn-slide-remove'),
+				elem: document.querySelector('#btn-slide-remove'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -576,7 +574,7 @@ class EditorView extends BaseView {
 				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			quick_help: new UIButton({
-				elem: $('#btn-quick-help'),
+				elem: document.querySelector('#btn-quick-help'),
 				cond: d => true,
 				enabler: null,
 				attach: {
@@ -585,7 +583,7 @@ class EditorView extends BaseView {
 				defer: () => !this.state('ready')
 			}),
 			add_media: new UIButton({
-				elem: $('#btn-add-media'),
+				elem: document.querySelector('#btn-add-media'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -602,7 +600,7 @@ class EditorView extends BaseView {
 				defer: () => !this.state('ready')
 			}),
 			preview_16x9: new UIButton({
-				elem: $('#btn-preview-ratio-16x9'),
+				elem: document.querySelector('#btn-preview-ratio-16x9'),
 				cond: () => this.preview.get_ratio() !== '16x9',
 				enabler: null,
 				attach: {
@@ -611,7 +609,7 @@ class EditorView extends BaseView {
 				defer: () => !this.state('ready')
 			}),
 			preview_4x3: new UIButton({
-				elem: $('#btn-preview-ratio-4x3'),
+				elem: document.querySelector('#btn-preview-ratio-4x3'),
 				cond: () => this.preview.get_ratio() !== '4x3',
 				enabler: null,
 				attach: {
@@ -682,22 +680,22 @@ class EditorView extends BaseView {
 		await this.preview.init();
 
 		// Slide remove DropConfirm.
-		this.remove = new DropConfirm($('#btn-slide-remove')[0]);
+		this.remove = new DropConfirm(document.querySelector('#btn-slide-remove'));
 		this.remove.set_button_html('<i class="fas fa-trash-alt"></i>');
 		this.remove.set_content_html('Remove slide?');
 
 		// Slide move DropSelect.
-		this.move = new DropSelect($('#btn-slide-move')[0]);
+		this.move = new DropSelect(document.querySelector('#btn-slide-move'));
 		this.move.set_button_html(
 			'<i class="fas fa-arrow-circle-right"></i>'
 		);
 
 		// Quick help popup.
-		this.quick_help = new Popup($('#quick-help')[0]);
+		this.quick_help = new Popup(document.querySelector('#quick-help'));
 
 		// Asset uploader popup.
 		this.asset_uploader = new AssetUploader(
-			$('#asset-uploader')[0],
+			document.querySelector('#asset-uploader'),
 			this.api
 		);
 
