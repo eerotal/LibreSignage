@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	try {
 		await API.init();
 	} catch (e) {
-		APIUI.handle_error(e);
+		new APIErrorDialog(e);
 		return;
 	}
 

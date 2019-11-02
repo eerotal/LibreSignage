@@ -2,7 +2,7 @@
 * @file Entry point for the Login page.
 */
 
-var APIUI = require('ls-api-ui');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 
 var APIInterface = require('libresignage/api/APIInterface');
 var LoginView = require('./LoginView.js');
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	try {
 		await API.init();
 	} catch (e) {
-		APIUI.handle_error(e);
+		new APIErrorDialog(e);
 		return;
 	}
 

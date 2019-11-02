@@ -3,7 +3,7 @@
 */
 
 var bootstrap = require('bootstrap');
-var APIUI = require('ls-api-ui');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 
 var LoginController = require('./LoginController');
 var Util = require('libresignage/util/Util');
@@ -123,7 +123,7 @@ class LoginView {
 					window.location.assign(`/login?${Util.querify(query)}`);
 					return;
 				} else {
-					APIUI.handle_error(e);
+					new APIErrorDialog(e);
 					return;
 				}
 			} else {
