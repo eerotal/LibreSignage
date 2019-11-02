@@ -29,8 +29,6 @@ class DisplayView extends BaseView {
 		let query = Util.get_GET_parameters();
 
 		this.controller = new DisplayController(api);
-		this.slide_buffer = [];
-		this.markup_buffer = [];
 		this.queue = null;
 		this.slide = null;
 
