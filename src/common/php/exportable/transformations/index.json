@@ -1,0 +1,6 @@
+{
+	"1.0.*": {
+		"to": "1.1.*",
+		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_1_0\\QueueTransformation"
+	}
+}

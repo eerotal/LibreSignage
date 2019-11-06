@@ -6,11 +6,10 @@
 * example.
 */
 
-namespace libresignage\common\php;
+namespace libresignage\common\php\exportable;
 
 use libresignage\common\php\Util;
-
-final class ExportableException extends \Exception {}
+use libresignage\common\php\JSONUtils;
 
 abstract class Exportable {
 	const EXP_CLASSNAME  = '__classname';
@@ -146,6 +145,26 @@ abstract class Exportable {
 		return $ret;
 	}
 
+	/**
+	* Import Exportable data from file.
+	*
+	* @param string $path The path of the file to read.
+	* @param bool   $lock If true, lock the file before reading.
+	*/
+	public function fimport(string $path, bool $lock = TRUE) {
+		$tmp = Util::file_lock_and_get($path);
+		$decoded = JSONUtils::decode($tmp, $assoc=TRUE);
+
+		$t = new ExportableTransformation($data, $path);
+		
+		// Transform data and write it back to the file if needed.
+		if ($t->transform()) {
+			Util::file_lock_and_put(JSONUtils::encode($decoded));
+		}
+
+		$this->import($decoded, TRUE);
+	}
+	
 	/**
 	* Import object data from an array previously exported by
 	* Exportable::export(). This function restores the proper
