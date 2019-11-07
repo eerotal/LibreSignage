@@ -1,32 +1,33 @@
 <?php
 
-namespace libresignage\common\php\exportable\transformations\v1_1_0
-;
+namespace libresignage\common\php\exportable\transformations\v1_1_0;
 
 use libresignage\common\php\Util;
 use libresignage\common\php\Config;
-use libresignage\common\php\exportable\ExportableTransformationInterface;
+use libresignage\common\php\exportable\transformations\TransformationInterface;
 
 /**
 * Queue data transformation from 1.0.0 to 1.1.0.
 */
-final class QueueTransformation implements ExportableTransformationInterface {
-	public function classname(): string {
+final class QueueTransformation implements TransformationInterface {
+	public static function classname(): string {
 		return 'libresignage\common\php\queue\Queue';
 	}
 
-	public function version(): string {
+	public static function from_version(): string {
 		return '1.0.*';
 	}
 
-	public function transform($data) {
-		$ret = clone $data;
+	public static function to_version(): string {
+		return '1.1.0';
+	}
 
+	public static function transform(array &$data) {
 		// rename: slide_ids -> slides
-		$ret['slide_ids'] = $ret['slides'];
-		unset($ret['slides']);
+		$data['slide_ids'] = $data['slides'];
+		unset($data['slides']);
 
 		// new: name
-		$ret['name'] = Util::get_uid(Config::config('QUEUE_NAME_MAX_LEN'));
+		$data['name'] = Util::get_uid(Config::limit('QUEUE_NAME_MAX_LEN'));
 	}
 }
