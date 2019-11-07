@@ -6,7 +6,7 @@ use libresignage\common\php\Config;
 use libresignage\common\php\Util;
 use libresignage\common\php\slide\Slide;
 use libresignage\common\php\auth\User;
-use libresignage\common\php\Exportable;
+use libresignage\common\php\exportable\Exportable;
 use libresignage\common\php\JSONUtils;
 use libresignage\common\php\exceptions\JSONException;
 use libresignage\common\php\exceptions\ArgException;
@@ -44,6 +44,13 @@ final class Queue extends Exportable {
 		return $this->{$name};
 	}
 
+	public function __exportable_version(): string {
+		return implode(
+			'.',
+			Util::parse_version_string(Config::config('LS_VER'))
+		);
+	}
+	
 	/*
 	* Load a queue from file.
 	*
@@ -56,9 +63,7 @@ final class Queue extends Exportable {
 			throw new QueueNotFoundException("Queue '{$name}' doesn't exist.");
 		}
 
-		$json = Util::file_lock_and_get(self::get_path($name));
-		$this->import(JSONUtils::decode($json, $assoc=TRUE));
-
+		$this->fimport(self::get_path($name));
 		$this->load_slide_objects();
 	}
 

@@ -1,6 +1,62 @@
-{
-	"1.0.*": {
-		"to": "1.1.*",
-		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_1_0\\QueueTransformation"
+[
+	{
+		"from": "0.0.*",
+		"to": "1.1.0",
+		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\QueueTransformation",
+		"data_fqcn": "libresignage\\common\\php\\queue\\Queue"
+	},
+	{
+		"from": "0.0.*",
+		"to": "1.1.0",
+		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SessionTransformation",
+		"data_fqcn": "libresignage\\common\\php\\auth\\Session"
+	},
+	{
+		"from": "0.0.*",
+		"to": "1.1.0",
+		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideAssetTransformation",
+		"data_fqcn": "libresignage\\common\\php\\slide\\SlideAsset"
+	},
+	{
+		"from": "0.0.*",
+		"to": "1.1.0",
+		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideLockTransformation",
+		"data_fqcn": "libresignage\\common\\php\\slide\\SlideLock"
+	},
+	{
+		"from": "0.0.*",
+		"to": "1.1.0",
+		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideTransformation",
+		"data_fqcn": "libresignage\\common\\php\\slide\\Slide"
+	},
+	{
+		"from": "0.0.*",
+		"to": "1.1.0",
+		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideTransformation",
+		"data_fqcn": "libresignage\\common\\php\\slide\\Slide"
+	},
+	{
+		"from": "0.0.*",
+		"to": "1.1.0",
+		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideTransformation",
+		"data_fqcn": "libresignage\\common\\php\\slide\\Slide"
+	},
+	{
+		"from": "0.0.*",
+		"to": "1.1.0",
+		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\UserQuotaTransformation",
+		"data_fqcn": "libresignage\\common\\php\\auth\\UserQuota"
+	},
+	{
+		"from": "0.0.*",
+		"to": "1.1.0",
+		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideTransformation",
+		"data_fqcn": "libresignage\\common\\php\\slide\\Slide"
+	},
+	{
+		"from": "0.0.*",
+		"to": "1.1.0",
+		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\UserTransformation",
+		"data_fqcn": "libresignage\\common\\php\\auth\\User"
 	}
-}
+]

@@ -4,7 +4,7 @@ namespace libresignage\common\php\slide;
 
 use libresignage\common\php\Util;
 use libresignage\common\php\Config;
-use libresignage\common\php\Exportable;
+use libresignage\common\php\exportable\Exportable;
 use libresignage\common\php\slide\Slide;
 use libresignage\common\php\thumbnail\Thumbnail;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -45,6 +45,13 @@ final class SlideAsset extends Exportable {
 
 	public function __exportable_set(string $name, $value) {
 		$this->{$name} = $value;
+	}
+
+	public function __exportable_version(): string {
+		return implode(
+			'.',
+			Util::parse_version_string(Config::config('LS_VER'))
+		);
 	}
 
 	/**

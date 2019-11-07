@@ -34,29 +34,33 @@ final class TransformationIndex {
 		}
 
 		$tmp = Util::file_lock_and_get($file);
-		foreach (JSONUtils::decode($tmp, $assoc=TRUE) as $from => $data) {
-			$index[$from] = new TransformationIndexEntry(
-				$from,
+		
+		$index = [];
+		foreach (JSONUtils::decode($tmp, $assoc=TRUE) as $data) {
+			array_push($index, new TransformationIndexEntry(
+				$data['from'],
 				$data['to'],
-				$data['fqcn']
-			);
+				$data['fqcn'],
+				$data['data_fqcn']
+			));
 		}
 		self::sort_index($index);
-
+		
 		$this->index = $index;
 	}
 
 	/**
-	* Get a transformation index entry for a data version.
+	* Get a transformation index entry for a data version for a class.
 	*
+	* @param string $fqcn The fully-qualified classname.
 	* @param string $from The origin version.
 	*
 	* @return TransformationIndexEntry|NULL The corresponding entry or NULL
 	*                                       if not found.
 	*/
-	public function get(string $from) {
-		foreach ($this->index as $key => $t) {
-			if ($t->transforms($from)) {
+	public function get(string $fqcn, string $from) {
+		foreach ($this->index as $t) {
+			if ($t->transforms($fqcn, $from)) {
 				return $t;
 			}
 		}

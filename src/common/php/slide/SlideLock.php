@@ -3,7 +3,7 @@
 namespace libresignage\common\php\slide;
 
 use libresignage\common\php\Config;
-use libresignage\common\php\Exportable;
+use libresignage\common\php\exportable\Exportable;
 use libresignage\common\php\auth\Session;
 
 /**
@@ -35,6 +35,13 @@ final class SlideLock extends Exportable {
 
 	public function __exportable_get(string $name) {
 		return $this->{$name};
+	}
+
+	public function __exportable_version(): string {
+		return implode(
+			'.',
+			Util::parse_version_string(Config::config('LS_VER'))
+		);
 	}
 
 	/**

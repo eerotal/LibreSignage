@@ -11,30 +11,37 @@ final class TransformationIndexEntry {
 	/**
 	* Construct a new TransformationIndexEntry.
 	*
-	* @param string $from The origin version string.
-	* @param string $to   The result version string.
-	* @param string $fqcn The fully-qualified classname of the transformation.
+	* @param string $from      The origin version string.
+	* @param string $to        The result version string.
+	* @param string $fqcn      The fully-qualified classname of the
+	*                          transformation class.
+	* @param string $data_fqcn The fully-qualified classname of the data class.
 	*/
 	public function __construct(
 		string $from,
 		string $to,
-		string $fqcn
+		string $fqcn,
+		string $data_fqcn
 	) {
 		$this->from = $from;
 		$this->to = $to;
 		$this->fqcn = $fqcn;
+		$this->data_fqcn = $data_fqcn;
 	}
 
 	/**
-	* Test whether a TransformationIndexEntry transforms data from
+	* Test whether a TransformationIndexEntry transforms data of a class from
 	* a specific version to a newer one.
 	*
+	* @param string $fqcn The fully-qualified classname of the data class.
 	* @param string $from The origin version to test for.
 	*
 	* @return bool TRUE if the TransformationIndexEntry transforms data from
 	*              the requested version, FALSE otherwise.
 	*/
-	public function transforms(string $from): bool {
+	public function transforms(string $fqcn, string $from): bool {
+		if ($this->data_fqcn !== $fqcn) { return FALSE; }
+
 		$a = explode(".", $from);
 		$b = explode(".", $this->from);
 

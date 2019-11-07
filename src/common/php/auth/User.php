@@ -10,7 +10,7 @@ use libresignage\common\php\JSONUtils;
 use libresignage\common\php\auth\Session;
 use libresignage\common\php\auth\UserQuota;
 use libresignage\common\php\auth\exceptions\UserNotFoundException;
-use libresignage\common\php\Exportable;
+use libresignage\common\php\exportable\Exportable;
 use libresignage\common\php\exceptions\IntException;
 use libresignage\common\php\exceptions\ArgException;
 use libresignage\common\php\exceptions\LimitException;
@@ -50,6 +50,13 @@ final class User extends Exportable {
 
 	public function __exportable_get(string $name) {
 		return $this->{$name};
+	}
+
+	public function __exportable_version(): string {
+		return implode(
+			'.',
+			Util::parse_version_string(Config::config('LS_VER'))
+		);
 	}
 
 	/**

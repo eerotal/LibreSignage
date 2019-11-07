@@ -8,13 +8,19 @@
 
 namespace libresignage\common\php\exportable;
 
+use libresignage\common\php\exportable\exceptions\ExportableException;
 use libresignage\common\php\Util;
 use libresignage\common\php\JSONUtils;
 
 abstract class Exportable {
 	const EXP_CLASSNAME  = '__classname';
 	const EXP_VISIBILITY = '__visibility';
-	const EXP_RESERVED   = [self::EXP_CLASSNAME, self::EXP_VISIBILITY];
+	const EXP_VERSION = '__version';
+	const EXP_RESERVED = [
+		self::EXP_CLASSNAME,
+		self::EXP_VISIBILITY,
+		self::EXP_VERSION
+	];
 
 	/**
 	* Setter function which must be implemented in classes extending
@@ -41,6 +47,14 @@ abstract class Exportable {
 	*/
 	public abstract function __exportable_get(string $name);
 
+
+	/**
+	* Return the version of the data format of an Exportable.
+	*
+	* @return string The data version.
+	*/
+	public abstract function __exportable_version(): string;
+	
 	/**
 	* Recursively export all object keys declared in static::$PUBLIC
 	* or static::$PRIVATE depending on the value of $private. If
@@ -74,6 +88,7 @@ abstract class Exportable {
 		if ($meta) { // Add metadata.
 			$ret[self::EXP_CLASSNAME] = get_class($this);
 			$ret[self::EXP_VISIBILITY] = $private ? 'private' : 'public';
+			$ret[self::EXP_VERSION] = $this->__exportable_version();
 		}
 
 		foreach ($keys as $k) {
@@ -109,7 +124,12 @@ abstract class Exportable {
 	* @throws ExportableException if $obj doesn't extend Exportable.
 	*/
 	private function exp_obj($obj, bool $private, bool $meta): array {
-		if (is_subclass_of($obj, 'libresignage\\common\\php\\Exportable')) {
+		if (
+			is_subclass_of(
+				$obj,
+				'libresignage\\common\\php\\exportable\\Exportable'
+			)
+		) {
 			return $obj->export($private, $meta);
 		} else {
 			throw new ExportableException(
@@ -148,41 +168,70 @@ abstract class Exportable {
 	/**
 	* Import Exportable data from file.
 	*
+	* If any data transformation is needed to use the data, the
+	* transformed data is automatically written back to the original file.
+	*
 	* @param string $path The path of the file to read.
-	* @param bool   $lock If true, lock the file before reading.
 	*/
-	public function fimport(string $path, bool $lock = TRUE) {
+	public function fimport(string $path) {
 		$tmp = Util::file_lock_and_get($path);
 		$decoded = JSONUtils::decode($tmp, $assoc=TRUE);
 
-		$t = new ExportableTransformation($data, $path);
-		
-		// Transform data and write it back to the file if needed.
-		if ($t->transform()) {
-			Util::file_lock_and_put(JSONUtils::encode($decoded));
-		}
+		$ret = $this->import($decoded, TRUE);
 
-		$this->import($decoded, TRUE);
+		// Write transformed data back to file.
+		if ($ret != NULL) {
+			Util::file_lock_and_put(JSONUtils::encode($ret));
+		}
 	}
 	
 	/**
 	* Import object data from an array previously exported by
-	* Exportable::export(). This function restores the proper
-	* object types if metadata exporting was used when the data
-	* was exported. If $check_keys is TRUE, the imported keys
-	* are checked against the expected keys in either
-	* static::$PUBLIC or static::$PRIVATE depending on which one
-	* was used when exporting. Note that this also only works if
-	* metadata was originally exported.
+	* Exportable::export().
 	*
-	* @param array $data       The data to import.
-	* @param bool  $check_keys If TRUE, check that the imported keys
-	*                          match the original ones.
+	* First this function attempts to convert data into a new format if
+	* the data is in an old format. This is only done if metadata is
+	* included in the supplied data.
+	*
+	* After data transformation, this function recreates the objects from the
+	* supplied data. If metadata is included in the data, the proper object
+	* types are also reconstructed. If $check_keys is TRUE, the imported
+	* keys are checked against the expected keys in either static::$PUBLIC
+	* or static::$PRIVATE depending on which one was used when exporting.
+	* Note that this also only works if metadata was originally exported.
+	*
+	* @param array  $data       The data to import.
+	* @param bool   $check_keys If TRUE, check that the imported keys
+	*                           match the original ones.
+	*
+	* @return array|NULL If data was transformed, the transformed data is
+	*                    returned. Otherwise NULL is returned.
 	*/
 	public function import(array $data, bool $check_keys = FALSE) {
+		$transformed = NULL;
+
+		if (
+			Util::array_is_subset(
+				[
+					Exportable::EXP_CLASSNAME,
+					Exportable::EXP_VISIBILITY
+				],
+				array_keys($data)
+			)
+		) {
+			$p = new ExportableTransformationPath(
+				$data,
+				$this->__exportable_version()
+			);
+			$transformed = $p->transform();
+			if ($transformed != NULL) { $data = $transformed; }
+		}
+		
 		foreach ($this->imp_array($data, TRUE, $check_keys) as $k => $v) {
 			$this->__exportable_set($k, $v);
 		}
+
+		return $transformed;
 	}
 
 	/**
@@ -200,8 +249,13 @@ abstract class Exportable {
 	private function imp_array(array $arr, bool $root, bool $check_keys) {
 		if (
 			$check_keys
-			&& array_key_exists(self::EXP_VISIBILITY, $arr)
-			&& array_key_exists(self::EXP_CLASSNAME, $arr)
+			&& Util::array_is_subset(
+				[
+					Exportable::EXP_CLASSNAME,
+					Exportable::EXP_VISIBILITY
+				],
+				array_keys($arr)
+			)
 		) {
 			// Check that the keys in $arr match the expected ones.
 			$keys = [];

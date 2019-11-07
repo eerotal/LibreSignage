@@ -2,10 +2,12 @@
 
 namespace libresignage\common\php\exportable;
 
+use libresignage\common\php\exportable\Exportable;
 use libresignage\common\php\exportable\transformations\TransformationIndex;
 use libresignage\common\php\exportable\exceptions\ExportableTransformationException;
 use libresignage\common\php\Log;
 use libresignage\common\php\Config;
+use libresignage\common\php\Util;
 
 /**
 * A class for creating transformations from one data format
@@ -19,26 +21,25 @@ final class ExportableTransformationPath {
 	* Construct a new ExportableTransformationPath.
 	*
 	* @param &array $data A reference to the data to transform.
-	* @param string $path The original filepath of the data. This
-	*                     is only used for logging.
 	* @param string $to   The version to convert the data to.
 	*
 	* @throws ExportableTransformationException If no transformation path
 	*                                           from $from to $to exists.
 	*
 	*/
-	public function __construct(&$data, string $filepath, string $to) {
+	public function __construct(&$data, string $to) {
 		assert(
-			array_key_exists(self::EXP_CLASSNAME),
-			"Metadata required when performing transformations."
-		);
-		assert(
-			array_key_exists(self::EXP_VISIBILITY),
-			"Metadata required when performing transformations."
+			Util::array_is_subset(
+				[
+					Exportable::EXP_CLASSNAME,
+					Exportable::EXP_VISIBILITY
+				],
+				array_keys($data)
+			),
+			'Metadata required when performing transformations.'
 		);
 
 		$this->data = $data;
-		$this->filepath = $filepath;
 		$this->path = [];
 
 		$this->index = new TransformationIndex();
@@ -55,8 +56,8 @@ final class ExportableTransformationPath {
 	*/
 	public function build_path(string $to) {
 		// Get origin version from $this->data.
-		if (\array_key_exists('version', $this->data)) {
-			$from = $this->data['version'];
+		if (\array_key_exists(Exportable::EXP_VERSION, $this->data)) {
+			$from = $this->data[Exportable::EXP_VERSION];
 		} else {
 			$from = self::FALLBACK_ORIGIN_VERSION;
 		}
@@ -64,10 +65,14 @@ final class ExportableTransformationPath {
 		$t = NULL;
 		$ver = $from;
 		while ($ver !== $to) {
-			$t = $this->index->get($ver);
+			$t = $this->index->get(
+				$this->data[Exportable::EXP_CLASSNAME],
+				$ver
+			);
 			if ($t === NULL) {
 				throw new ExportableTransformationException(
-					"No transformation path exists from '$from' to '$to'."
+					"No transformation path exists from '$from' to '$to' ".
+					"for class '{$this->data[Exportable::EXP_CLASSNAME]}'."
 				);
 			}
 			$ver = $t->get_result_version();
@@ -78,16 +83,22 @@ final class ExportableTransformationPath {
 	/**
 	* Perform a transformation.
 	*
-	* @return array The transformed data.
+	* @return array|NULL The transformed data or NULL if no transformation
+	*                    took place.
 	*/
 	public function transform() {
 		if (count($this->path)) {
-			Log::logs("Transforming data from '$this->filepath'.", Log::LOGDEF);
 			foreach ($this->path as $t) {
 				($t->get_fqcn())::transform($this->data);
+
+				// Update version field in data.
+				$this->data[
+					Exportable::EXP_VERSION
+				] = ($t->get_fqcn())::to_version();
 			}
 			return $this->data;
+		} else {
+			return NULL;
 		}
-		Log::logs("Data transformed for '$this->filepath'.", Log::LOGDEF);
 	}
 }

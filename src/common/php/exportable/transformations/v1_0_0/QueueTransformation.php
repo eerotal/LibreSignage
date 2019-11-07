@@ -1,6 +1,6 @@
 <?php
 
-namespace libresignage\common\php\exportable\transformations\v1_1_0;
+namespace libresignage\common\php\exportable\transformations\v1_0_0;
 
 use libresignage\common\php\Util;
 use libresignage\common\php\Config;
@@ -15,7 +15,11 @@ final class QueueTransformation implements TransformationInterface {
 	}
 
 	public static function from_version(): string {
-		return '1.0.*';
+		/*
+		* Use the fallback 0.0.0 because v1.0.0
+		* didn't include versions in data.
+		*/
+		return '0.0.0';
 	}
 
 	public static function to_version(): string {
