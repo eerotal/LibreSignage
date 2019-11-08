@@ -1,0 +1,61 @@
+#
+# Utility functions and targets for LibreSignage makefiles.
+#
+
+# Print a status message.
+#
+# $(1) = The program doing the work. (cp, rm, etc.)
+# $(2) = The source file.
+# $(3) = The destination file.
+VERBOSE ?= Y
+status = \
+	if [ "`printf '$(VERBOSE)'|cut -c1|sed 's/\n//g'|\
+		tr '[:upper:]' '[:lower:]'`" = "y" ]; then \
+		printf "$(1): $(2) >> $(3)\n"|tr -s ' '|sed 's/^ *$///g'; \
+	fi
+
+# Recursively create the directory path for a file.
+#
+# $(1) = The filepath to use.
+makedir = mkdir -p $(dir $(1))
+
+# Print the initialization check info/warning.
+#
+# $(1) = The status code of the initialization checks.
+INITCHK_WARN ?= N
+initchk_warn =\
+	if [ ! "$(1)" = "0" ]; then\
+		case "$(INITCHK_WARN)" in \
+			[nN]*)\
+				echo "[Info] To continue anyway, pass INITCHK_WARN=Y to make.";\
+				exit 1;\
+				;;\
+			*)\
+				echo "[Warning] Continuing anyway. You're on your own.";\
+				;;\
+		esac;\
+	fi
+
+# Install deps from Composer.
+vendor:
+	@:
+	set -e
+	composer install
+
+# Install deps from NPM.
+node_modules:
+	@:
+	set -e
+	npm install
+
+# Dump production autoload files.
+composer-prod-autoload: vendor
+	@:
+	echo "[Info] Dump production autoload."
+	composer dump-autoload --no-ansi --no-dev --optimize
+
+# Dump development composer autoload files.
+composer-dev-autoload: vendor
+	@:
+	echo "[Info] Dump development autoload."
+	composer dump-autoload --no-ansi

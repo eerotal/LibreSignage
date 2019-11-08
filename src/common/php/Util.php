@@ -40,6 +40,26 @@ final class Util {
 	}
 
 	/**
+	* Recursively scan a directory for files.
+	*
+	* @param string $dir The directory to scan.
+	*
+	* @return array An array of filepaths.
+	*/
+	static function scandir_recursive(string $dir): array {
+		$ret = [];
+		$files = array_diff(scandir($dir), ['.', '..']);
+		foreach ($files as $f) {
+			if (is_dir($dir.'/'.$f)) {
+				$ret = array_merge($ret, self::scandir_recursive($dir.'/'.$f));
+			} else if (is_file($dir.'/'.$f)) {
+				array_push($ret, $dir.'/'.$f);
+			}
+		}
+		return $ret;
+	}
+
+	/**
 	* Check if array $a has the same values as array $b. Returns
 	* TRUE if $a is equal to $b and FALSE otherwise.
 	*

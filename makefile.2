@@ -1,0 +1,218 @@
+#
+# LibreSignage stage 2 makefile
+#
+
+include makefile.common
+
+# Note: This makefile assumes that $(ROOT) always has a trailing
+# slash. (which is the case when using the makefile $(dir ...)
+# function) Do not use the shell dirname command here as that WILL
+# break things since it doesn't add the trailing slash to the path.
+ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+
+SASS_DEP := build/scripts/sassdep.py
+SASS_IPATHS := $(ROOT) $(ROOT)src/common/css $(ROOT)/src/node_modules
+SASS_FLAGS := --no-source-map $(addprefix -I,$(SASS_IPATHS))
+
+COMPOSER_DEP := build/scripts/composer_prod_deps.sh
+COMPOSER_DEP_FLAGS := --self
+
+POSTCSS_FLAGS := --config postcss.config.js --replace --no-map
+
+PHPUNIT_API_HOST ?= http://localhost:80
+PHPUNIT_CONFIG := tests/phpunit.xml
+PHPUNIT_FLAGS := -c "$(PHPUNIT_CONFIG)" --testdox --color=auto
+
+# Production PHP libraries.
+PHP_LIBS := $(shell find $(addprefix vendor/,\
+	$(shell "./$(COMPOSER_DEP)" "$(COMPOSER_DEP_FLAGS)"|cut -d' ' -f1)\
+) -type f)
+
+# Production JavaScript libraries.
+JS_LIBS := $(filter-out \
+	$(shell printf "$(ROOT)\n"|sed 's:/$$::g'), \
+	$(shell npm ls --prod --parseable|sed 's/\n/ /g') \
+)
+
+# Non-compiled files.
+SRC_FILES := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o \( \
+		-type f ! -name '*.swp' \
+		-a -type f ! -name '*.save' \
+		-a -type f ! -name '.\#*' \
+		-a -type f ! -name '\#*\#*' \
+		-a -type f ! -name '*~' \
+		-a -type f ! -name '*.js' \
+		-a -type f ! -name '*.scss' \
+		-a -type f ! -name '*.rst' -print \
+	\) \
+)
+
+# RST sources.
+SRC_RST := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o -type f -name '*.rst' -print \
+) README.rst CONTRIBUTING.rst AUTHORS.rst
+
+# SCSS sources.
+SRC_SCSS := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o -type f -name '*.scss' -a ! -name '_*' -print \
+)
+
+# JavaScript sources.
+SRC_JS := $(shell find src \
+	\( -type f -path 'src/node_modules/*' -prune \) \
+	-o \( -type f -name 'main.js' -print \) \
+)
+
+# Generated PNG logo paths.
+GENERATED_LOGOS := $(addprefix \
+	dist/public/assets/images/logo/libresignage_,\
+	16x16.png \
+	32x32.png \
+	96x96.png \
+	text_466x100.png \
+	text_inverted_466x100.png\
+)
+
+.PHONY: files js css config libs docs htmldocs
+
+.ONESHELL:
+
+all:: files docs htmldocs js css js_libs php_libs logo composer-prod-autoload; @:
+files:: $(subst src,dist,$(SRC_NO_COMPILE)); @:
+js:: $(subst src,dist/public,$(SRC_JS)); @:
+docs:: $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))); @:
+htmldocs:: $(addprefix dist/public/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
+css:: $(subst src,dist/public,$(SRC_SCSS:.scss=.css)); @:
+js_libs:: $(subst $(ROOT)node_modules/,dist/public/libs/,$(JS_LIBS)); @:
+php_libs:: $(subst vendor/,dist/vendor/,$(PHP_LIBS)); @:
+logo:: $(GENERATED_LOGOS); @:
+
+# Copy over non-compiled, non-PHP sources.
+$(filter-out %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
+	@:
+	set -e
+	$(call status,cp,$<,$@)
+	$(call makedir,$@)
+	cp -p $< $@
+
+# Copy over PHP files and check the syntax.
+$(filter %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
+	@:
+	set -e
+	$(call status,cp,$<,$@)
+	$(call makedir,$@)
+	cp -p $< $@
+	php -l $@ > /dev/null
+
+# Copy Composer libraries to dist/vendor/.
+dist/vendor/%:: vendor/%
+	@:
+	set -e
+	$(call status,cp,$<,$@)
+	mkdir -p $$(dirname $@)
+	cp -Rp $< $@
+
+# Copy over RST sources. Try to find prerequisites from
+# 'src/doc/rst/' first and then fall back to './'.
+dist/doc/rst/%.rst:: src/doc/rst/%.rst
+	@:
+	set -e
+	$(call status,cp,$<,$@)
+	$(call makedir,$@)
+	cp -p $< $@
+
+dist/doc/rst/%.rst:: %.rst
+	@:
+	set -e
+	$(call status,cp,$<,$@)
+	$(call makedir,$@)
+	cp -p $< $@
+
+# Compile RST sources into HTML. Try to find prerequisites
+# from 'src/doc/rst/' first and then fall back to './'.
+dist/public/doc/html/%.html:: src/doc/rst/%.rst
+	@:
+	set -e
+	$(call status,pandoc,$<,$@)
+	$(call makedir,$@)
+	pandoc -o $@ -f rst -t html $<
+
+dist/public/doc/html/%.html:: %.rst
+	@:
+	set -e
+	$(call status,pandoc,$<,$@)
+	$(call makedir,$@)
+	pandoc -o $@ -f rst -t html $<
+
+# Generate JavaScript dependency makefiles.
+dep/%/main.js.dep: src/%/main.js
+	@:
+	set -e
+	$(call status,deps-js,$<,$@)
+	$(call makedir,$@)
+
+	TARGET="$(subst src,dist/public,$(<))"
+	SRC="$(<)"
+	DEPS=`npx browserify --list $$SRC | tr '\n' ' ' | sed 's:$(ROOT)::g'`
+
+	# Printf dependency makefile contents.
+	printf "$$TARGET:: $$DEPS\n" > $@
+	printf "\t@:\n" >> $@
+	printf "\t\$$(call status,compile-js,$$SRC,$$TARGET)\n" >> $@
+	printf "\t\$$(call makedir,$$TARGET)\n" >> $@
+	printf "\tnpx browserify $$SRC -o $$TARGET\n" >> $@
+
+# Generate SCSS dependency makefiles.
+dep/%.scss.dep: src/%.scss
+	@:
+	set -e
+	# Don't create deps for partials.
+	if [ ! "`basename '$(<)' | cut -c 1`" = "_" ]; then
+		$(call status,deps-scss,$<,$@)
+		$(call makedir,$@)
+
+		TARGET="$(subst src,dist/public,$(<:.scss=.css))"
+		SRC="$(<)"
+		DEPS=`./$(SASS_DEP) -l $$SRC $(SASS_IPATHS)|sed 's:$(ROOT)::g'`
+
+		# Printf dependency makefile contents.
+		printf "$$TARGET:: $$SRC $$DEPS\n" > $@
+		printf "\t@:\n" >> $@
+		printf "\t\$$(call status,compile-scss,$$SRC,$$TARGET)\n" >> $@
+		printf "\t\$$(call makedir,$$SRC)\n" >> $@
+
+		printf "\tnpx sass $(SASS_FLAGS) $$SRC $$TARGET\n" >> $@
+		printf "\tnpx postcss $$TARGET $(POSTCSS_FLAGS)\n" >> $@
+	fi
+
+# Copy production node modules to 'dist/public/libs/'.
+dist/public/libs/%:: node_modules/%
+	@:
+	set -e
+	mkdir -p $@
+	$(call status,cp,$<,$@)
+	cp -Rp $</* $@
+
+# Convert the LibreSignage SVG logos to PNG logos of various sizes.
+.SECONDEXPANSION:
+$(GENERATED_LOGOS): dist/%.png: src/$$(shell printf '$$*\n' | rev | cut -f 2- -d '_' | rev).svg
+	@:
+	set -e
+	. build/scripts/convert_images.sh
+	SRC_DIR=`dirname $(@) | sed 's:dist:src:g'`
+	DEST_DIR=`dirname $(@)`
+	NAME=`basename $(lastword $^)`
+	SIZE=`printf "$(@)\n" | rev | cut -f 2 -d '.' | cut -f 1 -d '_' | rev`
+	svg_to_png "$$SRC_DIR" "$$DEST_DIR" "$$NAME" "$$SIZE"
+
+
+# Include the dependency makefiles from dep/. If the files don't
+# exist, they are built by running the required targets.
+ifeq (,$(filter LOC clean realclean configure,$(MAKECMDGOALS)))
+include $(subst src,dep,$(SRC_JS:.js=.js.dep))
+include $(subst src,dep,$(SRC_SCSS:.scss=.scss.dep))
+endif

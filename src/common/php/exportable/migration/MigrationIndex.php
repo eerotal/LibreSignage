@@ -50,6 +50,35 @@ final class MigrationIndex {
 	}
 
 	/**
+	* Write a new migration index file.
+	*
+	* @param string $file The filepath where the index is written.
+	* @param string $dir  The directory path that's scanned for
+	*                     migration definitions.
+	*
+	* @return int The number of migration definition classes exported.
+	*/
+	public static function write(string $file, string $dir) {
+		$index = [];
+		$files = Util::scandir_recursive($dir);
+		
+		foreach ($files as $f) {
+			require_once($f);
+			$classes = get_declared_classes();
+			$class = end($classes);
+			array_push($index, [
+				'from' => $class::from_version(),
+				'to' => $class::to_version(),
+				'fqcn' => $class,
+				'data_fqcn' => $class::classname()
+			]);
+		}
+		Util::file_lock_and_put($file, JSONUtils::encode($index));
+
+		return count($index);
+	}
+
+	/**
 	* Get a transformation index entry for a data version for a class.
 	*
 	* @param string $fqcn The fully-qualified classname.
