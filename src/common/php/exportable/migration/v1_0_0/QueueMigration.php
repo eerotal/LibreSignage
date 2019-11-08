@@ -1,15 +1,15 @@
 <?php
 
-namespace libresignage\common\php\exportable\transformations\v1_0_0;
+namespace libresignage\common\php\exportable\migration\v1_0_0;
 
 use libresignage\common\php\Util;
 use libresignage\common\php\Config;
-use libresignage\common\php\exportable\transformations\TransformationInterface;
+use libresignage\common\php\exportable\migration\MigrationInterface;
 
 /**
 * Queue data transformation from 1.0.0 to 1.1.0.
 */
-final class QueueTransformation implements TransformationInterface {
+final class QueueMigration implements MigrationInterface {
 	public static function classname(): string {
 		return 'libresignage\common\php\queue\Queue';
 	}

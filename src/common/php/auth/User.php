@@ -71,8 +71,7 @@ final class User extends Exportable {
 			throw new UserNotFoundException("Use '$name' doesn't exist.");
 		}
 
-		$json = Util::file_lock_and_get(User::get_data_file_path($name));
-		$this->import(JSONUtils::decode($json, TRUE));
+		$this->fimport(self::get_data_file_path($name), TRUE);
 		$this->session_cleanup();
 	}
 

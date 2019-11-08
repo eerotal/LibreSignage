@@ -9,8 +9,10 @@
 namespace libresignage\common\php\exportable;
 
 use libresignage\common\php\exportable\exceptions\ExportableException;
+use libresignage\common\php\exportable\migration\MigrationPath;
 use libresignage\common\php\Util;
 use libresignage\common\php\JSONUtils;
+use libresignage\common\php\Log;
 
 abstract class Exportable {
 	const EXP_CLASSNAME  = '__classname';
@@ -171,17 +173,22 @@ abstract class Exportable {
 	* If any data transformation is needed to use the data, the
 	* transformed data is automatically written back to the original file.
 	*
-	* @param string $path The path of the file to read.
+	* @param string $path       The path of the file to read.
+	* @param bool   $check_keys Passed to Exportable::import().
 	*/
-	public function fimport(string $path) {
+	public function fimport(string $path, bool $check_keys = FALSE) {
 		$tmp = Util::file_lock_and_get($path);
 		$decoded = JSONUtils::decode($tmp, $assoc=TRUE);
 
-		$ret = $this->import($decoded, TRUE);
+		$ret = $this->import($decoded, $check_keys);
 
 		// Write transformed data back to file.
 		if ($ret != NULL) {
-			Util::file_lock_and_put(JSONUtils::encode($ret));
+			Log::logs(
+				"Migrated data of '{$ret[self::EXP_CLASSNAME]}' ".
+				"from file '$path'.", Log::LOGDEF
+			);
+			Util::file_lock_and_put($path, JSONUtils::encode($ret));
 		}
 	}
 	
@@ -219,7 +226,7 @@ abstract class Exportable {
 				array_keys($data)
 			)
 		) {
-			$p = new ExportableTransformationPath(
+			$p = new MigrationPath(
 				$data,
 				$this->__exportable_version()
 			);

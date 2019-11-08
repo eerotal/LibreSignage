@@ -5,6 +5,7 @@ namespace libresignage\common\php\slide;
 use libresignage\common\php\Config;
 use libresignage\common\php\exportable\Exportable;
 use libresignage\common\php\auth\Session;
+use libresignage\common\php\Util;
 
 /**
 * SlideLock object for locking slides.

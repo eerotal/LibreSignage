@@ -2,61 +2,61 @@
 	{
 		"from": "0.0.*",
 		"to": "1.1.0",
-		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\QueueTransformation",
+		"fqcn": "libresignage\\common\\php\\exportable\\migration\\v1_0_0\\QueueMigration",
 		"data_fqcn": "libresignage\\common\\php\\queue\\Queue"
 	},
 	{
 		"from": "0.0.*",
 		"to": "1.1.0",
-		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SessionTransformation",
+		"fqcn": "libresignage\\common\\php\\exportable\\migration\\v1_0_0\\SessionMigration",
 		"data_fqcn": "libresignage\\common\\php\\auth\\Session"
 	},
 	{
 		"from": "0.0.*",
 		"to": "1.1.0",
-		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideAssetTransformation",
+		"fqcn": "libresignage\\common\\php\\exportable\\migration\\v1_0_0\\SlideAssetMigration",
 		"data_fqcn": "libresignage\\common\\php\\slide\\SlideAsset"
 	},
 	{
 		"from": "0.0.*",
 		"to": "1.1.0",
-		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideLockTransformation",
+		"fqcn": "libresignage\\common\\php\\exportable\\migration\\v1_0_0\\SlideLockMigration",
 		"data_fqcn": "libresignage\\common\\php\\slide\\SlideLock"
 	},
 	{
 		"from": "0.0.*",
 		"to": "1.1.0",
-		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideTransformation",
+		"fqcn": "libresignage\\common\\php\\exportable\\migration\\v1_0_0\\SlideMigration",
 		"data_fqcn": "libresignage\\common\\php\\slide\\Slide"
 	},
 	{
 		"from": "0.0.*",
 		"to": "1.1.0",
-		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideTransformation",
+		"fqcn": "libresignage\\common\\php\\exportable\\migration\\v1_0_0\\SlideMigration",
 		"data_fqcn": "libresignage\\common\\php\\slide\\Slide"
 	},
 	{
 		"from": "0.0.*",
 		"to": "1.1.0",
-		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideTransformation",
+		"fqcn": "libresignage\\common\\php\\exportable\\migration\\v1_0_0\\SlideMigration",
 		"data_fqcn": "libresignage\\common\\php\\slide\\Slide"
 	},
 	{
 		"from": "0.0.*",
 		"to": "1.1.0",
-		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\UserQuotaTransformation",
+		"fqcn": "libresignage\\common\\php\\exportable\\migration\\v1_0_0\\UserQuotaMigration",
 		"data_fqcn": "libresignage\\common\\php\\auth\\UserQuota"
 	},
 	{
 		"from": "0.0.*",
 		"to": "1.1.0",
-		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\SlideTransformation",
+		"fqcn": "libresignage\\common\\php\\exportable\\migration\\v1_0_0\\SlideMigration",
 		"data_fqcn": "libresignage\\common\\php\\slide\\Slide"
 	},
 	{
 		"from": "0.0.*",
 		"to": "1.1.0",
-		"fqcn": "libresignage\\common\\php\\exportable\\transformations\\v1_0_0\\UserTransformation",
+		"fqcn": "libresignage\\common\\php\\exportable\\migration\\v1_0_0\\UserMigration",
 		"data_fqcn": "libresignage\\common\\php\\auth\\User"
 	}
 ]

@@ -1,17 +1,17 @@
 <?php
 
-namespace libresignage\common\php\exportable\transformations;
+namespace libresignage\common\php\exportable\migration;
 
-use libresignage\common\php\exportable\exceptions\ExportableTransformationException;
+use libresignage\common\php\exportable\migration\exceptions\MigrationException;
 use libresignage\common\php\JSONUtils;
 use libresignage\common\php\Util;
 
 /**
 * A class representing a transformation index.
 */
-final class TransformationIndex {
+final class MigrationIndex {
 	/**
-	* Construct a new TransformationIndex.
+	* Construct a new MigrationIndex.
 	*/
 	public function __construct() {
 		$this->index = NULL;
@@ -24,12 +24,12 @@ final class TransformationIndex {
 	*
 	* @return array The transformation index as a associative array.
 	*
-	* @throws ExportableTransformationException If the index file doesn't exist.
+	* @throws MigrationException If the index file doesn't exist.
 	*/
 	public function load(string $file) {
 		if (!is_file($file)) {
-			throw new ExportableTransformationException(
-				"Transformation index missing!"
+			throw new MigrationException(
+				"Migration index missing!"
 			);
 		}
 
@@ -37,7 +37,7 @@ final class TransformationIndex {
 		
 		$index = [];
 		foreach (JSONUtils::decode($tmp, $assoc=TRUE) as $data) {
-			array_push($index, new TransformationIndexEntry(
+			array_push($index, new MigrationIndexEntry(
 				$data['from'],
 				$data['to'],
 				$data['fqcn'],
@@ -55,8 +55,8 @@ final class TransformationIndex {
 	* @param string $fqcn The fully-qualified classname.
 	* @param string $from The origin version.
 	*
-	* @return TransformationIndexEntry|NULL The corresponding entry or NULL
-	*                                       if not found.
+	* @return MigrationIndexEntry|NULL The corresponding entry or NULL
+	*                                  if not found.
 	*/
 	public function get(string $fqcn, string $from) {
 		foreach ($this->index as $t) {

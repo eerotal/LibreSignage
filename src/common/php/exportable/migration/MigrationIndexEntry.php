@@ -1,15 +1,15 @@
 <?php
 
-namespace libresignage\common\php\exportable\transformations;
+namespace libresignage\common\php\exportable\migration;
 
-use libresignage\common\php\exportable\exceptions\ExportableTransformationException;
+use libresignage\common\php\exportable\migration\exceptions\MigrationException;
 
 /**
-* A class representing an entry in a TransformationIndex.
+* A class representing an entry in a MigrationIndex.
 */
-final class TransformationIndexEntry {
+final class MigrationIndexEntry {
 	/**
-	* Construct a new TransformationIndexEntry.
+	* Construct a new MigrationIndexEntry.
 	*
 	* @param string $from      The origin version string.
 	* @param string $to        The result version string.
@@ -30,13 +30,13 @@ final class TransformationIndexEntry {
 	}
 
 	/**
-	* Test whether a TransformationIndexEntry transforms data of a class from
+	* Test whether a MigrationIndexEntry transforms data of a class from
 	* a specific version to a newer one.
 	*
 	* @param string $fqcn The fully-qualified classname of the data class.
 	* @param string $from The origin version to test for.
 	*
-	* @return bool TRUE if the TransformationIndexEntry transforms data from
+	* @return bool TRUE if the MigrationIndexEntry transforms data from
 	*              the requested version, FALSE otherwise.
 	*/
 	public function transforms(string $fqcn, string $from): bool {
@@ -46,7 +46,7 @@ final class TransformationIndexEntry {
 		$b = explode(".", $this->from);
 
 		if (count($a) !== count($b)) {
-			throw new ExportableTransformationException(
+			throw new MigrationException(
 				"Version numbers must have the same number of components!"
 			);
 		}

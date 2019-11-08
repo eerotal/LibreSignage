@@ -1,15 +1,15 @@
 <?php
 
-namespace libresignage\common\php\exportable\transformations;
+namespace libresignage\common\php\exportable\migration;
 
 /**
-* An interface for defining transformations for Exportable data.
+* An interface for defining migrations for Exportable data.
 *
-* Each class that implements TransformationInterface and is located in
-* src/common/php/exportable/transformations is used as a transformation
+* Each class that implements MigrationInterface and is located in
+* src/common/php/exportable/migration is used as a transformation
 * when migrating data between different versions of LibreSignage.
 */
-interface TransformationInterface {
+interface MigrationInterface {
 	/**
 	* Return the classname this transformation applies to.
 	*

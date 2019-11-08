@@ -1,17 +1,17 @@
 <?php
 
-namespace libresignage\common\php\exportable\transformations\v1_0_0;
+namespace libresignage\common\php\exportable\migration\v1_0_0;
 
 use libresignage\common\php\Util;
 use libresignage\common\php\Config;
-use libresignage\common\php\exportable\transformations\TransformationInterface;
+use libresignage\common\php\exportable\migration\MigrationInterface;
 
 /**
 * User data transformation from 1.0.0 to 1.1.0.
 */
-final class SlideAssetTransformation implements TransformationInterface {
+final class SlideLockMigration implements MigrationInterface {
 	public static function classname(): string {
-		return 'libresignage\common\php\slide\SlideAsset';
+		return 'libresignage\common\php\slide\SlideLock';
 	}
 
 	public static function from_version(): string {

@@ -97,9 +97,7 @@ final class Slide extends Exportable {
 	public function load(string $id) {
 		self::validate_id($id);
 
-		$tmp = Util::file_lock_and_get(self::get_conf_path($id));
-		$this->import(JSONUtils::decode($tmp, $assoc=TRUE), TRUE);
-
+		$this->fimport(self::get_conf_path($id), TRUE);
 		$this->lock_cleanup();
 		$this->update_sched_enabled();
 		$this->write();

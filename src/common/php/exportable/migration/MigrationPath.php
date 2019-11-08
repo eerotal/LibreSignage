@@ -1,29 +1,29 @@
 <?php
 
-namespace libresignage\common\php\exportable;
+namespace libresignage\common\php\exportable\migration;
 
 use libresignage\common\php\exportable\Exportable;
-use libresignage\common\php\exportable\transformations\TransformationIndex;
-use libresignage\common\php\exportable\exceptions\ExportableTransformationException;
+use libresignage\common\php\exportable\migration\MigrationIndex;
+use libresignage\common\php\exportable\migration\exceptions\MigrationException;
 use libresignage\common\php\Log;
 use libresignage\common\php\Config;
 use libresignage\common\php\Util;
 
 /**
-* A class for creating transformations from one data format
+* A class for creating migrations from one data format
 * version to another.
 */
-final class ExportableTransformationPath {
-	const INDEX_PATH = 'common/php/exportable/transformations/index.json';
+final class MigrationPath {
+	const INDEX_PATH = 'common/php/exportable/migration/index.json';
 	const FALLBACK_ORIGIN_VERSION = '0.0.0';
 
 	/**
-	* Construct a new ExportableTransformationPath.
+	* Construct a new MigrationPath.
 	*
 	* @param &array $data A reference to the data to transform.
 	* @param string $to   The version to convert the data to.
 	*
-	* @throws ExportableTransformationException If no transformation path
+	* @throws MigrationException If no transformation path
 	*                                           from $from to $to exists.
 	*
 	*/
@@ -36,13 +36,13 @@ final class ExportableTransformationPath {
 				],
 				array_keys($data)
 			),
-			'Metadata required when performing transformations.'
+			'Metadata required when performing migration.'
 		);
 
 		$this->data = $data;
 		$this->path = [];
 
-		$this->index = new TransformationIndex();
+		$this->index = new MigrationIndex();
 		$this->index->load(
 			Config::config('LIBRESIGNAGE_ROOT').'/'.self::INDEX_PATH
 		);
@@ -70,7 +70,7 @@ final class ExportableTransformationPath {
 				$ver
 			);
 			if ($t === NULL) {
-				throw new ExportableTransformationException(
+				throw new MigrationException(
 					"No transformation path exists from '$from' to '$to' ".
 					"for class '{$this->data[Exportable::EXP_CLASSNAME]}'."
 				);

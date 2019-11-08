@@ -12,6 +12,7 @@ use libresignage\common\php\exceptions\JSONException;
 use libresignage\common\php\exceptions\ArgException;
 use libresignage\common\php\exceptions\IntException;
 use libresignage\common\php\queue\exceptions\QueueNotFoundException;
+use libresignage\common\php\Log;
 
 /**
 * Queue class for handling LibreSignage queue data.
@@ -63,7 +64,7 @@ final class Queue extends Exportable {
 			throw new QueueNotFoundException("Queue '{$name}' doesn't exist.");
 		}
 
-		$this->fimport(self::get_path($name));
+		$this->fimport(self::get_path($name), TRUE);
 		$this->load_slide_objects();
 	}
 
