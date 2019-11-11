@@ -1,30 +1,88 @@
 #
-# Main LibreSignage makefile.
+# LibreSignage make entry point.
 #
 
-include makefile.common
+# Define required dependency versions.
+NPM_REQ_VER := 6.4.0
+COMPOSER_REQ_VER := 1.8.0
+MAKE_REQ_VER := 4.0
+PANDOC_REQ_VER := 2.0
+DOXYGEN_REQ_VER := 1.8.0
+RSVG_REQ_VER := 2.40.0
 
 # Caller supplied settings.
 CONF ?= ""
 TARGET ?=
 PASS ?=
 
+.PHONY: \
+	configure-build \
+	configure-system \
+	configure \
+	clean \
+	realclean \
+	LOC \
+	test-api \
+	doxygen-docs \
+	build \
+	php-dev-autoload \
+	php-prod-autoload
+
 .ONESHELL:
 
-.PHONY: configure-build configure-system configure clean realclean \
-	LOC test-api doxygen-docs composer-dev-autoload composer-prod-autoload
-
-all:
+all: initchk php-prod-autoload
 	@:
 	set -e
-	+make -f makefile.1
-	+make -f makefile.2
-	+make -f makefile.3
+	+make -f makefile.build
+	+make -f makefile.post
 
-#
-# PHONY targets
-#
+# Perform some initialization checks.
+initchk:
+	@:
+	set +e
+	tmp=0
+	./build/scripts/check_shell.sh
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/npm_version.sh $(NPM_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/composer_version.sh $(COMPOSER_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/make_version.sh $(MAKE_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/pandoc_version.sh $(PANDOC_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/rsvg_version.sh $(RSVG_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
+	./build/scripts/dep_checks/doxygen_version.sh $(DOXYGEN_REQ_VER)
+	tmp=$$(expr $$tmp + $$?)
 
+	$(call initchk_warn,$$tmp)
+
+# Install deps from Composer.
+vendor:
+	@:
+	set -e
+	composer install
+
+# Install deps from NPM.
+node_modules:
+	@:
+	set -e
+	npm install
+
+# Dump production autoload files.
+php-prod-autoload: vendor
+	@:
+	echo "[Info] Dump production autoload."
+	composer dump-autoload --no-ansi --no-dev --optimize
+
+# Dump development autoload files.
+php-dev-autoload: vendor
+	@:
+	echo "[Info] Dump development autoload."
+	composer dump-autoload --no-ansi
+
+# Install deps and configure.
 configure: vendor node_modules configure-build configure-system
 
 # Create build configuration.
@@ -142,7 +200,7 @@ LOC:
 		-o -name "*.json" -print`
 
 # Run API integration tests.
-test-api: composer-dev-autoload
+test-api: php-dev-autoload
 	@:
 	set -e
 	printf '[Info] Running API integration tests...\n'
@@ -164,3 +222,5 @@ doxygen-docs:
 	@:
 	set -e
 	doxygen Doxyfile
+
+include makefile.common

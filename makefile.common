@@ -35,27 +35,3 @@ initchk_warn =\
 				;;\
 		esac;\
 	fi
-
-# Install deps from Composer.
-vendor:
-	@:
-	set -e
-	composer install
-
-# Install deps from NPM.
-node_modules:
-	@:
-	set -e
-	npm install
-
-# Dump production autoload files.
-composer-prod-autoload: vendor
-	@:
-	echo "[Info] Dump production autoload."
-	composer dump-autoload --no-ansi --no-dev --optimize
-
-# Dump development composer autoload files.
-composer-dev-autoload: vendor
-	@:
-	echo "[Info] Dump development autoload."
-	composer dump-autoload --no-ansi

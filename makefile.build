@@ -1,8 +1,6 @@
 #
-# LibreSignage stage 2 makefile
+# LibreSignage main build targets.
 #
-
-include makefile.common
 
 # Note: This makefile assumes that $(ROOT) always has a trailing
 # slash. (which is the case when using the makefile $(dir ...)
@@ -26,7 +24,7 @@ PHPUNIT_FLAGS := -c "$(PHPUNIT_CONFIG)" --testdox --color=auto
 # Production PHP libraries.
 PHP_LIBS := $(shell find $(addprefix vendor/,\
 	$(shell "./$(COMPOSER_DEP)" "$(COMPOSER_DEP_FLAGS)"|cut -d' ' -f1)\
-) -type f)
+) -type f) vendor/composer vendor/autoload.php
 
 # Production JavaScript libraries.
 JS_LIBS := $(filter-out \
@@ -77,12 +75,19 @@ GENERATED_LOGOS := $(addprefix \
 	text_inverted_466x100.png\
 )
 
-.PHONY: files js css config libs docs htmldocs
+.PHONY: \
+	files \
+	js \
+	css \
+	config \
+	libs \
+	docs \
+	htmldocs
 
 .ONESHELL:
 
-all:: files docs htmldocs js css js_libs php_libs logo composer-prod-autoload; @:
-files:: $(subst src,dist,$(SRC_NO_COMPILE)); @:
+build:: files docs htmldocs js css js_libs php_libs logo; @:
+files:: $(subst src,dist,$(SRC_FILES)); @:
 js:: $(subst src,dist/public,$(SRC_JS)); @:
 docs:: $(addprefix dist/doc/rst/,$(notdir $(SRC_RST))); @:
 htmldocs:: $(addprefix dist/public/doc/html/,$(notdir $(SRC_RST:.rst=.html))); @:
@@ -92,7 +97,7 @@ php_libs:: $(subst vendor/,dist/vendor/,$(PHP_LIBS)); @:
 logo:: $(GENERATED_LOGOS); @:
 
 # Copy over non-compiled, non-PHP sources.
-$(filter-out %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
+$(filter-out %.php,$(subst src,dist,$(SRC_FILES))):: dist%: src%
 	@:
 	set -e
 	$(call status,cp,$<,$@)
@@ -100,7 +105,7 @@ $(filter-out %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
 	cp -p $< $@
 
 # Copy over PHP files and check the syntax.
-$(filter %.php,$(subst src,dist,$(SRC_NO_COMPILE))):: dist%: src%
+$(filter %.php,$(subst src,dist,$(SRC_FILES))):: dist%: src%
 	@:
 	set -e
 	$(call status,cp,$<,$@)
@@ -207,8 +212,11 @@ $(GENERATED_LOGOS): dist/%.png: src/$$(shell printf '$$*\n' | rev | cut -f 2- -d
 	DEST_DIR=`dirname $(@)`
 	NAME=`basename $(lastword $^)`
 	SIZE=`printf "$(@)\n" | rev | cut -f 2 -d '.' | cut -f 1 -d '_' | rev`
+	mkdir -p "$$DEST_DIR"
 	svg_to_png "$$SRC_DIR" "$$DEST_DIR" "$$NAME" "$$SIZE"
 
+
+include makefile.common
 
 # Include the dependency makefiles from dep/. If the files don't
 # exist, they are built by running the required targets.

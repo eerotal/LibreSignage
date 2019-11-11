@@ -1,6 +1,6 @@
 <?php
 
-namespace libresignage\common\php\exportable\migration\v1_0_0;
+namespace libresignage\common\php\exportable\migration\defs\v1_0_0;
 
 use libresignage\common\php\Util;
 use libresignage\common\php\Config;
