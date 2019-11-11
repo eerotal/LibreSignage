@@ -56,7 +56,7 @@ APIEndpoint::GET(
 				'properties' => [
 					'id' => ['type' => 'string'],
 					'name' => ['type' => 'string'],
-					'hash' => []
+					'hash' => ['type' => 'string']
 				],
 				'required' => ['id', 'name']
 			]

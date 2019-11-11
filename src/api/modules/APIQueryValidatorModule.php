@@ -6,6 +6,7 @@ use libresignage\api\APIEndpoint;
 use libresignage\api\APIModule;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
+use libresignage\common\php\Util;
 use JsonSchema\Validator;
 use JsonSchema\Constraints\Constraint;
 
@@ -26,7 +27,7 @@ class APIQueryValidatorModule extends APIModule {
 		$validator = new Validator();
 		$validator->validate(
 			$data,
-			$args['schema'],
+			Util::assoc_array_to_object($args['schema']),
 			(
 				Constraint::CHECK_MODE_COERCE_TYPES
 				| Constraint::CHECK_MODE_APPLY_DEFAULTS
