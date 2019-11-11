@@ -17,14 +17,10 @@ COMPOSER_DEP_FLAGS := --self
 
 POSTCSS_FLAGS := --config postcss.config.js --replace --no-map
 
-PHPUNIT_API_HOST ?= http://localhost:80
-PHPUNIT_CONFIG := tests/phpunit.xml
-PHPUNIT_FLAGS := -c "$(PHPUNIT_CONFIG)" --testdox --color=auto
-
 # Production PHP libraries.
 PHP_LIBS := $(shell find $(addprefix vendor/,\
-	$(shell "./$(COMPOSER_DEP)" "$(COMPOSER_DEP_FLAGS)"|cut -d' ' -f1)\
-) -type f) vendor/composer vendor/autoload.php
+	$(shell "./$(COMPOSER_DEP)" "$(COMPOSER_DEP_FLAGS)"|cut -d' ' -f1) composer\
+) -type f) vendor/autoload.php
 
 # Production JavaScript libraries.
 JS_LIBS := $(filter-out \

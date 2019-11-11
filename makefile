@@ -2,6 +2,10 @@
 # LibreSignage make entry point.
 #
 
+PHPUNIT_API_HOST ?= http://localhost:80
+PHPUNIT_CONFIG := tests/phpunit.xml
+PHPUNIT_FLAGS := -c "$(PHPUNIT_CONFIG)" --testdox --color=auto
+
 # Define required dependency versions.
 NPM_REQ_VER := 6.4.0
 COMPOSER_REQ_VER := 1.8.0
@@ -31,8 +35,6 @@ PASS ?=
 .ONESHELL:
 
 all: initchk php-prod-autoload
-	@:
-	set -e
 	+make -f makefile.build
 	+make -f makefile.post
 
@@ -203,6 +205,7 @@ LOC:
 test-api: php-dev-autoload
 	@:
 	set -e
+
 	printf '[Info] Running API integration tests...\n'
 
 	if [ ! -d 'dist/' ]; then
