@@ -11,7 +11,7 @@ NPM_REQ_VER := 6.4.0
 COMPOSER_REQ_VER := 1.8.0
 MAKE_REQ_VER := 4.0
 PANDOC_REQ_VER := 2.0
-DOXYGEN_REQ_VER := 1.8.0
+DOXYGEN_REQ_VER := 100.8.0
 RSVG_REQ_VER := 2.40.0
 
 # Caller supplied settings.
@@ -54,8 +54,6 @@ initchk:
 	./build/scripts/dep_checks/pandoc_version.sh $(PANDOC_REQ_VER)
 	tmp=$$(expr $$tmp + $$?)
 	./build/scripts/dep_checks/rsvg_version.sh $(RSVG_REQ_VER)
-	tmp=$$(expr $$tmp + $$?)
-	./build/scripts/dep_checks/doxygen_version.sh $(DOXYGEN_REQ_VER)
 	tmp=$$(expr $$tmp + $$?)
 
 	$(call initchk_warn,$$tmp)
@@ -224,6 +222,9 @@ test-api: php-dev-autoload
 doxygen-docs:
 	@:
 	set -e
+
+	./build/scripts/dep_checks/doxygen_version.sh $(DOXYGEN_REQ_VER)
+	$(call initchk_warn,$$?)
 	doxygen Doxyfile
 
 include makefile.common
