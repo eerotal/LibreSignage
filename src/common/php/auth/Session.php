@@ -210,7 +210,7 @@ final class Session extends Exportable {
 	* @return bool TRUE = Expired, FALSE = Not expired.
 	*/
 	public function is_expired(): bool {
-		return time() > $this->created + $this->max_age;
+		return !$this->permanent && time() > $this->created + $this->max_age;
 	}
 
 	/**
@@ -221,10 +221,7 @@ final class Session extends Exportable {
 	public function verify(string $token): bool {
 		return (
 			password_verify($token, $this->token_hash)
-			&& (
-				$this->permanent
-				|| !$this->is_expired()
-			)
+			&& !$this->is_expired()
 		);
 	}
 
