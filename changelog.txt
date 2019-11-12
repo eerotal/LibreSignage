@@ -27,15 +27,13 @@ v1.1.0
   - [bugfix]   Fix a bug where an error was thrown when changing queues if an
                unsaved slide was open. (#86)
 
-v1.0.3
-  - [bugfix]   Fix a bug that caused display users logged in with a (permament)
-               display session to be logged out after a certain amount of time.
-
 v1.0.2
   - [bugfix]   Apply a workaround for docker-library/php#865 which broke
                LibreSignage Docker image builds.
   - [bugfix]   Use rsvg-convert instead of ImageMagick's convert due to problems
                with convert crashing.
+  - [bugfix]   Fix a bug that caused display users logged in with a (permament)
+               display session to be logged out after a certain amount of time.
 
 v1.0.1
   - [bugfix]   Fix a bug where using forward slashes in slide markup caused
