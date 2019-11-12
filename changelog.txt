@@ -3,6 +3,8 @@ v1.0.2
                LibreSignage Docker image builds.
   - [bugfix]   Use rsvg-convert instead of ImageMagick's convert due to problems
                with convert crashing.
+  - [bugfix]   Fix a bug that caused display clients with a (permanent) display
+               session to be logged out after a certain amount of time.
 
 v1.0.1
   - [bugfix]   Fix a bug where using forward slashes in slide markup caused
