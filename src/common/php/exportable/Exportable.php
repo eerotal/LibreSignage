@@ -170,8 +170,8 @@ abstract class Exportable {
 	/**
 	* Import Exportable data from file.
 	*
-	* If any data transformation is needed to use the data, the
-	* transformed data is automatically written back to the original file.
+	* If any data migration is needed to use the data, the
+	* migrated data is automatically written back to the original file.
 	*
 	* @param string $path       The path of the file to read.
 	* @param bool   $check_keys Passed to Exportable::import().
@@ -182,7 +182,7 @@ abstract class Exportable {
 
 		$ret = $this->import($decoded, $check_keys);
 
-		// Write transformed data back to file.
+		// Write migrated data back to file.
 		if ($ret != NULL) {
 			Log::logs(
 				"Migrated data of '{$ret[self::EXP_CLASSNAME]}' ".
@@ -200,7 +200,7 @@ abstract class Exportable {
 	* the data is in an old format. This is only done if metadata is
 	* included in the supplied data.
 	*
-	* After data transformation, this function recreates the objects from the
+	* After data migration, this function recreates the objects from the
 	* supplied data. If metadata is included in the data, the proper object
 	* types are also reconstructed. If $check_keys is TRUE, the imported
 	* keys are checked against the expected keys in either static::$PUBLIC
@@ -211,11 +211,11 @@ abstract class Exportable {
 	* @param bool   $check_keys If TRUE, check that the imported keys
 	*                           match the original ones.
 	*
-	* @return array|NULL If data was transformed, the transformed data is
+	* @return array|NULL If data was migrated, the migrated data is
 	*                    returned. Otherwise NULL is returned.
 	*/
 	public function import(array $data, bool $check_keys = FALSE) {
-		$transformed = NULL;
+		$migrated = NULL;
 
 		if (
 			Util::array_is_subset(
@@ -230,15 +230,15 @@ abstract class Exportable {
 				$data,
 				$this->__exportable_version()
 			);
-			$transformed = $p->transform();
-			if ($transformed != NULL) { $data = $transformed; }
+			$migrated = $p->migrate();
+			if ($migrated != NULL) { $data = $migrated; }
 		}
 		
 		foreach ($this->imp_array($data, TRUE, $check_keys) as $k => $v) {
 			$this->__exportable_set($k, $v);
 		}
 
-		return $transformed;
+		return $migrated;
 	}
 
 	/**

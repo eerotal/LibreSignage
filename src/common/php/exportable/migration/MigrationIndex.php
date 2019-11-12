@@ -7,7 +7,7 @@ use libresignage\common\php\JSONUtils;
 use libresignage\common\php\Util;
 
 /**
-* A class representing a transformation index.
+* A class representing a migration class index.
 */
 final class MigrationIndex {
 	/**
@@ -18,11 +18,9 @@ final class MigrationIndex {
 	}
 
 	/**
-	* Load the transformation index.
+	* Load the migration index from file.
 	*
 	* @param string $path The filepath of the index file.
-	*
-	* @return array The transformation index as a associative array.
 	*
 	* @throws MigrationException If the index file doesn't exist.
 	*/
@@ -38,10 +36,11 @@ final class MigrationIndex {
 		$index = [];
 		foreach (JSONUtils::decode($tmp, $assoc=TRUE) as $data) {
 			array_push($index, new MigrationIndexEntry(
-				$data['from'],
-				$data['to'],
-				$data['fqcn'],
-				$data['data_fqcn']
+				$data['migration_class'],
+				$data['from_version'],
+				$data['to_version'],
+				$data['from_class'],
+				$data['to_class']
 			));
 		}
 		self::sort_index($index);
@@ -67,10 +66,11 @@ final class MigrationIndex {
 			$classes = get_declared_classes();
 			$class = end($classes);
 			array_push($index, [
-				'from' => $class::from_version(),
-				'to' => $class::to_version(),
-				'fqcn' => $class,
-				'data_fqcn' => $class::classname()
+				'migration_class' => $class,
+				'from_version' => $class::from_version(),
+				'to_version' => $class::to_version(),
+				'from_class' => $class::from_class(),
+				'to_class' => $class::to_class()
 			]);
 		}
 		Util::file_lock_and_put($file, JSONUtils::encode($index));
@@ -79,17 +79,17 @@ final class MigrationIndex {
 	}
 
 	/**
-	* Get a transformation index entry for a data version for a class.
+	* Get a migration index entry for a data version for a class.
 	*
-	* @param string $fqcn The fully-qualified classname.
+	* @param string $class The origin classname.
 	* @param string $from The origin version.
 	*
 	* @return MigrationIndexEntry|NULL The corresponding entry or NULL
 	*                                  if not found.
 	*/
-	public function get(string $fqcn, string $from) {
+	public function get(string $class, string $version) {
 		foreach ($this->index as $t) {
-			if ($t->transforms($fqcn, $from)) {
+			if ($t->migrates($class, $version)) {
 				return $t;
 			}
 		}
@@ -97,7 +97,7 @@ final class MigrationIndex {
 	}
 	
 	/**
-	* Sort a transformation index by the keys, ie. version numbers.
+	* Sort a migration index by the keys, ie. version numbers.
 	*
 	* @return bool TRUE on success or FALSE on failure. 
 	*/

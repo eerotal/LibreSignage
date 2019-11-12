@@ -11,39 +11,41 @@ final class MigrationIndexEntry {
 	/**
 	* Construct a new MigrationIndexEntry.
 	*
-	* @param string $from      The origin version string.
-	* @param string $to        The result version string.
-	* @param string $fqcn      The fully-qualified classname of the
-	*                          transformation class.
-	* @param string $data_fqcn The fully-qualified classname of the data class.
+	* @param string $migration_class The classname of the migration class.
+	* @param string $from_version    The origin version string.
+	* @param string $to_version      The result version string.
+	* @param string $from_class      The classname of the origin data class.
+	* @param string $to_class        The classname of the destination class.
 	*/
 	public function __construct(
-		string $from,
-		string $to,
-		string $fqcn,
-		string $data_fqcn
+		string $migration_class,
+		string $from_version,
+		string $to_version,
+		string $from_class,
+		string $to_class
 	) {
-		$this->from = $from;
-		$this->to = $to;
-		$this->fqcn = $fqcn;
-		$this->data_fqcn = $data_fqcn;
+		$this->migration_class = $migration_class;
+		$this->from_version = $from_version;
+		$this->to_version = $to_version;
+		$this->from_class = $from_class;
+		$this->to_class = $to_class;
 	}
 
 	/**
-	* Test whether a MigrationIndexEntry transforms data of a class from
+	* Test whether a MigrationIndexEntry migrates data of a class from
 	* a specific version to a newer one.
 	*
-	* @param string $fqcn The fully-qualified classname of the data class.
+	* @param string $class The classname of the data class.
 	* @param string $from The origin version to test for.
 	*
-	* @return bool TRUE if the MigrationIndexEntry transforms data from
+	* @return bool TRUE if the MigrationIndexEntry migrates data from
 	*              the requested version, FALSE otherwise.
 	*/
-	public function transforms(string $fqcn, string $from): bool {
-		if ($this->data_fqcn !== $fqcn) { return FALSE; }
+	public function migrates(string $class, string $version): bool {
+		if ($this->from_class !== $class) { return FALSE; }
 
-		$a = explode(".", $from);
-		$b = explode(".", $this->from);
+		$a = explode(".", $version);
+		$b = explode(".", $this->from_version);
 
 		if (count($a) !== count($b)) {
 			throw new MigrationException(
@@ -63,20 +65,20 @@ final class MigrationIndexEntry {
 	}
 
 	/**
-	* Get the result version string.
+	* Get the destination version string.
 	*
-	* @return string The version string.
+	* @return string A version string.
 	*/
-	public function get_result_version(): string {
-		return $this->to;
+	public function get_dest_version(): string {
+		return $this->to_version;
 	}
 
 	/**
-	* Get the FQCN of the transformation class.
+	* Get the name of the migration class.
 	*
-	* @return string The transform class FQCN.
+	* @return string A classname.
 	*/
-	public function get_fqcn(): string {
-		return $this->fqcn;
+	public function get_migration_class(): string {
+		return $this->migration_class;
 	}
 }

@@ -20,14 +20,14 @@ final class MigrationPath {
 	/**
 	* Construct a new MigrationPath.
 	*
-	* @param &array $data A reference to the data to transform.
-	* @param string $to   The version to convert the data to.
+	* @param &array $data       A reference to the data to migrate.
+	* @param string $to_version The version to convert the data to.
 	*
-	* @throws MigrationException If no transformation path
-	*                                           from $from to $to exists.
+	* @throws MigrationException If no migration path from $from_version to
+	*                            $to_version exists.
 	*
 	*/
-	public function __construct(&$data, string $to) {
+	public function __construct(&$data, string $to_version) {
 		assert(
 			Util::array_is_subset(
 				[
@@ -46,55 +46,56 @@ final class MigrationPath {
 		$this->index->load(
 			Config::config('LIBRESIGNAGE_ROOT').'/'.self::INDEX_PATH
 		);
-		$this->build_path($to);
+		$this->build_path($to_version);
 	}
 
 	/**
-	* Build the transformation path for data.
+	* Build the migration path for data.
 	*
-	* @param string $to The version to transform the data to.
+	* @param string $to_version The version to migrate the data to.
 	*/
-	public function build_path(string $to) {
+	public function build_path(string $to_version) {
 		// Get origin version from $this->data.
 		if (\array_key_exists(Exportable::EXP_VERSION, $this->data)) {
-			$from = $this->data[Exportable::EXP_VERSION];
+			$from_version = $this->data[Exportable::EXP_VERSION];
 		} else {
-			$from = self::FALLBACK_ORIGIN_VERSION;
+			$from_version = self::FALLBACK_ORIGIN_VERSION;
 		}
 
 		$t = NULL;
-		$ver = $from;
-		while ($ver !== $to) {
+		$ver = $from_version;
+		while ($ver !== $to_version) {
 			$t = $this->index->get(
 				$this->data[Exportable::EXP_CLASSNAME],
 				$ver
 			);
 			if ($t === NULL) {
 				throw new MigrationException(
-					"No transformation path exists from '$from' to '$to' ".
-					"for class '{$this->data[Exportable::EXP_CLASSNAME]}'."
+					"No migration path exists from ".
+					"'$from_version' to '$to_version' for class ".
+					"'{$this->data[Exportable::EXP_CLASSNAME]}'."
 				);
 			}
-			$ver = $t->get_result_version();
+			$ver = $t->get_dest_version();
 			array_push($this->path, $t);
 		}
 	}
 
 	/**
-	* Perform a transformation.
+	* Perform a migration.
 	*
-	* @return array|NULL The transformed data or NULL if no transformation
+	* @return array|NULL The migrated data or NULL if no migration
 	*                    took place.
 	*/
-	public function transform() {
+	public function migrate() {
 		if (count($this->path)) {
 			foreach ($this->path as $t) {
-				($t->get_fqcn())::transform($this->data);
+				($t->get_migration_class())::migrate($this->data);
 
 				// Update version field in data.
 				$this->data[
 					Exportable::EXP_VERSION
-				] = ($t->get_fqcn())::to_version();
+				] = ($t->get_migration_class())::to_version();
 			}
 			return $this->data;
 		} else {

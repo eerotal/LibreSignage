@@ -7,10 +7,14 @@ use libresignage\common\php\Config;
 use libresignage\common\php\exportable\migration\MigrationInterface;
 
 /**
-* Queue data transformation from 1.0.0 to 1.1.0.
+* Queue data migration from 1.0.0 to 1.1.0.
 */
 final class QueueMigration implements MigrationInterface {
-	public static function classname(): string {
+	public static function from_class(): string {
+		return 'libresignage\common\php\queue\Queue';
+	}
+
+	public static function to_class(): string {
 		return 'libresignage\common\php\queue\Queue';
 	}
 
@@ -26,7 +30,7 @@ final class QueueMigration implements MigrationInterface {
 		return '1.1.0';
 	}
 
-	public static function transform(array &$data) {
+	public static function migrate(array &$data) {
 		// rename: slide_ids -> slides
 		$data['slide_ids'] = $data['slides'];
 		unset($data['slides']);

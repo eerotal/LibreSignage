@@ -6,36 +6,43 @@ namespace libresignage\common\php\exportable\migration;
 * An interface for defining migrations for Exportable data.
 *
 * Each class that implements MigrationInterface and is located in
-* src/common/php/exportable/migration is used as a transformation
+* src/common/php/exportable/migration is used as a migration
 * when migrating data between different versions of LibreSignage.
 */
 interface MigrationInterface {
 	/**
-	* Return the classname this transformation applies to.
+	* Return the classname this migration applies to.
 	*
-	* @return string The fully-qualified classname as a string.
+	* @return string The classname as a string.
 	*/
-	public static function classname(): string;
+	public static function from_class(): string;
 
 	/**
-	* Return the version of data from which this transformation can transform.
+	* Return the classname this migration converts to.
+	*
+	* @return string The classname as a string.
+	*/
+	public static function to_class(): string;
+	
+	/**
+	* Return the original data version.
 	*
 	* @return string The version string.
 	*/
 	public static function from_version(): string;
 
 	/**
-	* Return the version of data to which this transformation can transform.
+	* Return the destination data version.
 	*
 	* @return string The version string.
 	*/
 	public static function to_version(): string;
 
 	/**
-	* Perform the transformation of data.
+	* Perform the migration of data.
 	*
-	* @param array The data to be transformed. This function modifies
+	* @param array The data to be migrated. This function modifies
 	*              the array passed as the argument.
 	*/
-	public static function transform(array &$data);
+	public static function migrate(array &$data);
 }

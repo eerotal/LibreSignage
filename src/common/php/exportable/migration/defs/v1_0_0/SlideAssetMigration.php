@@ -7,10 +7,14 @@ use libresignage\common\php\Config;
 use libresignage\common\php\exportable\migration\MigrationInterface;
 
 /**
-* User data transformation from 1.0.0 to 1.1.0.
+* SlideAsset data migration from 1.0.0 to 1.1.0.
 */
 final class SlideAssetMigration implements MigrationInterface {
-	public static function classname(): string {
+	public static function from_class(): string {
+		return 'libresignage\common\php\slide\SlideAsset';
+	}
+
+	public static function to_class(): string {
 		return 'libresignage\common\php\slide\SlideAsset';
 	}
 
@@ -26,5 +30,5 @@ final class SlideAssetMigration implements MigrationInterface {
 		return '1.1.0';
 	}
 
-	public static function transform(array &$data) {}
+	public static function migrate(array &$data) {}
 }
