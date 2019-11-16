@@ -11,7 +11,7 @@ NPM_REQ_VER := 6.4.0
 COMPOSER_REQ_VER := 1.8.0
 MAKE_REQ_VER := 4.0
 PANDOC_REQ_VER := 2.0
-DOXYGEN_REQ_VER := 100.8.0
+DOXYGEN_REQ_VER := 1.8.0
 RSVG_REQ_VER := 2.40.0
 
 # Caller supplied settings.
@@ -190,6 +190,9 @@ LOC:
 		-o -name 'composer.lock.json' -printf '' \
 		-o -name "Dockerfile" -print \
 		-o -name "makefile" -print \
+		-o -name "makefile.common" -print \
+		-o -name "makefile.build" -print \
+		-o -name "makefile.post" -print \
 		-o -name "*.py" -print \
 		-o -name "*.php" -print \
 		-o -name "*.js" -print \
