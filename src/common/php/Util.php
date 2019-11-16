@@ -345,27 +345,4 @@ final class Util {
 		}
 		return $ret_obj;
 	}
-
-	/**
-	* Parse a LibreSignage version string into an array of components.
-	*
-	* LibreSignage version strings are of the form:
-	*
-	*   vMAJOR.MINOR.PATCH(-identifier)(-commit)(-dirty)
-	*
-	* This function returns the MAJOR, MINOR and PATCH numbers converted to
-	* integers as an array in that order.
-	*
-	* @return array The parsed version numbers.
-	*/
-	public static function parse_version_string(string $version): array {
-		$ret = [];
-		$parts = explode('-', $version);
-		if (count($parts) > 0) {
-			foreach (explode('.', substr($parts[0], 1)) as $n) {
-				array_push($ret, intval($n));
-			}
-		}
-		return $ret;
-	}
 }
