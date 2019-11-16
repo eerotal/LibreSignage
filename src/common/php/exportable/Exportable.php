@@ -40,7 +40,7 @@ abstract class Exportable {
 	public abstract function __exportable_set(string $name, $value);
 
 	/**
-	* Getter functino which must be implemented in classes extending
+	* Getter function which must be implemented in classes extending
 	* Exportable as follows:
 	*
 	* public function __exportable_get(string $name) {
@@ -57,7 +57,7 @@ abstract class Exportable {
 	*
 	* Write the current data of the exportable to disk if that's an
 	* operation normally supported by the object. This should probably
-	* be just a wrapper function for the object's other methods or empty
+	* just be a wrapper function for the object's other methods or empty
 	* if the object doesn't support writing to disk in the first place.
 	*/
 	public abstract function __exportable_write();
@@ -235,6 +235,13 @@ abstract class Exportable {
 	
 	/**
 	* Handle object importing.
+	*
+	* Use Exportable::import() or Exportable::fimport() instead.
+	*
+	* @param array                 $data       The data to import.
+	* @param bool                  $check_keys If TRUE, check that the imported
+	*                                          keys match the original ones.
+	* @param ExportableDataContext $ctx        Exportable context data.
 	*/
 	private function imp(array $data, bool $check_keys = FALSE) {
 		foreach ($this->imp_array($data, TRUE, $check_keys) as $k => $v) {
@@ -247,12 +254,15 @@ abstract class Exportable {
 	*
 	* @param array $arr        The array to import.
 	* @param bool  $root       Whether this array is the root array or not.
-	* @param bool  $check_keys Parameter originally passed to Exportable::import().
+	* @param bool  $check_keys Parameter originally passed to
+	*                          Exportable::import().
 	*
 	* @return array The imported data as an array.
 	*
-	* @throws ExportableException if the visibility value loaded from $arr is invalid.
-	* @throws ExportableException if $check_keys === TRUE and the data keys don't match.
+	* @throws ExportableException if the visibility value loaded from
+	*                             $arr is invalid.
+	* @throws ExportableException if $check_keys === TRUE and the data
+	*                             keys don't match.
 	*/
 	private function imp_array(array $arr, bool $root, bool $check_keys) {
 		if (
@@ -283,9 +293,7 @@ abstract class Exportable {
 					}
 					break;
 				default:
-					throw new ExportableException(
-						"Unknown visibility value."
-					);
+					throw new ExportableException("Unknown visibility value.");
 			}
 
 			$diff = Util::arraydiff(
@@ -318,11 +326,7 @@ abstract class Exportable {
 			foreach ($arr as $k => $v) {
 				switch (gettype($v)) {
 					case 'array':
-						$ret[$k] = $this->imp_array(
-							$v,
-							FALSE,
-							$check_keys
-						);
+						$ret[$k] = $this->imp_array($v, FALSE, $check_keys);
 						break;
 					default:
 						if (!in_array($k, self::EXP_RESERVED, TRUE)) {
