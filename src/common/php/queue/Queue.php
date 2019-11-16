@@ -45,11 +45,8 @@ final class Queue extends Exportable {
 		return $this->{$name};
 	}
 
-	public function __exportable_version(): string {
-		return implode(
-			'.',
-			Util::parse_version_string(Config::config('LS_VER'))
-		);
+	public function __exportable_write() {
+		$this->write();
 	}
 	
 	/*
@@ -79,6 +76,7 @@ final class Queue extends Exportable {
 			try {
 				$s->load($n);
 			} catch (\Exception $e) {
+				throw $e;
 				if (
 					$e instanceof IntException
 					|| $e instanceof JSONException

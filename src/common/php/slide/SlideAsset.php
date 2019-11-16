@@ -47,12 +47,7 @@ final class SlideAsset extends Exportable {
 		$this->{$name} = $value;
 	}
 
-	public function __exportable_version(): string {
-		return implode(
-			'.',
-			Util::parse_version_string(Config::config('LS_VER'))
-		);
-	}
+	public function __exportable_write() {}
 
 	/**
 	* Validate an UploadedFile.

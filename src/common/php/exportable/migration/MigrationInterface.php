@@ -2,6 +2,8 @@
 
 namespace libresignage\common\php\exportable\migration;
 
+use libresignage\common\php\exportable\ExportableDataContext;
+
 /**
 * An interface for defining migrations for Exportable data.
 *
@@ -11,11 +13,11 @@ namespace libresignage\common\php\exportable\migration;
 */
 interface MigrationInterface {
 	/**
-	* Return the classname this migration applies to.
+	* Return an array of classnames this migration applies to.
 	*
-	* @return string The classname as a string.
+	* @return string The classnames as an array.
 	*/
-	public static function from_class(): string;
+	public static function from_class(): array;
 
 	/**
 	* Return the classname this migration converts to.
@@ -25,11 +27,11 @@ interface MigrationInterface {
 	public static function to_class(): string;
 	
 	/**
-	* Return the original data version.
+	* Return an array of versions this migration applies to.
 	*
 	* @return string The version string.
 	*/
-	public static function from_version(): string;
+	public static function from_version(): array;
 
 	/**
 	* Return the destination data version.
@@ -44,5 +46,5 @@ interface MigrationInterface {
 	* @param array The data to be migrated. This function modifies
 	*              the array passed as the argument.
 	*/
-	public static function migrate(array &$data);
+	public static function migrate(array &$data, ExportableDataContext $ctx);
 }

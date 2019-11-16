@@ -3,6 +3,7 @@
 namespace libresignage\common\php\exportable\migration;
 
 use libresignage\common\php\exportable\migration\exceptions\MigrationException;
+use libresignage\common\php\util\VersionNumber;
 
 /**
 * A class representing an entry in a MigrationIndex.
@@ -12,16 +13,16 @@ final class MigrationIndexEntry {
 	* Construct a new MigrationIndexEntry.
 	*
 	* @param string $migration_class The classname of the migration class.
-	* @param string $from_version    The origin version string.
+	* @param array  $from_version    The origin version string.
 	* @param string $to_version      The result version string.
-	* @param string $from_class      The classname of the origin data class.
+	* @param array  $from_class      The classname of the origin data class.
 	* @param string $to_class        The classname of the destination class.
 	*/
 	public function __construct(
 		string $migration_class,
-		string $from_version,
+		array $from_version,
 		string $to_version,
-		string $from_class,
+		array $from_class,
 		string $to_class
 	) {
 		$this->migration_class = $migration_class;
@@ -42,26 +43,17 @@ final class MigrationIndexEntry {
 	*              the requested version, FALSE otherwise.
 	*/
 	public function migrates(string $class, string $version): bool {
-		if ($this->from_class !== $class) { return FALSE; }
+		if (!in_array($class, $this->from_class)) { return FALSE; }
 
-		$a = explode(".", $version);
-		$b = explode(".", $this->from_version);
+		$a = new VersionNumber([]);
+		$b = new VersionNumber([]);
 
-		if (count($a) !== count($b)) {
-			throw new MigrationException(
-				"Version numbers must have the same number of components!"
-			);
+		$a->from_string($version);
+		foreach ($this->from_version as $v) {
+			$b->from_string($v);
+			if ($b->matches($a)) { return TRUE; }
 		}
-
-		for ($i = 0; $i < count($b); $i++) {
-			if ($b[$i] === "*") {
-				continue;
-			} else if ($b[$i] !== $a[$i]) {
-				return FALSE;
-			}
-		}
-
-		return TRUE;
+		return FALSE;
 	}
 
 	/**

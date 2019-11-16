@@ -80,11 +80,8 @@ final class Slide extends Exportable {
 		return $this->{$name};
 	}
 
-	public function __exportable_version(): string {
-		return implode(
-			'.',
-			Util::parse_version_string(Config::config('LS_VER'))
-		);
+	public function __exportable_write() {
+		$this->write();
 	}
 	
 	/**
@@ -698,7 +695,7 @@ final class Slide extends Exportable {
 	public function write() {
 		$tmp = '';
 		$this->assert_ready();
-
+		
 		if (!is_dir(self::get_dir_path($this->id))) {
 			mkdir(self::get_dir_path($this->id));
 		}

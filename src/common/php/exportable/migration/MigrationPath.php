@@ -5,6 +5,7 @@ namespace libresignage\common\php\exportable\migration;
 use libresignage\common\php\exportable\Exportable;
 use libresignage\common\php\exportable\migration\MigrationIndex;
 use libresignage\common\php\exportable\migration\exceptions\MigrationException;
+use libresignage\common\php\exportable\ExportableDataContext;
 use libresignage\common\php\Log;
 use libresignage\common\php\Config;
 use libresignage\common\php\Util;
@@ -20,14 +21,20 @@ final class MigrationPath {
 	/**
 	* Construct a new MigrationPath.
 	*
-	* @param &array $data       A reference to the data to migrate.
-	* @param string $to_version The version to convert the data to.
+	* @param &array                $data       The data to migrate.
+	* @param string                $to_version The version to convert
+	*                                          the data to.
+	* @param ExportableDataContext $ctx        Exportable context data.
 	*
 	* @throws MigrationException If no migration path from $from_version to
 	*                            $to_version exists.
 	*
 	*/
-	public function __construct(&$data, string $to_version) {
+	public function __construct(
+		$data,
+		string $to_version,
+		ExportableDataContext $ctx
+	) {
 		assert(
 			Util::array_is_subset(
 				[
@@ -41,6 +48,7 @@ final class MigrationPath {
 
 		$this->data = $data;
 		$this->path = [];
+		$this->context = $ctx;
 
 		$this->index = new MigrationIndex();
 		$this->index->load(
@@ -56,7 +64,7 @@ final class MigrationPath {
 	*/
 	public function build_path(string $to_version) {
 		// Get origin version from $this->data.
-		if (\array_key_exists(Exportable::EXP_VERSION, $this->data)) {
+		if (array_key_exists(Exportable::EXP_VERSION, $this->data)) {
 			$from_version = $this->data[Exportable::EXP_VERSION];
 		} else {
 			$from_version = self::FALLBACK_ORIGIN_VERSION;
@@ -84,22 +92,26 @@ final class MigrationPath {
 	/**
 	* Perform a migration.
 	*
-	* @return array|NULL The migrated data or NULL if no migration
-	*                    took place.
+	* @return array|NULL The migrated data or NULL if no migration took place.
 	*/
 	public function migrate() {
 		if (count($this->path)) {
 			foreach ($this->path as $t) {
-				($t->get_migration_class())::migrate($this->data);
+				($t->get_migration_class())::migrate(
+					$this->data,
+					$this->context
+				);
 
-				// Update version field in data.
+				// Update version and classname fields in data.
 				$this->data[
 					Exportable::EXP_VERSION
 				] = ($t->get_migration_class())::to_version();
+				$this->data[
+					Exportable::EXP_CLASSNAME
+				] = ($t->get_migration_class())::to_class();
 			}
 			return $this->data;
-		} else {
-			return NULL;
 		}
+		return NULL;
 	}
 }

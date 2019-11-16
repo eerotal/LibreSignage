@@ -52,12 +52,7 @@ final class Session extends Exportable {
 		return $this->{$name};
 	}
 
-	public function __exportable_version(): string {
-		return implode(
-			'.',
-			Util::parse_version_string(Config::config('LS_VER'))
-		);
-	}
+	public function __exportable_write() {}
 
 	/**
 	* Validate a caller description string.

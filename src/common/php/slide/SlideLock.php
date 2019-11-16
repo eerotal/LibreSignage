@@ -38,13 +38,8 @@ final class SlideLock extends Exportable {
 		return $this->{$name};
 	}
 
-	public function __exportable_version(): string {
-		return implode(
-			'.',
-			Util::parse_version_string(Config::config('LS_VER'))
-		);
-	}
-
+	public function __exportable_write() {}
+	
 	/**
 	* Check whether a SlideLock has expired.
 	*

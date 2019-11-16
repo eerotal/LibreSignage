@@ -52,13 +52,10 @@ final class User extends Exportable {
 		return $this->{$name};
 	}
 
-	public function __exportable_version(): string {
-		return implode(
-			'.',
-			Util::parse_version_string(Config::config('LS_VER'))
-		);
+	public function __exportable_write() {
+		$this->write();
 	}
-
+	
 	/**
 	* Load user from file.
 	*

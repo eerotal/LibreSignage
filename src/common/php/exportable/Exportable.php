@@ -10,9 +10,11 @@ namespace libresignage\common\php\exportable;
 
 use libresignage\common\php\exportable\exceptions\ExportableException;
 use libresignage\common\php\exportable\migration\MigrationPath;
+use libresignage\common\php\exportable\ExportableDataContext;
 use libresignage\common\php\Util;
 use libresignage\common\php\JSONUtils;
 use libresignage\common\php\Log;
+use libresignage\common\php\Config;
 
 abstract class Exportable {
 	const EXP_CLASSNAME  = '__classname';
@@ -48,14 +50,17 @@ abstract class Exportable {
 	* @param string $name The name of the property to get.
 	*/
 	public abstract function __exportable_get(string $name);
-
+	
 
 	/**
-	* Return the version of the data format of an Exportable.
+	* Write the object data to disk.
 	*
-	* @return string The data version.
+	* Write the current data of the exportable to disk if that's an
+	* operation normally supported by the object. This should probably
+	* be just a wrapper function for the object's other methods or empty
+	* if the object doesn't support writing to disk in the first place.
 	*/
-	public abstract function __exportable_version(): string;
+	public abstract function __exportable_write();
 	
 	/**
 	* Recursively export all object keys declared in static::$PUBLIC
@@ -90,7 +95,7 @@ abstract class Exportable {
 		if ($meta) { // Add metadata.
 			$ret[self::EXP_CLASSNAME] = get_class($this);
 			$ret[self::EXP_VISIBILITY] = $private ? 'private' : 'public';
-			$ret[self::EXP_VERSION] = $this->__exportable_version();
+			$ret[self::EXP_VERSION] = self::current_version();
 		}
 
 		foreach ($keys as $k) {
@@ -180,7 +185,9 @@ abstract class Exportable {
 		$tmp = Util::file_lock_and_get($path);
 		$decoded = JSONUtils::decode($tmp, $assoc=TRUE);
 
-		$ret = $this->import($decoded, $check_keys);
+		$ctx = new ExportableDataContext();
+		$ctx->set(ExportableDataContext::FILEPATH, $path);
+		$ret = $this->import($decoded, $check_keys, $ctx);
 
 		// Write migrated data back to file.
 		if ($ret != NULL) {
@@ -188,8 +195,8 @@ abstract class Exportable {
 				"Migrated data of '{$ret[self::EXP_CLASSNAME]}' ".
 				"from file '$path'.", Log::LOGDEF
 			);
-			Util::file_lock_and_put($path, JSONUtils::encode($ret));
-		}
+			$this->__exportable_write();
+ 		}
 	}
 	
 	/**
@@ -207,40 +214,34 @@ abstract class Exportable {
 	* or static::$PRIVATE depending on which one was used when exporting.
 	* Note that this also only works if metadata was originally exported.
 	*
-	* @param array  $data       The data to import.
-	* @param bool   $check_keys If TRUE, check that the imported keys
-	*                           match the original ones.
+	* @param array                 $data       The data to import.
+	* @param bool                  $check_keys If TRUE, check that the imported
+	*                                          keys match the original ones.
+	* @param ExportableDataContext $ctx        Exportable context data.
 	*
 	* @return array|NULL If data was migrated, the migrated data is
 	*                    returned. Otherwise NULL is returned.
 	*/
-	public function import(array $data, bool $check_keys = FALSE) {
-		$migrated = NULL;
-
-		if (
-			Util::array_is_subset(
-				[
-					Exportable::EXP_CLASSNAME,
-					Exportable::EXP_VISIBILITY
-				],
-				array_keys($data)
-			)
-		) {
-			$p = new MigrationPath(
-				$data,
-				$this->__exportable_version()
-			);
-			$migrated = $p->migrate();
-			if ($migrated != NULL) { $data = $migrated; }
-		}
-		
+	public function import(
+		array $data,
+		bool $check_keys = FALSE,
+		ExportableDataContext $ctx
+	) {
+		$tmp = self::migrate($data, $ctx);
+		$data = ($tmp != NULL) ? $tmp : $data;
+		$this->imp($data, $check_keys);
+		return $tmp;
+	}
+	
+	/**
+	* Handle object importing.
+	*/
+	private function imp(array $data, bool $check_keys = FALSE) {
 		foreach ($this->imp_array($data, TRUE, $check_keys) as $k => $v) {
 			$this->__exportable_set($k, $v);
-		}
-
-		return $migrated;
+		}		
 	}
-
+	
 	/**
 	* Handle array importing.
 	*
@@ -294,13 +295,15 @@ abstract class Exportable {
 			if (!empty($diff['missing'])) {
 				throw new ExportableException(
 					"Missing keys from imported data: [ ".
-					implode(', ', $diff['missing'])." ]"
+					implode(', ', $diff['missing'])." ] for class ".
+					$arr[self::EXP_CLASSNAME]
 				);
 			}
 			if (!empty($diff['extra'])) {
 				throw new ExportableException(
 					"Extra keys in imported data: [ ".
-					implode(', ', $diff['extra'])." ]"
+					implode(', ', $diff['extra'])." ] for class ".
+					$arr[self::EXP_CLASSNAME]
 				);
 			}
 		}
@@ -309,7 +312,7 @@ abstract class Exportable {
 		$ret = NULL;
 		if (!$root && array_key_exists(self::EXP_CLASSNAME, $arr)) {
 			$ret = new $arr[self::EXP_CLASSNAME];
-			$ret->import($arr);
+			$ret->imp($arr);
 		} else {
 			$ret = [];
 			foreach ($arr as $k => $v) {
@@ -330,5 +333,53 @@ abstract class Exportable {
 			}
 		}
 		return $ret;
+	}
+
+	/**
+	* Migrate data to a new version recursively.
+	*
+	* @return array|NULL The migrated data or NULL if no migration took place.
+	*/
+	private static function migrate(array $data, ExportableDataContext $ctx) {
+		$migrated = FALSE;
+		
+		// Migrate "root" element.
+		if (Util::array_is_subset(
+			[Exportable::EXP_CLASSNAME, Exportable::EXP_VISIBILITY],
+			array_keys($data)
+		)) {
+			$p = new MigrationPath(
+				$data,
+				self::current_version(),
+				$ctx
+			);
+			$tmp = $p->migrate();	
+			$data = ($tmp != NULL) ? $tmp : $data;
+			$migrated |= ($tmp != NULL);
+		}
+
+		// Migrate each key separately.
+		foreach ($data as &$value) {
+			if (is_array($value)) {
+				$tmp = self::migrate($value, new ExportableDataContext());
+				$value = ($tmp != NULL) ? $tmp : $value;
+				$migrated |= ($tmp != NULL);
+			}
+		}
+
+		if ($migrated) {
+			return $data;
+		} else {
+			return NULL;
+		}
+	}
+
+	/**
+	* Get a cleaned-up LibreSignage version string.
+	*
+	* @return string A version string.
+	*/
+	private static function current_version(): string {
+		return substr(explode('-', Config::config('LS_VER'))[0], 1);
 	}
 }
