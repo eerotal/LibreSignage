@@ -13,25 +13,6 @@ use libresignage\common\php\exceptions\ArgException;
 * Class for handling session data and authentication.
 */
 final class Session extends Exportable {
-	static $PUBLIC = [
-		'id',
-		'who',
-		'from',
-		'created',
-		'max_age',
-		'permanent'
-	];
-
-	static $PRIVATE = [
-		'id',
-		'who',
-		'from',
-		'created',
-		'max_age',
-		'permanent',
-		'token_hash'
-	];
-
 	const ID_DELIMITER = '_';
 	const TRUNC_LEN    = 45;
 	const WHO_REGEX    = '/^[A-Za-z0-9_-]+$/';
@@ -53,6 +34,29 @@ final class Session extends Exportable {
 	}
 
 	public function __exportable_write() {}
+
+	public static function __exportable_private(): array {
+		return [
+			'id',
+			'who',
+			'from',
+			'created',
+			'max_age',
+			'permanent',
+			'token_hash'
+		];
+	}
+
+	public static function __exportable_public(): array {
+		return [
+			'id',
+			'who',
+			'from',
+			'created',
+			'max_age',
+			'permanent'
+		];
+	}
 
 	/**
 	* Validate a caller description string.

@@ -26,6 +26,9 @@ abstract class Exportable {
 		self::EXP_VERSION
 	];
 
+	const EXP_VISIBILITY_PRIVATE = "private";
+	const EXP_VISIBILITY_PUBLIC = "public";
+
 	/**
 	* Setter function which must be implemented in classes extending
 	* Exportable as follows:
@@ -61,38 +64,54 @@ abstract class Exportable {
 	* if the object doesn't support writing to disk in the first place.
 	*/
 	public abstract function __exportable_write();
+
+	/**
+	* Return an array of private object properties.
+	*
+	* @return array An array of private object properties.
+	*/
+	public static abstract function __exportable_private(): array;
+
+	/**
+	* Return an array of public object properties.
+	*
+	* @return array An array of public object properties.
+	*/
+	public static abstract function __exportable_public(): array;
 	
 	/**
-	* Recursively export all object keys declared in static::$PUBLIC
-	* or static::$PRIVATE depending on the value of $private. If
-	* $meta === TRUE, Exportable metadata is included in the
-	* returned data so that Exportable::import() can restore the
-	* proper data structure when importing.
+	* Recursively export object properties.
 	*
-	* @param bool $private If TRUE, also export properties listed in static::$PRIVATE.
-	* @param bool $meta    If TRUE, metadata is also exported.
+	* @param bool $private If TRUE, export properties listed in
+	*                      static::__exportable_private().
+	* @param bool $meta    If TRUE, export metadata along with object
+	*                      properties so that Exportable::import() can
+	*                      be used.
 	*
 	* @return array The exported data as an associative array.
 	*
-	* @throws ExportableException if a reserved key is used as an object property name.
+	* @throws ExportableException if a reserved key is used as
+	*                             an object property name.
 	*/
 	public function export(bool $private = FALSE, bool $meta = FALSE): array {
 		$keys = [];
 		$ret = [];
 
 		if ($private) {
-			$keys = static::$PRIVATE;
+			$keys = static::__exportable_private();
 		} else {
-			$keys = static::$PUBLIC;
+			$keys = static::__exportable_public();
 		}
 
+		// Check for reserved keys.
 		if (!empty(array_intersect(self::EXP_RESERVED, $keys))) {
 			throw new ExportableException(
 				"Reserved key '".self::EXP_CLASSNAME."' used in object."
 			);
 		}
 
-		if ($meta) { // Add metadata.
+		// Add metadata.
+		if ($meta) {
 			$ret[self::EXP_CLASSNAME] = get_class($this);
 			$ret[self::EXP_VISIBILITY] = $private ? 'private' : 'public';
 			$ret[self::EXP_VERSION] = self::current_version();
@@ -102,14 +121,10 @@ abstract class Exportable {
 			$current = $this->__exportable_get($k);
 			switch (gettype($current)) {
 				case 'object':
-					$ret[$k] = $this->exp_obj(
-						$current, $private, $meta
-					);
+					$ret[$k] = $this->exp_obj($current, $private, $meta);
 					break;
 				case 'array':
-					$ret[$k] = $this->exp_array(
-						$current, $private, $meta
-					);
+					$ret[$k] = $this->exp_array($current, $private, $meta);
 					break;
 				default:
 					$ret[$k] = $current;
@@ -123,20 +138,18 @@ abstract class Exportable {
 	* Handle object exporting.
 	*
 	* @param  mixed $obj     The object to export.
-	* @param  bool  $private Parameter originally passed to Exportable::export();
-	* @param  bool  $meta    Parameter originally passed to Exportable::export();
+	* @param  bool  $private See Exportable::export().
+	* @param  bool  $meta    See Exportable::export().
 	*
 	* @return array The exported object as an associative array.
 	*
 	* @throws ExportableException if $obj doesn't extend Exportable.
 	*/
 	private function exp_obj($obj, bool $private, bool $meta): array {
-		if (
-			is_subclass_of(
-				$obj,
-				'libresignage\\common\\php\\exportable\\Exportable'
-			)
-		) {
+		if (is_subclass_of(
+			$obj,
+			'libresignage\\common\\php\\exportable\\Exportable'
+		)) {
 			return $obj->export($private, $meta);
 		} else {
 			throw new ExportableException(
@@ -149,8 +162,8 @@ abstract class Exportable {
 	* Handle array exporting.
 	*
 	* @param array $arr     The array to export.
-	* @param bool  $private Parameter originally passed to Exportable::export();
-	* @param bool  $meta    Parameter originally passed to Exportable::export();
+	* @param bool  $private See Exportable::export();
+	* @param bool  $meta    See Exportable::export();
 	*
 	* @return array The exported array.
 	*/
@@ -173,209 +186,133 @@ abstract class Exportable {
 	}
 
 	/**
-	* Import Exportable data from file.
+	* Import Exportable object data from file.
 	*
-	* If any data migration is needed to use the data, the
-	* migrated data is automatically written back to the original file.
+	* If any data migration is required, the migrated data is automatically
+	* written back to the original file.
 	*
-	* @param string $path       The path of the file to read.
-	* @param bool   $check_keys Passed to Exportable::import().
+	* @param string $path The path of the file to read.
 	*/
-	public function fimport(string $path, bool $check_keys = FALSE) {
+	public function fimport(string $path) {
+		$migrated = FALSE;
+
 		$tmp = Util::file_lock_and_get($path);
 		$decoded = JSONUtils::decode($tmp, $assoc=TRUE);
 
 		$ctx = new ExportableDataContext();
 		$ctx->set(ExportableDataContext::FILEPATH, $path);
-		$ret = $this->import($decoded, $check_keys, $ctx);
+		$ret = $this->reconstruct_object($decoded, $ctx, FALSE, $migrated);
 
 		// Write migrated data back to file.
-		if ($ret != NULL) {
+		if ($migrated) {
 			Log::logs(
-				"Migrated data of '{$ret[self::EXP_CLASSNAME]}' ".
-				"from file '$path'.", Log::LOGDEF
+				"Migrated data of '".get_class($ret).
+				"' from file '$path'.", Log::LOGDEF
 			);
 			$this->__exportable_write();
  		}
 	}
 	
 	/**
-	* Import object data from an array previously exported by
-	* Exportable::export().
+	* Reconstruct Exportable object data.
 	*
-	* First this function attempts to convert data into a new format if
-	* the data is in an old format. This is only done if metadata is
-	* included in the supplied data.
+	* If data migration is required, this function automatically
+	* migrates the data first.
 	*
-	* After data migration, this function recreates the objects from the
-	* supplied data. If metadata is included in the data, the proper object
-	* types are also reconstructed. If $check_keys is TRUE, the imported
-	* keys are checked against the expected keys in either static::$PUBLIC
-	* or static::$PRIVATE depending on which one was used when exporting.
-	* Note that this also only works if metadata was originally exported.
+	* This function automatically reconstructs objects from metadata
+	* included in the data that's being imported. Note that this function
+	* will fail if you supply a $data array that doesn't contain the
+	* required metadata fields.
 	*
-	* @param array                 $data       The data to import.
-	* @param bool                  $check_keys If TRUE, check that the imported
-	*                                          keys match the original ones.
-	* @param ExportableDataContext $ctx        Exportable context data.
+	* @param array                 $data      The data to reconstruct.
+	* @param ExportableDataContext $ctx       Exportable context data.
+	* @param bool                  $return    If TRUE, a new object is created
+	*                                         for the data and the new object is
+	*                                         returned. Otherwise the data is
+	*                                         set into $this and $this is
+	*                                         returned.
+	* @param bool                  &$migrated A reference to a boolean that's
+	*                                         set to TRUE if migration took
+	*                                         place. Otherwise this is set to
+	*                                         FALSE.
 	*
-	* @return array|NULL If data was migrated, the migrated data is
-	*                    returned. Otherwise NULL is returned.
+	* @throws AssertionError If $data doesn't contain metadata.
 	*/
-	public function import(
+	public function reconstruct_object(
 		array $data,
-		bool $check_keys = FALSE,
-		ExportableDataContext $ctx
+		ExportableDataContext $ctx,
+		bool $return = TRUE,
+		bool &$migrated = FALSE
 	) {
-		$tmp = self::migrate($data, $ctx);
-		$data = ($tmp != NULL) ? $tmp : $data;
-		$this->imp($data, $check_keys);
-		return $tmp;
-	}
-	
-	/**
-	* Handle object importing.
-	*
-	* Use Exportable::import() or Exportable::fimport() instead.
-	*
-	* @param array                 $data       The data to import.
-	* @param bool                  $check_keys If TRUE, check that the imported
-	*                                          keys match the original ones.
-	* @param ExportableDataContext $ctx        Exportable context data.
-	*/
-	private function imp(array $data, bool $check_keys = FALSE) {
-		foreach ($this->imp_array($data, TRUE, $check_keys) as $k => $v) {
-			$this->__exportable_set($k, $v);
-		}		
-	}
-	
-	/**
-	* Handle array importing.
-	*
-	* @param array $arr        The array to import.
-	* @param bool  $root       Whether this array is the root array or not.
-	* @param bool  $check_keys Parameter originally passed to
-	*                          Exportable::import().
-	*
-	* @return array The imported data as an array.
-	*
-	* @throws ExportableException if the visibility value loaded from
-	*                             $arr is invalid.
-	* @throws ExportableException if $check_keys === TRUE and the data
-	*                             keys don't match.
-	*/
-	private function imp_array(array $arr, bool $root, bool $check_keys) {
-		if (
-			$check_keys
-			&& Util::array_is_subset(
-				[
-					Exportable::EXP_CLASSNAME,
-					Exportable::EXP_VISIBILITY
-				],
-				array_keys($arr)
-			)
-		) {
-			// Check that the keys in $arr match the expected ones.
-			$keys = [];
-			switch ($arr[self::EXP_VISIBILITY]) {
-				case 'public':
-					if ($root) {
-						$keys = static::$PUBLIC;
-					} else {
-						$keys = $arr[self::EXP_CLASSNAME]::$PUBLIC;
-					}
-					break;
-				case 'private':
-					if ($root) {
-						$keys = static::$PRIVATE;
-					} else {
-						$keys = $arr[self::EXP_CLASSNAME]::$PRIVATE;
-					}
-					break;
-				default:
-					throw new ExportableException("Unknown visibility value.");
-			}
+		assert(self::has_metadata());
 
-			$diff = Util::arraydiff(
-				$keys,
-				array_diff(array_keys($arr), self::EXP_RESERVED)
-			);
-			if (!empty($diff['missing'])) {
-				throw new ExportableException(
-					"Missing keys from imported data: [ ".
-					implode(', ', $diff['missing'])." ] for class ".
-					$arr[self::EXP_CLASSNAME]
-				);
-			}
-			if (!empty($diff['extra'])) {
-				throw new ExportableException(
-					"Extra keys in imported data: [ ".
-					implode(', ', $diff['extra'])." ] for class ".
-					$arr[self::EXP_CLASSNAME]
-				);
-			}
+		$tmp = self::migrate($data, $ctx);
+		if ($tmp == NULL) {
+			$tmp = $data;
+			$migrated = FALSE;
+		} else {
+			$migrated = TRUE;
 		}
 
-		// Handle the actual array importing.
-		$ret = NULL;
-		if (!$root && array_key_exists(self::EXP_CLASSNAME, $arr)) {
-			$ret = new $arr[self::EXP_CLASSNAME];
-			$ret->imp($arr);
-		} else {
-			$ret = [];
-			foreach ($arr as $k => $v) {
-				switch (gettype($v)) {
-					case 'array':
-						$ret[$k] = $this->imp_array($v, FALSE, $check_keys);
-						break;
-					default:
-						if (!in_array($k, self::EXP_RESERVED, TRUE)) {
-							$ret[$k] = $v;
-						}
-						break;
+		self::check_data_keys($tmp);
+
+		$tmp = self::reconstruct_array($tmp);
+		$obj = ($return) ? new $tmp[self::EXP_CLASSNAME]() : $this;
+		foreach ($tmp as $k => $v) { $obj->__exportable_set($k, $v); }
+
+		return $obj;
+	}
+	
+	/**
+	* Recursively reconstruct an array that contains Exportable data.
+	*
+	* The "root" element is left as an array and is returned with all
+	* nested Exportable objects reconstructed.
+	*
+	* @param array $data       The array to reconstruct.
+	*
+	* @return array The reconstructed data.
+	*/
+	private function reconstruct_array(array $data): array {
+		$ret = [];
+		foreach ($data as $k => $v) {
+			if (is_array($v)) {
+				if (self::has_metadata($v)) {
+					// Nested object.
+					$ret[$k] = $this->reconstruct_object(
+						$v,
+						new ExportableDataContext(),
+						TRUE
+					);
+				} else {
+					// Bare array.
+					$ret[$k] = $this->reconstruct_array($v);
 				}
+			} else {
+				// Primitive value.
+				$ret[$k] = $v;
 			}
 		}
 		return $ret;
 	}
 
 	/**
-	* Migrate data to a new version recursively.
+	* Migrate an array of Exportable data.
+	*
+	* @param array                 $data The data to migrate.
+	* @param ExportableDataContext $ctx  Exportable context data.
 	*
 	* @return array|NULL The migrated data or NULL if no migration took place.
+	*
+	* @throws AssertionError If $data doesn't contain metadata.
 	*/
-	private static function migrate(array $data, ExportableDataContext $ctx) {
-		$migrated = FALSE;
-		
-		// Migrate "root" element.
-		if (Util::array_is_subset(
-			[Exportable::EXP_CLASSNAME, Exportable::EXP_VISIBILITY],
-			array_keys($data)
-		)) {
-			$p = new MigrationPath(
-				$data,
-				self::current_version(),
-				$ctx
-			);
-			$tmp = $p->migrate();	
-			$data = ($tmp != NULL) ? $tmp : $data;
-			$migrated |= ($tmp != NULL);
-		}
-
-		// Migrate each key separately.
-		foreach ($data as &$value) {
-			if (is_array($value)) {
-				$tmp = self::migrate($value, new ExportableDataContext());
-				$value = ($tmp != NULL) ? $tmp : $value;
-				$migrated |= ($tmp != NULL);
-			}
-		}
-
-		if ($migrated) {
-			return $data;
-		} else {
-			return NULL;
-		}
+	public static function migrate(
+		array $data,
+		ExportableDataContext $ctx
+	) {
+		assert(self::has_metadata($data));
+		$p = new MigrationPath($data, self::current_version(), $ctx);
+		return $p->migrate();
 	}
 
 	/**
@@ -385,5 +322,63 @@ abstract class Exportable {
 	*/
 	private static function current_version(): string {
 		return substr(explode('-', Config::config('LS_VER'))[0], 1);
+	}
+
+	/**
+	* Check whether an array contains Exportable metadata.
+	*
+	* This function doesn't require the Exportable::EXP_VERSION key
+	* to exist in $data.
+	*
+	* @return bool TRUE if metadata exists, FALSE otherwise.
+	*/
+	public static function has_metadata(array $data): bool {
+		return Util::array_is_subset(
+			[
+				Exportable::EXP_CLASSNAME,
+				Exportable::EXP_VISIBILITY
+			],
+			array_keys($data)
+		);
+	}
+
+	/**
+	* Check that a data array contains the required keys.
+	*
+	* @param array $data The data to check.
+	*
+	* @throws ExportableException if missing or extra keys are found.
+	*/
+	public static function check_data_keys(array $data) {
+		 $keys = [];
+		 switch ($data[self::EXP_VISIBILITY]) {
+			 case self::EXP_VISIBILITY_PUBLIC:
+				 $keys = $data[self::EXP_CLASSNAME]::__exportable_public();
+				 break;
+			 case self::EXP_VISIBILITY_PRIVATE:
+				 $keys = $data[self::EXP_CLASSNAME]::__exportable_private();
+				 break;
+			 default:
+				 throw new ExportableException("Unknown visibility value.");
+		 }
+
+		 $diff = Util::arraydiff(
+			 $keys,
+			 array_diff(array_keys($data), self::EXP_RESERVED)
+		 );
+		 if (!empty($diff['missing'])) {
+			 throw new ExportableException(
+				 "Missing keys from imported data: [ ".
+				 implode(', ', $diff['missing'])." ] for class ".
+				 $data[self::EXP_CLASSNAME]
+			 );
+		 }
+		 if (!empty($diff['extra'])) {
+			 throw new ExportableException(
+				 "Extra keys in imported data: [ ".
+				 implode(', ', $diff['extra'])." ] for class ".
+				 $data[self::EXP_CLASSNAME]
+			 );
+		 }
 	}
 }

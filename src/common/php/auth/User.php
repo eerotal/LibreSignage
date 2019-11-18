@@ -16,21 +16,6 @@ use libresignage\common\php\exceptions\ArgException;
 use libresignage\common\php\exceptions\LimitException;
 
 final class User extends Exportable {
-	static $PRIVATE = [
-		'user',
-		'hash',
-		'groups',
-		'sessions',
-		'quota'
-	];
-
-	static $PUBLIC = [
-		'user',
-		'groups',
-		'sessions',
-		'quota'
-	];
-
 	private $user = '';
 	private $hash = '';
 	private $groups = [];
@@ -55,7 +40,26 @@ final class User extends Exportable {
 	public function __exportable_write() {
 		$this->write();
 	}
-	
+
+	public static function __exportable_private(): array {
+		return [
+			'user',
+			'hash',
+			'groups',
+			'sessions',
+			'quota'
+		];
+	}
+
+	public static function __exportable_public(): array {
+		return [
+			'user',
+			'groups',
+			'sessions',
+			'quota'
+		];
+	}
+
 	/**
 	* Load user from file.
 	*
@@ -68,7 +72,7 @@ final class User extends Exportable {
 			throw new UserNotFoundException("Use '$name' doesn't exist.");
 		}
 
-		$this->fimport(self::get_data_file_path($name), TRUE);
+		$this->fimport(self::get_data_file_path($name));
 		$this->session_cleanup();
 	}
 

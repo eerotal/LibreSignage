@@ -19,43 +19,6 @@ use libresignage\common\php\exceptions\IntException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class Slide extends Exportable {
-	static $PUBLIC = [
-		'id',
-		'name',
-		'index',
-		'duration',
-		'markup',
-		'owner',
-		'enabled',
-		'sched',
-		'sched_t_s',
-		'sched_t_e',
-		'animation',
-		'queue_name',
-		'collaborators',
-		'lock',
-		'assets'
-	];
-
-	static $PRIVATE = [
-		'id',
-		'name',
-		'index',
-		'duration',
-		'markup',
-		'owner',
-		'enabled',
-		'sched',
-		'sched_t_s',
-		'sched_t_e',
-		'animation',
-		'queue_name',
-		'collaborators',
-		'lock',
-		'assets'
-	];
-
-	// Slide data variables.
 	private $id = NULL;
 	private $name = NULL;
 	private $index = NULL;
@@ -83,7 +46,47 @@ final class Slide extends Exportable {
 	public function __exportable_write() {
 		$this->write();
 	}
-	
+
+	public static function __exportable_private(): array {
+		return [
+			'id',
+			'name',
+			'index',
+			'duration',
+			'markup',
+			'owner',
+			'enabled',
+			'sched',
+			'sched_t_s',
+			'sched_t_e',
+			'animation',
+			'queue_name',
+			'collaborators',
+			'lock',
+			'assets'
+		];
+	}
+
+	public static function __exportable_public(): array {
+		return [
+			'id',
+			'name',
+			'index',
+			'duration',
+			'markup',
+			'owner',
+			'enabled',
+			'sched',
+			'sched_t_s',
+			'sched_t_e',
+			'animation',
+			'queue_name',
+			'collaborators',
+			'lock',
+			'assets'
+		];
+	}
+
 	/**
 	* Load a slide from file.
 	*
@@ -94,7 +97,7 @@ final class Slide extends Exportable {
 	public function load(string $id) {
 		self::validate_id($id);
 
-		$this->fimport(self::get_conf_path($id), TRUE);
+		$this->fimport(self::get_conf_path($id));
 		$this->lock_cleanup();
 		$this->update_sched_enabled();
 		$this->write();

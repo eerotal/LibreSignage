@@ -18,25 +18,13 @@ use libresignage\common\php\Log;
 * Queue class for handling LibreSignage queue data.
 */
 final class Queue extends Exportable {
-	static $PRIVATE = [
-		'name',
-		'owner',
-		'slide_ids'
-	];
-
-	static $PUBLIC = [
-		'name',
-		'owner',
-		'slide_ids'
-	];
-
 	const NAME_REGEX = '/^[A-Za-z0-9_-]+$/';
 
 	private $name      = '';
 	private $owner     = '';
 	private $slides    = [];
 	private $slide_ids = [];
-
+	
 	public function __exportable_set(string $name, $value) {
 		$this->{$name} = $value;
 	}
@@ -48,7 +36,15 @@ final class Queue extends Exportable {
 	public function __exportable_write() {
 		$this->write();
 	}
-	
+
+	public static function __exportable_private(): array {
+		return ['name', 'owner', 'slide_ids'];
+	}
+
+	public static function __exportable_public(): array {
+		return ['name', 'owner', 'slide_ids'];
+	}
+
 	/*
 	* Load a queue from file.
 	*
@@ -61,7 +57,7 @@ final class Queue extends Exportable {
 			throw new QueueNotFoundException("Queue '{$name}' doesn't exist.");
 		}
 
-		$this->fimport(self::get_path($name), TRUE);
+		$this->fimport(self::get_path($name));
 		$this->load_slide_objects();
 	}
 

@@ -12,16 +12,6 @@ final class QuotaException extends \Exception {};
 * Class for handling user quotas.
 */
 final class UserQuota extends Exportable {
-	static $PRIVATE = [
-		'used',
-		'state'
-	];
-
-	static $PUBLIC = [
-		'limits',
-		'used'
-	];
-
 	private $limits = [];
 	private $used   = [];
 	private $state  = [];
@@ -41,6 +31,14 @@ final class UserQuota extends Exportable {
 	}
 
 	public function __exportable_write() {}
+
+	public static function __exportable_private(): array {
+		return ['used', 'state'];
+	}
+
+	public static function __exportable_public(): array {
+		return ['used', 'limits'];
+	}
 
 	/**
 	* Check whether there's quota left.

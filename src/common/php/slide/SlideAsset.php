@@ -14,21 +14,6 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 * A class for handling file uploads to slides.
 */
 final class SlideAsset extends Exportable {
-	static $PRIVATE = [
-		'filename',
-		'mime',
-		'uid',
-		'slide_id',
-		'has_thumb',
-		'hash'
-	];
-	static $PUBLIC = [
-		'mime',
-		'filename',
-		'has_thumb',
-		'hash'
-	];
-
 	const FILENAME_REGEX = '/^[ A-Za-z0-9_.-]*$/';
 	const THUMB_SUFFIX   = '_thumb';
 
@@ -48,6 +33,26 @@ final class SlideAsset extends Exportable {
 	}
 
 	public function __exportable_write() {}
+
+	public static function __exportable_private(): array {
+		return [
+			'filename',
+			'mime',
+			'uid',
+			'slide_id',
+			'has_thumb',
+			'hash'
+		];
+	}
+
+	public static function __exportable_public(): array {
+		return [
+			'mime',
+			'filename',
+			'has_thumb',
+			'hash'
+		];
+	}
 
 	/**
 	* Validate an UploadedFile.

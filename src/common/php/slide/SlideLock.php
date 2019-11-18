@@ -11,15 +11,6 @@ use libresignage\common\php\Util;
 * SlideLock object for locking slides.
 */
 final class SlideLock extends Exportable {
-	static $PRIVATE = [
-		'session_id',
-		'expire'
-	];
-	static $PUBLIC = [
-		'session_id',
-		'expire'
-	];
-
 	private $session_id = NULL;
 	private $expire = NULL;
 
@@ -39,7 +30,15 @@ final class SlideLock extends Exportable {
 	}
 
 	public function __exportable_write() {}
-	
+
+	public static function __exportable_private(): array {
+		return ['session_id', 'expire'];
+	}
+
+	public static function __exportable_public(): array {
+		return ['session_id', 'expire'];
+	}
+
 	/**
 	* Check whether a SlideLock has expired.
 	*
