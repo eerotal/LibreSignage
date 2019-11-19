@@ -25,7 +25,7 @@ interface MigrationInterface {
 	* @return string The classname as a string.
 	*/
 	public static function to_class(): string;
-	
+
 	/**
 	* Return an array of versions this migration applies to.
 	*

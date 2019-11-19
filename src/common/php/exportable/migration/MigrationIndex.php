@@ -32,7 +32,7 @@ final class MigrationIndex {
 		}
 
 		$tmp = Util::file_lock_and_get($file);
-		
+
 		$index = [];
 		foreach (JSONUtils::decode($tmp, $assoc=TRUE) as $data) {
 			array_push($index, new MigrationIndexEntry(
@@ -44,7 +44,7 @@ final class MigrationIndex {
 			));
 		}
 		self::sort_index($index);
-		
+
 		$this->index = $index;
 	}
 
@@ -60,7 +60,7 @@ final class MigrationIndex {
 	public static function write(string $file, string $dir) {
 		$index = [];
 		$files = Util::scandir_recursive($dir);
-		
+
 		foreach ($files as $f) {
 			require_once($f);
 			$classes = get_declared_classes();
@@ -95,18 +95,18 @@ final class MigrationIndex {
 		}
 		return NULL;
 	}
-	
+
 	/**
 	* Sort a migration index by the keys, ie. version numbers.
 	*
-	* @return bool TRUE on success or FALSE on failure. 
+	* @return bool TRUE on success or FALSE on failure.
 	*/
 	public static function sort_index(array &$index) {
 		return uksort($index, function ($a, $b) {
 			$a_split = explode('.', $a);
 			$b_split = explode('.', $b);
 			assert(count($a_split) == count($b_split));
-			
+
 			for ($i = 0; $i < count($a_split); $i++) {
 				if ($a_split[$i] < $b_split[$i]) {
 					return -1;
