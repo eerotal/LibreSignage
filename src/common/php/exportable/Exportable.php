@@ -329,35 +329,35 @@ abstract class Exportable {
 	* @throws ExportableException if missing or extra keys are found.
 	*/
 	public static function check_data_keys(array $data) {
-		 $keys = [];
-		 switch ($data[self::EXP_VISIBILITY]) {
-			 case self::EXP_VISIBILITY_PUBLIC:
-				 $keys = $data[self::EXP_CLASSNAME]::__exportable_public();
-				 break;
-			 case self::EXP_VISIBILITY_PRIVATE:
-				 $keys = $data[self::EXP_CLASSNAME]::__exportable_private();
-				 break;
-			 default:
-				 throw new ExportableException("Unknown visibility value.");
-		 }
+		$keys = [];
+		switch ($data[self::EXP_VISIBILITY]) {
+			case self::EXP_VISIBILITY_PUBLIC:
+				$keys = $data[self::EXP_CLASSNAME]::__exportable_public();
+				break;
+			case self::EXP_VISIBILITY_PRIVATE:
+				$keys = $data[self::EXP_CLASSNAME]::__exportable_private();
+				break;
+			default:
+				throw new ExportableException("Unknown visibility value.");
+		}
 
-		 $diff = Util::arraydiff(
-			 $keys,
-			 array_diff(array_keys($data), self::EXP_RESERVED)
-		 );
-		 if (!empty($diff['missing'])) {
-			 throw new ExportableException(
-				 "Missing keys from imported data: [ ".
-				 implode(', ', $diff['missing'])." ] for class ".
-				 $data[self::EXP_CLASSNAME]
-			 );
-		 }
-		 if (!empty($diff['extra'])) {
-			 throw new ExportableException(
-				 "Extra keys in imported data: [ ".
-				 implode(', ', $diff['extra'])." ] for class ".
-				 $data[self::EXP_CLASSNAME]
-			 );
-		 }
+		$diff = Util::arraydiff(
+			$keys,
+			array_diff(array_keys($data), self::EXP_RESERVED)
+		);
+		if (!empty($diff['missing'])) {
+			throw new ExportableException(
+				"Missing keys from imported data: [ ".
+				implode(', ', $diff['missing'])." ] for class ".
+				$data[self::EXP_CLASSNAME]
+			);
+		}
+		if (!empty($diff['extra'])) {
+			throw new ExportableException(
+				"Extra keys in imported data: [ ".
+				implode(', ', $diff['extra'])." ] for class ".
+				$data[self::EXP_CLASSNAME]
+			);
+		}
 	}
 }
