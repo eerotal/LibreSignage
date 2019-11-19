@@ -1,10 +1,4 @@
 <?php
-/**
-* An Exportable object implementation for easily exporting and importing
-* object values in a format with only primitive values, ie. no objects.
-* This is useful when object data needs to be JSON encoded/decoded for
-* example.
-*/
 
 namespace libresignage\common\php\exportable;
 
@@ -15,11 +9,16 @@ use libresignage\common\php\Util;
 use libresignage\common\php\JSONUtils;
 use libresignage\common\php\Log;
 use libresignage\common\php\Config;
+use libresignage\common\php\util\VersionNumber;
 
+/**
+* A class for serializing/deserializing objects.
+*/
 abstract class Exportable {
 	const EXP_CLASSNAME  = '__classname';
 	const EXP_VISIBILITY = '__visibility';
 	const EXP_VERSION = '__version';
+
 	const EXP_RESERVED = [
 		self::EXP_CLASSNAME,
 		self::EXP_VISIBILITY,
@@ -53,7 +52,6 @@ abstract class Exportable {
 	* @param string $name The name of the property to get.
 	*/
 	public abstract function __exportable_get(string $name);
-	
 
 	/**
 	* Write the object data to disk.
@@ -78,19 +76,16 @@ abstract class Exportable {
 	* @return array An array of public object properties.
 	*/
 	public static abstract function __exportable_public(): array;
-	
+
 	/**
 	* Recursively export object properties.
 	*
-	* @param bool $private If TRUE, export properties listed in
-	*                      static::__exportable_private().
-	* @param bool $meta    If TRUE, export metadata along with object
-	*                      properties so that Exportable::import() can
-	*                      be used.
+	* @param bool $private Export private values.
+	* @param bool $meta    Export metadata.
 	*
 	* @return array The exported data as an associative array.
 	*
-	* @throws ExportableException if a reserved key is used as
+	* @throws ExportableException If a reserved key is used as
 	*                             an object property name.
 	*/
 	public function export(bool $private = FALSE, bool $meta = FALSE): array {
@@ -103,12 +98,19 @@ abstract class Exportable {
 			$keys = static::__exportable_public();
 		}
 
-		// Check for reserved keys.
 		if (!empty(array_intersect(self::EXP_RESERVED, $keys))) {
 			throw new ExportableException(
 				"Reserved key '".self::EXP_CLASSNAME."' used in object."
 			);
 		}
+
+		/*
+		* Convert the Exportable object into an associative array with all
+		* the required values and export it using Exportable::export_array().
+		*/
+		$data = [];
+		foreach ($keys as $k) { $data[$k] = $this->__exportable_get($k); }
+		$ret = self::export_array($data, $private, $meta);
 
 		// Add metadata.
 		if ($meta) {
@@ -117,67 +119,42 @@ abstract class Exportable {
 			$ret[self::EXP_VERSION] = self::current_version();
 		}
 
-		foreach ($keys as $k) {
-			$current = $this->__exportable_get($k);
-			switch (gettype($current)) {
-				case 'object':
-					$ret[$k] = $this->exp_obj($current, $private, $meta);
-					break;
-				case 'array':
-					$ret[$k] = $this->exp_array($current, $private, $meta);
-					break;
-				default:
-					$ret[$k] = $current;
-					break;
-			}
-		}
 		return $ret;
 	}
 
 	/**
-	* Handle object exporting.
-	*
-	* @param  mixed $obj     The object to export.
-	* @param  bool  $private See Exportable::export().
-	* @param  bool  $meta    See Exportable::export().
-	*
-	* @return array The exported object as an associative array.
-	*
-	* @throws ExportableException if $obj doesn't extend Exportable.
-	*/
-	private function exp_obj($obj, bool $private, bool $meta): array {
-		if (is_subclass_of(
-			$obj,
-			'libresignage\\common\\php\\exportable\\Exportable'
-		)) {
-			return $obj->export($private, $meta);
-		} else {
-			throw new ExportableException(
-				"Can't export a non-Exportable object."
-			);
-		}
-	}
-
-	/**
-	* Handle array exporting.
+	* Export an array.
 	*
 	* @param array $arr     The array to export.
-	* @param bool  $private See Exportable::export();
-	* @param bool  $meta    See Exportable::export();
+	* @param bool  $private Export private values.
+	* @param bool  $meta    Export metadata.
 	*
 	* @return array The exported array.
 	*/
-	private function exp_array(array $arr, bool $private, bool $meta) {
+	private static function export_array(
+		array $data,
+		bool $private,
+		bool $meta
+	) {
 		$ret = [];
-		foreach ($arr as $k => $v) {
-			switch(gettype($v)) {
+		foreach ($data as $k => $v) {
+			switch (gettype($v)) {
 				case 'object':
-					$ret[$k] = $this->exp_obj($v, $private, $meta);
+					# Object
+					if (is_subclass_of($v, self::class)) {
+						$ret[$k] = $v->export($private, $meta);
+					} else {
+						throw new ExportableException(
+							"Can't export a non-Exportable object."
+						);
+					}
 					break;
 				case 'array':
-					$ret[$k] = $this->exp_array($v, $private, $meta);
+					# Array
+					$ret[$k] = self::export_array($v, $private, $meta);
 					break;
 				default:
+					# Primitive value
 					$ret[$k] = $v;
 					break;
 			}
@@ -210,9 +187,9 @@ abstract class Exportable {
 				"' from file '$path'.", Log::LOGDEF
 			);
 			$this->__exportable_write();
- 		}
+		}
 	}
-	
+
 	/**
 	* Reconstruct Exportable object data.
 	*
@@ -262,7 +239,7 @@ abstract class Exportable {
 
 		return $obj;
 	}
-	
+
 	/**
 	* Recursively reconstruct an array that contains Exportable data.
 	*
@@ -321,7 +298,9 @@ abstract class Exportable {
 	* @return string A version string.
 	*/
 	private static function current_version(): string {
-		return substr(explode('-', Config::config('LS_VER'))[0], 1);
+		$ver = new VersionNumber([]);
+		$ver->from_string(Config::config('LS_VER'));
+		return strval($ver);
 	}
 
 	/**

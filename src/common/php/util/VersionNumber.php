@@ -40,7 +40,7 @@ final class VersionNumber {
 	*
 	* @return bool TRUE if the version numbers match, FALSE otherwise.
 	*/
-	public function matches(VersionNumber $v) {
+	public function matches(VersionNumber $v): bool {
 		if ($this->length() !== $v->length()) { return FALSE; }
 		for ($i = 0; $i < $this->length(); $i++) {
 			if ($this->get($i) === "*") {
@@ -72,7 +72,16 @@ final class VersionNumber {
 	*
 	* @return int The length of the version number.
 	*/
-	public function length() {
+	public function length(): int {
 		return count($this->version);
+	}
+
+	/**
+	* Return a string representation of a VersionNumber.
+	*
+	* @return string The version string.
+	*/
+	public function __toString(): string {
+		return implode(".", $this->version);
 	}
 }
