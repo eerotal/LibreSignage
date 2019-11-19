@@ -26,6 +26,9 @@ v1.1.0
                not locked. (issue #80)
   - [bugfix]   Fix a bug where an error was thrown when changing queues if an
                unsaved slide was open. (#86)
+  - [feature]  Implement a data migration system for simplifying upgrades
+               between different versions of LibreSignage.
+  - [bugfix]   Fix outdated information in documentation.
 
 v1.0.2
   - [bugfix]   Apply a workaround for docker-library/php#865 which broke
