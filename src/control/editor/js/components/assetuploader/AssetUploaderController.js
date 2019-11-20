@@ -1,6 +1,14 @@
 var Assert = require('libresignage/util/assert/Assert');
 
+/**
+* Controller class for an AssetUploader popup.
+*/
 class AssetUploaderController {
+	/**
+	* Construct a new AssetUploaderController.
+	*
+	* @param {APIInterface} api An APIInterface object.
+	*/
 	constructor(api) {
 		this.api = api;
 		this.state = {
@@ -15,10 +23,12 @@ class AssetUploaderController {
 		}
 	}
 
+	/**
+	* Open the asset uploader for a slide.
+	*
+	* @param {Slide} slide The Slide object to open the uploader for.
+	*/
 	open(slide) {
-		/*
-		*  Open the asset uploader for the Slide object 'slide'.
-		*/
 		this.slide = slide;
 		Object.assign(this.state.slide, {
 			loaded:      true,
@@ -30,10 +40,10 @@ class AssetUploaderController {
 		this.state.slide.loaded = true;
 	}
 
+	/**
+	* Close the asset uploader.
+	*/
 	close() {
-		/*
-		*  Close the assetuploader and reset all variables.
-		*/
 		this.slide = null;
 		Object.assign(this.state.slide, {
 			loaded:      false,
@@ -45,29 +55,40 @@ class AssetUploaderController {
 		})
 	}
 
+	/**
+	* Get the assets of the current slide.
+	*
+	* @return {SlideAsset[]} The list of assets.
+	*/
 	get_assets() {
-		/*
-		*  Get the slide assets list.
-		*/
 		return this.slide.get('assets');
 	}
 
+	/**
+	* Remove an asset.
+	*
+	* @param {string} name The name of the asset to remove.
+	*
+	* @throws {AssertError} If no name is supplied.
+	*/
 	async remove_asset(name) {
-		/*
-		*  Remove asset 'name'.
-		*/
 		Assert.assert(name != null && name.length != 0, "Empty slide name.");
 		await this.slide.remove_asset(name);
 		this.update_file_limit_state();
 	}
 
+	/**
+	* Upload assets to a Slide.
+	*
+	* This function sets the 'uploading' state value.
+	*
+	* @param {FileList} files The FileList from an HTML <input type="file">
+	*                         element.
+	*
+	* @throws {AssertError} If no files are selected.
+	* @throws {AssertError} If no slide is loaded.
+	*/
 	async upload_assets(files) {
-		/*
-		*  Upload the files specified in 'files' which
-		*  is an object created by an HTML <input type="file">
-		*  object or a similarly structured one. This function
-		*  sets the 'uploading' state value.
-		*/
 		Assert.assert(files.length != 0, "Empty files list.");
 		Assert.assert(this.slide, "No slide loaded.");
 
@@ -82,26 +103,26 @@ class AssetUploaderController {
 		this.update_file_limit_state();
 	}
 
+	/**
+	* Update the slide data.
+	*/
 	async update() {
-		/*
-		*  Update the slide data.
-		*/
 		await this.slide.fetch();
 	}
 
+	/**
+	* Update the 'filelimit' state value with the current data.
+	*/
 	update_file_limit_state() {
-		/*
-		*  Update the 'filelimit' state value with the current data.
-		*/
-		this.state.slide.filelimit = 
+		this.state.slide.filelimit =
 			Object.keys(this.slide.get('assets')).length
 				>= this.api.limits.SLIDE_MAX_ASSETS;
 	}
 
+	/**
+	* Get the valid file mime types for input validation.
+	*/
 	get_valid_file_mime_types() {
-		/*
-		*  Get the valid file mime types for input validation.
-		*/
 		let ret = [];
 		for (let m of this.api.limits.SLIDE_ASSET_VALID_MIMES) {
 			ret[m.split('/')[1]] = m;
@@ -109,27 +130,42 @@ class AssetUploaderController {
 		return ret;
 	}
 
+	/**
+	* Get the valid filename regex for input validation.
+	*
+	* TODO: This could be fetched from the server.
+	*
+	* @return {object} A regex.
+	*/
 	get_valid_filename_regex() {
-		/*
-		*  Get the valid filename regex for input validation.
-		*  TODO: This could be fetched from the server.
-		*/
 		return /^[ A-Za-z0-9_.-]*$/;
 	}
 
+	/**
+	* Get the maximum filename length for input validation.
+	*
+	* @return {number} The maximum filename length.
+	*/
 	get_max_filename_len() {
-		/*
-		*  Get the maximum filename length for input validation.
-		*/
 		return this.api.limits.SLIDE_ASSET_NAME_MAX_LEN;
 	}
 
+	/**
+	* Get the current slide.
+	*
+	* @return {Slide} The Slide object.
+	*/
 	get_slide() {
 		return this.slide;
 	}
 
+	/**
+	* Get all state variables as an object.
+	*
+	* @return {object} The state variables.
+	*/
 	get_state() {
 		return this.state;
 	}
 }
-exports.AssetUploaderController = AssetUploaderController;
+module.exports = AssetUploaderController;

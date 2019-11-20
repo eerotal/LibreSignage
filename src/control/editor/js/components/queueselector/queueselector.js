@@ -1,16 +1,16 @@
 var $ = require('jquery');
-var UIController = require('ls-uicontrol').UIController;
-var UIButton = require('ls-uicontrol').UIButton;
-var UIInput = require('ls-uicontrol').UIInput;
-var APIUI = require('ls-api-ui');
-var DropSelect = require('ls-dropselect').DropSelect;
-var DropConfirm = require('ls-dropconfirm').DropConfirm;
-var dialog = require('ls-dialog');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 var EventData = require('ls-eventdata').EventData;
 
 var StrValidator = require('libresignage/ui/validator/StrValidator');
 var BlacklistValidator = require('libresignage/ui/validator/BlacklistValidator');
 var Queue = require('libresignage/queue/Queue');
+var DropSelect = require('libresignage/ui/components/DropSelect');
+var UIController = require('libresignage/ui/controller/UIController')
+var UIInput = require('libresignage/ui/controller/UIInput')
+var UIButton = require('libresignage/ui/controller/UIButton');
+var PromptDialog = require('libresignage/ui/components/Dialog/PromptDialog');
+var DropConfirm = require('libresignage/ui/components/DropConfirm');
 
 class QueueSelector {
 	constructor(container_id, api) {
@@ -29,15 +29,11 @@ class QueueSelector {
 				cond: () => true,
 				enabler: null,
 				attach: {
-					'component.dropselect.show': async (e, data) => {
+					'component.dropselect.show': async e => {
 						await this.update_queue_list();
 					},
-					'component.dropselect.select': (e, data) => {
-						if (this.select_queue(data.get('option'))) {
-							data.then();
-						} else {
-							data.except();
-						}
+					'component.dropselect.select': e => {
+						this.select_queue(this.select.get_selection());
 					}
 				},
 				defer: () => !this.state.ready
@@ -96,7 +92,7 @@ class QueueSelector {
 		try {
 			queues = await Queue.get_queues(this.api);
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 
@@ -122,16 +118,14 @@ class QueueSelector {
 		try {
 			queues = await Queue.get_queues(this.api);
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 
 		new Promise((resolve, reject) => {
-			dialog.dialog(
-				dialog.TYPE.PROMPT,
+			let dialog = new PromptDialog(
 				'Queue name',
 				'Please enter a name for the new queue.',
-				(action, val) => action ? resolve(val) : reject(),
 				[new StrValidator({
 					min: 1,
 					max: null,
@@ -149,8 +143,9 @@ class QueueSelector {
 				}, "Invalid characters in queue name."),
 				new BlacklistValidator({
 					bl: queues
-				}, "This queue already exists.")]
-			)
+				}, "This queue already exists.")],
+				status => status ? resolve(dialog.get_value()) : reject(),
+			);
 		}).then((value) => {
 			this.trigger(
 				'create',

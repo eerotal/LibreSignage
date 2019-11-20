@@ -1,12 +1,5 @@
-var ShortcutController = require('ls-shortcut').ShortcutController;
-var Shortcut = require('ls-shortcut').Shortcut;
-
-var APIUI = require('ls-api-ui');
 var MarkupError = require('ls-markup').err.MarkupError;
 
-var AssetUploader = require(
-	'./components/assetuploader/assetuploader.js'
-).AssetUploader;
 var Timeline = require(
 	'./components/timeline/timeline.js'
 ).Timeline;
@@ -16,6 +9,8 @@ var Preview = require(
 var QueueSelector = require(
 	'./components/queueselector/queueselector.js'
 ).QueueSelector;
+
+var AssetUploader = require('./components/assetuploader/AssetUploader.js')
 
 var bootstrap = require('bootstrap');
 var ace_range = ace.require('ace/range');
@@ -36,25 +31,28 @@ var UIInput = require('libresignage/ui/controller/UIInput')
 var UIButton = require('libresignage/ui/controller/UIButton');
 var UIStatic = require('libresignage/ui/controller/UIStatic');
 var BaseView = require('libresignage/ui/view/BaseView');
+var ShortcutController = require('libresignage/misc/ShortcutController');
+var Shortcut = require('libresignage/misc/Shortcut');
 var EditorController = require('./EditorController.js');
 var EditorValidators = require('./EditorValidators.js');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 
 class EditorView extends BaseView {
 	constructor(api) {
 		super();
 
-		this.api        = api;
+		this.api = api;
 		this.controller = new EditorController(api);
 
-		this.buttons    = null;
-		this.inputs     = null;
-		this.statics    = null;
+		this.buttons = null;
+		this.inputs = null;
+		this.statics = null;
 
-		this.editor     = null;
-		this.timeline   = null;
-		this.preview    = null;
+		this.editor = null;
+		this.timeline = null;
+		this.preview = null;
 
-		this.error_id   = null;
+		this.error_id = null;
 
 		this.init_state({
 			ready: false,
@@ -69,14 +67,14 @@ class EditorView extends BaseView {
 		try {
 			await this.controller.init();
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 
 		try {
 			users = await User.list_all(this.api);
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 		user = this.api.get_session().get_user().get_user();
@@ -385,7 +383,7 @@ class EditorView extends BaseView {
 						try {
 							await this.show_slide(data.get('id'));
 						} catch (e) {
-							APIUI.handle_error(e);
+							new APIErrorDialog(e);
 							data.except();
 							return;
 						}
@@ -407,7 +405,7 @@ class EditorView extends BaseView {
 						try {
 							await this.show_queue(data.get('queue'));
 						} catch (e) {
-							APIUI.handle_error(e);
+							new APIErrorDialog(e);
 							data.except();
 							return;
 						}
@@ -419,7 +417,7 @@ class EditorView extends BaseView {
 						try {
 							await this.create_queue(data.get('queue'));
 						} catch (e) {
-							APIUI.handle_error(e);
+							new APIErrorDialog(e);
 							data.except();
 							return;
 						}
@@ -434,7 +432,7 @@ class EditorView extends BaseView {
 						try {
 							await this.remove_queue();
 						} catch (e) {
-							APIUI.handle_error(e);
+							new APIErrorDialog(e);
 							data.except();
 							return;
 						}
@@ -544,7 +542,7 @@ class EditorView extends BaseView {
 						try {
 							await this.move_slide(data.get('option'));
 						} catch (e) {
-							APIUI.handle_error(e);
+							new APIErrorDialog(e);
 							data.except();
 							return;
 						}
@@ -840,27 +838,29 @@ class EditorView extends BaseView {
 		/*
 		*  Highlight lines from-to in the markup editor.
 		*/
-		return this.editor.session.addMarker(
+		this.error_id = this.editor.session.addMarker(
 			new ace_range.Range(from, 0, to, 10),
 			'syntax-error-highlight',
 			'fullLine'
 		);
 	}
 
-	clear_error(id) {
+	clear_error() {
 		/*
 		*  Clear editor highlights.
 		*/
-		if (id) { this.editor.session.removeMarker(id); }
+		if (this.error_id != null) {
+			this.editor.session.removeMarker(this.error_id);
+			this.statics.get('label_editor_error').set('');
+			this.error_id = null;
+		}
 	}
 
 	render_preview() {
 		/*
 		*  Render the live markup preview.
 		*/
-		this.statics.get('label_editor_error').set('');
-		this.clear_error(this.error_id);
-		this.error_id = null;
+		this.clear_error();
 
 		try {
 			this.preview.render(this.inputs.get('editor').get());
@@ -869,7 +869,7 @@ class EditorView extends BaseView {
 				this.statics.get('label_editor_error').set(
 					`>> ${e.toString()}`
 				);
-				this.error_id = this.highlight_error(e.line(), e.line());
+				this.highlight_error(e.line(), e.line());
 			} else {
 				throw e;
 			}
@@ -931,6 +931,10 @@ class EditorView extends BaseView {
 			await this.controller.close_slide();
 		}
 		this.inputs.all(function() { this.clear(); });
+
+		// Make sure slide markup errors are cleared.
+		this.clear_error();
+
 		this.update();
 	}
 
@@ -955,7 +959,7 @@ class EditorView extends BaseView {
 			await this.controller.save_slide();
 			await this.timeline.update(false);
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 		this.timeline.set_selected(s.get('id'));
@@ -970,7 +974,7 @@ class EditorView extends BaseView {
 			await this.controller.duplicate_slide();
 			await this.timeline.update(true);
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 		}
 	}
 
@@ -994,7 +998,7 @@ class EditorView extends BaseView {
 				await Queue.get_queues(this.api)
 			).filter(q => q !== sq);
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 		this.move.set_options(queues);

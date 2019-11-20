@@ -1,33 +1,39 @@
-var $ = require('jquery');
-var UIStatic = require('ls-uicontrol').UIStatic
-var UIInput = require('ls-uicontrol').UIInput;
-var UIButton = require('ls-uicontrol').UIButton;
-var UIController = require('ls-uicontrol').UIController;
-var Popup = require('ls-popup').Popup;
-var APIUI = require('ls-api-ui');
-
-var AssetUploaderController = require('./assetuploader_controller.js').AssetUploaderController;
-var AssetList = require('./assetlist.js').AssetList;
+var AssetUploaderController = require('./AssetUploaderController.js');
+var AssetList = require('./AssetList.js');
 
 var ValidatorSelector = require('libresignage/ui/validator/ValidatorSelector');
 var ValidatorTrigger = require('libresignage/ui/validator/ValidatorTrigger');
 var FileSelectorValidator = require('libresignage/ui/validator/FileSelectorValidator');
 var Assert = require('libresignage/util/assert/Assert');
+var UIController = require('libresignage/ui/controller/UIController')
+var UIInput = require('libresignage/ui/controller/UIInput')
+var UIButton = require('libresignage/ui/controller/UIButton');
+var UIStatic = require('libresignage/ui/controller/UIStatic');
+var Popup = require('libresignage/ui/components/Popup');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 
+/**
+* A view class for the AssetUploader popup.
+*/
 class AssetUploader {
+	/**
+	* Construct a new AssetUploader object.
+	*
+	* @param {HTMLElement} container The container element where the popup
+	*                                is created.
+	* @param {APIInterface} api      An APIInterface object.
+	*/
 	constructor(container, api) {
 		this.controller = new AssetUploaderController(api);
 		this.container = container;
-
 		this.popup = new Popup(container);
-
 		this.assetlist = new AssetList(
-			$(this.container).find('.filelist')
+			this.container.querySelector('.filelist')
 		);
 
 		this.inputs = new UIController({
 			files: new UIInput({
-				elem: $(this.container).find('.filesel'),
+				elem: this.container.querySelector('.filesel'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -40,24 +46,23 @@ class AssetUploader {
 				},
 				defer: () => !this.ready,
 				mod: null,
-				getter: e => e.prop('files'),
+				getter: e => e.files,
 				setter: null,
 				clearer: e => {
-					e.val('');
-					e.trigger('input');
+					e.value = '';
+					e.dispatchEvent('input');
 				}
 			}),
 			filelist: new UIInput({
-				elem: $(this.container).find('.filelist'),
+				elem: this.container.querySelector('.filelist'),
 				cond: d => true,
 				enabler: null,
 				attach: {
-					'component.assetlist.select': (e, data) => {
-						this.select_asset(data.name);
+					'component.assetlist.select': e => {
+						this.select_asset(this.assetlist.get_selection());
 					},
 					'component.assetlist.remove': async (e, data) => {
-						await this.remove_asset(data.name);
-						this.inputs.get('filelink').clear();
+						await this.remove_asset(this.assetlist.get_selection());
 					}
 				},
 				defer: () => !this.ready,
@@ -67,20 +72,20 @@ class AssetUploader {
 				clearer: null
 			}),
 			filelink: new UIInput({
-				elem: $(this.container).find('.file-link-input'),
+				elem: this.container.querySelector('.file-link-input'),
 				cond: d => true,
 				enabler: null,
 				attach: null,
 				defer: () => !this.ready,
 				mod: null,
-				setter: (e, val) => e.val(val),
-				getter: e => e.val(),
-				clearer: e => e.val('')
+				setter: (e, val) => e.value = val,
+				getter: e => e.value,
+				clearer: e => e.value = ''
 			})
 		});
 		this.buttons = new UIController({
 			upload: new UIButton({
-				elem: $(this.container).find('.upload-btn'),
+				elem: this.container.querySelector('.upload-btn'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -90,16 +95,14 @@ class AssetUploader {
 				),
 				enabler: null,
 				attach: {
-					click: () => {
-						this.upload_assets();
-					}
+					click: () => this.upload_assets()
 				},
 				defer: () => !this.ready
 			})
 		});
 		this.statics = new UIController({
 			popup: new UIStatic({
-				elem: $(this.container),
+				elem: this.container,
 				cond: d => true,
 				enabler: null,
 				attach: {
@@ -111,7 +114,7 @@ class AssetUploader {
 				clearer: null
 			}),
 			files_label: new UIStatic({
-				elem: $(this.container).find('.filesel-label'),
+				elem: this.container.querySelector('.filesel-label'),
 				cond: d => true,
 				enabler: null,
 				attach: null,
@@ -121,7 +124,7 @@ class AssetUploader {
 				clearer: null
 			}),
 			files_limit_label: new UIStatic({
-				elem: $(this.container).find('.file-limit-label-row'),
+				elem: this.container.querySelector('.file-limit-label-row'),
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
@@ -129,7 +132,7 @@ class AssetUploader {
 					&& d.slide.filelimit
 				),
 				enabler: (elem, s) => {
-					elem.css('display', s === true ? 'block' : 'none');
+					elem.style.display = s ? 'block' : 'none'
 				},
 				attach: null,
 				defer: () => !this.ready,
@@ -143,12 +146,10 @@ class AssetUploader {
 		let f_regex = this.controller.get_valid_filename_regex();
 		let f_max_len = this.controller.get_max_filename_len();
 
-		/*
-		*  Create validators for the file selector.
-		*/
+		// Create validators for the file selector.
 		this.fileval_sel = new ValidatorSelector(
-			$(this.container).find('.filesel')[0],
-			$(this.container).find('.filesel-cont')[0],
+			this.container.querySelector('.filesel'),
+			this.container.querySelector('.filesel-cont'),
 			[new FileSelectorValidator(
 				{
 					mimes: Object.values(f_mimes),
@@ -179,7 +180,7 @@ class AssetUploader {
 					minfiles: null,
 					bl: null
 				},
-				"Invalid characters in filename. " + 
+				"Invalid characters in filename. " +
 				"A-Z, a-z, 0-9, ., _, - and space are allowed."
 			),
 			new FileSelectorValidator(
@@ -208,9 +209,7 @@ class AssetUploader {
 			)]
 		);
 
-		/*
-		*  Create a validator trigger and manually trigger it once.
-		*/
+		// Create a validator trigger.
 		this.fileval_trig = new ValidatorTrigger(
 			[this.fileval_sel],
 			() => this.update()
@@ -219,10 +218,12 @@ class AssetUploader {
 		this.ready = true;
 	}
 
+	/**
+	* Open the asset uploader for a Slide.
+	*
+	* @param {Slide} slide The Slide to open the AssetUploader for.
+	*/
 	show(slide) {
-		/*
-		*  Open the asset uploader for 'slide'.
-		*/
 		Assert.assert(slide != null, "No slide specified.");
 		this.controller.open(slide);
 		this.assetlist.show(slide);
@@ -230,22 +231,22 @@ class AssetUploader {
 		this.update();
 	}
 
+	/**
+	* Clear the asset uploader.
+	*/
 	clear() {
-		/*
-		*  Clear the asset uploader.
-		*/
 		this.inputs.all(function() { this.clear(); });
 		this.assetlist.hide();
 		this.controller.close();
 	}
 
+	/**
+	* Upload the currently selected files.
+	*
+	* This function also handles indicating uploads in progress in the UI.
+	*/
 	async upload_assets() {
-		/*
-		*  Upload the currently selected files. This function
-		*  also handles indicating uploads in progress in the UI.
-		*/
 		let selector = this.inputs.get('files');
-
 		this.indicate_upload_begin();
 		try {
 			let tmp = this.controller.upload_assets(selector.get());
@@ -254,7 +255,7 @@ class AssetUploader {
 		} catch (e) {
 			this.indicate_upload_end();
 			this.update();
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 		selector.clear();
@@ -262,28 +263,36 @@ class AssetUploader {
 		this.update();
 	}
 
+	/**
+	* Show the upload in progess -indicator.
+	*/
 	indicate_upload_begin() {
 		this.buttons.get('upload')
 			.get_elem()
 			.addClass('uploading');
 	}
 
+	/**
+	* Clear the upload in progress -indicator.
+	*/
 	indicate_upload_end() {
 		this.buttons.get('upload')
 			.get_elem()
 			.removeClass('uploading');
 	}
 
+	/**
+	* Remove an asset.
+	*
+	* @param {string} name The name of the asset to remove.
+	*/
 	async remove_asset(name) {
-		/*
-		*  Remove the asset 'name' and update the UI.
-		*/
 		try {
 			await this.controller.remove_asset(name);
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 		}
-		this.inputs.get('filelink').clear();
+		this.deselect_asset();
 		this.update();
 	}
 
@@ -299,25 +308,33 @@ class AssetUploader {
 		);
 	}
 
+	/**
+	* Deselect an asset.
+	*/
+	deselect_asset() {
+		this.assetlist.deselect();
+		this.inputs.get('filelink').clear();
+	}
+
+	/**
+	* Update the file selector label with the selected
+	* filenames.
+	*/
 	update_file_selector_label() {
-		/*
-		*  Update the file selector label with the selected
-		*  filenames.
-		*/
 		let names = [];
 		let elem = this.inputs.get('files').get_elem()[0];
 		if (elem.files.length != 0) {
 			for (let f of elem.files) { names.push(f.name); }
-			this.statics.get('files_label').set(names.join(', '));	
+			this.statics.get('files_label').set(names.join(', '));
 		} else {
 			this.statics.get('files_label').set('Choose a file');
 		}
 	}
 
+	/**
+	* Update the UI of the asset uploader.
+	*/
 	update() {
-		/*
-		*  Update the UI of the asset uploader.
-		*/
 		this.inputs.all(
 			function(d) { this.state(d); },
 			this.controller.get_state()

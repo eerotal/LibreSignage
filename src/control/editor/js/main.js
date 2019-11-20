@@ -1,15 +1,18 @@
-var $ = require('jquery');
-var EditorView = require('./editorview.js').EditorView;
-var APIUI = require('ls-api-ui');
+/**
+* @file Entry point for the Editor page.
+*/
+
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 
 var APIInterface = require('libresignage/api/APIInterface');
+var EditorView = require('./EditorView.js');
 
-$(document).ready(async () => {
+document.addEventListener('DOMContentLoaded', async () => {
 	let API = new APIInterface();
 	try {
 		await API.init();
 	} catch (e) {
-		APIUI.handle_error(e);
+		new APIErrorDialog(e);
 		return;
 	}
 
