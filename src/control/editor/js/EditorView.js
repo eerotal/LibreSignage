@@ -1,8 +1,5 @@
 var MarkupError = require('ls-markup').err.MarkupError;
 
-var Timeline = require(
-	'./components/timeline/timeline.js'
-).Timeline;
 var QueueSelector = require(
 	'./components/queueselector/queueselector.js'
 ).QueueSelector;
@@ -33,6 +30,7 @@ var EditorValidators = require('./EditorValidators.js');
 var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 var Preview = require('./components/preview/Preview.js');
 var AssetUploader = require('./components/assetuploader/AssetUploader.js')
+var Timeline = require('./components/timeline/Timeline.js');
 
 class EditorView extends BaseView {
 	constructor(api) {

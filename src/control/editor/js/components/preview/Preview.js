@@ -8,7 +8,8 @@ class Preview {
 	/**
 	* Construct a new Slide preview.
 	*
-	* @param {HTMLElement} container The preview container.
+	* @param {HTMLElement} container The HTML element where the Preview
+	*                                is created.
 	*/
 	constructor(container) {
 		this.valid_ratios = ['4x3', '16x9', '4x3-fit', '16x9-fit'];
