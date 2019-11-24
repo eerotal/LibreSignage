@@ -3,14 +3,9 @@ var MarkupError = require('ls-markup').err.MarkupError;
 var Timeline = require(
 	'./components/timeline/timeline.js'
 ).Timeline;
-var Preview = require(
-	'./components/preview/preview.js'
-).Preview;
 var QueueSelector = require(
 	'./components/queueselector/queueselector.js'
 ).QueueSelector;
-
-var AssetUploader = require('./components/assetuploader/AssetUploader.js')
 
 var bootstrap = require('bootstrap');
 var ace_range = ace.require('ace/range');
@@ -36,6 +31,8 @@ var Shortcut = require('libresignage/misc/Shortcut');
 var EditorController = require('./EditorController.js');
 var EditorValidators = require('./EditorValidators.js');
 var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
+var Preview = require('./components/preview/Preview.js');
+var AssetUploader = require('./components/assetuploader/AssetUploader.js')
 
 class EditorView extends BaseView {
 	constructor(api) {
@@ -674,7 +671,7 @@ class EditorView extends BaseView {
 		this.timeline = new Timeline('timeline');
 
 		// Live slide preview.
-		this.preview = new Preview('preview');
+		this.preview = new Preview(document.querySelector('#preview'));
 		await this.preview.init();
 
 		// Slide remove DropConfirm.
