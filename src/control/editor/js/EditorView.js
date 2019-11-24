@@ -373,17 +373,20 @@ class EditorView extends BaseView {
 				cond: () => true,
 				enabler: null,
 				attach: {
-					'component.timeline.click': async (e, data) => {
+					'component.timeline.click': async e => {
 						this.state('loading', true);
+
+						let new_id = this.timeline.get_last_clicked_slide_id();
 						try {
-							await this.show_slide(data.get('id'));
+							await this.show_slide(new_id);
 						} catch (e) {
 							new APIErrorDialog(e);
-							data.except();
+							this.state('loading', false);
 							return;
 						}
+						this.timeline.set_selected(new_id);
+
 						this.state('loading', false);
-						data.then();
 					}
 				},
 				defer: () => !this.state('ready') || this.state('loading'),
@@ -532,17 +535,16 @@ class EditorView extends BaseView {
 						await this.update_move_slide_options();
 						this.state('loading', false);
 					},
-					'component.dropselect.select': async (e, data) => {
+					'component.dropselect.select': async e => {
 						this.state('loading', true);
 						try {
-							await this.move_slide(data.get('option'));
+							await this.move_slide(this.move.get_selection());
 						} catch (e) {
 							new APIErrorDialog(e);
-							data.except();
+							this.state('loading', false);
 							return;
 						}
 						this.state('loading', false);
-						data.then();
 					}
 				},
 				defer: () => !this.state('ready') || this.state('loading')
