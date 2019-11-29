@@ -1,5 +1,5 @@
 var $ = require('jquery');
-var APIUI = require('ls-api-ui');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 
 var APIInterface = require('libresignage/api/APIInterface');
 

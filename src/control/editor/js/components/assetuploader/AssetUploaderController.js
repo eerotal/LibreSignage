@@ -1,4 +1,4 @@
-var Assert = require('libresignage/util/assert/Assert');
+var Assert = require('assert');
 
 /**
 * Controller class for an AssetUploader popup.
@@ -72,7 +72,7 @@ class AssetUploaderController {
 	* @throws {AssertError} If no name is supplied.
 	*/
 	async remove_asset(name) {
-		Assert.assert(name != null && name.length != 0, "Empty slide name.");
+		Assert.ok(name != null && name.length != 0, "Empty slide name.");
 		await this.slide.remove_asset(name);
 		this.update_file_limit_state();
 	}
@@ -89,8 +89,8 @@ class AssetUploaderController {
 	* @throws {AssertError} If no slide is loaded.
 	*/
 	async upload_assets(files) {
-		Assert.assert(files.length != 0, "Empty files list.");
-		Assert.assert(this.slide, "No slide loaded.");
+		Assert.ok(files.length != 0, "Empty files list.");
+		Assert.ok(this.slide, "No slide loaded.");
 
 		this.state.slide.uploading = true;
 		try {

@@ -1,5 +1,5 @@
 var $ = require('jquery');
-var APIUI = require('ls-api-ui');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 var UserView = require('./userview.js').UserView;
 
 var APIInterface = require('libresignage/api/APIInterface');
@@ -9,7 +9,7 @@ $(document).ready(async () => {
 	try {
 		await API.init();
 	} catch (e) {
-		APIUI.handle_error(e);
+		new APIErrorDialog(e);
 		return;
 	}
 

@@ -20,26 +20,30 @@ class Timeline {
 	}
 
 	/**
-	* Create a template for the Slide "frames" in the Timeline.
+	* Create a div node for the Slide "frames" in the Timeline.
 	*
-	* @param {Slide} s The Slide to create the template for.
+	* @param {Slide} s The Slide to create the node for.
 	*
-	* @param {HTMLElement} The created frame template.
+	* @param {HTMLElement} The created frame node.
 	*/
-	static make_slide_frame_template(s) {
-		let template = document.createElement('template');
-		template.innerHTML = `
+	static make_slide_frame_node(s) {
+		let div = document.createElement('div');
+
+		div.classList.add('btn', 'tl-slide-cont');
+		if (!s.get('enabled')) {
+			div.classList.add('disabled');
+		}
+
+		div.id = `tl-slide-btn-${s.get('id')}`;
+		div.innerHTML = `
+			<div class="tl-slide-index-cont">${s.get('index')}</div>
 			<div
-				class="btn tl-slide-cont ${!s.get('enabled') ? 'disabled': ''}"
-				id="tl-slide-btn-${s.get('id')}">
-				<div class="tl-slide-index-cont">${s.get('index')}</div>
-				<div
-					class="tl-slide-thumb-cont preview-cont"
-					id="tl-slide-thumb-cont-${s.get('id')}">
-				</div>
+				class="tl-slide-thumb-cont preview-cont"
+				id="tl-slide-thumb-cont-${s.get('id')}">
 			</div>
 		`;
-		return template;
+
+		return div;
 	}
 
 	/**
@@ -54,7 +58,7 @@ class Timeline {
 		) { return; }
 
 		this.last_clicked_slide_id = id;
-		this.container.dispatchEvent('component.timeline.click');
+		this.container.dispatchEvent(new Event('component.timeline.click'));
 	}
 
 	/**
@@ -68,8 +72,8 @@ class Timeline {
 				.querySelector(`#tl-slide-btn-${s.get('id')}`)
 				.classList;
 
-			this.slide = s;
 			if (s.get('id') === id) {
+				this.slide = s;
 				cl.add('selected');
 			} else {
 				cl.remove('selected');
@@ -89,14 +93,16 @@ class Timeline {
 		this.thumbs = {};
 
 		for (let s of [...this.queue.get_slidelist()]) {
-			let template = Preview.make_slide_frame_template(s);
-			template.content
-				.querySelector(`#tl-slide-btn-${s.get('id')}`)
-				.addEventListener('click', () => {
-					this.slide_clicked(s.get('id'));
-				});
+			let div = Timeline.make_slide_frame_node(s);
+			this.container.appendChild(div);
 
-			let thumb = new Preview(`tl-slide-thumb-cont-${s.get('id')}`);
+			div.addEventListener('click', () => {
+				this.slide_clicked(s.get('id'));
+			});
+
+			let thumb = new Preview(div.querySelector(
+				`#tl-slide-thumb-cont-${s.get('id')}`
+			));
 			await thumb.init();
 
 			try {
@@ -108,12 +114,12 @@ class Timeline {
 
 				if (e instanceof MarkupError) {
 					cl.add('error');
-				} else {d
+				} else {
 					cl.remove('error');
 					throw e;
 				}
 			}
-			this.thumbs[id] = thumb;
+			this.thumbs[s.get('id')] = thumb;
 		}
 	}
 

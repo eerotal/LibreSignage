@@ -1,5 +1,5 @@
 var UIUtil = require('libresignage/util/UIUtil');
-var Assert = require('libresignage/util/assert/Assert');
+var Assert = require('assert');
 
 /**
 * A class representing the list of assets in an AssetUploader window.
@@ -86,7 +86,7 @@ class AssetList {
 	* Update the asset list content.
 	*/
 	update() {
-		Assert.assert(this.slide != null);
+		Assert.ok(this.slide != null);
 
 		this.container.innerHTML = '';
 		for (let a of Object.values(this.slide.get('assets'))) {
@@ -106,12 +106,16 @@ class AssetList {
 				.querySelector('.thumb')
 				.addEventListener('click', () => {
 					this.selected = a.filename;
-					this.container.dispatchEvent('component.assetlist.select');
+					this.container.dispatchEvent(
+						new Event('component.assetlist.select')
+					);
 				});
 			template.content
 				.querySelector('.btn-remove')
 				.addEventListener('click', e => {
-					this.container.dispatchEvent('component.assetlist.remove');
+					this.container.dispatchEvent(
+						new Event('component.assetlist.remove')
+					);
 					e.preventDefault();
 				});
 		}

@@ -4,7 +4,7 @@ var AssetList = require('./AssetList.js');
 var ValidatorSelector = require('libresignage/ui/validator/ValidatorSelector');
 var ValidatorTrigger = require('libresignage/ui/validator/ValidatorTrigger');
 var FileSelectorValidator = require('libresignage/ui/validator/FileSelectorValidator');
-var Assert = require('libresignage/util/assert/Assert');
+var Assert = require('assert');
 var UIController = require('libresignage/ui/controller/UIController')
 var UIInput = require('libresignage/ui/controller/UIInput')
 var UIButton = require('libresignage/ui/controller/UIButton');
@@ -50,7 +50,7 @@ class AssetUploader {
 				setter: null,
 				clearer: e => {
 					e.value = '';
-					e.dispatchEvent('input');
+					e.dispatchEvent(new Event('input'));
 				}
 			}),
 			filelist: new UIInput({
@@ -224,7 +224,7 @@ class AssetUploader {
 	* @param {Slide} slide The Slide to open the AssetUploader for.
 	*/
 	show(slide) {
-		Assert.assert(slide != null, "No slide specified.");
+		Assert.ok(slide != null, "No slide specified.");
 		this.controller.open(slide);
 		this.assetlist.show(slide);
 		this.popup.visible(true);
@@ -350,4 +350,4 @@ class AssetUploader {
 		this.assetlist.update();
 	}
 }
-exports.AssetUploader = AssetUploader;
+module.exports = AssetUploader;

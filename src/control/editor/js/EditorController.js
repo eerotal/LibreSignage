@@ -2,7 +2,7 @@ var Queue = require('libresignage/queue/Queue');
 var User = require('libresignage/user/User');
 var APIInterface = require('libresignage/api/APIInterface');
 var APIError = require('libresignage/api/APIError');
-var Assert = require('libresignage/util/assert/Assert');
+var Assert = require('assert');
 var Slide = require('libresignage/slide/Slide');
 
 /**
@@ -94,7 +94,7 @@ class EditorController {
 	* Fetch up-to-date data for the current queue.
 	*/
 	async update_queue() {
-		Assert.assert(this.queue != null, "No queue loaded.");
+		Assert.ok(this.queue != null, "No queue loaded.");
 		await this.queue.update();
 	}
 
@@ -119,7 +119,7 @@ class EditorController {
 	* Remove the current queue.
 	*/
 	async remove_queue() {
-		Assert.assert(this.queue != null, "No queue loaded.");
+		Assert.ok(this.queue != null, "No queue loaded.");
 		await this.queue.remove();
 		this.queue = null;
 		Object.assign(this.state.queue, {
@@ -162,8 +162,8 @@ class EditorController {
 	* @param {string} id The ID of the slide to open.
 	*/
 	async open_slide(id) {
-		Assert.assert(this.queue != null, "No queue loaded.");
-		Assert.assert(this.queue.has_slide(id), "No such slide in queue.");
+		Assert.ok(this.queue != null, "No queue loaded.");
+		Assert.ok(this.queue.has_slide(id), "No such slide in queue.");
 
 		if (this.slide != null && this.slide.is_locked_from_here()) {
 			try {
@@ -203,7 +203,7 @@ class EditorController {
 	* This function doesn't save the slide!
 	*/
 	async new_slide() {
-		Assert.assert(this.queue != null, "No queue loaded.");
+		Assert.ok(this.queue != null, "No queue loaded.");
 
 		if (this.slide != null && this.slide.has('id')) {
 			await this.close_slide();
@@ -243,7 +243,7 @@ class EditorController {
 	* Save the current slide.
 	*/
 	async save_slide() {
-		Assert.assert(this.slide != null, "No slide to save.");
+		Assert.ok(this.slide != null, "No slide to save.");
 
 		await this.slide.save();
 		await this.update_queue();
@@ -260,8 +260,8 @@ class EditorController {
 	* @param {string} queue The name of the queue where the slide is moved.
 	*/
 	async move_slide(queue) {
-		Assert.assert(this.slide != null, "No slide to move.");
-		Assert.assert(this.state.slide.saved, "Slide not saved.");
+		Assert.ok(this.slide != null, "No slide to move.");
+		Assert.ok(this.state.slide.saved, "Slide not saved.");
 
 		this.slide.set({ 'queue_name': queue });
 		await this.save_slide();
@@ -272,7 +272,7 @@ class EditorController {
 	* Duplicate the current slide.
 	*/
 	async duplicate_slide() {
-		Assert.assert(this.slide != null, "No slide to duplicate.");
+		Assert.ok(this.slide != null, "No slide to duplicate.");
 		await this.slide.dup();
 		await this.update_queue();
 	}
@@ -281,7 +281,7 @@ class EditorController {
 	* Remove the current slide.
 	*/
 	async remove_slide() {
-		Assert.assert(this.slide != null, "No slide to remove.");
+		Assert.ok(this.slide != null, "No slide to remove.");
 
 		if (this.slide.get('id') === null) {
 			this.slide = null;

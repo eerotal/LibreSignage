@@ -1,5 +1,5 @@
 var markup = require('ls-markup');
-var Assert = require('libresignage/util/assert/Assert');
+var Assert = require('assert');
 
 /**
 * Slide preview component.
@@ -30,32 +30,33 @@ class Preview {
 		template.innerHTML = '<iframe class="preview rounded"></iframe>';
 
 		/*
-		*  NOTE!
+		* NOTE!
 		*
-		*  Firefox doesn't allow adding content to iframes before a load
-		*  event is fired on them, which is why the code below is wrapped
-		*  in an event listener. Other browsers, however, don't even fire
-		*  the load event so the event is fired manually after creating
-		*  the event listener.
+		* Firefox doesn't allow adding content to iframes before a load
+		* event is fired on them, which is why the code below is wrapped
+		* in an event listener. Other browsers, however, don't even fire
+		* the load event so the event is fired manually after creating
+		* the event listener.
 		*/
 		ret = new Promise((resolve, reject) => {
 			let iframe = template.content.querySelector('iframe');
-			iframe.addEventListener('load', () => {
+
+			let hook = () => {
 				let head = null;
-				let prpmises = [];
+				let promises = [];
 
 				/*
-				*  Workaround for odd Firefox behaviour where the 'load'
-				*  event is fired twice for the iframe. Once when the
-				*  document readyState == 'uninitialized' and again when
-				*  readyState == 'complete'. This if statement skips the
-				*  uninitialized step to make the modified iframe contents
-				*  actually persist.
+				* Workaround for odd Firefox behaviour where the 'load'
+				* event is fired twice for the iframe. Once when the
+				* document readyState == 'uninitialized' and again when
+				* readyState == 'complete'. This if statement skips the
+				* uninitialized step to make the modified iframe contents
+				* actually persist.
 				*/
 				if (iframe.contentDocument.readyState !== 'complete') {
 					return;
 				}
-				iframe.removeEventListener('load');
+				iframe.removeEventListener('load', hook);
 
 				// Add meta tags and stylesheets.
 				head = iframe.contentDocument.querySelector('head');
@@ -79,7 +80,9 @@ class Preview {
 
 				this.set_ratio('16x9');
 				Promise.all(promises).then(resolve);
-			})
+			};
+
+			iframe.addEventListener('load', hook);
 		});
 		this.container.appendChild(template.content);
 
@@ -88,7 +91,9 @@ class Preview {
 			|| window.navigator.userAgent === null
 			|| !window.navigator.userAgent.match('/mozilla/i')
 		) {
-			this.container.querySelector('iframe').dispatchEvent('load');
+			this.container
+				.querySelector('iframe')
+				.dispatchEvent(new Event('load'));
 		}
 		return ret;
 	}
@@ -96,10 +101,10 @@ class Preview {
 	/**
 	* Render a Preview.
 	*
-	* @param {string} markup The markup to render.
+	* @param {string} m The markup to render.
 	*/
-	render(markup) {
-		let html = markup.parse(mmarkup);
+	render(m) {
+		let html = markup.parse(m);
 		let template = null;
 
 		if (html != null) {
@@ -115,7 +120,7 @@ class Preview {
 				.querySelector('iframe')
 				.contentDocument
 				.querySelector('body')
-				.innerHTML = template.content.innerHTML;
+				.appendChild(document.importNode(template.content, true))
 		}
 	}
 
@@ -128,7 +133,7 @@ class Preview {
 	* @throws {AssertError} If the supplied ratio is not valid.
 	*/
 	set_ratio(ratio) {
-		Assert.assert(r in this.valid_ratios);
+		Assert.ok(this.valid_ratios.includes(ratio));
 		this.ratio = ratio;
 
 		for (let r of this.valid_ratios) {

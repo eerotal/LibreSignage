@@ -1,9 +1,5 @@
 var MarkupError = require('ls-markup').err.MarkupError;
 
-var QueueSelector = require(
-	'./components/queueselector/queueselector.js'
-).QueueSelector;
-
 var bootstrap = require('bootstrap');
 var ace_range = ace.require('ace/range');
 var MultiSelect = require('libresignage/ui/components/MultiSelect');
@@ -31,6 +27,7 @@ var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog')
 var Preview = require('./components/preview/Preview.js');
 var AssetUploader = require('./components/assetuploader/AssetUploader.js')
 var Timeline = require('./components/timeline/Timeline.js');
+var QueueSelector = require('./components/queueselector/QueueSelector.js');
 
 class EditorView extends BaseView {
 	constructor(api) {
@@ -87,9 +84,9 @@ class EditorView extends BaseView {
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: e => e.val(),
-				setter: (e, val) => e.val(val),
-				clearer: e => e.val('')
+				getter: e => e.value,
+				setter: (e, val) => e.value = val,
+				clearer: e => e.value = ''
 			}),
 			owner: new UIInput({
 				elem: document.querySelector('#slide-owner'),
@@ -98,9 +95,9 @@ class EditorView extends BaseView {
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: e => e.val(),
-				setter: (e, val) => e.val(val),
-				clearer: e => e.val('')
+				getter: e => e.value,
+				setter: (e, val) => e.value = val,
+				clearer: e => e.value = ''
 			}),
 			collaborators: new UIInput({
 				elem: new MultiSelect(
@@ -148,9 +145,9 @@ class EditorView extends BaseView {
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: e => parseFloat(e.val(), 10)*1000,
-				setter: (e, val) => e.val(val/1000),
-				clearer: e => e.val('')
+				getter: e => parseFloat(e.value, 10)*1000,
+				setter: (e, val) => e.value = val/1000,
+				clearer: e => e.value = ''
 			}),
 			index: new UIInput({
 				elem: document.querySelector('#slide-index'),
@@ -163,9 +160,9 @@ class EditorView extends BaseView {
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: e => parseInt(e.val(), 10),
-				setter: (e, val) => e.val(val),
-				clearer: e => e.val('')
+				getter: e => parseInt(e.value, 10),
+				setter: (e, val) => e.value = val,
+				clearer: e => e.value = ''
 			}),
 			animation: new UIInput({
 				elem: document.querySelector('#slide-animation'),
@@ -178,9 +175,9 @@ class EditorView extends BaseView {
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: e => parseInt(e.val(), 10),
-				setter: (e, val) => e.val(val),
-				clearer: e => e.val('')
+				getter: e => parseInt(e.value, 10),
+				setter: (e, val) => e.value = val,
+				clearer: e => e.value = ''
 			}),
 			schedule_enable: new UIInput({
 				elem: document.querySelector('#slide-schedule-enable'),
@@ -193,9 +190,9 @@ class EditorView extends BaseView {
 				attach: { change: () => this.update() },
 				defer: () => !this.state('ready'),
 				mod: null,
-				getter: e => e.prop('checked'),
-				setter: (e, val) => e.prop('checked', val),
-				clearer: e => e.prop('checked', false)
+				getter: e => e.checked,
+				setter: (e, val) => e.checked = val,
+				clearer: e => e.checked = false
 			}),
 			schedule_date_start: new UIInput({
 				elem: document.querySelector('#slide-sched-date-s'),
@@ -209,11 +206,11 @@ class EditorView extends BaseView {
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: e => e.val(),
+				getter: e => e.value,
 				setter: (e, val) => {
-					e.val(Util.tstamp_to_datetime(val)[0]);
+					e.value = Util.tstamp_to_datetime(val)[0];
 				},
-				clearer: e => e.val('')
+				clearer: e => e.value = ''
 			}),
 			schedule_time_start: new UIInput({
 				elem: document.querySelector('#slide-sched-time-s'),
@@ -227,11 +224,11 @@ class EditorView extends BaseView {
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: e => e.val(),
+				getter: e => e.value,
 				setter: (e, val) => {
-					e.val(Util.tstamp_to_datetime(val)[1]);
+					e.value = Util.tstamp_to_datetime(val)[1];
 				},
-				clearer: e => e.val('')
+				clearer: e => e.value = ''
 			}),
 			schedule_date_end: new UIInput({
 				elem: document.querySelector('#slide-sched-date-e'),
@@ -245,11 +242,11 @@ class EditorView extends BaseView {
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: e => e.val(),
+				getter: e => e.value,
 				setter: (e, val) => {
-					e.val(Util.tstamp_to_datetime(val)[0]);
+					e.value = Util.tstamp_to_datetime(val)[0];
 				},
-				clearer: e => e.val('')
+				clearer: e => e.value = ''
 			}),
 			schedule_time_end: new UIInput({
 				elem: document.querySelector('#slide-sched-time-e'),
@@ -263,11 +260,11 @@ class EditorView extends BaseView {
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: e => e.val(),
+				getter: e => e.value,
 				setter: (e, val) => {
-					e.val(Util.tstamp_to_datetime(val)[1]);
+					e.value = Util.tstamp_to_datetime(val)[1];
 				},
-				clearer: e => e.val('')
+				clearer: e => e.value = ''
 			}),
 			editor: new UIInput({
 				elem: document.querySelector('#slide-input'),
@@ -302,9 +299,9 @@ class EditorView extends BaseView {
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: e => e.prop('checked'),
-				setter: (e, val) => e.prop('checked', val),
-				clearer: e => e.prop('checked', false)
+				getter: e => e.checked,
+				setter: (e, val) => e.checked = val,
+				clearer: e => e.checked = false
 			})
 		});
 		this.statics = new UIController({
@@ -316,7 +313,9 @@ class EditorView extends BaseView {
 					&& !d.slide.owned
 					&& !d.slide.collaborate
 				),
-				enabler: (e, s) => s ? e.show() : e.hide(),
+				enabler: (e, s) => s
+					? e.style.display = ''
+					: e.style.display = 'none',
 				attach: null,
 				defer: null,
 				getter: null,
@@ -329,7 +328,9 @@ class EditorView extends BaseView {
 					&& !d.slide.locked
 					&& (d.slide.owned || d.slide.collaborate)
 				),
-				enabler: (e, s) => s ? e.show() : e.hide(),
+				enabler: (e, s) => s
+					? e.style.display = ''
+					: e.style.display = 'none',
 				attach: null,
 				defer: null,
 				getter: null,
@@ -342,7 +343,9 @@ class EditorView extends BaseView {
 					&& d.slide.locked
 					&& d.slide.collaborate
 				),
-				enabler: (e, s) => s ? e.show() : e.hide(),
+				enabler: (e, s) => s
+					? e.style.display = ''
+					: e.style.display = 'none',
 				attach: null,
 				defer: null,
 				getter: null,
@@ -351,7 +354,9 @@ class EditorView extends BaseView {
 			label_no_quota: new UIStatic({
 				elem: document.querySelector('#slide-label-no-quota'),
 				cond: d => !d.quota.slides,
-				enabler: (e, s) => s ? e.show() : e.hide(),
+				enabler: (e, s) => s
+					? e.style.display = ''
+					: e.style.display = 'none',
 				attach: null,
 				defer: null,
 				getter: null,
@@ -360,7 +365,9 @@ class EditorView extends BaseView {
 			label_editor_error: new UIStatic({
 				elem: document.querySelector('#slide-label-editor-error'),
 				cond: () => true,
-				enabler: (e, s) => s ? e.show() : e.hide(),
+				enabler: (e, s) => s
+					? e.style.display = ''
+					: e.style.display = 'none',
 				attach: null,
 				defer: null,
 				getter: null,
@@ -398,47 +405,51 @@ class EditorView extends BaseView {
 				cond: () => true,
 				enabler: null,
 				attach: {
-					'component.queueselector.select': async (e, data) => {
+					'component.queueselector.select': async e => {
+						// Attempt to select a queue.
 						this.state('loading', true);
 						try {
-							await this.show_queue(data.get('queue'));
+							await this.show_queue(
+								this.queueselector.get_selected_queue_name()
+							);
 						} catch (e) {
 							new APIErrorDialog(e);
-							data.except();
 							return;
 						}
 						this.state('loading', false);
-						data.then();
 					},
-					'component.queueselector.create': async (e, data) => {
+					'component.queueselector.create': async e => {
+						let name = '';
+						// Attempt to create a new queue.
 						this.state('loading', true);
 						try {
-							await this.create_queue(data.get('queue'));
+							name = await this.create_queue();
 						} catch (e) {
 							new APIErrorDialog(e);
-							data.except();
 							return;
 						}
 						this.state('loading', false);
-						data.then();
+
+						// Update QueueSelector.
+						this.queueselector.select_queue(name);
 					},
-					'component.queueselector.view': (e, data) => {
+					'component.queueselector.view': () => {
+						// View a queue.
 						this.view_queue();
 					},
-					'component.queueselector.remove': async (e, data) => {
+					'component.queueselector.remove': async e => {
+						// Attempt to remove a queue.
 						this.state('loading', true);
 						try {
 							await this.remove_queue();
 						} catch (e) {
 							new APIErrorDialog(e);
-							data.except();
 							return;
 						}
 						this.state('loading', false);
-						data.then();
-					},
-					'component.queueselector.deselect': (e, data) => {
-						data.then();
+
+						// Update QueueSelector.
+						this.queueselector.deselect_queue();
 					}
 				},
 				defer: () => !this.state('ready') || this.state('loading'),
@@ -527,7 +538,7 @@ class EditorView extends BaseView {
 					&& (d.user.admin || d.slide.owned)
 				),
 				enabler: (elem, s) => {
-					elem.find('.dropselect-open').prop('disabled', !s);
+					elem.querySelector('.dropselect-open').disabled = !s;
 				},
 				attach: {
 					'component.dropselect.show': async () => {
@@ -557,7 +568,7 @@ class EditorView extends BaseView {
 					&& (d.user.admin || d.slide.owned)
 				),
 				enabler: (elem, s) => {
-					elem.find('.dropconfirm-open').prop('disabled', !s);
+					elem.querySelector('.dropconfirm-open').disabled = !s;
 				},
 				attach: {
 					'component.dropconfirm.confirm': async () => {
@@ -620,8 +631,8 @@ class EditorView extends BaseView {
 				keys: ['Control', 'Alt', 'n'],
 				hook: () => {
 					let elem = this.buttons.get('new').get_elem();
-					if (!elem.prop('disabled')) {
-						elem.trigger('click');
+					if (!elem.disabled) {
+						elem.dispatchEvent(new Event('click'));
 					}
 				},
 				defer: () => !this.state('ready')
@@ -630,8 +641,8 @@ class EditorView extends BaseView {
 				keys: ['Control', 's'],
 				hook: () => {
 					let elem = this.buttons.get('save').get_elem();
-					if (!elem.prop('disabled')) {
-						elem.trigger('click');
+					if (!elem.disabled) {
+						elem.dispatchEvent(new Event('click'));
 					}
 				},
 				defer: () => !this.state('ready')
@@ -640,8 +651,8 @@ class EditorView extends BaseView {
 				keys: ['Control', 'd'],
 				hook: () => {
 					let elem = this.buttons.get('duplicate').get_elem();
-					if (!elem.prop('disabled')) {
-						elem.trigger('click');
+					if (!elem.disabled) {
+						elem.dispatchEvent(new Event('click'));
 					}
 				},
 				defer: () => !this.state('ready')
@@ -650,8 +661,8 @@ class EditorView extends BaseView {
 				keys: ['Control', 'p'],
 				hook: () => {
 					let elem = this.buttons.get('preview').get_elem();
-					if (!elem.prop('disabled')) {
-						elem.trigger('click');
+					if (!elem.disabled) {
+						elem.dispatchEvent(new Event('click'));
 					}
 				},
 				defer: () => !this.state('ready')
@@ -664,11 +675,14 @@ class EditorView extends BaseView {
 		this.editor.blockScrolling = Infinity;
 
 		// Queue selector.
-		this.queueselector = new QueueSelector('queueselector', this.api);
+		this.queueselector = new QueueSelector(
+			document.querySelector('#queueselector'),
+			this.api
+		);
 		await this.queueselector.init();
 
 		// Queue timeline.
-		this.timeline = new Timeline('timeline');
+		this.timeline = new Timeline(document.querySelector('#timeline'));
 
 		// Live slide preview.
 		this.preview = new Preview(document.querySelector('#preview'));
@@ -689,10 +703,10 @@ class EditorView extends BaseView {
 		this.quick_help = new Popup(document.querySelector('#quick-help'));
 
 		// Asset uploader popup.
-		this.asset_uploader = new AssetUploader(
+		/*this.asset_uploader = new AssetUploader(
 			document.querySelector('#asset-uploader'),
 			this.api
-		);
+		);*/
 
 		/*
 		*  Initialize the input validators. All input validators except
@@ -748,12 +762,15 @@ class EditorView extends BaseView {
 		});
 	}
 
+	/**
+	* Show a queue.
+	*
+	* If a slide is open and unsaved, the user is prompted for
+	* confirmation before changing the queue.
+	*
+	* @param {string} name The name of the queue to show.
+	*/
 	async show_queue(name) {
-		/*
-		*  Show the queue 'name'. If a slide is already loaded and it
-		*  has unsaved changes, the user is prompted for confirmation
-		*  before changing the queue.
-		*/
 		if (!(await this.confirm_slide_hide())) { return; }
 		await this.hide_queue();
 		await this.controller.open_queue(name);
@@ -771,11 +788,57 @@ class EditorView extends BaseView {
 		this.update();
 	}
 
-	async create_queue(queue) {
-		/*
-		*  Create a new queue.
-		*/
-		await this.controller.create_queue(queue);
+	/**
+	* Create a new queue.
+	*
+	* This function prompts for the queue name.
+	*/
+	async create_queue() {
+		let queues = null;
+		try {
+			queues = await Queue.get_queues(this.api);
+		} catch (e) {
+			new APIErrorDialog(e);
+			return;
+		}
+
+		new Promise((resolve, reject) => {
+			let dialog = new PromptDialog(
+				'Queue name',
+				'Please enter a name for the new queue.',
+				[new StrValidator({
+					min: 1,
+					max: null,
+					regex: null,
+				}, "", true),
+				new StrValidator({
+					min: null,
+					max: this.api.limits.QUEUE_NAME_MAX_LEN,
+					regex: null
+				}, "The queue name is too long."),
+				new StrValidator({
+					min: null,
+					max: null,
+					regex: /^[A-Za-z0-9_-]*$/
+				}, "Invalid characters in queue name."),
+				new BlacklistValidator({
+					bl: queues
+				}, "This queue already exists.")],
+				status => status ? resolve(dialog.get_value()) : reject()
+			);
+		}).then(async value => {
+			// Create the new queue.
+			try {
+				await this.controller.create_queue(value);
+			} catch (e) {
+				new APIErrorDialog(e);
+				return;
+			}
+
+			// Update the QueueSelector.
+			await this.queueselector.update_queue_list();
+			this.queueselector.select_queue(value);
+		}).catch(() => {})
 	}
 
 	view_queue() {

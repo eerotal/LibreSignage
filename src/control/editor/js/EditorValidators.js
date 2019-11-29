@@ -35,7 +35,7 @@ class EditorValidators extends ValidatorController {
 						},
 						'The name contains invalid characters.'
 					),
-				]	
+				]
 			),
 			duration: new ValidatorSelector(
 				document.querySelector('#slide-duration'),

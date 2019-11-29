@@ -1,18 +1,17 @@
 var $ = require('jquery');
 var bootstrap = require('bootstrap');
 
-var BaseView = require('ls-baseview').BaseView;
-var UIController = require('ls-uicontrol').UIController;
-var UIButton = require('ls-uicontrol').UIButton;
-var UIInput = require('ls-uicontrol').UIInput;
-
-var dialog = require('ls-dialog');
-var APIUI = require('ls-api-ui');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 
 var UserManagerController = require('./usermanagercontroller.js').UserManagerController;
 var UserList = require('./components/userlist.js').UserList;
 
 var StrValidator = require('libresignage/ui/validator/StrValidator');
+var UIController = require('libresignage/ui/controller/UIController')
+var UIInput = require('libresignage/ui/controller/UIInput');
+var UIButton = require('libresignage/ui/controller/UIButton');
+var PromptDialog  = require('libresignage/ui/components/Dialog/PromptDialog');
+var BaseView = require('libresignage/ui/view/BaseView');
 
 class UserManagerView extends BaseView {
 	constructor(api) {
@@ -81,30 +80,9 @@ class UserManagerView extends BaseView {
 		/*
 		*  Prompt for a username and create a new user.
 		*/
-		dialog.dialog(
-			dialog.TYPE.PROMPT,
+		let dialog = new PromptDialog(
 			'Create a new user',
 			'Enter a name for the new user.',
-			async (status, val) => {
-				let user = null;
-
-				if (!status) { return; }
-				try {
-					user = await this.controller.create_user(val);
-				} catch (e) {
-					APIUI.handle_error(e);
-					return;
-				}
-
-				/*
-				*  Manually add the new user to the UserList to make
-				*  the generated initial password visible in the UI.
-				*  This is done because the API doesn't return (or
-				*  even know) the password on subsequent calls.
-				*/
-				this.userlist.add_user(user);
-				this.populate();
-			},
 			[
 				new StrValidator({
 					min: 1,
@@ -121,8 +99,30 @@ class UserManagerView extends BaseView {
 					max: null,
 					regex: /^[A-Za-z0-9_]*$/
 				}, 'The username contains invalid characters.')
-			]
-		)
+			],
+			async status => {
+				let user = null;
+
+				if (!status) { return; }
+				try {
+					user = await this.controller.create_user(
+						dialog.get_value()
+					);
+				} catch (e) {
+					new APIErrorDialog(e);
+					return;
+				}
+
+				/*
+				*  Manually add the new user to the UserList to make
+				*  the generated initial password visible in the UI.
+				*  This is done because the API doesn't return (or
+				*  even know) the password on subsequent calls.
+				*/
+				this.userlist.add_user(user);
+				this.populate();
+			}
+		);
 	}
 
 	async fetch() {
@@ -134,7 +134,7 @@ class UserManagerView extends BaseView {
 				await this.controller.get_users()
 			);
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 	}
@@ -153,7 +153,7 @@ class UserManagerView extends BaseView {
 		try {
 			await this.controller.save_user(username, groups);
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 	}
@@ -165,7 +165,7 @@ class UserManagerView extends BaseView {
 		try {
 			await this.controller.remove_user(username);
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 		await this.fetch();

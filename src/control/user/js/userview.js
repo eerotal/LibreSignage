@@ -1,13 +1,13 @@
 var $ = require('jquery');
-var BaseView = require('ls-baseview').BaseView;
-var UIController = require('ls-uicontrol').UIController;
-var UIInput = require('ls-uicontrol').UIInput;
-var UIButton = require('ls-uicontrol').UIButton;
-var APIUI = require('ls-api-ui');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 
 var UserController = require('./usercontroller.js').UserController;
 var UserValidators = require('./uservalidators.js').UserValidators;
 var SessionList = require('./components/sessionlist.js').SessionList;
+var UIController = require('libresignage/ui/controller/UIController')
+var UIInput = require('libresignage/ui/controller/UIInput')
+var UIButton = require('libresignage/ui/controller/UIButton');
+var BaseView = require('libresignage/ui/view/BaseView');
 
 class UserView extends BaseView {
 	constructor(api) {
@@ -128,7 +128,7 @@ class UserView extends BaseView {
 		try {
 			await this.sessionlist.fetch();
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 		this.sessionlist.render();
@@ -143,7 +143,7 @@ class UserView extends BaseView {
 				this.inputs.get('password').get()
 			);
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 
@@ -161,7 +161,7 @@ class UserView extends BaseView {
 		try {
 			await this.controller.logout_other_sessions();
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
 			return;
 		}
 		await this.populate();
