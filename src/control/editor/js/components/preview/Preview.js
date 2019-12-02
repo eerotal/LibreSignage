@@ -119,6 +119,11 @@ class Preview {
 			this.container
 				.querySelector('iframe')
 				.contentDocument
+				.body
+				.innerHTML = "";
+			this.container
+				.querySelector('iframe')
+				.contentDocument
 				.querySelector('body')
 				.appendChild(document.importNode(template.content, true))
 		}
