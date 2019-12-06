@@ -80,13 +80,12 @@ class QueueSelector {
 				elem: this.container.querySelector('.q-remove'),
 				cond: d => this.select.get_selection() != null,
 				enabler: (elem, s) => {
-					elem.querySelector('.dropconfirm-open')
-						.setAttribute('disabled', !s);
+					elem.querySelector('.dropconfirm-open').disabled = !s;
 				},
 				attach: {
 					'component.dropconfirm.confirm': () => {
 						this.container.dispatchEvent(
-							new Event('component.queueselector.view')
+							new Event('component.queueselector.remove')
 						);
 					}
 				},

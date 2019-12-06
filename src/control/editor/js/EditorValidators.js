@@ -77,6 +77,14 @@ class EditorValidators extends ValidatorController {
 				document.querySelector('#slide-index'),
 				document.querySelector('#slide-index-group'),
 				[
+					new StrValidator(
+						{
+							min: 1,
+							max: null,
+							regex: null
+						},
+						'You must specify an index.'
+					),
 					new NumValidator(
 						{
 							min: 0,
@@ -101,18 +109,9 @@ class EditorValidators extends ValidatorController {
 							min: null,
 							max: null,
 							nan: false,
-							float: true
-						},
-						'The index must be an integer number.'
-					),
-					new NumValidator(
-						{
-							min: null,
-							max: null,
-							nan: false,
 							float: false
 						},
-						'You must specify and index.'
+						'The index must be an integer number.'
 					)
 				]
 			)

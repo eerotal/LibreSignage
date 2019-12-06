@@ -14,6 +14,7 @@ var DropSelect = require('libresignage/ui/components/DropSelect');
 var DropConfirm = require('libresignage/ui/components/DropConfirm');
 var Popup = require('libresignage/ui/components/Popup');
 var ConfirmDialog = require('libresignage/ui/components/Dialog/ConfirmDialog');
+var PromptDialog = require('libresignage/ui/components/Dialog/PromptDialog');
 var UIController = require('libresignage/ui/controller/UIController')
 var UIInput = require('libresignage/ui/controller/UIInput')
 var UIButton = require('libresignage/ui/controller/UIButton');
@@ -113,7 +114,8 @@ class EditorView extends BaseView {
 							"This user doesn't exist."
 						),
 						new BlacklistValidator(
-							{ bl: [user] }
+							{ bl: [user] },
+							"Can't add yourself as a collaborator."
 						)
 					],
 					{
@@ -429,9 +431,6 @@ class EditorView extends BaseView {
 							return;
 						}
 						this.state('loading', false);
-
-						// Update QueueSelector.
-						this.queueselector.select_queue(name);
 					},
 					'component.queueselector.view': () => {
 						// View a queue.
@@ -802,29 +801,37 @@ class EditorView extends BaseView {
 			return;
 		}
 
-		new Promise((resolve, reject) => {
+		let ret = new Promise((resolve, reject) => {
 			let dialog = new PromptDialog(
 				'Queue name',
 				'Please enter a name for the new queue.',
-				[new StrValidator({
-					min: 1,
-					max: null,
-					regex: null,
-				}, "", true),
-				new StrValidator({
-					min: null,
-					max: this.api.limits.QUEUE_NAME_MAX_LEN,
-					regex: null
-				}, "The queue name is too long."),
-				new StrValidator({
-					min: null,
-					max: null,
-					regex: /^[A-Za-z0-9_-]*$/
-				}, "Invalid characters in queue name."),
-				new BlacklistValidator({
-					bl: queues
-				}, "This queue already exists.")],
-				status => status ? resolve(dialog.get_value()) : reject()
+				[
+					new StrValidator({
+						min: 1,
+						max: null,
+						regex: null,
+					}, "", true),
+					new StrValidator({
+						min: null,
+						max: this.api.limits.QUEUE_NAME_MAX_LEN,
+						regex: null
+					}, "The queue name is too long."),
+					new StrValidator({
+						min: null,
+						max: null,
+						regex: /^[A-Za-z0-9_-]*$/
+					}, "Invalid characters in queue name."),
+					new BlacklistValidator({
+						bl: queues
+					}, "This queue already exists.")
+				],
+				(status) => {
+					if (status) {
+						resolve(dialog.get_value())
+					} else {
+						reject()
+					}
+				}
 			);
 		}).then(async value => {
 			// Create the new queue.
@@ -838,7 +845,11 @@ class EditorView extends BaseView {
 			// Update the QueueSelector.
 			await this.queueselector.update_queue_list();
 			this.queueselector.select_queue(value);
-		}).catch(() => {})
+		}).catch(e => {
+			if (e instanceof Error) { throw e; }
+		})
+
+		return ret;
 	}
 
 	view_queue() {
