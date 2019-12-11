@@ -269,7 +269,8 @@ class AssetUploader {
 	indicate_upload_begin() {
 		this.buttons.get('upload')
 			.get_elem()
-			.addClass('uploading');
+			.classList
+			.add('uploading');
 	}
 
 	/**
@@ -278,7 +279,8 @@ class AssetUploader {
 	indicate_upload_end() {
 		this.buttons.get('upload')
 			.get_elem()
-			.removeClass('uploading');
+			.classList
+			.remove('uploading');
 	}
 
 	/**
@@ -322,7 +324,7 @@ class AssetUploader {
 	*/
 	update_file_selector_label() {
 		let names = [];
-		let elem = this.inputs.get('files').get_elem()[0];
+		let elem = this.inputs.get('files').get_elem();
 		if (elem.files.length != 0) {
 			for (let f of elem.files) { names.push(f.name); }
 			this.statics.get('files_label').set(names.join(', '));

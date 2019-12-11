@@ -18,34 +18,33 @@ class AssetList {
 	}
 
 	/**
-	* Create the required HTML for a thumbnail.
+	* Create a HTML DIV node for a thumbnail.
 	*
 	* @param {string} asset_name The name of the asset.
 	* @param {string} url        The URL of the asset thumbnail.
 	*
-	* @return {HTMLElement} A template with the generated innerHTML.
+	* @return {HTMLElement} The created HTML DOM node.
 	*/
-	static make_thumb_template(asset_name, url) {
-		let template = document.createElement('template');
-		template.innerHTML = `
-			<div class="thumb">
-				<div class="thumb-inner default-border">
-					<div class="thumb-img-wrapper">
-						<img src="${url}"></img>
+	static make_thumb_node(asset_name, url) {
+		let div = document.createElement('div');
+		div.classList.add('thumb');
+		div.innerHTML = `
+			<div class="thumb-inner default-border">
+				<div class="thumb-img-wrapper">
+					<img src="${url}"></img>
+				</div>
+				<div class="thumb-label-wrapper">
+					<div class="thumb-rm-wrapper">
+						<button class="btn btn-danger small-btn btn-remove"
+								type="button">
+							<i class="fas fa-times"></i>
+						</button>
 					</div>
-					<div class="thumb-label-wrapper">
-						<div class="thumb-rm-wrapper">
-							<button class="btn btn-danger small-btn btn-remove"
-									type="button">
-								<i class="fas fa-times"></i>
-							</button>
-						</div>
-						<div class="thumb-label">${asset_name}</div>
-					</div>
+					<div class="thumb-label">${asset_name}</div>
 				</div>
 			</div>
 		`;
-		return template;
+		return div;
 	}
 
 	/**
@@ -99,19 +98,17 @@ class AssetList {
 				url = UIUtil.fa_svg_uri('solid', 'image');
 			}
 
-			template = AssetList.make_thumb_html(a.filename, url);
+			let div = AssetList.make_thumb_node(a.filename, url);
+			this.container.appendChild(div);
 
 			// Attach event listeners for the select and remove actions.
-			template.content
-				.querySelector('.thumb')
-				.addEventListener('click', () => {
-					this.selected = a.filename;
-					this.container.dispatchEvent(
-						new Event('component.assetlist.select')
-					);
-				});
-			template.content
-				.querySelector('.btn-remove')
+			div.addEventListener('click', () => {
+				this.selected = a.filename;
+				this.container.dispatchEvent(
+					new Event('component.assetlist.select')
+				);
+			});
+			div.querySelector('.btn-remove')
 				.addEventListener('click', e => {
 					this.container.dispatchEvent(
 						new Event('component.assetlist.remove')
