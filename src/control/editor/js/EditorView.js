@@ -853,7 +853,7 @@ class EditorView extends BaseView {
 	}
 
 	view_queue() {
-		window.open(`/app/?q=${this.controller.get_queue().get_name()}`);
+		window.open(`/app/?queue=${this.controller.get_queue().get_name()}`);
 	}
 
 	async remove_queue() {
