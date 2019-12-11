@@ -702,10 +702,10 @@ class EditorView extends BaseView {
 		this.quick_help = new Popup(document.querySelector('#quick-help'));
 
 		// Asset uploader popup.
-		/*this.asset_uploader = new AssetUploader(
+		this.asset_uploader = new AssetUploader(
 			document.querySelector('#asset-uploader'),
 			this.api
-		);*/
+		);
 
 		/*
 		*  Initialize the input validators. All input validators except

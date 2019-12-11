@@ -86,9 +86,9 @@ class AssetList {
 	* Update the asset list content.
 	*/
 	update() {
-		Assert.ok(this.slide != null);
-
 		this.container.innerHTML = '';
+		if (this.slide == null) { return; }
+
 		for (let a of Object.values(this.slide.get('assets'))) {
 			let url = null;
 
