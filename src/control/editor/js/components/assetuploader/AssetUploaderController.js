@@ -69,7 +69,7 @@ class AssetUploaderController {
 	*
 	* @param {string} name The name of the asset to remove.
 	*
-	* @throws {AssertError} If no name is supplied.
+	* @throws {AssertionError} If no name is supplied.
 	*/
 	async remove_asset(name) {
 		Assert.ok(name != null && name.length != 0, "Empty slide name.");
@@ -85,8 +85,8 @@ class AssetUploaderController {
 	* @param {FileList} files The FileList from an HTML <input type="file">
 	*                         element.
 	*
-	* @throws {AssertError} If no files are selected.
-	* @throws {AssertError} If no slide is loaded.
+	* @throws {AssertionError} If no files are selected.
+	* @throws {AssertionError} If no slide is loaded.
 	*/
 	async upload_assets(files) {
 		Assert.ok(files.length != 0, "Empty files list.");

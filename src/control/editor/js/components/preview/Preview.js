@@ -135,7 +135,7 @@ class Preview {
 	* @param {string} ratio The ratio to use. This should be one of the strings
 	*                       defined in Preview.valid_ratios.
 	*
-	* @throws {AssertError} If the supplied ratio is not valid.
+	* @throws {AssertionError} If the supplied ratio is not valid.
 	*/
 	set_ratio(ratio) {
 		Assert.ok(this.valid_ratios.includes(ratio));
