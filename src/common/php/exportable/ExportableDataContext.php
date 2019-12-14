@@ -11,6 +11,7 @@ namespace libresignage\common\php\exportable;
 */
 final class ExportableDataContext {
 	const FILEPATH = "filepath";
+	const CLASSNAME = "classname";
 
 	public function __constructor(array $data) {
 		$this->data = $data;

@@ -167,7 +167,7 @@ abstract class Exportable {
 	*
 	* If any data migration is required, the migrated data is automatically
 	* written back to the original file.
-	*
+*
 	* @param string $path The path of the file to read.
 	*/
 	public function fimport(string $path) {
@@ -178,6 +178,8 @@ abstract class Exportable {
 
 		$ctx = new ExportableDataContext();
 		$ctx->set(ExportableDataContext::FILEPATH, $path);
+		$ctx->set(ExportableDataContext::CLASSNAME, get_class($this));
+
 		$ret = $this->reconstruct_object($decoded, $ctx, FALSE, $migrated);
 
 		// Write migrated data back to file.

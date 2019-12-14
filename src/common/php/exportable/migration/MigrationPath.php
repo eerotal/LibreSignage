@@ -61,27 +61,56 @@ final class MigrationPath {
 	* Build the migration path for data.
 	*
 	* @param string $to_version The version to migrate the data to.
+	*
+	* @throws {MigrationException} If no classname is found in the data to be
+	*                              migrated and all fallbacks fail.
 	*/
 	public function build_path(string $to_version) {
-		// Get origin version from $this->data.
+		/*
+		* Get the origin version number from $this->data or use a fallback
+		* if no version exists.
+		*/
 		if (array_key_exists(Exportable::EXP_VERSION, $this->data)) {
 			$from_version = $this->data[Exportable::EXP_VERSION];
 		} else {
 			$from_version = self::FALLBACK_ORIGIN_VERSION;
+			Log::logs(
+				"No origin version defined for data to be migrated, ".
+				"falling back to '$from_version'.", Log::LOGDEF
+			);
+		}
+
+		/*
+		* Get the origin classname from $this->data or use the current classname
+		* from $this->context if no classname exists in $this->data. If neither
+		* of these exists, throw an error.
+		*
+		* This check exists because early versions of LibreSignage had
+		* inconsistent data formats but those still needed to be migrated.
+		*/
+		if (array_key_exists(Exportable::EXP_CLASSNAME, $this->data)) {
+			$from_class = $this->data[Exportable::EXP_CLASSNAME];
+		} else if ($this->context->has(ExportableDataContext::CLASSNAME)) {
+			$from_class = $this->context->get(ExportableDataContext::CLASSNAME);
+			Log::logs(
+				"No origin class defined for data to be migrated, ".
+				"falling back to '$from_class'.", Log::LOGDEF
+			);
+		} else {
+			throw new MigrationException(
+				"No classname found for data to be migrated ".
+				"and all fallbacks failed."
+			);
 		}
 
 		$t = NULL;
 		$ver = $from_version;
 		while ($ver !== $to_version) {
-			$t = $this->index->get(
-				$this->data[Exportable::EXP_CLASSNAME],
-				$ver
-			);
+			$t = $this->index->get($from_class, $ver);
 			if ($t === NULL) {
 				throw new MigrationException(
-					"No migration path exists from ".
-					"'$from_version' to '$to_version' for class ".
-					"'{$this->data[Exportable::EXP_CLASSNAME]}'."
+					"No migration path exists from '$from_version' to ".
+					"'$to_version' for class '$from_class'."
 				);
 			}
 			$ver = $t->get_dest_version();

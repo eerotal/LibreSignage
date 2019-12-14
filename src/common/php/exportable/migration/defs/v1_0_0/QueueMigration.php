@@ -5,6 +5,7 @@ namespace libresignage\common\php\exportable\migration\defs\v1_0_0;
 use libresignage\common\php\Util;
 use libresignage\common\php\Config;
 use libresignage\common\php\exportable\migration\MigrationInterface;
+use libresignage\common\php\exportable\Exportable;
 use libresignage\common\php\exportable\ExportableDataContext;
 use libresignage\common\php\exportable\migration\exceptions\MigrationException;
 
@@ -49,5 +50,8 @@ final class QueueMigration implements MigrationInterface {
 				"Queue migration requires filepath in context object."
 			);
 		}
+
+		// Add the private visibility field that was previously missing.
+		$data[Exportable::EXP_VISIBILITY] = Exportable::EXP_VISIBILITY_PRIVATE;
 	}
 }
