@@ -34,19 +34,6 @@ matrix:
             - target="apache2-debian-docker"
               features="imgthumbs"
 
-deploy:
-    - provider: script
-      script: sh build/scripts/travis/docker_push.sh eerotal nightly
-      on:
-          branch: next
-          condition: $target = 'apache2-debian-docker'
-          condition: $TRAVIS_EVENT_TYPE = 'cron'
-    - provider: script
-      script: sh build/scripts/travis/docker_push.sh eerotal release
-      on:
-          tags: true
-          condition: $target = 'apache2-debian-docker'
-
 install:
     # Install pandoc 2.7.2 from a .deb package because the
     # version in the repos is too old.
@@ -67,3 +54,16 @@ before_script:
 script:
     # Build and install
     - make -j$(nproc) && make install
+
+deploy:
+    - provider: script
+      script: sh build/scripts/travis/docker_push.sh eerotal nightly "$TRAVIS_BRANCH-nightly"
+      on:
+          condition: $target = 'apache2-debian-docker'
+          condition: $TRAVIS_EVENT_TYPE = 'cron'
+          condition: $ENABLE_NIGHTLY_BUILDS = 1
+    - provider: script
+      script: sh build/scripts/travis/docker_push.sh eerotal release
+      on:
+          tags: true
+          condition: $target = 'apache2-debian-docker'

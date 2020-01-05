@@ -1,7 +1,10 @@
 #
 #  Script used to push Docker images to Docker Hub in the CI pipeline.
-#  $1 is the repository to push the image to and $2 is the build type, ie
-#  either 'nightly' or 'release'.
+#
+#  $1 = The repository to push the image to.
+#  $2 = The build type, ie. either 'nightly' or 'release'.
+#  $3 = The Docker tag name for nightly builds. This must be specified if
+#       $2 = nightly and otherwise this isn't used.
 #
 
 #!/bin/sh
@@ -11,6 +14,7 @@ set -e
 
 REPO="$1"
 BUILD="$2"
+TAG="$3"
 
 # Check that the necessary env vars are set.
 if [ -z "$DOCKER_USER" ]; then
@@ -26,8 +30,12 @@ fi
 echo "$DOCKER_PASS" | docker login --username="$DOCKER_USER" --password-stdin
 
 if [ "$BUILD" = "nightly" ]; then
+	if [ -z "$TAG" ]; then
+		echo "[Error] Docker tag must be specified for nightly builds."
+		exit 1
+	fi
 	docker tag "libresignage:$LS_VER" "$REPO/libresignage:nightly"
-	docker push "$REPO/libresignage:nightly"
+	docker push "$REPO/libresignage:$TAG"
 elif [ "$BUILD" = "release" ]; then
 	docker tag "libresignage:$LS_VER" "$REPO/libresignage:$LS_VER"
 	docker push "$REPO/libresignage:$LS_VER"
