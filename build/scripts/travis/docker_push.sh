@@ -34,7 +34,7 @@ if [ "$BUILD" = "nightly" ]; then
 		echo "[Error] Docker tag must be specified for nightly builds."
 		exit 1
 	fi
-	docker tag "libresignage:$LS_VER" "$REPO/libresignage:nightly"
+	docker tag "libresignage:$LS_VER" "$REPO/libresignage:$TAG"
 	docker push "$REPO/libresignage:$TAG"
 elif [ "$BUILD" = "release" ]; then
 	docker tag "libresignage:$LS_VER" "$REPO/libresignage:$LS_VER"
