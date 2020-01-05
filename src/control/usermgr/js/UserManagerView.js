@@ -1,11 +1,5 @@
-var $ = require('jquery');
 var bootstrap = require('bootstrap');
-
 var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
-
-var UserManagerController = require('./usermanagercontroller.js').UserManagerController;
-var UserList = require('./components/userlist.js').UserList;
-
 var StrValidator = require('libresignage/ui/validator/StrValidator');
 var UIController = require('libresignage/ui/controller/UIController')
 var UIInput = require('libresignage/ui/controller/UIInput');
@@ -13,7 +7,18 @@ var UIButton = require('libresignage/ui/controller/UIButton');
 var PromptDialog  = require('libresignage/ui/components/Dialog/PromptDialog');
 var BaseView = require('libresignage/ui/view/BaseView');
 
+var UserManagerController = require('./UserManagerController.js');
+var UserList = require('./components/userlist.js').UserList;
+
+/**
+* View class for the User Manager page.
+*/
 class UserManagerView extends BaseView {
+	/**
+	* Construct a new UserManagerView.
+	*
+	* @param {APIInterface} api An APIInterface object.
+	*/
 	constructor(api) {
 		super();
 		this.api = api;
@@ -25,10 +30,13 @@ class UserManagerView extends BaseView {
 		});
 	}
 
+	/**
+	* Initialize the view.
+	*/
 	async init() {
 		this.buttons = new UIController({
 			create: new UIButton({
-				elem: $('#btn-create-user'),
+				elem: document.querySelector('#btn-create-user'),
 				cond: () => true,
 				enabler: null,
 				attach: { click: () => this.create_user() },
@@ -38,7 +46,7 @@ class UserManagerView extends BaseView {
 
 		this.inputs = new UIController({
 			userlist: new UIInput({
-				elem: $('#users-table'),
+				elem: document.querySelector('#users-table'),
 				cond: () => true,
 				enabler: null,
 				attach: {
@@ -68,7 +76,7 @@ class UserManagerView extends BaseView {
 
 		this.userlist = new UserList(
 			this.api,
-			$('#users-table')[0]
+			document.querySelector('#users-table')
 		);
 
 		await this.fetch();
@@ -76,10 +84,12 @@ class UserManagerView extends BaseView {
 		this.state('ready', true);
 	}
 
+	/**
+	* Create a new user.
+	*
+	* This function prompts for the new username.
+	*/
 	create_user() {
-		/*
-		*  Prompt for a username and create a new user.
-		*/
 		let dialog = new PromptDialog(
 			'Create a new user',
 			'Enter a name for the new user.',
@@ -101,23 +111,20 @@ class UserManagerView extends BaseView {
 				}, 'The username contains invalid characters.')
 			],
 			async status => {
-				let user = null;
-
+				let val = null;
 				if (!status) { return; }
 				try {
-					user = await this.controller.create_user(
-						dialog.get_value()
-					);
+					val = await this.controller.create_user(dialog.get_value());
 				} catch (e) {
 					new APIErrorDialog(e);
 					return;
 				}
 
 				/*
-				*  Manually add the new user to the UserList to make
-				*  the generated initial password visible in the UI.
-				*  This is done because the API doesn't return (or
-				*  even know) the password on subsequent calls.
+				* Manually add the new user to the UserList to make
+				* the generated initial password visible in the UI.
+				* This is done because the API doesn't return (or
+				* even know) the password on subsequent calls.
 				*/
 				this.userlist.add_user(user);
 				this.populate();
@@ -125,43 +132,50 @@ class UserManagerView extends BaseView {
 		);
 	}
 
+	/**
+	* Fetch userdata for the UI.
+	*/
 	async fetch() {
-		/*
-		*  Fetch userdata for the UI.
-		*/
+		let users = null;
+
 		try {
-			this.userlist.set_user_data(
-				await this.controller.get_users()
-			);
+			await this.controller.get_users();
 		} catch (e) {
 			new APIErrorDialog(e);
 			return;
 		}
+
+		this.userlist.set_user_data(users);
 	}
 
+	/**
+	* Populate the UI from the current userdata.
+	*/
 	populate() {
-		/*
-		*  Populate the UI from the current userdata.
-		*/
-		this.userlist.render();
+		this.userlist.update();
 	}
 
+	/**
+	* Save a user with modified groups.
+	*
+	* @param {string} username The name of the user to save.
+	* @param {string[]} groups An array of group names to save.
+	*/
 	async save_user(username, groups) {
-		/*
-		*  Save the user 'username' with the new groups 'groups'.
-		*/
 		try {
-			await this.controller.save_user(username, groups);
+			this.controller.save_user(username, groups);
 		} catch (e) {
 			new APIErrorDialog(e);
 			return;
 		}
 	}
 
+	/**
+	* Remove a user and update the UI.
+	*
+	* @param {string} username The name of the user to remove.
+	*/
 	async remove_user(username) {
-		/*
-		*  Remove the user 'username'.
-		*/
 		try {
 			await this.controller.remove_user(username);
 		} catch (e) {
@@ -172,4 +186,4 @@ class UserManagerView extends BaseView {
 		this.populate()
 	}
 }
-exports.UserManagerView = UserManagerView;
+module.exports = UserManagerView;
