@@ -59,6 +59,7 @@ deploy:
     - provider: script
       script: sh build/scripts/travis/docker_push.sh eerotal nightly "$TRAVIS_BRANCH-nightly"
       on:
+          all_branches: true
           condition: $target = 'apache2-debian-docker'
           condition: $TRAVIS_EVENT_TYPE = 'cron'
           condition: $ENABLE_NIGHTLY_BUILDS = 1
