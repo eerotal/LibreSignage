@@ -3,32 +3,31 @@ Using LibreSignage behind a reverse proxy
 #########################################
 
 A common way to run a server is to run the actual server software behind
-a `reverse proxy <https://en.wikipedia.org/wiki/Reverse_proxy>`_. It's also
-possible to run LibreSignage behind a reverse proxy. Below are some examples on
-how to configure and nginx reverse proxy to work with LibreSignage.
+a `reverse proxy <https://en.wikipedia.org/wiki/Reverse_proxy>`_. This document
+is about configuring an nginx reverse proxy to work with LibreSignage.
+Configuration examples are only provided for nginx as that's the most commonly
+used software for reverse proxies. Apache can also be used as a reverse proxy
+and the configuration needed for that is somewhat similar to the required nginx
+configuration.
 
 In the examples in this document a LibreSignage server is running on
-`localhost` on port `8080`. If you are running a LibreSignage Docker container,
-you can bind the container to listen on port `8080` by passing `-p 8080:80` to
-`docker run`.
+``localhost`` on port ``8080``. If you are running a LibreSignage Docker
+container, you can bind the container to listen on port ``8080`` by passing
+``-p 8080:80`` to ``docker run``.
 
-If you want to run the native build of LibreSignage on a port other than `80`,
+If you want to run the native build of LibreSignage on a port other than ``80``,
 you need to manually edit the Apache VHost configuration file. To make apache
-listen on port `8080`, for example, you need to add `Listen 8080` at the start
-of the VHost config file and change the port number in the VirtualHost tag to
-`8080` like this: `<VirtualHost *:8080>`.
-
-This document only contains instructions for setting up an nginx reverse proxy
-as it's the most common software used for reverse proxies. Apache can also be
-used as a reverse proxy and the configuration needed for that is somewhat
-similar to the required nginx configuration. The required configuration
-directives are only named differently.
+listen on port ``8080``, for example, you need to add ``Listen 8080`` at the
+start of the VirtualHost config file and change the port number in the
+VirtualHost tag to ``8080`` like this: ``<VirtualHost *:8080>``.
 
 Configuring an nginx reverse proxy (without SSL)
 ------------------------------------------------
 
 A sample nginx reverse proxy configuration *without SSL* support is included
 below.
+
+::
 
 	server {
 		listen 80;
@@ -44,14 +43,16 @@ below.
 	}
 
 This configuration creates an nginx reverse proxy that listens on
-`example.com:80` (or `http://example.com`) and proxies all requests to
-the LibreSignage server running on `localhost:8080`.
+``example.com:80`` (or ``http://example.com``) and proxies all requests to
+the LibreSignage server running on ``localhost:8080``.
 
 Configuring an nginx reverse proxy (with SSL)
 ---------------------------------------------
 
 A sample nginx reverse proxy configuration *with SSL* support is included
 below.
+
+::
 
 	server {
 		listen 443 ssl;
@@ -73,5 +74,5 @@ below.
 Replace the SSL certificate paths with proper paths on your system.
 
 This configuration creates an nginx reverse proxy that listens on
-`example.com:443` (or `https://example.com`) and proxies all requests to
-the LibreSignage server running on `localhost:8080`.
+``example.com:443`` (or ``https://example.com``) and proxies all requests to
+the LibreSignage server running on ``localhost:8080``.
