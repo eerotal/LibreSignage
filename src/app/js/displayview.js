@@ -241,28 +241,31 @@ class DisplayView extends BaseView {
 			anim_2 = buf.anim_hide_rev();
 		}
 
-		this.animate(
-			$('#display'),
-			anim_1,
-			() => {
-				$('#display').html(buf.get_html_buffer());
-				this.animate(
-					$('#display'),
-					anim_2,
-					() => {
-						this.render_timeouts[0] = new Timeout(
-							() => this.controller.buffer_next_slide(),
-							BUFFER_UPDATE_PERIOD
-						);
+		this.animate($('#display'), anim_1, () => {
+			/*
+			* Use vanilla JS for clearing the display because the .html()
+			* function seems to leak memory somehow.
+			*/
+			util.free_multimedia_memory_recursive($('#display')[0]);
+			$('#display')[0].innerHTML = '';
+			$('#display')[0].innerHTML = buf.get_html_buffer();
 
-						this.render_timeouts[1] = new Timeout(
-							() => this.render(),
-							buf.get('duration')
-						);
-					}
-				);
-			}
-		);
+			this.animate(
+				$('#display'),
+				anim_2,
+				() => {
+					this.render_timeouts[0] = new Timeout(
+						() => this.controller.buffer_next_slide(),
+						BUFFER_UPDATE_PERIOD
+					);
+
+					this.render_timeouts[1] = new Timeout(
+						() => this.render(),
+						buf.get('duration')
+					);
+				}
+			);
+		});
 	}
 
 	async preview_slide(id) {
