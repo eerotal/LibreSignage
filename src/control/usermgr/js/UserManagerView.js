@@ -8,7 +8,7 @@ var PromptDialog  = require('libresignage/ui/components/Dialog/PromptDialog');
 var BaseView = require('libresignage/ui/view/BaseView');
 
 var UserManagerController = require('./UserManagerController.js');
-var UserList = require('./components/userlist.js').UserList;
+var UserList = require('./components/UserList.js');
 
 /**
 * View class for the User Manager page.
