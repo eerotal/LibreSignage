@@ -40,6 +40,8 @@ Server setup
 
 `Docker </doc?doc=docker>`_
 
+`LibreSignage behind a reverse proxy</doc?doc=reverse_proxy>`_
+
 Development
 -----------
 
