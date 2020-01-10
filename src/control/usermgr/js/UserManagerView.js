@@ -5,15 +5,14 @@ var UIController = require('libresignage/ui/controller/UIController')
 var UIInput = require('libresignage/ui/controller/UIInput');
 var UIButton = require('libresignage/ui/controller/UIButton');
 var PromptDialog  = require('libresignage/ui/components/Dialog/PromptDialog');
-var BaseView = require('libresignage/ui/view/BaseView');
-
+var BaseComponent = require('libresignage/ui/components/BaseComponent');
 var UserManagerController = require('./UserManagerController.js');
 var UserList = require('./components/UserList.js');
 
 /**
 * View class for the User Manager page.
 */
-class UserManagerView extends BaseView {
+class UserManagerView extends BaseComponent {
 	/**
 	* Construct a new UserManagerView.
 	*
@@ -50,19 +49,32 @@ class UserManagerView extends BaseView {
 				cond: () => true,
 				enabler: null,
 				attach: {
-					'component.userlist.save': async (event, data) => {
+					'component.userlist.save': async event => {
 						this.state('loading', true);
-						await this.save_user(
-							data.get('username'),
-							data.get('groups')
-						);
+
+						for (let e of this.userlist.get_entries()) {
+							if (e.get_state('save_pending')) {
+								await this.save_user(
+									e.get_user().get_user(),
+									e.get_new_groups()
+								)
+								e.state('save_pending', false);
+							}
+						}
+
 						this.state('loading', false);
 					},
-					'component.userlist.remove': async (event, data) => {
+					'component.userlist.remove': async event => {
 						this.state('loading', true);
-						await this.remove_user(
-							data.get('username')
-						);
+
+						for (let e of this.userlist.get_entries()) {
+							if (e.get_state('remove_pending')) {
+								await this.remove_user(
+									e.get_user().get_user()
+								)
+							}
+						}
+
 						this.state('loading', false);
 					}
 				},
@@ -126,7 +138,7 @@ class UserManagerView extends BaseView {
 				* This is done because the API doesn't return (or
 				* even know) the password on subsequent calls.
 				*/
-				this.userlist.add_user(user);
+				this.userlist.add_user(val);
 				this.populate();
 			}
 		);
@@ -139,7 +151,7 @@ class UserManagerView extends BaseView {
 		let users = null;
 
 		try {
-			await this.controller.get_users();
+			users = await this.controller.get_users();
 		} catch (e) {
 			new APIErrorDialog(e);
 			return;

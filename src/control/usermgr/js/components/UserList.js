@@ -36,6 +36,15 @@ class UserList {
 	}
 
 	/**
+	* Get the list of UserListEntry objects currently displayed.
+	*
+	* @return {UserListEntry[]} A list of entries.
+	*/
+	get_entries() {
+		return this.list;
+	}
+
+	/**
 	* Update the UserList UI elements.
 	*/
 	update() {

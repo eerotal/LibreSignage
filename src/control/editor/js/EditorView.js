@@ -19,7 +19,7 @@ var UIController = require('libresignage/ui/controller/UIController')
 var UIInput = require('libresignage/ui/controller/UIInput')
 var UIButton = require('libresignage/ui/controller/UIButton');
 var UIStatic = require('libresignage/ui/controller/UIStatic');
-var BaseView = require('libresignage/ui/view/BaseView');
+var BaseComponent = require('libresignage/ui/components/BaseComponent');
 var ShortcutController = require('libresignage/misc/ShortcutController');
 var Shortcut = require('libresignage/misc/Shortcut');
 var EditorController = require('./EditorController.js');
@@ -30,7 +30,7 @@ var AssetUploader = require('./components/assetuploader/AssetUploader.js')
 var Timeline = require('./components/timeline/Timeline.js');
 var QueueSelector = require('./components/queueselector/QueueSelector.js');
 
-class EditorView extends BaseView {
+class EditorView extends BaseComponent {
 	constructor(api) {
 		super();
 

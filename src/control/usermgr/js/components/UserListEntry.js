@@ -1,11 +1,12 @@
 var MultiSelect = require('libresignage/ui/components/MultiSelect');
 var StrValidator = require('libresignage/ui/validator/StrValidator');
 var DropConfirm = require('libresignage/ui/components/DropConfirm');
+var BaseComponent = require('libresignage/ui/components/BaseComponent');
 
 /**
 * UserListEntry component for UserList.
 */
-class UserListEntry extends BaseView {
+class UserListEntry extends BaseComponent {
 	/**
 	* Construct a new UserListEntry object.
 	*
@@ -14,12 +15,16 @@ class UserListEntry extends BaseView {
 	* @param {HTMLElement}  container The container element of the entry.
 	*/
 	constructor(api, user, container) {
+		super();
+
 		this.api = api;
 		this.user = user;
 		this.container = container;
+		this.entry_node = null;
 
 		this.init_state({
-			'remove_pending': true
+			'remove_pending': false,
+			'save_pending': false
 		});
 	}
 
@@ -126,10 +131,11 @@ class UserListEntry extends BaseView {
 		let name = this.user.get_user();
 
 		// Create the DOM element for the entry.
-		this.container.appendChild(UserListEntry.make_entry_node(
+		this.entry_node = UserListEntry.make_entry_node(
 			name,
 			pass != null ? pass : '**********'
-		));
+		);
+		this.container.appendChild(this.entry_node);
 
 		// Initialize the groups MultiSelect.
 		this.groups = new MultiSelect(
@@ -177,7 +183,9 @@ class UserListEntry extends BaseView {
 			'component.dropconfirm.confirm',
 			() => {
 				this.state('remove_pending', true);
-				this.container.dispatchEvent('component.userlistentry.remove');
+				this.entry_node.dispatchEvent(
+					new Event('component.userlistentry.remove')
+				);
 			}
 		);
 
@@ -185,9 +193,30 @@ class UserListEntry extends BaseView {
 		document.querySelector(`#btn-user-save-${name}`).addEventListener(
 			'click',
 			() => {
-				this.container.dispatchEvent('component.userlistentry.save');
+				this.state('save_pending', true);
+				this.entry_node.dispatchEvent(
+					new Event('component.userlistentry.save')
+				);
 			}
 		);
+	}
+
+	/**
+	* Get the User object of a UserListEntry.
+	*
+	* @return {User} A User object.
+	*/
+	get_user() {
+		return this.user;
+	}
+
+	/**
+	* Get new User groups as an array.
+	*
+	* @param {string[]} New User groups for a User.
+	*/
+	get_new_groups() {
+		return this.groups.get_selected();
 	}
 
 	/**

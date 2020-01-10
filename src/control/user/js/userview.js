@@ -7,9 +7,9 @@ var SessionList = require('./components/sessionlist.js').SessionList;
 var UIController = require('libresignage/ui/controller/UIController')
 var UIInput = require('libresignage/ui/controller/UIInput')
 var UIButton = require('libresignage/ui/controller/UIButton');
-var BaseView = require('libresignage/ui/view/BaseView');
+var BaseComponent = require('libresignage/ui/components/BaseComponent');
 
-class UserView extends BaseView {
+class UserView extends BaseComponent {
 	constructor(api) {
 		super();
 		this.api = api;

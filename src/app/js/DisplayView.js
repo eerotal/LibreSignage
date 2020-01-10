@@ -5,7 +5,7 @@ var Util = require('libresignage/util/Util');
 var UIController = require('libresignage/ui/controller/UIController')
 var UIButton = require('libresignage/ui/controller/UIButton');
 var UIStatic = require('libresignage/ui/controller/UIStatic')
-var BaseView = require('libresignage/ui/view/BaseView');
+var BaseComponent = require('libresignage/ui/components/BaseComponent');
 var SelectDialog = require('libresignage/ui/components/Dialog/SelectDialog');
 var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 var DisplayController = require('./DisplayController.js');
@@ -14,7 +14,7 @@ var Timeout = require('libresignage/misc/Timeout');
 /**
 * View class for the display page.
 */
-class DisplayView extends BaseView {
+class DisplayView extends BaseComponent {
 	/**
 	* Construct a new DisplayView object.
 	*
