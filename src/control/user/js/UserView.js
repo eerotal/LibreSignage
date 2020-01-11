@@ -1,15 +1,21 @@
-var $ = require('jquery');
 var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
-
-var UserController = require('./usercontroller.js').UserController;
-var UserValidators = require('./uservalidators.js').UserValidators;
-var SessionList = require('./components/sessionlist.js').SessionList;
 var UIController = require('libresignage/ui/controller/UIController')
 var UIInput = require('libresignage/ui/controller/UIInput')
 var UIButton = require('libresignage/ui/controller/UIButton');
 var BaseComponent = require('libresignage/ui/components/BaseComponent');
+var UserController = require('./UserController.js');
+var UserValidators = require('./UserValidators.js');
+var SessionList = require('./components/SessionList.js');
 
+/**
+* View class for the User Settings page.
+*/
 class UserView extends BaseComponent {
+	/**
+	* Construct a new UserView object.
+	*
+	* @param {APIInterface} api An APIInterface object.
+	*/
 	constructor(api) {
 		super();
 		this.api = api;
@@ -21,60 +27,60 @@ class UserView extends BaseComponent {
 		});
 	}
 
+	/**
+	* Initialize the view.
+	*/
 	async init() {
-		/*
-		*  Initialize the view.
-		*/
 		this.inputs = new UIController({
 			username: new UIInput({
-				elem: $('#user-name'),
+				elem: document.querySelector('#user-name'),
 				cond: () => false,
 				enabler: null,
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: elem => elem.val(),
-				setter: (elem, val) => elem.val(val),
-				clearer: elem => elem.val('')
+				getter: elem => elem.value,
+				setter: (elem, val) => elem.value = val,
+				clearer: elem => elem.value = ''
 			}),
 			groups: new UIInput({
-				elem: $('#user-groups'),
+				elem: document.querySelector('#user-groups'),
 				cond: () => false,
 				enabler: null,
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: elem => elem.val().replace(/\s/g, ''.split(',')),
-				setter: (elem, val) => elem.val(val.join(', ')),
-				clearer: elem => elem.val('')
+				getter: elem => elem.value.replace(/\s/g, ''.split(',')),
+				setter: (elem, val) => elem.value = val.join(', '),
+				clearer: elem => elem.value = ''
 			}),
 			password: new UIInput({
-				elem: $('#user-pass'),
+				elem: document.querySelector('#user-pass'),
 				cond: () => true,
 				enabler: null,
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: elem => elem.val(),
+				getter: elem => elem.value,
 				setter: null,
-				clearer: elem => elem.val('')
+				clearer: elem => elem.value = ''
 			}),
 			password_confirm: new UIInput({
-				elem: $('#user-pass-confirm'),
+				elem: document.querySelector('#user-pass-confirm'),
 				cond: () => true,
 				enabler: null,
 				attach: null,
 				defer: null,
 				mod: null,
-				getter: elem => elem.val(),
+				getter: elem => elem.value,
 				setter: null,
-				clearer: elem => elem.val('')
+				clearer: elem => elem.value = ''
 			})
 		});
 
 		this.buttons = new UIController({
 			save: new UIButton({
-				elem: $('#user-save'),
+				elem: document.querySelector('#user-save'),
 				cond: () => this.validators.get_state(),
 				enabler: null,
 				attach: {
@@ -87,7 +93,7 @@ class UserView extends BaseComponent {
 				defer: () => !this.state('ready') || this.state('loading')
 			}),
 			logout_other: new UIButton({
-				elem: $('#btn-logout-other'),
+				elem: document.querySelector('#btn-logout-other'),
 				cond: () => true,
 				enabler: null,
 				attach: {
@@ -106,17 +112,17 @@ class UserView extends BaseComponent {
 
 		this.sessionlist = new SessionList(
 			this.api,
-			$('#user-sessions')[0]
+			document.querySelector('#user-sessions')
 		);
 
 		await this.populate();
 		this.state('ready', true);
 	}
 
+	/**
+	* Populate the UI with userdata.
+	*/
 	async populate() {
-		/*
-		*  Populate the UI with userdata.
-		*/
 		this.inputs.get('username').set(
 			this.controller.get_user().get_user()
 		);
@@ -134,10 +140,10 @@ class UserView extends BaseComponent {
 		this.sessionlist.render();
 	}
 
+	/**
+	* Save the modified password.
+	*/
 	async save_password() {
-		/*
-		*  Save the modified password.
-		*/
 		try {
 			await this.controller.save_password(
 				this.inputs.get('password').get()
@@ -151,13 +157,16 @@ class UserView extends BaseComponent {
 		this.inputs.get('password_confirm').clear();
 
 		// Trigger ValidatorTrigger.
-		this.inputs.get('password').get_elem().trigger('input');
+		this.inputs
+			.get('password')
+			.get_elem()
+			.dispatchEvent(new Event('input'));
 	}
 
+	/**
+	* Logout other sessions excluding the current one.
+	*/
 	async logout_other_sessions() {
-		/*
-		*  Logout other sessions excluding the current one.
-		*/
 		try {
 			await this.controller.logout_other_sessions();
 		} catch (e) {
@@ -171,4 +180,4 @@ class UserView extends BaseComponent {
 		this.buttons.all(function() { this.state(); })
 	}
 }
-exports.UserView = UserView;
+module.exports = UserView;

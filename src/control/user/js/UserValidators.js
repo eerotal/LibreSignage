@@ -1,16 +1,17 @@
-var $ = require('jquery');
-
 var ValidatorController = require('libresignage/ui/validator/ValidatorController');
 var ValidatorSelector = require('libresignage/ui/validator/ValidatorSelector');
 var EqValidator = require('libresignage/ui/validator/EqValidator');
 var StrValidator = require('libresignage/ui/validator/StrValidator');
 
+/**
+* Validators for the User Settings page.
+*/
 class UserValidators extends ValidatorController {
 	constructor() {
 		super({
 			password: new ValidatorSelector(
-				$('#user-pass')[0],
-				$('#user-pass-confirm-group')[0],
+				document.querySelector('#user-pass'),
+				document.querySelector('#user-pass-confirm-group'),
 				[
 					new StrValidator(
 						{ min: 1, max: null, regex: null },
@@ -20,11 +21,17 @@ class UserValidators extends ValidatorController {
 				]
 			),
 			password_confirm: new ValidatorSelector(
-				$('#user-pass-confirm')[0],
-				$('#user-pass-confirm-group')[0],
+				document.querySelector('#user-pass-confirm'),
+				document.querySelector('#user-pass-confirm-group'),
 				[
 					new EqValidator(
-						{ value: () => $('#user-pass').val() },
+						{
+							value: () => {
+								return document
+									.querySelector('#user-pass')
+									.value;
+							}
+						},
 						"The passwords don't match."
 					)
 				]
@@ -43,10 +50,14 @@ class UserValidators extends ValidatorController {
 		*  one. This messes up any ValidatorTriggers attached onto the
 		*  validators.
 		*/
-		$('#user-pass').on(
+		document.querySelector('#user-pass').addEventListener(
 			'input',
-			() => $('#user-pass-confirm').trigger('input')
+			() => {
+				document
+					.querySelector('#user-pass-confirm')
+					.dispatchEvent(new Event('input'));
+			}
 		);
 	}
 }
-exports.UserValidators = UserValidators;
+module.exports = UserValidators;
