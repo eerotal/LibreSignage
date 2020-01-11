@@ -1,7 +1,3 @@
-/**
-* @file JS for handling interactions on the Login page.
-*/
-
 var bootstrap = require('bootstrap');
 var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 

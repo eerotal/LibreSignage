@@ -1,8 +1,4 @@
 /**
-* @file Controller code for the logout page.
-*/
-
-/**
 * Controller class for the logout page.
 */
 class LogoutController {

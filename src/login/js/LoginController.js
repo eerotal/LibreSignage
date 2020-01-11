@@ -1,8 +1,4 @@
 /**
-* @file Controller code for the login page.
-*/
-
-/**
 * Controller class for the Login page.
 */
 class LoginController {

@@ -231,4 +231,10 @@ doxygen-docs:
 	$(call initchk_warn,$$?)
 	doxygen Doxyfile
 
+# Generate JSDoc docs.
+jsdoc-docs:
+	@:
+	set -e
+	npx jsdoc -c jsdoc.json
+
 include makefile.common

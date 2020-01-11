@@ -1,7 +1,3 @@
-/**
-* @file JS for handling interactions on the Logout page.
-*/
-
 var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 var LogoutController = require('./LogoutController');
 
