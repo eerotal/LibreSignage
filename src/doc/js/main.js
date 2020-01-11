@@ -1,15 +1,13 @@
-var $ = require('jquery');
-var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
-
 var APIInterface = require('libresignage/api/APIInterface');
+var Util = require('libresignage/util/Util');
 
-var API = null;
-
-$(document).ready(async () => {
-	API = new APIInterface();
-	try {
-		await API.init();
-	} catch (e) {
-		APIUI.handle_error(e);
-	}
+document.addEventListener('DOMContentLoaded', () => {
+	Util.await_and_watch_for_errors(async () => {
+		let API = new APIInterface();
+		try {
+			await API.init();
+		} catch (e) {
+			APIUI.handle_error(e);
+		}
+	});
 });
