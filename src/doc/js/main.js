@@ -1,4 +1,9 @@
+/**
+* @file Entry point for the Help JS.
+*/
+
 var APIInterface = require('libresignage/api/APIInterface');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
 var Util = require('libresignage/util/Util');
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -7,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		try {
 			await API.init();
 		} catch (e) {
-			APIUI.handle_error(e);
+			new APIErrorDialog(e);
+			return;
 		}
 	});
 });
