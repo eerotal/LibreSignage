@@ -1,6 +1,5 @@
 var $ = require('jquery');
 var markup = require('ls-markup');
-var util = require('ls-util');
 
 const META = [
 	{ charset: 'utf-8' },
@@ -85,7 +84,7 @@ class Preview {
 
 	render(m) {
 		let content = null;
-		let html = markup.parse(util.sanitize_html(m));
+		let html = markup.parse(m);
 
 		if (html != null) {
 			content = $(html);

@@ -1,21 +1,28 @@
 #!/bin/sh
 
-##
-##  Load a LibreSignage build config file. If $1 is a valid
-##  filepath, load the config from that path. Otherwise use
-##  the last generated config that should be symlinked in 
-##  build/link/last.conf.
-##
-
 set -e
 
-if [ -n "$1" ]; then
-	. "$1"
-else
-	if [ -f "build/link/last.conf" ]; then
-		. "build/link/last.conf"
+#
+# Load a LibreSignage build configuration file. A file path can be
+# passed in $1. If no file is passed, the last generated config file
+# is loaded from build/link/last.sh.
+#
+# $1 = A config file path or unset for the last generated config.
+#
+load_build_config() {
+	if [ -n "$1" ]; then
+		if [ -f "$1" ]; then
+			. "$1"
+		else
+			echo "[Error] No such file: $1" > /dev/stderr
+			exit 1
+		fi
 	else
-		echo "[Error] Build config doesn't exist. Did you run 'make configure'?"
-		exit 1
+		if [ -f "build/link/last.conf" ]; then
+			. "build/link/last.conf"
+		else
+			echo "[Error] No build config found." > /dev/stderr
+			exit 1
+		fi
 	fi
-fi
+}

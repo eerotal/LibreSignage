@@ -1,0 +1,21 @@
+#
+# LibreSignage post-build makefile.
+#
+
+# Exportable migration index path and defs.
+MIGRATION_INDEX := dist/common/php/exportable/migration/index.json
+MIGRATION_DEFS := $(shell find src/common/php/exportable/migration/defs \
+	-type f -name '*.php' -print \
+)
+
+.ONESHELL:
+
+post: $(MIGRATION_INDEX)
+
+# Generate an Exportable migration index.
+$(MIGRATION_INDEX): $(MIGRATION_DEFS)
+	@:
+	set -e
+	php build/scripts/gen_migration_index.php
+
+include makefile.common

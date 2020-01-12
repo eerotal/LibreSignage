@@ -59,6 +59,11 @@ class EditorView extends BaseView {
 		this.preview    = null;
 
 		this.error_id   = null;
+
+		this.init_state({
+			ready: false,
+			loading: false
+		});
 	}
 
 	async init() {
@@ -87,7 +92,7 @@ class EditorView extends BaseView {
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
 				attach: null,
@@ -133,7 +138,7 @@ class EditorView extends BaseView {
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
-					&& d.slide.owned
+					&& (d.user.admin || d.slide.owned)
 				),
 				enabler: (e, s) => s ? e.enable() : e.disable(),
 				attach: null,
@@ -148,7 +153,7 @@ class EditorView extends BaseView {
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
 				attach: null,
@@ -163,7 +168,7 @@ class EditorView extends BaseView {
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
 				attach: null,
@@ -178,7 +183,7 @@ class EditorView extends BaseView {
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
 				attach: null,
@@ -193,7 +198,7 @@ class EditorView extends BaseView {
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
 				attach: { change: () => this.update() },
@@ -209,7 +214,7 @@ class EditorView extends BaseView {
 					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
 				attach: null,
@@ -227,7 +232,7 @@ class EditorView extends BaseView {
 					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
 				attach: null,
@@ -245,7 +250,7 @@ class EditorView extends BaseView {
 					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
 				attach: null,
@@ -263,7 +268,7 @@ class EditorView extends BaseView {
 					this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
 				attach: null,
@@ -280,7 +285,7 @@ class EditorView extends BaseView {
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: (e, s) => this.editor.setReadOnly(!s),
 				attach: { 'keyup': () => this.render_preview() },
@@ -302,7 +307,7 @@ class EditorView extends BaseView {
 					!this.inputs.get('schedule_enable').get()
 					&& d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
 				attach: null,
@@ -473,7 +478,11 @@ class EditorView extends BaseView {
 							d.slide.saved
 							&& d.slide.loaded
 							&& d.slide.locked
-							&& (d.slide.owned || d.slide.collaborate)
+							&& (
+								d.user.admin
+								|| d.slide.owned
+								|| d.slide.collaborate
+							)
 						) || (
 							d.slide.loaded
 							&& !d.slide.saved
@@ -497,7 +506,7 @@ class EditorView extends BaseView {
 					d.quota.slides
 					&& d.slide.loaded
 					&& d.slide.locked
-					&& (d.slide.owned || d.slide.collaborate)
+					&& (d.user.admin || d.slide.owned || d.slide.collaborate)
 				),
 				enabler: null,
 				attach: {
@@ -523,7 +532,7 @@ class EditorView extends BaseView {
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
-					&& d.slide.owned
+					&& (d.user.admin || d.slide.owned)
 				),
 				enabler: (elem, s) => {
 					elem.find('.dropselect-open').prop('disabled', !s);
@@ -554,7 +563,7 @@ class EditorView extends BaseView {
 				cond: d => (
 					d.slide.loaded
 					&& d.slide.locked
-					&& d.slide.owned
+					&& (d.user.admin || d.slide.owned)
 				),
 				enabler: (elem, s) => {
 					elem.find('.dropconfirm-open').prop('disabled', !s);

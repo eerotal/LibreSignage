@@ -16,8 +16,7 @@ ensure_dependency_installed() {
 ensure_dependency_version() {
 	# Compare the semver version numbers from $2 and $3 and error
 	# out if $2 is older than $3. $1 is the dependency name.
-	if [ "$(echo "$2 $3" | tr " " "\n" | sort -rV | head -n 1)" != "$2" ]
-	then
+	if [ "$(echo "$2 $3" | tr " " "\n" | sort -rV | head -n 1)" != "$2" ]; then
 		echo -n "[Error] Version $3 required for '$1' but version $2 is "
 		echo    "installed."
 		exit 1

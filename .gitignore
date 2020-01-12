@@ -22,11 +22,22 @@ __pycache__
 .mypy_cache
 .pyc
 
-# Exclude various temporary NPM files.
+# Exclude composer files.
+/vendor
+composer.lock
+
+# Exclude node and npm files.
 /node_modules
 /package-lock.json
 npm-debug.log
 
+# Exclude PHPUnit files.
+.phpunit.result.cache
+tests/tmp
+
 # Exclude temporary sass files.
 .sass-cache
+
+# Exclude Doxygen generated docs
+doxygen_docs/
 

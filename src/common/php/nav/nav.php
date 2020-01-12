@@ -1,89 +1,84 @@
 <?php
-	/*
-	*  Navigation bar generation code for the
-	*  LibreSignage web interface. $NAV_PAGE_LINKS
-	*  should have all the pages to show on the bar
-	*  listed.
-	*/
+/**
+* Navigation bar generation code for the LibreSignage web interface.
+* $NAV_PAGE_LINKS should have all the pages to show on the bar listed.
+*/
 
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/auth/auth.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/util.php');
+use libresignage\common\php\Config;
+use libresignage\common\php\auth\Auth;
 
-	$d = web_auth(NULL, NULL, FALSE);
-	if (!$d) {
-		throw new Exception("Can't display navigation ".
-			"bar when not logged in. You should check ".
-			"for authorization before including ".
-			"'nav.php'.");
-	}
-
-	$NAV_PAGE_LINKS = array(
-		'Display' => array(
-			'uri' => APP_PAGE,
-			'active' => FALSE,
-			'groups' => NULL
-		),
-		'Editor' => array(
-			'uri' => EDITOR_PAGE,
-			'active' => FALSE,
-			'groups' => array(
-				'editor'
-			)
-		),
-		'User Manager' => array(
-			'uri' => USER_MGR_PAGE,
-			'active' => FALSE,
-			'groups' => array(
-				'admin'
-			)
-		),
-		'Settings' => array(
-			'uri' => USER_SETTINGS_PAGE,
-			'active' => FALSE,
-			'groups' => NULL
-		),
-		'Control Panel' => array(
-			'uri' => CONTROL_PANEL_PAGE,
-			'active' => FALSE,
-			'groups' => NULL
-		),
-		'Help' => array(
-			'uri' => DOCS_PAGE,
-			'active' => FALSE,
-			'groups' => NULL
-		)
+$d = Auth::web_auth(NULL, NULL, FALSE);
+if (!$d) {
+	throw new Exception(
+		"Can't display navigation ".
+		"bar when not logged in. You should check ".
+		"for authorization before including ".
+		"'nav.php'."
 	);
+}
 
-	$req = $_SERVER['REQUEST_URI'];
-	foreach ($NAV_PAGE_LINKS as &$pg) {
-		if (substr($req, 0, strlen($pg['uri'])) == $pg['uri']) {
-			$pg['active'] = TRUE;
-			break;
-		}
+$NAV_PAGE_LINKS = array(
+	'Display' => array(
+		'uri' => Config::config('APP_PAGE'),
+		'active' => FALSE,
+		'groups' => NULL
+	),
+	'Editor' => array(
+		'uri' => Config::config('EDITOR_PAGE'),
+		'active' => FALSE,
+		'groups' => ['editor']
+	),
+	'User Manager' => array(
+		'uri' => Config::config('USER_MGR_PAGE'),
+		'active' => FALSE,
+		'groups' => ['admin']
+	),
+	'Settings' => array(
+		'uri' => Config::config('USER_SETTINGS_PAGE'),
+		'active' => FALSE,
+		'groups' => NULL
+	),
+	'Control Panel' => array(
+		'uri' => Config::config('CONTROL_PANEL_PAGE'),
+		'active' => FALSE,
+		'groups' => NULL
+	),
+	'Help' => array(
+		'uri' => Config::config('DOCS_PAGE'),
+		'active' => FALSE,
+		'groups' => NULL
+	)
+);
+
+$req = $_SERVER['REQUEST_URI'];
+foreach ($NAV_PAGE_LINKS as &$pg) {
+	if (substr($req, 0, strlen($pg['uri'])) == $pg['uri']) {
+		$pg['active'] = TRUE;
+		break;
 	}
+}
 
-	function _is_page_active(string $name) {
-		global $NAV_PAGE_LINKS;
-		if (!array_key_exists($name, $NAV_PAGE_LINKS)) {
-			return FALSE;
-		}
-		return $NAV_PAGE_LINKS[$name]['active'];
-	}
-
-	function _can_access_page(string $name) {
-		global $NAV_PAGE_LINKS, $d;
-		if ($NAV_PAGE_LINKS[$name]['groups'] == NULL ) {
-			// 'groups' == NULL -> All groups have access.
-			return TRUE;
-		}
-		foreach ($NAV_PAGE_LINKS[$name]['groups'] as $g) {
-			if ($d['user']->is_in_group($g)) {
-				return TRUE;
-			}
-		}
+function _is_page_active(string $name) {
+	global $NAV_PAGE_LINKS;
+	if (!array_key_exists($name, $NAV_PAGE_LINKS)) {
 		return FALSE;
 	}
+	return $NAV_PAGE_LINKS[$name]['active'];
+}
+
+function _can_access_page(string $name) {
+	global $NAV_PAGE_LINKS, $d;
+	if ($NAV_PAGE_LINKS[$name]['groups'] == NULL ) {
+		// 'groups' == NULL -> All groups have access.
+		return TRUE;
+	}
+	foreach ($NAV_PAGE_LINKS[$name]['groups'] as $g) {
+		if ($d['user']->is_in_group($g)) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
 ?>
 
 <nav class="nav nav-pills">

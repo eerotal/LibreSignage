@@ -1,0 +1,20 @@
+{
+	"id": "tests/",
+	"type": "object",
+	"properties": {
+		"user": {
+			"type": "object",
+			"properties": {
+				"groups": {
+					"type": "array",
+					"items": { "$ref": "common/schemas/User.schema.json#/definitions/group" }
+				},
+				"user": { "$ref": "common/schemas/User.schema.json#/definitions/name" }
+			},
+			"required": ["groups", "user"],
+			"additionalProperties": false
+		}
+	},
+	"required": ["user"],
+	"additionalProperties": false
+}

@@ -190,17 +190,10 @@ class AssetUploader {
 					minfiles: null,
 					bl: () => {
 						// Create and return the uploaded files blacklist.
-						let tmp = [];
-						let slide = this.controller.get_slide();
-						if (
-							this.controller.get_state().slide.loaded
-							&& slide.has('assets')
-						) {
-							for (let a of slide.get('assets')) {
-								tmp.push(a['filename']);
-							}
+						if (this.controller.get_state().slide.loaded) {
+							return Object.values(this.controller.get_assets())
+								.map(x => x.get_filename());
 						}
-						return tmp;
 					}
 				}, 'At least one of the selected files already exists.'
 			),
@@ -294,13 +287,15 @@ class AssetUploader {
 		this.update();
 	}
 
+	/**
+	* Select an asset.
+	*
+	* @param {string} name The name of the asset to select.
+	*/
 	select_asset(name) {
-		/*
-		*  Select the asset 'name'.
-		*/
 		this.inputs.get('filelink').set(
 			window.location.origin
-			+ this.controller.get_slide().get_asset_uri(name)
+			+ this.controller.get_assets()[name].get_url()
 		);
 	}
 

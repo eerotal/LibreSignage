@@ -1,0 +1,10 @@
+{
+	"id": "tests/",
+	"type": "object",
+	"properties": {
+		"ls": { "type": "string" },
+		"api": { "type": "string" }
+	},
+	"required": ["ls", "api"],
+	"additionalProperties": false
+}

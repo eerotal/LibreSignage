@@ -1,0 +1,46 @@
+{
+	"name": "eerotal/libresignage",
+	"description": "An open source digital signage solution.",
+	"type": "project",
+	"keywords": ["digital-signage", "signage", "slideshow"],
+	"homepage": "https://github.com/eerotal/LibreSignage",
+	"readme": "README.rst",
+	"license": "BSD-3-Clause",
+	"authors": [
+		{
+			"name": "Eero Talus",
+			"email": "etal@mbnet.fi",
+			"role": "Developer"
+		}
+	],
+	"support": {
+		"email": "etal@mbnet.fi",
+		"issues": "https://github.com/eerotal/LibreSignage/issues",
+		"source": "https://github.com/eerotal/LibreSignage",
+		"docs": "https://github.com/eerotal/LibreSignage/tree/master/src/doc/rst"
+	},
+	"require": {
+		"symfony/http-foundation": "4.2.*",
+		"justinrainbow/json-schema": "5.2.*",
+		"php": "^7.0"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "8.1.*",
+		"guzzlehttp/guzzle": "6.3.*"
+	},
+	"suggest": {
+		"ext-gd": "Enables image thumbnail generation for slide assets."
+	},
+	"autoload": {
+		"psr-4": {
+			"libresignage\\common\\php\\": "common/php/",
+			"libresignage\\api\\": "api/",
+			"libresignage\\api\\endpoint\\": "public/api/endpoint/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"libresignage\\tests\\": "tests/"
+		}
+	}
+}

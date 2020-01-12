@@ -1,0 +1,23 @@
+{
+	"definitions": {
+		"owner": { "$ref": "User.schema.json#/definitions/name" },
+		"slide_ids": {
+			"type": "array",
+			"items": { "$ref": "Slide.schema.json#/definitions/id" }
+		},
+		"name": {
+			"type": "string",
+			"pattern": "^[A-Za-z0-9_-]+$",
+			"minLength": 1
+		}
+	},
+
+	"type": "object",
+	"properties": {
+		"name": { "$ref": "#/definitions/name" },
+		"owner": { "$ref": "#/definitions/owner" },
+		"slide_ids": { "$ref": "#/definitions/slide_ids" }
+	},
+	"required": ["owner", "slide_ids"],
+	"additionalProperties": false
+}

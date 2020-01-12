@@ -1,11 +1,10 @@
 #!/bin/sh
 
-##
-##  Start a LibreSignage Docker container.
-##
+#
+# Start a LibreSignage Docker container.
+#
 
 . build/scripts/conf.sh
-. build/scripts/ldconf.sh
 
 echo "[INFO] Starting a LibreSignage Docker container."
 

@@ -24,6 +24,9 @@ class EditorController {
 			},
 			quota: {
 				slides: false
+			},
+			user: {
+				admin: false
 			}
 		};
 
@@ -48,6 +51,10 @@ class EditorController {
 		*  Initialize the EditorController.
 		*/
 		await this.update_quotas();
+
+		this.state.user = {
+			'admin': this.api.get_session().get_user().is_in_group('admin')
+		};
 	}
 
 	async update_quotas() {
@@ -106,7 +113,9 @@ class EditorController {
 
 	async close_slide() {
 		if (this.slide != null) {
-			await this.slide.lock_release();
+			if (this.slide.is_locked_from_here()) {
+				await this.slide.lock_release();
+			}
 			this.slide = null;
 		}
 		Object.assign(this.state.slide, {
@@ -134,9 +143,10 @@ class EditorController {
 		try {
 			await this.slide.load(id, true, true);
 		} catch (e) {
-			switch (e.get_code()) {
-				case APIError.codes.API_E_NOT_AUTHORIZED:
-				case APIError.codes.API_E_LOCK:
+			if (!(e instanceof APIError)) { throw e; }
+			switch (e.get_status()) {
+				case HTTPStatus.UNAUTHORIZED:
+				case HTTPStatus.LOCKED:
 					await this.slide.load(id, false, false);
 					break;
 				default:

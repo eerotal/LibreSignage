@@ -36,16 +36,6 @@ Raw string *(rstr)*
   The same thing as a normal string but raw strings don't have quotes
   around them.
 
-Character escaping
-------------------
-
-In LibreSignage markup the characters =, [ and ] have special meanings
-and they can't be used in strings without escaping. These characters can
-be escaped by prefixing them with a backward slash (*\\*). This makes the
-markup parser treat even the special characters as normal ones, making
-it possible to use them in strings.
-
-
 Markup classes
 --------------
 
@@ -125,8 +115,8 @@ Color
   | ``c: rstr``
 
 Set the color of text. All text inside this class will have the color
-set by this class if no nested classes change the color. ``<color>`` is
-the `CSS color name`_ or a hexadecimal color code to use.
+set by this class if no nested classes change the color. ``<color>`` must
+be a valid `CSS color`_.
 
 Font
   | Syntax: ``[font f=<font>][/font]``
@@ -181,6 +171,21 @@ Align text. ``<type>`` can be ``left``, ``right``, ``center``
 or ``justify``
 
 
+Background color
+  | Syntax: ``[bgcolor c=<color>][/bgcolor]``
+  | ``type: rstr``
+
+Change the background color. ``<color>`` must be a valid `CSS color`_.
+
+
+Background image
+  | Syntax: ``[bgimg url=<URL>][/bgimg]``
+  | ``type: str``
+
+Set a background image. ``<URL>`` must be a valid URL pointing to
+the image file.
+
+
 Examples
 --------
 
@@ -231,4 +236,4 @@ Columns
   [/container]
 
 
-.. _`CSS color name`: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#Color_keywords
+.. _`CSS color`: https://developer.mozilla.org/en-US/docs/Web/CSS/color

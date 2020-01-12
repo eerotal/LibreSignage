@@ -6,11 +6,11 @@ var util = require('ls-util');
 *  object to use and 'name' is the asset name.
 */
 
-const asset_thumb_template = (name, thumb_uri) => `
+const asset_thumb_template = (name, t_url) => `
 <div class="thumb">
 	<div class="thumb-inner default-border">
 		<div class="thumb-img-wrapper">
-			<img src="${thumb_uri}"></img>
+			<img src="${t_url}"></img>
 		</div>
 		<div class="thumb-label-wrapper">
 			<div class="thumb-rm-wrapper">
@@ -47,31 +47,25 @@ class AssetList {
 		this.update();
 	}
 
+	/**
+	* Update the asset list content.
+	*/
 	update() {
-		/*
-		*  Update the asset list content.
-		*/
 		$(this.container).html('');
 		if (this.slide == null) { return; }
 
-		for (let a of this.slide.get('assets')) {
-			let thumb_uri = null;
+		for (let a of Object.values(this.slide.get('assets'))) {
+			let t_url = null;
 			let html = null;
 
-			/*
-			*  Use the asset thumbnail if it exists and a placeholder
-			*  icon otherwise.
-			*/
-			if (this.slide.has_thumb(a.filename)) {
-				thumb_uri = this.slide.get_asset_thumb_uri(a.filename);
+			// Use the asset thumbnail if it exists and a placeholder otherwise.
+			if (this.slide.get('assets')[a.filename].has_thumb()) {
+				t_url = this.slide.get('assets')[a.filename].get_thumb_url();
 			} else {
-				thumb_uri = util.fa_svg_uri('solid', 'image');
+				t_url = util.fa_svg_uri('solid', 'image');
 			}
 
-			html = $(asset_thumb_template(
-				a.filename,
-				thumb_uri
-			));
+			html = $(asset_thumb_template(a.filename, t_url));
 			$(this.container).append(html);
 
 			// Attach event listeners for the select and remove actions.

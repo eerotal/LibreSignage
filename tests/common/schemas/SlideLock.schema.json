@@ -1,0 +1,14 @@
+{
+	"definitions": {
+		"session_id": { "$ref": "Session.schema.json#/definitions/id" },
+		"expire": { "$ref": "Utils.schema.json#/definitions/numbers/unix_time" }
+	},
+
+	"type": "object",
+	"properties": {
+		"session_id": { "$ref": "#/definitions/session_id" },
+		"expire": { "$ref": "#/definitions/expire" }
+	},
+	"required": ["session_id", "expire"],
+	"additionalProperties": false
+}

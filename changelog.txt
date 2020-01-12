@@ -1,3 +1,35 @@
+v1.1.0
+  - [internal] Separate private and public files in the directory tree
+               to naturally prevent access to private files. (PR #56)
+  - [feature]  Implement [bgimg] and [bgcolor] markup tags for styling
+               slide backgrounds. (issue #75)
+  - [feature]  Implement buttons for manual slide navigation in display.
+  - [internal] Mostly rewrite the API system
+  - [internal] Use PHP autoloading and namespaces instead of direct
+               file includes.
+  - [internal] Improve various classes and PHP files to make them more object
+               oriented.
+  - [internal] Implement a testing framework with PHPUnit and write tests
+               for all API endpoints.
+  - [bugfix]   Fix various bugs in the backend that were discovered while
+               writing tests.
+  - [build]    Make the build system more modular.
+  - [build]    Write separate interactive and CLI versions of the apache2-debian
+               target. (apache2-debian-interactive and apache2-debian)
+  - [build]    Various improvements to the build system.
+  - [docs]     Generate documentation with Doxygen.
+  - [internal] Implement HTTP cache support for slide asset fetching endpoints.
+               (issue #53)
+  - [bugfix]   Fix a bug where uploading/removing slide assets was allowed even
+               when the slide was not locked. (issue #81)
+  - [bugfix]   Fix a bug where a slide could be deleted even when it was
+               not locked. (issue #80)
+  - [bugfix]   Fix a bug where an error was thrown when changing queues if an
+               unsaved slide was open. (#86)
+  - [feature]  Implement a data migration system for simplifying upgrades
+               between different versions of LibreSignage.
+  - [bugfix]   Fix outdated information in documentation.
+
 v1.0.3
   - [bugfix]   Fix a bug where slide markup error indicators weren't cleared
                if the slide with the errors was removed. (issue #97)
@@ -9,8 +41,8 @@ v1.0.2
                LibreSignage Docker image builds.
   - [bugfix]   Use rsvg-convert instead of ImageMagick's convert due to problems
                with convert crashing.
-  - [bugfix]   Fix a bug that caused display clients with a (permanent) display
-               session to be logged out after a certain amount of time.
+  - [bugfix]   Fix a bug that caused display users logged in with a (permament)
+               display session to be logged out after a certain amount of time.
 
 v1.0.1
   - [bugfix]   Fix a bug where using forward slashes in slide markup caused

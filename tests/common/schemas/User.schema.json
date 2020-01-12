@@ -1,0 +1,32 @@
+{
+	"definitions": {
+		"name": {
+			"type": "string",
+			"pattern": "^[A-Za-z0-9_-]+$"
+		},
+		"group": {
+			"type": "string",
+			"pattern": "^[A-Za-z0-9_-]+$"
+		},
+		"pass": {
+			"type": "string",
+			"minLength": 1
+		}
+	},
+
+	"type": "object",
+	"properties": {
+		"groups": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/group" }
+		},
+		"quota": { "$ref": "Quota.schema.json" },
+		"sessions": {
+			"type": "array",
+			"items": { "$ref": "Session.schema.json" }
+		},
+		"user": { "$ref": "#/definitions/name" }
+	},
+	"required": ["groups", "quota", "sessions", "user"],
+	"additionalProperties": false
+}
