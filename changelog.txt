@@ -33,6 +33,8 @@ v1.1.0
 v1.0.3
   - [bugfix]   Fix a bug where slide markup error indicators weren't cleared
                if the slide with the errors was removed. (issue #97)
+  - [bugfix]   Attempt to fix a bug that caused a memory leak on the
+               display page. (issue #101)
 
 v1.0.2
   - [bugfix]   Apply a workaround for docker-library/php#865 which broke
