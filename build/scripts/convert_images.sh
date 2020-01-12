@@ -7,7 +7,7 @@
 #!/bin/sh
 
 split_name() { echo $1 | rev | cut -f 2 -d '.' | rev; }
-echo_debug() { echo $1"/"$3" >> "$2"/"$(split_name $3)"_"$4".png"; }
+echo_debug() { echo "convert: "$1"/"$3" >> "$2"/"$(split_name $3)"_"$4".png"; }
 
 svg_to_png() {
 	src_dir=$1

@@ -94,7 +94,7 @@ class AssetUploaderController {
 		*  Update the 'filelimit' state value with the current data.
 		*/
 		this.state.slide.filelimit = 
-			this.slide.get('assets').length
+			Object.keys(this.slide.get('assets')).length
 				>= this.api.limits.SLIDE_MAX_ASSETS;
 	}
 

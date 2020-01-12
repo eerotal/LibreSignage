@@ -5,6 +5,7 @@
 var $ = require('jquery');
 var bootstrap = require('bootstrap');
 var APIError = require('ls-api').APIError;
+var HTTPStatus = require('ls-api').HTTPStatus;
 var APIUI = require('ls-api-ui');
 
 var UIController = require('ls-uicontrol').UIController;
@@ -111,7 +112,7 @@ class LoginView {
 			);
 		} catch (e) {
 			if (e instanceof APIError) {
-				if (e.get_code() === APIError.codes.API_E_INCORRECT_CREDS) {
+				if (e.is(HTTPStatus.UNAUTHORIZED)) {
 					query.failed = '1';
 					window.location.assign(`/login?${util.querify(query)}`);
 					return;

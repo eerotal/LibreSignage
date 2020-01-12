@@ -1,6 +1,7 @@
 var $ = require('jquery');
 var bootstrap = require('bootstrap');
 
+var BaseView = require('ls-baseview').BaseView;
 var UIController = require('ls-uicontrol').UIController;
 var UIButton = require('ls-uicontrol').UIButton;
 var UIInput = require('ls-uicontrol').UIInput;
@@ -12,20 +13,26 @@ var APIUI = require('ls-api-ui');
 var UserManagerController = require('./usermanagercontroller.js').UserManagerController;
 var UserList = require('./components/userlist.js').UserList;
 
-class UserManagerView {
+class UserManagerView extends BaseView {
 	constructor(api) {
+		super();
 		this.api = api;
-		this.ready = false;
-
 		this.controller = new UserManagerController(api);
 
+		this.init_state({
+			ready: false,
+			loading: false
+		});
+	}
+
+	async init() {
 		this.buttons = new UIController({
 			create: new UIButton({
 				elem: $('#btn-create-user'),
 				cond: () => true,
 				enabler: null,
 				attach: { click: () => this.create_user() },
-				defer: () => !this.ready
+				defer: () => !this.state('ready') || this.state('loading')
 			})
 		});
 
@@ -36,35 +43,37 @@ class UserManagerView {
 				enabler: null,
 				attach: {
 					'component.userlist.save': async (event, data) => {
+						this.state('loading', true);
 						await this.save_user(
 							data.get('username'),
 							data.get('groups')
 						);
+						this.state('loading', false);
 					},
 					'component.userlist.remove': async (event, data) => {
+						this.state('loading', true);
 						await this.remove_user(
 							data.get('username')
 						);
+						this.state('loading', false);
 					}
 				},
-				defer: () => !this.ready,
+				defer: () => !this.state('ready') || this.state('loading'),
 				mod: null,
 				getter: null,
 				setter: null,
 				clearer: null
 			})
-		})
+		});
 
 		this.userlist = new UserList(
 			this.api,
 			$('#users-table')[0]
 		);
-	}
 
-	async init() {
 		await this.fetch();
 		this.populate();
-		this.ready = true;
+		this.state('ready', true);
 	}
 
 	create_user() {

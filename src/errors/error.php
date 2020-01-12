@@ -1,6 +1,7 @@
 <?php
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/config.php');
-	require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/css.php');
+	require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
+
+	use libresignage\common\php\Config;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -8,7 +9,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="/errors/css/error.css">
-		<?php require_once($_SERVER['DOCUMENT_ROOT'].'/common/php/favicon.php'); ?>
+		<?php require_once(Config::config('LIBRESIGNAGE_ROOT').'/common/php/favicon.php'); ?>
 		<title><?php echo $ERROR_PAGE_HEADING; ?></title>
 	</head>
 	<body>
@@ -19,7 +20,7 @@
 			</div>
 		</main>
 		<?php
-			require_once($_SERVER['DOCUMENT_ROOT'].FOOTER_PATH);
+			require_once(Config::config('LIBRESIGNAGE_ROOT').Config::config('FOOTER_PATH'));
 		?>
 	</body>
 </html>

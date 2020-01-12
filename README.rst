@@ -32,13 +32,19 @@ Table Of Contents
 
 `7. Screenshots`_
 
-`8. Make rules`_
+`8. Makefile`_
 
-`9. Documentation`_
+`8.1. Targets`_
 
-`10. Third-party dependencies`_
+`8.2. Option variables`_
 
-`11. License`_
+`9. Build targets`_
+
+`10. Documentation`_
+
+`11. Third-party dependencies`_
+
+`12. License`_
 
 1. Introduction
 ---------------
@@ -146,23 +152,29 @@ tested.*
   * Apache2 (Version 2.4.x.)
 
 *Optional* runtime dependencies
-  * PHP gd extension for image thumbnail generation.
+  * php-gd extension for image thumbnail generation.
   * ffmpeg (Version 4.0.x) for video thumbnail generation.
+  * php-xml extension for running PHPUnit.
 
-Build system dependencies
+*Required* build system dependencies
   * PHP (Version 7.x.) (http://www.php.net/)
   * GNU Make (Version 4.x or newer.) (https://www.gnu.org/software/make/)
   * Pandoc (Version 2.0.x or newer.) (https://pandoc.org/)
   * npm (Version 6.4.x or newer.) (https://nodejs.org/en/)
+  * composer (Version 1.8.x or newer) (https://getcomposer.org/)
   * rsvg-convert (Version 2.44.x or newer.) (https://gitlab.gnome.org/GNOME/librsvg)
 
-Build system dependencies installed automatically by npm
-  * Tools
+*Optional* build system dependencies.
+  * Doxygen (Version 1.8.x or newer.) (http://www.doxygen.nl/)
+
+Dependencies installed automatically by *npm* or *composer*
+  * Tools & development libraries
 
     * SASS (https://sass-lang.com/)
     * Browserify (http://browserify.org/)
     * PostCSS (https://postcss.org/)
     * Autoprefixer (https://github.com/postcss/autoprefixer)
+    * PHPUnit (https://phpunit.de/)
 
   * Libraries
 
@@ -171,7 +183,13 @@ Build system dependencies installed automatically by npm
     * jQuery (https://jquery.com/)
     * Popper.js (https://popper.js.org/)
     * Font-Awesome Free (https://fontawesome.com/)
+    * HttpFoundation (https://symfony.com/)
+    * Guzzle (https://github.com/guzzle/guzzle)
+    * json-schema (https://github.com/justinrainbow/json-schema)
+    * JSDOM (https://github.com/jsdom/jsdom)
+    * node-XMLHttpRequest (https://github.com/driverdan/node-XMLHttpRequest)
 
+See `11. Third-party dependencies`_ for license information.
 
 4.2. Using prebuilt Docker images on any distribution
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -223,15 +241,22 @@ a native LibreSignage build that runs directly on a Debian or Ubuntu
 host (ie. no containers) by following the instructions below.
 
 1. Install software needed for building LibreSignage. You will need the
-   following packages: ``git, apache2, php, php-gd, pandoc, npm, make,
-   rsvg-convert``. All other packages except *npm* can be installed from
-   the distribution repos by running ``sudo apt update && sudo apt install
-   -y git apache2 php php-gd pandoc make librsvg2-bin``. You can install
-   NPM by following the instructions on the
+   following packages: ``git, apache2, php, php-gd, pandoc, npm, composer,
+   make, rsvg-convert``. All other packages except *npm* can be
+   installed from the distribution repos by running ``sudo apt update && sudo
+   apt install -y git apache2 php php-gd pandoc composer make librsvg2-bin``.
+   You can install NPM by following the instructions on the
    `node.js website <https://nodejs.org/en/download/package-manager/>`_.
 
    * If you want to enable video thumbnail generation, you need to install
      *ffmpeg* too. You can do that by running ``sudo apt install -y ffmpeg``.
+
+   * If you want to run the PHPUnit unit tests you need to install the php-xml
+     extension. You can do that by running ``sudo apt install -y php-xml``.
+
+   * If you want to generate Doxygen documentation for LibreSignage, you
+     need to install Doxygen. You can do that by running
+     ``sudo apt install -y doxygen``
 
    See the section `4.1. Minimum system requirements`_ for more info.
 2. Use ``cd`` to move to the directory where you want to download the
@@ -239,18 +264,16 @@ host (ie. no containers) by following the instructions below.
 3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
    The repository will be cloned into the directory *LibreSignage/*.
 4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
-5. Install dependencies from NPM by running ``npm install``. *This command
-   will probably print a warning about an incompatible package. That's
-   normal and doesn't affect the build in any way.*
-6. Run ``make configure TARGET=apache2-debian``. This script asks you
-   to enter the following configuration values:
+5. Run ``make configure TARGET=apache2-debian-interactive``. This target
+   installs any needed *composer* and *npm* dependencies first and then
+   prompts you for some configuration values:
 
-   * Install directory (default: /var/www)
+   * Install directory [default: /var/www]
 
      * The directory where LibreSignage is installed. A subdirectory
        is created in this directory.
 
-   * Server name (domain)
+   * Server domain [default: localhost]
 
      * The domain name to use for configuring apache2. If you
        don't have a domain and you are just testing the system,
@@ -259,7 +282,7 @@ host (ie. no containers) by following the instructions below.
        domain, you can add it to your */etc/hosts* file to make
        it work on your machine.
 
-   * Server name aliases
+   * Domain aliases [default: ]
 
      * Domain name aliases for the server. Aliases make it possible
        to have the server respond from multiple domains. One useful
@@ -269,17 +292,17 @@ host (ie. no containers) by following the instructions below.
        to *localhost* on the host machine or by connecting to the LAN
        IP on the local network.
 
-   * Admin name
+   * Admin name [default: Example Admin]
 
      * Shown to users on the main page as contact info in case of
        any problems.
 
-   * Admin email
+   * Admin email [default: admin@example.com]
 
      * Shown to users on the main page as contact info in case of
        any problems.
 
-   * Enable image thumbnail generation (y/N)
+   * Enable image thumbnail generation? (Y/N/y/n) [default: N]
 
      * Enable image thumbnail generation on the server. Currently
        image thumbnails are only generated for uploaded slide
@@ -289,35 +312,36 @@ host (ie. no containers) by following the instructions below.
        is enabled. If *gd* doesn't appear in the list but is
        installed, you can run ``sudo phpenmod gd`` to enable it.
 
-   * Enable video thumbnail generation (y/N) *Requires ffmpeg.*
+   * Enable video thumbnail generation? (Y/N/y/n) [default: N]
 
      * Enable video thumbnail generation. Currently video thumbnails
-       are only generated for uploaded slide media. Note that video
-       thumbnail generation requires *ffmpeg* and *ffprobe* to be
-       available on the host system. If you enable this option,
+       are only generated for uploaded slide media. **Note that video
+       thumbnail generation requires ffmpeg and ffprobe to be
+       available on the host system.** If you enable this option,
        you'll also need to configure the binary paths to *ffmpeg*
        and *ffprobe* in the LibreSignage configuration files. The
        paths default to */usr/bin/ffmpeg* and */usr/bin/ffprobe*.
        See the help page `Libresignage configuration` or the file
        `src/doc/rst/configuration.rst` for more info.
 
-   * Enable debugging (y/N) *Do not enable on production systems.*
+   * Enable debugging? (Y/N/y/n) [default: N]
 
      *  Whether to enable debugging. This enables things like
-        verbose error reporting through the API etc.
+        verbose error reporting through the API etc. **DO NOT
+        enable debugging on production systems.**
 
-   This command generates aa build configuration file needed
+   This command generates a build configuration file needed
    for building LibreSignage. The file is saved in ``build/`` as
    ``<DOMAIN>.conf`` where ``<DOMAIN>`` is the domain name you
    specified.
-7. Run ``make -j$(nproc)`` to build LibreSignage. See `8. Make rules`_
+6. Run ``make -j$(nproc)`` to build LibreSignage. See `8. Makefile`_
    for more advanced make usage.
-8. Finally, to install LibreSignage, run ``sudo make install`` and answer
+7. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
-9. Disable the default Apache site by running
+8. Disable the default Apache site by running
    ``sudo a2dissite 000-default.conf``.
-10. Navigate to the domain name you entered and you should see the
-    LibreSignage login page.
+9. Navigate to the domain name you entered and you should see the
+   LibreSignage login page.
 
 4.3.2. Building a Docker image on Debian or Ubuntu
 ..................................................
@@ -394,7 +418,7 @@ Why doesn't LibreSignage have feature X?
 Is LibreSignage really free?
   YES! In fact LibreSignage is not only free, it's also open source.
   You can find information about the LibreSignage license in the
-  section `11. License`_.
+  section `12. License`_.
 
 7. Screenshots
 ---------------
@@ -449,10 +473,13 @@ Open these images in a new tab to view the full resolution versions.
    :width: 320 px
    :height: 180 px
 
-8. Make rules
---------------
+8. Makefile
+-----------
 
-The following ``make`` rules are implemented in the makefile.
+8.1. Targets
+++++++++++++
+
+The following ``make`` targets are implemented.
 
 all
   The default rule that builds the LibreSignage distribution. You
@@ -463,18 +490,21 @@ configure
   Generate a LibreSignage build configuration file. You need to use
   ``TARGET=[target]`` to select a build target to use. You can also
   optionally use ``PASS=[pass]`` to pass any target specific arguments
-  to the build configuration script. The recognized targets are:
+  to the build configuration script. See `9. Build targets`_ for more info.
 
-  * apache2-debian (Build target for a native install on Debian.)
-  * apache2-debian-docker (Build target for building Docker images.)
+configure-build
+  Generate a LibreSignage build configuration file. You need to pass
+  ``TARGET=[target]`` to select a build target to use. You can also optionally
+  use ``PASS=[pass]`` to pass any target specific arguments to the build
+  configuration script. See `9. Build targets`_ for more info. **You don't need
+  to run this target because the configure target runs this one aswell.**
 
-    * You can use PASS with ``--features [features]`` where ``[features]``
-      is a comma separated list of features to enable. See the section
-      `4.3.2. Building a Docker image on Debian or Ubuntu`_ for more
-      info.
+configure-system
+  Generate LibreSignage system configuration files. **You don't need to run
+  this target because the configure target runs this one aswell.**
 
 install
-  Install the LibreSignage distribution on the machine. Note that
+  Install the LibreSignage distribution on the system. Note that
   the meaning of install depends on the target you are building for.
   Running ``make install`` for the *apache2-debian-docker* target,
   for example, builds the Docker image (ie. installs LibreSignage into
@@ -488,20 +518,27 @@ realclean
   too. This rule effectively resets the LibreSignage directory to how it
   was right after cloning the repo.
 
+test-api
+  Run the API integration tests. Note that you must install LibreSignage
+  first. The API URI can be set by changing the value of ``PHPUNIT_API_HOST``.
+  See below for more info.
+
+doxygen-docs
+  Build the Doxygen documentation for LibreSignage. The docs are output in
+  the ``doxygen_docs/`` directory.
+
 LOC
   Count the lines of code in LibreSignage.
 
-LOD
-  Count the lines of documentation in LibreSignage. This target will
-  only work after building LibreSignage since the documentation lines
-  are counted from the docs in the dist/ directory. This way the
-  generated API endpoint docs can be taken into account too.
+8.2. Option variables
++++++++++++++++++++++
 
-You can also pass some other settings to the LibreSignage makefile.
+You can also pass some other variables to the LibreSignage makefile.
 
 CONF=<config file> - (default: Last generated config.)
-  Manually specify a config file to use. This setting can be used with
-  the targets *all* and *install*.
+  Use a specific build configuration file when building or installing
+  LibreSignage. This option can be used with the targets *all* and
+  *install*.
 
 VERBOSE=<Y/n>
   Print verbose log output. This setting can be used with any target.
@@ -512,7 +549,31 @@ INITCHK_WARN=<y/N>
   for example when an incompatible dependency version is used but the user
   wants to try building LibreSignage with that version anyway.
 
-9. Documentation
+PHPUNIT_API_HOST=<URI>
+  Use *URI* as the hostname when running API integration tests. This is
+  ``http://localhost:80/`` by default.
+
+9. Build targets
+----------------
+
+* apache2-debian
+
+  * A target for building a native install on Debian with Apache2.
+  * Run ``make configure TARGET=apache2-debian PASS="--help"`` to
+    get a list of accepted CLI options.
+
+* apache2-debian-interactive
+
+  * An interactive version of *apache2-debian*.
+  * This target doesn't accept any CLI options.
+
+* apache2-debian-docker (Build target for building Docker images.)
+
+  * A target for building Docker images.
+  * Run ``make configure TARGET=apache2-debian-docker PASS="--help"`` to
+    get a list of accepted CLI options.
+
+10. Documentation
 -----------------
 
 LibreSignage documentation is written in reStructuredText, which is
@@ -524,22 +585,37 @@ are located in the directory *src/doc/rst/*.
 The reStructuredText files are also compiled into HTML when LibreSignage
 is built and they can be accessed from the *Help* page of LibreSignage.
 
-10. Third-party dependencies
+11. Third-party dependencies
 ----------------------------
 
-Bootstrap (Library, MIT License)
+Bootstrap (Library, MIT License) (https://getbootstrap.com/)
   Copyright (c) 2011-2016 Twitter, Inc.
 
-JQuery (Library, MIT License)
+JQuery (Library, MIT License) (https://jquery.com/)
   Copyright JS Foundation and other contributors, https://js.foundation/
 
-Popper.JS (Library, MIT License)
+Popper.JS (Library, MIT License) (https://popper.js.org/)
   Copyright (C) 2016 Federico Zivolo and contributors
 
-Ace (Library, 3-clause BSD License)
+Ace (Library, 3-clause BSD License) (https://ace.c9.io/)
   Copyright (c) 2010, Ajax.org B.V. All rights reserved.
 
-Raleway (Font, SIL Open Font License 1.1) 
+JSDOM (Library, MIT License) (https://github.com/jsdom/jsdom)
+  Copyright (c) 2010 Elijah Insua
+
+node-XMLHttprequest (Library, MIT License) (https://github.com/driverdan/node-XMLHttpRequest)
+  Copyright (c) 2010 passive.ly LLC
+
+Guzzle (Library, MIT License) (https://github.com/guzzle/guzzle)
+  Copyright (c) 2011-2018 Michael Dowling, https://github.com/mtdowling <mtdowling@gmail.com>
+
+json-schema (Library, MIT License) (https://github.com/justinrainbow/json-schema)
+  Copyright (c) 2016
+
+Symfony/HttpFoundation (Library, MIT License) (https://symfony.com/)
+  Copyright (c) 2004-2019 Fabien Potencier
+
+Raleway (Font, SIL Open Font License 1.1) (https://github.com/impallari/Raleway)
   Copyright (c) 2010, Matt McInerney (matt@pixelspread.com),  
 
   Copyright (c) 2011, Pablo Impallari (www.impallari.com|impallari@gmail.com),  
@@ -547,26 +623,26 @@ Raleway (Font, SIL Open Font License 1.1)
   Copyright (c) 2011, Rodrigo Fuenzalida (www.rfuenzalida.com|hello@rfuenzalida.com),  
   with Reserved Font Name Raleway
 
-Montserrat (Font, SIL Open Font License 1.1)
+Montserrat (Font, SIL Open Font License 1.1) (https://github.com/JulietaUla/Montserrat)
   Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)  
 
-Inconsolata (Font, SIL Open Font License 1.1)
+Inconsolata (Font, SIL Open Font License 1.1) (https://github.com/googlefonts/Inconsolata)
   Copyright 2006 The Inconsolata Project Authors (https://github.com/cyrealtype/Inconsolata)
 
-Font-Awesome (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+Font-Awesome (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) (https://fontawesome.com/)
   Font Awesome Free 5.1.0 by @fontawesome - https://fontawesome.com
 
 The full licenses for these third party libraries and resources can be
 found in the file *src/doc/rst/LICENSES_EXT.rst* in the source
 distribution.
 
-11. License
+12. License
 -----------
 
 LibreSignage is licensed under the BSD 3-clause license, which can be
 found in the files *LICENSE.rst* and *src/doc/rst/LICENSE.rst* in the
 source distribution. Third party libraries and resources are licensed
-under their respective licenses. See `10. Third-party dependencies`_ for
+under their respective licenses. See `11. Third-party dependencies`_ for
 more information.
 
 Copyright Eero Talus 2018 and contributors

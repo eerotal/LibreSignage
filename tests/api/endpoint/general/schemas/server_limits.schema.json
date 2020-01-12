@@ -1,0 +1,9 @@
+{
+	"id": "tests/",
+	"type": "object",
+	"properties": {
+		"limits": { "type": "object" }
+	},
+	"required": ["limits"],
+	"additionalProperties": false
+}

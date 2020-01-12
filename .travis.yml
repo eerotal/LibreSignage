@@ -1,12 +1,8 @@
-##
-##  Travis CI config for LibreSignage. Currently only
-##  the Docker image is built and packaged in Travis
-##  since automatically configuring the apache2-debian
-##  target is quite tricky.
-##
+#
+# Travis CI config for LibreSignage.
+#
 
-# Ubuntu Xenial is used mainly to get access to a newer
-# version of GNU Make.
+# Ubuntu Xenial is used to get access to a newer version of GNU Make.
 dist: xenial
 
 language: php
@@ -30,11 +26,13 @@ branches:
 
 matrix:
     include:
-        env:
-            - target="apache2-debian-docker"
-              features="imgthumbs"
+        - env: target="apache2-debian-docker" opts="--feature-imgthumbs"
 
 install:
+    # Install other dependencies from repos.
+    - sudo apt-get update
+    - sudo apt-get install -y librsvg2-bin composer php-xml
+
     # Install pandoc 2.7.2 from a .deb package because the
     # version in the repos is too old.
     - |
@@ -42,18 +40,23 @@ install:
       sudo dpkg -i pandoc.deb
       rm pandoc.deb
 
-    # Install other dependencies from repos & npm.
-    - sudo apt-get update
-    - sudo apt-get install librsvg2-bin
-    - npm install
-
 before_script:
     # Configure the build
-    - make configure TARGET="$target" PASS="--features $features"
+    - make configure TARGET="$target" PASS="$opts"
 
 script:
     # Build and install
     - make -j$(nproc) && make install
+
+    # Run integration tests.
+    - |
+      set -e
+      if [ "$target" = "apache2-debian-docker" ]; then
+          tag="$(sudo docker image ls|grep libresignage|head -n1|tr -s ' '|cut -d ' ' -f2)"
+          sudo docker run -d -p80:80 "libresignage:$tag"
+          make test-api
+          sudo docker stop $(sudo docker ps -a -q)
+      fi
 
 deploy:
     - provider: script

@@ -1,0 +1,12 @@
+{
+	"definitions": {
+		"thrown_at": { "type": "string" },
+		"e_msg": { "type": "string" },
+		"e_trace": { "type": "string" }
+	},
+	"properties": {
+		"thrown_at": { "$ref": "#/definitions/thrown_at" },
+		"e_msg": { "$ref": "#/definitions/e_msg" },
+		"e_trace": { "$ref": "#/definitions/e_trace" }
+	}
+}

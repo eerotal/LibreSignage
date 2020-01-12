@@ -1,6 +1,7 @@
 {
-	"__classname": "User",
+	"__classname": "libresignage\\common\\php\\auth\\User",
 	"__visibility": "private",
+	"__version": "1.1.0",
 	"user": "user",
 	"hash": "$2y$10$.x3m780GNd39CsQZ97sQleyCvVShtTHwXwiw8e89neJOzCrRgyj8S",
 	"groups": [
@@ -9,7 +10,7 @@
 	],
 	"sessions": [],
 	"quota": {
-		"__classname": "UserQuota",
+		"__classname": "libresignage\\common\\php\\auth\\UserQuota",
 		"__visibility": "private",
 		"used": {
 			"slides": 0,

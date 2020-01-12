@@ -4,11 +4,11 @@
 
 /* Swipe left */
 .swipe-left {
-	animation: swipe-left-k 0.25s forwards !important;
+	animation: swipe-left-k 0.25s forwards;
 }
 
 .swipe-from-right {
-	animation: swipe-from-right-k 0.25s forwards !important;
+	animation: swipe-from-right-k 0.25s forwards;
 }
 
 @keyframes swipe-left-k {
@@ -23,11 +23,11 @@
 
 /* Swipe right */
 .swipe-right {
-	animation: swipe-right-k 0.25s forwards !important;
+	animation: swipe-right-k 0.25s forwards;
 }
 
 .swipe-from-left {
-	animation: swipe-from-left-k 0.25s forwards !important;
+	animation: swipe-from-left-k 0.25s forwards;
 }
 
 @keyframes swipe-right-k {
@@ -42,11 +42,11 @@
 
 /* Swipe up */
 .swipe-up {
-	animation: swipe-up-k 0.25s forwards !important;
+	animation: swipe-up-k 0.25s forwards;
 }
 
 .swipe-from-below {
-	animation: swipe-from-below-k 0.25s forwards !important;
+	animation: swipe-from-below-k 0.25s forwards;
 }
 
 @keyframes swipe-up-k {
@@ -61,11 +61,11 @@
 
 /* Swipe down */
 .swipe-down {
-	animation: swipe-down-k 0.25s forwards !important;
+	animation: swipe-down-k 0.25s forwards;
 }
 
 .swipe-from-above {
-	animation: swipe-from-above-k 0.25s forwards !important;
+	animation: swipe-from-above-k 0.25s forwards;
 }
 
 @keyframes swipe-down-k {

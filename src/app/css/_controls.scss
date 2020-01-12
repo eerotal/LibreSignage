@@ -1,0 +1,47 @@
+/*
+*  LibreSignage display controls styling.
+*/
+
+$contr-color-normal: hsl(0, 0, 30%);
+$contr-color-hover: hsl(0, 0, 10%);
+
+@keyframes controls-fade {
+	0%   { opacity: 0.15; }
+	100% { opacity: 0;    }
+}
+
+.controls-hidden {
+	animation: controls-fade 1s forwards;
+}
+
+#controls {
+	display: flex;
+	flex-direction: row;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+
+	.left, .right {
+		visibility: hidden;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+
+		height: 100%;
+		width: 10%;
+
+		opacity: 0.15;
+		i {
+			font-size: 15vh;
+			color: $contr-color-normal;
+			&:hover { color: $contr-color-hover; }
+		}
+	}
+	.center {
+		height: 100%;
+		width: 80%;
+	}
+}
