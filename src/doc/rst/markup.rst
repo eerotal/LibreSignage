@@ -51,7 +51,7 @@ Markup classes
 
 Heading
   | Syntax: ``[h size=<size>][/h]``
-  | ``size: percent`` 
+  | ``size: percent``
 
 Display a heading. ``<size>`` is the size of the heading in percents
 relative to the height of the viewport.
@@ -59,7 +59,7 @@ relative to the height of the viewport.
 
 Lead
   | Syntax: ``[lead][/lead]``
-  
+
 Display a lead paragraph. The default font size for lead paragraphs
 is 4% of the viewport height. The font size can be changed using the
 *size* class.
@@ -219,7 +219,7 @@ Columns
               columns is not limited in any way.[/p]
           [/container]
           [container top=2% right=2% bottom=2% left=2%]
-              [h size=5%]Second column[/h]  
+              [h size=5%]Second column[/h]
               [p]This is the second column in this slide. Columns within one
               [i]columns[/i] class all have equal width and height.[/p]
           [/container]

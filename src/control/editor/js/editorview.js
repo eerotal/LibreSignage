@@ -835,27 +835,28 @@ class EditorView extends BaseView {
 		/*
 		*  Highlight lines from-to in the markup editor.
 		*/
-		return this.editor.session.addMarker(
+		this.error_id = this.editor.session.addMarker(
 			new ace_range.Range(from, 0, to, 10),
 			'syntax-error-highlight',
 			'fullLine'
 		);
 	}
 
-	clear_error(id) {
+	clear_error() {
 		/*
 		*  Clear editor highlights.
 		*/
-		if (id) { this.editor.session.removeMarker(id); }
+		if (this.error_id != null) {
+			this.editor.session.removeMarker(this.error_id);
+			this.statics.get('label_editor_error').set('');
+		}
 	}
 
 	render_preview() {
 		/*
 		*  Render the live markup preview.
 		*/
-		this.statics.get('label_editor_error').set('');
-		this.clear_error(this.error_id);
-		this.error_id = null;
+		this.clear_error();
 
 		try {
 			this.preview.render(this.inputs.get('editor').get());
@@ -864,7 +865,7 @@ class EditorView extends BaseView {
 				this.statics.get('label_editor_error').set(
 					`>> ${e.toString()}`
 				);
-				this.error_id = this.highlight_error(e.line(), e.line());
+				this.highlight_error(e.line(), e.line());
 			} else {
 				throw e;
 			}
@@ -926,6 +927,10 @@ class EditorView extends BaseView {
 			await this.controller.close_slide();
 		}
 		this.inputs.all(function() { this.clear(); });
+
+		// Make sure possible editor errors are cleared.
+		this.clear_error();
+
 		this.update();
 	}
 

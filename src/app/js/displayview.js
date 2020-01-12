@@ -135,7 +135,14 @@ class DisplayView {
 		}
 
 		this.animate($('#display'), anim_hide, () => {
-			$('#display').html(this.markup_buffer);
+			/*
+			* Use vanilla JS for clearing the display because the .html()
+			* function seems to leak memory somehow.
+			*/
+			util.free_multimedia_memory_recursive($('#display')[0]);
+			$('#display')[0].innerHTML = '';
+			$('#display')[0].innerHTML = this.markup_buffer;
+
 			this.animate(
 				$('#display'),
 				this.slide_buffer[1].anim_show(),
