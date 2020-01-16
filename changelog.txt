@@ -1,3 +1,7 @@
+v1.2.0
+  - [bugfix]   Fix a bug where markup [containers] weren't 100% high by default
+               which caused some problems with slide layout.
+
 v1.1.0
   - [internal] Separate private and public files in the directory tree
                to naturally prevent access to private files. (PR #56)
