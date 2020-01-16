@@ -185,6 +185,12 @@ Background image
 Set a background image. ``<URL>`` must be a valid URL pointing to
 the image file.
 
+Iframe
+  | Syntax: ``[iframe url=<URL>][/iframe]``
+  | ``type: str``
+
+Embed a url using an iframe. ``<URL>`` must be a valid URL pointing to
+the web page.
 
 Examples
 --------
