@@ -1,5 +1,5 @@
 .. image:: http://etal.mbnet.fi/libresignage/logo/libresignage_text_466x100.png
-    
+
 A free and open source digital signage solution.
 
 .. image:: https://travis-ci.org/eerotal/LibreSignage.svg?branch=master
@@ -132,20 +132,9 @@ RAM
   Depends on the specific use case.
 
 Tested operating systems
-
-*The following is a list of distributions where LibreSignage has successfully
-been run. The list is not complete. It gets updated as more distributions are
-tested.*
-
-  * Debian
-
-    * 9 (Stretch)
-    * 10 (Buster)
-    * 11 (Bullseye)
-
-  * Ubuntu
-
-    * 18.04 LTS (Bionic Beaver)
+  It's possible to build LibreSignage on most Linux systems, but the default
+  scripts work at least on Debian and Ubuntu. You can technically run the
+  official Docker images on any system, possibly even on Microsoft Windows.
 
 *Required* runtime dependencies
   * PHP (Version 7.x.)
