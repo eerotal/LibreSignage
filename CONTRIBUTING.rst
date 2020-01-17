@@ -1,4 +1,3 @@
-
 Table Of Contents
 -----------------
 
@@ -8,11 +7,7 @@ Table Of Contents
 
 `3. LibreSignage versioning`_
 
-`4. Development timeline`_
-
-`4.1. Major and minor releases`_
-
-`4.2. Patch releases`_
+`4. How to contribute`_
 
 1. General
 ----------
@@ -39,18 +34,11 @@ next
   This branch contains the latest changes for the *next* MAJOR or
   MINOR release. The next branch is often quite stable but it can
   still contain even serious bugs since it's a development branch.
-  If you want to contribute to LibreSignage, you should clone this
-  branch.
 
 v<MAJOR>.<MINOR>.x
-  These branches are release branches. A release branch is created
-  when the feature freeze period begins for a release. Release branches
-  are usually rather stable but they do still contain some bugs.
-
-v<MAJOR>.<MINOR>.x-patch
-  These branches are patch development branches. A new patch is branched
-  from a MAJOR or MINOR release branch instead of *next*. A patch branch
-  is created once the first patch against a specific release is written.
+  These branches are release branches. Development for patch releases
+  takes place in release branches. These may contain some bugs but should
+  be quite stable.
 
 feature/*, bugfix/*, ...
   Branches that start with a category and have the branch name after
@@ -79,30 +67,25 @@ form MAJOR.MINOR.PATCH. This version numbering scheme is called
 The LibreSignage API also has its own version number that's incremented
 when backwards incompatible API changes are made.
 
-4. Development timeline
------------------------
+4. How to contribute
+--------------------
 
-4.1. Major and minor releases
-+++++++++++++++++++++++++++++
+Contributions to LibreSignage are always welcome and fortunately contributing
+is quite straightforward. Basically you only need to write your patches against
+a specific branch in the GIT repo and create a Pull Request on GitHub to get
+it merged into the main repo. You should always ask whether your proposed change
+is needed in the GitHub issue tracker first, since in the end the repository
+owner, Eero Talus, is the one deciding what changes are merged.
 
-1. LibreSignage development for the next major or minor release takes
-   place in the *next* branch.
-2. Feature freeze begins when all of the planned features for the release
-   are implemented. No new features are allowed during the feature freeze.
-   A release branch is branched from *next* when the freeze starts. At
-   this point development for the next version begins in *next*.
-3. When the release is deemed stable enough, it is tagged and merged back
-   to master. Now the new release is ready to be used by users. Any
-   further fixes are handled by the patching workflow described in
-   `4.2. Patch releases`_.
+* If you want to write a bugfix for a patch release, you need to base you
+  changes on the oldest release branch where you want your patch applied. That
+  way it's easy to merge it into newer releases aswell.
+* If you want to contribute a new feature or a change that's not considered a
+  bugfix, you need to base your changes on the *next* branch. This will make
+  sure your changes are included in a future MINOR or MAJOR release.
 
-4.2. Patch releases
-+++++++++++++++++++
-
-1. Development for *patch* releases takes place in patch development
-   branches with the name *<original_version>-dev*.
-2. Patches are released on the first monday of each month. When a patch
-   is released, the patch development branch is merged to the original
-   release branch and the patch development branch is removed. If the
-   release branch contains the latest LibreSignage release, it's merged
-   back to *master* too.
+In your pull request description, please describe the changes your pull pequest
+contains and why they are required. Your pull request will be reviewed by the
+repository owner and if changes are required you'll be requested to make them
+before merging. When everything is finished, your PR will be merged to the
+correct branch and the changes will ship in a future release.
