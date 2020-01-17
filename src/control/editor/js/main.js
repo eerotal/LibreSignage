@@ -14,4 +14,4 @@ $(document).ready(async () => {
 
 	let view = new EditorView(API);
 	await view.init();
-})
+});
