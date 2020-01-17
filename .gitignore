@@ -38,6 +38,9 @@ tests/tmp
 # Exclude temporary sass files.
 .sass-cache
 
-# Exclude Doxygen generated docs
+# Exclude Doxygen and JSDoc generated docs
 doxygen_docs/
+jsdoc_docs/
 
+# Exclude all debug & development related files in src/debug.
+src/debug/

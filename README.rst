@@ -177,6 +177,7 @@ Dependencies installed automatically by *npm* or *composer*
     * json-schema (https://github.com/justinrainbow/json-schema)
     * JSDOM (https://github.com/jsdom/jsdom)
     * node-XMLHttpRequest (https://github.com/driverdan/node-XMLHttpRequest)
+	* commonjs-assert (https://github.com/browserify/commonjs-assert)
 
 See `11. Third-party dependencies`_ for license information.
 
@@ -395,7 +396,7 @@ display      display                  display
 
 Why doesn't LibreSignage use framework/library X?
   To avoid bloat; LibreSignage is designed to be minimal and lightweight
-  and it only uses external libraries where they are actually needed. 
+  and it only uses external libraries where they are actually needed.
   Most UI frameworks for example are huge. LibreSignage does use
   Bootstrap though, since it's a rather clean and simple framework.
 
@@ -605,15 +606,15 @@ Symfony/HttpFoundation (Library, MIT License) (https://symfony.com/)
   Copyright (c) 2004-2019 Fabien Potencier
 
 Raleway (Font, SIL Open Font License 1.1) (https://github.com/impallari/Raleway)
-  Copyright (c) 2010, Matt McInerney (matt@pixelspread.com),  
+  Copyright (c) 2010, Matt McInerney (matt@pixelspread.com),
 
-  Copyright (c) 2011, Pablo Impallari (www.impallari.com|impallari@gmail.com),  
+  Copyright (c) 2011, Pablo Impallari (www.impallari.com|impallari@gmail.com),
 
-  Copyright (c) 2011, Rodrigo Fuenzalida (www.rfuenzalida.com|hello@rfuenzalida.com),  
+  Copyright (c) 2011, Rodrigo Fuenzalida (www.rfuenzalida.com|hello@rfuenzalida.com),
   with Reserved Font Name Raleway
 
 Montserrat (Font, SIL Open Font License 1.1) (https://github.com/JulietaUla/Montserrat)
-  Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)  
+  Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)
 
 Inconsolata (Font, SIL Open Font License 1.1) (https://github.com/googlefonts/Inconsolata)
   Copyright 2006 The Inconsolata Project Authors (https://github.com/cyrealtype/Inconsolata)

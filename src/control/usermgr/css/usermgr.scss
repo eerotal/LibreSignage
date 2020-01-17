@@ -1,9 +1,9 @@
 @import 'default';
 @import 'footer';
 @import 'nav';
-@import 'dialog';
-@import 'multiselect';
-@import 'ls-dropconfirm/css/dropconfirm.scss';
+@import 'libresignage/ui/components/Dialog/css/Dialog.scss';
+@import 'libresignage/ui/components/MultiSelect/css/MultiSelect.scss';
+@import 'libresignage/ui/components/DropConfirm/css/DropConfirm.scss';
 
 $usermgr-minw: 250px;
 

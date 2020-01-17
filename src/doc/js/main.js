@@ -1,14 +1,19 @@
-var $ = require('jquery');
-var APIInterface = require('ls-api').APIInterface;
-var APIUI = require('ls-api-ui');
+/**
+* @file Entry point for the Help JS.
+*/
 
-var API = null;
+var APIInterface = require('libresignage/api/APIInterface');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
+var Util = require('libresignage/util/Util');
 
-$(document).ready(async () => {
-	API = new APIInterface();
-	try {
-		await API.init();
-	} catch (e) {
-		APIUI.handle_error(e);
-	}
+document.addEventListener('DOMContentLoaded', () => {
+	Util.await_and_watch_for_errors(async () => {
+		let API = new APIInterface();
+		try {
+			await API.init();
+		} catch (e) {
+			new APIErrorDialog(e);
+			return;
+		}
+	});
 });

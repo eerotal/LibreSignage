@@ -184,6 +184,7 @@ LOC:
 			-o -path "./node_modules/*" \
 			-o -path "./vendor/*" \
 			-o -path "./doxygen_docs/*" \
+			-o -path "./jsdoc_docs/*" \
 		\) -prune \
 		-o -name ".#*" -printf '' \
 		-o -name 'package-lock.json' -printf '' \
@@ -229,5 +230,11 @@ doxygen-docs:
 	./build/scripts/dep_checks/doxygen_version.sh $(DOXYGEN_REQ_VER)
 	$(call initchk_warn,$$?)
 	doxygen Doxyfile
+
+# Generate JSDoc docs.
+jsdoc-docs:
+	@:
+	set -e
+	npx jsdoc -c jsdoc.json
 
 include makefile.common

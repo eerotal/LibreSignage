@@ -1,16 +1,15 @@
-var $ = require('jquery');
-var APIInterface = require('ls-api').APIInterface;
-var APIUI = require('ls-api-ui');
-var DisplayView = require('./displayview.js').DisplayView;
-var util = require('ls-util');
+var APIErrorDialog = require('libresignage/ui/components/Dialog/APIErrorDialog');
+var APIInterface = require('libresignage/api/APIInterface');
+var Util = require('libresignage/util/Util');
+var DisplayView = require('./DisplayView.js');
 
-$(document).ready(async () => {
+document.addEventListener('DOMContentLoaded', async () => {
 	let API = new APIInterface();
 	try {
 		await API.init();
 	} catch(e) {
-		if (!('noui' in util.get_GET_parameters())) {
-			APIUI.handle_error(e);
+		if (!('noui' in Util.get_GET_parameters())) {
+			new APIErrorDialog(e);
 			return;
 		} else {
 			console.error(e.message);

@@ -42,17 +42,6 @@ Server setup
 
 `LibreSignage behind a reverse proxy</doc?doc=reverse_proxy>`_
 
-Development
------------
-
-`API Endpoints </doc?doc=api_index>`_
-
-`API Errors </doc?doc=api_errors>`_
-
-`The APIEndpoint class </doc?doc=APIEndpoint>`_
-
-`Input validator </doc?doc=input_validator>`_
-
 `Limits </doc?doc=limits>`_
 
 Licenses
