@@ -34,6 +34,7 @@ matrix:
 install:
     - sudo apt-get update
     - sudo apt-get install -y librsvg2-bin composer php-xml qemu binfmt-support qemu-user-static
+    - update-binfmts --display
 
     # Install a newer version of Docker.
     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
