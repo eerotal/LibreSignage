@@ -54,7 +54,7 @@ before_script:
     - echo "$DOCKER_PASS" | docker login --username="$DOCKER_USER" --password-stdin
     - export DOCKER_CLI_EXPERIMENTAL=enabled
     - docker buildx create --driver=docker-container --name=lsbuilder --use
-    - docker buildx ls
+    - docker buildx inspect --bootstrap
 
 script:
     # Build and install
