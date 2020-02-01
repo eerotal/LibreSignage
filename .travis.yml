@@ -26,48 +26,54 @@ branches:
 
 matrix:
     include:
-        - env: target="apache2-debian-docker" opts="--feature-imgthumbs"
+        - env:
+            - |
+                target="apache2-debian-docker"
+                opts="--feature-imgthumbs"
+                platform="linux/arm64,linux/arm/v7,linux/arm/v6,linux/amd64"
 
 install:
-    # Install other dependencies from repos.
     - sudo apt-get update
-    - sudo apt-get install -y librsvg2-bin composer php-xml
+    - sudo apt-get install -y librsvg2-bin composer php-xml qemu binfmt-support qemu-user-static
 
-    # Install pandoc 2.7.2 from a .deb package because the
-    # version in the repos is too old.
+    # Install a newer version of pandoc (2.7.2).
     - |
-      wget -qO pandoc.deb https://github.com/jgm/pandoc/releases/download/2.7.2/pandoc-2.7.2-1-amd64.deb
-      sudo dpkg -i pandoc.deb
-      rm pandoc.deb
+        wget -qO pandoc.deb https://github.com/jgm/pandoc/releases/download/2.7.2/pandoc-2.7.2-1-amd64.deb
+        sudo dpkg -i pandoc.deb
+        rm pandoc.deb
 
 before_script:
     # Configure the build
     - make configure TARGET="$target" PASS="$opts"
+    - echo "$DOCKER_PASS" | docker login --username="$DOCKER_USER" --password-stdin
+    - export DOCKER_CLI_EXPERIMENTAL=enabled
 
 script:
     # Build and install
-    - make -j$(nproc) && make install
+    - |
+        set -e
+        make -j$(nproc)
+        make install PASS="--tag=eerotal/libresignage:build-tmp --platform=$platform"
 
     # Run integration tests.
     - |
-      set -e
-      if [ "$target" = "apache2-debian-docker" ]; then
-          tag="$(sudo docker image ls|grep libresignage|head -n1|tr -s ' '|cut -d ' ' -f2)"
-          sudo docker run -d -p80:80 "libresignage:$tag"
-          make test-api
-          sudo docker stop $(sudo docker ps -a -q)
-      fi
+        set -e
+        if [ "$target" = "apache2-debian-docker" ]; then
+            sudo docker run -d -p80:80 "eerotal/libresignage:build-tmp"
+            make test-api
+            sudo docker stop $(sudo docker ps -a -q)
+        fi
 
 deploy:
     - provider: script
-      script: sh build/scripts/travis/docker_push.sh eerotal nightly "$TRAVIS_BRANCH-nightly"
+      script: sh build/scripts/travis/docker_rename.sh eerotal nightly "build-tmp" "$TRAVIS_BRANCH-nightly"
       on:
           all_branches: true
           condition: $target = 'apache2-debian-docker'
           condition: $TRAVIS_EVENT_TYPE = 'cron'
           condition: $ENABLE_NIGHTLY_BUILDS = 1
     - provider: script
-      script: sh build/scripts/travis/docker_push.sh eerotal release
+      script: sh build/scripts/travis/docker_rename.sh eerotal release "build-tmp"
       on:
           tags: true
           condition: $target = 'apache2-debian-docker'

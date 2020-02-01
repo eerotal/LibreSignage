@@ -3,6 +3,10 @@
 #
 # Installation script for the apache2-debian-docker target.
 #
+# This script uses docker buildx to build multiarch Docker images and
+# automatically pushes the images to Docker Hub. Note that you must
+# enable experimental Docker features to use this script for now.
+#
 
 set -e
 
@@ -10,9 +14,8 @@ set -e
 . build/scripts/ldconf.sh
 . build/scripts/args.sh
 
-#
+
 # Setup and parse arguments.
-#
 
 script_help() {
 	echo 'Usage:'
@@ -22,17 +25,30 @@ script_help() {
 	echo 'Build a LibreSignage Docker image.'
 	echo ''
 	echo 'Options:'
-	echo '  OPTION (DEFAULT VALUE) ........... DESCRIPTION'
-	echo '  --config=FILE (last generated) ... Use a specific configuration file.'
-	echo '  --help ........................... Print this message and exit.'
+	echo '  OPTION (DEFAULT VALUE) ............. DESCRIPTION'
+	echo '  --config=FILE (last generated) ..... Specify a config file.'
+	echo '  --platform=PLATFORMS ............... Specify build platforms.'
+	echo '  --tag=TAG .......................... The image tag to use.'
+	echo '  --help ............................. Print this message and exit.'
 }
 
 BUILD_CONFIG=''
+PLATFORMS=''
+TAG=''
 
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--config=*)
 			BUILD_CONFIG="$(get_arg_value "$1")"
+			;;
+		--platform=*)
+			PLATFORMS="$(get_arg_value "$1")"
+			;;
+		--tag=*)
+			TAG="$(get_arg_value "$1")"
+			;;
+		--push)
+			PUSH=1
 			;;
 		--help)
 			script_help
@@ -55,11 +71,14 @@ while [ $# -gt 0 ]; do
 	set -e
 done
 
+if [ -z "$TAG" ]; then
+	echo "[Error] No Docker tag specified."
+	exit 1
+fi
+
 load_build_config "$BUILD_CONFIG"
 
-#
-# Build Docker image.
-#
+# Concatenate arguments into one string.
 
 args="--build-arg version=$LS_VER"
 args="$args --build-arg logdir=$LOG_DIR"
@@ -77,6 +96,18 @@ if [ "$CONF_FEATURE_VIDTHUMBS" = "TRUE" ]; then
 	args="$args --build-arg vidthumbs=y"
 fi
 
-echo "[Info] Args for 'docker build': $args";
+if [ -n "$PLATFORMS" ]; then
+	args="$args --platform=$PLATFORMS";
+fi
 
-docker build -t libresignage:"$LS_VER" $args .
+args="$args --tag=$TAG --push"
+
+# Login, build and push.
+
+echo "[Info] Args for 'docker buildx build': $args";
+
+if [ -z "$(docker buildx ls | grep lsbuilder)" ]; then
+	docker buildx create --driver=docker-container --name lsbuilder
+fi
+docker buildx use lsbuilder
+docker buildx build $args .

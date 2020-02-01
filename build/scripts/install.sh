@@ -39,7 +39,7 @@ while [ $# -gt 0 ]; do
 		case "$1" in
 			--config=*)
 				BUILD_CONFIG="$(get_arg_value "$1")"
-				PASS="--config='$BUILD_CONFIG'"
+				PASS="--config=$BUILD_CONFIG"
 				;;
 			--pass)
 				PASS_REMAINING=1
@@ -56,7 +56,7 @@ while [ $# -gt 0 ]; do
 				;;
 		esac
 	fi
-	
+
 	set +e
 	shift > /dev/null 2>&1
 	if [ ! "$?" = "0" ]; then
@@ -70,4 +70,4 @@ load_build_config "$BUILD_CONFIG"
 
 echo "[Info] Pass to target installation script: $PASS."
 
-echo "$PASS" | xargs sh "build/target/${CONF_TARGET:?}/install.sh"
+./build/target/${CONF_TARGET:?}/install.sh $PASS

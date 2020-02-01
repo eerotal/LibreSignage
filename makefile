@@ -30,7 +30,8 @@ PASS ?=
 	doxygen-docs \
 	build \
 	php-dev-autoload \
-	php-prod-autoload
+	php-prod-autoload \
+	install
 
 .ONESHELL:
 
