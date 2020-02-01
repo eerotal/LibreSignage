@@ -106,8 +106,4 @@ args="$args --tag=$TAG --push"
 
 echo "[Info] Args for 'docker buildx build': $args";
 
-if [ -z "$(docker buildx ls | grep lsbuilder)" ]; then
-	docker buildx create --driver=docker-container --name lsbuilder
-fi
-docker buildx use lsbuilder
 docker buildx build $args .

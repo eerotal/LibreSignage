@@ -53,6 +53,8 @@ before_script:
     - make configure TARGET="$target" PASS="$opts"
     - echo "$DOCKER_PASS" | docker login --username="$DOCKER_USER" --password-stdin
     - export DOCKER_CLI_EXPERIMENTAL=enabled
+    - docker buildx create --driver=docker-container --name=lsbuilder --user
+    - docker buildx ls
 
 script:
     # Build and install
