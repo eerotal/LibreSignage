@@ -19,7 +19,6 @@ branches:
         - next
         - /v[0-9]+.x.x/
         - /v[0-9]+.[0-9]+.[0-9]+/
-        - feature/docker-multiarch
 
 matrix:
     include:
