@@ -2,9 +2,7 @@
 # Travis CI config for LibreSignage.
 #
 
-# Ubuntu Xenial is used to get access to a newer version of GNU Make.
 dist: bionic
-
 language: php
 php:
     - '7.2'
@@ -32,14 +30,17 @@ matrix:
                 platform="linux/arm64,linux/arm/v7,linux/arm/v6,linux/amd64"
 
 install:
-    - sudo apt-get update
-    - sudo apt-get install -y librsvg2-bin composer php-xml qemu binfmt-support qemu-user-static
+    # Install deps for compilation and multiarch builds.
+    - |
+        sudo apt-get update
+        sudo apt-get install -y librsvg2-bin composer php-xml qemu binfmt-support qemu-user-static
 
     # Install a newer version of Docker.
-    - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    - sudo apt-get update
-    - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+    - |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        sudo apt-get update
+        sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
     # Install a newer version of pandoc (2.7.2).
     - |
@@ -49,13 +50,14 @@ install:
 
 before_script:
     # Configure the build
+    - make configure TARGET="$target" PASS="$opts"
+
+    # Properly configure Docker to use binfmts_misc.
     - |
-        make configure TARGET="$target" PASS="$opts"
         export DOCKER_CLI_EXPERIMENTAL=enabled
         echo "$DOCKER_PASS" | docker login --username="$DOCKER_USER" --password-stdin
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
         docker buildx create --driver=docker-container --name=lsbuilder --use
-        cat /proc/sys/fs/binfmt_misc/qemu-*
         docker buildx inspect --bootstrap
 
 script:
