@@ -49,11 +49,14 @@ install:
 
 before_script:
     # Configure the build
-    - make configure TARGET="$target" PASS="$opts"
-    - echo "$DOCKER_PASS" | docker login --username="$DOCKER_USER" --password-stdin
-    - export DOCKER_CLI_EXPERIMENTAL=enabled
-    - docker buildx create --driver=docker-container --name=lsbuilder --use
-    - cat /proc/sys/fs/binfmt_misc/qemu-*
+    - |
+        make configure TARGET="$target" PASS="$opts"
+        export DOCKER_CLI_EXPERIMENTAL=enabled
+        echo "$DOCKER_PASS" | docker login --username="$DOCKER_USER" --password-stdin
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        docker buildx create --driver=docker-container --name=lsbuilder --use
+        cat /proc/sys/fs/binfmt_misc/qemu-*
+        docker buildx inspect --bootstrap
 
 script:
     # Build and install
