@@ -4,6 +4,10 @@ v1.2.0
   - [internal] Rewrite most web interface JavaScript files and clean them up.
   - [docs]     Add JSDoc documentation to web interface JavaScript.
 
+v1.1.1
+  - [feature]  Enable multiarch Docker image builds in the CI pipepline. Images
+               are now built for AMD64, ARMv6, ARMv7 and ARM64.
+
 v1.1.0
   - [internal] Separate private and public files in the directory tree
                to naturally prevent access to private files. (PR #56)
