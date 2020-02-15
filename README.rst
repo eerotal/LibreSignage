@@ -177,7 +177,7 @@ Dependencies installed automatically by *npm* or *composer*
     * json-schema (https://github.com/justinrainbow/json-schema)
     * JSDOM (https://github.com/jsdom/jsdom)
     * node-XMLHttpRequest (https://github.com/driverdan/node-XMLHttpRequest)
-	* commonjs-assert (https://github.com/browserify/commonjs-assert)
+    * commonjs-assert (https://github.com/browserify/commonjs-assert)
 
 See `11. Third-party dependencies`_ for license information.
 
