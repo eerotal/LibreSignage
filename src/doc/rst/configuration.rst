@@ -72,7 +72,7 @@ config file must start with the PHP tag ``<?php`` and it must return an array
 with the config options to modify like so::
 
     <?php
-    
+
     return [
         'OPTION_TO_MODIFY' => 'NEW_VALUE'
     ];
@@ -83,12 +83,28 @@ available config options and what they do.
 3.2. Accessing configuration files in a Docker container
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-You can modify the config files of a LibreSignage Docker container by bind
-mounting the internal *config/* directory onto your host machine. You can do
-this by adding the following switch to your ``docker run`` command::
+You can modify the config files of a LibreSignage Docker container by using
+Docker volumes. To create a Docker volume that points to the internal *config/*
+directory, you can add the following CLI switch to your ``docker run`` command::
 
-    -v [HOSTDIR]:/var/www/html/config
+    --mount source=ls_config,target=/var/www/html/config
 
-Replace ``[HOSTDIR]`` with a directory path on the host machine. After
-you run the container with this switch, you can access the config files
-in the container by navigating to ``[HOSTDIR]``.
+After starting the container, you can find out the path where the volume is
+mounted by running ``docker volume inspect ls_config``. This command should
+print something like the following::
+
+    [
+        {
+            "CreatedAt": "2020-02-14T21:21:52+02:00",
+            "Driver": "local",
+            "Labels": null,
+            "Mountpoint": "/var/lib/docker/volumes/ls_config/_data",
+            "Name": "ls_config",
+            "Options": null,
+            "Scope": "local"
+        }
+    ]
+
+The mountpoint is the path after ``"Mountpoint":``. If you navigate into that
+directory on the host machine, you should see the contents of the *config/*
+directory in the container.
