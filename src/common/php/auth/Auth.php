@@ -24,7 +24,11 @@ final class Auth {
 	* @return User|NULL   A User object or NULL if the creds were invalid.
 	*/
 	public static function verify_creds(string $user, string $pass) {
-		if (empty($user) || empty($pass) || !User::exists($user)) {
+		/*
+		* Make sure the supplied user exists. $pass can also be empty
+		* if the user is a "no login" user.
+		*/
+		if (empty($user) || !User::exists($user)) {
 			return NULL;
 		}
 

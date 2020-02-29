@@ -17,7 +17,7 @@ use libresignage\common\php\exceptions\LimitException;
 
 final class User extends Exportable {
 	private $user = '';
-	private $hash = '';
+	private $hash = NULL;
 	private $groups = [];
 	private $sessions = [];
 	private $quota = NULL;
@@ -327,7 +327,7 @@ final class User extends Exportable {
 	}
 
 	/**
-	* Set the pasword of the loaded user.
+	* Set the password of the loaded user.
 	*
 	* @see User::validate_password() For validation exceptions.
 	*
@@ -346,11 +346,20 @@ final class User extends Exportable {
 	/**
 	* Verify the password $pass against the loaded user.
 	*
+	* If the password hash in $this->hash is NULL, this method
+	* always returns TRUE. This makes it possible to create
+	* "no login" users.
+	*
 	* @param string $pass The password to verify.
 	* @return bool TRUE if the password is correct, FALSE otherwise.
 	*/
 	public function verify_password(string $pass): bool {
-		return password_verify($pass, $this->hash);
+		if ($this->hash === NULL) {
+			// No password hash -> no login required.
+			return TRUE;
+		} else {
+			return password_verify($pass, $this->hash);
+		}
 	}
 
 	/**

@@ -10,11 +10,13 @@
 * @request_start{application/json}
 * @request{string,user,The name of the new user.,required}
 * @request{array|NULL,groups,An array of groups or NULL for no groups.,optional}
+* @request{boolean,no_login,Allow login without a password.,optional}
 * @request_end
 *
 * @response_start{application/json}
 * @response{User,user,The new User object.}
-* @response{string,pass,The random password of the new user.}
+* @response{string,pass,The random password of the new user or
+*                       NULL if no login is required.}
 * @response_end
 *
 * @status_start
@@ -56,6 +58,9 @@ APIEndpoint::POST(
 						'items' => [
 							'type' => 'string'
 						]
+					],
+					'no_login' => [
+						'type' => 'boolean'
 					]
 				],
 				'required' => ['user']
@@ -108,16 +113,20 @@ APIEndpoint::POST(
 			}
 		}
 
-		// Generate password.
-		try {
-			$pass = Util::gen_passwd(Config::config('GENERATED_PASSWD_LEN'));
-			$new->set_password($pass);
-		} catch (\Exception $e) {
-			throw new APIException(
-				"Failed to generate password.",
-				HTTPStatus::INTERNAL_SERVER_ERROR,
-				$e
-			);
+		// Generate a password if login is required for the user.
+		if (!property_exists($params, 'no_login') || !$params->no_login) {
+			try {
+				$pass = Util::gen_passwd(
+					Config::config('GENERATED_PASSWD_LEN')
+				);
+				$new->set_password($pass);
+			} catch (\Exception $e) {
+				throw new APIException(
+					"Failed to generate password.",
+					HTTPStatus::INTERNAL_SERVER_ERROR,
+					$e
+				);
+			}
 		}
 
 		// Write to file.

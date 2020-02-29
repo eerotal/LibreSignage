@@ -20,11 +20,11 @@ use libresignage\common\php\Log;
 final class Queue extends Exportable {
 	const NAME_REGEX = '/^[A-Za-z0-9_-]+$/';
 
-	private $name      = '';
-	private $owner     = '';
-	private $slides    = [];
+	private $name = '';
+	private $owner = '';
+	private $slides = [];
 	private $slide_ids = [];
-	
+
 	public function __exportable_set(string $name, $value) {
 		$this->{$name} = $value;
 	}

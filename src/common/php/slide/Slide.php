@@ -698,7 +698,7 @@ final class Slide extends Exportable {
 	public function write() {
 		$tmp = '';
 		$this->assert_ready();
-		
+
 		if (!is_dir(self::get_dir_path($this->id))) {
 			mkdir(self::get_dir_path($this->id));
 		}
