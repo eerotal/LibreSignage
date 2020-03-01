@@ -40,7 +40,7 @@ can login as the passwordless user to view slides on any display without having
 permissions to modify any data on the server. As an admin user you can create
 passwordless users from the `User Manager </doc?doc=user_manager>`_.
 
-You can user the same login procedure as described in ``Setting up a client when
+You can user the same login procedure as described in `Setting up a client when
 authentication is required`_ with passwordless users aswell. There is, however,
 another way to setup a client to log in as a passwordless user automatically:
 You can make the client browser navigate to ``http://<server>/app_bootstrap?user=<username>``
