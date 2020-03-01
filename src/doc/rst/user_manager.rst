@@ -26,12 +26,24 @@ Users can be removed by clicking the *Remove (Trash icon)* button.
 Creating new users
 ------------------
 
-New users can be created by clicking the *Create user* button and specifying a
-name for the new user in the popup dialog. The maximum length of a username is
-set in the LibreSignage instance config and can be changed only by server admins.
-The maximum length is 64 characters by default.
+New users can be created by clicking the *New user* or *New passwordless user*
+buttons and specifying a name for the new user in the popup dialog. The maximum
+length of a username is set in the LibreSignage instance config and can be
+changed only by server admins. The maximum length is 64 characters by default.
 
-When a new user is created they are given an automatically generated password.
-The initial password is visible to the admin user in the *Password* input box
-in the user editor dropdown **once** after creating the user. The password is not
-visible (or known by the server) on subsequent reloads of the page.
+When a new user is created by clicking the *New user* button, they are given a
+automatically generated password. The initial password is visible to the admin
+user in the *Password* box in the user editor dropdown until the page is
+reloaded. The password is not visible or even known by the server on subsequent
+reloads of the page.
+
+The *New passwordless user* button creates a user without a password, meaning
+you can login as the new user without supplying any password. This is handy if
+you need to create users for many individual people who then set the passwords
+by themselves. *For increased security it's recommended to create normal users
+instead.*
+
+Passwordless users can also be used for public facing display clients where
+authentication is not needed. LibreSignage includes a system for automatically
+logging in a display client as a passwordless user. Please see
+`Display Setup </doc?doc=display_setup>`_ for more info.
