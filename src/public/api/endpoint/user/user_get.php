@@ -78,6 +78,7 @@ APIEndpoint::GET(
 		return [
 			'user' => [
 				'user' => $user->get_name(),
+				'passwordless' => $user->is_passwordless(),
 				'groups' => $user->get_groups()
 			]
 		];

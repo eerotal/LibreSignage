@@ -127,14 +127,19 @@ class UserListEntry extends BaseComponent {
 	* Render a UserListEntry.
 	*/
 	render() {
-		let pass = this.user.get_password();
 		let name = this.user.get_user();
+		let pass_show = "";
+
+		if (this.user.get_password() != null) {
+			pass_show = this.user.get_password();
+		} else if (this.user.is_passwordless()) {
+			pass_show = "(No password)";
+		} else {
+			pass_show = "**********";
+		}
 
 		// Create the DOM element for the entry.
-		this.entry_node = UserListEntry.make_entry_node(
-			name,
-			pass != null ? pass : '**********'
-		);
+		this.entry_node = UserListEntry.make_entry_node(name, pass_show);
 		this.container.appendChild(this.entry_node);
 
 		// Initialize the groups MultiSelect.

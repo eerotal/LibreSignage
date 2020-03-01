@@ -21,6 +21,7 @@ final class User extends Exportable {
 	private $groups = [];
 	private $sessions = [];
 	private $quota = NULL;
+	private $passwordless = TRUE;
 
 	const USERNAME_REGEX = '/^[A-Za-z0-9_]+$/';
 	const GROUPS_REGEX = '/^[A-Za-z0-9_]+$/';
@@ -47,7 +48,8 @@ final class User extends Exportable {
 			'hash',
 			'groups',
 			'sessions',
-			'quota'
+			'quota',
+			'passwordless'
 		];
 	}
 
@@ -56,7 +58,8 @@ final class User extends Exportable {
 			'user',
 			'groups',
 			'sessions',
-			'quota'
+			'quota',
+			'passwordless'
 		];
 	}
 
@@ -341,6 +344,7 @@ final class User extends Exportable {
 			throw new IntException('Password hashing failed.');
 		}
 		$this->hash = $tmp_hash;
+		$this->passwordless = FALSE;
 	}
 
 	/**
@@ -443,6 +447,7 @@ final class User extends Exportable {
 	public function get_hash() { return $this->hash; }
 	public function get_name() { return $this->user; }
 	public function get_quota() { return $this->quota; }
+	public function is_passwordless() { return $this->passwordless; }
 
 	/**
 	* Get an array of all the existing user objects.

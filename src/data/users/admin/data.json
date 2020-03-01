@@ -4,6 +4,7 @@
 	"__version": "1.1.0",
 	"user": "admin",
 	"hash": "$2y$10$21MD1KxpFZ5fEbu6BViVSOQL57T4a2xbuO3.lAoSkOEXxi2LZE42.",
+	"passwordless": false,
 	"groups": [
 		"admin",
 		"editor",
