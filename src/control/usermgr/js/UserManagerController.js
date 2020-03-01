@@ -16,13 +16,14 @@ class UserManagerController {
 	/**
 	* Create a new user.
 	*
-	* @param {string} username The username of the new user.
+	* @param {string}  username     The username of the new user.
+	* @param {boolean} passwordless Enable passwordless login for the user.
 	*
 	* @return {User} The newly created User object.
 	*/
-	async create_user(username) {
+	async create_user(username, passwordless) {
 		let user = new User(this.api);
-		await user.create(username);
+		await user.create(username, passwordless);
 		return user;
 	}
 

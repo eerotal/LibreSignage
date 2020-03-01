@@ -28,7 +28,13 @@
 					type="button"
 					id="btn-create-user"
 					class="btn btn-primary">
-					<i class="fas fa-plus-circle"></i> Create user
+					<i class="fas fa-plus-circle"></i> New user
+				</button>
+				<button
+					type="button"
+					id="btn-create-user-passwordless"
+					class="btn btn-primary">
+					<i class="fas fa-plus-circle"></i> New passwordless user
 				</button>
 			</div>
 		</div>

@@ -38,7 +38,14 @@ class UserManagerView extends BaseComponent {
 				elem: document.querySelector('#btn-create-user'),
 				cond: () => true,
 				enabler: null,
-				attach: { click: () => this.create_user() },
+				attach: { click: () => this.create_user(false) },
+				defer: () => !this.state('ready') || this.state('loading')
+			}),
+			create_passwordless: new UIButton({
+				elem: document.querySelector('#btn-create-user-passwordless'),
+				cond: () => true,
+				enabler: null,
+				attach: { click: () => this.create_user(true) },
 				defer: () => !this.state('ready') || this.state('loading')
 			})
 		});
@@ -101,7 +108,7 @@ class UserManagerView extends BaseComponent {
 	*
 	* This function prompts for the new username.
 	*/
-	create_user() {
+	create_user(passwordless) {
 		let dialog = new PromptDialog(
 			'Create a new user',
 			'Enter a name for the new user.',
@@ -126,7 +133,10 @@ class UserManagerView extends BaseComponent {
 				let val = null;
 				if (!status) { return; }
 				try {
-					val = await this.controller.create_user(dialog.get_value());
+					val = await this.controller.create_user(
+						dialog.get_value(),
+						passwordless
+					);
 				} catch (e) {
 					new APIErrorDialog(e);
 					return;

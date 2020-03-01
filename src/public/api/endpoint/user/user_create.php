@@ -59,7 +59,7 @@ APIEndpoint::POST(
 							'type' => 'string'
 						]
 					],
-					'no_login' => [
+					'passwordless' => [
 						'type' => 'boolean'
 					]
 				],
@@ -114,7 +114,10 @@ APIEndpoint::POST(
 		}
 
 		// Generate a password if login is required for the user.
-		if (!property_exists($params, 'no_login') || !$params->no_login) {
+		if (
+			!property_exists($params, 'passwordless')
+			|| !$params->passwordless
+		) {
 			try {
 				$pass = Util::gen_passwd(
 					Config::config('GENERATED_PASSWD_LEN')
