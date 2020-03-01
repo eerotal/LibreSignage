@@ -38,7 +38,6 @@ class LoginView {
 						if (
 							e.key === 'Enter'
 							&& this.inputs.get('username').get().length
-							&& this.inputs.get('password').get().length
 						) { await this.login(); }
 						this.update();
 					}
@@ -58,7 +57,6 @@ class LoginView {
 						if (
 							e.key === 'Enter'
 							&& this.inputs.get('username').get().length
-							&& this.inputs.get('password').get().length
 						) { await this.login(); }
 						this.update();
 					}
@@ -84,10 +82,7 @@ class LoginView {
 		this.buttons = new UIController({
 			login: new UIButton({
 				elem: document.querySelector('#btn-login'),
-				cond: () => (
-					this.inputs.get('password').get().length
-					&& this.inputs.get('username').get().length
-				),
+				cond: () => this.inputs.get('username').get().length,
 				enabler: null,
 				attach: { click: async () => { await this.login(); } },
 				defer: () => !this.ready
