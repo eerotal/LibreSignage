@@ -40,8 +40,8 @@ reloads of the page.
 The *New passwordless user* button creates a user without a password, meaning
 you can login as the new user without supplying any password. This is handy if
 you need to create users for many individual people who then set the passwords
-by themselves. *For increased security it's recommended to create normal users
-instead.*
+by themselves. **For increased security it's recommended to create normal users
+instead.**
 
 Passwordless users can also be used for public facing display clients where
 authentication is not needed. LibreSignage includes a system for automatically
