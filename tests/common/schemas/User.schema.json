@@ -11,6 +11,9 @@
 		"pass": {
 			"type": "string",
 			"minLength": 1
+		},
+		"passwordless": {
+			"type": "boolean"
 		}
 	},
 
@@ -25,7 +28,8 @@
 			"type": "array",
 			"items": { "$ref": "Session.schema.json" }
 		},
-		"user": { "$ref": "#/definitions/name" }
+		"user": { "$ref": "#/definitions/name" },
+		"passwordless": { "$ref": "#/definitions/passwordless" }
 	},
 	"required": ["groups", "quota", "sessions", "user"],
 	"additionalProperties": false
