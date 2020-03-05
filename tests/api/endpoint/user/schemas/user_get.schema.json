@@ -9,7 +9,8 @@
 					"type": "array",
 					"items": { "$ref": "common/schemas/User.schema.json#/definitions/group" }
 				},
-				"user": { "$ref": "common/schemas/User.schema.json#/definitions/name" }
+				"user": { "$ref": "common/schemas/User.schema.json#/definitions/name" },
+				"passwordless": { "$ref": "common/schemas/User.schema.json#/definitions/passwordless" }
 			},
 			"required": ["groups", "user"],
 			"additionalProperties": false
