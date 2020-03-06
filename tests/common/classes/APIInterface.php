@@ -188,7 +188,7 @@ final class APIInterface {
 	* Decode raw response data into a suitable datatype.
 	*
 	* @param Response $resp The Response object to use.
-	* @param callable $fallback A fallback decoder function to use for	
+	* @param callable $fallback A fallback decoder function to use for
 	*                           mimetypes other than application/json.
 	*                           The default is strval().
 	*

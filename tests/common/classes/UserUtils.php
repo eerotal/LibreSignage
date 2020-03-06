@@ -17,14 +17,16 @@ final class UserUtils {
 	public static function create(
 		APIInterface $api,
 		string $user,
-		array $groups
+		array $groups,
+		bool $passwordless = FALSE
 	): Response {
 		return $api->call_return_raw_response(
 			'POST',
 			'user/user_create.php',
 			[
 				'user' => $user,
-				'groups' => $groups
+				'groups' => $groups,
+				'passwordless' => $passwordless
 			],
 			[],
 			TRUE

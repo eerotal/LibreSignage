@@ -48,6 +48,13 @@ class user_create extends APITestCase {
 				],
 				HTTPStatus::OK
 			],
+			"Valid parameters passwordless user" => [
+				[
+					'user' => self::UNIT_TEST_USER,
+					'passwordless' => true
+				],
+				HTTPStatus::OK
+			],
 			'Wrong type for user parameter' => [
 				[
 					'user' => 1,
@@ -107,6 +114,13 @@ class user_create extends APITestCase {
 				[
 					'user' => self::UNIT_TEST_USER,
 					'groups' => [1, 2, 3]
+				],
+				HTTPStatus::BAD_REQUEST
+			],
+			"Wrong type for passwordless parameter" => [
+				[
+					'user' => self::UNIT_TEST_USER,
+					'passwordless' => 1
 				],
 				HTTPStatus::BAD_REQUEST
 			],

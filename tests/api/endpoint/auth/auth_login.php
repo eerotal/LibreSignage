@@ -2,10 +2,14 @@
 
 namespace libresignage\tests\api\endpoint\auth;
 
+use libresignage\tests\common\classes\APIInterface;
+use libresignage\tests\common\classes\UserUtils;
 use libresignage\tests\common\classes\APITestCase;
 use libresignage\api\HTTPStatus;
 
 class auth_login extends APITestCase {
+	const UNIT_TEST_USER = "unit_test_user";
+
 	public function setUp(): void {
 		parent::setUp();
 
@@ -140,8 +144,51 @@ class auth_login extends APITestCase {
 					'permanent' => 123
 				],
 				HTTPStatus::BAD_REQUEST
-			],
+			]
 		];
+	}
+
+	public function test_passwordless_login() {
+		// Create a passwordless user for testing.
+		$this->api->login('admin', 'admin');
+
+		APIInterface::assert_success(UserUtils::create(
+			$this->api,
+			self::UNIT_TEST_USER,
+			['editor', 'display'],
+			TRUE
+		), 'Failed to create initial user.', [$this, 'abort']);
+
+		$this->api->logout();
+
+		// Attempt to login as the new passwordless user.
+		$response = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			[
+				'username' => self::UNIT_TEST_USER,
+				'who' => 'LibreSignage-Unit-Tests',
+				'password' => '',
+				'permanent' => FALSE
+			],
+			[]
+		);
+
+		try {
+			$this->assert_api_succeeded($response);
+		} catch (\Exception $e) {
+			throw $e;
+		} finally {
+			// Remove the passwordless user.
+			$this->api->login('admin', 'admin');
+
+			APIInterface::assert_success(UserUtils::remove(
+				$this->api,
+				self::UNIT_TEST_USER
+			), 'Failed to remove initial user.', [$this->api, 'logout']);
+
+			$this->api->logout();
+		}
 	}
 
 	public function test_is_response_schema_correct() {
