@@ -314,7 +314,7 @@ abstract class Exportable {
 	* @return bool TRUE if metadata exists, FALSE otherwise.
 	*/
 	public static function has_metadata(array $data): bool {
-		return Util::array_is_subset(
+		return Util::is_subset(
 			[
 				Exportable::EXP_CLASSNAME,
 				Exportable::EXP_VISIBILITY

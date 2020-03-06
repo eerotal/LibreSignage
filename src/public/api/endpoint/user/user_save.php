@@ -6,9 +6,9 @@
 *   * The caller is in the group *admin* and *pass* is NULL or unset
 *     in the request, ie. the caller is not trying to set the password
 *     of the user. This prevents the admin from taking over an account.
-*   * The caller is the user that's being saved and *groups* is NULL or
-*     unset in the request, ie. the caller is not trying to set groups.
-*     This prevents privilege escalation.
+*   * The caller is the user that's being saved and *groups* is NULL,
+*     unset or equal to the current user groups, ie. the caller is not
+*     trying to set groups. This prevents privilege escalation.
 *
 * @method{POST}
 * @auth{By token}
@@ -47,6 +47,7 @@ use libresignage\common\php\auth\exceptions\UserNotFoundException;
 use libresignage\common\php\exceptions\IntException;
 use libresignage\common\php\exceptions\ArgException;
 use libresignage\common\php\exceptions\LimitException;
+use libresignage\common\php\Util;
 
 APIEndpoint::POST(
 	[
@@ -123,7 +124,10 @@ APIEndpoint::POST(
 		}
 
 		// Case 2.
-		if (isset($params->groups)) {
+		if (
+			isset($params->groups)
+			&& !Util::set_equals($params->groups, $u->get_groups())
+		) {
 			if ($auth_admin) {
 				try {
 					$u->set_groups($params->groups);

@@ -36,7 +36,7 @@ final class MigrationPath {
 		ExportableDataContext $ctx
 	) {
 		assert(
-			Util::array_is_subset(
+			Util::is_subset(
 				[
 					Exportable::EXP_CLASSNAME,
 					Exportable::EXP_VISIBILITY

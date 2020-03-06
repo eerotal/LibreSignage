@@ -60,16 +60,15 @@ final class Util {
 	}
 
 	/**
-	* Check if array $a has the same values as array $b. Returns
-	* TRUE if $a is equal to $b and FALSE otherwise.
+	* Check if array $a treated as a set has the same values as $b.
 	*
 	* @param array $a Set A.
 	* @param array $b Set B.
 	*
 	* @returns bool TRUE if the values of $a and $b match, FALSE otherwise.
 	*/
-	static function array_is_equal(array $a, array $b): bool {
-		return array_is_subset($a, $b) && count($a) == count($b);
+	static function set_equals(array $a, array $b): bool {
+		return self::is_subset($a, $b) && count($a) == count($b);
 	}
 
 	/*
@@ -81,7 +80,7 @@ final class Util {
 	*
 	* @return bool TRUE if $a E $b and FALSE otherwise.
 	*/
-	static function array_is_subset(array $a, array $b): bool {
+	static function is_subset(array $a, array $b): bool {
 		return count(array_intersect($a, $b)) == count($a);
 	}
 

@@ -83,6 +83,15 @@ class user_save extends APITestCase {
 				],
 				HTTPStatus::OK
 			],
+			'Non-admin sends request with same groups' => [
+				'user',
+				'user',
+				[
+					'user' => 'user',
+					'groups' => ['editor', 'display']
+				],
+				HTTPStatus::OK
+			],
 			'Missing user parameter' => [
 				'admin',
 				'admin',
