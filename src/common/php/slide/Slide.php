@@ -30,7 +30,7 @@ final class Slide extends Exportable {
 	private $sched_t_s = 0;
 	private $sched_t_e = 0;
 	private $animation = 0;
-	private $queues = [];
+	private $queue_names = [];
 	private $collaborators = [];
 	private $lock = NULL;
 	private $assets = [];
@@ -60,7 +60,7 @@ final class Slide extends Exportable {
 			'sched_t_s',
 			'sched_t_e',
 			'animation',
-			'queues',
+			'queue_names',
 			'collaborators',
 			'lock',
 			'assets'
@@ -80,7 +80,7 @@ final class Slide extends Exportable {
 			'sched_t_s',
 			'sched_t_e',
 			'animation',
-			'queues',
+			'queue_names',
 			'collaborators',
 			'lock',
 			'assets'
@@ -104,19 +104,30 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Duplicate the loaded slide.
+	* Copy the loaded Slide into a specific Queue.
 	*
-	* @return Slide The duplicate slide.
+	* @param Queue $dest The destination Queue of the copied Slide.
+	*
+	* @return Slide The newly created Slide object.
 	*/
-	public function dup(): Slide {
+	public function copy(Queue $dest): Slide {
 		$slide = clone $this;
 		$slide->gen_id();
 		$slide->set_index($slide->get_index() + 1);
 		$slide->set_lock(NULL);
 
+		/*
+		* Clear the queues of the duplicated Slide since it should only
+		* exist in $dest. Note that Slide::remove_from_all_queues() works
+		* even when the Queues indicated in Slide::queue_names don't actually
+		* contain the Slide like in this case.
+		*/
+		$slide->remove_from_all_queues();
+
 		// Make sure all directories are created.
 		$slide->write();
 
+		// Clone assets to the duplicated Slide.
 		$tmp = [];
 		foreach ($this->get_assets() as $a) {
 			$tmp[] = $a->clone($slide);
@@ -126,9 +137,8 @@ final class Slide extends Exportable {
 		// Write latest changes to file.
 		$slide->write();
 
-		$queue = $slide->get_queue();
-		$queue->add($slide);
-		$queue->write();
+		$dest->add($slide);
+		$dest->write();
 
 		return $slide;
 	}
@@ -443,7 +453,10 @@ final class Slide extends Exportable {
 	/**
 	* Remove a Slide from a Queue.
 	*
-	* @param string $name The name of the Queue from where the Slide is removed.
+	* If a Slide is removed from all of its Queues, the Slide is
+	* automatically removed from the server.
+	*
+	* @param string $name The name of the Queue.
 	*/
 	public function remove_from_queue(string $name) {
 		if (in_array($name, $this->queue_names)) {
@@ -457,8 +470,22 @@ final class Slide extends Exportable {
 			$q->load($name);
 			$q->remove_slide($this);
 			$q->write();
+
+			if (count($this->queue_names)) {
+				// Remove Slides that aren't included in any Queue.
+				$this->remove();
+			}
 		} else {
 			throw new ArgException("Slide doesn't exist in queue '{$name}'.");
+		}
+	}
+
+	/**
+	* Remove a Slide from all of its Queues.
+	*/
+	public function remove_from_all_queues() {
+		foreach ($this->get_queue_names() as $n) {
+			$this->remove_from_queue($n);
 		}
 	}
 
@@ -731,10 +758,13 @@ final class Slide extends Exportable {
 	public function remove() {
 		$this->assert_ready();
 
-		// Remove slide from its queue.
-		$queue = $this->get_queue();
-		$queue->remove_slide($this);
-		$queue->write();
+		// Remove the Slide from its Queues.
+		foreach ($this->get_queue_names() as $qn) {
+			$queue = new Queue();
+			$queue->load($qn);
+			$queue->remove_slide($this);
+			$queue->write();
+		}
 
 		// Remove slide data files.
 		Util::rmdir_recursive(self::get_dir_path($this->id));
@@ -767,7 +797,7 @@ final class Slide extends Exportable {
 	public function get_sched_t_s() { return $this->sched_t_s; }
 	public function get_sched_t_e() { return $this->sched_t_e; }
 	public function get_animation() { return $this->animation; }
-	public function get_queue_names() { return $this->queues; }
+	public function get_queue_names() { return $this->queue_names; }
 	public function get_collaborators() { return $this->collaborators; }
 	public function get_lock() { return $this->lock; }
 	public function get_assets() { return $this->assets; }

@@ -237,9 +237,12 @@ final class Queue extends Exportable {
 	}
 
 	/**
-	* Remove a slide from the loaded queue.
+	* Remove a Slide from a Queue.
 	*
-	* @param Slide $slide The slide object to remove.
+	* This function succeeds even when the supplied Slide doesn't
+	* exist in the Queue.
+	*
+	* @param Slide $slide The Slide object to remove.
 	*/
 	public function remove_slide(Slide $slide) {
 		$this->slide_ids = array_values(array_filter(

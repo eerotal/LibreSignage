@@ -11,7 +11,7 @@
 *      is the owner of the slide and is in the editor group.
 *    * Otherwise allow restricted access if the caller is in
 *      the collaborators array of the slide. In this case the
-*      queue_name and collaborators parameters of the API
+*      queue_names and collaborators parameters of the API
 *      call are silently discarded.
 *  * \c id == null
 *    * Allow if the caller is in the admin or editor groups.
@@ -49,7 +49,7 @@
 * @request{int,sched_t_s,The start unix timestamp of scheduling.,required}
 * @request{int,sched_t_e,The end unix timestamp of scheduling.,required}
 * @request{int,animation,The new ID of the slide transition animation.,required}
-* @request{string,queue_name,The new queue name of the slide.,required}
+* @request{string,queue_names,The new Queue names of the slide.,required}
 * @request{array,collaborators,An array of collaborator usernames.,required}
 * @request{mixed,owner,Unused.,optional}
 * @request{mixed,lock,Unused.,optional}
@@ -106,7 +106,12 @@ APIEndpoint::POST(
 					'sched_t_s' => ['type' => 'integer'],
 					'sched_t_e' => ['type' => 'integer'],
 					'animation' => ['type' => 'integer'],
-					'queue_name' => ['type' => 'string'],
+					'queue_names' => [
+						'type' => 'array',
+						'items' => [
+							'type' => 'string'
+						]
+					],
 					'collaborators' => [
 						'type' => 'array',
 						'items' => [
@@ -126,7 +131,7 @@ APIEndpoint::POST(
 					'sched_t_s',
 					'sched_t_e',
 					'animation',
-					'queue_name',
+					'queue_names',
 					'collaborators'
 				]
 			]
@@ -191,9 +196,9 @@ APIEndpoint::POST(
 */
 function set_slide_data(Slide $slide, $data, bool $owner): void {
 
-	// Don't set 'queue_name' and 'collaborators' if $owner === FALSE.
+	// Don't set 'queue_names' and 'collaborators' if $owner === FALSE.
 	if ($owner === TRUE) {
-		$slide->set_queue($data->queue_name);
+		foreach ($data->queue_names as $qn) { $slide->add_to_queue($qn); }
 		$slide->set_collaborators($data->collaborators);
 	}
 
@@ -260,18 +265,20 @@ function finish(Slide $slide) {
 	$slide->write();
 
 	// Juggle slide indices.
-	$queue = new Queue();
-	try {
-		$queue->load($slide->get_queue_name());
-	} catch (QueueNotFoundException $e) {
-		throw new APIException(
-			"Queue '{$slide->get_queue_name()}' of '{$slide->get_id()}' ".
-			"doesn't exist. This shouldn't happen happen.",
-			HTTPStatus::INTERNAL_SERVER_ERROR,
-			$e
-		);
+	foreach ($slide->get_queue_names() as $qn) {
+		$queue = new Queue();
+		try {
+			$queue->load($qn);
+		} catch (QueueNotFoundException $e) {
+			throw new APIException(
+				"Queue '{$qn}' of '{$slide->get_id()}' ".
+				"doesn't exist. This shouldn't be possible.",
+				HTTPStatus::INTERNAL_SERVER_ERROR,
+				$e
+			);
+		}
+		$queue->juggle($slide->get_id());
 	}
-	$queue->juggle($slide->get_id());
 
 	// Get the slide data from $queue since $queue->juggle() modifies it.
 	return $queue->get_slide($slide->get_id())->export(FALSE, FALSE);

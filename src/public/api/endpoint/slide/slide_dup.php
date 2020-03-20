@@ -12,6 +12,7 @@
 *
 * @request_start{application/json}
 * @request{string,id,The ID of the slide to duplicate.,required}
+* @request{string,dest,The name of the destination Queue.,required}
 * @request_end
 *
 * @response_start{application/json}
@@ -46,11 +47,10 @@ APIEndpoint::POST(
 			'schema' => [
 				'type' => 'object',
 				'properties' => [
-					'id' => [
-						'type' => 'string'
-					]
+					'id' => [ 'type' => 'string' ],
+					'dest' => [ 'type' => 'string' ]
 				],
-				'required' => ['id']
+				'required' => ['id', 'dest']
 			]
 		]
 	],
