@@ -36,6 +36,8 @@ use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
 use libresignage\common\php\slide\Slide;
 use libresignage\common\php\slide\exceptions\SlideNotFoundException;
+use libresignage\common\php\queue\Queue;
+use libresignage\common\php\queue\exceptions\QueueNotFoundException;
 
 APIEndpoint::POST(
 	[
@@ -81,15 +83,23 @@ APIEndpoint::POST(
 			);
 		}
 
-		$new = $old->dup();
+		$dest = new Queue();
+		try {
+			$dest->load($params->dest);
+		} catch (QueueNotFoundException $e) {
+			throw new APIException(
+				"Queue '{$params->dest}' not found.",
+				HTTPStatus::NOT_FOUND,
+				$e
+			);
+		}
+		$new = $old->copy($dest);
 		$new->set_owner($caller->get_name());
 		$new->lock_acquire($session);
 		$new->write();
 
-		// Juggle slide indices to make sure they are correct.
-		$queue = $new->get_queue();
-		$queue->juggle($new->get_id());
-		$queue->write();
+		$dest->juggle($new->get_id());
+		$dest->write();
 
 		return ['slide' => $new->export(FALSE, FALSE)];
 	}

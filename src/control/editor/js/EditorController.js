@@ -224,7 +224,7 @@ class EditorController {
 			sched_t_s:     Math.round(Date.now()/1000),
 			sched_t_e:     Math.round(Date.now()/1000),
 			animation:     0,
-			queue_name:    this.queue.get_name(),
+			queue_names:   [this.queue.get_name()],
 			collaborators: [],
 			lock:          null,
 			assets:        []
@@ -263,18 +263,26 @@ class EditorController {
 		Assert.ok(this.slide != null, "No slide to move.");
 		Assert.ok(this.state.slide.saved, "Slide not saved.");
 
-		this.slide.set({ 'queue_name': queue });
+		this.slide.remove_from_queue(this.queue.get_name());
+		this.slide.add_to_queue(queue);
+
 		await this.save_slide();
 		await this.update_queue();
 	}
 
 	/**
-	* Duplicate the current slide.
+	* Duplicate the current slide into a Queue
+	*
+	* @param {string} dest_name The name of the destination Queue.
 	*/
-	async duplicate_slide() {
+	async copy_slide(dest_name) {
 		Assert.ok(this.slide != null, "No slide to duplicate.");
-		await this.slide.dup();
-		await this.update_queue();
+		await this.slide.copy(dest_name);
+
+		// Update the current Queue if the Slide was copied into it.
+		if (dest_name == this.get_queue().get_name()) {
+			await this.update_queue();
+		}
 	}
 
 	/**

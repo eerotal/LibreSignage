@@ -502,8 +502,8 @@ class EditorView extends BaseComponent {
 				},
 				defer: () => !this.state('ready') || this.state('loading')
 			}),
-			duplicate: new UIButton({
-				elem: document.querySelector('#btn-slide-duplicate'),
+			copy: new UIButton({
+				elem: document.querySelector('#btn-slide-copy'),
 				cond: d => (
 					d.quota.slides
 					&& d.slide.loaded
@@ -514,7 +514,7 @@ class EditorView extends BaseComponent {
 				attach: {
 					click: async () => {
 						this.state('loading', true);
-						await this.duplicate_slide();
+						await this.copy_slide();
 						this.state('loading', false);
 					}
 				},
@@ -646,10 +646,10 @@ class EditorView extends BaseComponent {
 				},
 				defer: () => !this.state('ready')
 			}),
-			new Shortcut({ // Control + d => Duplicate slide
+			new Shortcut({ // Control + d => Copy slide
 				keys: ['Control', 'd'],
 				hook: () => {
-					let elem = this.buttons.get('duplicate').get_elem();
+					let elem = this.buttons.get('copy').get_elem();
 					if (!elem.disabled) {
 						elem.dispatchEvent(new Event('click'));
 					}
@@ -1037,12 +1037,12 @@ class EditorView extends BaseComponent {
 		await this.show_slide(null);
 	}
 
-	async duplicate_slide() {
+	async copy_slide() {
 		/*
-		*  Duplicate the current slide.
+		* Copy the current Slide into a Queue.
 		*/
 		try {
-			await this.controller.duplicate_slide();
+			await this.controller.copy_slide(this.controller.get_queue().get_name());
 			await this.timeline.update(true);
 		} catch (e) {
 			new APIErrorDialog(e);

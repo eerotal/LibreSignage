@@ -14,11 +14,11 @@
 		title="Save slide.">
 		<i class="fas fa-save"></i>
 	</button>
-	<button id="btn-slide-duplicate"
+	<button id="btn-slide-copy"
 		type="button"
 		class="btn btn-success btn-slide-ctrl"
 		data-toggle="tooltip"
-		title="Duplicate slide.">
+		title="Copy slide.">
 		<i class="fas fa-copy"></i>
 	</button>
 	<button id="btn-slide-preview"
