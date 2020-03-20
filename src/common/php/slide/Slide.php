@@ -30,7 +30,7 @@ final class Slide extends Exportable {
 	private $sched_t_s = 0;
 	private $sched_t_e = 0;
 	private $animation = 0;
-	private $queue_name = NULL;
+	private $queues = [];
 	private $collaborators = [];
 	private $lock = NULL;
 	private $assets = [];
@@ -60,7 +60,7 @@ final class Slide extends Exportable {
 			'sched_t_s',
 			'sched_t_e',
 			'animation',
-			'queue_name',
+			'queues',
 			'collaborators',
 			'lock',
 			'assets'
@@ -80,7 +80,7 @@ final class Slide extends Exportable {
 			'sched_t_s',
 			'sched_t_e',
 			'animation',
-			'queue_name',
+			'queues',
 			'collaborators',
 			'lock',
 			'assets'
@@ -422,28 +422,43 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Set the slide queue.
+	* Add a Slide to a Queue.
 	*
 	* @see Slide::validate_queue() for validation exceptions.
 	*
 	* @param string $name The queue name.
 	*/
-	public function set_queue(string $name) {
+	public function add_to_queue(string $name) {
 		self::validate_queue($name);
-		if ($this->queue_name != $name) {
-			if ($this->queue_name) {
-				// Remove slide from the old queue.
-				$o = $this->get_queue();
-				$o->remove_slide($this);
-				$o->write();
-			}
 
-			// Add slide to the the new queue.
-			$this->queue_name = $name;
+		if (!in_array($name, $this->queue_names)) {
+			$this->queue_names[] = $name;
 			$n = new Queue();
 			$n->load($name);
 			$n->add($this);
 			$n->write();
+		}
+	}
+
+	/**
+	* Remove a Slide from a Queue.
+	*
+	* @param string $name The name of the Queue from where the Slide is removed.
+	*/
+	public function remove_from_queue(string $name) {
+		if (in_array($name, $this->queue_names)) {
+			array_splice(
+				$this->queue_names,
+				array_search($name, $this->queue_names),
+				1
+			);
+
+			$q = new Queue();
+			$q->load($name);
+			$q->remove_slide($this);
+			$q->write();
+		} else {
+			throw new ArgException("Slide doesn't exist in queue '{$name}'.");
 		}
 	}
 
@@ -752,16 +767,10 @@ final class Slide extends Exportable {
 	public function get_sched_t_s() { return $this->sched_t_s; }
 	public function get_sched_t_e() { return $this->sched_t_e; }
 	public function get_animation() { return $this->animation; }
-	public function get_queue_name() { return $this->queue_name; }
+	public function get_queue_names() { return $this->queues; }
 	public function get_collaborators() { return $this->collaborators; }
 	public function get_lock() { return $this->lock; }
 	public function get_assets() { return $this->assets; }
-
-	public function get_queue(): Queue {
-		$queue = new Queue();
-		$queue->load($this->queue_name);
-		return $queue;
-	}
 
 	/**
 	* List all existing Slide IDs.
