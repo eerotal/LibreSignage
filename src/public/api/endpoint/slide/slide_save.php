@@ -198,7 +198,11 @@ function set_slide_data(Slide $slide, $data, bool $owner): void {
 
 	// Don't set 'queue_names' and 'collaborators' if $owner === FALSE.
 	if ($owner === TRUE) {
-		foreach ($data->queue_names as $qn) { $slide->add_to_queue($qn); }
+		foreach ($data->queue_names as $qn) {
+			$tmp_queue = new Queue();
+			$tmp_queue->load($qn);
+			$slide->add_to_queue($tmp_queue);
+		}
 		$slide->set_collaborators($data->collaborators);
 	}
 

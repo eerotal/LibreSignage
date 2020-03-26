@@ -106,6 +106,8 @@ final class Slide extends Exportable {
 	/**
 	* Copy the loaded Slide into a specific Queue.
 	*
+	* This function writes the Queue data to disk.
+	*
 	* @param Queue $dest The destination Queue of the copied Slide.
 	*
 	* @return Slide The newly created Slide object.
@@ -123,6 +125,7 @@ final class Slide extends Exportable {
 		* contain the Slide like in this case.
 		*/
 		$slide->remove_from_all_queues();
+		$slide->add_to_queue($dest);
 
 		// Make sure all directories are created.
 		$slide->write();
@@ -134,10 +137,7 @@ final class Slide extends Exportable {
 		}
 		$slide->set_assets($tmp);
 
-		// Write latest changes to file.
 		$slide->write();
-
-		$dest->add($slide);
 		$dest->write();
 
 		return $slide;
@@ -434,19 +434,13 @@ final class Slide extends Exportable {
 	/**
 	* Add a Slide to a Queue.
 	*
-	* @see Slide::validate_queue() for validation exceptions.
-	*
-	* @param string $name The queue name.
+	* @param Queue $queue The Queue where the Slide is added.
 	*/
-	public function add_to_queue(string $name) {
-		self::validate_queue($name);
-
-		if (!in_array($name, $this->queue_names)) {
-			$this->queue_names[] = $name;
-			$n = new Queue();
-			$n->load($name);
-			$n->add($this);
-			$n->write();
+	public function add_to_queue(Queue $queue) {
+		if (!in_array($queue->get_name(), $this->queue_names)) {
+			$this->queue_names[] = $queue->get_name();
+			$queue->add($this);
+			$queue->write();
 		}
 	}
 

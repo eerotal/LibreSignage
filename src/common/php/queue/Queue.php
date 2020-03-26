@@ -216,6 +216,10 @@ final class Queue extends Exportable {
 		$this->name = $name;
 	}
 
+	public function get_name(): string {
+		return $this->name;
+	}
+
 	public function set_owner(string $owner) {
 		User::validate_name($owner);
 		$this->owner = $owner;
@@ -234,6 +238,7 @@ final class Queue extends Exportable {
 		$this->slide_ids[] = $slide->get_id();
 		$this->slides[] = $slide;
 		$this->normalize();
+		Log::logs(var_export($this->slide_ids, TRUE));
 	}
 
 	/**
