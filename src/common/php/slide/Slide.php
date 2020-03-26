@@ -115,7 +115,6 @@ final class Slide extends Exportable {
 	public function copy(Queue $dest): Slide {
 		$slide = clone $this;
 		$slide->gen_id();
-		$slide->set_index($slide->get_index() + 1);
 		$slide->set_lock(NULL);
 
 		/*
