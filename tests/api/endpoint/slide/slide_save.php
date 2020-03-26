@@ -19,7 +19,7 @@ class slide_save extends APITestCase {
 		'sched_t_s' => 0,
 		'sched_t_e' => 0,
 		'animation' => 1,
-		'queue_name' => 'default',
+		'queue_names' => ['default'],
 		'collaborators' => [],
 		'owner' => NULL,
 		'lock' => NULL,

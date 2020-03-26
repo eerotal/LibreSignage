@@ -69,7 +69,7 @@ final class SlideUtils {
 	* @param int          $sched_t_s
 	* @param int          $sched_t_e
 	* @param int          $animation
-	* @param string       $queue_name
+	* @param array        $queue_names
 	* @param array        $collaborators
 	*
 	* @return Response The API response.
@@ -86,7 +86,7 @@ final class SlideUtils {
 		int $sched_t_s,
 		int $sched_t_e,
 		int $animation,
-		string $queue_name,
+		array $queue_names,
 		array $collaborators
 	): Response {
 		return $api->call_return_raw_response(
@@ -103,7 +103,7 @@ final class SlideUtils {
 				'sched_t_s' => $sched_t_s,
 				'sched_t_e' => $sched_t_e,
 				'animation' => $animation,
-				'queue_name' => $queue_name,
+				'queue_names' => $queue_names,
 				'collaborators' => $collaborators
 			],
 			[],

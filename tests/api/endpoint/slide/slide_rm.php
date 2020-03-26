@@ -32,7 +32,7 @@ class slide_rm extends APITestCase {
 			0,
 			0,
 			0,
-			'default',
+			['default'],
 			[]
 		), 'Failed to create initial slide.', [$this, 'abort']);
 		$this->api->logout();

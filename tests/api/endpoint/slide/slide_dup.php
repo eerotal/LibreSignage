@@ -34,7 +34,7 @@ class slide_dup extends APITestCase {
 			0,
 			0,
 			0,
-			'default',
+			['default'],
 			[]
 		), 'Failed to create initial slide.', [$this, 'abort']);
 		$this->api->logout();
@@ -71,37 +71,89 @@ class slide_dup extends APITestCase {
 			'Valid parameters' => [
 				'admin',
 				'admin',
-				['id' => '1'],
+				[
+					'id' => '1',
+					'dest' => 'default'
+				],
 				HTTPStatus::OK
 			],
 			'Missing id parameter' => [
 				'admin',
 				'admin',
-				[],
+				[
+					'dest' => 'default'
+				],
 				HTTPStatus::BAD_REQUEST
 			],
 			'Wrong type for id parameter' => [
 				'admin',
 				'admin',
-				['id' => TRUE],
+				[
+					'id' => TRUE,
+					'dest' => 'default'
+				],
 				HTTPStatus::BAD_REQUEST
 			],
 			'Empty id parameter' => [
 				'admin',
 				'admin',
-				['id' => ''],
+				[
+					'id' => '',
+					'dest' => 'default'
+				],
 				HTTPStatus::NOT_FOUND
 			],
 			'Nonexistent id' => [
 				'admin',
 				'admin',
-				['id' => 'aabbccddee'],
+				[
+					'id' => 'aabbccddee',
+					'dest' => 'default'
+				],
+				HTTPStatus::NOT_FOUND
+			],
+			'Missing dest parameter' => [
+				'admin',
+				'admin',
+				[
+					'id' => '1'
+				],
+				HTTPStatus::BAD_REQUEST
+			],
+			'Wrong type for dest parameter' => [
+				'admin',
+				'admin',
+				[
+					'id' => '1',
+					'dest' => TRUE
+				],
+				HTTPStatus::BAD_REQUEST
+			],
+			'Empty dest parameter' => [
+				'admin',
+				'admin',
+				[
+					'id' => '1',
+					'dest' => ''
+				],
+				HTTPStatus::NOT_FOUND
+			],
+			'Nonexistent destination queue' => [
+				'admin',
+				'admin',
+				[
+					'id' => '1',
+					'dest' => 'aabbcc'
+				],
 				HTTPStatus::NOT_FOUND
 			],
 			'Editor not in admin or user groups duplicates slide' => [
 				'display',
 				'display',
-				['id' => '1'],
+				[
+					'id' => '1',
+					'dest' => 'default'
+				],
 				HTTPStatus::UNAUTHORIZED
 			]
 		];
@@ -110,7 +162,10 @@ class slide_dup extends APITestCase {
 	public function test_is_response_schema_correct() {
 		$this->dup_slide_id = APIInterface::decode_raw_response(
 			$this->call_api_and_check_response_schema(
-				['id' => '1'],
+				[
+					'id' => '1',
+					'dest' => 'default'
+				],
 				[],
 				dirname(__FILE__).'/schemas/slide_dup.schema.json',
 				'admin',
