@@ -1,6 +1,6 @@
 <?php
 /** \file
-* Duplicate a slide.
+* Copy a slide.
 *
 * The caller is set as the owner of the new slide and the slide is
 * automatically locked for the caller.
@@ -11,18 +11,18 @@
 * @ratelimit_yes
 *
 * @request_start{application/json}
-* @request{string,id,The ID of the slide to duplicate.,required}
+* @request{string,id,The ID of the slide to copy.,required}
 * @request{string,dest,The name of the destination Queue.,required}
 * @request_end
 *
 * @response_start{application/json}
-* @response{Slide,slide,The duplicated slide object.}
+* @response{Slide,slide,The copy slide object.}
 * @response_end
 *
 * @status_start
 * @status{200,On success.}
 * @status{400,If the request parameters are invalid.}
-* @status{401,If the user is not allowed to duplicate slides.}
+* @status{401,If the user is not allowed to copy slides.}
 * @status{404,If the requested slide doesn't exist.}
 * @status_end
 */

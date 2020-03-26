@@ -446,12 +446,14 @@ final class Slide extends Exportable {
 	/**
 	* Remove a Slide from a Queue.
 	*
-	* If a Slide is removed from all of its Queues, the Slide is
-	* automatically removed from the server.
+	* If $autoremove == TRUE and a Slide is removed from all of its Queues,
+	* the Slide is automatically removed from the server.
 	*
-	* @param string $name The name of the Queue.
+	* @param string $name       The name of the Queue.
+	* @param bool   $autoremove Automatically remove Slides not included in
+	*                           any Queue.
 	*/
-	public function remove_from_queue(string $name) {
+	public function remove_from_queue(string $name, bool $autoremove=TRUE) {
 		if (in_array($name, $this->queue_names)) {
 			array_splice(
 				$this->queue_names,
@@ -464,7 +466,7 @@ final class Slide extends Exportable {
 			$q->remove_slide($this);
 			$q->write();
 
-			if (count($this->queue_names)) {
+			if ($autoremove && !count($this->queue_names)) {
 				// Remove Slides that aren't included in any Queue.
 				$this->remove();
 			}
@@ -475,10 +477,13 @@ final class Slide extends Exportable {
 
 	/**
 	* Remove a Slide from all of its Queues.
+	*
+	* This function doesn't remove the Slide even though it doesn'than
+	* exist in any Queue afterwards.
 	*/
 	public function remove_from_all_queues() {
 		foreach ($this->get_queue_names() as $n) {
-			$this->remove_from_queue($n);
+			$this->remove_from_queue($n, FALSE);
 		}
 	}
 
@@ -746,20 +751,12 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Remove the loaded slide from file.
+	* Remove the loaded Slide from disk.
 	*/
 	public function remove() {
 		$this->assert_ready();
 
-		// Remove the Slide from its Queues.
-		foreach ($this->get_queue_names() as $qn) {
-			$queue = new Queue();
-			$queue->load($qn);
-			$queue->remove_slide($this);
-			$queue->write();
-		}
-
-		// Remove slide data files.
+		$this->remove_from_all_queues();
 		Util::rmdir_recursive(self::get_dir_path($this->id));
 	}
 

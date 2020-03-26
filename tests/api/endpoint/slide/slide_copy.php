@@ -20,7 +20,7 @@ class slide_dup extends APITestCase {
 		$this->set_endpoint_method('POST');
 		$this->set_endpoint_uri('slide/slide_dup.php');
 
-		// Create an initial slide to duplicate.
+		// Create an initial slide to copy.
 		$this->api->login('admin', 'admin');
 		$resp = APIInterface::assert_success(SlideUtils::save(
 			$this->api,
@@ -147,7 +147,7 @@ class slide_dup extends APITestCase {
 				],
 				HTTPStatus::NOT_FOUND
 			],
-			'Editor not in admin or user groups duplicates slide' => [
+			'Editor not in admin or user groups copies slide' => [
 				'display',
 				'display',
 				[
@@ -188,7 +188,7 @@ class slide_dup extends APITestCase {
 		), 'Failed to remove original slide.', [$this->api, 'logout']);
 		$this->orig_slide_id = NULL;
 
-		// Remove duplicated slide if it was created.
+		// Remove copied slide if it was created.
 		if ($this->dup_slide_id !== NULL) {
 			APIInterface::assert_success(SlideUtils::lock(
 				$this->api,
