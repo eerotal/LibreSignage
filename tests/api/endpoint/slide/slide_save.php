@@ -335,7 +335,7 @@ class slide_save extends APITestCase {
 				self::VALID_PARAMS,
 				[
 					'id' => $this->slide_id,
-    				'markup' => 'Modified'
+					'markup' => 'Modified'
 				]
 			),
 			[],
@@ -370,6 +370,41 @@ class slide_save extends APITestCase {
 			array_merge(
 				array_merge(self::VALID_PARAMS, ['id' => $this->slide_id]),
 				['markup' => 'Modified']
+			),
+			[],
+			TRUE
+		);
+		$this->api->logout();
+		$this->assert_api_succeeded(
+			$resp,
+			'Failed to save slide as a collaborator.'
+		);
+	}
+
+	public function test_slide_removed_when_removed_from_all_queues() {
+		$this->setup_create_slide('admin', 'admin', self::VALID_PARAMS);
+
+		// Lock the slide.
+		$this->api->login('admin', 'admin');
+		$resp = $this->api->call_return_raw_response(
+			'POST',
+			'slide/slide_lock_acquire.php',
+			['id' => $this->slide_id],
+			[],
+			TRUE
+		);
+		$this->assert_api_succeeded(
+			$resp,
+			'Failed to lock slide as owner.'
+		);
+
+		// Remove the slide from all queues.
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
+			array_merge(
+				array_merge(self::VALID_PARAMS, ['id' => $this->slide_id]),
+				['queue_names' => []]
 			),
 			[],
 			TRUE

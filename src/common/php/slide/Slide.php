@@ -16,6 +16,7 @@ use libresignage\common\php\slide\exceptions\SlideNotFoundException;
 use libresignage\common\php\Log;
 use libresignage\common\php\exceptions\ArgException;
 use libresignage\common\php\exceptions\IntException;
+use libresignage\common\php\exceptions\IllegalOperationException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class Slide extends Exportable {
@@ -446,29 +447,31 @@ final class Slide extends Exportable {
 	/**
 	* Remove a Slide from a Queue.
 	*
-	* If $autoremove == TRUE and a Slide is removed from all of its Queues,
-	* the Slide is automatically removed from the server.
+	* Note that you cannot remove a Slide from all of its Queues. If that's
+	* needed you should remove the Slide itself instead.
 	*
-	* @param string $name       The name of the Queue.
-	* @param bool   $autoremove Automatically remove Slides not included in
-	*                           any Queue.
+	* @param string $name The name of the Queue.
+	*
+	* @throws IllegalOperationException If the Slide would be removed
+	*                                   from all of its Queues.
 	*/
-	public function remove_from_queue(string $name, bool $autoremove=TRUE) {
+	public function remove_from_queue(string $name) {
 		if (in_array($name, $this->queue_names)) {
-			array_splice(
-				$this->queue_names,
-				array_search($name, $this->queue_names),
-				1
-			);
+			if (count($this->queue_names) > 1) {
+				array_splice(
+					$this->queue_names,
+					array_search($name, $this->queue_names),
+					1
+				);
 
-			$q = new Queue();
-			$q->load($name);
-			$q->remove_slide($this);
-			$q->write();
-
-			if ($autoremove && !count($this->queue_names)) {
-				// Remove Slides that aren't included in any Queue.
-				$this->remove();
+				$q = new Queue();
+				$q->load($name);
+				$q->remove_slide($this);
+				$q->write();
+			} else {
+				throw new IllegalOperationException(
+					"Slide cannot be removed from all of its queues."
+				);
 			}
 		} else {
 			throw new ArgException("Slide doesn't exist in queue '{$name}'.");
@@ -478,13 +481,19 @@ final class Slide extends Exportable {
 	/**
 	* Remove a Slide from all of its Queues.
 	*
-	* This function doesn't remove the Slide even though it doesn'than
-	* exist in any Queue afterwards.
+	* This method is private because it technically leaves the Slide
+	* in a semi-broken state without any Queues. You should only call this
+	* function if you ensure the Slide is either removed or added to a new
+	* Queue(s) afterwards.
 	*/
-	public function remove_from_all_queues() {
-		foreach ($this->get_queue_names() as $n) {
-			$this->remove_from_queue($n, FALSE);
+	private function remove_from_all_queues() {
+		foreach ($this->get_queue_names() as $qn) {
+			$q = new Queue();
+			$q->load($qn);
+			$q->remove_slide($this);
+			$q->write();
 		}
+		$this->queue_names = [];
 	}
 
 	/**

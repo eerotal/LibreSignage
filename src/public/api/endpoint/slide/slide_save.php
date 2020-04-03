@@ -193,17 +193,31 @@ APIEndpoint::POST(
 
 /**
 * Set the slide data of $slide.
+*
+* @throws APIException If $data->queue_names is empty.
 */
-function set_slide_data(Slide $slide, $data, bool $owner): void {
-
+function set_slide_data(Slide $slide, $data, bool $owner) {
 	// Don't set 'queue_names' and 'collaborators' if $owner === FALSE.
 	if ($owner === TRUE) {
-		foreach ($data->queue_names as $qn) {
-			$tmp_queue = new Queue();
-			$tmp_queue->load($qn);
-			$slide->add_to_queue($tmp_queue);
+		if (count($data->queue_names) == 0) {
+			throw new APIException(
+				'Slide cannot be removed from all Queues.',
+				HTTPStatus::BAD_REQUEST
+			);
 		}
-		$slide->set_collaborators($data->collaborators);
+
+		// Add to new Queues.
+		foreach ($data->queue_names as $qn) {
+			$q = new Queue();
+			$q->load($qn);
+			$slide->add_to_queue($q);
+		}
+		// Remove from old Queues.
+		foreach ($slide->get_queue_names() as $qn) {
+			if (!in_array($qn, $data->queue_names)) {
+				$slide->remove_from_queue($qn);
+			}
+		}
 	}
 
 	$slide->set_name($data->name);
