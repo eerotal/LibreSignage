@@ -761,12 +761,17 @@ final class Slide extends Exportable {
 
 	/**
 	* Remove the loaded Slide from disk.
+	*
+	* This method succeeds even if the Slide is not yet written to disk.
+	* In this case the Slide is just removed from all Queues.
 	*/
 	public function remove() {
 		$this->assert_ready();
 
 		$this->remove_from_all_queues();
-		Util::rmdir_recursive(self::get_dir_path($this->id));
+		if (is_dir(self::get_dir_path($this->id))) {
+			Util::rmdir_recursive(self::get_dir_path($this->id));
+		}
 	}
 
 	public static function get_dir_path(string $id): string {
