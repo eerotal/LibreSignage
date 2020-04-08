@@ -199,7 +199,7 @@ APIEndpoint::POST(
 function set_slide_data(Slide $slide, $data, bool $owner) {
 	// Don't set 'queue_names' and 'collaborators' if $owner === FALSE.
 	if ($owner === TRUE) {
-		if (count($data->queue_names) == 0) {
+		if (count($data->queue_names) === 0) {
 			throw new APIException(
 				'Slide cannot be removed from all Queues.',
 				HTTPStatus::BAD_REQUEST
@@ -218,6 +218,8 @@ function set_slide_data(Slide $slide, $data, bool $owner) {
 				$slide->remove_from_queue($qn);
 			}
 		}
+
+		$slide->set_collaborators($data->collaborators);
 	}
 
 	$slide->set_name($data->name);
@@ -253,6 +255,7 @@ function create_slide(User $caller, Session $session, Slide $slide, $data) {
 
 		set_slide_data($slide, $data, TRUE);
 	} catch (\Exception $e) {
+		// Cleanup the created Slide in case of any exception.
 		$slide->remove();
 		$caller->get_quota()->free_quota('slides');
 		$caller->write();
