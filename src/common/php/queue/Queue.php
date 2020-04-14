@@ -100,16 +100,19 @@ final class Queue extends Exportable {
 	*/
 	public function normalize() {
 		usort($this->slides, function(Slide $a, Slide $b) {
-			if ($a->get_index() > $b->get_index()) {
+			$i_a = $a->get_index($this->get_name());
+			$i_b = $b->get_index($this->get_name());
+
+			if ($i_a > $i_b) {
 				return 1;
-			} else if ($a->get_index() < $b->get_index()) {
+			} else if ($i_a < $i_b) {
 				return -1;
 			} else {
 				return 0;
 			}
 		});
 		for ($i = 0; $i < count($this->slides); $i++) {
-			$this->slides[$i]->set_index($i);
+			$this->slides[$i]->set_index($i, $this->get_name());
 			$this->slides[$i]->write();
 		}
 	}
@@ -143,12 +146,12 @@ final class Queue extends Exportable {
 		$this->normalize();
 
 		// Shift indices so that the index of $keep_id is left free.
-		$keep_i = $keep->get_index();
+		$keep_i = $keep->get_index($this->get_name());
 		foreach ($this->slides as $k => $s) {
-			$s_i = $s->get_index();
+			$s_i = $s->get_index($this->get_name());
 			$clash |= $s_i == $keep_i;
 			if ($s_i >= $keep_i) {
-				$s->set_index($s_i + 1);
+				$s->set_index($s_i + 1, $this->get_name());
 				$s->write();
 			}
 		}
@@ -157,7 +160,7 @@ final class Queue extends Exportable {
 			* $keep_id didn't have the same index as any of the
 			* other slides -> make it the last one.
 			*/
-			$keep->set_index(count($this->slides));
+			$keep->set_index(count($this->slides), $this->get_name());
 			$keep->write();
 		}
 
@@ -238,7 +241,6 @@ final class Queue extends Exportable {
 		$this->slide_ids[] = $slide->get_id();
 		$this->slides[] = $slide;
 		$this->normalize();
-		Log::logs(var_export($this->slide_ids, TRUE));
 	}
 
 	/**
@@ -286,6 +288,29 @@ final class Queue extends Exportable {
 			if ($s->get_id() === $id) { return $s; }
 		}
 		return NULL;
+	}
+
+	/**
+	* Get the last Slide in a Queue based on indices.
+	*
+	* If no Slides exist in the Queue, NULL is returned instead.
+	*
+	* @return Slide The last Slide in the Queue or NULL.
+	*/
+	public function get_last_slide() {
+		$ret = NULL;
+
+		foreach ($this->slides as $s) {
+			if (
+				$ret === NULL
+				|| $s->get_index($this->get_name())
+					> $ret->get_index($this->get_name())
+			) {
+				$ret = $s;
+			}
+		}
+
+		return $ret;
 	}
 
 	/**

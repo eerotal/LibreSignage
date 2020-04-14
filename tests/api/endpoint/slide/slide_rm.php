@@ -24,7 +24,7 @@ class slide_rm extends APITestCase {
 			$this->api,
 			NULL,
 			'Unit-Test-Slide',
-			0,
+			['default' => 0],
 			5000,
 			'Test Markup',
 			TRUE,

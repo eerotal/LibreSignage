@@ -16,6 +16,6 @@ post: $(MIGRATION_INDEX)
 $(MIGRATION_INDEX): $(MIGRATION_DEFS)
 	@:
 	set -e
-	php build/scripts/gen_migration_index.php
+	php -d display_errors=On build/scripts/gen_migration_index.php
 
 include makefile.common

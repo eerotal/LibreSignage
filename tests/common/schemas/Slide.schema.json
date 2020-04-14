@@ -6,9 +6,16 @@
 			"pattern": "^[A-Za-z0-9_-]+$",
 			"minLength": 1
 		},
-		"index": {
+		"index_single": {
 			"type": "integer",
 			"minimum": 0
+		},
+		"index": {
+			"type": "object",
+			"propertyNames": { "$ref": "Queue.schema.json#/definitions/name" },
+			"patternProperties": {
+				"^.*$": { "$ref": "#/definitions/index_single" }
+			}
 		},
 		"duration": {
 			"type": "number",

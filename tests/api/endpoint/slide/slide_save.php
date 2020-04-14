@@ -11,7 +11,7 @@ class slide_save extends APITestCase {
 	const VALID_PARAMS = [
 		'id' => NULL,
 		'name' => 'Unit-Test-Slide',
-		'index' => 1,
+		'index' => ['default' => 0],
 		'duration' => 5000,
 		'markup' => 'Test Markup',
 		'enabled' => TRUE,
@@ -126,7 +126,19 @@ class slide_save extends APITestCase {
 			'Negative index parameter' => [
 				'admin',
 				'admin',
-				\array_merge(self::VALID_PARAMS, ['index' => -1]),
+				\array_merge(self::VALID_PARAMS, ['index' => ['default' => -1]]),
+				HTTPStatus::BAD_REQUEST
+			],
+			'Wrong type for index parameter' => [
+				'admin',
+				'admin',
+				\array_merge(self::VALID_PARAMS, ['index' => 0]),
+				HTTPStatus::BAD_REQUEST
+			],
+			'Empty index object' => [
+				'admin',
+				'admin',
+				\array_merge(self::VALID_PARAMS, ['index' => []]),
 				HTTPStatus::BAD_REQUEST
 			],
 			'Wrong type for name parameter' => [

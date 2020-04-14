@@ -1,10 +1,10 @@
 {
 	"__classname":"libresignage\\common\\php\\slide\\Slide",
 	"__visibility":"private",
-	"__version": "1.1.0",
+	"__version": "1.2.0",
 	"id":"3",
 	"name":"Columns",
-	"index":2,
+	"index":{"default":2},
 	"duration":6000,
 	"markup":"[container top=10% right=10% bottom=10% left=10%]\n\t[xcenter]\n\t\t[h size=12%]Multi-column example[\/h]\n\t[\/xcenter]\n\t[columns]\n\t\t[container top=2% right=2% bottom=2% left=2%]\n\t\t\t[h size=5%]First column[\/h]\n\t\t\t[p]This is the first column in this slide. Columns are created\n\t\t\tusing the [i]columns[\/i] class. Each [i]container[\/i] inside a\n\t\t\t[i]columns[\/i] class creates a new column. The maximum number of\n\t\t\tcolumns is not limited in any way.[\/p]\n\t\t[\/container]\n\t\t[container top=2% right=2% bottom=2% left=2%]\n\t\t\t[h size=5%]Second column[\/h]\n\t\t\t[p]This is the second column in this slide. Columns within one\n\t\t\t[i]columns[\/i] class all have equal width and height.[\/p]\n\t\t[\/container]\n\t[\/columns]\n\t[container top=2% right=2% bottom=2% left=2%]\n\t\t[p]Containers [b]outside[\/b] a [i]columns[\/i] class are normal full-width\n\t\tcontainers like this one.[\/p]\n\t[\/container]\n[\/container]",
 	"owner":"admin",

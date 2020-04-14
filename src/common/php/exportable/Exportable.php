@@ -167,7 +167,7 @@ abstract class Exportable {
 	*
 	* If any data migration is required, the migrated data is automatically
 	* written back to the original file.
-*
+	*
 	* @param string $path The path of the file to read.
 	*/
 	public function fimport(string $path) {

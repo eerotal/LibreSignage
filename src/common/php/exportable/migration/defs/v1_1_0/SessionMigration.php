@@ -8,22 +8,18 @@ use libresignage\common\php\exportable\migration\MigrationInterface;
 use libresignage\common\php\exportable\ExportableDataContext;
 
 /**
-* User data migration from 1.1.0 to 1.2.0.
+* Session data migration from 1.1.0 to 1.2.0.
 */
-final class UserMigration implements MigrationInterface {
+final class SessionMigration implements MigrationInterface {
 	public static function from_class(): array {
-		return ['libresignage\common\php\auth\User'];
+		return ['libresignage\common\php\auth\Session'];
 	}
 
 	public static function to_class(): string {
-		return 'libresignage\common\php\auth\User';
+		return 'libresignage\common\php\auth\Session';
 	}
 
 	public static function from_version(): array { return ['1.1.0']; }
 	public static function to_version(): string { return '1.2.0'; }
-
-	public static function migrate(array &$data, ExportableDataContext $ctx) {
-		// new: passwordless, infer from password hash.
-		$data['passwordless'] = ($data['hash'] === NULL);
-	}
+	public static function migrate(array &$data, ExportableDataContext $ctx) {}
 }

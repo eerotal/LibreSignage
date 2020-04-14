@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 final class Slide extends Exportable {
 	private $id = NULL;
 	private $name = NULL;
-	private $index = NULL;
+	private $index = [];
 	private $duration = NULL;
 	private $markup = NULL;
 	private $owner = NULL;
@@ -125,7 +125,10 @@ final class Slide extends Exportable {
 		* contain the Slide like in this case.
 		*/
 		$slide->remove_from_all_queues();
-		$slide->add_to_queue($dest);
+		$slide->add_to_queue(
+			$dest,
+			$dest->get_last_slide()->get_index($dest->get_name()) + 1
+		);
 
 		// Make sure all directories are created.
 		$slide->write();
@@ -255,15 +258,16 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Set the slide index.
+	* Set the slide index in a queue.
 	*
 	* @see Slide::validate_index() for validation exceptions.
 	*
-	* @param int $index The slide index.
+	* @param int    $index The slide index.
+	* @param string $queue The queue to use.
 	*/
-	public function set_index(int $index) {
+	public function set_index(int $index, string $queue) {
 		self::validate_index($index);
-		$this->index = $index;
+		$this->index[$queue] = $index;
 	}
 
 	/**
@@ -434,9 +438,16 @@ final class Slide extends Exportable {
 	/**
 	* Add a Slide to a Queue.
 	*
+	* If the Slide already exists in the Queue, only the index is changed.
+	*
+	* @see Slide::validate_index() for validation exceptions.
+	*
 	* @param Queue $queue The Queue where the Slide is added.
+	* @param int   $index The index of the Slide in the new Queue.
 	*/
-	public function add_to_queue(Queue $queue) {
+	public function add_to_queue(Queue $queue, int $index) {
+		$this->set_index($index, $queue->get_name());
+
 		if (!in_array($queue->get_name(), $this->queue_names)) {
 			$this->queue_names[] = $queue->get_name();
 			$queue->add($this);
@@ -793,7 +804,6 @@ final class Slide extends Exportable {
 	public function get_id() { return $this->id; }
 	public function get_markup() { return $this->markup; }
 	public function get_name() { return $this->name; }
-	public function get_index() { return $this->index; }
 	public function get_duration() { return $this->duration; }
 	public function get_owner() { return $this->owner; }
 	public function get_enabled() { return $this->enabled; }
@@ -805,6 +815,15 @@ final class Slide extends Exportable {
 	public function get_collaborators() { return $this->collaborators; }
 	public function get_lock() { return $this->lock; }
 	public function get_assets() { return $this->assets; }
+
+	/**
+	* Get the index of a slide in a queue.
+	*
+	* @param string $queue The queue name.
+	*/
+	public function get_index(string $queue) {
+		return $this->index[$queue];
+	}
 
 	/**
 	* List all existing Slide IDs.

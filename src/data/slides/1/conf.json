@@ -1,10 +1,10 @@
 {
 	"__classname":"libresignage\\common\\php\\slide\\Slide",
 	"__visibility":"private",
-	"__version": "1.1.0",
+	"__version": "1.2.0",
 	"id":"1",
 	"name":"Welcome",
-	"index":0,
+	"index":{"default":0},
 	"duration":3000,
 	"markup":"[container top=35% right=0% bottom=0% left=0%]\n    [xcenter]\n        [h size=12%]Welcome to LibreSignage![\/h]\n    [\/xcenter]\n[\/container]",
 	"owner":"admin",

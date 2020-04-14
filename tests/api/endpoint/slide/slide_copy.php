@@ -18,7 +18,7 @@ class slide_dup extends APITestCase {
 		parent::setUp();
 
 		$this->set_endpoint_method('POST');
-		$this->set_endpoint_uri('slide/slide_dup.php');
+		$this->set_endpoint_uri('slide/slide_copy.php');
 
 		// Create an initial slide to copy.
 		$this->api->login('admin', 'admin');
@@ -26,7 +26,7 @@ class slide_dup extends APITestCase {
 			$this->api,
 			NULL,
 			'Unit-Test-Slide',
-			0,
+			['default' => 0],
 			5000,
 			'Test Markup',
 			TRUE,
@@ -38,7 +38,6 @@ class slide_dup extends APITestCase {
 			[]
 		), 'Failed to create initial slide.', [$this, 'abort']);
 		$this->api->logout();
-
 		$this->orig_slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 	}
 
@@ -167,7 +166,7 @@ class slide_dup extends APITestCase {
 					'dest' => 'default'
 				],
 				[],
-				dirname(__FILE__).'/schemas/slide_dup.schema.json',
+				dirname(__FILE__).'/schemas/slide_copy.schema.json',
 				'admin',
 				'admin'
 			)

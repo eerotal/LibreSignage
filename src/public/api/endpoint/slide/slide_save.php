@@ -97,7 +97,10 @@ APIEndpoint::POST(
 				'properties' => [
 					'id' => ['type' => ['string', 'null']],
 					'name' => ['type' => 'string'],
-					'index' => ['type' => 'integer'],
+					'index' => [
+						'type' => 'object',
+						'items' => ['type' => 'integer']
+					],
 					'markup' => ['type' => 'string'],
 					'owner' => [],
 					'duration' => ['type' => 'integer'],
@@ -197,8 +200,11 @@ APIEndpoint::POST(
 * @throws APIException If $data->queue_names is empty.
 */
 function set_slide_data(Slide $slide, $data, bool $owner) {
-	// Don't set 'queue_names' and 'collaborators' if $owner === FALSE.
 	if ($owner === TRUE) {
+		/*
+		* Set 'queue_names' and 'collaborators' if the caller is
+		* the owner of the Slide.
+		*/
 		if (count($data->queue_names) === 0) {
 			throw new APIException(
 				'Slide cannot be removed from all Queues.',
@@ -208,9 +214,16 @@ function set_slide_data(Slide $slide, $data, bool $owner) {
 
 		// Add to new Queues.
 		foreach ($data->queue_names as $qn) {
+			if (!property_exists($data->index, $qn)) {
+				throw new APIException(
+					"Slide index not provided for Queue '$qn'.",
+					HTTPStatus::BAD_REQUEST
+				);
+			}
+
 			$q = new Queue();
 			$q->load($qn);
-			$slide->add_to_queue($q);
+			$slide->add_to_queue($q, $data->index->$qn);
 		}
 		// Remove from old Queues.
 		foreach ($slide->get_queue_names() as $qn) {
@@ -220,10 +233,20 @@ function set_slide_data(Slide $slide, $data, bool $owner) {
 		}
 
 		$slide->set_collaborators($data->collaborators);
+	} else {
+		// Only set Slide indices if the caller is not the owner of the Slide.
+		foreach ($slide->get_queue_names() as $qn) {
+			if (!property_exists($data->index, $qn)) {
+				throw new APIException(
+					"Slide index not provided for Queue '$qn'.",
+					HTTPStatus::BAD_REQUEST
+				);
+			}
+			$slide->set_index($data->index->$qn, $qn);
+		}
 	}
 
 	$slide->set_name($data->name);
-	$slide->set_index($data->index);
 	$slide->set_duration($data->duration);
 	$slide->set_markup($data->markup);
 	$slide->set_enabled($data->enabled);

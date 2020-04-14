@@ -61,7 +61,7 @@ final class SlideUtils {
 	* @param APIInterface $api An APIInterface object.
 	* @param string|NULL  $id
 	* @param string       $name
-	* @param int          $index
+	* @param array        $index
 	* @param int          $duration
 	* @param string       $markup
 	* @param bool         $enabled
@@ -78,7 +78,7 @@ final class SlideUtils {
 		APIInterface $api,
 		$id,
 		string $name,
-		int $index,
+		array $index,
 		int $duration,
 		string $markup,
 		bool $enabled,
