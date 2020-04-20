@@ -12,6 +12,9 @@ use libresignage\common\php\exceptions\JSONException;
 use libresignage\common\php\exceptions\ArgException;
 use libresignage\common\php\exceptions\IntException;
 use libresignage\common\php\queue\exceptions\QueueNotFoundException;
+use libresignage\common\php\queue\exceptions\BrokenQueueException;
+use libresignage\common\php\slide\exceptions\SlideNotFoundException;
+use libresignage\common\php\slide\exceptions\IllegalOperationException;
 use libresignage\common\php\Log;
 
 /**
@@ -19,6 +22,9 @@ use libresignage\common\php\Log;
 */
 final class Queue extends Exportable {
 	const NAME_REGEX = '/^[A-Za-z0-9_-]+$/';
+
+	const ENDPOS = -1;
+	const NPOS = -2;
 
 	private $name = '';
 	private $owner = '';
@@ -50,7 +56,8 @@ final class Queue extends Exportable {
 	*
 	* @param string $name The name of the queue to load.
 	*
-	* @throws QueueNotFoundException if the requested queue doesn't exist.
+	* @throws QueueNotFoundException If the requested queue doesn't exist.
+	* @throws BrokenQueueException If errors occur during loading the Slides.
 	*/
 	public function load(string $name) {
 		if (!self::exists($name)) {
@@ -62,31 +69,33 @@ final class Queue extends Exportable {
 	}
 
 	/**
-	* Load the slide objects of a Queue and remove any
-	* broken slides.
+	* Load the Slide objects of a Queue.
+	*
+	* This method clears the internal slides array first.
+	*
+	* @throws BrokenQueueException If loading a Slide fails.
 	*/
-	public function load_slide_objects() {
-		$s = NULL;
-		foreach ($this->slide_ids as &$n) {
+	private function load_slide_objects() {
+		$this->slides = [];
+
+		foreach ($this->slide_ids as $n) {
 			$s = new Slide();
 			try {
 				$s->load($n);
 			} catch (\Exception $e) {
-				throw $e;
-				if (
-					$e instanceof IntException
-					|| $e instanceof JSONException
-				) { $n = NULL; }
+				throw new BrokenQueueException(
+					"Broken Slide '{$s->get_id()}' in ".
+					"Queue '{$this->get_name()}'."
+				);
 			}
-			if ($n) { $this->slides[] = $s; }
+			$this->slides[] = $s;
 		}
-		$this->normalize();
 	}
 
 	/**
-	* Write a queue to file.
+	* Write a Queue to disk.
 	*
-	* @throws IntException if the queue is not ready.
+	* @throws IntException If the Queue is not ready.
 	*/
 	public function write() {
 		$this->assert_ready();
@@ -95,82 +104,10 @@ final class Queue extends Exportable {
 	}
 
 	/**
-	* Recalculate slide indices so that no unused indices
-	* remain between slides and sort the slide array.
-	*/
-	public function normalize() {
-		usort($this->slides, function(Slide $a, Slide $b) {
-			$i_a = $a->get_index($this->get_name());
-			$i_b = $b->get_index($this->get_name());
-
-			if ($i_a > $i_b) {
-				return 1;
-			} else if ($i_a < $i_b) {
-				return -1;
-			} else {
-				return 0;
-			}
-		});
-		for ($i = 0; $i < count($this->slides); $i++) {
-			$this->slides[$i]->set_index($i, $this->get_name());
-			$this->slides[$i]->write();
-		}
-	}
-
-	/**
-	* Recalculate slide indices so that the position of the slide with
-	* the ID $keep_id stays the same, no unused indices remain and slides
-	* are sorted based on the indices.
+	* Remove a Queue.
 	*
-	* @param string $keep_id The ID of the slide to keep at it's position.
-	*
-	* @throws ArgException if the slide $keep_id doesn't exist in the queue.
-	*/
-	public function juggle(string $keep_id) {
-		$keep = NULL;
-		$clash = FALSE;
-
-		// Remove the slide with ID $keep_id initially.
-		foreach ($this->slides as $k => $s) {
-			if ($s->get_id() == $keep_id) {
-				$keep = $s;
-				unset($this->slides[$k]);
-				$this->slides = array_values($this->slides);
-				break;
-			}
-		}
-
-		if (!$keep) {
-			throw new ArgException("Slide $keep_id doesn't exist in queue.");
-		}
-		$this->normalize();
-
-		// Shift indices so that the index of $keep_id is left free.
-		$keep_i = $keep->get_index($this->get_name());
-		foreach ($this->slides as $k => $s) {
-			$s_i = $s->get_index($this->get_name());
-			$clash |= $s_i == $keep_i;
-			if ($s_i >= $keep_i) {
-				$s->set_index($s_i + 1, $this->get_name());
-				$s->write();
-			}
-		}
-		if (!$clash) {
-			/*
-			* $keep_id didn't have the same index as any of the
-			* other slides -> make it the last one.
-			*/
-			$keep->set_index(count($this->slides), $this->get_name());
-			$keep->write();
-		}
-
-		// Add $keep back to $this->slides at the correct index.
-		$this->slides[] = $keep;
-		$this->normalize();
-	}
-
-	/**
-	* Remove the loaded queue.
+	* Slides that only exists in the Queue that's to be removed are
+	* removed from the server completely.
 	*
 	* @throws IntException if the current queue is not ready.
 	* @throws ArgException if the loaded queue doesn't exist.
@@ -180,12 +117,17 @@ final class Queue extends Exportable {
 		$this->assert_ready();
 
 		if (!self::exists($this->name)) {
-			throw new ArgException(
-				"Queue doesn't exist. Unsaved queue?"
-			);
+			throw new ArgException("Queue doesn't exist. Unsaved queue?");
 		}
 
-		foreach ($this->slides() as $s) { $s->remove(); }
+		foreach ($this->get_slides() as $s) {
+			try {
+				$s->remove_ref();
+			} catch (IllegalOperationException $e) {
+				// Slide would be removed from all Queues -> Remove Slide.
+				$s->remove();
+			}
+		}
 
 		if (!unlink(self::get_path($this->name))) {
 			throw new IntException("Failed to remove queue.");
@@ -233,14 +175,46 @@ final class Queue extends Exportable {
 	}
 
 	/**
-	* Add a slide to the loaded queue.
+	* Add a Slide to a Queue at a specific position.
 	*
-	* @param Slide $slide The slide object to add.
+	* @param Slide $slide The Slide object to add.
+	* @param int   $at    The index where the Slide is added. If
+	*                     Queue::ENDPOS is passed, the Slide is added
+	*                     at the end of the Queue.
 	*/
-	public function add(Slide $slide) {
-		$this->slide_ids[] = $slide->get_id();
-		$this->slides[] = $slide;
-		$this->normalize();
+	public function add_slide(Slide $slide, int $at) {
+		if ($at === self::ENDPOS) { $at = count($this->slide_ids); }
+
+		array_splice($this->slide_ids, $at, 0, $slide->get_id());
+		array_splice($this->slides, $at, 0, $slide);
+
+		$slide->add_ref();
+	}
+
+	/**
+	* Change the index of a Slide in a Queue.
+	*
+	* @param $slide Slide The Slide to move.
+	* @param int    $to   The new index or Queue::ENDPOS for last.
+	*
+	* @throws SlideNotFoundexception If $slide doesn't exist in the Queue.
+	*/
+	public function reorder(Slide $slide, int $to) {
+		if ($to === self::ENDPOS) { $to = count($this->slides) - 1; }
+
+		$old = $this->get_index($slide);
+		if ($old === self::NPOS) {
+			throw new SlideNotFoundException(
+				"Slide '{$slide->get_id()}' not found in ".
+				"Queue '{$this->get_name()}'."
+			);
+		}
+
+		array_splice($this->slide_ids, $old, 1);
+		array_splice($this->slides, $old, 1);
+
+		array_splice($this->slide_ids, $to, 0, $slide->get_id());
+		array_splice($this->slides, $to, 0, $slide);
 	}
 
 	/**
@@ -250,8 +224,13 @@ final class Queue extends Exportable {
 	* exist in the Queue.
 	*
 	* @param Slide $slide The Slide object to remove.
+	*
+	* @throws IllegalOperationException If the Slide wouldn't remain
+	*                                   in any Queue.
 	*/
 	public function remove_slide(Slide $slide) {
+		$slide->remove_ref();
+
 		$this->slide_ids = array_values(array_filter(
 			$this->slide_ids,
 			function($id) use ($slide) {
@@ -264,22 +243,22 @@ final class Queue extends Exportable {
 				return $s->get_id() !== $slide->get_id();
 			}
 		));
-		$this->normalize();
 	}
 
 	/**
-	* Get the slides array of the loaded queue.
+	* Get an array with all the Slide objects of a Queue.
 	*
 	* @return array An array of Slide objects.
 	*/
-	public function slides(): array {
+	public function get_slides(): array {
 		return $this->slides;
 	}
 
 	/**
 	* Get a Slide by ID.
 	*
-	* @param string $id The ID of the Slide to get.
+	* @param string $id  The ID of the Slide to get.
+	*
 	* @return Slide|NULL The Slide with ID $id or NULL if
 	*                    no matching Slide exists.
 	*/
@@ -291,26 +270,34 @@ final class Queue extends Exportable {
 	}
 
 	/**
-	* Get the last Slide in a Queue based on indices.
+	* Get the index of a Slide in a Queue.
+	*
+	* @param Slide $slide The Slide to search for.
+	*
+	* @return int The index of the Slide or Queue::NPOS if not found.
+	*/
+	public function get_index(Slide $slide): int {
+		for ($i = 0; $i < count($this->slide_ids); $i++) {
+			if ($this->slide_ids[$i] === $slide->get_id()) {
+				return $i;
+			}
+		}
+		return self::NPOS;
+	}
+
+	/**
+	* Get the last Slide in a Queue.
 	*
 	* If no Slides exist in the Queue, NULL is returned instead.
 	*
-	* @return Slide The last Slide in the Queue or NULL.
+	* @return Slide|NULL The last Slide in the Queue or NULL.
 	*/
 	public function get_last_slide() {
-		$ret = NULL;
-
-		foreach ($this->slides as $s) {
-			if (
-				$ret === NULL
-				|| $s->get_index($this->get_name())
-					> $ret->get_index($this->get_name())
-			) {
-				$ret = $s;
-			}
+		if (!empty($this->slides)) {
+			return end($this->slides);
+		} else {
+			return NULL;
 		}
-
-		return $ret;
 	}
 
 	/**
@@ -342,20 +329,20 @@ final class Queue extends Exportable {
 	}
 
 	/**
-	* Check whether the queue with name $name exists.
+	* Check whether a Queue with name $name exists.
 	*
-	* @param string $name The queue name.
+	* @param string $name The Queue name.
 	*
-	* @return bool TRUE if $name exists and FALSE otherwise.
+	* @return bool TRUE if the Queue exists and FALSE otherwise.
 	*/
 	public static function exists(string $name): bool {
 		return in_array($name, self::list());
 	}
 
 	/**
-	* Get an array with all the existing queue names.
+	* Get an array with all the existing Queue names.
 	*
-	* @return array An array with all queue names.
+	* @return array An array with all Queue names.
 	*/
 	public static function list(): array {
 		$queues = array_map(

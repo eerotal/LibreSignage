@@ -19,7 +19,8 @@ final class Config {
 	* @throws Exception if config values are problematic.
 	*/
 	public static function setup() {
-		$tmp = $_SERVER['DOCUMENT_ROOT'].'/..';
+		//$tmp = $_SERVER['DOCUMENT_ROOT'].'/..';
+		$tmp = dirname(__FILE__).'/../..';
 		require($tmp.'/vendor/autoload.php');
 
 		define(

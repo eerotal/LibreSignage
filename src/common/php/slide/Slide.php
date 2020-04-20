@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 final class Slide extends Exportable {
 	private $id = NULL;
 	private $name = NULL;
-	private $index = [];
 	private $duration = NULL;
 	private $markup = NULL;
 	private $owner = NULL;
@@ -31,10 +30,10 @@ final class Slide extends Exportable {
 	private $sched_t_s = 0;
 	private $sched_t_e = 0;
 	private $animation = 0;
-	private $queue_names = [];
 	private $collaborators = [];
 	private $lock = NULL;
 	private $assets = [];
+	private $ref_count = 0;
 
 	public function __exportable_set(string $name, $value) {
 		$this->{$name} = $value;
@@ -52,7 +51,6 @@ final class Slide extends Exportable {
 		return [
 			'id',
 			'name',
-			'index',
 			'duration',
 			'markup',
 			'owner',
@@ -61,10 +59,10 @@ final class Slide extends Exportable {
 			'sched_t_s',
 			'sched_t_e',
 			'animation',
-			'queue_names',
 			'collaborators',
 			'lock',
-			'assets'
+			'assets',
+			'ref_count'
 		];
 	}
 
@@ -72,7 +70,6 @@ final class Slide extends Exportable {
 		return [
 			'id',
 			'name',
-			'index',
 			'duration',
 			'markup',
 			'owner',
@@ -81,10 +78,10 @@ final class Slide extends Exportable {
 			'sched_t_s',
 			'sched_t_e',
 			'animation',
-			'queue_names',
 			'collaborators',
 			'lock',
-			'assets'
+			'assets',
+			'ref_count'
 		];
 	}
 
@@ -107,7 +104,8 @@ final class Slide extends Exportable {
 	/**
 	* Copy the loaded Slide into a specific Queue.
 	*
-	* This function writes the Queue data to disk.
+	* This function calls Queue::write() on the Queue and Slide::write()
+	* on the Slide that's created.
 	*
 	* @param Queue $dest The destination Queue of the copied Slide.
 	*
@@ -117,18 +115,8 @@ final class Slide extends Exportable {
 		$slide = clone $this;
 		$slide->gen_id();
 		$slide->set_lock(NULL);
-
-		/*
-		* Clear the queues of the duplicated Slide since it should only
-		* exist in $dest. Note that Slide::remove_from_all_queues() works
-		* even when the Queues indicated in Slide::queue_names don't actually
-		* contain the Slide like in this case.
-		*/
-		$slide->remove_from_all_queues();
-		$slide->add_to_queue(
-			$dest,
-			$dest->get_last_slide()->get_index($dest->get_name()) + 1
-		);
+		$slide->reset_ref();
+		$dest->add_slide($slide, Queue::ENDPOS);
 
 		// Make sure all directories are created.
 		$slide->write();
@@ -151,6 +139,34 @@ final class Slide extends Exportable {
 	*/
 	public function gen_id() {
 		$this->id = Util::get_uid();
+	}
+
+	/**
+	* Increase the internal reference counter for a Slide.
+	*/
+	public function add_ref() {
+		$this->ref_count++;
+	}
+
+	/**
+	* Decrease the internal reference counter for a Slide.
+	*
+	* @throws IllegalOperationException If the refcount would be decreased to 0.
+	*/
+	public function remove_ref() {
+		if ($this->ref_count === 1) {
+			throw new IllegalOperationException(
+				"Can't decrease Slide refcount to 0."
+			);
+		}
+		$this->ref_count--;
+	}
+
+	/**
+	* Reset the internal reference counter of a Slide to 0.
+	*/
+	private function reset_ref(int $count) {
+		$this->ref_count = 0;
 	}
 
 	/**
@@ -242,32 +258,6 @@ final class Slide extends Exportable {
 	public function set_name(string $name) {
 		self::validate_name($name);
 		$this->name = $name;
-	}
-
-	/**
-	* Validate the slide index.
-	*
-	* @param int $index The slide index.
-	*
-	* @throws ArgException if $index < 0 or $index > SLIDE_MAX_INDEX.
-	*/
-	public static function validate_index(int $index) {
-		if ($index < 0 || $index > Config::limit('SLIDE_MAX_INDEX')) {
-			throw new ArgException("Slide index $index out of bounds.");
-		}
-	}
-
-	/**
-	* Set the slide index in a queue.
-	*
-	* @see Slide::validate_index() for validation exceptions.
-	*
-	* @param int    $index The slide index.
-	* @param string $queue The queue to use.
-	*/
-	public function set_index(int $index, string $queue) {
-		self::validate_index($index);
-		$this->index[$queue] = $index;
 	}
 
 	/**
@@ -433,78 +423,6 @@ final class Slide extends Exportable {
 		if (!Queue::exists($name)) {
 			throw new ArgException("Queue '{$name}' doesn't exist.");
 		}
-	}
-
-	/**
-	* Add a Slide to a Queue.
-	*
-	* If the Slide already exists in the Queue, only the index is changed.
-	*
-	* @see Slide::validate_index() for validation exceptions.
-	*
-	* @param Queue $queue The Queue where the Slide is added.
-	* @param int   $index The index of the Slide in the new Queue.
-	*/
-	public function add_to_queue(Queue $queue, int $index) {
-		$this->set_index($index, $queue->get_name());
-
-		if (!in_array($queue->get_name(), $this->queue_names)) {
-			$this->queue_names[] = $queue->get_name();
-			$queue->add($this);
-			$queue->write();
-		}
-	}
-
-	/**
-	* Remove a Slide from a Queue.
-	*
-	* Note that you cannot remove a Slide from all of its Queues. If that's
-	* needed you should remove the Slide itself instead.
-	*
-	* @param string $name The name of the Queue.
-	*
-	* @throws IllegalOperationException If the Slide would be removed
-	*                                   from all of its Queues.
-	*/
-	public function remove_from_queue(string $name) {
-		if (in_array($name, $this->queue_names)) {
-			if (count($this->queue_names) > 1) {
-				array_splice(
-					$this->queue_names,
-					array_search($name, $this->queue_names),
-					1
-				);
-
-				$q = new Queue();
-				$q->load($name);
-				$q->remove_slide($this);
-				$q->write();
-			} else {
-				throw new IllegalOperationException(
-					"Slide cannot be removed from all of its queues."
-				);
-			}
-		} else {
-			throw new ArgException("Slide doesn't exist in queue '{$name}'.");
-		}
-	}
-
-	/**
-	* Remove a Slide from all of its Queues.
-	*
-	* This method is private because it technically leaves the Slide
-	* in a semi-broken state without any Queues. You should only call this
-	* function if you ensure the Slide is either removed or added to a new
-	* Queue(s) afterwards.
-	*/
-	private function remove_from_all_queues() {
-		foreach ($this->get_queue_names() as $qn) {
-			$q = new Queue();
-			$q->load($qn);
-			$q->remove_slide($this);
-			$q->write();
-		}
-		$this->queue_names = [];
 	}
 
 	/**
@@ -811,19 +729,9 @@ final class Slide extends Exportable {
 	public function get_sched_t_s() { return $this->sched_t_s; }
 	public function get_sched_t_e() { return $this->sched_t_e; }
 	public function get_animation() { return $this->animation; }
-	public function get_queue_names() { return $this->queue_names; }
 	public function get_collaborators() { return $this->collaborators; }
 	public function get_lock() { return $this->lock; }
 	public function get_assets() { return $this->assets; }
-
-	/**
-	* Get the index of a slide in a queue.
-	*
-	* @param string $queue The queue name.
-	*/
-	public function get_index(string $queue) {
-		return $this->index[$queue];
-	}
 
 	/**
 	* List all existing Slide IDs.
