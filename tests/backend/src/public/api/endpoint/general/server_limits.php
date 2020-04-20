@@ -1,6 +1,6 @@
 <?php
 
-namespace libresignage\tests\backend\api\endpoint\general;
+namespace libresignage\tests\backend\src\pub\api\endpoint\general;
 
 use \JsonSchema\Validator;
 use libresignage\tests\backend\common\classes\APITestCase;

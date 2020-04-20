@@ -1,6 +1,6 @@
 <?php
 
-namespace libresignage\tests\backend\api\endpoint\slide;
+namespace libresignage\tests\backend\src\pub\api\endpoint\slide;
 
 use libresignage\tests\backend\common\classes\APITestCase;
 

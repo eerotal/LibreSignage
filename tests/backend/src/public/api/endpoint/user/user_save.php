@@ -1,6 +1,6 @@
 <?php
 
-namespace libresignage\tests\backend\api\endpoint\user;
+namespace libresignage\tests\backend\src\pub\api\endpoint\user;
 
 use libresignage\tests\backend\common\classes\APITestCase;
 use libresignage\tests\backend\common\classes\APIInterface;

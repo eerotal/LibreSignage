@@ -1,6 +1,6 @@
 <?php
 
-namespace libresignage\tests\backend\api\endpoint\queue;
+namespace libresignage\tests\backend\src\pub\api\endpoint\queue;
 
 use libresignage\tests\backend\common\classes\APITestCase;
 
