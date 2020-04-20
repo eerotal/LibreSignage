@@ -2,7 +2,7 @@
 <phpunit bootstrap="bootstrap.php">
 	<testsuites>
 		<testsuite name="API">
-			<directory suffix=".php">./api/endpoint</directory>
+			<directory suffix=".php">./src/public/api/endpoint</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>

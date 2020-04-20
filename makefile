@@ -3,7 +3,7 @@
 #
 
 PHPUNIT_API_HOST ?= http://localhost:80
-PHPUNIT_CONFIG := tests/phpunit.xml
+PHPUNIT_CONFIG := tests/backend/phpunit.xml
 PHPUNIT_FLAGS := -c "$(PHPUNIT_CONFIG)" --testdox --color=auto
 
 # Define required dependency versions.
@@ -216,12 +216,12 @@ test-api: php-dev-autoload
 		exit 1
 	fi
 
-	sh tests/setup.sh "API"
+	sh tests/backend/setup.sh "API"
 
 	export PHPUNIT_API_HOST="$(PHPUNIT_API_HOST)"
 	vendor/bin/phpunit $(PHPUNIT_FLAGS) $(PASS) --testsuite "API"
 
-	sh tests/cleanup.sh "API"
+	sh tests/backend/cleanup.sh "API"
 
 # Generate doxygen docs.
 doxygen-docs:
