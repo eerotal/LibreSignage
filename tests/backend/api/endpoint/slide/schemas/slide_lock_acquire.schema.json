@@ -1,0 +1,9 @@
+{
+	"id": "tests/backend/",
+	"type": "object",
+	"properties": {
+		"lock": { "$ref": "common/schemas/SlideLock.schema.json" }
+	},
+	"required": ["lock"],
+	"additionalProperties": false
+}

@@ -1,0 +1,12 @@
+{
+	"id": "tests/backend/",
+	"type": "object",
+	"properties": {
+		"queues": {
+			"type": "array",
+			"items": { "$ref": "common/schemas/Queue.schema.json#/definitions/name" }
+		}
+	},
+	"required": ["queues"],
+	"additionalProperties": false
+}

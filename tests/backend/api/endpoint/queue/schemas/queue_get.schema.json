@@ -1,0 +1,9 @@
+{
+	"id": "tests/backend/",
+	"type": "object",
+	"properties": {
+		"queue": { "$ref": "common/schemas/Queue.schema.json" }
+	},
+	"required": ["queue"],
+	"additionalProperties": false
+}

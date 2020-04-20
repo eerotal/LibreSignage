@@ -1,0 +1,10 @@
+{
+	"id": "tests/backend/",
+	"type": "object",
+	"properties": {
+		"ls": { "type": "string" },
+		"api": { "type": "string" }
+	},
+	"required": ["ls", "api"],
+	"additionalProperties": false
+}

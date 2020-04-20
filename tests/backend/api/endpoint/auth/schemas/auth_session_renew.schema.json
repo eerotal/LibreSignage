@@ -1,0 +1,9 @@
+{
+	"id": "tests/backend/",
+	"type": "object",
+	"properties": {
+		"session": { "$ref": "common/schemas/Session.schema.json" }
+	},
+	"required": ["session"],
+	"additionalProperties": false
+}
