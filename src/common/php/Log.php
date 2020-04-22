@@ -5,8 +5,6 @@ namespace libresignage\common\php;
 use libresignage\common\php\Config;
 use libresignage\common\php\exceptions\IntException;
 
-$LS_LOG_ENABLED = FALSE;
-
 /**
 * Logging functions for LibreSignage.
 */
@@ -14,14 +12,15 @@ final class Log {
 	const LOGDEF = 'default.log';
 	const LOGERR = 'error.log';
 
+	private static $log_enabled = FALSE;
+
 	/**
 	* Enable/disable logging.
 	*
 	* @param bool $state TRUE = log enabled, FALSE = log disabled.
 	*/
 	public static function enable(bool $state) {
-		global $LS_LOG_ENABLED;
-		$LS_LOG_ENABLED = $state;
+		self::$log_enabled = $state;
 	}
 
 	/**
@@ -30,8 +29,7 @@ final class Log {
 	* @return bool TRUE = Enabled, FALSE = Disabled
 	*/
 	private static function is_enabled(): bool {
-		global $LS_LOG_ENABLED;
-		return $LS_LOG_ENABLED;
+		return self::$log_enabled;
 	}
 
 	/**
