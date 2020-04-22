@@ -223,6 +223,22 @@ test-api: php-dev-autoload
 
 	sh tests/backend/cleanup.sh "API"
 
+# Run backend PHP tests.
+test-backend: php-dev-autoload
+	@:
+	set -e
+
+	printf '[Info] Running backend tests...\n'
+
+	if [ ! -d 'dist/' ]; then
+		echo "[Error] 'dist'/ doesn't exist. Did you compile first?"
+		exit 1
+	fi
+
+	sh tests/backend/setup.sh "backend"
+	vendor/bin/phpunit $(PHPUNIT_FLAGS) $(PASS) --testsuite "backend"
+	sh tests/backend/cleanup.sh "backend"
+
 # Generate doxygen docs.
 doxygen-docs:
 	@:

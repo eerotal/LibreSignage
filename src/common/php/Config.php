@@ -9,9 +9,14 @@ use libresignage\common\php\exceptions\ConfigException;
 * Setup functions for LibreSignage.
 */
 final class Config {
-	const CONFIG_DIR  = "config/conf";
-	const QUOTA_DIR   = "config/quota";
-	const LIMITS_DIR  = "config/limits";
+	const CONFIG_DIR  = "conf/";
+	const QUOTA_DIR   = "quota/";
+	const LIMITS_DIR  = "limits/";
+
+	private static $config_load_paths = [];
+	private static $limits = [];
+	private static $quotas = [];
+	private static $config = [];
 
 	/**
 	* Setup LibreSignage.
@@ -19,28 +24,20 @@ final class Config {
 	* @throws Exception if config values are problematic.
 	*/
 	public static function setup() {
-		//$tmp = $_SERVER['DOCUMENT_ROOT'].'/..';
-		$tmp = dirname(__FILE__).'/../..';
-		require($tmp.'/vendor/autoload.php');
+		$root = dirname(__FILE__).'/../..';
+		/*
+		* Only include the Composer autoload file if tests are not running
+		* because the test framework includes the file automatically.
+		*/
+		if (!self::is_testing()) {
+			require_once($root.'/vendor/autoload.php');
+		}
 
-		define(
-			'LS_CONFIG',
-			array_merge(
-				self::load_config_array($tmp.'/'.self::CONFIG_DIR),
-				['LIBRESIGNAGE_ROOT' => $tmp]
-			)
-		);
-		define(
-			'LS_LIMITS',
-			self::load_config_array($tmp.'/'.self::LIMITS_DIR)
-		);
-		define(
-			'LS_QUOTAS',
-			self::load_config_array($tmp.'/'.self::QUOTA_DIR)
-		);
+		self::add_config_load_path(join('/', [$root, 'config']));
+		self::load_config();
 
 		// Do some checks on the configured values.
-		$max_slides = LS_QUOTAS['slides']['limit']*self::limit('MAX_USERS');
+		$max_slides = self::quota('slides')['limit']*self::limit('MAX_USERS');
 		if ($max_slides > self::limit('SLIDE_MAX_INDEX') - 1) {
 			throw new \Exception(
 				'The configured slide quota conflicts with the '.
@@ -48,8 +45,54 @@ final class Config {
 			);
 		}
 
-		ErrorHandler::setup();
-		ErrorHandler::set_debug(self::config('LIBRESIGNAGE_DEBUG'));
+		/*
+		* Only set up error handling if test are not running because
+		* the test framework has its own way of handling errors.
+		*/
+		if (!self::is_testing()) {
+			ErrorHandler::setup();
+			ErrorHandler::set_debug(self::config('LIBRESIGNAGE_DEBUG'));
+		}
+	}
+
+	/**
+	* Add a path to the array of config load paths.
+	*
+	* @param string $path A new config load path.
+	*
+	* @throws ConfigException If $path doesn't exist.
+	*/
+	public static function add_config_load_path(string $path) {
+		if (!realpath($path)) {
+			throw new ConfigException(
+				"Config load path '$path' doesn't exist."
+			);
+		}
+		self::$config_load_paths[] = $path;
+	}
+
+	/**
+	* Load the LibreSignage config files.
+	*
+	* If some configuration values are already loaded, new values
+	* will override the previous ones.
+	*/
+	public static function load_config() {
+		foreach (self::$config_load_paths as $p) {
+			self::$config = array_merge(
+				self::$config,
+				self::load_config_array(join('/', [$p, self::CONFIG_DIR])),
+				['LIBRESIGNAGE_ROOT' => dirname(__FILE__).'/../..']
+			);
+			self::$limits = array_merge(
+				self::$limits,
+				self::load_config_array(join('/', [$p, self::LIMITS_DIR]))
+			);
+			self::$quotas = array_merge(
+				self::$quotas,
+				self::load_config_array(join('/', [$p, self::QUOTA_DIR]))
+			);
+		}
 	}
 
 	/**
@@ -64,6 +107,7 @@ final class Config {
 	* @throws Exception if a config file doesn't return an array.
 	*/
 	private static function load_config_array(string $dir): array {
+		if (!is_dir($dir)) { return []; }
 		$tmp = [];
 		$files = scandir($dir, SCANDIR_SORT_ASCENDING);
 		if ($files !== FALSE) {
@@ -82,19 +126,6 @@ final class Config {
 	}
 
 	/**
-	* Define the value in $arr as global constants.
-	*
-	* @param array $arr The constants array.
-	*/
-	private static function define_array_values(array $arr) {
-		foreach ($arr as $k => $v) {
-			if (gettype($k) === 'string') {
-				define($k, $v);
-			}
-		}
-	}
-
-	/**
 	* Get a quota.
 	*
 	* @param string $quota The name of the quota.
@@ -102,7 +133,7 @@ final class Config {
 	* @return array The matching quota data.
 	*/
 	public static function quota(string $quota): array {
-		return LS_QUOTAS[$quota];
+		return self::$quotas[$quota];
 	}
 
 	/**
@@ -113,7 +144,7 @@ final class Config {
 	* @return mixed The value of the limit.
 	*/
 	public static function limit(string $lim) {
-		return LS_LIMITS[$lim];
+		return self::$limits[$lim];
 	}
 
 	/**
@@ -124,12 +155,21 @@ final class Config {
 	* @return mixed The config value.
 	*/
 	public static function config(string $conf) {
-		return LS_CONFIG[$conf];
+		return self::$config[$conf];
 	}
 
-	public static function get_quotas(): array { return LS_QUOTAS; }
-	public static function get_limits(): array { return LS_LIMITS; }
-	public static function get_config(): array { return LS_CONFIG; }
+	public static function get_quotas(): array { return self::$quotas; }
+	public static function get_limits(): array { return self::$limits; }
+	public static function get_config(): array { return self::$config; }
+
+	/**
+	* Check whether LibreSignage unit tests are running.
+	*
+	* @return bool TRUE if tests are running and FALSE otherwise.
+	*/
+	public static function is_testing(): bool {
+		return defined('LS_TESTING') && LS_TESTING;
+	}
 }
 
 /* Bootstrap */

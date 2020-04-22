@@ -6,7 +6,7 @@
 */
 return [
 	// Version information.
-	'LS_VER'                => "0.0.0",
+	'LS_VER'                => "v0.0.0",
 	'API_VER'               => "0",
 
 	// Control debugging.

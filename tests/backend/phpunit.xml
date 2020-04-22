@@ -4,5 +4,8 @@
 		<testsuite name="API">
 			<directory suffix=".php">./src/public/api/endpoint</directory>
 		</testsuite>
+		<testsuite name="backend">
+			<directory suffix=".php">./src/common/php/</directory>
+		</testsuite>
 	</testsuites>
 </phpunit>
