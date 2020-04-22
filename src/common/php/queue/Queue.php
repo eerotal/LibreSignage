@@ -14,7 +14,7 @@ use libresignage\common\php\exceptions\IntException;
 use libresignage\common\php\queue\exceptions\QueueNotFoundException;
 use libresignage\common\php\queue\exceptions\BrokenQueueException;
 use libresignage\common\php\slide\exceptions\SlideNotFoundException;
-use libresignage\common\php\slide\exceptions\IllegalOperationException;
+use libresignage\common\php\exceptions\IllegalOperationException;
 use libresignage\common\php\Log;
 
 /**
@@ -187,7 +187,7 @@ final class Queue extends Exportable {
 		if ($at === self::ENDPOS) { $at = count($this->slide_ids); }
 
 		array_splice($this->slide_ids, $at, 0, $slide->get_id());
-		array_splice($this->slides, $at, 0, $slide);
+		array_splice($this->slides, $at, 0, [$slide]);
 
 		$slide->add_ref();
 	}
@@ -215,7 +215,7 @@ final class Queue extends Exportable {
 		array_splice($this->slides, $old, 1);
 
 		array_splice($this->slide_ids, $to, 0, $slide->get_id());
-		array_splice($this->slides, $to, 0, $slide);
+		array_splice($this->slides, $to, 0, [$slide]);
 	}
 
 	/**
@@ -323,7 +323,7 @@ final class Queue extends Exportable {
 	*
 	* @return string The full path to the Queue data file.
 	*/
-	public static function get_path(string $name): string {
+	private static function get_path(string $name): string {
 		return Config::config('LIBRESIGNAGE_ROOT')
 				.Config::config('QUEUES_DIR')
 				.'/'.$name.'.json';

@@ -697,7 +697,6 @@ final class Slide extends Exportable {
 	public function remove() {
 		$this->assert_ready();
 
-		$this->remove_from_all_queues();
 		if (is_dir(self::get_dir_path($this->id))) {
 			Util::rmdir_recursive(self::get_dir_path($this->id));
 		}
