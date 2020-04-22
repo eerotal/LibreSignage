@@ -1,7 +1,7 @@
 {
 	"__classname": "libresignage\\common\\php\\auth\\User",
 	"__visibility": "private",
-	"__version": "1.2.0",
+	"__version": "1.1.0",
 	"user": "user",
 	"hash": "$2y$10$.x3m780GNd39CsQZ97sQleyCvVShtTHwXwiw8e89neJOzCrRgyj8S",
 	"passwordless": false,
