@@ -66,6 +66,14 @@ script:
         make -j$(nproc)
         make install PASS="--tag=eerotal/libresignage:build-tmp --platform=$platform"
 
+    # Run unit tests
+    - |
+        set -e
+        make test-backend
+
+        # Copy the original data files back after testing.
+        make -j$(nproc)
+
     # Run integration tests.
     - |
         set -e
