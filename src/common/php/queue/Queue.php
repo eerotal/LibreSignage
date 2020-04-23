@@ -111,14 +111,16 @@ final class Queue extends Exportable {
 	* removed from the server completely.
 	*
 	* @throws IntException if the current queue is not ready.
-	* @throws ArgException if the loaded queue doesn't exist.
+	* @throws QueueNotFoundException if the loaded queue doesn't exist.
 	* @throws IntException if unlink() fails.
 	*/
 	function remove() {
 		$this->assert_ready();
 
 		if (!self::exists($this->name)) {
-			throw new ArgException("Queue doesn't exist. Unsaved queue?");
+			throw new QueueNotFoundException(
+				"Can't remove nonexistent Queue '$this->name'."
+			);
 		}
 
 		foreach ($this->get_slides() as $s) {
@@ -221,29 +223,25 @@ final class Queue extends Exportable {
 	/**
 	* Remove a Slide from a Queue.
 	*
-	* This function succeeds even when the supplied Slide doesn't
-	* exist in the Queue.
-	*
 	* @param Slide $slide The Slide object to remove.
 	*
 	* @throws IllegalOperationException If the Slide wouldn't remain
 	*                                   in any Queue.
+	* @throws SlideNotFoundException    If the Slide doesn't exist in the Queue.
 	*/
 	public function remove_slide(Slide $slide) {
 		$slide->remove_ref();
 
-		$this->slide_ids = array_values(array_filter(
-			$this->slide_ids,
-			function($id) use ($slide) {
-				return $id !== $slide->get_id();
-			}
-		));
-		$this->slides = array_values(array_filter(
-			$this->slides,
-			function($s) use ($slide) {
-				return $s->get_id() !== $slide->get_id();
-			}
-		));
+		$index = $this->get_index($slide);
+		if ($index === Queue::NPOS) {
+			throw new SlideNotFoundException(
+				"Slide '{$slide->get_id()}' not found in ".
+				"Queue '{$this->get_name()}'."
+			);
+		}
+
+		array_splice($this->slide_ids, $index, 1);
+		array_splice($this->slides, $index, 1);
 	}
 
 	/**

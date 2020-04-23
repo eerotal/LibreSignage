@@ -6,12 +6,16 @@ use \PHPUnit\Framework\TestCase;
 use libresignage\common\php\queue\Queue;
 use libresignage\common\php\Config;
 use libresignage\common\php\queue\exceptions\QueueNotFoundException;
+use libresignage\common\php\slide\exceptions\SlideNotFoundException;
 use libresignage\common\php\exceptions\ArgException;
+use libresignage\common\php\exceptions\IntException;
+use libresignage\common\php\exceptions\IllegalOperationException;
 use libresignage\common\php\slide\Slide;
 
 class QueueTest extends TestCase {
 	const TEST_QUEUE_NAME = 'test-queue';
 	const TEST_QUEUE_OWNER = 'admin';
+
 	private $queue = NULL;
 
 	public function setUp(): void {
@@ -33,6 +37,28 @@ class QueueTest extends TestCase {
 		$this->expectException(QueueNotFoundException::class);
 		$q = new Queue();
 		$q->load('nonexistent');
+	}
+
+	public function test_remove(): void {
+		$this->queue->remove();
+
+		$this->expectException(QueueNotFoundException::class);
+		$q = new Queue();
+		$q->load(self::TEST_QUEUE_NAME);
+	}
+
+	public function test_remove_not_ready(): void {
+		$this->expectException(IntException::class);
+		$q = new Queue();
+		$q->remove();
+	}
+
+	public function test_remove_nonexistent(): void {
+		$this->expectException(QueueNotFoundException::class);
+		$q = new Queue();
+		$q->set_name('nonexistent');
+		$q->set_owner('admin');
+		$q->remove();
 	}
 
 	public function test_get_name(): void {
@@ -153,6 +179,100 @@ class QueueTest extends TestCase {
 		$this->assertSame([$s1, $s3, $s2], $this->queue->get_slides());
 	}
 
+	public function test_reorder_slides(): void {
+		$s1 = new Slide();
+		$s1->gen_id();
+		$s2 = new Slide();
+		$s2->gen_id();
+		$s3 = new Slide();
+		$s3->gen_id();
+
+		$this->queue->add_slide($s1, Queue::ENDPOS);
+		$this->queue->add_slide($s2, Queue::ENDPOS);
+		$this->queue->add_slide($s3, Queue::ENDPOS);
+
+		$this->queue->reorder($s1, Queue::ENDPOS);
+		$this->assertSame([$s2, $s3, $s1], $this->queue->get_slides());
+
+		$this->queue->reorder($s3, 0);
+		$this->assertSame([$s3, $s2, $s1], $this->queue->get_slides());
+
+		$this->queue->reorder($s3, 10);
+		$this->assertSame([$s2, $s1, $s3], $this->queue->get_slides());
+	}
+
+	public function test_reorder_nonexistent_slide(): void {
+		$s1 = new Slide();
+		$s1->gen_id();
+		$s2 = new Slide();
+		$s2->gen_id();
+
+		$this->queue->add_slide($s1, Queue::ENDPOS);
+
+		$this->expectException(SlideNotFoundException::class);
+		$this->queue->reorder($s2, 0);
+	}
+
+	public function test_reorder_single_slide(): void {
+		$s = new Slide();
+		$s->gen_id();
+
+		$this->queue->add_slide($s, Queue::ENDPOS);
+
+		$this->queue->reorder($s, 0);
+		$this->assertSame([$s], $this->queue->get_slides());
+	}
+
+	public function test_remove_slide_and_check_refs_and_refcounts(): void {
+		$s1 = new Slide();
+		$s1->gen_id();
+		$s2 = new Slide();
+		$s2->gen_id();
+
+		/*
+		* Add the Slide to two Queues because Slides can't be removed
+		* from all of their Queues.
+		*/
+		$q1 = new Queue();
+		$q1->set_name('test1');
+		$q1->set_owner('admin');
+
+		$q1->add_slide($s1, Queue::ENDPOS);
+		$q1->add_slide($s2, Queue::ENDPOS);
+		$this->queue->add_slide($s1, Queue::ENDPOS);
+		$this->queue->add_slide($s2, Queue::ENDPOS);
+
+		$this->queue->remove_slide($s1);
+		$this->assertSame([$s2], $this->queue->get_slides());
+		$this->assertSame([$s1, $s2], $q1->get_slides());
+		$this->assertSame(1, $s1->get_refcount());
+		$this->assertSame(2, $s2->get_refcount());
+
+		$this->queue->remove_slide($s2);
+		$this->assertSame([], $this->queue->get_slides());
+		$this->assertSame([$s1, $s2], $q1->get_slides());
+		$this->assertSame(1, $s1->get_refcount());
+		$this->assertSame(1, $s2->get_refcount());
+	}
+
+	public function test_try_to_remove_slide_from_all_queues(): void {
+		$s = new Slide();
+		$s->gen_id();
+
+		$this->queue->add_slide($s, Queue::ENDPOS);
+
+		$this->expectException(IllegalOperationException::class);
+		$this->queue->remove_slide($s);
+	}
+
+	public function test_remove_nonexistent_slide(): void {
+		$s = new Slide();
+		$s->gen_id();
+
+		$this->expectException(SlideNotFoundException::class);
+		$this->queue->remove_slide($s);
+	}
+
 	public function test_get_slide_by_id(): void {
 		$s = new Slide();
 		$s->gen_id();
@@ -171,7 +291,7 @@ class QueueTest extends TestCase {
 		$s2 = new Slide();
 		$s2->gen_id();
 
-		$this->queue->add_slide($s1, 0);
+		$this->queue->add_slide($s1, Queue::ENDPOS);
 		$this->queue->add_slide($s2, Queue::ENDPOS);
 
 		$this->assertSame(0, $this->queue->get_index($s1));
@@ -206,6 +326,8 @@ class QueueTest extends TestCase {
 	}
 
 	public function tearDown(): void {
-		$this->queue->remove();
+		try {
+			$this->queue->remove();
+		} catch (\Exception $e) {}
 	}
 }

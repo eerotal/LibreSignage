@@ -170,6 +170,13 @@ final class Slide extends Exportable {
 	}
 
 	/**
+	* Get the refcount of a Slide.
+	*/
+	public function get_refcount(): int {
+		return $this->ref_count;
+	}
+
+	/**
 	* Validate the slide ID $id. This function checks that
 	* $id already exists to make sure IDs are always generated
 	* server-side; a non-existent ID is considered invalid even
