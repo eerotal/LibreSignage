@@ -83,7 +83,7 @@ final class Queue extends Exportable {
 			try {
 				$s->load($n);
 			} catch (\Exception $e) {
-				throw $e;
+				// TODO: Remove the Slide instead of throwing.
 				throw new BrokenQueueException(
 					"Broken Slide '{$n}' in ".
 					"Queue '{$this->get_name()}'."
