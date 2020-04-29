@@ -7,9 +7,9 @@ use libresignage\common\php\exportable\diff\BaseDiff;
 /**
 * A class that describes a diff between two primitive values.
 */
-final class PrimitiveDiff extends BaseDiff {
-	private $base = NULL;
-	private $other = NULL;
+class PrimitiveDiff extends BaseDiff {
+	protected $base = NULL;
+	protected $other = NULL;
 
 	public function __construct($base, $other, bool $private_value) {
 		parent::__construct($private_value);

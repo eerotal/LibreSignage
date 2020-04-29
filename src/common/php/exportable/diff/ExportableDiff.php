@@ -11,9 +11,9 @@ use libresignage\common\php\exportable\diff\ArrayDiff;
 /**
 * A class that describes a diff between two Exportable objects.
 */
-final class ExportableDiff extends BaseDiff {
-	private $base = NULL;
-	private $other = NULL;
+class ExportableDiff extends BaseDiff {
+	protected $base = NULL;
+	protected $other = NULL;
 
 	const DIFF_CLASSNAME = '__classname';
 

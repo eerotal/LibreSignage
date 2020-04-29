@@ -12,9 +12,9 @@ use libresignage\common\php\exportable\diff\ExportableDiff;
 /**
 * A class that describes a diff between two arrays.
 */
-final class ArrayDiff extends BaseDiff {
-	private $base = [];
-	private $other = [];
+class ArrayDiff extends BaseDiff {
+	protected $base = [];
+	protected $other = [];
 
 	public function __construct(
 		array $base,
@@ -35,7 +35,7 @@ final class ArrayDiff extends BaseDiff {
 	*
 	* @param int $depth The maximum recursion depth for the diff.
 	*/
-	private function diff(int $depth) {
+	protected function diff(int $depth) {
 		foreach($this->base as $base_key => $base_value) {
 			if (array_key_exists($base_key, $this->other)) {
 				$other_value = $this->other[$base_key];

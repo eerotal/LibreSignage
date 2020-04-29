@@ -16,7 +16,7 @@ abstract class BaseDiff {
 
 	const INDENT = '    ';
 
-	private $priv = FALSE;
+	protected $priv = FALSE;
 	protected $diff = [];
 
 	/**
