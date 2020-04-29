@@ -1,6 +1,6 @@
 <?php
 
-namespace libresignage\tests\backend\src\common\php\Queue;
+namespace libresignage\tests\backend\src\common\php\queue;
 
 use \PHPUnit\Framework\TestCase;
 use libresignage\common\php\queue\Queue;

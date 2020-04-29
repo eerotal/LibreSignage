@@ -3,7 +3,7 @@
 namespace libresignage\tests\backend\common\constraints;
 
 use \PHPUnit\Framework\Constraint\Constraint;
-use libresignage\common\php\exportable\ExportableDiff;
+use libresignage\common\php\exportable\diff\ExportableDiff;
 use libresignage\common\php\exportable\Exportable;
 
 class ExportableEquals extends Constraint {
