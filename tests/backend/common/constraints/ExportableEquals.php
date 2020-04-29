@@ -3,7 +3,8 @@
 namespace libresignage\tests\backend\common\constraints;
 
 use \PHPUnit\Framework\Constraint\Constraint;
-use libresignage\common\php\exportable\diff\ExportableDiff;
+use libresignage\common\php\exportable\diff\Diff;
+use libresignage\common\php\exportable\diff\BaseDiff;
 use libresignage\common\php\exportable\Exportable;
 
 class ExportableEquals extends Constraint {
@@ -15,10 +16,10 @@ class ExportableEquals extends Constraint {
 	}
 
 	public function matches($other): bool {
-		$this->diff = new ExportableDiff(
+		$this->diff = Diff::diff(
 			$this->expect,
 			$other,
-			ExportableDiff::DIFF_DEPTH_INF
+			BaseDiff::DIFF_DEPTH_INF
 		);
 		return $this->diff->is_equal(FALSE);
 	}
@@ -28,7 +29,7 @@ class ExportableEquals extends Constraint {
 	}
 
 	public function additionalFailureDescription($other): string {
-		return "\nExportableDiff dump included below: \n\n"
+		return "\nDiff dump included below: \n\n"
 			.$this->diff->dump_str(FALSE, 0);
 	}
 
