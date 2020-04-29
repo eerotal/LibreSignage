@@ -1,14 +1,10 @@
 <?php
 
 namespace libresignage\common\php\exportable\diff;
-
 use libresignage\common\php\Util;
 
 abstract class BaseDiff {
 	const DIFF_DEPTH_INF = -1;
-
-	const DIFF_BASE = '__base';
-	const DIFF_OTHER = '__other';
 
 	const COLOR_DEFAULT = "\e[49m";
 	const COLOR_GOOD = "\e[42m";
@@ -51,18 +47,25 @@ abstract class BaseDiff {
 	public abstract function is_equal(bool $compare_private): bool;
 
 	/**
+	* Dump a diff as a string.
+	*
+	* @return string The diff dump as a string.
+	*/
+	public function dump_str(bool $compare_private, int $indent = 0): string {
+		$ret = '';
+		$dump = $this->dump($compare_private, $indent);
+		foreach ($dump as $ln) {
+			$ret .= $ln."\n";
+		}
+		return $ret;
+	}
+
+	/**
 	* Check whether a diff is between private Exportable members.
 	*
 	* @return bool
 	*/
-	public function is_private(): bool { return $this->priv; }
-
-	/**
-	* Get the internal diff array.
-	*
-	* @return array
-	*/
-	public function get_diff(): array { return $this->diff; }
+	protected function is_private(): bool { return $this->priv; }
 
 	/**
 	* Indent a dump string array.
@@ -75,7 +78,7 @@ abstract class BaseDiff {
 	*
 	* @return array The indented array.
 	*/
-	public static function indent_dump_str_array(array $arr, int $level): array {
+	protected static function indent_dump_str_array(array $arr, int $level): array {
 		$ret = [];
 		$color = '';
 
@@ -90,20 +93,6 @@ abstract class BaseDiff {
 
 			$str = substr($str, strlen($color));
 			$ret[] = $color.str_repeat(self::INDENT, $level).$str;
-		}
-		return $ret;
-	}
-
-	/**
-	* Dump a diff as a string.
-	*
-	* @return string The diff dump as a string.
-	*/
-	public function dump_str(bool $compare_private, int $indent = 0): string {
-		$ret = '';
-		$dump = $this->dump($compare_private, $indent);
-		foreach ($dump as $ln) {
-			$ret .= $ln."\n";
 		}
 		return $ret;
 	}

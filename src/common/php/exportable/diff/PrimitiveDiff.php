@@ -8,6 +8,12 @@ use libresignage\common\php\exportable\diff\BaseDiff;
 * A class that describes a diff between two primitive values.
 */
 class PrimitiveDiff extends BaseDiff {
+	const PREFIX_MINUS = '---';
+	const PREFIX_PLUS = '+++';
+
+	const DIFF_BASE = '__base';
+	const DIFF_OTHER = '__other';
+
 	protected $base = NULL;
 	protected $other = NULL;
 
@@ -18,8 +24,8 @@ class PrimitiveDiff extends BaseDiff {
 		$this->other = $other;
 
 		$this->diff = [
-			BaseDiff::DIFF_BASE => self::describe_value($this->base),
-			BaseDiff::DIFF_OTHER => self::describe_value($this->other),
+			self::DIFF_BASE => $this->base,
+			self::DIFF_OTHER => $this->other,
 		];
 	}
 
@@ -44,8 +50,8 @@ class PrimitiveDiff extends BaseDiff {
 			$ret = [BaseDiff::COLOR_DEFAULT.self::describe_value($this->base)];
 		} else {
 			$ret = [
-				BaseDiff::COLOR_BAD.'--- '.self::describe_value($this->base),
-				BaseDiff::COLOR_GOOD.'+++ '.self::describe_value($this->other)
+				BaseDiff::COLOR_BAD.self::PREFIX_MINUS.self::describe_value($this->base),
+				BaseDiff::COLOR_GOOD.self::PREFIX_PLUS.self::describe_value($this->other)
 			];
 		}
 
