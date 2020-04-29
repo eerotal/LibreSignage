@@ -344,4 +344,16 @@ final class Util {
 		}
 		return $ret_obj;
 	}
+
+	/**
+	* Check whether a string starts with a prefix.
+	*
+	* @param string $str The base string.
+	* @param string $prefix The prefix.
+	*
+	* @return TRUE if $base starts with $prefix, FALSE otherwise.
+	*/
+	public static function str_starts_with(string $str, string $prefix) {
+		return substr($str, 0, strlen($prefix)) == $prefix;
+	}
 }
