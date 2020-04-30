@@ -30,7 +30,7 @@ class Diff {
 		int $depth,
 		bool $private = FALSE
 	): BaseDiff {
-		if (!$depth) { return new EmptyDiff($private); }
+		if ($depth === 0) { return new EmptyDiff($private); }
 
 		if (is_object($base)) {
 			if (get_class($base) !== get_class($other)) {

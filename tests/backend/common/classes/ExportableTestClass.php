@@ -28,7 +28,7 @@ class ExportableTestClass extends Exportable {
 	}
 
 	public static function __exportable_private(): array {
-		return ['b'];
+		return ['a', 'b'];
 	}
 
 	public function set_a($value) { $this->a = $value; }

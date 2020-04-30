@@ -50,7 +50,13 @@ class ExportableDiff extends BaseDiff {
 				$base_val,
 				$other_val,
 				$depth,
-				in_array($k, $this->base::__exportable_private())
+				in_array(
+					$k,
+					array_diff(
+						$this->base::__exportable_private(),
+						$this->base::__exportable_public()
+					)
+				)
 			);
 		}
 	}

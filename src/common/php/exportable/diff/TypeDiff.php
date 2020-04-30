@@ -5,7 +5,7 @@ namespace libresignage\common\php\exportable\diff;
 use libresignage\common\php\exportable\diff\BaseDiff;
 
 /**
-* A class that describes a diff between types of two values.
+* A class that describes a diff between the types of two values.
 */
 class TypeDiff extends BaseDiff {
 	protected $base = NULL;
