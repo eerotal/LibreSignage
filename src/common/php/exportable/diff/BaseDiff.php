@@ -4,13 +4,16 @@ namespace libresignage\common\php\exportable\diff;
 use libresignage\common\php\Util;
 
 abstract class BaseDiff {
-	const DIFF_DEPTH_INF = -1;
+	const PREFIX_MINUS = '--- ';
+	const PREFIX_PLUS = '+++ ';
 
 	const COLOR_DEFAULT = "\e[49m";
 	const COLOR_GOOD = "\e[42m";
 	const COLOR_BAD = "\e[41m";
 
 	const INDENT = '    ';
+
+	const DIFF_DEPTH_INF = -1;
 
 	protected $priv = FALSE;
 	protected $diff = [];
@@ -33,9 +36,8 @@ abstract class BaseDiff {
 	*                              compared in the dump. Otherwise private values
 	*                              are included in the dump but they are always
 	*                              considered equal.
-	* @param int $indent           The first indentation level.
 	*/
-	public abstract function dump(bool $compare_private, int $indent): array;
+	public abstract function dump(bool $compare_private): array;
 
 	/**
 	* Check whether the two objects used for a diff are equal.

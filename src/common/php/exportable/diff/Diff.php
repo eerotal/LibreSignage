@@ -7,6 +7,7 @@ use libresignage\common\php\exportable\diff\ArrayDiff;
 use libresignage\common\php\exportable\diff\EmptyDiff;
 use libresignage\common\php\exportable\diff\ObjectDiff;
 use libresignage\common\php\exportable\diff\ExportableDiff;
+use libresignage\common\php\exportable\diff\TypeDiff;
 use libresignage\common\php\exportable\Exportable;
 
 /**
@@ -32,15 +33,25 @@ class Diff {
 		if (!$depth) { return new EmptyDiff($private); }
 
 		if (is_object($base)) {
-			if (is_subclass_of($base, Exportable::class)) {
+			if (get_class($base) !== get_class($other)) {
+				return new TypeDiff($base, $other, $private);
+			} else if (is_subclass_of($base, Exportable::class)) {
 				return new ExportableDiff($base, $other, $depth, $private);
 			} else {
 				return new ObjectDiff($base, $other, $depth, $private);
 			}
 		} else if (is_array($base)) {
-			return new ArrayDiff( $base, $other, $depth, $private);
+			if (!is_array($other)) {
+				return new TypeDiff($base, $other, $private);
+			} else {
+				return new ArrayDiff($base, $other, $depth, $private);
+			}
 		} else {
-			return new PrimitiveDiff($base, $other, $private);
+			if (gettype($base) !== gettype($other)) {
+				return new TypeDiff($base, $other, $private);
+			} else {
+				return new PrimitiveDiff($base, $other, $private);
+			}
 		}
 	}
 }

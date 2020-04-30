@@ -18,7 +18,7 @@ class ArrayDiff extends BaseDiff {
 
 	public function __construct(
 		array $base,
-		array $other,
+		$other,
 		int $depth,
 		bool $private
 	) {
@@ -64,13 +64,13 @@ class ArrayDiff extends BaseDiff {
 		return TRUE;
 	}
 
-	public function dump(bool $compare_private, int $indent): array {
+	public function dump(bool $compare_private): array {
 		$ret = [];
 		foreach ($this->diff as $k => $v) {
 			$ret = array_merge(
 				$ret,
-				[BaseDiff::COLOR_DEFAULT.str_repeat(BaseDiff::INDENT, $indent)."$k:"],
-				$v->dump($compare_private, $indent + 1)
+				[BaseDiff::COLOR_DEFAULT."$k:"],
+				BaseDiff::indent_dump_str_array($v->dump($compare_private), 1)
 			);
 		}
 		return $ret;

@@ -12,7 +12,7 @@ use libresignage\common\php\exportable\diff\BaseDiff;
 * always returns TRUE.
 */
 class EmptyDiff extends BaseDiff {
-	public function dump(bool $compare_private, int $indent): array {
+	public function dump(bool $compare_private): array {
 		return [];
 	}
 

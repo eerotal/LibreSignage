@@ -76,4 +76,34 @@ class ArrayDiffTest extends TestCase {
 		);
 		$this->assertTrue($diff->is_equal(FALSE));
 	}
+
+	public function test_equal_recursive(): void {
+		$diff = new ArrayDiff(
+			['a', ['b']],
+			['a', ['b']],
+			BaseDiff::DIFF_DEPTH_INF,
+			FALSE
+		);
+		$this->assertTrue($diff->is_equal(FALSE));
+	}
+
+	public function test_not_equal_recursive(): void {
+		$diff = new ArrayDiff(
+			['a', ['b']],
+			['a', ['c']],
+			BaseDiff::DIFF_DEPTH_INF,
+			FALSE
+		);
+		$this->assertFalse($diff->is_equal(FALSE));
+	}
+
+	public function test_different_keys_recursive(): void {
+		$diff = new ArrayDiff(
+			['one' => 'a', 'two' => ['b']],
+			['one' => 'a', 'three' => ['b']],
+			BaseDiff::DIFF_DEPTH_INF,
+			FALSE
+		);
+		$this->assertFalse($diff->is_equal(FALSE));
+	}
 }

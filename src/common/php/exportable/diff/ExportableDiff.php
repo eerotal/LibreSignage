@@ -15,8 +15,6 @@ class ExportableDiff extends BaseDiff {
 	protected $base = NULL;
 	protected $other = NULL;
 
-	const DIFF_CLASSNAME = '__classname';
-
 	public function __construct(
 		Exportable $base,
 		Exportable $other,
@@ -37,12 +35,6 @@ class ExportableDiff extends BaseDiff {
 	* @param int $depth The maximum recursion depth for the diff.
 	*/
 	private function diff(int $depth) {
-		$this->diff[self::DIFF_CLASSNAME] = new PrimitiveDiff(
-			get_class($this->base),
-			get_class($this->other),
-			FALSE
-		);
-
 		$keys = array_merge(
 			$this->base::__exportable_public(),
 			$this->base::__exportable_private()
@@ -58,7 +50,7 @@ class ExportableDiff extends BaseDiff {
 				$base_val,
 				$other_val,
 				$depth,
-				array_key_exists($k, $this->base::__exportable_private())
+				in_array($k, $this->base::__exportable_private())
 			);
 		}
 	}
@@ -67,25 +59,21 @@ class ExportableDiff extends BaseDiff {
 		if ($this->is_private() && !$compare_private) { return TRUE; }
 
 		foreach ($this->diff as $v) {
-			if ($v->is_private() && !$compare_private) {
-				continue;
-			} else if (!$v->is_equal($compare_private)) {
-				return FALSE;
-			}
+			if (!$v->is_equal($compare_private)) { return FALSE; }
 		}
 
 		return TRUE;
 	}
 
-	public function dump(bool $compare_private, int $indent = 0): array {
+	public function dump(bool $compare_private): array {
 		$ret = [];
 		foreach ($this->diff as $k => $v) {
 			$ret = array_merge(
 				$ret,
 				[BaseDiff::COLOR_DEFAULT.$k.':'],
-				$v->dump($compare_private, $indent + 1),
+				BaseDiff::indent_dump_str_array($v->dump($compare_private), 1),
 			);
 		}
-		return BaseDiff::indent_dump_str_array($ret, $indent);
+		return $ret;
 	}
 }
