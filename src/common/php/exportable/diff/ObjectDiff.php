@@ -12,11 +12,11 @@ class ObjectDiff extends ArrayDiff {
 	protected $other = [];
 
 	public function __construct($base, $other, int $depth, bool $private) {
-		parent::__construct($private);
-
-		$this->base = get_object_vars($base);
-		$this->other = get_object_vars($other);
-
-		$this->diff($depth);
+		parent::__construct(
+			get_object_vars($base),
+			get_object_vars($other),
+			$depth,
+			$private
+		);
 	}
 }
