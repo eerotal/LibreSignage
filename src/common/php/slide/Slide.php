@@ -391,6 +391,13 @@ final class Slide extends Exportable {
 	*/
 	public function set_sched_t_e(int $tstamp) {
 		self::validate_sched_t_e($tstamp);
+
+		if ($tstamp < $this->get_sched_t_s()) {
+			throw new ArgException(
+				"Schedule end time can't be before start time."
+			);
+		}
+
 		$this->sched_t_e = $tstamp;
 	}
 
