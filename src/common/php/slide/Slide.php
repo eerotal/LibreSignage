@@ -8,6 +8,7 @@ use libresignage\common\php\JSONUtils;
 use libresignage\common\php\exportable\Exportable;
 use libresignage\common\php\auth\User;
 use libresignage\common\php\auth\Session;
+use libresignage\common\php\auth\exceptions\UserNotFoundException;
 use libresignage\common\php\queue\Queue;
 use libresignage\common\php\slide\SlideLock;
 use libresignage\common\php\slide\SlideAsset;
@@ -114,7 +115,7 @@ final class Slide extends Exportable {
 	public function copy(Queue $dest): Slide {
 		$slide = clone $this;
 		$slide->gen_id();
-		$slide->set_lock(NULL);
+		$slide->clear_lock();
 		$slide->reset_ref();
 		$dest->add_slide($slide, Queue::ENDPOS);
 
@@ -445,15 +446,27 @@ final class Slide extends Exportable {
 	* @param array $collaborators An array of collaborator usernames.
 	*
 	* @throws ArgException if count($collaborators) > SLIDE_MAX_COLLAB.
-	* @throws ArgException if a collaborator doesn't exist.
+	* @throws ArgException if $collaborators contains duplicate items.
+	* @throws UserNotFoundException if a collaborator doesn't exist.
 	*/
 	public static function validate_collaborators(array $collaborators) {
 		if (count($collaborators) > Config::limit('SLIDE_MAX_COLLAB')) {
 			throw new ArgException("Too many collaborators.");
 		}
+
+		$freq = array_count_values($collaborators);
+		foreach ($freq as $f) {
+			if ($f !== 1) {
+				throw new ArgException(
+					"Each collaborator must appear ".
+					"only once in the collaborators array."
+				);
+			}
+		}
+
 		foreach ($collaborators as $k => $c) {
 			if (!User::exists($c)) {
-				throw new ArgException("User $c doesn't exist.");
+				throw new UserNotFoundException("User $c doesn't exist.");
 			}
 		}
 	}
@@ -463,29 +476,31 @@ final class Slide extends Exportable {
 	*
 	* @see Slide::validate_collaborators() for validation exceptions.
 	*
-	* @throws ArgException if the slide owner is not set.
-	* @throws ArgException if the slide owner is a collaborator.
+	* @throws IllegalOperationException if the slide owner is not set.
+	* @throws IllegalOperationException if the slide owner is a collaborator.
 	*
 	* @param array $collaborators An array of collaborator usernames.
 	*/
 	function set_collaborators(array $collaborators) {
 		self::validate_collaborators($collaborators);
 		if (empty($this->get_owner())) {
-			throw new ArgException("Can't set collaborators before owner.");
+			throw new IllegalOperationException(
+				"Can't set collaborators before owner."
+			);
 		}
 		if (in_array($this->get_owner(), $collaborators)) {
-			throw new ArgException("Can't set owner as collaborator.");
+			throw new IllegalOperationException(
+				"Can't set owner as collaborator."
+			);
 		}
 		$this->collaborators = $collaborators;
 	}
 
 	/**
-	* Set the slide lock object.
-	*
-	* @param mixed $lock The SlideLock object.
+	* Clear the slide lock object.
 	*/
-	public function set_lock($lock) {
-		$this->lock = $lock;
+	public function clear_lock() {
+		$this->lock = NULL;
 	}
 
 	/**
@@ -616,6 +631,13 @@ final class Slide extends Exportable {
 		throw new ArgException("Asset '$name' doesn't exist.");
 	}
 
+	/**
+	* Check whether a Slide contains an asset.
+	*
+	* @param string $name The name of the asset to check.
+	*
+	* @return bool TRUE if the asset exists, FALSE otherwise.
+	*/
 	public function has_uploaded_asset(string $name): bool {
 		try {
 			$this->get_uploaded_asset($name);
@@ -625,6 +647,11 @@ final class Slide extends Exportable {
 		return TRUE;
 	}
 
+	/**
+	* Set the assets array of a Slide.
+	*
+	* @param array $assets
+	*/
 	public function set_assets(array $assets) {
 		$this->assets = $assets;
 	}

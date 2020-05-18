@@ -7,7 +7,11 @@ use libresignage\common\php\exceptions\ArgException;
 use libresignage\common\php\exceptions\IllegalOperationException;
 use libresignage\common\php\Config;
 use libresignage\common\php\slide\Slide;
+use libresignage\common\php\auth\User;
+use libresignage\common\php\auth\Session;
 use libresignage\common\php\slide\exceptions\SlideNotFoundException;
+use libresignage\common\php\slide\exceptions\SlideLockException;
+use libresignage\common\php\auth\exceptions\UserNotFoundException;
 use libresignage\tests\backend\common\constraints\ExportableEquals;
 
 class SlideTest extends TestCase {
@@ -210,6 +214,208 @@ class SlideTest extends TestCase {
 		$s = new Slide();
 		$this->expectException(ArgException::class);
 		$s->set_animation(-1);
+	}
+
+	public function test_set_and_get_collaborators(): void {
+		$collaborators = ['user', 'display'];
+		$s = new Slide();
+		$s->set_owner('admin'); // Owner must be set first.
+		$s->set_collaborators($collaborators);
+		$this->assertEquals($collaborators, $s->get_collaborators());
+	}
+
+	public function test_set_and_get_collaborators_empty_array(): void {
+		$collaborators = [];
+		$s = new Slide();
+		$s->set_owner('admin');
+		$s->set_collaborators($collaborators);
+		$this->assertEquals($collaborators, $s->get_collaborators());
+	}
+
+	public function test_set_collaborators_throws_on_too_many_users(): void {
+		$s = new Slide();
+		$s->set_owner('admin');
+
+		$this->expectException(ArgException::class);
+
+		$collaborators = [];
+		for ($i = 0; $i < Config::limit('SLIDE_MAX_COLLAB') + 1; $i++) {
+			$collaborators[] = 'user_'.strval($i);
+		}
+		$s->set_collaborators($collaborators);
+	}
+
+	public function test_set_collaborators_throws_on_duplicate_users(): void {
+		if (Config::limit('SLIDE_MAX_COLLAB') < 2) {
+			$this->markTestSkipped(
+				"Can't test with duplicate users because max collaborators < 2."
+			);
+		}
+
+		$s = new Slide();
+		$s->set_owner('admin');
+		$this->expectException(ArgException::class);
+		$s->set_collaborators(['admin', 'admin']);
+	}
+
+	public function test_set_collaborators_throws_on_nonexistent_user(): void {
+		$s = new Slide();
+		$s->set_owner('admin');
+
+		$this->expectException(UserNotFoundException::class);
+		$s->set_collaborators(['nonexistent']);
+	}
+
+	public function test_set_collaborators_throws_if_owner_not_set(): void {
+		$s = new Slide();
+		$this->expectException(IllegalOperationException::class);
+		$s->set_collaborators(['admin']);
+	}
+
+	public function test_set_collaborators_throws_if_owner_is_collaborator(): void {
+		$s = new Slide();
+		$s->set_owner('admin');
+		$this->expectException(IllegalOperationException::class);
+		$s->set_collaborators(['admin']);
+	}
+
+	public function test_acquire_lock_release_lock_and_check_is_locked(): void {
+		$user = new User();
+		$user->load('admin');
+		['session' => $session] = $user->session_new(
+			'LibreSignage-Unit-Test',
+			'127.0.0.1',
+			FALSE
+		);
+		$user->write();
+
+		$this->slide->lock_acquire($session);
+		$this->assertTrue($this->slide->is_locked_by($session));
+		$this->slide->lock_release($session);
+		$this->assertFalse($this->slide->is_locked_by($session));
+	}
+
+	public function test_acquire_lock_throws_if_already_locked(): void {
+		$user = new User();
+		$user->load('admin');
+		['session' => $session_1] = $user->session_new(
+			'LibreSignage-Unit-Test-1',
+			'127.0.0.1',
+			FALSE
+		);
+		['session' => $session_2] = $user->session_new(
+			'LibreSignage-Unit-Test-2',
+			'127.0.0.1',
+			FALSE
+		);
+		$user->write();
+
+		$this->slide->lock_acquire($session_1);
+		$this->expectException(SlideLockException::class);
+		$this->slide->lock_acquire($session_2);
+	}
+
+	public function test_check_is_locked_when_not_locked(): void {
+		$user = new User();
+		$user->load('admin');
+		['session' => $session] = $user->session_new(
+			'LibreSignage-Unit-Test',
+			'127.0.0.1',
+			FALSE
+		);
+		$user->write();
+		$this->assertFalse($this->slide->is_locked_by($session));
+	}
+
+	public function test_check_is_locked_when_locked_by_another_session(): void {
+		$user = new User();
+		$user->load('admin');
+		['session' => $session_1] = $user->session_new(
+			'LibreSignage-Unit-Test-1',
+			'127.0.0.1',
+			FALSE
+		);
+		['session' => $session_2] = $user->session_new(
+			'LibreSignage-Unit-Test-2',
+			'127.0.0.1',
+			FALSE
+		);
+		$user->write();
+
+		$this->slide->lock_acquire($session_1);
+		$this->assertFalse($this->slide->is_locked_by($session_2));
+	}
+
+	public function test_check_is_locked_when_lock_has_expired(): void {
+		$user = new User();
+		$user->load('admin');
+		['session' => $session] = $user->session_new(
+			'LibreSignage-Unit-Test',
+			'127.0.0.1',
+			FALSE
+		);
+		$user->write();
+
+		$this->slide->lock_acquire($session);
+
+		// Make the lock artificially expired using Reflection.
+		$ref = new \ReflectionObject($this->slide->get_lock());
+		$ref_prop = $ref->getProperty('expire');
+		$ref_prop->setAccessible(TRUE);
+		$ref_prop->setValue($this->slide->get_lock(), 0);
+
+		$this->assertFalse($this->slide->is_locked_by($session));
+	}
+
+	public function test_release_lock_throws_on_another_session(): void {
+		$user = new User();
+		$user->load('admin');
+		['session' => $session_1] = $user->session_new(
+			'LibreSignage-Unit-Test-1',
+			'127.0.0.1',
+			FALSE
+		);
+		['session' => $session_2] = $user->session_new(
+			'LibreSignage-Unit-Test-2',
+			'127.0.0.1',
+			FALSE
+		);
+		$user->write();
+
+		$this->slide->lock_acquire($session_1);
+		$this->expectException(SlideLockException::class);
+		$this->slide->lock_release($session_2);
+	}
+
+	public function test_release_lock_succeeds_when_not_locked(): void {
+		$user = new User();
+		$user->load('admin');
+		['session' => $session] = $user->session_new(
+			'LibreSignage-Unit-Test',
+			'127.0.0.1',
+			FALSE
+		);
+		$user->write();
+
+		$this->slide->lock_release($session);
+
+		// Make PHPUnit happy about not asserting.
+		$this->addToAssertionCount(1);
+	}
+
+	public function test_clear_lock(): void {
+		$user = new User();
+		$user->load('admin');
+		['session' => $session] = $user->session_new(
+			'LibreSignage-Unit-Test',
+			'127.0.0.1',
+			FALSE
+		);
+		$user->write();
+
+		$this->slide->lock_acquire($session);
+		$this->slide->clear_lock();
+		$this->assertNull($this->slide->get_lock());
 	}
 
 	public function tearDown(): void {
