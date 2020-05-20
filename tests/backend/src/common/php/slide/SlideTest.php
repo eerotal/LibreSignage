@@ -17,7 +17,12 @@ use libresignage\tests\backend\common\constraints\ExportableEquals;
 class SlideTest extends TestCase {
 	const TEST_SLIDE_NAME = 'test-slide';
 
-	public function setUp(): void {
+	private $slide = NULL;
+
+	/**
+	* Create a testing Slide and write it to disk.
+	*/
+	public function setup_test_slide(): void {
 		$this->slide = new Slide();
 		$this->slide->gen_id();
 		$this->slide->set_name(self::TEST_SLIDE_NAME);
@@ -26,7 +31,8 @@ class SlideTest extends TestCase {
 		$this->slide->write();
 	}
 
-	public function test_load_slide(): void {
+	public function test_write_and_load_slide(): void {
+		$this->setup_test_slide();
 		$s = new Slide();
 		$s->load($this->slide->get_id());
 		$this->assertThat($s, new ExportableEquals($this->slide));
@@ -60,6 +66,7 @@ class SlideTest extends TestCase {
 	}
 
 	public function test_set_and_get_id(): void {
+		$this->setup_test_slide();
 		$s = new Slide();
 		$s->set_id($this->slide->get_id());
 		$this->assertEquals($this->slide->get_id(), $s->get_id());
@@ -280,6 +287,8 @@ class SlideTest extends TestCase {
 	}
 
 	public function test_acquire_lock_release_lock_and_check_is_locked(): void {
+		$this->setup_test_slide();
+
 		$user = new User();
 		$user->load('admin');
 		['session' => $session] = $user->session_new(
@@ -296,6 +305,8 @@ class SlideTest extends TestCase {
 	}
 
 	public function test_acquire_lock_throws_if_already_locked(): void {
+		$this->setup_test_slide();
+
 		$user = new User();
 		$user->load('admin');
 		['session' => $session_1] = $user->session_new(
@@ -316,6 +327,8 @@ class SlideTest extends TestCase {
 	}
 
 	public function test_check_is_locked_when_not_locked(): void {
+		$this->setup_test_slide();
+
 		$user = new User();
 		$user->load('admin');
 		['session' => $session] = $user->session_new(
@@ -328,6 +341,8 @@ class SlideTest extends TestCase {
 	}
 
 	public function test_check_is_locked_when_locked_by_another_session(): void {
+		$this->setup_test_slide();
+
 		$user = new User();
 		$user->load('admin');
 		['session' => $session_1] = $user->session_new(
@@ -347,6 +362,8 @@ class SlideTest extends TestCase {
 	}
 
 	public function test_check_is_locked_when_lock_has_expired(): void {
+		$this->setup_test_slide();
+
 		$user = new User();
 		$user->load('admin');
 		['session' => $session] = $user->session_new(
@@ -368,6 +385,8 @@ class SlideTest extends TestCase {
 	}
 
 	public function test_release_lock_throws_on_another_session(): void {
+		$this->setup_test_slide();
+
 		$user = new User();
 		$user->load('admin');
 		['session' => $session_1] = $user->session_new(
@@ -388,6 +407,8 @@ class SlideTest extends TestCase {
 	}
 
 	public function test_release_lock_succeeds_when_not_locked(): void {
+		$this->setup_test_slide();
+
 		$user = new User();
 		$user->load('admin');
 		['session' => $session] = $user->session_new(
@@ -404,6 +425,8 @@ class SlideTest extends TestCase {
 	}
 
 	public function test_clear_lock(): void {
+		$this->setup_test_slide();
+
 		$user = new User();
 		$user->load('admin');
 		['session' => $session] = $user->session_new(
@@ -419,6 +442,6 @@ class SlideTest extends TestCase {
 	}
 
 	public function tearDown(): void {
-		$this->slide->remove();
+		if ($this->slide) { $this->slide->remove(); }
 	}
 }
