@@ -11,8 +11,7 @@
 *      is the owner of the slide and is in the editor group.
 *    * Otherwise allow restricted access if the caller is in
 *      the collaborators array of the slide. In this case the
-*      queue_names and collaborators parameters of the API
-*      call are silently discarded.
+*      collaborators parameter of the API call is silently discarded.
 *  * \c id == null
 *    * Allow if the caller is in the admin or editor groups.
 *
@@ -49,7 +48,6 @@
 * @request{int,sched_t_s,The start unix timestamp of scheduling.,required}
 * @request{int,sched_t_e,The end unix timestamp of scheduling.,required}
 * @request{int,animation,The new ID of the slide transition animation.,required}
-* @request{string,queue_names,The new Queue names of the slide.,required}
 * @request{array,collaborators,An array of collaborator usernames.,required}
 * @request{mixed,owner,Unused.,optional}
 * @request{mixed,lock,Unused.,optional}
@@ -77,11 +75,10 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
-use libresignage\common\php\queue\Queue;
-use libresignage\common\php\queue\exceptions\QueueNotFoundException;
 use libresignage\common\php\slide\Slide;
 use libresignage\common\php\slide\exceptions\SlideNotFoundException;
 use libresignage\common\php\auth\User;
+use libresignage\common\php\auth\exceptions\UserNotFoundException;
 use libresignage\common\php\auth\Session;
 use libresignage\common\php\Log;
 
@@ -97,10 +94,6 @@ APIEndpoint::POST(
 				'properties' => [
 					'id' => ['type' => ['string', 'null']],
 					'name' => ['type' => 'string'],
-					'index' => [
-						'type' => 'object',
-						'items' => ['type' => 'integer']
-					],
 					'markup' => ['type' => 'string'],
 					'owner' => [],
 					'duration' => ['type' => 'integer'],
@@ -109,12 +102,6 @@ APIEndpoint::POST(
 					'sched_t_s' => ['type' => 'integer'],
 					'sched_t_e' => ['type' => 'integer'],
 					'animation' => ['type' => 'integer'],
-					'queue_names' => [
-						'type' => 'array',
-						'items' => [
-							'type' => 'string'
-						]
-					],
 					'collaborators' => [
 						'type' => 'array',
 						'items' => [
@@ -122,11 +109,11 @@ APIEndpoint::POST(
 						]
 					],
 					'lock' => [],
-					'assets' => []
+					'assets' => [],
+					'ref_count' => []
 				],
 				'required' => [
 					'name',
-					'index',
 					'markup',
 					'duration',
 					'enabled',
@@ -134,7 +121,6 @@ APIEndpoint::POST(
 					'sched_t_s',
 					'sched_t_e',
 					'animation',
-					'queue_names',
 					'collaborators'
 				]
 			]
@@ -196,53 +182,20 @@ APIEndpoint::POST(
 
 /**
 * Set the slide data of $slide.
-*
-* @throws APIException If $data->queue_names is empty.
 */
 function set_slide_data(Slide $slide, $data, bool $owner) {
 	if ($owner === TRUE) {
 		/*
-		* Set 'queue_names' and 'collaborators' if the caller is
+		* Set 'collaborators' if the caller is
 		* the owner of the Slide.
-		*/
-		if (count($data->queue_names) === 0) {
+		 */
+		try {
+			$slide->set_collaborators($data->collaborators);
+		} catch (UserNotFoundException $e) {
 			throw new APIException(
-				'Slide cannot be removed from all Queues.',
-				HTTPStatus::BAD_REQUEST
+				$e->getMessage(),
+				HTTPStatus::NOT_FOUND
 			);
-		}
-
-		// Add to new Queues.
-		foreach ($data->queue_names as $qn) {
-			if (!property_exists($data->index, $qn)) {
-				throw new APIException(
-					"Slide index not provided for Queue '$qn'.",
-					HTTPStatus::BAD_REQUEST
-				);
-			}
-
-			$q = new Queue();
-			$q->load($qn);
-			$slide->add_to_queue($q, $data->index->$qn);
-		}
-		// Remove from old Queues.
-		foreach ($slide->get_queue_names() as $qn) {
-			if (!in_array($qn, $data->queue_names)) {
-				$slide->remove_from_queue($qn);
-			}
-		}
-
-		$slide->set_collaborators($data->collaborators);
-	} else {
-		// Only set Slide indices if the caller is not the owner of the Slide.
-		foreach ($slide->get_queue_names() as $qn) {
-			if (!property_exists($data->index, $qn)) {
-				throw new APIException(
-					"Slide index not provided for Queue '$qn'.",
-					HTTPStatus::BAD_REQUEST
-				);
-			}
-			$slide->set_index($data->index->$qn, $qn);
 		}
 	}
 
@@ -307,23 +260,5 @@ function modify_slide(Session $session, Slide $slide, $data, bool $owner) {
 */
 function finish(Slide $slide) {
 	$slide->write();
-
-	// Juggle slide indices.
-	foreach ($slide->get_queue_names() as $qn) {
-		$queue = new Queue();
-		try {
-			$queue->load($qn);
-		} catch (QueueNotFoundException $e) {
-			throw new APIException(
-				"Queue '{$qn}' of '{$slide->get_id()}' ".
-				"doesn't exist. This shouldn't be possible.",
-				HTTPStatus::INTERNAL_SERVER_ERROR,
-				$e
-			);
-		}
-		$queue->juggle($slide->get_id());
-	}
-
-	// Get the slide data from $queue since $queue->juggle() modifies it.
-	return $queue->get_slide($slide->get_id())->export(FALSE, FALSE);
+	return $slide->export(FALSE, FALSE);
 }

@@ -9,7 +9,7 @@ use libresignage\api\HTTPStatus;
 
 class slide_get_asset_thumb extends APITestCase {
 	const TEST_SLIDE_ID = '1';
-	const TEST_ASSET_PATH = 'tests/tmp/test.png';
+	const TEST_ASSET_PATH = 'tests/backend/tmp/test.png';
 
 	use \libresignage\tests\backend\common\traits\TestEndpointNotAuthorizedWithoutLogin;
 

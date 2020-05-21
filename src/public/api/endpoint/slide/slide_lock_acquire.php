@@ -16,7 +16,7 @@
 * @request_start{application/json}
 * @request{string,id,The ID of the slide to lock.,required}
 * @request_end
-* 
+*
 * @response_start{application/json}
 * @response{Lock,lock,The created Lock object.}
 * @response_end

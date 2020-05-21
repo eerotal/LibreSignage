@@ -6,17 +6,6 @@
 			"pattern": "^[A-Za-z0-9_-]+$",
 			"minLength": 1
 		},
-		"index_single": {
-			"type": "integer",
-			"minimum": 0
-		},
-		"index": {
-			"type": "object",
-			"propertyNames": { "$ref": "Queue.schema.json#/definitions/name" },
-			"patternProperties": {
-				"^.*$": { "$ref": "#/definitions/index_single" }
-			}
-		},
 		"duration": {
 			"type": "number",
 			"minimum": 0
@@ -31,10 +20,6 @@
 			"type": "integer",
 			"minimum": 0
 		},
-		"queue_names": {
-			"type": "array",
-			"items": { "$ref": "Queue.schema.json#/definitions/name" }
-		},
 		"collaborators": {
 			"type": "array",
 			"items": { "$ref": "User.schema.json#/definitions/name" }
@@ -48,6 +33,10 @@
 		"assets": {
 			"type": "array",
 			"items": { "$ref": "SlideAsset.schema.json" }
+		},
+		"ref_count": {
+			"type": "integer",
+			"minimum": 0
 		}
 	},
 
@@ -55,7 +44,6 @@
 	"properties": {
 		"id": { "$ref": "#/definitions/id" },
 		"name": { "$ref": "#/definitions/name" },
-		"index": { "$ref": "#/definitions/index" },
 		"duration": { "$ref": "#/definitions/duration" },
 		"markup": { "$ref": "#/definitions/markup" },
 		"owner": { "$ref": "#/definitions/owner" },
@@ -64,15 +52,14 @@
 		"sched_t_s": { "$ref": "#/definitions/sched_t_s" },
 		"sched_t_e": { "$ref": "#/definitions/sched_t_e" },
 		"animation": { "$ref": "#/definitions/animation" },
-		"queue_names": { "$ref": "#/definitions/queue_names" },
 		"collaborators": { "$ref": "#/definitions/collaborators" },
 		"lock": { "$ref": "#/definitions/lock" },
-		"assets": { "$ref": "#/definitions/assets" }
+		"assets": { "$ref": "#/definitions/assets" },
+		"ref_count": { "$ref": "#/definitions/ref_count" }
 	},
 	"required": [
 		"id",
 		"name",
-		"index",
 		"duration",
 		"markup",
 		"owner",
@@ -81,10 +68,10 @@
 		"sched_t_s",
 		"sched_t_e",
 		"animation",
-		"queue_names",
 		"collaborators",
 		"lock",
-		"assets"
+		"assets",
+		"ref_count"
 	],
 	"additionalProperties": false
 }

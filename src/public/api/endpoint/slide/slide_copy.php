@@ -93,12 +93,11 @@ APIEndpoint::POST(
 				$e
 			);
 		}
-		$new = $old->copy($dest);
+		$new = $old->copy();
 		$new->set_owner($caller->get_name());
 		$new->lock_acquire($session);
+		$dest->add_slide($new, Queue::ENDPOS);
 		$new->write();
-
-		$dest->juggle($new->get_id());
 		$dest->write();
 
 		return ['slide' => $new->export(FALSE, FALSE)];

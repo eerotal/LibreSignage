@@ -186,7 +186,7 @@ class APITestCase extends TestCase {
 	* @param array  $headers The headers to pass to the API endpoint.
 	* @param int    $error   The expected HTTP status code.
 	* @param string $user    The username to use or NULL for no login.
-	* @param string $pass    The password to use or NULL for no login. 
+	* @param string $pass    The password to use or NULL for no login.
 	*
 	* @return Response The response returned by the API.
 	*/

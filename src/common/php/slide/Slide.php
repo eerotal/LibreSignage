@@ -103,21 +103,15 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Copy the loaded Slide into a specific Queue.
-	*
-	* This function calls Queue::write() on the Queue and Slide::write()
-	* on the Slide that's created.
-	*
-	* @param Queue $dest The destination Queue of the copied Slide.
+	* Copy a Slide.
 	*
 	* @return Slide The newly created Slide object.
 	*/
-	public function copy(Queue $dest): Slide {
+	public function copy(): Slide {
 		$slide = clone $this;
 		$slide->gen_id();
 		$slide->clear_lock();
 		$slide->reset_ref();
-		$dest->add_slide($slide, Queue::ENDPOS);
 
 		// Make sure all directories are created.
 		$slide->write();
@@ -130,7 +124,6 @@ final class Slide extends Exportable {
 		$slide->set_assets($tmp);
 
 		$slide->write();
-		$dest->write();
 
 		return $slide;
 	}
@@ -166,7 +159,7 @@ final class Slide extends Exportable {
 	/**
 	* Reset the internal reference counter of a Slide to 0.
 	*/
-	private function reset_ref(int $count) {
+	private function reset_ref() {
 		$this->ref_count = 0;
 	}
 

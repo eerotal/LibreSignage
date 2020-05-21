@@ -99,7 +99,7 @@ class queue_remove extends APITestCase {
 			'admin',
 			'admin'
 		);
-		$this->queue_removed = ($resp->getStatusCode() === HTTPStatus::OK);		
+		$this->queue_removed = ($resp->getStatusCode() === HTTPStatus::OK);
 	}
 
 	public function tearDown(): void {

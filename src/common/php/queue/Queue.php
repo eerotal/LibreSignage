@@ -72,25 +72,32 @@ final class Queue extends Exportable {
 	* Load the Slide objects of a Queue.
 	*
 	* This method clears the internal slides array first.
+	* Nonexistent Slides are automatically removed from the Queue.
 	*
 	* @throws BrokenQueueException If loading a Slide fails.
 	*/
 	private function load_slide_objects() {
 		$this->slides = [];
 
-		foreach ($this->slide_ids as $n) {
+		foreach ($this->slide_ids as &$n) {
 			$s = new Slide();
 			try {
 				$s->load($n);
+			} catch (SlideNotFoundException $e) {
+				// Remove Slides that don't exist anymore.
+				$n = NULL;
+				continue;
 			} catch (\Exception $e) {
-				// TODO: Remove the Slide instead of throwing.
 				throw new BrokenQueueException(
 					"Broken Slide '{$n}' in ".
-					"Queue '{$this->get_name()}'."
+					"Queue '{$this->get_name()}': {$e->getMessage()}"
 				);
 			}
 			$this->slides[] = $s;
 		}
+
+		// Remove NULL ids.
+		$this->slide_ids = array_filter($this->slide_ids);
 	}
 
 	/**

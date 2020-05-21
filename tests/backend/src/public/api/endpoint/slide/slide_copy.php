@@ -8,7 +8,7 @@ use libresignage\api\HTTPStatus;
 use libresignage\common\php\JSONUtils;
 use libresignage\tests\backend\common\classes\SlideUtils;
 
-class slide_dup extends APITestCase {
+class slide_copy extends APITestCase {
 	private $orig_slide_id = NULL;
 	private $dup_slide_id = NULL;
 

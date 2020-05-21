@@ -11,7 +11,6 @@ class slide_save extends APITestCase {
 	const VALID_PARAMS = [
 		'id' => NULL,
 		'name' => 'Unit-Test-Slide',
-		'index' => ['default' => 0],
 		'duration' => 5000,
 		'markup' => 'Test Markup',
 		'enabled' => TRUE,
@@ -19,7 +18,6 @@ class slide_save extends APITestCase {
 		'sched_t_s' => 0,
 		'sched_t_e' => 0,
 		'animation' => 1,
-		'queue_names' => ['default'],
 		'collaborators' => [],
 		'owner' => NULL,
 		'lock' => NULL,
@@ -121,24 +119,6 @@ class slide_save extends APITestCase {
 				'admin',
 				'admin',
 				\array_merge(self::VALID_PARAMS, ['name' => 123]),
-				HTTPStatus::BAD_REQUEST
-			],
-			'Negative index parameter' => [
-				'admin',
-				'admin',
-				\array_merge(self::VALID_PARAMS, ['index' => ['default' => -1]]),
-				HTTPStatus::BAD_REQUEST
-			],
-			'Wrong type for index parameter' => [
-				'admin',
-				'admin',
-				\array_merge(self::VALID_PARAMS, ['index' => 0]),
-				HTTPStatus::BAD_REQUEST
-			],
-			'Empty index object' => [
-				'admin',
-				'admin',
-				\array_merge(self::VALID_PARAMS, ['index' => []]),
 				HTTPStatus::BAD_REQUEST
 			],
 			'Wrong type for name parameter' => [
@@ -301,7 +281,7 @@ class slide_save extends APITestCase {
 				'admin',
 				'admin',
 				\array_merge(self::VALID_PARAMS, ['collaborators' => ['nouser']]),
-				HTTPStatus::BAD_REQUEST
+				HTTPStatus::NOT_FOUND
 			],
 			'Empty collaborators array' => [
 				'admin',
@@ -332,12 +312,6 @@ class slide_save extends APITestCase {
 				'display',
 				self::VALID_PARAMS,
 				HTTPStatus::UNAUTHORIZED
-			],
-			'Cannot remove Slide from all Queues' => [
-				'admin',
-				'admin',
-				array_merge(self::VALID_PARAMS, ['queue_names' => []]),
-				HTTPStatus::BAD_REQUEST
 			]
 		];
 	}

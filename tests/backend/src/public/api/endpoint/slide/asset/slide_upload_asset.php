@@ -11,7 +11,7 @@ use \GuzzleHttp\Psr7\MultipartStream;
 
 class slide_upload_asset extends APITestCase {
 	const TEST_SLIDE_ID   = '1';
-	const TEST_ASSET_PATH = 'tests/tmp/test.png';
+	const TEST_ASSET_PATH = 'tests/backend/tmp/test.png';
 
 	private $upload_success = FALSE;
 

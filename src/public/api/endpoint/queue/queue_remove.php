@@ -32,6 +32,7 @@ use libresignage\api\HTTPStatus;
 use libresignage\common\php\queue\Queue;
 use libresignage\common\php\queue\exceptions\QueueNotFoundException;
 use libresignage\common\php\Util;
+use libresignage\common\php\Log;
 
 APIEndpoint::POST(
 	[
@@ -71,14 +72,18 @@ APIEndpoint::POST(
 			$caller->is_in_group('admin')
 			|| (
 				$caller->is_in_group('editor')
-				&& Util::array_check($queue->slides(), function($s) use($caller) {
-					return $s->get_owner() === $caller->get_name();
-				})
+				&& Util::array_check(
+					$queue->get_slides(),
+					function($s) use($caller) {
+						return $s->get_owner() === $caller->get_name();
+					}
+				)
 			)
 		) {
 			$queue->remove();
 			return [];
 		}
+
 		throw new APIException(
 			'Non-admin user not authorized.',
 			HTTPStatus::UNAUTHORIZED

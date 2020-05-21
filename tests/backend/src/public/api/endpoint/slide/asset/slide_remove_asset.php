@@ -9,7 +9,7 @@ use libresignage\api\HTTPStatus;
 
 class slide_remove_asset extends APITestCase {
 	const TEST_SLIDE_ID = '1';
-	const TEST_ASSET_PATH = 'tests/tmp/test.png';
+	const TEST_ASSET_PATH = 'tests/backend/tmp/test.png';
 
 	private $asset_removed = FALSE;
 
