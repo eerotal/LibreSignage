@@ -37,7 +37,7 @@ class slide_rm extends APITestCase {
 		), 'Failed to create initial slide.', [$this, 'abort']);
 		$this->api->logout();
 
-		$this->slide_id = APIInterface::decode_raw_response($resp)->slide->id;
+		$this->slide_id = APIInterface::decode_raw_response($resp)->id;
 	}
 
 	/**

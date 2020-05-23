@@ -49,9 +49,10 @@
 * @request{int,sched_t_e,The end unix timestamp of scheduling.,required}
 * @request{int,animation,The new ID of the slide transition animation.,required}
 * @request{array,collaborators,An array of collaborator usernames.,required}
-* @request{mixed,owner,Unused.,optional}
-* @request{mixed,lock,Unused.,optional}
-* @request{mixed,assets,Unused.,optional}
+* @request{mixed,owner,Ignored.,optional}
+* @request{mixed,lock,Ignored.,optional}
+* @request{mixed,assets,Ignored.,optional}
+* @request{mixed,ref_count,Ignored.,optional}
 * @request_end
 *
 * @response_start{application/json}
@@ -95,7 +96,6 @@ APIEndpoint::POST(
 					'id' => ['type' => ['string', 'null']],
 					'name' => ['type' => 'string'],
 					'markup' => ['type' => 'string'],
-					'owner' => [],
 					'duration' => ['type' => 'integer'],
 					'enabled' => ['type' => 'boolean'],
 					'sched' => ['type' => 'boolean'],
@@ -108,9 +108,10 @@ APIEndpoint::POST(
 							'type' => 'string'
 						]
 					],
-					'lock' => [],
-					'assets' => [],
-					'ref_count' => []
+					'owner' => [], // ignored
+					'lock' => [], // ignored
+					'assets' => [], // ignored
+					'ref_count' => [] // ignored
 				],
 				'required' => [
 					'name',
@@ -155,13 +156,13 @@ APIEndpoint::POST(
 				)
 			) {
 				// admin or editor+owner => ALLOW modifying.
-				return ['slide' => modify_slide($session, $slide, $params, TRUE)];
+				return modify_slide($session, $slide, $params, TRUE);
 			} else if (
 				$caller->is_in_group('editor')
 				&& in_array($caller->get_name(), $slide->get_collaborators())
 			) {
 				// Restricted modification permissions for collaborators.
-				return ['slide' => modify_slide($session, $slide, $params, FALSE)];
+				return modify_slide($session, $slide, $params, FALSE);
 			} else {
 				throw new APIException(
 					'User not authorized to do this operation.',
@@ -170,7 +171,7 @@ APIEndpoint::POST(
 			}
 		} else if ($caller->is_in_group(['admin', 'editor'])) {
 			// admin or editor => ALLOW creation.
-			return ['slide' => create_slide($caller, $session, $slide, $params)];
+			return create_slide($caller, $session, $slide, $params);
 		} else {
 			throw new APIException(
 				'User not authorized to do this operation.',
@@ -182,13 +183,14 @@ APIEndpoint::POST(
 
 /**
 * Set the slide data of $slide.
+*
+* @param Slide  $slide The Slide to modify.
+* @param object $data  The data fields of the Slide.
+* @param bool   $owner TRUE if Slide owner called the endpoint, FALSE otherwise.
 */
 function set_slide_data(Slide $slide, $data, bool $owner) {
 	if ($owner === TRUE) {
-		/*
-		* Set 'collaborators' if the caller is
-		* the owner of the Slide.
-		 */
+		// Set 'collaborators' if the caller is the owner of the Slide.
 		try {
 			$slide->set_collaborators($data->collaborators);
 		} catch (UserNotFoundException $e) {
@@ -211,7 +213,16 @@ function set_slide_data(Slide $slide, $data, bool $owner) {
 }
 
 /**
-* Handler function for creating the slide $slide.
+* Handler function for creating a new slide as $slide.
+*
+* This function automatically locks the new Slide for $session.
+*
+* @param User    $caller  The User object calling this endpoint.
+* @param Session $session The Session object of the caller.
+* @param Slide   $slide   The Slide to modify.
+* @param object  $data    The data fields of the Slide.
+*
+* @returns array The exported Slide data.
 */
 function create_slide(User $caller, Session $session, Slide $slide, $data) {
 	if (!$caller->get_quota()->has_quota('slides')) {
@@ -219,30 +230,35 @@ function create_slide(User $caller, Session $session, Slide $slide, $data) {
 			'Slide quota exceeded.',
 			HTTPStatus::FORBIDDEN
 		);
-	} else {
-		$caller->get_quota()->use_quota('slides');
-		$caller->write();
 	}
 
 	try {
 		$slide->gen_id();
 		$slide->set_owner($caller->get_name());
 		$slide->lock_acquire($session);
-
 		set_slide_data($slide, $data, TRUE);
 	} catch (\Exception $e) {
-		// Cleanup the created Slide in case of any exception.
+		// Cleanup in case of an exception.
 		$slide->remove();
-		$caller->get_quota()->free_quota('slides');
-		$caller->write();
 
 		throw $e;
 	}
-	return finish($slide);
+
+	$caller->get_quota()->use_quota('slides');
+	$caller->write();
+
+	return finish_slide($slide);
 }
 
 /**
 * Handler function for modifying $slide.
+*
+* @param User    $caller  The User object calling this endpoint.
+* @param Session $session The Session object of the caller.
+* @param Slide   $slide   The Slide to modify.
+* @param object  $data    The data fields of the Slide.
+*
+* @returns array The exported Slide data.
 */
 function modify_slide(Session $session, Slide $slide, $data, bool $owner) {
 	if (!$slide->is_locked_by($session)) {
@@ -251,14 +267,23 @@ function modify_slide(Session $session, Slide $slide, $data, bool $owner) {
 			HTTPStatus::FAILED_DEPENDENCY
 		);
 	}
+
 	set_slide_data($slide, $data, $owner);
-	return finish($slide);
+
+	return finish_slide($slide);
 }
 
 /**
-* Finish saving the slide.
+* Handler function for finishing $slide.
+*
+* @param User    $caller  The User object calling this endpoint.
+* @param Session $session The Session object of the caller.
+* @param Slide   $slide   The Slide to modify.
+* @param object  $data    The data fields of the Slide.
+*
+* @returns array The exported Slide data.
 */
-function finish(Slide $slide) {
+function finish_slide(Slide $slide) {
 	$slide->write();
 	return $slide->export(FALSE, FALSE);
 }

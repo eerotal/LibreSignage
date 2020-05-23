@@ -16,7 +16,7 @@
 * @request_end
 *
 * @response_start{application/json}
-* @response{Slide,slide,The copy slide object.}
+* @response{Slide,slide,The copied slide object.}
 * @response_end
 *
 * @status_start
@@ -100,6 +100,6 @@ APIEndpoint::POST(
 		$new->write();
 		$dest->write();
 
-		return ['slide' => $new->export(FALSE, FALSE)];
+		return $new->export(FALSE, FALSE);
 	}
 );

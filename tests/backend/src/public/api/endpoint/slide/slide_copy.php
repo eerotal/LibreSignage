@@ -38,7 +38,7 @@ class slide_copy extends APITestCase {
 			[]
 		), 'Failed to create initial slide.', [$this, 'abort']);
 		$this->api->logout();
-		$this->orig_slide_id = APIInterface::decode_raw_response($resp)->slide->id;
+		$this->orig_slide_id = APIInterface::decode_raw_response($resp)->id;
 	}
 
 	/**
@@ -59,9 +59,7 @@ class slide_copy extends APITestCase {
 		);
 
 		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->dup_slide_id = APIInterface::decode_raw_response(
-				$resp
-			)->slide->id;
+			$this->dup_slide_id = APIInterface::decode_raw_response($resp)->id;
 		}
 	}
 
@@ -170,7 +168,7 @@ class slide_copy extends APITestCase {
 				'admin',
 				'admin'
 			)
-		)->slide->id;
+		)->id;
 	}
 
 	public function tearDown(): void {

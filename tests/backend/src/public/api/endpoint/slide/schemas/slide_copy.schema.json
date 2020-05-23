@@ -1,9 +1,4 @@
 {
 	"id": "tests/backend/",
-	"type": "object",
-	"properties": {
-		"slide": { "$ref": "common/schemas/Slide.schema.json" }
-	},
-	"required": ["slide"],
-	"additionalProperties": false
+	"$ref": "common/schemas/Slide.schema.json"
 }

@@ -65,7 +65,7 @@ final class Queue extends Exportable {
 		}
 
 		$this->fimport(self::get_path($name));
-		$this->load_slide_objects();
+		$this->load_slides();
 	}
 
 	/**
@@ -76,7 +76,7 @@ final class Queue extends Exportable {
 	*
 	* @throws BrokenQueueException If loading a Slide fails.
 	*/
-	private function load_slide_objects() {
+	private function load_slides() {
 		$this->slides = [];
 
 		foreach ($this->slide_ids as &$n) {
