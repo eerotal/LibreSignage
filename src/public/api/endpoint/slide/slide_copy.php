@@ -100,6 +100,6 @@ APIEndpoint::POST(
 		$new->write();
 		$dest->write();
 
-		return $new->export(FALSE, FALSE);
+		return ['slide' => $new->export(FALSE, FALSE)];
 	}
 );

@@ -156,13 +156,13 @@ APIEndpoint::POST(
 				)
 			) {
 				// admin or editor+owner => ALLOW modifying.
-				return modify_slide($session, $slide, $params, TRUE);
+				return ['slide' => modify_slide($session, $slide, $params, TRUE)];
 			} else if (
 				$caller->is_in_group('editor')
 				&& in_array($caller->get_name(), $slide->get_collaborators())
 			) {
 				// Restricted modification permissions for collaborators.
-				return modify_slide($session, $slide, $params, FALSE);
+				return ['slide' => modify_slide($session, $slide, $params, FALSE)];
 			} else {
 				throw new APIException(
 					'User not authorized to do this operation.',
@@ -171,7 +171,7 @@ APIEndpoint::POST(
 			}
 		} else if ($caller->is_in_group(['admin', 'editor'])) {
 			// admin or editor => ALLOW creation.
-			return create_slide($caller, $session, $slide, $params);
+			return ['slide' => create_slide($caller, $session, $slide, $params)];
 		} else {
 			throw new APIException(
 				'User not authorized to do this operation.',

@@ -52,7 +52,7 @@ class slide_save extends APITestCase {
 		), 'Failed to create slide for testing.', [$this, 'abort']);
 
 		$this->api->logout();
-		$this->slide_id = APIInterface::decode_raw_response($resp)->id;
+		$this->slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 	}
 
 	/**
@@ -73,7 +73,7 @@ class slide_save extends APITestCase {
 		);
 
 		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->slide_id = APIInterface::decode_raw_response($resp)->id;
+			$this->slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 		}
 	}
 
@@ -383,7 +383,7 @@ class slide_save extends APITestCase {
 		);
 
 		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->slide_id = APIInterface::decode_raw_response($resp)->id;
+			$this->slide_id = APIInterface::decode_raw_response($resp)->slide->id;
 		}
 	}
 
