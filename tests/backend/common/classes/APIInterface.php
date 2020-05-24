@@ -246,16 +246,12 @@ final class APIInterface {
 				APIInterface::decode_raw_response($resp)
 			);
 
-			$e = new \Exception(
-				!empty($message)
-					? $message.
-						"\n\nAPI call failed. Response:\n".
-						$rdump.
-						"\n\n"
-					: "API call failed."
-			);
-			if ($cleanup !== NULL) { ($cleanup)($e); }
-			throw $e;
+			$ex_msg = !empty($message) ? $message : "API call failed";
+			$ex_msg .= ": \n\nResponse:\n".$rdump."\n\n";
+			$ex = new \Exception($ex_msg);
+
+			if ($cleanup !== NULL) { ($cleanup)($ex); }
+			throw $ex;
 		}
 		return $resp;
 	}

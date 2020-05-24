@@ -26,7 +26,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
-use libresignage\common\php\slide\Slide;
 use libresignage\common\php\queue\Queue;
 
 APIEndpoint::POST(
@@ -43,7 +42,7 @@ APIEndpoint::POST(
 						'type' => 'string'
 					]
 				],
-				'required' => ['name']	
+				'required' => ['name']
 			]
 		]
 	],

@@ -191,8 +191,19 @@ final class Queue extends Exportable {
 	* @param int   $at    The index where the Slide is added. If
 	*                     Queue::ENDPOS is passed, the Slide is added
 	*                     at the end of the Queue.
+	*
+	* @throws ArgException if $at < 0 and $at !== self::ENDPOS
+	* @throws ArgException if $at > Queue length.
 	*/
 	public function add_slide(Slide $slide, int $at) {
+		if ($at < 0 && $at !== self::ENDPOS) {
+			throw new ArgException('Invalid (negative) Slide index.');
+		}
+
+		if ($at > $this->get_length()) {
+			throw new ArgException('Slide index out of bounds.');
+		}
+
 		if ($at === self::ENDPOS) { $at = count($this->slide_ids); }
 
 		array_splice($this->slide_ids, $at, 0, $slide->get_id());
@@ -258,6 +269,15 @@ final class Queue extends Exportable {
 	*/
 	public function get_slides(): array {
 		return $this->slides;
+	}
+
+	/**
+	* Get the number of Slides in a Queue.
+	*
+	* @return int The number of Slides in a Queue.
+	*/
+	public function get_length(): int {
+		return count($this->slides);
 	}
 
 	/**

@@ -61,7 +61,6 @@ final class SlideUtils {
 	* @param APIInterface $api An APIInterface object.
 	* @param string|NULL  $id
 	* @param string       $name
-	* @param array        $index
 	* @param int          $duration
 	* @param string       $markup
 	* @param bool         $enabled
@@ -69,7 +68,6 @@ final class SlideUtils {
 	* @param int          $sched_t_s
 	* @param int          $sched_t_e
 	* @param int          $animation
-	* @param array        $queue_names
 	* @param array        $collaborators
 	*
 	* @return Response The API response.
@@ -78,7 +76,6 @@ final class SlideUtils {
 		APIInterface $api,
 		$id,
 		string $name,
-		array $index,
 		int $duration,
 		string $markup,
 		bool $enabled,
@@ -86,7 +83,6 @@ final class SlideUtils {
 		int $sched_t_s,
 		int $sched_t_e,
 		int $animation,
-		array $queue_names,
 		array $collaborators
 	): Response {
 		return $api->call_return_raw_response(
@@ -95,7 +91,6 @@ final class SlideUtils {
 			[
 				'id' => $id,
 				'name' => $name,
-				'index' => $index,
 				'duration' => $duration,
 				'markup' => $markup,
 				'enabled' => $enabled,
@@ -103,7 +98,6 @@ final class SlideUtils {
 				'sched_t_s' => $sched_t_s,
 				'sched_t_e' => $sched_t_e,
 				'animation' => $animation,
-				'queue_names' => $queue_names,
 				'collaborators' => $collaborators
 			],
 			[],

@@ -80,6 +80,10 @@ APIEndpoint::POST(
 				)
 			)
 		) {
+			// Free the quota used by the Slides in the Queue.
+			$caller->get_quota()->free_quota('slides', $queue->get_length());
+			$caller->write();
+
 			$queue->remove();
 			return [];
 		}
