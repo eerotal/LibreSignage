@@ -1,23 +1,26 @@
 <?php
 /** \file
-* Add a Slide to a Queue.
-*
-* @method{POST}
-* @auth{By token}
-* @groups{admin|editor}
-* @ratelimit_yes
-*
-* @request_start{application/json}
-* @request{string,queue_name,The name of the Queue.}
-* @request{string,slide_id,The ID of the Slide to add.}
-* @request{integer,pos,The position in the Queue where the
-*                      Slide is added. -1 for last.}
-* @request_end
-*
-* @status_start
-* @status{200,On success.}
-* @status_end
-*/
+ * Add a Slide to a Queue.
+ *
+ * @method{POST}
+ * @auth{By token}
+ * @groups{admin|editor}
+ * @ratelimit_yes
+ *
+ * @request_start{application/json}
+ * @request{string,queue_name,The name of the Queue.}
+ * @request{string,slide_id,The ID of the Slide to add.}
+ * @request{integer,pos,The position in the Queue where the
+ *                      Slide is added. -1 for last.}
+ * @request_end
+ *
+ * @status_start
+ * @status{200,On success.}
+ * @status{400,If the pos parameter is invalid.}
+ * @status{401,If the caller is not allowed to use this endpoint.}
+ * @status{404,If the slide or queue doesn't exist.}
+ * @status_end
+ */
 
 namespace libresignage\api\endpoint\queue;
 
@@ -81,6 +84,7 @@ APIEndpoint::POST(
 			);
 		}
 
+		// Add the slide to the queue.
 		try {
 			$queue->add_slide($slide, $params->pos);
 		} catch (ArgException $e) {
