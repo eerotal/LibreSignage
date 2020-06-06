@@ -2,8 +2,9 @@
 /** \file
  * Remove a Slide from a Queue.
  *
- * If the slide is removed from all of its queues, it's automatically
- * removed from the server.
+ * If the slide would be removed from the last queue it's in, this endpoint
+ * returns HTTP FORBIDDEN. In that case you must call slide_remove.php
+ * to remove the slide from both the queue and the server.
  *
  * @method{POST}
  * @auth{By token}
@@ -30,7 +31,11 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../common/php/Config.php');
 use libresignage\api\APIEndpoint;
 use libresignage\api\APIException;
 use libresignage\api\HTTPStatus;
+use libresignage\common\php\exceptions\IllegalOperationException;
 use libresignage\common\php\queue\Queue;
+use libresignage\common\php\queue\exceptions\QueueNotFoundException;
+use libresignage\common\php\slide\Slide;
+use libresignage\common\php\slide\exceptions\SlideNotFoundException;
 
 APIEndpoint::POST(
 	[
@@ -57,7 +62,7 @@ APIEndpoint::POST(
 		if (!$caller->is_in_group('admin') && !$caller->is_in_group('editor')) {
 			throw new APIException(
 				'User not in groups admin or editor not authorized.',
-					HTTPStatus::UNAUTHORIZED
+				HTTPStatus::UNAUTHORIZED
 			);
 		}
 
@@ -67,7 +72,7 @@ APIEndpoint::POST(
 		} catch (QueueNotFoundException $e) {
 			throw new APIException(
 				"Queue '{$params->queue_name}' not found.",
-					HTTPStatus::NOT_FOUND
+				HTTPStatus::NOT_FOUND
 			);
 		}
 
@@ -77,7 +82,7 @@ APIEndpoint::POST(
 		} catch (SlideNotFoundException $e) {
 			throw new APIException(
 				"Slide '{$params->slide_id}' not found.",
-					HTTPStatus::NOT_FOUND
+				HTTPStatus::NOT_FOUND
 			);
 		}
 
@@ -87,19 +92,17 @@ APIEndpoint::POST(
 		} catch (SlideNotFoundException $e) {
 			throw new APIException(
 				$e->getMessage(),
-					HTTPStatus::BAD_REQUEST
+				HTTPStatus::BAD_REQUEST
+			);
+		} catch (IllegalOperationException $e) {
+			throw new APIException(
+				$e->getMessage(),
+				HTTPStatus::FORBIDDEN
 			);
 		}
 
 		$queue->write();
-
-		/*
-		 * Only write the slide to disk if it wasn't completely removed.
-		 * This can happen if the slide was removed from all queues.
-		 */
-		if ($slide->get_id() !== NULL) {
-			$slide->write();
-		}
+		$slide->write();
 
 		return [];
 	}
