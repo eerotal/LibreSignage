@@ -26,7 +26,6 @@ class slide_copy extends APITestCase {
 			$this->api,
 			NULL,
 			'Unit-Test-Slide',
-			['default' => 0],
 			5000,
 			'Test Markup',
 			TRUE,
@@ -34,7 +33,6 @@ class slide_copy extends APITestCase {
 			0,
 			0,
 			0,
-			['default'],
 			[]
 		), 'Failed to create initial slide.', [$this, 'abort']);
 		$this->api->logout();
