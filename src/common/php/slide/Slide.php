@@ -87,12 +87,12 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Load a slide from file.
-	*
-	* @see Slide::validate_id() for validation exceptions.
-	*
-	* @param string $id The ID of the slide to load.
-	*/
+	 * Load a slide from file.
+	 *
+	 * @see Slide::validate_id() for validation exceptions.
+	 *
+	 * @param string $id The ID of the slide to load.
+	 */
 	public function load(string $id) {
 		self::validate_id($id);
 
@@ -103,10 +103,10 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Copy a Slide.
-	*
-	* @return Slide The newly created Slide object.
-	*/
+	 * Copy a Slide.
+	 *
+	 * @return Slide The newly created Slide object.
+	 */
 	public function copy(): Slide {
 		$slide = clone $this;
 		$slide->gen_id();
@@ -129,24 +129,24 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Generate a new ID for a slide.
-	*/
+	 * Generate a new ID for a slide.
+	 */
 	public function gen_id() {
 		$this->id = Util::get_uid();
 	}
 
 	/**
-	* Increase the internal reference counter for a Slide.
-	*/
+	 * Increase the internal reference counter for a Slide.
+	 */
 	public function add_ref() {
 		$this->ref_count++;
 	}
 
 	/**
-	* Decrease the internal reference counter for a Slide.
-	*
-	* @throws IllegalOperationException If the refcount would be decreased to 0.
-	*/
+	 * Decrease the internal reference counter for a Slide.
+	 *
+	 * @throws IllegalOperationException If the refcount would be decreased to 0.
+	 */
 	public function remove_ref() {
 		if ($this->ref_count === 1) {
 			throw new IllegalOperationException(
@@ -157,29 +157,29 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Reset the internal reference counter of a Slide to 0.
-	*/
+	 * Reset the internal reference counter of a Slide to 0.
+	 */
 	private function reset_ref() {
 		$this->ref_count = 0;
 	}
 
 	/**
-	* Get the refcount of a Slide.
-	*/
+	 * Get the refcount of a Slide.
+	 */
 	public function get_refcount(): int {
 		return $this->ref_count;
 	}
 
 	/**
-	* Validate the slide ID $id. This function checks that
-	* $id already exists to make sure IDs are always generated
-	* server-side; a non-existent ID is considered invalid even
-	* for unsaved slides.
-	*
-	* @param string $id The ID to validate.
-	*
-	* @throws SlideNotFoundException if the ID doesn't already exist.
-	*/
+	 * Validate the slide ID $id. This function checks that
+	 * $id already exists to make sure IDs are always generated
+	 * server-side; a non-existent ID is considered invalid even
+	 * for unsaved slides.
+	 *
+	 * @param string $id The ID to validate.
+	 *
+	 * @throws SlideNotFoundException if the ID doesn't already exist.
+	 */
 	public static function validate_id(string $id) {
 		if (!self::exists($id)) {
 			throw new SlideNotFoundException("Slide '$id' doesn't exist.");
@@ -187,25 +187,25 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Set the slide id. The ID must already exist to make
-	* sure IDs are always generated server-side.
-	*
-	* @see Slide::validate_id() for validation exceptions.
-	*
-	* @param string $id The ID to set.
-	*/
+	 * Set the slide id. The ID must already exist to make
+	 * sure IDs are always generated server-side.
+	 *
+	 * @see Slide::validate_id() for validation exceptions.
+	 *
+	 * @param string $id The ID to set.
+	 */
 	public function set_id(string $id) {
 		self::validate_id($id);
 		$this->id = $id;
 	}
 
 	/**
-	* Validate the slide markup.
-	*
-	* @param string $markup The slide markup.
-	*
-	* @throws ArgException if the markup is longer than SLIDE_MARKUP_MAX_LEN chars.
-	*/
+	 * Validate the slide markup.
+	 *
+	 * @param string $markup The slide markup.
+	 *
+	 * @throws ArgException if the markup is longer than SLIDE_MARKUP_MAX_LEN chars.
+	 */
 	public static function validate_markup(string $markup) {
 		if (strlen($markup) > Config::limit('SLIDE_MARKUP_MAX_LEN')) {
 			throw new ArgException("Slide markup too long.");
@@ -213,27 +213,27 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Set the slide markup.
-	*
-	* @see Slide::validate_markup() for validation exceptions.
-	*
-	* @param string $markup The slide markup.
-	*/
+	 * Set the slide markup.
+	 *
+	 * @see Slide::validate_markup() for validation exceptions.
+	 *
+	 * @param string $markup The slide markup.
+	 */
 	public function set_markup(string $markup) {
 		self::validate_markup($markup);
 		$this->markup = $markup;
 	}
 
 	/**
-	* Validate the slide name.
-	*
-	* @param string $name The slide name.
-	*
-	* @throws ArgException if the slide name contains invalid characters.
-	* @throws IntException if preg_match() fails.
-	* @throws ArgException if the slide name is empty.
-	* @throws ArgException if the slide name is longer than SLIDE_NAME_MAX_LEN chars.
-	*/
+	 * Validate the slide name.
+	 *
+	 * @param string $name The slide name.
+	 *
+	 * @throws ArgException if the slide name contains invalid characters.
+	 * @throws IntException if preg_match() fails.
+	 * @throws ArgException if the slide name is empty.
+	 * @throws ArgException if the slide name is longer than SLIDE_NAME_MAX_LEN chars.
+	 */
 	public static function validate_name(string $name) {
 		$tmp = preg_match('/^[A-Za-z0-9_-]+$/', $name);
 		if ($tmp === 0) {
@@ -250,53 +250,53 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Set the slide name.
-	*
-	* @see Slide::validate_markup() for validation exceptions.
-	*
-	* @param string $name The slide name.
-	*/
+	 * Set the slide name.
+	 *
+	 * @see Slide::validate_markup() for validation exceptions.
+	 *
+	 * @param string $name The slide name.
+	 */
 	public function set_name(string $name) {
 		self::validate_name($name);
 		$this->name = $name;
 	}
 
 	/**
-	* Validate the slide duration.
-	*
-	* @param int $duration The slide duration in seconds.
-	*
-	* @throws ArgException if $duration < SLIDE_MIN_DURATION or
-	*                      $duration > SLIDE_MAX_DURATION.
-	*/
+	 * Validate the slide duration.
+	 *
+	 * @param int $duration The slide duration in seconds.
+	 *
+	 * @throws ArgException if $duration < SLIDE_MIN_DURATION or
+	 *                      $duration > SLIDE_MAX_DURATION.
+	 */
 	public static function validate_duration(int $duration) {
 		if (
 			$duration < Config::limit('SLIDE_MIN_DURATION')
-			|| $duration > Config::limit('SLIDE_MAX_DURATION')
+				|| $duration > Config::limit('SLIDE_MAX_DURATION')
 		) {
 			throw new ArgException("Slide duration $duration out of bounds.");
 		}
 	}
 
 	/**
-	* Set the slide duration.
-	*
-	* @see Slide::validate_duration() for validation exceptions.
-	*
-	* @param int $duration The slide duration in seconds.
-	*/
+	 * Set the slide duration.
+	 *
+	 * @see Slide::validate_duration() for validation exceptions.
+	 *
+	 * @param int $duration The slide duration in seconds.
+	 */
 	public function set_duration(int $duration) {
 		self::validate_duration($duration);
 		$this->duration = $duration;
 	}
 
 	/**
-	* Validate the slide owner.
-	*
-	* @param string $owner The slide owner.
-	*
-	* @throws ArgException if the user $owner doesn't exist.
-	*/
+	 * Validate the slide owner.
+	 *
+	 * @param string $owner The slide owner.
+	 *
+	 * @throws ArgException if the user $owner doesn't exist.
+	 */
 	public static function validate_owner(string $owner) {
 		if (!User::exists($owner)) {
 			throw new ArgException("User $owner doesn't exist.");
@@ -305,42 +305,42 @@ final class Slide extends Exportable {
 
 
 	/**
-	* Set the slide owner.
-	*
-	* @see Slide::validate_owner() for validation exceptions.
-	*
-	* @param string $owner The slide owner.
-	*/
+	 * Set the slide owner.
+	 *
+	 * @see Slide::validate_owner() for validation exceptions.
+	 *
+	 * @param string $owner The slide owner.
+	 */
 	public function set_owner(string $owner) {
 		self::validate_owner($owner);
 		$this->owner = $owner;
 	}
 
 	/**
-	* Set whether the slide is enabled or not.
-	*
-	* @param bool $enabled TRUE = Enabled, FALSE = Disabled.
-	*/
+	 * Set whether the slide is enabled or not.
+	 *
+	 * @param bool $enabled TRUE = Enabled, FALSE = Disabled.
+	 */
 	public function set_enabled(bool $enabled) {
 		$this->enabled = $enabled;
 	}
 
 	/**
-	* Set whether the slide is scheduled.
-	*
-	* @param bool $sched TRUE = Scheduled, FALSE = Normal.
-	*/
+	 * Set whether the slide is scheduled.
+	 *
+	 * @param bool $sched TRUE = Scheduled, FALSE = Normal.
+	 */
 	public function set_sched(bool $sched) {
 		$this->sched = $sched;
 	}
 
 	/**
-	* Validate the slide schedule start time.
-	*
-	* @param int $tstamp The starting timestamp in seconds.
-	*
-	* @throws ArgException if $tstamp < 0.
-	*/
+	 * Validate the slide schedule start time.
+	 *
+	 * @param int $tstamp The starting timestamp in seconds.
+	 *
+	 * @throws ArgException if $tstamp < 0.
+	 */
 	public static function validate_sched_t_s(int $tstamp) {
 		if ($tstamp < 0) {
 			throw new ArgException(
@@ -350,24 +350,24 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Set the slide schedule start time.
-	*
-	* @see Slide::validate_sched_t_s() for validation exceptions.
-	*
-	* @param int $tstamp The starting timestamp in seconds.
-	*/
+	 * Set the slide schedule start time.
+	 *
+	 * @see Slide::validate_sched_t_s() for validation exceptions.
+	 *
+	 * @param int $tstamp The starting timestamp in seconds.
+	 */
 	public function set_sched_t_s(int $tstamp) {
 		self::validate_sched_t_s($tstamp);
 		$this->sched_t_s = $tstamp;
 	}
 
 	/**
-	* Validate the slide schedule end time.
-	*
-	* @param int $tstamp The ending timestamp in seconds.
-	*
-	* @throws ArgException if $tstamp < 0.
-	*/
+	 * Validate the slide schedule end time.
+	 *
+	 * @param int $tstamp The ending timestamp in seconds.
+	 *
+	 * @throws ArgException if $tstamp < 0.
+	 */
 	public static function validate_sched_t_e(int $tstamp) {
 		if ($tstamp < 0) {
 			throw new ArgException(
@@ -377,12 +377,12 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Set the slide schedule end time.
-	*
-	* @see Slide::validate_sched_t_e() for validation exceptions.
-	*
-	* @param int $tstamp The ending timestamp in seconds.
-	*/
+	 * Set the slide schedule end time.
+	 *
+	 * @see Slide::validate_sched_t_e() for validation exceptions.
+	 *
+	 * @param int $tstamp The ending timestamp in seconds.
+	 */
 	public function set_sched_t_e(int $tstamp) {
 		self::validate_sched_t_e($tstamp);
 
@@ -396,12 +396,12 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Validate the slide animation ID.
-	*
-	* @param int $anim The ID of the slide animation.
-	*
-	* @throws ArgException if $anim < 0.
-	*/
+	 * Validate the slide animation ID.
+	 *
+	 * @param int $anim The ID of the slide animation.
+	 *
+	 * @throws ArgException if $anim < 0.
+	 */
 	public static function validate_animation(int $anim) {
 		if ($anim < 0) {
 			throw new ArgException("Invalid negative animation.");
@@ -409,24 +409,24 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Set the slide animation ID.
-	*
-	* @see Slide::validate_animation() for validation exceptions.
-	*
-	* @param int $anim The ID of the slide animation.
-	*/
+	 * Set the slide animation ID.
+	 *
+	 * @see Slide::validate_animation() for validation exceptions.
+	 *
+	 * @param int $anim The ID of the slide animation.
+	 */
 	public function set_animation(int $anim) {
 		self::validate_animation($anim);
 		$this->animation = $anim;
 	}
 
 	/**
-	* Validate the slide queue.
-	*
-	* @param string $name The queue name.
-	*
-	* @throws ArgException if a queue named $name doesn't exist.
-	*/
+	 * Validate the slide queue.
+	 *
+	 * @param string $name The queue name.
+	 *
+	 * @throws ArgException if a queue named $name doesn't exist.
+	 */
 	public static function validate_queue(string $name) {
 		if (!Queue::exists($name)) {
 			throw new ArgException("Queue '{$name}' doesn't exist.");
@@ -434,14 +434,14 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Validate the slide collaborators.
-	*
-	* @param array $collaborators An array of collaborator usernames.
-	*
-	* @throws ArgException if count($collaborators) > SLIDE_MAX_COLLAB.
-	* @throws ArgException if $collaborators contains duplicate items.
-	* @throws UserNotFoundException if a collaborator doesn't exist.
-	*/
+	 * Validate the slide collaborators.
+	 *
+	 * @param array $collaborators An array of collaborator usernames.
+	 *
+	 * @throws ArgException if count($collaborators) > SLIDE_MAX_COLLAB.
+	 * @throws ArgException if $collaborators contains duplicate items.
+	 * @throws UserNotFoundException if a collaborator doesn't exist.
+	 */
 	public static function validate_collaborators(array $collaborators) {
 		if (count($collaborators) > Config::limit('SLIDE_MAX_COLLAB')) {
 			throw new ArgException("Too many collaborators.");
@@ -465,15 +465,15 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Set the slide collaborators.
-	*
-	* @see Slide::validate_collaborators() for validation exceptions.
-	*
-	* @throws IllegalOperationException if the slide owner is not set.
-	* @throws IllegalOperationException if the slide owner is a collaborator.
-	*
-	* @param array $collaborators An array of collaborator usernames.
-	*/
+	 * Set the slide collaborators.
+	 *
+	 * @see Slide::validate_collaborators() for validation exceptions.
+	 *
+	 * @throws IllegalOperationException if the slide owner is not set.
+	 * @throws IllegalOperationException if the slide owner is a collaborator.
+	 *
+	 * @param array $collaborators An array of collaborator usernames.
+	 */
 	function set_collaborators(array $collaborators) {
 		self::validate_collaborators($collaborators);
 		if (empty($this->get_owner())) {
@@ -490,15 +490,15 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Clear the slide lock object.
-	*/
+	 * Clear the slide lock object.
+	 */
 	public function clear_lock() {
 		$this->lock = NULL;
 	}
 
 	/**
-	* Cleanup expired slide locks.
-	*/
+	 * Cleanup expired slide locks.
+	 */
 	private function lock_cleanup() {
 		if (
 			$this->lock !== NULL
@@ -510,12 +510,12 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Attempt to lock this slide.
-	*
-	* @param Session $session The Session to lock the slide for.
-	* @throws SlideLockException if the slide is already
-	*                            locked by another user.
-	*/
+	 * Attempt to lock this slide.
+	 *
+	 * @param Session $session The Session to lock the slide for.
+	 * @throws SlideLockException if the slide is already
+	 *                            locked by another user.
+	 */
 	public function lock_acquire(Session $session) {
 		if (
 			$this->lock !== NULL
@@ -527,11 +527,11 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Attempt to unlock this slide.
-	*
-	* @param Session $session The Session object of the caller.
-	* @throws SlideLockException if the slide is locked by another user.
-	*/
+	 * Attempt to unlock this slide.
+	 *
+	 * @param Session $session The Session object of the caller.
+	 * @throws SlideLockException if the slide is locked by another user.
+	 */
 	public function lock_release(Session $session) {
 		if (
 			$this->lock !== NULL
@@ -545,12 +545,12 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Check whether a slide is locked by a session.
-	*
-	* @param Session $session The session to check the lock against.
-	*
-	* @return bool TRUE if the slide is locked by $session and FALSE otherwise.
-	*/
+	 * Check whether a slide is locked by a session.
+	 *
+	 * @param Session $session The session to check the lock against.
+	 *
+	 * @return bool TRUE if the slide is locked by $session and FALSE otherwise.
+	 */
 	public function is_locked_by(Session $session) {
 		return (
 			$this->lock !== NULL
@@ -560,15 +560,15 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Store an uploaded asset in the 'assets' directory of this
-	* slide. This function also generates a thumbnail for the asset.
-	*
-	* @param UploadedFile $file The upload data from $_FILE.
-	*
-	* @throws LimitException if the asset limit SLIDE_MAX_ASSETS is reached.
-	*
-	* @see SlideAsset::new() for additional exceptions.
-	*/
+	 * Store an uploaded asset in the 'assets' directory of this
+	 * slide. This function also generates a thumbnail for the asset.
+	 *
+	 * @param UploadedFile $file The upload data from $_FILE.
+	 *
+	 * @throws LimitException if the asset limit SLIDE_MAX_ASSETS is reached.
+	 *
+	 * @see SlideAsset::new() for additional exceptions.
+	 */
 	public function store_uploaded_asset(UploadedFile $file) {
 		$this->assert_ready();
 
@@ -589,12 +589,12 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Remove an uploaded asset from a slide.
-	*
-	* @param string $name The name of the asset.
-	*
-	* @throws ArgException if the assetdoesn't exist.
-	*/
+	 * Remove an uploaded asset from a slide.
+	 *
+	 * @param string $name The name of the asset.
+	 *
+	 * @throws ArgException if the assetdoesn't exist.
+	 */
 	public function remove_uploaded_asset(string $name) {
 		$this->assert_ready();
 		for ($i = 0; $i < count($this->assets); $i++) {
@@ -609,14 +609,14 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Get the SlideAsset named $name.
-	*
-	* @param string $name The name of the asset.
-	*
-	* @throws ArgException if the asset doesn't exist.
-	*
-	* @return SlideAsset The requested asset.
-	*/
+	 * Get the SlideAsset named $name.
+	 *
+	 * @param string $name The name of the asset.
+	 *
+	 * @throws ArgException if the asset doesn't exist.
+	 *
+	 * @return SlideAsset The requested asset.
+	 */
 	public function get_uploaded_asset(string $name): SlideAsset {
 		foreach ($this->assets as $a) {
 			if ($a->get_filename() === $name) { return $a; }
@@ -625,12 +625,12 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Check whether a Slide contains an asset.
-	*
-	* @param string $name The name of the asset to check.
-	*
-	* @return bool TRUE if the asset exists, FALSE otherwise.
-	*/
+	 * Check whether a Slide contains an asset.
+	 *
+	 * @param string $name The name of the asset to check.
+	 *
+	 * @return bool TRUE if the asset exists, FALSE otherwise.
+	 */
 	public function has_uploaded_asset(string $name): bool {
 		try {
 			$this->get_uploaded_asset($name);
@@ -641,19 +641,19 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Set the assets array of a Slide.
-	*
-	* @param array $assets
-	*/
+	 * Set the assets array of a Slide.
+	 *
+	 * @param array $assets
+	 */
 	public function set_assets(array $assets) {
 		$this->assets = $assets;
 	}
 
 	/**
-	* Update $this->enabled based on whether a scheduled slide
-	* should be enabled. This function overrides manual control
-	* of $this->enabled.
-	*/
+	 * Update $this->enabled based on whether a scheduled slide
+	 * should be enabled. This function overrides manual control
+	 * of $this->enabled.
+	 */
 	public function update_sched_enabled() {
 		$t = time();
 		if (
@@ -668,11 +668,11 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Check whether $user can modify the loaded slide.
-	*
-	* @param User $user The user to check.
-	* @return bool TRUE = Can modify, FALSE = Can't modify.
-	*/
+	 * Check whether $user can modify the loaded slide.
+	 *
+	 * @param User $user The user to check.
+	 * @return bool TRUE = Can modify, FALSE = Can't modify.
+	 */
 	function can_modify(User $user): bool {
 		return (
 			$user->is_in_group('admin')
@@ -691,12 +691,12 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Throw an exception if the slide is not ready. Use
-	* this in functions that access files to prevent trying
-	* to access nonexistent files.
-	*
-	* @throws IntException if the slide is not ready.
-	*/
+	 * Throw an exception if the slide is not ready. Use
+	 * this in functions that access files to prevent trying
+	 * to access nonexistent files.
+	 *
+	 * @throws IntException if the slide is not ready.
+	 */
 	private function assert_ready() {
 		assert(
 			!empty($this->id),
@@ -705,8 +705,8 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Write slide data to file.
-	*/
+	 * Write slide data to file.
+	 */
 	public function write() {
 		$tmp = '';
 		$this->assert_ready();
@@ -723,17 +723,20 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Remove the loaded Slide from disk.
-	*
-	* This method succeeds even if the Slide is not yet written to disk.
-	* In this case the Slide is just removed from all Queues.
-	*/
+	 * Remove the loaded Slide from disk.
+	 *
+	 * This method succeeds even if the Slide is not yet written to disk.
+	 * In this case the Slide is just removed from all Queues.
+	 */
 	public function remove() {
 		$this->assert_ready();
 
 		if (is_dir(self::get_dir_path($this->id))) {
 			Util::rmdir_recursive(self::get_dir_path($this->id));
 		}
+
+		// Make sure the slide is not considered ready afterwards.
+		$this->id = NULL;
 	}
 
 	public static function get_dir_path(string $id): string {
@@ -767,10 +770,10 @@ final class Slide extends Exportable {
 	public function get_assets() { return $this->assets; }
 
 	/**
-	* List all existing Slide IDs.
-	*
-	* @return array An array of Slide IDs.
-	*/
+	 * List all existing Slide IDs.
+	 *
+	 * @return array An array of Slide IDs.
+	 */
 	public static function list_ids(): array {
 		$ids = scandir(
 			Config::config('LIBRESIGNAGE_ROOT')
@@ -788,10 +791,10 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* List all Slide objects.
-	*
-	* @return array An array of Slide objects.
-	*/
+	 * List all Slide objects.
+	 *
+	 * @return array An array of Slide objects.
+	 */
 	public static function list(): array {
 		$ids = self::list_ids();
 		$slides = [];
@@ -806,12 +809,12 @@ final class Slide extends Exportable {
 	}
 
 	/**
-	* Check whether a slide exists.
-	*
-	* @param string $id The ID of the slide to check.
-	*
-	* @return bool TRUE if $id exists, FALSE otherwise.
-	*/
+	 * Check whether a slide exists.
+	 *
+	 * @param string $id The ID of the slide to check.
+	 *
+	 * @return bool TRUE if $id exists, FALSE otherwise.
+	 */
 	public static function exists(string $id): bool {
 		return in_array($id, self::list_ids(), TRUE);
 	}
