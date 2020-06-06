@@ -243,8 +243,6 @@ final class Queue extends Exportable {
 	*
 	* @param Slide $slide The Slide object to remove.
 	*
-	* @throws IllegalOperationException If the Slide wouldn't remain
-	*                                   in any Queue.
 	* @throws SlideNotFoundException    If the Slide doesn't exist in the Queue.
 	*/
 	public function remove_slide(Slide $slide) {
