@@ -176,14 +176,6 @@ class queue_add_slide extends APITestCase {
 				FALSE,
 				HTTPStatus::OK
 			],
-			'pos parameter == -1' => [
-				[
-					'queue_name' => self::TEST_QUEUE_NAME,
-					'pos' => -1
-				],
-				FALSE,
-				HTTPStatus::OK
-			],
 			'pos parameter > queue length' => [
 				[
 					'queue_name' => self::TEST_QUEUE_NAME,
