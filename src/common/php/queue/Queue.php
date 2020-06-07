@@ -213,15 +213,29 @@ final class Queue extends Exportable {
 	}
 
 	/**
-	* Change the index of a Slide in a Queue.
-	*
-	* @param $slide Slide The Slide to move.
-	* @param int    $to   The new index or Queue::ENDPOS for last.
-	*
-	* @throws SlideNotFoundexception If $slide doesn't exist in the Queue.
-	*/
+	 * Change the index of a Slide in a Queue.
+	 *
+	 * The $to parameter is the index in the Queue where the supplied
+	 * Slide is moved. If Queue::ENDPOS is passed as $to, the Slide is
+	 * moved to the end of the Queue. If $to is negative, an exception is
+	 * thrown. Note that even though Queue::ENDPOS is actually a negative
+	 * integer, passing it as $to obviously won't cause an exception. If
+	 * $to is larger than the Queue length, an exception is thrown.
+	 *
+	 * @param $slide Slide The Slide to move.
+	 * @param int    $to   The new index or Queue::ENDPOS for last.
+	 *
+	 * @throws SlideNotFoundexception If $slide doesn't exist in the Queue.
+	 * @throws ArgException If $to < 0 or $to > queue length.
+	 */
 	public function reorder(Slide $slide, int $to) {
-		if ($to === self::ENDPOS) { $to = count($this->slides) - 1; }
+		if ($to === self::ENDPOS) {
+			$to = $this->get_length() - 1;
+		} else if ($to < 0) {
+			throw new ArgException('$to cannot be negative.');
+		} else if ($to > $this->get_length()) {
+			throw new ArgException('$to out of bounds.');
+		}
 
 		$old = $this->get_index($slide);
 		if ($old === self::NPOS) {
