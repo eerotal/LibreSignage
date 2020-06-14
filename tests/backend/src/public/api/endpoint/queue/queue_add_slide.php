@@ -56,8 +56,11 @@ class queue_add_slide extends APITestCase {
 	}
 
 	/**
-	* @dataProvider params_provider
-	*/
+	 * Test that the endpoint returns the correct HTTP status and
+	 * on HTTP OK test that the Slide was actually added to the Queue.
+	 *
+	 * @dataProvider params_provider
+	 */
 	public function test_fuzz_params(
 		array $params,
 		bool $no_slide_id,
@@ -71,17 +74,50 @@ class queue_add_slide extends APITestCase {
 			$params['slide_id'] = $this->slide_id;
 		}
 
-		$resp = $this->call_api_and_assert_failed(
+		$this->api->login('admin', 'admin');
+
+		// Call the API and assert the HTTP status code.
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
 			$params,
 			[],
-			$error,
-			'admin',
-			'admin'
+			TRUE
 		);
+		$this->assert_api_failed($resp, $error);
 
+		// If the call returned HTTP OK, check that the Slide was added.
 		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->slide_added = TRUE;
+			assert(
+				array_key_exists('queue_name', $params),
+				"'queue_name' not in params but HTTP_SUCCESS returned! ".
+				"This shouldn't be possible, fix your tests."
+			);
+
+			// Load the Queue via the API.
+			$tmp = QueueUtils::get($this->api, $params['queue_name']);
+			APIInterface::assert_success($tmp);
+
+			// Check that the Slide was actually added to the Queue.
+			$decoded = APIInterface::decode_raw_response($tmp);
+			$this->slide_added = FALSE;
+			foreach ($decoded->queue->slide_ids as $id) {
+				if ($id === $params['slide_id']) {
+					$this->slide_added = TRUE;
+				}
+			}
+
+			$this->api->logout();
+			$this->assertTrue(
+				$this->slide_added,
+				"Slide wasn't added to Queue."
+			);
+
+			# Return here so that APIInterface::logout() is not called twice.
+			return;
 		}
+
+		$this->api->logout();
 	}
 
 	public static function params_provider(): array {
