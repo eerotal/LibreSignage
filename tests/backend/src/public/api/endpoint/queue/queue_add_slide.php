@@ -84,40 +84,62 @@ class queue_add_slide extends APITestCase {
 			[],
 			TRUE
 		);
-		$this->assert_api_failed($resp, $error);
+		try {
+			$this->assert_api_failed($resp, $error);
+		} catch (\Exception $e) {
+			$this->api->logout();
+			throw $e;
+		}
 
-		// If the call returned HTTP OK, check that the Slide was added.
+		/**
+		 * If the call returned HTTP OK, check that the
+		 * Slide was properly added.
+		 */
 		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			assert(
-				array_key_exists('queue_name', $params),
-				"'queue_name' not in params but HTTP_SUCCESS returned! ".
-				"This shouldn't be possible, fix your tests."
-			);
+			try {
+				assert(
+					array_key_exists('slide_id', $params),
+					"'slide_id' not in params but endpoint returned OK! ".
+					"This shouldn't be possible, fix your tests."
+				);
+				assert(
+					array_key_exists('queue_name', $params),
+					"'queue_name' not in params but endpoint returned OK! ".
+					"This shouldn't be possible, fix your tests."
+				);
 
-			// Load the Queue via the API.
-			$tmp = QueueUtils::get($this->api, $params['queue_name']);
-			APIInterface::assert_success($tmp);
+				// Load the Queue via the API.
+				$queue_resp = QueueUtils::get($this->api, $params['queue_name']);
+				APIInterface::assert_success($queue_resp);
 
-			// Check that the Slide was actually added to the Queue.
-			$decoded = APIInterface::decode_raw_response($tmp);
-			$this->slide_added = FALSE;
-			foreach ($decoded->queue->slide_ids as $id) {
-				if ($id === $params['slide_id']) {
-					$this->slide_added = TRUE;
-				}
+				// Load the added Slide via the API.
+				$slide_resp = SlideUtils::get($this->api, $params['slide_id']);
+				APIInterface::assert_success($slide_resp);
+			} finally {
+				$this->api->logout();
 			}
 
-			$this->api->logout();
+			// Assert that the Slide was asdded to the Queue.
+			$queue_resp_decoded = APIInterface::decode_raw_response($queue_resp);
+			$this->slide_added = in_array(
+				$params['slide_id'],
+				$queue_resp_decoded->queue->slide_ids
+			);
 			$this->assertTrue(
 				$this->slide_added,
 				"Slide wasn't added to Queue."
 			);
 
-			# Return here so that APIInterface::logout() is not called twice.
-			return;
+			// Assert that the Slide ref_count was incremented.
+			$slide_resp_decoded = APIInterface::decode_raw_response($slide_resp);
+			$this->assertEquals(
+				1,
+				$slide_resp_decoded->slide->ref_count,
+				"Slide ref_count wasn't decremented."
+			);
+		} else {
+			$this->api->logout();
 		}
-
-		$this->api->logout();
 	}
 
 	public static function params_provider(): array {
