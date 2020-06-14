@@ -65,28 +65,47 @@ class queue_remove_slide extends APITestCase {
 		 * be used if the slide is to be removed from all queues the
 		 * slide is in.
 		 */
-		APIInterface::assert_success(
-			QueueUtils::add_slide(
-				$this->api,
-				self::TEST_QUEUE_NAME_1,
-				$this->slide_id,
-				0
-			)
-		);
-		APIInterface::assert_success(
-			QueueUtils::add_slide(
-				$this->api,
-				self::TEST_QUEUE_NAME_2,
-				$this->slide_id,
-				0
-			)
-		);
+		try {
+			APIInterface::assert_success(
+				QueueUtils::add_slide(
+					$this->api,
+					self::TEST_QUEUE_NAME_1,
+					$this->slide_id,
+					0
+				)
+			);
+			APIInterface::assert_success(
+				QueueUtils::add_slide(
+					$this->api,
+					self::TEST_QUEUE_NAME_2,
+					$this->slide_id,
+					0
+				)
+			);
+		} catch (\Exception $e) {
+			/**
+			 * Remove the testing slide if adding it to the queues
+			 * fails. The rest of the cleanup is done by $this->tearDown().
+			 */
+			SlideUtils::remove($this->api, $this->slide_id);
+			throw $e;
+		}
 		$this->api->logout();
 	}
 
 	/**
-	* @dataProvider params_provider
-	*/
+	 * Test that the endpoint returns the correct HTTP status.
+	 *
+	 * On HTTP OK test that the Slide was properly removed from the Queue.
+	 *
+	 * @param array $params      The parameters to pass to the endpoint. The
+	 *                           testing Slide ID is automatically added to
+	 *                           this array unless slide_id already exists.
+	 * @param bool  $no_slide_id If TRUE, the Slide id is not added to $params.
+	 * @param int   $error       The HTTP status code to expect.
+	 *
+	 * @dataProvider params_provider
+	 */
 	public function test_fuzz_params(
 		array $params,
 		bool $no_slide_id,
@@ -100,13 +119,70 @@ class queue_remove_slide extends APITestCase {
 			$params['slide_id'] = $this->slide_id;
 		}
 
-		$resp = $this->call_api_and_assert_failed(
+		// Call the API and assert the HTTP status code.
+		$this->api->login('admin', 'admin');
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
 			$params,
 			[],
-			$error,
-			'admin',
-			'admin'
+			TRUE
 		);
+		try {
+			$this->assert_api_failed($resp, $error);
+		} catch (\Exception $e) {
+			$this->api->logout();
+			throw $e;
+		}
+
+		/**
+		 * If the call returned HTTP OK, check that the
+		 * Slide was properly removed.
+		 */
+		if ($resp->getStatusCode() === HTTPStatus::OK) {
+			try {
+				assert(
+					array_key_exists('slide_id', $params),
+					"'slide_id' not in params but endpoint returned OK! ".
+					"This shouldn't happen, fix your tests."
+				);
+				assert(
+					array_key_exists('queue_name', $params),
+					"'queue_name' not in params but endpoint returned OK! ".
+					"This shouldn't happen, fix your tests."
+				);
+
+				// Load the Queue via the API.
+				$queue_resp = QueueUtils::get($this->api, $params['queue_name']);
+				APIInterface::assert_success($queue_resp);
+
+				// Load the removed Slide via the API.
+				$slide_resp = SlideUtils::get($this->api, $params['slide_id']);
+				APIInterface::assert_success($slide_resp);
+			} finally {
+				$this->api->logout();
+			}
+
+			// Assert that the Slide was removed.
+			$queue_resp_decoded = APIInterface::decode_raw_response($queue_resp);
+			$this->assertFalse(
+				array_key_exists(
+					$params['slide_id'],
+					$queue_resp_decoded->queue->slide_ids
+				),
+				"Slide wasn't removed from Queue."
+			);
+
+			// Assert that the Slide ref_count was decremented.
+			$slide_resp_decoded = APIInterface::decode_raw_response($slide_resp);
+			$this->assertEquals(
+				1,
+				$slide_resp_decoded->slide->ref_count,
+				"Slide ref_count wasn't decremented."
+			);
+		} else {
+			$this->api->logout();
+		}
 	}
 
 	public static function params_provider(): array {

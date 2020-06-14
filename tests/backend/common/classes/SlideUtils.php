@@ -14,6 +14,26 @@ use libresignage\common\php\JSONUtils;
 */
 final class SlideUtils {
 	/**
+	 * Get a Slide from the server.
+	 *
+	 * @param APIInterface $api An APIInterface object.
+	 * @param string       $id  The ID of the slide to get.
+	 *
+	 * @return Response The API response.
+	 */
+	public static function get(
+		APIInterface $api,
+		string $id
+	): Response {
+		return $api->call_return_raw_response(
+			'GET',
+			'slide/slide_get.php',
+			['id' => $id],
+			[],
+			TRUE
+		);
+	}
+	/**
 	* Lock a slide.
 	*
 	* @param APIInterface $api An APIInterface object.
