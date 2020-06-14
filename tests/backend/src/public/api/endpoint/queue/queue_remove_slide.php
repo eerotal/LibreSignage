@@ -166,7 +166,7 @@ class queue_remove_slide extends APITestCase {
 			// Assert that the Slide was removed.
 			$queue_resp_decoded = APIInterface::decode_raw_response($queue_resp);
 			$this->assertFalse(
-				array_key_exists(
+				in_array(
 					$params['slide_id'],
 					$queue_resp_decoded->queue->slide_ids
 				),
