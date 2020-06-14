@@ -10,6 +10,26 @@ use GuzzleHttp\Psr7\Response;
 */
 final class QueueUtils {
 	/**
+	 * Get a Queue from the server.
+	 *
+	 * @param APIInterface $api  The APIInterface to use.
+	 * @param string       $name The name of the new Queue.
+	 *
+	 * @return Response The API response.
+	 */
+	public static function get(
+		APIInterface $api,
+		string $name
+	): Response {
+		return $api->call_return_raw_response(
+			'GET',
+			'queue/queue_get.php',
+			['name' => $name],
+			[],
+			TRUE
+		);
+	}
+	/**
 	* Create a new queue.
 	*
 	* @param APIInterface $api  The APIInterface to use.
