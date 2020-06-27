@@ -8,6 +8,7 @@ use libresignage\tests\backend\common\classes\QueueUtils;
 use libresignage\tests\backend\common\classes\SlideUtils;
 use libresignage\common\php\Config;
 use libresignage\api\HTTPStatus;
+use libresignage\common\php\queue\Queue;
 
 class queue_reorder extends APITestCase {
 	use \libresignage\tests\backend\common\traits\TestEndpointNotAuthorizedWithoutLogin;
@@ -63,8 +64,8 @@ class queue_reorder extends APITestCase {
 			);
 		} catch (\Exception $e) {
 			/*
-			 * Remove the created slide if setup fails.
-			 * $this->tearDown() should handle the rest of the cleanup.
+			 * Remove the created slide if adding it to the queue fails.
+			 * The rest of the cleanup if done by $this->tearDown().
 			 */
 			SlideUtils::remove($this->api, $this->slide_id);
 			throw $e;
@@ -89,16 +90,66 @@ class queue_reorder extends APITestCase {
 			$params['slide_id'] = $this->slide_id;
 		}
 
-		$resp = $this->call_api_and_assert_failed(
+		$this->api->login('admin', 'admin');
+		$resp = $this->api->call_return_raw_response(
+			$this->get_endpoint_method(),
+			$this->get_endpoint_uri(),
 			$params,
 			[],
-			$error,
-			'admin',
-			'admin'
+			TRUE
 		);
+		try {
+			$this->assert_api_failed($resp, $error);
+		} catch (\Exception $e) {
+			$this->api->logout();
+			throw $e;
+		}
 
+		/**
+		 * If the call returned HTTP OK, check that the
+		 * Queue was properly reordered.
+		 */
 		if ($resp->getStatusCode() === HTTPStatus::OK) {
-			$this->slide_added = TRUE;
+			try {
+				assert(
+					array_key_exists('queue_name', $params),
+					"'queue_name' not in params but endpoint returned OK! ".
+					"This shouldn't happen, fix your tests."
+				);
+				assert(
+					array_key_exists('slide_id', $params),
+					"'slide_id' not in params but endpoint returned OK! ".
+					"This shouldn't happen, fix your tests."
+				);
+				assert(
+					array_key_exists('to', $params),
+					"'to' not in params but endpoint returned OK! ".
+					"This shouldn't happen, fix your tests."
+				);
+
+				$queue_resp = QueueUtils::get($this->api, $params['queue_name']);
+				APIInterface::assert_success($queue_resp);
+			} finally {
+				$this->api->logout();
+			}
+
+			// Assert that the Slide is where it should be in the Queue.
+			$queue_resp_decoded = APIInterface::decode_raw_response($queue_resp);
+			if ($params['to'] === Queue::ENDPOS) {
+				// Slide moved to end of Queue.
+				$tmp = end($queue_resp_decoded->queue->slide_ids);
+			} else {
+				// Slide moved to an arbitary position in Queue.
+				$tmp = $queue_resp_decoded->queue->slide_ids[$params['to']];
+			}
+
+			$this->assertEquals(
+				$params['slide_id'],
+				$tmp,
+				"Queue wasn't reordered correctly."
+			);
+		} else {
+			$this->api->logout();
 		}
 	}
 
@@ -202,13 +253,13 @@ class queue_reorder extends APITestCase {
 				FALSE,
 				HTTPStatus::BAD_REQUEST
 			],
-			'to parameter === queue length' => [
+			'to parameter == queue length' => [
 				[
 					'queue_name' => self::TEST_QUEUE_NAME,
 					'to' => 1
 				],
 				FALSE,
-				HTTPStatus::OK
+				HTTPStatus::BAD_REQUEST
 			],
 			'Missing to parameter' => [
 				[

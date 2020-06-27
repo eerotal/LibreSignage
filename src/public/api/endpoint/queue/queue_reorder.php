@@ -10,14 +10,14 @@
  * @request_start{application/json}
  * @request{string,queue_name,The name of the Queue.}
  * @request{string,slide_id,The ID of the Slide to add.}
- * @request{integer,pos,The position in the Queue where the
- *                      Slide is moved to. -1 (Queue::ENDPOS)
- *                      for last.}
+ * @request{integer,to,The position in the Queue where the
+ *                     Slide is moved to. -1 (Queue::ENDPOS)
+ *                     for last.}
  * @request_end
  *
  * @status_start
  * @status{200,On success.}
- * @status{400,If the $to parameter is invalid.}
+ * @status{400,If the $to parameter is out of bounds.}
  * @status{401,If the caller is not allowed to use this API endpoint.}
  * @status{404,If the requested Queue or Slide doesn't exist or if the Slide
  *             doesn't exist in the requested Queue.}
@@ -86,7 +86,7 @@ APIEndpoint::POST(
 			);
 		}
 
-		// Attempt to reorder the queue-
+		// Attempt to reorder the queue.
 		try {
 			$queue->reorder($slide, $params->to);
 		} catch (SlideNotFoundException $e) {
