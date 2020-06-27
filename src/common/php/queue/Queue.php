@@ -220,20 +220,20 @@ final class Queue extends Exportable {
 	 * moved to the end of the Queue. If $to is negative, an exception is
 	 * thrown. Note that even though Queue::ENDPOS is actually a negative
 	 * integer, passing it as $to obviously won't cause an exception. If
-	 * $to is larger than the Queue length, an exception is thrown.
+	 * $to is larger than or equal to the Queue length, an exception is thrown.
 	 *
 	 * @param $slide Slide The Slide to move.
 	 * @param int    $to   The new index or Queue::ENDPOS for last.
 	 *
 	 * @throws SlideNotFoundexception If $slide doesn't exist in the Queue.
-	 * @throws ArgException If $to < 0 or $to > queue length.
+	 * @throws ArgException If $to < 0 or $to >= Queue length.
 	 */
 	public function reorder(Slide $slide, int $to) {
 		if ($to === self::ENDPOS) {
 			$to = $this->get_length() - 1;
 		} else if ($to < 0) {
 			throw new ArgException('$to cannot be negative.');
-		} else if ($to > $this->get_length()) {
+		} else if ($to >= $this->get_length()) {
 			throw new ArgException('$to out of bounds.');
 		}
 
