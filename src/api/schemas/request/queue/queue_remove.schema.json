@@ -1,0 +1,9 @@
+{
+	"$id": "api/schemas/request/queue/queue_list.schema.json",
+	"type": "object",
+	"properties": {
+		"name": {"$ref": "file://api/schemas/common/Queue.schema.json#/definitions/name"}
+	},
+	"required": ["name"],
+	"additionalproperties": false
+}

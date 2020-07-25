@@ -1,0 +1,20 @@
+{
+	"$id": "api/schemas/response/user/user_save.schema.json",
+	"type": "object",
+	"properties": {
+		"user": {
+			"type": "object",
+			"properties": {
+				"name": { "$ref": "file://api/schemas/common/User.schema.json#/definitions/name" },
+				"groups": {
+					"type": "array",
+					"items": { "$ref": "file://api/schemas/common/User.schema.json#/definitions/group"}
+				}
+			}
+		},
+		"required": ["name", "groups"],
+		"additionalProperties": false
+	},
+	"required": "user",
+	"additionalProperties": false
+}

@@ -1,0 +1,78 @@
+{
+	"$id": "api/schemas/common/Slide.schema.json",
+	"definitions": {
+		"id": { "$ref": "file://api/schemas/common/Utils.schema.json#/definitions/numbers/hexadecimal" },
+		"name": {
+			"type": "string",
+			"pattern": "^[A-Za-z0-9_-]+$",
+			"minLength": 1
+		},
+		"duration": {
+			"type": "number",
+			"minimum": 0
+		},
+		"markup": { "type": "string" },
+		"owner": { "$ref": "file://api/schemas/common/User.schema.json#/definitions/name" },
+		"enabled": { "type": "boolean" },
+		"sched": { "type": "boolean" },
+		"sched_t_s": { "$ref": "file://api/schemas/common/Utils.schema.json#/definitions/numbers/unix_time" },
+		"sched_t_e": { "$ref": "file://api/schemas/common/Utils.schema.json#/definitions/numbers/unix_time" },
+		"animation": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"collaborators": {
+			"type": "array",
+			"items": { "$ref": "file://api/schemas/common/User.schema.json#/definitions/name" }
+		},
+		"lock": {
+			"oneOf": [
+				{"$ref": "file://api/schemas/common/SlideLock.schema.json" },
+				{"type": "null"}
+			]
+		},
+		"assets": {
+			"type": "array",
+			"items": { "$ref": "file://api/schemas/common/SlideAsset.schema.json" }
+		},
+		"ref_count": {
+			"type": "integer",
+			"minimum": 0
+		}
+	},
+
+	"type": "object",
+	"properties": {
+		"id": { "$ref": "#/definitions/id" },
+		"name": { "$ref": "#/definitions/name" },
+		"duration": { "$ref": "#/definitions/duration" },
+		"markup": { "$ref": "#/definitions/markup" },
+		"owner": { "$ref": "#/definitions/owner" },
+		"enabled": { "$ref": "#/definitions/enabled" },
+		"sched": { "$ref": "#/definitions/sched" },
+		"sched_t_s": { "$ref": "#/definitions/sched_t_s" },
+		"sched_t_e": { "$ref": "#/definitions/sched_t_e" },
+		"animation": { "$ref": "#/definitions/animation" },
+		"collaborators": { "$ref": "#/definitions/collaborators" },
+		"lock": { "$ref": "#/definitions/lock" },
+		"assets": { "$ref": "#/definitions/assets" },
+		"ref_count": { "$ref": "#/definitions/ref_count" }
+	},
+	"required": [
+		"id",
+		"name",
+		"duration",
+		"markup",
+		"owner",
+		"enabled",
+		"sched",
+		"sched_t_s",
+		"sched_t_e",
+		"animation",
+		"collaborators",
+		"lock",
+		"assets",
+		"ref_count"
+	],
+	"additionalProperties": false
+}

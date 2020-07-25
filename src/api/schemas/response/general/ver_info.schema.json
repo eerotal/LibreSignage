@@ -1,0 +1,10 @@
+{
+	"$id": "api/schemas/response/general/ver_info.schema.json",
+	"type": "object",
+	"properties": {
+		"ls": { "type": "string" },
+		"api": { "type": "string" }
+	},
+	"required": ["ls", "api"],
+	"additionalProperties": false
+}

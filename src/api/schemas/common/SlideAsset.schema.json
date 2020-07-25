@@ -1,0 +1,20 @@
+{
+	"$id": "api/schemas/common/SlideAsset.schema.json",
+	"definitions": {
+		"mime": { "$ref": "file://api/schemas/common/Utils.schema.json#/definitions/strings/mime_type" },
+		"filename": {
+			"type": "string",
+			"minLength": 1
+		},
+		"has_thumb": { "type": "boolean" }
+	},
+
+	"type": "object",
+	"properties": {
+		"mime": { "$ref": "#/definitions/mime" },
+		"filename": { "$ref": "#/definitions/filename" },
+		"has_thumb": { "$ref": "#/definitions/has_thumb" }
+	},
+	"required": ["mime", "filename", "has_thumb"],
+	"additionalProperties": false
+}

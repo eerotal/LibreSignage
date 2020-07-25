@@ -1,0 +1,7 @@
+{
+	"$id": "api/schemas/response/queue/queue_create.schema.json",
+	"type": "object",
+	"properties": {},
+	"required": [],
+	"additionalProperties": false
+}

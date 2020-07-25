@@ -1,0 +1,37 @@
+{
+	"$id": "api/schemas/request/queue/slide_save.schema.json",
+	"type": "object",
+	"properties": {
+		"id": {"type": {"string", "null"}},
+		"name": {"type": "string"},
+		"markup": {"type": "string"},
+		"duration": {"type": "integer"},
+		"enabled": {"type": "boolean"},
+		"sched": {"type": "boolean"},
+		"sched_t_s": {"type": "integer"},
+		"sched_t_e": {"type": "integer"},
+		"animation": {"type": "integer"},
+		"collaborators": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"owner": {},
+		"lock": {},
+		"assets": {},
+		"ref_count": {}
+	},
+	"required": [
+		"name",
+		"markup",
+		"duration",
+		"enabled",
+		"sched",
+		"sched_t_s",
+		"sched_t_e",
+		"animation",
+		"collaborators"
+	],
+	"additionalproperties": false
+}

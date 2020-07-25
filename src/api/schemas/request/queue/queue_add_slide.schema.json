@@ -1,0 +1,11 @@
+{
+	"$id": "api/schemas/request/queue/queue_add_slide.schema.json",
+	"type": "object",
+	"properties": {
+		"queue_name": {"$ref": "file://api/schemas/common/Queue.schema.json#/definitions/name"},
+		"slide_id": {"$ref": "file://api/schemas/common/Slide.schema.json#/definitions/id"},
+		"pos": {"type": "integer"}
+	},
+	"required": ["queue_name", "slide_id", "pos"],
+	"additionalproperties": false
+}

@@ -1,0 +1,12 @@
+{
+	"$id": "api/schemas/response/auth/auth_get_sessions.schema.json",
+	"type": "object",
+	"properties": {
+		"sessions": {
+			"type": "array",
+			"items": { "$ref": "file://api/schemas/common/Session.schema.json" }
+		}
+	},
+	"required": ["sessions"],
+	"additionalProperties": false
+}

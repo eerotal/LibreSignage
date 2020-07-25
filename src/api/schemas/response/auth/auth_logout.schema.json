@@ -1,0 +1,7 @@
+{
+	"$id": "api/schemas/response/auth/auth_logout.schema.json",
+	"type": "object",
+	"properties": {},
+	"required": [],
+	"additionalProperties": false
+}

@@ -1,0 +1,10 @@
+{
+	"$id": "api/schemas/response/user/user_create.schema.json",
+	"type": "object",
+	"properties": {
+		"user": { "$ref": "file://api/schemas/common/User.schema.json#/properties" },
+		"pass": { "$ref": "file://api/schemas/common/User.schema.json#/definitions/pass" }
+	},
+	"required": ["user", "pass"],
+	"additionalProperties": false
+}

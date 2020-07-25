@@ -1,0 +1,12 @@
+{
+	"$id": "api/schemas/response/user/user_list.schema.json",
+	"type": "object",
+	"properties": {
+		"users": {
+			"type": "array",
+			"items": { "$ref": "file://api/schemas/common/User.schema.json#/definitions/name" }
+		}
+	},
+	"required": ["users"],
+	"additionalProperties": false
+}

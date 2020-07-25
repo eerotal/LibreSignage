@@ -1,0 +1,9 @@
+{
+	"$id": "api/schemas/response/user/user_get_current.schema.json",
+	"type": "object",
+	"properties": {
+		"user": { "$ref": "file://api/schemas/common/User.schema.json" }
+	},
+	"required": ["user"],
+	"additionalProperties": false
+}

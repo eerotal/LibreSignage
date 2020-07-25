@@ -1,0 +1,9 @@
+{
+	"$id": "api/schemas/response/slide/slide_get.schema.json",
+	"type": "object",
+	"properties": {
+		"slide": { "$ref": "file://api/schemas/common/Slide.schema.json" }
+	},
+	"required": ["slide"],
+	"additionalProperties": false
+}

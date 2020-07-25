@@ -1,0 +1,7 @@
+{
+	"$id": "api/schemas/response/queue/queue_remove_slide.schema.json",
+	"type": "object",
+	"properties": {},
+	"required": [],
+	"additionalProperties": false
+}

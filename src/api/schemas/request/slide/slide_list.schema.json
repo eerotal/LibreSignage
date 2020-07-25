@@ -1,0 +1,7 @@
+{
+	"$id": "api/schemas/request/queue/slide_list.schema.json",
+	"type": "object",
+	"properties": {},
+	"required": [],
+	"additionalproperties": false
+}

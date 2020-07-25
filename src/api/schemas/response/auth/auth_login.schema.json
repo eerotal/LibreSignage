@@ -1,0 +1,11 @@
+{
+	"$id": "api/schemas/response/auth/auth_login.schema.json",
+	"type": "object",
+	"properties": {
+		"user": { "$ref": "file://api/schemas/common/User.schema.json" },
+		"session": { "$ref": "file://api/schemas/common/Session.schema.json" },
+		"token": { "$ref": "file://api/schemas/common/Session.schema.json#/definitions/token" }
+	},
+	"required": ["user", "session", "token"],
+	"additionalProperties": false
+}

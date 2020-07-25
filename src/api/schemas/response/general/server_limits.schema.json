@@ -1,0 +1,9 @@
+{
+	"$id": "api/schemas/response/general/server_limits.schema.json",
+	"type": "object",
+	"properties": {
+		"limits": { "type": "object" }
+	},
+	"required": ["limits"],
+	"additionalProperties": false
+}

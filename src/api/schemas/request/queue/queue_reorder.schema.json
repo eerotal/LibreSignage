@@ -1,0 +1,11 @@
+{
+	"$id": "api/schemas/request/queue/queue_remove_slide.schema.json",
+	"type": "object",
+	"properties": {
+		"queue_name": {"$ref": "file://api/schemas/common/Queue.schema.json#/definitions/name"},
+		"slide_id": {"$ref": "file://schemas/common/Slide.schema.json#/definitions/id"},
+		"to": {"type": "integer"}
+	},
+	"required": ["queue_name", "slide_id", "to"],
+	"additionalproperties": false
+}

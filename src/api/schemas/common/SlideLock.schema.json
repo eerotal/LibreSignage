@@ -1,0 +1,15 @@
+{
+	"$id": "api/schemas/common/SlideLock.schema.json",
+	"definitions": {
+		"session_id": { "$ref": "file://api/schemas/common/Session.schema.json#/definitions/id" },
+		"expire": { "$ref": "file://api/schemas/common/Utils.schema.json#/definitions/numbers/unix_time" }
+	},
+
+	"type": "object",
+	"properties": {
+		"session_id": { "$ref": "#/definitions/session_id" },
+		"expire": { "$ref": "#/definitions/expire" }
+	},
+	"required": ["session_id", "expire"],
+	"additionalProperties": false
+}

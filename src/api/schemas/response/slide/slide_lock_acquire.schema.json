@@ -1,0 +1,9 @@
+{
+	"$id": "api/schemas/response/slide/slide_lock_acquire.schema.json",
+	"type": "object",
+	"properties": {
+		"lock": { "$ref": "file://api/schemas/common/SlideLock.schema.json" }
+	},
+	"required": ["lock"],
+	"additionalProperties": false
+}

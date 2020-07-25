@@ -1,0 +1,21 @@
+{
+	"$id": "api/schemas/response/user/user_get.schema.json",
+	"type": "object",
+	"properties": {
+		"user": {
+			"type": "object",
+			"properties": {
+				"groups": {
+					"type": "array",
+					"items": { "$ref": "file://api/schemas/common/User.schema.json#/definitions/group" }
+				},
+				"user": { "$ref": "file://api/schemas/common/User.schema.json#/definitions/name" },
+				"passwordless": { "$ref": "file://api/schemas/common/User.schema.json#/definitions/passwordless" }
+			},
+			"required": ["groups", "user"],
+			"additionalProperties": false
+		}
+	},
+	"required": ["user"],
+	"additionalProperties": false
+}

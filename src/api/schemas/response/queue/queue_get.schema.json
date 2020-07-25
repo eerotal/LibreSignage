@@ -1,0 +1,9 @@
+{
+	"$id": "api/schemas/response/queue/queue_get.schema.json",
+	"type": "object",
+	"properties": {
+		"queue": { "$ref": "file://api/schemas/common/Queue.schema.json" }
+	},
+	"required": ["queue"],
+	"additionalProperties": false
+}

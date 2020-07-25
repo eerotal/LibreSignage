@@ -1,0 +1,7 @@
+{
+	"$id": "api/schemas/response/slide/slide_lock_release.schema.json",
+	"type": "object",
+	"properties": {},
+	"required": [],
+	"additionalProperties": false
+}

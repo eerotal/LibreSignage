@@ -1,0 +1,10 @@
+{
+	"$id": "api/schemas/request/queue/slide_copy.schema.json",
+	"type": "object",
+	"properties": {
+		"id": {"type": "string"},
+		"dest": {"type": "string"}
+	},
+	"required": ["id", "dest"],
+	"additionalproperties": false
+}

@@ -1,0 +1,9 @@
+{
+	"$id": "api/schemas/response/auth/auth_session_renew.schema.json",
+	"type": "object",
+	"properties": {
+		"session": { "$ref": "file://api/schemas/common/Session.schema.json" }
+	},
+	"required": ["session"],
+	"additionalProperties": false
+}

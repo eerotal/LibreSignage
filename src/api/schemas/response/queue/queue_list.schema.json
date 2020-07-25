@@ -1,0 +1,12 @@
+{
+	"$id": "api/schemas/response/queue/queue_list.schema.json",
+	"type": "object",
+	"properties": {
+		"queues": {
+			"type": "array",
+			"items": { "$ref": "file://api/schemas/common/Queue.schema.json#/definitions/name" }
+		}
+	},
+	"required": ["queues"],
+	"additionalProperties": false
+}

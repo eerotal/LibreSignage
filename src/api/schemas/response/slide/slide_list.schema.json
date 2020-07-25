@@ -1,0 +1,12 @@
+{
+	"$id": "api/schemas/response/slide/slide_list.schema.json",
+	"type": "object",
+	"properties": {
+		"slides": {
+			"type": "array",
+			"items": { "$ref": "file://api/schemas/common/Slide.schema.json#/definitions/id" }
+		}
+	},
+	"required": ["slides"],
+	"additionalProperties": false
+}

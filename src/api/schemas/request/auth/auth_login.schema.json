@@ -1,0 +1,12 @@
+{
+	"$id": "",
+	"type": "object",
+	"properties": {
+		"username": {"$ref": "file://api/schemas/common/User.schema.json#/definitions/name"},
+		"password": {"$ref": "file://api/schemas/common/User.schema.json#/definitions/pass"},
+		"who": {"$ref": "file://api/schemas/common/Session.schema.json#/definitions/who"},
+		"permanent": {"$ref": "file://api/schemas/common/Session.schema.json#/definitions/permanent"}
+	},
+	"required": ["username", "password", "who", "permanent"],
+	"additionalProperties": false
+}

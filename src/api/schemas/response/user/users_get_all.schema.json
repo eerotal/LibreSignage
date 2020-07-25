@@ -1,0 +1,26 @@
+{
+	"$id": "api/schemas/response/user/user_get_all.schema.json",
+	"type": "object",
+	"properties": {
+		"users": {
+			"type": "object",
+			"patternProperties": {
+				"^.+$": {
+					"type": "object",
+					"properties": {
+						"user": { "$ref": "file://api/schemas/common/User.schema.json#/definitions/name" },
+						"groups": {
+							"type": "array",
+							"items": { "$ref": "file://api/schemas/common/User.schema.json#/definitions/group" }
+						}
+					},
+					"required": ["user", "groups"],
+					"additionalProperties": false
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"required": ["users"],
+	"additionalProperties": false
+}
