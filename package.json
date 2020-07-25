@@ -32,7 +32,10 @@
     "jsdom": "^15.1.0",
     "postcss-cli": "^6.0.0",
     "sass": "^1.15.0",
-    "xmlhttprequest": "^1.8.0"
+    "xmlhttprequest": "^1.8.0",
+    "ava": "3.9.0",
+    "sinon": "9.0.2",
+    "ajv": "6.12.3"
   },
   "private": true
 }
