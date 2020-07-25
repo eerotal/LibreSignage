@@ -5,6 +5,7 @@
 PHPUNIT_API_HOST ?= http://localhost:80
 PHPUNIT_CONFIG := tests/backend/phpunit.xml
 PHPUNIT_FLAGS := -c "$(PHPUNIT_CONFIG)" --testdox --color=auto
+TEST_NODE_PATH := "src/node_modules:tests/frontend/node_modules:tests/backend/:$(dir $(abspath $(lastword $(MAKEFILE_LIST))))"
 
 # Define required dependency versions.
 NPM_REQ_VER := 6.4.0
@@ -238,6 +239,19 @@ test-backend: php-dev-autoload
 	sh tests/backend/setup.sh "backend"
 	vendor/bin/phpunit $(PHPUNIT_FLAGS) $(PASS) --testsuite "backend"
 	sh tests/backend/cleanup.sh "backend"
+
+# Run frontend JS tests.
+test-frontend:
+	@:
+
+	# Setup NODE_PATH for running JS tests.
+	if [ -n "$$NODE_PATH" ]; then
+		export NODE_PATH="$$NODE_PATH:$(TEST_NODE_PATH)"
+	else
+		export NODE_PATH="$(TEST_NODE_PATH)"
+	fi
+
+	npx ava
 
 # Generate doxygen docs.
 doxygen-docs:
