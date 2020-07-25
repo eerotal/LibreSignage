@@ -119,7 +119,7 @@ class queue_add_slide extends APITestCase {
 				$this->api->logout();
 			}
 
-			// Assert that the Slide was asdded to the Queue.
+			// Assert that the Slide was added to the Queue.
 			$queue_resp_decoded = APIInterface::decode_raw_response($queue_resp);
 			$this->slide_added = in_array(
 				$params['slide_id'],
@@ -135,7 +135,7 @@ class queue_add_slide extends APITestCase {
 			$this->assertEquals(
 				1,
 				$slide_resp_decoded->slide->ref_count,
-				"Slide ref_count wasn't decremented."
+				"Slide ref_count wasn't incremented."
 			);
 		} else {
 			$this->api->logout();
