@@ -3,6 +3,10 @@ v1.2.0
                which caused some problems with slide layout.
   - [internal] Rewrite most web interface JavaScript files and clean them up.
   - [docs]     Add JSDoc documentation to web interface JavaScript.
+  - [docs]     Improve documentation about Docker and about reverse proxy config.
+  - [feature]  Implement support for passwordless users.
+  - [feature]  Implement a bootstrap page for automating passwordless logins.
+  - [bugfix]   Fix a bug where non-admin users couldn't change passwords.
 
 v1.1.1
   - [feature]  Enable multiarch Docker image builds in the CI pipepline. Images
