@@ -223,8 +223,6 @@ abstract class Exportable {
 		bool $return = TRUE,
 		bool &$migrated = FALSE
 	) {
-		assert(self::has_metadata());
-
 		$tmp = self::migrate($data, $ctx);
 		if ($tmp == NULL) {
 			$tmp = $data;
