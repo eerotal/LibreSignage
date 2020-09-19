@@ -101,7 +101,7 @@ configure-build:
 configure-system:
 	@:
 	set -e
-	./build/scripts/configure_system.sh --config="$(CONF)"
+	./build/scripts/configure_system.sh --config="$(CONF)" --pass $(PASS)
 
 # Install LibreSignage.
 install:

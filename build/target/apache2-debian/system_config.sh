@@ -21,6 +21,7 @@ script_help() {
 	echo 'Options:'
 	echo '  OPTION (DEFAULT VALUE) ........... DESCRIPTION'
 	echo '  --config=FILE (last generated) ... Use a specific build config.'
+	echo '  --ver=VERSION .................... Manually specify a version string to use.'
 	echo '  --help ........................... Print this message and exit.'
 }
 
@@ -31,15 +32,17 @@ while [ $# -gt 0 ]; do
 		--config=*)
 			BUILD_CONFIG="$(get_arg_value "$1")"
 			;;
+		--ver=*)
+			tmp="$(get_arg_value "$1")"
+			echo "[Info] Overriding version string from '$LS_VER' to '$tmp'."
+			LS_VER=$tmp
+			;;
 		--help)
 			script_help
 			exit 0
 			;;
 		*)
-			echo "[Error] Unknown option '$1'." > /dev/stderr
-			echo ''
-			script_help
-			exit 1
+			echo "[Warning] Unknown option '$1'. Ignoring." > /dev/stderr
 	esac
 
 	set +e

@@ -24,17 +24,22 @@ script_help() {
 	echo 'Options:'
 	echo '  OPTION (DEFAULT VALUE) ..... DESCRIPTION'
 	echo '  --target=TARGET ............ The target name to use.'
+	echo '  --ver=VERSION .............. Manually specify a version string to use.'
 	echo '  --pass ..................... All options after --pass are passed'
 	echo '                               to the target build config script.'
 	echo '  --help ..................... Print this message and exit.'
 }
 
-PASS_REMAINING=1
+PASS_REMAINING=0
+PASS=''
 
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--target=*)
-			TARGET="$(get_arg_value "$1")"	
+			TARGET="$(get_arg_value "$1")"
+			;;
+		--ver)
+			VERSION="$(get_arg_value "$1")"
 			;;
 		--pass)
 			PASS_REMAINING=1

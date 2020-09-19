@@ -22,23 +22,31 @@ script_help() {
 	echo 'Options:'
 	echo '  OPTION (DEFAULT VALUE) ..... DESCRIPTION'
 	echo '  --config=FILE .............. Use a specific build config file.'
+	echo '  --pass ..................... All options after --pass are passed'
+	echo '                               to the target build config script.'
 }
 
 BUILD_CONFIG=''
+PASS_REMAINING=0
+PASS=''
 
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--config=*)
 			BUILD_CONFIG="$(get_arg_value "$1")"
 			;;
+		--pass)
+			PASS_REMAINING=1
+			;;
 		*)
-			echo "[Error] Unknown option '$1'." > /dev/stderr
-			echo ''
-			script_help
-			exit 1
+			if [ "$PASS_REMAINING" = "1" ]; then
+				PASS="$(if [ -z "$PASS" ]; then echo "$1"; else echo "$PASS $1"; fi)"
+			else
+				echo "[Warning] Unknown option '$1'. Ignoring." > /dev/stderr
+			fi
 			;;
 	esac
-	
+
 	set +e
 	shift > /dev/null 2>&1
 	if [ ! "$?" = "0" ]; then
@@ -50,6 +58,6 @@ done
 
 load_build_config "$BUILD_CONFIG"
 
-echo "[Info] Pass to target config generator: --config='$BUILD_CONFIG'"
+echo "[Info] Pass to target system config generator: --config='$BUILD_CONFIG' $PASS"
 
-sh "build/target/${CONF_TARGET:?}/system_config.sh" --config="$BUILD_CONFIG"
+sh "build/target/${CONF_TARGET:?}/system_config.sh" --config="$BUILD_CONFIG" $PASS

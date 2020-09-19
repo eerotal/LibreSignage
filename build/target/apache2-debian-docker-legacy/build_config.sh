@@ -37,10 +37,7 @@ while [ $# -gt 0 ]; do
 			exit 0
 			;;
 		*)
-			echo "[Error] Unknown option '$1'." > /dev/stderr
-			echo ''
-			script_help
-			exit 1
+			echo "[Warning] Unknown option '$1'. Ignoring." > /dev/stderr
 			;;
 	esac
 
