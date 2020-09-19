@@ -71,7 +71,7 @@ way the teachers could inform students about important things such as
 upcoming tests for example.
 
 LibreSignage uses a HTTP web server to serve content to the individual
-signage displays. This means that he displays only need to run a web
+signage displays. This means that the displays only need to run a web
 browser pointed to the central LibreSignage server to actually display
 content. This approach has a few advantages.
 
@@ -349,7 +349,7 @@ below.
            PASS="--features [features]"
 
    Where ``[features]`` is a comma separated list of features to enable.
-   The recognised features are:
+   The recognized features are:
 
    * imgthumbs = Image thumbnail generation using *PHP gd*.
    * vidthumbs = Video thumbnail generation using *ffmpeg*.
