@@ -5,18 +5,20 @@ namespace libresignage\common\php\exportable\migration\defs\v1_1_0;
 use libresignage\common\php\Util;
 use libresignage\common\php\Config;
 use libresignage\common\php\exportable\migration\MigrationInterface;
+use libresignage\common\php\exportable\Exportable;
 use libresignage\common\php\exportable\ExportableDataContext;
+use libresignage\common\php\exportable\migration\exceptions\MigrationException;
 
 /**
-* User data migration from 1.1.0 to 1.2.0.
+* Queue data migration from 1.1.0 to 1.2.0.
 */
-final class UserMigration implements MigrationInterface {
+final class QueueMigration implements MigrationInterface {
 	public static function from_class(): array {
-		return ['libresignage\common\php\auth\User'];
+		return ['libresignage\common\php\queue\Queue'];
 	}
 
 	public static function to_class(): string {
-		return 'libresignage\common\php\auth\User';
+		return 'libresignage\common\php\queue\Queue';
 	}
 
 	public static function from_version(): array {
@@ -27,8 +29,5 @@ final class UserMigration implements MigrationInterface {
 		return '1.2.0';
 	}
 
-	public static function migrate(array &$data, ExportableDataContext $ctx) {
-		// new: passwordless, infer from password hash.
-		$data['passwordless'] = ($data['hash'] === NULL);
-	}
+	public static function migrate(array &$data, ExportableDataContext $ctx) {}
 }

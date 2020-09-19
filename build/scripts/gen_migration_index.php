@@ -17,9 +17,7 @@ use libresignage\common\php\exportable\migration\MigrationIndex;
 // Write the migration index.
 echo "Generating Exportable migration index...\n";
 $num = MigrationIndex::write(
-	Config::config('LIBRESIGNAGE_ROOT').
-		'/common/php/exportable/migration/index.json',
-	Config::config('LIBRESIGNAGE_ROOT').
-		'/common/php/exportable/migration/defs'
+	Config::config('LIBRESIGNAGE_ROOT').'/common/php/exportable/migration/index.json',
+	Config::config('LIBRESIGNAGE_ROOT').'/common/php/exportable/migration/defs'
 );
 echo "Wrote an index with $num classes.\n";
