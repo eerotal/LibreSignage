@@ -24,9 +24,11 @@ Table Of Contents
 
   * `4.3.1. Setting up a Dockerized build environment (recommended)`_
 
-  * `4.3.2. Building a native build on Debian or Ubuntu`_
+  * `4.3.2. Setting up a native build environment`_
 
-  * `4.3.3. Building a Docker image on Debian or Ubuntu`_
+  * `4.3.3. Building a native build on Debian or Ubuntu`_
+
+  * `4.3.4. Building a Docker image on Debian or Ubuntu`_
 
 `5. Default users`_
 
@@ -363,7 +365,7 @@ host (ie. no containers) by following the instructions below.
 8. Navigate to the domain name you entered and you should see the
    LibreSignage login page.
 
-4.3.2. Building a Docker image on Debian or Ubuntu
+4.3.4. Building a Docker image on Debian or Ubuntu
 ..................................................
 
 You can build LibreSignage Docker images by following the instructions
