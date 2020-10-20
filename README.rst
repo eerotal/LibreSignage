@@ -22,9 +22,11 @@ Table Of Contents
 
 * `4.3. Building from source`_
 
-  * `4.3.1. Building a native build on Debian or Ubuntu`_
+  * `*4.3.1. Setting up a Dockerized build environment (recommended)`_
 
-  * `4.3.2. Building a Docker image on Debian or Ubuntu`_
+  * `4.3.2. Building a native build on Debian or Ubuntu`_
+
+  * `4.3.3. Building a Docker image on Debian or Ubuntu`_
 
 `5. Default users`_
 
@@ -224,7 +226,7 @@ The steps required to run a LibreSignage Docker image are listed below.
 +++++++++++++++++++++++++
 
 4.3.1. Setting up a Dockerized build environment (recommended)
-.............................................................
+..............................................................
 
 The easiest way to build LibreSignage is to use a build environment running
 in a Docker container. A suitable Dockerfile and build script is provided in the
@@ -248,7 +250,7 @@ is automatically put into the Docker registry of the host machine.
 
 
 4.3.2. Setting up a native build environment
-...........................................
+............................................
 
 You can also setup the LibreSignage build environment directly on your on
 machine. You will need the following packages: ``git, apache2, php, php-gd,
