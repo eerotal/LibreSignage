@@ -12,4 +12,4 @@ fi
 
 mkdir -p "build/link"
 rm -f "build/link/last.conf"
-ln -s "`pwd`/$1" "build/link/last.conf"
+ln -sr "`pwd`/$1" "build/link/last.conf"
