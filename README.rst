@@ -22,7 +22,7 @@ Table Of Contents
 
 * `4.3. Building from source`_
 
-  * `*4.3.1. Setting up a Dockerized build environment (recommended)`_
+  * `4.3.1. Setting up a Dockerized build environment (recommended)`_
 
   * `4.3.2. Building a native build on Debian or Ubuntu`_
 
