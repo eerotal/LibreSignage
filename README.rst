@@ -223,38 +223,66 @@ The steps required to run a LibreSignage Docker image are listed below.
 4.3. Building from source
 +++++++++++++++++++++++++
 
-4.3.1. Building a native build on Debian or Ubuntu
+4.3.1. Setting up a Dockerized build environment (recommended)
+.............................................................
+
+The easiest way to build LibreSignage is to use a build environment running
+in a Docker container. A suitable Dockerfile and build script is provided in the
+LibreSignage-BuildEnv repository (https://github.com/eerotal/LibreSignage-BuildEnv).
+By using this method you'll only need to install Docker on your machine. All other
+dependencies are contained in the build environment container. See the README in
+the LibreSignage-BuildEnv repository for more info.
+
+If you want to build a native build in the Dockerized build environment you can
+do that simply by doing steps 1-5 from `4.3.3. Building a native build on Debian
+or Ubuntu`_ in the build environment container and the installation steps 6-8 in
+the LibreSignage repository on your machine. You'll also need install the
+runtime dependencies on your machine, ie. at least the packages ``apache2, php``
+and ``php-gd``. Video thumbnail generation also requires ``ffmpeg`` and running
+unit tests requires ``php-xml``.
+
+If you want to build a LibreSignage Docker image, you can just build the
+LibreSignage image in the build environment container normally according to
+`4.3.2. Building a Docker image on Debian or Ubuntu`_. The produced Docker image
+is automatically put into the Docker registry of the host machine.
+
+
+4.3.2. Setting up a native build environment
+...........................................
+
+You can also setup the LibreSignage build environment directly on your on
+machine. You will need the following packages: ``git, apache2, php, php-gd,
+pandoc, npm, composer, make, rsvg-convert``. All other packages except *npm*
+can be installed from the distribution repos by running ``sudo apt update &&
+sudo apt install -y git apache2 php php-gd pandoc composer make librsvg2-bin``.
+You can install NPM by following the instructions on the
+`node.js website <https://nodejs.org/en/download/package-manager/>`_.
+
+* If you want to enable video thumbnail generation, you need to install
+  *ffmpeg* too. You can do that by running ``sudo apt install -y ffmpeg``.
+
+* If you want to run the PHPUnit unit tests you need to install the php-xml
+  extension. You can do that by running ``sudo apt install -y php-xml``.
+
+* If you want to generate Doxygen documentation for LibreSignage, you
+  need to install Doxygen. You can do that by running
+  ``sudo apt install -y doxygen``
+
+See the section `4.1. Minimum system requirements`_ for more info.
+
+4.3.3. Building a native build on Debian or Ubuntu
 ..................................................
 
 Building LibreSignage from source isn't too difficult. You can build
 a native LibreSignage build that runs directly on a Debian or Ubuntu
 host (ie. no containers) by following the instructions below.
 
-1. Install software needed for building LibreSignage. You will need the
-   following packages: ``git, apache2, php, php-gd, pandoc, npm, composer,
-   make, rsvg-convert``. All other packages except *npm* can be
-   installed from the distribution repos by running ``sudo apt update && sudo
-   apt install -y git apache2 php php-gd pandoc composer make librsvg2-bin``.
-   You can install NPM by following the instructions on the
-   `node.js website <https://nodejs.org/en/download/package-manager/>`_.
-
-   * If you want to enable video thumbnail generation, you need to install
-     *ffmpeg* too. You can do that by running ``sudo apt install -y ffmpeg``.
-
-   * If you want to run the PHPUnit unit tests you need to install the php-xml
-     extension. You can do that by running ``sudo apt install -y php-xml``.
-
-   * If you want to generate Doxygen documentation for LibreSignage, you
-     need to install Doxygen. You can do that by running
-     ``sudo apt install -y doxygen``
-
-   See the section `4.1. Minimum system requirements`_ for more info.
-2. Use ``cd`` to move to the directory where you want to download the
+1. Use ``cd`` to move to the directory where you want to download the
    LibreSignage repository.
-3. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
+2. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
    The repository will be cloned into the directory *LibreSignage/*.
-4. Run ``cd LibreSignage`` to move into the LibreSignage repository.
-5. Run ``make configure TARGET=apache2-debian-interactive``. This target
+3. Run ``cd LibreSignage`` to move into the LibreSignage repository.
+4. Run ``make configure TARGET=apache2-debian-interactive``. This target
    installs any needed *composer* and *npm* dependencies first and then
    prompts you for some configuration values:
 
@@ -324,13 +352,13 @@ host (ie. no containers) by following the instructions below.
    for building LibreSignage. The file is saved in ``build/`` as
    ``<DOMAIN>.conf`` where ``<DOMAIN>`` is the domain name you
    specified.
-6. Run ``make -j$(nproc)`` to build LibreSignage. See `8. Makefile`_
+5. Run ``make -j$(nproc)`` to build LibreSignage. See `8. Makefile`_
    for more advanced make usage.
-7. Finally, to install LibreSignage, run ``sudo make install`` and answer
+6. Finally, to install LibreSignage, run ``sudo make install`` and answer
    the questions asked.
-8. Disable the default Apache site by running
+7. Disable the default Apache site by running
    ``sudo a2dissite 000-default.conf``.
-9. Navigate to the domain name you entered and you should see the
+8. Navigate to the domain name you entered and you should see the
    LibreSignage login page.
 
 4.3.2. Building a Docker image on Debian or Ubuntu
