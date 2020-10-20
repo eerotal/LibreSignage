@@ -247,7 +247,7 @@ unit tests requires ``php-xml``.
 
 If you want to build a LibreSignage Docker image, you can just build the
 LibreSignage image in the build environment container normally according to
-`4.3.2. Building a Docker image on Debian or Ubuntu`_. The produced Docker image
+`4.3.4. Building a Docker image on Debian or Ubuntu`_. The produced Docker image
 is automatically put into the Docker registry of the host machine.
 
 
