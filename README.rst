@@ -199,11 +199,11 @@ Docker images from Docker Hub. The LibreSignage Docker repository
 
 Start a Docker container by running::
 
-   docker run \
-       -d \
-       -p 80:80 \
-       --mount source=ls_vol,target=/var/www/html/data \
-       eerotal/libresignage:latest
+  docker run \
+      -d \
+      -p 80:80 \
+      --mount source=ls_vol,target=/var/www/html/data \
+      eerotal/libresignage:latest
 
 This command pulls the latest stable LibreSignage image from Docker Hub, binds
 port 80 on the host system to the container's port 80 (*-p*) and creates a
@@ -258,12 +258,12 @@ See the section `4.1. Minimum system requirements`_ for more info.
 
 You can build and install a native LibreSignage build by running::
 
-    git clone https://github.com/eerotal/LibreSignage.git
-    cd LibreSignage/
-    make configure TARGET=apache2-debian-interactive
-    make -j$(nproc)
-    sudo make install
-    sudo a2dissite 000-default.conf
+  git clone https://github.com/eerotal/LibreSignage.git
+  cd LibreSignage/
+  make configure TARGET=apache2-debian-interactive
+  make -j$(nproc)
+  sudo make install
+  sudo a2dissite 000-default.conf
 
 *Note: If you are building in the LibreSignage-BuildEnv Docker container, you
 should run the last two commands above on your host machine in the LibreSignage
@@ -271,70 +271,70 @@ repository directory.*
 
 The ``make configure`` command will prompt your for the following settings:
 
-   * Install directory [default: /var/www]
+* Install directory [default: /var/www]
 
-     * The directory where LibreSignage is installed. A subdirectory
-       named the same as the domain name is created in this directory.
+  * The directory where LibreSignage is installed. A subdirectory
+    named the same as the domain name is created in this directory.
 
-   * Server domain [default: localhost]
+* Server domain [default: localhost]
 
-     * The domain name to use for configuring apache2. If you
-       don't have a domain and you are just testing the system,
-       you can either use *localhost*, your machines LAN IP or
-       a test domain you don't actually own. If you use a test
-       domain, you can add it to your */etc/hosts* file to make
-       it work on your machine.
+  * The domain name to use for configuring apache2. If you
+    don't have a domain and you are just testing the system,
+    you can either use *localhost*, your machines LAN IP or
+    a test domain you don't actually own. If you use a test
+    domain, you can add it to your */etc/hosts* file to make
+    it work on your machine.
 
-   * Domain aliases [default: ]
+* Domain aliases [default: ]
 
-     * Domain name aliases for the server. Aliases make it possible
-       to have the server respond from multiple domains. One useful
-       way to use name aliases is to set *localhost* as the main
-       domain and the LAN IP of the server as an alias. This would
-       make it possible to connect to the server either by navigating
-       to *localhost* on the host machine or by connecting to the LAN
-       IP on the local network.
+  * Domain name aliases for the server. Aliases make it possible
+    to have the server respond from multiple domains. One useful
+    way to use name aliases is to set *localhost* as the main
+    domain and the LAN IP of the server as an alias. This would
+    make it possible to connect to the server either by navigating
+    to *localhost* on the host machine or by connecting to the LAN
+    IP on the local network.
 
-   * Admin name [default: Example Admin]
+* Admin name [default: Example Admin]
 
-     * Shown to users on the main page as contact info in case of
-       any problems.
+  * Shown to users on the main page as contact info in case of
+    any problems.
 
-   * Admin email [default: admin@example.com]
+* Admin email [default: admin@example.com]
 
-     * Shown to users on the main page as contact info in case of
-       any problems.
+  * Shown to users on the main page as contact info in case of
+    any problems.
 
-   * Enable image thumbnail generation? (Y/N/y/n) [default: N]
+* Enable image thumbnail generation? (Y/N/y/n) [default: N]
 
-     * Enable image thumbnail generation on the server. Currently
-       image thumbnails are only generated for uploaded slide
-       media. This option only works if the PHP GD extension is
-       installed and enabled. You can check whether it's enabled
-       by running ``php -m``. If *gd* is in the printed list, it
-       is enabled. If *gd* doesn't appear in the list but is
-       installed, you can run ``sudo phpenmod gd`` to enable it.
+  * Enable image thumbnail generation on the server. Currently
+    image thumbnails are only generated for uploaded slide
+    media. This option only works if the PHP GD extension is
+    installed and enabled. You can check whether it's enabled
+    by running ``php -m``. If *gd* is in the printed list, it
+    is enabled. If *gd* doesn't appear in the list but is
+    installed, you can run ``sudo phpenmod gd`` to enable it.
 
-   * Enable video thumbnail generation? (Y/N/y/n) [default: N]
+* Enable video thumbnail generation? (Y/N/y/n) [default: N]
 
-     * Enable video thumbnail generation. Currently video thumbnails
-       are only generated for uploaded slide media. **Note that video
-       thumbnail generation requires ffmpeg and ffprobe to be
-       available on the host system.** If you enable this option,
-       you'll also need to configure the binary paths to *ffmpeg*
-       and *ffprobe* in the LibreSignage configuration files. The
-       paths default to */usr/bin/ffmpeg* and */usr/bin/ffprobe*.
-       See the help page `Libresignage configuration` or the file
-       `src/doc/rst/configuration.rst` for more info.
+  * Enable video thumbnail generation. Currently video thumbnails
+    are only generated for uploaded slide media. **Note that video
+    thumbnail generation requires ffmpeg and ffprobe to be
+    available on the host system.** If you enable this option,
+    you'll also need to configure the binary paths to *ffmpeg*
+    and *ffprobe* in the LibreSignage configuration files. The
+    paths default to */usr/bin/ffmpeg* and */usr/bin/ffprobe*.
+    See the help page `Libresignage configuration` or the file
+    `src/doc/rst/configuration.rst` for more info.
 
-   * Enable debugging? (Y/N/y/n) [default: N]
+* Enable debugging? (Y/N/y/n) [default: N]
 
-     *  Whether to enable debugging. This enables things like
-        verbose error reporting through the API etc. **DO NOT
-        enable debugging on production systems.**
+  * Whether to enable debugging. This enables things like
+    verbose error reporting through the API etc. **DO NOT
+    enable debugging on production systems.**
 
-   The settings are saved in ``build/`` as ``<DOMAIN>.conf`` where ``<DOMAIN>``
-   is the domain name you specified.
+The settings are saved in ``build/`` as ``<DOMAIN>.conf`` where ``<DOMAIN>``
+is the domain name you specified.
 
 
 4.3.4. Building a Docker image
@@ -342,12 +342,12 @@ The ``make configure`` command will prompt your for the following settings:
 
 You can build a Docker image by running::
 
-    git clone https://github.com/eerotal/LibreSignage.git
-    cd LibreSignage/
-    make configure TARGET=apache2-debian-docker PASS="--features [features]"
-    make -j$(nproc)
-    export DOCKER_CLI_EXPERIMENTAL=enabled
-    make install PASS="--platform=[platform] --tag=[tag]"
+  git clone https://github.com/eerotal/LibreSignage.git
+  cd LibreSignage/
+  make configure TARGET=apache2-debian-docker PASS="--features [features]"
+  make -j$(nproc)
+  export DOCKER_CLI_EXPERIMENTAL=enabled
+  make install PASS="--platform=[platform] --tag=[tag]"
 
 Replace the parts enclosed in brackets:
 
@@ -481,7 +481,6 @@ LOC
 
 7.2. Option variables
 +++++++++++++++++++++
-
 
 You can also pass some other variables to the LibreSignage makefile.
 
