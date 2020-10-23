@@ -18,37 +18,35 @@ Table Of Contents
 
 * `4.1. Minimum system requirements`_
 
-* `4.2. Using prebuilt Docker images on any distribution`_
+* `4.2. Running a Docker container`_
 
 * `4.3. Building from source`_
 
-  * `4.3.1. Setting up a Dockerized build environment (recommended)`_
+  * `4.3.1. Setting up a Dockerized build environment on any distro (recommended)`_
 
-  * `4.3.2. Setting up a native build environment`_
+  * `4.3.2. Setting up a native build environment on Debian or Ubuntu`_
 
-  * `4.3.3. Building a native build on Debian or Ubuntu`_
+  * `4.3.3. Building a native build`_
 
-  * `4.3.4. Building a Docker image on Debian or Ubuntu`_
+  * `4.3.4. Building a Docker image`_
 
 `5. Default users`_
 
-`6. FAQ`_
+`6. Screenshots`_
 
-`7. Screenshots`_
+`7. Makefile`_
 
-`8. Makefile`_
+`7.1. Targets`_
 
-`8.1. Targets`_
+`7.2. Option variables`_
 
-`8.2. Option variables`_
+`8. Build targets`_
 
-`9. Build targets`_
+`9. Documentation`_
 
-`10. Documentation`_
+`10. Third-party dependencies`_
 
-`11. Third-party dependencies`_
-
-`12. License`_
+`11. License`_
 
 1. Introduction
 ---------------
@@ -159,6 +157,7 @@ Tested operating systems
 
 *Optional* build system dependencies.
   * Doxygen (Version 1.8.x or newer.) (http://www.doxygen.nl/)
+  * Docker (Version 19.03.x or newer.) (https://www.docker.com/)
 
 Dependencies installed automatically by *npm* or *composer*
   * Tools & development libraries
@@ -183,123 +182,105 @@ Dependencies installed automatically by *npm* or *composer*
     * node-XMLHttpRequest (https://github.com/driverdan/node-XMLHttpRequest)
     * commonjs-assert (https://github.com/browserify/commonjs-assert)
 
-See `11. Third-party dependencies`_ for license information.
+See `10. Third-party dependencies`_ for license information.
 
-4.2. Using prebuilt Docker images on any distribution
-+++++++++++++++++++++++++++++++++++++++++++++++++++++
+4.2. Running a Docker container
++++++++++++++++++++++++++++++++
 
-You can easily deploy a containerized LibreSignage instance using the
-LibreSignage Docker images from Docker Hub. The LibreSignage Docker
-repository `eerotal/libresignage` contains the following images:
+You can easily run a containerized LibreSignage instance using the LibreSignage
+Docker images from Docker Hub. The LibreSignage Docker repository
+`eerotal/libresignage` contains the following tags:
 
-* **eerotal/libresignage:latest  - (Recommended) The latest stable image.**
-* eerotal/libresignage:nightly   - The latest development build. This image
-                                   is built from the `next` branch every night
-                                   at 00:00.
-* eerotal/libresignage:<version> - The current and all prevous stable releases.
-                                   If you want to use the latest stable release,
-                                   prefer the `latest` tag instead. `<version>`
-                                   is the version number of the release.
+* *latest* - The latest stable image. **(Recommended)**
+* *nightly* - The latest development build. This image is built from the `next`
+  branch every night at 00:00.
+* *[version]* - The current and all prevous stable releases by version number.
+  If you want to use the latest stable release, prefer the `latest` tag instead.
 
-The steps required to run a LibreSignage Docker image are listed below.
+Start a Docker container by running::
 
-1. Install `Docker <https://www.docker.com/>`_ if it's not installed yet.
-2. Run the following command::
+   docker run \
+       -d \
+       -p 80:80 \
+       --mount source=ls_vol,target=/var/www/html/data \
+       eerotal/libresignage:latest
 
-       docker run \
-           -d \
-           -p 80:80 \
-           --mount source=ls_vol,target=/var/www/html/data \
-           eerotal/libresignage:latest
+This command pulls the latest stable LibreSignage image from Docker Hub, binds
+port 80 on the host system to the container's port 80 (*-p*) and creates a
+volume *ls_vol* for storing LibreSignage data (*--mount*).
+`eerotal/libresignage:latest` is the image to run. Replace the tag after `:` to
+run a different image. You might need to prefix the above command with *sudo*
+depending on your system configuration.
 
-   This command pulls the latest stable LibreSignage image from Docker Hub,
-   binds port 80 on the host system to the container's port 80 (*-p*) and
-   creates a volume *ls_vol* for storing LibreSignage data (*--mount*).
-   `eerotal/libresignage:latest` is the image to run. Replace the tag after
-   `:` to run a different image. *You might need to prefix the above command
-   with `sudo` depending on your system configuration.*
-3. Navigate to *localhost* and you should see the LibreSignage login
-   page. The file *src/docs/rst/docker.rst* in the LibreSignage source
-   distribution contains a more detailed explanation of using the
-   LibreSignage Docker image. The documentation can also be accessed in
-   the web interface from the *Help* page.
+Navigate to *localhost* and you should see the LibreSignage login page. The
+file *src/docs/rst/docker.rst* in the LibreSignage source distribution contains
+a more detailed explanation of using the LibreSignage Docker image. The
+documentation can also be accessed in the web interface from the *Help* page.
 
 4.3. Building from source
 +++++++++++++++++++++++++
 
-4.3.1. Setting up a Dockerized build environment (recommended)
-..............................................................
+4.3.1. Setting up a Dockerized build environment on any distro (recommended)
+............................................................................
 
-The easiest way to build LibreSignage is to use a build environment running
-in a Docker container. A suitable Dockerfile and build script is provided in the
-LibreSignage-BuildEnv repository (https://github.com/eerotal/LibreSignage-BuildEnv).
-By using this method you'll only need to install Docker on your machine. All other
-dependencies are contained in the build environment container. See the README in
-the LibreSignage-BuildEnv repository for more info.
+The easiest and recommended way to build LibreSignage is to use a build
+environment running in a Docker container. A suitable Dockerfile and a Docker
+build script is provided in the `LibreSignage-BuildEnv
+<https://github.com/eerotal/LibreSignage-BuildEnv>`_ repository. By using this
+method you only need to install *Docker* on your machine. All other dependencies
+are contained in the build environment container. See the readme in the
+*LibreSignage-BuildEnv* repository for more info.
 
-If you want to build a native build in the Dockerized build environment you can
-do that simply by doing steps 1-5 from `4.3.3. Building a native build on Debian
-or Ubuntu`_ in the build environment container and the installation steps 6-8 in
-the LibreSignage repository on your machine. You'll also need install the
-runtime dependencies on your machine, ie. at least the packages ``apache2, php``
-and ``php-gd``. Video thumbnail generation also requires ``ffmpeg`` and running
-unit tests requires ``php-xml``.
+4.3.2. Setting up a native build environment on Debian or Ubuntu
+................................................................
 
-If you want to build a LibreSignage Docker image, you can just build the
-LibreSignage image in the build environment container normally according to
-`4.3.4. Building a Docker image on Debian or Ubuntu`_. The produced Docker image
-is automatically put into the Docker registry of the host machine.
-
-
-4.3.2. Setting up a native build environment
-............................................
-
-You can also setup the LibreSignage build environment directly on your on
-machine. You will need the following packages: ``git, apache2, php, php-gd,
-pandoc, npm, composer, make, rsvg-convert``. All other packages except *npm*
-can be installed from the distribution repos by running ``sudo apt update &&
+You can also setup the LibreSignage build environment directly on your own
+Debian or Ubuntu machine. Install dependencies by running ``sudo apt update &&
 sudo apt install -y git apache2 php php-gd pandoc composer make librsvg2-bin``.
-You can install NPM by following the instructions on the
-`node.js website <https://nodejs.org/en/download/package-manager/>`_.
+You must also install NPM by following the instructions on the `node.js
+website <https://nodejs.org/en/download/package-manager/>`_.
 
-* If you want to enable video thumbnail generation, you need to install
-  *ffmpeg* too. You can do that by running ``sudo apt install -y ffmpeg``.
+* If you want to enable video thumbnail generation, install
+  *ffmpeg*: ``sudo apt install -y ffmpeg``.
 
-* If you want to run the PHPUnit unit tests you need to install the php-xml
-  extension. You can do that by running ``sudo apt install -y php-xml``.
+* If you want to run the PHPUnit unit tests you, install the *php-xml*
+  extension: ``sudo apt install -y php-xml``.
 
-* If you want to generate Doxygen documentation for LibreSignage, you
-  need to install Doxygen. You can do that by running
-  ``sudo apt install -y doxygen``
+* If you want to generate Doxygen documentation, install
+  *Doxygen*: ``sudo apt install -y doxygen``
+
+* If you want to build Docker images, install `Docker <https://www.docker.com/>`_
 
 See the section `4.1. Minimum system requirements`_ for more info.
 
-4.3.3. Building a native build on Debian or Ubuntu
-..................................................
+4.3.3. Building a native build
+..............................
 
-Building LibreSignage from source isn't too difficult. You can build
-a native LibreSignage build that runs directly on a Debian or Ubuntu
-host (ie. no containers) by following the instructions below.
+You can build and install a native LibreSignage build by running::
 
-1. Use ``cd`` to move to the directory where you want to download the
-   LibreSignage repository.
-2. Run ``git clone https://github.com/eerotal/LibreSignage.git``.
-   The repository will be cloned into the directory *LibreSignage/*.
-3. Run ``cd LibreSignage`` to move into the LibreSignage repository.
-4. Run ``make configure TARGET=apache2-debian-interactive``. This target
-   installs any needed *composer* and *npm* dependencies first and then
-   prompts you for some configuration values:
+    git clone https://github.com/eerotal/LibreSignage.git
+    cd LibreSignage/
+    make configure TARGET=apache2-debian-interactive
+    make -j$(nproc)
+    sudo make install
+    sudo a2dissite 000-default.conf
+
+*Note: If you are building in the LibreSignage-BuildEnv Docker container, you
+should run the last two commands above on your host machine in the LibreSignage
+repository directory.*
+
+The ``make configure`` command will prompt your for the following settings:
 
    * Install directory [default: /var/www]
 
      * The directory where LibreSignage is installed. A subdirectory
-       is created in this directory.
+       named the same as the domain name is created in this directory.
 
    * Server domain [default: localhost]
 
      * The domain name to use for configuring apache2. If you
        don't have a domain and you are just testing the system,
-       you can either use 'localhost', your machines LAN IP or
+       you can either use *localhost*, your machines LAN IP or
        a test domain you don't actually own. If you use a test
        domain, you can add it to your */etc/hosts* file to make
        it work on your machine.
@@ -352,67 +333,45 @@ host (ie. no containers) by following the instructions below.
         verbose error reporting through the API etc. **DO NOT
         enable debugging on production systems.**
 
-   This command generates a build configuration file needed
-   for building LibreSignage. The file is saved in ``build/`` as
-   ``<DOMAIN>.conf`` where ``<DOMAIN>`` is the domain name you
-   specified.
-5. Run ``make -j$(nproc)`` to build LibreSignage. See `8. Makefile`_
-   for more advanced make usage.
-6. Finally, to install LibreSignage, run ``sudo make install`` and answer
-   the questions asked.
-7. Disable the default Apache site by running
-   ``sudo a2dissite 000-default.conf``.
-8. Navigate to the domain name you entered and you should see the
-   LibreSignage login page.
+   The settings are saved in ``build/`` as ``<DOMAIN>.conf`` where ``<DOMAIN>``
+   is the domain name you specified.
 
-4.3.4. Building a Docker image on Debian or Ubuntu
-..................................................
 
-You can build LibreSignage Docker images by following the instructions
-below.
+4.3.4. Building a Docker image
+..............................
 
-1. Follow the steps 1-5 from `4.3.1. Building a native build on Debian
-   or Ubuntu`_.
-2. Install `Docker <https://www.docker.com/>`_ if it isn't yet installed.
-3. Run the following command::
+You can build a Docker image by running::
 
-       make configure \
-           TARGET=apache2-debian-docker \
-           PASS="--features [features]"
+    git clone https://github.com/eerotal/LibreSignage.git
+    cd LibreSignage/
+    make configure TARGET=apache2-debian-docker PASS="--features [features]"
+    make -j$(nproc)
+    export DOCKER_CLI_EXPERIMENTAL=enabled
+    make install PASS="--platform=[platform] --tag=[tag]"
 
-   Where ``[features]`` is a comma separated list of features to enable.
-   The recognised features are:
+Replace the parts enclosed in brackets:
 
-   * imgthumbs = Image thumbnail generation using *PHP gd*.
-   * vidthumbs = Video thumbnail generation using *ffmpeg*.
-   * debug     = Debugging.
+* ``[features]`` is a comma separated list of the features to enable:
 
-4. Run ``make`` to build the LibreSignage distribution.
-5. Run ``make install`` to package LibreSignage in a Docker image.
-   This will take some time as Docker needs to download a lot of stuff.
-   After this command has completed the LibreSignage image is saved in
-   your machine's Docker registry as *libresignage:[version]*. You can
-   use it by following the instructions in `4.2. Using prebuilt Docker
-   images on any distribution`_.
+  * imgthumbs = Image thumbnail generation using *PHP gd*.
+  * vidthumbs = Video thumbnail generation using *ffmpeg*.
+  * debug     = Debugging.
 
-Extra
-*****
+* ``[platform]`` is the platform to build for, for example ``linux/amd64`` or
+  ``linux/arm64``. See `the Docker website <https://docs.docker.com/buildx/
+  working-with-buildx/#build-multi-platform-images>`_ for more info.
 
- You can also build LibreSignage Docker images automatically using the
- helper script *build/helpers/docker/build_img.sh*. If you want to build
- a release image just run the script. If you want to build a development
- image, pass *dev* as the first argument.
+* ``[tag]`` is the Docker image name and tag to use.
 
- The *build/helpers/docker/* directory also contains the script
- *run_dev.sh* for starting a development/testing docker container.
+The settings passed to ``make configure`` are saved in ``build/`` as
+``docker-[timestamp].conf`` where ``[timestamp]`` is the current Unix epoch time.
 
 5. Default users
 ----------------
 
-The default users and their groups and passwords are listed below.
-It goes without saying that you should create new users and change
-the passwords if you intend to use LibreSignage on a production
-system.
+The default users and their groups and passwords are listed below. It goes
+without saying that you should create new users and change the passwords if you
+intend to use LibreSignage on a production system.
 
 =========== ======================== ==========
     User             Groups           Password
@@ -422,27 +381,7 @@ user         editor, display          user
 display      display                  display
 =========== ======================== ==========
 
-
-6. FAQ
-------
-
-Why doesn't LibreSignage use framework/library X?
-  To avoid bloat; LibreSignage is designed to be minimal and lightweight
-  and it only uses external libraries where they are actually needed.
-  Most UI frameworks for example are huge. LibreSignage does use
-  Bootstrap though, since it's a rather clean and simple framework.
-
-Why doesn't LibreSignage have feature X?
-  You can suggest new features in the bug tracker. If you know a bit
-  about programming in PHP, JS, HTML and CSS, you can also implement
-  the feature yourself and create a pull request.
-
-Is LibreSignage really free?
-  YES! In fact LibreSignage is not only free, it's also open source.
-  You can find information about the LibreSignage license in the
-  section `12. License`_.
-
-7. Screenshots
+6. Screenshots
 ---------------
 
 Open these images in a new tab to view the full resolution versions.
@@ -495,35 +434,23 @@ Open these images in a new tab to view the full resolution versions.
    :width: 320 px
    :height: 180 px
 
-8. Makefile
+7. Makefile
 -----------
 
-8.1. Targets
+7.1. Targets
 ++++++++++++
 
 The following ``make`` targets are implemented.
 
 all
-  The default rule that builds the LibreSignage distribution. You
-  can pass ``NOHTMLDOCS=y`` if you don't want to generate any HTML
-  documentation.
+  The default rule that builds the LibreSignage distribution. You can pass
+  ``NOHTMLDOCS=y`` if you don't want to generate any HTML documentation.
 
 configure
   Generate a LibreSignage build configuration file. You need to use
   ``TARGET=[target]`` to select a build target to use. You can also
   optionally use ``PASS=[pass]`` to pass any target specific arguments
-  to the build configuration script. See `9. Build targets`_ for more info.
-
-configure-build
-  Generate a LibreSignage build configuration file. You need to pass
-  ``TARGET=[target]`` to select a build target to use. You can also optionally
-  use ``PASS=[pass]`` to pass any target specific arguments to the build
-  configuration script. See `9. Build targets`_ for more info. **You don't need
-  to run this target because the configure target runs this one aswell.**
-
-configure-system
-  Generate LibreSignage system configuration files. **You don't need to run
-  this target because the configure target runs this one aswell.**
+  to the build configuration script. See `8. Build targets`_ for more info.
 
 install
   Install the LibreSignage distribution on the system. Note that
@@ -552,8 +479,9 @@ doxygen-docs
 LOC
   Count the lines of code in LibreSignage.
 
-8.2. Option variables
+7.2. Option variables
 +++++++++++++++++++++
+
 
 You can also pass some other variables to the LibreSignage makefile.
 
@@ -575,7 +503,7 @@ PHPUNIT_API_HOST=<URI>
   Use *URI* as the hostname when running API integration tests. This is
   ``http://localhost:80/`` by default.
 
-9. Build targets
+8. Build targets
 ----------------
 
 * apache2-debian
@@ -589,13 +517,13 @@ PHPUNIT_API_HOST=<URI>
   * An interactive version of *apache2-debian*.
   * This target doesn't accept any CLI options.
 
-* apache2-debian-docker (Build target for building Docker images.)
+* apache2-debian-docker
 
   * A target for building Docker images.
   * Run ``make configure TARGET=apache2-debian-docker PASS="--help"`` to
     get a list of accepted CLI options.
 
-10. Documentation
+9. Documentation
 -----------------
 
 LibreSignage documentation is written in reStructuredText, which is
@@ -607,7 +535,7 @@ are located in the directory *src/doc/rst/*.
 The reStructuredText files are also compiled into HTML when LibreSignage
 is built and they can be accessed from the *Help* page of LibreSignage.
 
-11. Third-party dependencies
+10. Third-party dependencies
 ----------------------------
 
 Bootstrap (Library, MIT License) (https://getbootstrap.com/)
@@ -658,13 +586,13 @@ The full licenses for these third party libraries and resources can be
 found in the file *src/doc/rst/LICENSES_EXT.rst* in the source
 distribution.
 
-12. License
+11. License
 -----------
 
 LibreSignage is licensed under the BSD 3-clause license, which can be
 found in the files *LICENSE.rst* and *src/doc/rst/LICENSE.rst* in the
 source distribution. Third party libraries and resources are licensed
-under their respective licenses. See `11. Third-party dependencies`_ for
+under their respective licenses. See `10. Third-party dependencies`_ for
 more information.
 
 Copyright Eero Talus 2018 and contributors

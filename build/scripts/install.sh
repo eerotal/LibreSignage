@@ -68,6 +68,6 @@ done
 
 load_build_config "$BUILD_CONFIG"
 
-echo "[Info] Pass to target installation script: $PASS."
+echo "[Info] Pass to target installation script: '$PASS'."
 
 ./build/target/${CONF_TARGET:?}/install.sh $PASS
