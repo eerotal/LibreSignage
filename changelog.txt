@@ -1,3 +1,6 @@
+v1.3.0
+  - [feature]  Support a Dockerized build environment.
+
 v1.2.0
   - [bugfix]   Fix a bug where markup [containers] weren't 100% high by default
                which caused some problems with slide layout.
