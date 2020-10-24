@@ -36,9 +36,9 @@ Table Of Contents
 
 `7. Makefile`_
 
-`7.1. Targets`_
+* `7.1. Targets`_
 
-`7.2. Option variables`_
+* `7.2. Option variables`_
 
 `8. Build targets`_
 
