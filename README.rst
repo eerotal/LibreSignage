@@ -265,9 +265,10 @@ You can build and install a native LibreSignage build by running::
   sudo make install
   sudo a2dissite 000-default.conf
 
-*Note: If you are building in the LibreSignage-BuildEnv Docker container, you
-should run the last two commands above on your host machine in the LibreSignage
-repository directory.*
+.. note::
+  If you are building in the LibreSignage-BuildEnv Docker container, you should
+  run the last two commands above on your host machine in the LibreSignage
+  repository directory.
 
 The ``make configure`` command will prompt your for the following settings:
 
@@ -333,8 +334,9 @@ The ``make configure`` command will prompt your for the following settings:
     verbose error reporting through the API etc. **DO NOT
     enable debugging on production systems.**
 
-The settings are saved in ``build/`` as ``<DOMAIN>.conf`` where ``<DOMAIN>``
-is the domain name you specified.
+.. note::
+  The settings passed to ``make configure`` are saved in ``build/`` as
+  ``[domain].conf`` where ``[domain]`` is the domain name you specified.
 
 
 4.3.4. Building a Docker image
@@ -347,6 +349,7 @@ You can build a Docker image by running::
   make configure TARGET=apache2-debian-docker PASS="--features [features]"
   make -j$(nproc)
   export DOCKER_CLI_EXPERIMENTAL=enabled
+  docker login
   make install PASS="--platform=[platform] --tag=[tag]"
 
 Replace the parts enclosed in brackets:
@@ -363,8 +366,18 @@ Replace the parts enclosed in brackets:
 
 * ``[tag]`` is the Docker image name and tag to use.
 
-The settings passed to ``make configure`` are saved in ``build/`` as
-``docker-[timestamp].conf`` where ``[timestamp]`` is the current Unix epoch time.
+.. note::
+  The ``docker login`` command prompts you for your Docker Hub credentials by
+  default. You can also login to a self-hosted Docker registry by specifying its
+  URL after the command. **Login is required because the apache2-debian-docker
+  target automatically pushes the built images to a registry.** This is done
+  because apparently multiarch images can't be stored in a local Docker registry
+  for some reason.
+
+.. note::
+  The settings passed to ``make configure`` are saved in ``build/`` as
+  ``docker-[timestamp].conf`` where ``[timestamp]`` is the current Unix epoch
+  time.
 
 5. Default users
 ----------------
