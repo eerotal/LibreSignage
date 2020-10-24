@@ -32,7 +32,7 @@ install:
     # Install deps for compilation and multiarch builds.
     - |
         sudo apt-get update
-        sudo apt-get install -y librsvg2-bin composer php-xml qemu binfmt-support qemu-user-static
+        sudo apt-get install -y librsvg2-bin composer php-xml doxygen qemu binfmt-support qemu-user-static
 
     # Install a newer version of Docker.
     - |
@@ -64,8 +64,8 @@ script:
     - |
         set -e
         make -j$(nproc)
+        make doxygen-docs jsdoc-docs
         make install PASS="--tag=eerotal/libresignage:build-tmp --platform=$platform"
-        make doxygen-docs
 
     # Run integration tests.
     - |
