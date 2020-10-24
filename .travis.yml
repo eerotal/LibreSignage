@@ -65,6 +65,7 @@ script:
         set -e
         make -j$(nproc)
         make install PASS="--tag=eerotal/libresignage:build-tmp --platform=$platform"
+        make doxygen-docs
 
     # Run integration tests.
     - |
@@ -88,3 +89,12 @@ deploy:
       on:
           tags: true
           condition: $target = 'apache2-debian-docker'
+    - provider: pages
+      repo: eerotal/LibreSignage-Pages
+      local_dir: doxygen_docs/html/
+      target_branch: master
+      skip_cleanup: true
+      github_token: $GITHUB_TOKEN
+      keep_history: true
+      on:
+        all_branches: true
