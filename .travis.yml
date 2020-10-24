@@ -90,7 +90,7 @@ deploy:
           tags: true
           condition: $target = 'apache2-debian-docker'
     - provider: pages
-      repo: eerotal/LibreSignage-Pages
+      repo: eerotal/LibreSignage-Docs
       local_dir: doxygen_docs/html/
       target_branch: master
       skip_cleanup: true
