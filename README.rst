@@ -553,10 +553,16 @@ LibreSignage documentation is written in reStructuredText, which is
 a plaintext format often used for writing technical documentation.
 The reStructuredText syntax is also human-readable as-is, so you can
 read the documentation files straight from the source tree. The docs
-are located in the directory *src/doc/rst/*.
+are located in the directory *src/doc/rst/*. The reStructuredText files
+are also compiled into HTML when LibreSignage is built and they can be
+accessed from the *Help* page of LibreSignage.
 
-The reStructuredText files are also compiled into HTML when LibreSignage
-is built and they can be accessed from the *Help* page of LibreSignage.
+The LibreSignage source code also includes documentation in machine readable
+format. The source code documentation can be compiled into a more accessible
+format during buildtime using Doxygen and JSDoc. The documentation building
+has been automated in the LibreSignage CI/CD pipeline and the developer
+documentation for the latest stable release is available online
+`here <https://www.talus.cc/LibreSignage-Docs/>`_.
 
 10. Third-party dependencies
 ----------------------------
