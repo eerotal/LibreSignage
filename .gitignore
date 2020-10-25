@@ -16,7 +16,8 @@
 /dep
 /build/link
 /build/*.conf
-/docs
+/docs/doxygen
+/docs/jsdoc
 
 # Exclude generated Python files.
 __pycache__

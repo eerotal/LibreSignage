@@ -117,8 +117,10 @@ clean:
 	rm -rf dist
 	$(call status,rm,dep,none)
 	rm -rf dep
-	$(call status,rm,docs,none)
-	rm -rf docs
+	$(call status,rm,docs/doxygen,none)
+	rm -rf docs/doxygen
+	$(call status,rm,docs/jsdoc,none)
+	rm -rf docs/jsdoc
 	$(call status,rm,*.log,none)
 	rm -f *.log
 
