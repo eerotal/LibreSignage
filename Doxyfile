@@ -58,7 +58,7 @@ PROJECT_LOGO           = src/public/assets/images/logo/libresignage.svg
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = doxygen_docs/
+OUTPUT_DIRECTORY       = docs/doxygen/
 
 # If the CREATE_SUBDIRS tag is set to YES then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -239,29 +239,29 @@ TAB_SIZE               = 4
 # newlines.
 
 ALIASES                +=\
-						dataProvider=""\
-						\
-						method{1}="\par HTTP Method\n\1" \
-						auth{1}="\par Authentication\n\1" \
-						groups{1}="\par Allowed groups\n `\1`" \
-						\
-						ratelimit_yes="\par Rate limiting\nThis endpoint is rate limited." \
-						ratelimit_no="\par Rate limiting\nThis endpoint is not rate limited." \
-						\
-						cache_yes="\par Cache\nThis endpoint supports HTTP caching."\
-						cache_no="\par Cache\nThis endpoint doesn't support caching."\
-						\
-						request_start{1}="\par Parameters\n \1" \
-						request{4}="* `\1` **\2** \3 [*\4*] \n" \
-						request_end="\n" \
-						\
-						response_start{1}="\par Response\n \1" \
-						response{3}="* `\1` **\2** \3 \n"\
-						response_end="\n" \
-						\
-						status_start="\par Status\n" \
-						status{2}="* **\1** \2 \n"\
-						status_end="\n" \
+                       dataProvider=""\
+                       \
+                       method{1}="\par HTTP Method\n\1" \
+                       auth{1}="\par Authentication\n\1" \
+                       groups{1}="\par Allowed groups\n `\1`" \
+                       \
+                       ratelimit_yes="\par Rate limiting\nThis endpoint is rate limited." \
+                       ratelimit_no="\par Rate limiting\nThis endpoint is not rate limited." \
+                       \
+                       cache_yes="\par Cache\nThis endpoint supports HTTP caching."\
+                       cache_no="\par Cache\nThis endpoint doesn't support caching."\
+                       \
+                       request_start{1}="\par Parameters\n \1" \
+                       request{4}="* `\1` **\2** \3 [*\4*] \n" \
+                       request_end="\n" \
+                       \
+                       response_start{1}="\par Response\n \1" \
+                       response{3}="* `\1` **\2** \3 \n"\
+                       response_end="\n" \
+                       \
+                       status_start="\par Status\n" \
+                       status{2}="* **\1** \2 \n"\
+                       status_end="\n" \
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"

@@ -247,7 +247,7 @@ website <https://nodejs.org/en/download/package-manager/>`_.
   extension: ``sudo apt install -y php-xml``.
 
 * If you want to generate Doxygen documentation, install
-  *Doxygen*: ``sudo apt install -y doxygen``
+  *Doxygen*: ``sudo apt install -y doxygen graphviz``
 
 * If you want to build Docker images, install `Docker <https://www.docker.com/>`_
 
@@ -348,8 +348,14 @@ You can build a Docker image by running::
   cd LibreSignage/
   make configure TARGET=apache2-debian-docker PASS="--features [features]"
   make -j$(nproc)
+
+  # Login to Docker and create a multiarch Docker builder.
   export DOCKER_CLI_EXPERIMENTAL=enabled
   docker login
+  docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  docker buildx create --driver=docker-container --name=lsbuilder --use
+  docker buildx inspect --bootstrap
+
   make install PASS="--platform=[platform] --tag=[tag]"
 
 Replace the parts enclosed in brackets:
@@ -360,17 +366,22 @@ Replace the parts enclosed in brackets:
   * vidthumbs = Video thumbnail generation using *ffmpeg*.
   * debug     = Debugging.
 
-* ``[platform]`` is the platform to build for, for example ``linux/amd64`` or
-  ``linux/arm64``. See `the Docker website <https://docs.docker.com/buildx/
-  working-with-buildx/#build-multi-platform-images>`_ for more info.
+* ``[platform]`` is the platform to build for, for example ``linux/amd64``
+  or ``linux/arm64``. A list of all supported platforms is dumped by
+  ``docker buildx inspect --bootstrap`` See `the Docker website
+  <https://docs.docker.com/buildx/ working-with-buildx/#build-multi
+  -platform-images>`_ for more info about multiarch Docker images.
 
 * ``[tag]`` is the Docker image name and tag to use.
 
 .. note::
-  The ``docker login`` command prompts you for your Docker Hub credentials by
-  default. You can also login to a self-hosted Docker registry by specifying its
-  URL after the command. **Login is required because the apache2-debian-docker
-  target automatically pushes the built images to a registry.** This is done
+  The Docker commands above enable experimental Docker features and multiarch
+  emulation on your machine via QEMU and binfmt_misc to make it possible to
+  build multiarch images.
+
+.. note::
+  Logging in to Docker Hub is required because the *apache2-debian-docker* target
+  automatically pushes the built images to the remote registry. This is done
   because apparently multiarch images can't be stored in a local Docker registry
   for some reason.
 

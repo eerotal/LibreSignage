@@ -117,6 +117,8 @@ clean:
 	rm -rf dist
 	$(call status,rm,dep,none)
 	rm -rf dep
+	$(call status,rm,docs,none)
+	rm -rf docs
 	$(call status,rm,*.log,none)
 	rm -f *.log
 
@@ -184,8 +186,7 @@ LOC:
 			-path "./dist/*" \
 			-o -path "./node_modules/*" \
 			-o -path "./vendor/*" \
-			-o -path "./doxygen_docs/*" \
-			-o -path "./jsdoc_docs/*" \
+			-o -path "./docs/*" \
 		\) -prune \
 		-o -name ".#*" -printf '' \
 		-o -name 'package-lock.json' -printf '' \
@@ -230,12 +231,14 @@ doxygen-docs:
 
 	./build/scripts/dep_checks/doxygen_version.sh $(DOXYGEN_REQ_VER)
 	$(call initchk_warn,$$?)
+	mkdir -p docs
 	doxygen Doxyfile
 
 # Generate JSDoc docs.
 jsdoc-docs:
 	@:
 	set -e
+	mkdir -p docs
 	npx jsdoc -c jsdoc.json
 
 include makefile.common

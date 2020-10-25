@@ -91,7 +91,7 @@ deploy:
           condition: $target = 'apache2-debian-docker'
     - provider: pages
       repo: eerotal/LibreSignage-Docs
-      local_dir: doxygen_docs/html/
+      local_dir: docs/
       target_branch: master
       skip_cleanup: true
       github_token: $GITHUB_TOKEN
