@@ -1,5 +1,6 @@
 v1.3.0
   - [feature]  Support a Dockerized build environment.
+  - [feature]  Automatically deploy documentation to GitHub pages from Travis CI.
 
 v1.2.0
   - [bugfix]   Fix a bug where markup [containers] weren't 100% high by default
