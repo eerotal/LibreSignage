@@ -81,7 +81,7 @@ deploy:
       script: sh build/scripts/travis/docker_rename.sh eerotal nightly "build-tmp" "$TRAVIS_BRANCH-nightly"
       on:
           all_branches: true
-          condition: $target = 'apache2-debian-docker' || $TRAVIS_EVENT_TYPE = 'cron' || $ENABLE_NIGHTLY_BUILDS = 1
+          condition: $target = 'apache2-debian-docker' && $TRAVIS_EVENT_TYPE = 'cron' && $ENABLE_NIGHTLY_BUILDS = 1
     - provider: script
       script: sh build/scripts/travis/docker_rename.sh eerotal release "build-tmp"
       on:
