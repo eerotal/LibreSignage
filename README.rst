@@ -224,12 +224,12 @@ documentation can also be accessed in the web interface from the *Help* page.
 ............................................................................
 
 The easiest and recommended way to build LibreSignage is to use a build
-environment running in a Docker container. A suitable Dockerfile and a Docker
-build script is provided in the `LibreSignage-BuildEnv
-<https://github.com/eerotal/LibreSignage-BuildEnv>`_ repository. By using this
-method you only need to install *Docker* on your machine. All other dependencies
-are contained in the build environment container. See the readme in the
-*LibreSignage-BuildEnv* repository for more info.
+environment running in a Docker container. A suitable Dockerfile and some
+setup scriptsa are provided in the `LibreSignage-BuildEnv<https://github.com/
+eerotal/LibreSignage-BuildEnv>`_ repository. By using this method you only need
+to install *Docker* and some multiarch emulation dependencies on your machine.
+All other dependencies are contained in the build environment container. See the
+readme in the *LibreSignage-BuildEnv* repository for more info.
 
 4.3.2. Setting up a native build environment on Debian or Ubuntu
 ................................................................
@@ -249,7 +249,9 @@ website <https://nodejs.org/en/download/package-manager/>`_.
 * If you want to generate Doxygen documentation, install
   *Doxygen*: ``sudo apt install -y doxygen graphviz``
 
-* If you want to build Docker images, install `Docker <https://www.docker.com/>`_
+* If you want to build Docker images, install `Docker <https://www.docker.com/>`_.
+  You also need some multiarch emulation dependencies: ``sudo apt install qemu
+  binfmt-support qemu-user-static``.
 
 See the section `4.1. Minimum system requirements`_ for more info.
 
