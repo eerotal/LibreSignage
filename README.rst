@@ -5,6 +5,24 @@ A free and open source digital signage solution.
 .. image:: https://travis-ci.org/eerotal/LibreSignage.svg?branch=master
     :target: https://travis-ci.org/eerotal/LibreSignage
 
+
+LibreSignage is unmaintained as of 3rd of February 2021
+-------------------------------------------------------
+
+LibreSignage started in 2018 as a small project aiming to make digital signage
+accessible to everyone. Since then the project has grown a lot, many new features
+have been added and even some contributions have been merged from other people.
+Developing LibreSignage has been a fantastic journey and I'm really grateful for
+for all code and bug reports submitted by contributors. I have personally spent
+hundreds of hours working on LibreSignage and enjoyed every bit of that time. It
+really has been a great 3 years.
+
+That said, unfortunately I don't have the time, resources or interest to continue
+developing or supporting LibreSignage anymore. As such, after 3rd of Februrary 2021,
+LibreSignage development and support is officially halted. If I regain my interest
+in developing LibreSignage I might pick up the project again but **for now LibreSignage
+is unmaintained.**
+
 Table Of Contents
 -----------------
 
